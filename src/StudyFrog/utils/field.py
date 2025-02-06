@@ -27,7 +27,7 @@ class Field(ImmutableBaseObject):
             Possible values are "CASCADE", "SET NULL", "NO ACTION", "RESTRICT", "SET DEFAULT"
         on_update (str): What to do when the referenced field is updated.
             Possible values are "CASCADE", "SET NULL", "NO ACTION", "RESTRICT", "SET DEFAULT"
-        primary (bool): If the field is a primary key.
+        primary_key (bool): If the field is a primary key.
         size (int): The size of the field.
         type (str): The type of the field.
             Possible values are "BLOB", "BOOLEAN", "DATE", "DATETIME", "FLOAT", "INTEGER", "JSON","TIME", "VARCHAR", "NULL", "REAL", "TEXT"
@@ -51,7 +51,7 @@ class Field(ImmutableBaseObject):
         on_update: Optional[
             Literal["CASCADE", "SET NULL", "NO ACTION", "RESTRICT", "SET DEFAULT"]
         ] = None,
-        primary: Optional[bool] = None,
+        primary_key: Optional[bool] = None,
         size: Optional[int] = None,
         type: Optional[
             Literal[
@@ -87,7 +87,7 @@ class Field(ImmutableBaseObject):
                 Possible values are "CASCADE", "SET NULL", "NO ACTION", "RESTRICT", "SET DEFAULT"
             on_update (str): What to do when the referenced field is updated.
                 Possible values are "CASCADE", "SET NULL", "NO ACTION", "RESTRICT", "SET DEFAULT"
-            primary (bool): If the field is a primary key.
+            primary_key (bool): If the field is a primary key.
             size (int): The size of the field.
             type (str): The type of the field.
                 Possible values are "BLOB", "BOOLEAN", "DATE", "DATETIME", "FLOAT", "INTEGER", "JSON","TIME", "VARCHAR", "NULL", "REAL", "TEXT"
@@ -109,7 +109,7 @@ class Field(ImmutableBaseObject):
             nullable=nullable,
             on_delete=on_delete,
             on_update=on_update,
-            primary=primary,
+            primary_key=primary_key,
             size=size,
             type=type,
             unique=unique,
@@ -138,7 +138,7 @@ class Field(ImmutableBaseObject):
             # Add size if field is VARCHAR
             sql_parts[-1] += f"({self.size})"
 
-        if self.primary:
+        if self.primary_key:
             # PRIMARY KEY and AUTOINCREMENT
             sql_parts.append("PRIMARY KEY")
             if self.autoincrement and self.type.upper() == "INTEGER":
