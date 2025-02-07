@@ -5,6 +5,9 @@ Date: 2025-02-06
 
 from typing import *
 
+from utils.constants import Constants
+from utils.dispatcher import Dispatcher
+from utils.events import Events
 from utils.logger import Logger
 
 
@@ -12,20 +15,56 @@ __all__: List[str] = ["Application"]
 
 
 class Application:
+    """
+    Represents the application.
+
+    This class provides a singleton instance for the application, which is accessible via the `Application` class.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the application.
+    """
+
     _shared_instance: Optional["Application"] = None
 
     def __new__(cls) -> "Application":
+        """
+        Creates and returns a new instance of Application class.
+
+        If the instance does not exist, creates a new one by calling the parent class constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            Application: The created or existing instance of Application class.
+        """
         if cls._shared_instance is None:
             cls._shared_instance = super().__new__(cls)
             cls._shared_instance.init()
         return cls._shared_instance
 
     def init(self) -> None:
+        """
+        Initializes the Application instance.
+
+        Initializes the Application instance by setting a logger to the logger with the name of the class.
+
+        Returns:
+            None
+        """
+
+        # Initialize a logger
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+
+        # Initialize the dispatcher
+        self.dispatcher: Dispatcher = Dispatcher()
 
     def start(self) -> None:
         try:
-            pass
+            # Dispatch the "APPLICATION_STARTED" event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.APPLICATION_STARTED,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

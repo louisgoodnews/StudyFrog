@@ -5,12 +5,24 @@ Date: 2025-02-06
 
 import uuid
 
+from datetime import datetime
+
 from typing import *
 
-from src.StudyFrog.utils.miscellaneous import Miscellaneous
 from utils.builder import BaseObjectBuilder
-from utils.object import ImmutableBaseObject
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
+from utils.object import ImmutableBaseObject
+
+
+__all__: List[str] = [
+    "Dispatcher",
+    "DispatcherEvent",
+    "DispatcherEventFactory",
+    "DispatcherEventSubscription",
+    "DispatcherNotification",
+    "DispatcherNotificationBuilder",
+]
 
 
 class DispatcherEvent(ImmutableBaseObject):
@@ -105,14 +117,11 @@ class DispatcherEventFactory:
             Exception: If an exception occurs while creating the event.
         """
         try:
-            # Generate a UUID
-            uuid: str = str(uuid.uuid4())
-
             # Attempt to create and return a new instance of the DispatcherEvent class
             event: DispatcherEvent = DispatcherEvent(
                 id=cls.index,
                 name=name,
-                uuid=uuid,
+                uuid=str(uuid.uuid4()),
             )
 
             # Increment the index for the next event
@@ -588,7 +597,6 @@ class Dispatcher:
 
                 # Return None
                 return None
-
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
