@@ -7,6 +7,7 @@ from typing import *
 
 from utils.database_service import DatabaseService
 from utils.field import Field
+from utils.miscellaneous import Miscellaneous
 from utils.object import ImmutableBaseObject
 
 
@@ -19,62 +20,35 @@ T: TypeVar("T") = TypeVar("T")
 
 
 class ImmutableBaseModel(ImmutableBaseObject):
+    """
+    Represents an immutable base model for interacting with a SQLite database table.
+
+    This class provides a base implementation for models that are stored in a SQLite database table.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the object.
+    """
+
     def __init__(
         self,
-        table: str,
         **kwargs,
     ) -> None:
         """
         Initializes a new instance of the ImmutableBaseModel class.
 
         Args:
-            table (str): The name of the table represented by the model.
+            **kwargs: Keyword arguments.
 
         Returns:
             None
         """
 
         # Call the parent class constructor
-        super().__init__(
-            fields={},
-            table=table,
-        )
+        super().__init__(**kwargs)
 
-        for (
-            key,
-            value,
-        ) in kwargs.items():
-            self.add_field(
-                key=key,
-                value=value,
-            )
-
-    def add_field(
-        self,
-        key: str,
-        value: Any,
-    ) -> None:
-        """
-        Adds a key-value pair to the model's fields dictionary.
-
-        Args:
-            key (str): The name of the field.
-            value (Any): The value of the field.
-
-        Returns:
-            None
-        """
-
-        # Check if the field already exists
-        if key in self.fields.keys():
-            # Log a warning message
-            self.logger.warning(message=f"Field '{key}' already exists. Overwriting...")
-
-        # Add the field to the fields dictionary
-        self.fields[key] = value
-
+    @classmethod
     async def create_table(
-        self,
+        cls,
         database: str,
     ) -> bool:
         """
@@ -87,22 +61,48 @@ class ImmutableBaseModel(ImmutableBaseObject):
             bool: True if the table was created successfully, False otherwise.
         """
 
-        # Build the field definitions string
-        field_definitions: str = ", ".join(
-            [field.to_sql_string() for field in self.fields.values()]
+        # Build the SQL query
+        sql: str = (
+            f"CREATE TABLE IF NOT EXISTS {cls.table} ({", ".join([value.to_sql_string() for value in cls.__dict__.values() if isinstance(value, Field)])})"
         )
 
-        # Build the SQL query
-        sql: str = f"CREATE TABLE IF NOT EXISTS {self.table} ({field_definitions})"
-
         # Execute the SQL query
-        return await DatabaseService.execute(
+        await DatabaseService.execute(
             database=database,
+            parameters=(),
             sql=sql,
         )
 
-    async def drop_table(
+    async def delete(
         self,
+        database: str,
+    ) -> bool:
+        """
+        Deletes the model instance from the database.
+
+        Args:
+            database (str): Path to the SQLite database file.
+
+        Returns:
+            bool: True if deletion was successful, False otherwise.
+        """
+
+        # Build the SQL query
+        sql: str = f"DELETE FROM {self.table} WHERE id = ?"
+
+        # Execute the SQL query
+        return (
+            await DatabaseService.delete(
+                database=database,
+                parameters=(self.id,),
+                sql=sql,
+            )
+            > 0
+        )
+
+    @classmethod
+    async def drop_table(
+        cls,
         database: str,
     ) -> bool:
         """
@@ -116,11 +116,38 @@ class ImmutableBaseModel(ImmutableBaseObject):
         """
 
         # Build the SQL query
-        sql: str = f"DROP TABLE IF EXISTS {self.table}"
+        sql: str = f"DROP TABLE IF EXISTS {cls.table}"
 
         # Execute the SQL query
         return await DatabaseService.execute(
             database=database,
+            parameters=(),
+            sql=sql,
+        )
+
+    @classmethod
+    async def execute(
+        cls,
+        database: str,
+        sql: str,
+        parameters: Optional[Tuple[..., Any]] = [],
+    ) -> Any:
+        """
+        Executes a custom SQL query.
+
+        Args:
+            database (str): Path to the SQLite database file.
+            parameters (Tuple[..., Any], optional): Parameters for the query.
+            sql (str): The SQL query to execute.
+
+        Returns:
+            Any: The result of the query.
+        """
+
+        # Execute the SQL query
+        return await DatabaseService.execute(
+            database=database,
+            parameters=parameters,
             sql=sql,
         )
 
@@ -146,10 +173,14 @@ class ImmutableBaseModel(ImmutableBaseObject):
         sql: str = f"SELECT * FROM {cls.table} WHERE {column} = ?"
 
         # Execute the SQL query
-        row: Dict[str, Any] = await DatabaseService.read_one(database, sql, value)
+        row: Dict[str, Any] = await DatabaseService.read_one(
+            database=database,
+            parameters=(value,),
+            sql=sql,
+        )
 
         # Return the model instance
-        return cls(**row) if row else None
+        return cls(**Miscellaneous.convert_from_db_format(data=row)) if row else None
 
     @classmethod
     async def get_all(
@@ -172,31 +203,75 @@ class ImmutableBaseModel(ImmutableBaseObject):
         # Execute the SQL query
         rows: List[Dict[str, Any]] = await DatabaseService.read_all(
             database=database,
+            parameters=(),
             sql=sql,
         )
 
         # Return the model instances
-        return [cls(**row) for row in rows]
+        return [cls(**Miscellaneous.convert_from_db_format(data=row)) for row in rows]
 
-    async def delete(
+    async def create(
         self,
         database: str,
-    ) -> bool:
+    ) -> Optional[int]:
         """
-        Deletes the model instance from the database.
+        Saves the current model instance to the database.
 
         Args:
-            database (str): Path to the SQLite database file.
+            database (str): The path to the database.
 
         Returns:
-            bool: True if deletion was successful, False otherwise.
+            Optional[int]: The ID of the newly created entry, or None if an error occurred.
+        """
+        try:
+            # Convert object to dictionary and ensure DB-friendly format
+            converted_data = Miscellaneous.convert_to_db_format(
+                self.to_dict(exclude=["_logger"])
+            )
+
+            # Extract columns and values
+            columns = ", ".join(converted_data.keys())
+            placeholders = ", ".join(["?" for _ in converted_data])
+            parameters = tuple(converted_data.values())  # Convert to tuple
+
+            # Construct SQL query
+            sql = f"INSERT INTO {self.table} ({columns}) VALUES ({placeholders});"
+
+            # Execute SQL command and return the last row ID
+            return await DatabaseService.create(
+                database=database,
+                parameters=parameters,
+                sql=sql,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'save' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
+
+    @classmethod
+    def to_sql_string(cls) -> str:
+        """
+        Returns a SQL string representation of the model's fields.
+
+        Returns:
+            str: The SQL string representation of the model's fields.
         """
 
-        # Build the SQL query
-        sql: str = f"DELETE FROM {self.table} WHERE id = ?"
-
-        # Execute the SQL query
-        return await DatabaseService.delete(database, sql, self.id) > 0
+        # Return a SQL string representation of the model's fields
+        return ", ".join(
+            [
+                field.to_sql_string()
+                for field in cls.__dict__.values()
+                if isinstance(
+                    field,
+                    Field,
+                )
+            ]
+        )
 
     async def update(
         self,
@@ -217,89 +292,20 @@ class ImmutableBaseModel(ImmutableBaseObject):
         # Build the SQL query
         updates: str = ", ".join([f"{key} = ?" for key in kwargs.keys()])
 
-        # Build the values tuple
-        values: Tuple[Any, ...] = tuple(kwargs.values()) + (self.id,)
+        # Build the parameters tuple
+        parameters: Tuple[Any, ...] = tuple(
+            Miscellaneous.convert_to_db_format(data=kwargs).values()
+        ) + (self.id,)
 
         # Build the SQL query
         sql: str = f"UPDATE {self.table} SET {updates} WHERE id = ?"
 
         # Execute the SQL query
-        return await DatabaseService.update(database, sql, *values) > 0
-
-    async def execute(
-        self,
-        database: str,
-        sql: str,
-        *args,
-    ) -> bool:
-        """
-        Executes a custom SQL query.
-
-        Args:
-            database (str): Path to the SQLite database file.
-            sql (str): The SQL query to execute.
-            *args: Parameters for the query.
-
-        Returns:
-            bool: True if query executed successfully, False otherwise.
-        """
-
-        # Execute the SQL query
-        return await DatabaseService.execute(
-            database,
-            sql,
-            *args,
-        )
-
-    async def save(
-        self,
-        database: str,
-    ) -> Optional[int]:
-        """
-        Inserts a new model instance into the database.
-
-        Args:
-            database (str): Path to the SQLite database file.
-
-        Returns:
-            Optional[int]: The ID of the inserted row or None if insert failed.
-        """
-
-        # Get the fields and values
-        fields: List[str] = [key for key in self.fields.keys()]
-
-        # Build the placeholder string
-        placeholders: str = ", ".join(["?" for _ in fields])
-
-        # Build the field names
-        field_names: str = ", ".join(fields)
-
-        # Build the SQL query
-        sql = f"INSERT INTO {self.table} ({field_names}) VALUES ({placeholders})"
-
-        # Get the values of the value
-        values: Tuple[Any, ...] = tuple(
-            getattr(
-                self,
-                field,
+        return (
+            await DatabaseService.update(
+                database=database,
+                parameters=parameters,
+                sql=sql,
             )
-            for field in fields
+            > 0
         )
-
-        # Execute the SQL query
-        return await DatabaseService.create(
-            database,
-            sql,
-            *values,
-        )
-
-    def to_sql_string(self) -> str:
-        """
-        Returns a SQL string representation of the model's fields.
-
-        Returns:
-            str: The SQL string representation of the model's fields.
-        """
-
-        # Return a SQL string representation of the model's fields
-        return ", ".join([field.to_sql_string() for field in self.fields.values()])

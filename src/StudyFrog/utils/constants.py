@@ -18,11 +18,24 @@ class Constants:
 
     * APPLICATION_NAME: The name of the application.
     * APPLICATION_VERSION: The version of the application.
+    * BASE_ID: The base ID of objects in the application.
     * CWD: The current working directory.
     * DATA_PATH: The path to the data directory.
     * DATABASE_PATH: The path to the database file.
     * EXPORT_PATH: The path to the export directory.
     * IMPORT_PATH: The path to the import directory.
+    * ANSWERS: The name of the table for answers.
+    * ASSOCIATIONS: The name of the table for associations.
+    * CHANGE_HISTORY: The name of the table for change history.
+    * CHANGE_HISTORY_ITEMS: The name of the table for change history items.
+    * DIFFICULTIES: The name of the table for difficulties.
+    * FLASHCARDS: The name of the table for flashcards.
+    * NOTES: The name of the table for notes.
+    * PRIORITIES: The name of the table for priorities.
+    * QUESTIONS: The name of the table for questions.
+    * STACKS: The name of the table for stacks.
+    * TAGS: The name of the table for tags.
+    * USERS: The name of the table for users.
     * DEFAULT_FONT_FAMILIY: The default font family.
     * DEFAULT_FONT_SIZE: The default font size.
     * GLOBAL_NAMESPACE: The namespace for global dispatching of events.
@@ -34,6 +47,8 @@ class Constants:
 
     APPLICATION_NAME: str = "StudyFrog"
     APPLICATION_VERSION: float = 0.1
+
+    BASE_ID: int = 10000
 
     CWD: str = os.getcwd()
 
@@ -56,6 +71,19 @@ class Constants:
         DATA_PATH,
         "imports",
     )
+
+    ANSWERS: str = "answers"
+    ASSOCIATIONS: str = "associations"
+    CHANGE_HISTORY: str = "change_history"
+    CHANGE_HISTORY_ITEMS: str = "change_history_items"
+    DIFFICULTIES: str = "difficulties"
+    FLASHCARDS: str = "flashcards"
+    NOTES: str = "notes"
+    PRIORITIES: str = "priorities"
+    QUESTIONS: str = "questions"
+    STACKS: str = "stacks"
+    TAGS: str = "tags"
+    USERS: str = "users"
 
     DEFAULT_FONT_FAMILIY: str = "Helvetica"
     DEFAULT_FONT_SIZE: int = 16

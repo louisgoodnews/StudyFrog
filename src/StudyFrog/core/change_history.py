@@ -28,3 +28,43 @@ __all__: List[str] = [
     "ChangeHistoryItemManager",
     "ChangeHistoryItemModel",
 ]
+
+
+class ChangeHistory(ImmutableBaseObject):
+    pass
+
+
+class ChangeHistoryConverter:
+    pass
+
+
+class ChangeHistoryFactory:
+    pass
+
+
+class ChangeHistoryManager(BaseObjectManager):
+    pass
+
+
+class ChangeHistoryModel(ImmutableBaseModel):
+    pass
+
+
+class ChangeHistoryItem(ImmutableBaseObject):
+    pass
+
+
+class ChangeHistoryItemConverter:
+    pass
+
+
+class ChangeHistoryItemFactory:
+    pass
+
+
+class ChangeHistoryItemManager(BaseObjectManager):
+    pass
+
+
+class ChangeHistoryItemModel(ImmutableBaseModel):
+    pass

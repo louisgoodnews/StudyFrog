@@ -3,6 +3,8 @@ Author: lodego
 Date: 2025-02-06
 """
 
+import json
+
 from typing import *
 
 from datetime import datetime
@@ -60,6 +62,123 @@ class Miscellaneous:
         return "".join(["_" + i.lower() if i.isupper() else i for i in string]).strip(
             "_"
         )
+
+    @classmethod
+    def convert_from_db_format(
+        cls,
+        data: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """
+        Converts a dictionary's values from a database format back to Python-native types.
+
+        Args:
+            data (Dict[str, Any]): The dictionary containing values to be converted.
+
+        Returns:
+            Dict[str, Any]: The dictionary with converted values.
+        """
+        try:
+            # Initialize an empty dictionary to store the converted values
+            result: Dict[str, Any] = {}
+
+            # Iterate over the keys and values in the dictionary
+            for key, value in data.items():
+                # Check if the value is a string (since DB stores JSON/datetime as strings)
+                if isinstance(
+                    value,
+                    str,
+                ):
+                    # Try parsing as JSON
+                    try:
+                        parsed_value = json.loads(value)
+                        if isinstance(
+                            parsed_value,
+                            (
+                                dict,
+                                list,
+                            ),
+                        ):  # Only accept valid JSON
+                            result[key] = parsed_value
+                            continue
+                    except json.JSONDecodeError:
+                        pass  # Not a valid JSON, continue
+
+                    # Try parsing as datetime
+                    try:
+                        result[key] = cls.string_to_datetime(value)
+                        continue
+                    except ValueError:
+                        pass  # Not a valid datetime, keep original value
+
+                # Keep unchanged if no conversion applied
+                result[key] = value
+
+            # Return the converted dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'convert_from_db_format' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def convert_to_db_format(
+        cls,
+        data: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """
+        Converts a dictionary's values to a database-friendly format.
+
+        Args:
+            data (Dict[str, Any]): The dictionary containing values to be converted.
+
+        Returns:
+            Dict[str, Any]: The dictionary with converted values.
+        """
+        try:
+            # Initialize an empty dictionary to store the converted values
+            result: Dict[str, Any] = {}
+
+            # Iterate over the keys and values in the dictionary
+            for (
+                key,
+                value,
+            ) in data.items():
+                # Check if the value is a datetime object
+                if isinstance(
+                    value,
+                    datetime,
+                ):
+                    # Convert the datetime object to a string
+                    result[key] = cls.datetime_to_string(datetime=value)
+                # Check if the value is a list or dictionary
+                elif isinstance(
+                    value,
+                    (
+                        dict,
+                        list,
+                    ),
+                ):
+                    # Convert the list or dictionary to a JSON string
+                    result[key] = json.dumps(
+                        value
+                    )  # Convert lists and dictionaries to JSON strings
+                else:
+                    result[key] = value  # Keep other values unchanged
+
+            # Return the converted dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'convert_to_db_format' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
 
     @classmethod
     def datetime_to_string(

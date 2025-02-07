@@ -3,15 +3,19 @@ Author: lodego
 Date: 2025-02-05
 """
 
+import asyncio
+
 import uuid
 
 from datetime import datetime
 
 from typing import *
 
+from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
 from utils.manager import BaseObjectManager
+from utils.miscellaneous import Miscellaneous
 from utils.model import ImmutableBaseModel
 from utils.object import MutableBaseObject, ImmutableBaseObject
 
@@ -84,7 +88,7 @@ class ImmutableNote(ImmutableBaseObject):
             id=id,
             key=key,
             updated_at=updated_at,
-            uuid=uuid or str(uuid.uuid4()),
+            uuid=uuid,
         )
 
     def to_mutable(self) -> "MutableNote":
@@ -96,7 +100,7 @@ class ImmutableNote(ImmutableBaseObject):
         """
 
         # Create a new MutableNote instance from the dictionary representation of the ImmutableNote instance
-        return MutableNote(**self.to_dict(exclude=["logger"]))
+        return MutableNote(**self.to_dict(exclude=["_logger"]))
 
 
 class MutableNote(MutableBaseObject):
@@ -157,7 +161,7 @@ class MutableNote(MutableBaseObject):
             id=id,
             key=key,
             updated_at=updated_at,
-            uuid=uuid or str(uuid.uuid4()),
+            uuid=uuid,
         )
 
     def to_immutable(self) -> ImmutableNote:
@@ -169,7 +173,7 @@ class MutableNote(MutableBaseObject):
         """
 
         # Create a new ImmutableNote instance from the dictionary representation of the MutableNote instance
-        return ImmutableNote(**self.to_dict(exclude=["logger"]))
+        return ImmutableNote(**self.to_dict(exclude=["_logger"]))
 
 
 class NoteConverter:
@@ -204,7 +208,7 @@ class NoteConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableNote class from the dictionary representation of the NoteModel instance
-            return ImmutableNote(**model.to_dict(exclude=["logger"])["fields"])
+            return ImmutableNote(**model.to_dict(exclude=["_logger"])["fields"])
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -233,7 +237,7 @@ class NoteConverter:
         """
         try:
             # Attempt to create and return a new instance of the NoteModel class from the dictionary representation of the ImmutableNote instance
-            return NoteModel(**object.to_dict(exclude=["logger"]))
+            return NoteModel(**object.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -273,8 +277,8 @@ class NoteFactory:
         Args:
             body_text (str): The body of the Note.
             title_text (str): The title of the Note.
-            ancestor (Optional[int]): The ID of the ancestor Note.
-            children (Optional[List[int]]): The IDs of the children Notes.
+
+
             created_at (Optional[datetime]): The timestamp when the Note was created.
             id (Optional[int]): The ID of the Note.
             key (Optional[str]): The key of the Note.
@@ -311,7 +315,369 @@ class NoteFactory:
 
 
 class NoteManager(BaseObjectManager):
-    pass
+    """
+    A manager class for managing notes in the application.
+
+    This class extends the BaseObjectManager class and provides CRUD (Create, Read, Update, Delete) methods for notes.
+
+    Attributes:
+        cache: (List[Any]): The cache for storing notes.
+        logger (Logger): The logger instance associated with the object.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the NoteManager class.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    def count(self) -> int:
+        """
+        Returns the number of notes in the database.
+
+        Returns:
+            int: The number of notes in the database.
+        """
+        try:
+            # Count the number of notes in the database
+            result: Any = asyncio.run(
+                NoteModel.execute(
+                    database=Constants.DATABASE_PATH,
+                    sql=f"SELECT COUNT(*) FROM {Constants.NOTES};",
+                )
+            )
+
+            # Return the number of notes in the database
+            return result[0][0] if result else 0
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'count' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return 0 indicating an exception has occurred
+            return 0
+
+    def create(
+        self,
+        note: Union[ImmutableNote, MutableNote],
+    ) -> Optional[ImmutableNote]:
+        """
+        Creates a new note in the database.
+
+        Args:
+            note (Union[ImmutableNote, MutableNote]): The note to be created.
+
+        Returns:
+            Optional[ImmutableNote]: The newly created immutable note if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the note.
+        """
+        try:
+            # Check if the note object is immutable
+            if isinstance(
+                note,
+                ImmutableNote,
+            ):
+                # If it is, convert it to a mutable note
+                note = MutableNote(**note.to_dict(exclude=["_logger"]))
+
+            # Set the created_at timestamp of the note
+            note.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the key of the note
+            note.key = f"FLASHCARD_{self.count() + 1}"
+
+            # Set the updated_at timestamp of the note
+            note.updated_at = Miscellaneous.get_current_datetime()
+
+            # Set the uuid of the note
+            note.uuid = str(uuid.uuid4())
+
+            # Convert the note object to a NoteModel object
+            model: NoteModel = NoteConverter.object_to_model(object=note)
+
+            # Create a new note in the database
+            id: Optional[int] = asyncio.run(
+                model.create(database=Constants.DATABASE_PATH)
+            )
+
+            if id:
+                # Set the ID of the note
+                note.id = id
+
+                # Convert the note to an immutable note
+                note = ImmutableNote(**note.to_dict(exclude=["_logger"]))
+
+                # Add the note to the cache
+                self.add_to_cache(
+                    key=note.key,
+                    value=note,
+                )
+
+                # Return the newly created immutable note
+                return note
+
+            # Log a warning message indicating an error has occurred
+            self.logger.warning(
+                message=f"It seems that an error has occured while attempting to create a note ({note}) in the database."
+            )
+
+            # Return None indicating an error has occurred
+            return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_note' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def delete(
+        self,
+        note: Union[ImmutableNote, MutableNote],
+    ) -> bool:
+        """
+        Deletes a note from the database.
+
+        Args:
+            note (Union[ImmutableNote, MutableNote]): The note to be deleted.
+
+        Returns:
+            bool: True if the note was deleted successfully. False otherwise.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Convert the note to an immutable note and delete the note from the database
+            result: bool = asyncio.run(
+                NoteConverter.object_to_model(
+                    object=ImmutableNote(**note.to_dict(exclude=["_logger"]))
+                ).delete()
+            )
+
+            # Return True if the note was deleted successfully
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return False indicating an exception has occurred
+            return False
+
+    def get_all(self) -> Optional[List[ImmutableNote]]:
+        """
+        Returns a list of all notes in the database.
+
+        Returns:
+            Optional[List[ImmutableNote]]: A list of all notes in the database if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if cache and table size are equal
+            if self.cache and len(self._cache) == self.count():
+                # Return the list of immutable notes from the cache
+                return self.get_cache_values()
+
+            # Get all notes from the database
+            models: List[NoteModel] = asyncio.run(
+                NoteModel.get_all(database=Constants.DATABASE_PATH)
+            )
+
+            # Convert the list of NoteModel objects to a list of ImmutableNote objects
+            notes: List[ImmutableNote] = [
+                ImmutableNote(**model.to_dict(exclude=["_logger"])) for model in models
+            ]
+
+            # Iterate over the list of immutable notes
+            for note in notes:
+                if not self.is_key_in_cache(key=note.key):
+                    # Add the immutable note to the cache
+                    self.add_to_cache(
+                        key=note.key,
+                        value=note,
+                    )
+                else:
+                    # Update the immutable note in the cache
+                    self.update_in_cache(
+                        key=note.key,
+                        value=note,
+                    )
+
+            # Return the list of immutable notes
+            return notes
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_by_id(
+        self,
+        id: int,
+    ) -> Optional[ImmutableNote]:
+        """
+        Returns a note with the given ID.
+
+        Args:
+            id (int): The ID of the note.
+
+        Returns:
+            Optional[ImmutableNote]: The note with the given ID if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the note is already in the cache
+            if self.is_key_in_cache(key=f"FLASHCARD_{id}"):
+                # Return the note from the cache
+                return self.get_value_from_cache(key=f"FLASHCARD_{id}")
+
+            # Get the note with the given ID from the database
+            model: Optional[NoteModel] = asyncio.run(
+                NoteModel.get_by(
+                    column="id",
+                    database=Constants.DATABASE_PATH,
+                    value=id,
+                )
+            )
+
+            # Return the note if it exists
+            if model is not None:
+                # Convert the NoteModel object to an ImmutableNote object
+                return ImmutableNote(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the note does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_id' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_by_uuid(
+        self,
+        uuid: str,
+    ) -> Optional[ImmutableNote]:
+        """
+        Returns a note with the given UUID.
+
+        Args:
+            uuid (str): The UUID of the note.
+
+        Returns:
+            Optional[ImmutableNote]: The note with the given UUID if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the note is already in the cache
+            if self.is_key_in_cache(key=uuid):
+                # Return the note from the cache
+                return self.get_value_from_cache(key=uuid)
+
+            # Get the note with the given UUID from the database
+            model: Optional[NoteModel] = asyncio.run(
+                NoteModel.get_by(
+                    column="uuid",
+                    database=Constants.DATABASE_PATH,
+                    value=uuid,
+                )
+            )
+
+            # Return the note if it exists
+            if model is not None:
+                # Convert the NoteModel object to an ImmutableNote object
+                return ImmutableNote(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the note does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_uuid' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def update(
+        self,
+        note: Union[ImmutableNote, MutableNote],
+    ) -> Optional[ImmutableNote]:
+        """
+        Updates a note with the given ID.
+
+        Args:
+            note (Union[ImmutableNote, MutableNote]): The note to update.
+
+        Returns:
+            Optional[ImmutableNote]: The updated note if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Convert the note to an immutable note and update the note in the database
+            model: Optional[NoteModel] = asyncio.run(
+                NoteConverter.object_to_model(
+                    object=ImmutableNote(**note.to_dict(exclude=["_logger"]))
+                ).update(
+                    **note.to_dict(
+                        exclude=[
+                            "_id",
+                            "_key",
+                            "_logger",
+                            "_uuid",
+                        ]
+                    )
+                )
+            )
+
+            # Return the updated note if it exists
+            if model is not None:
+                # Convert the NoteModel object to an ImmutableNote object
+                note = ImmutableNote(**model.to_dict(exclude=["_logger"]))
+
+                # Add the note to the cache
+                self.update_in_cache(
+                    key=note.key,
+                    value=note,
+                )
+
+                # Return the updated note
+                return note
+            else:
+                # Return None indicating that the note does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class NoteModel(ImmutableBaseModel):
@@ -319,9 +685,9 @@ class NoteModel(ImmutableBaseModel):
     Represents the structure of a Note model.
 
     Attributes:
-        ancestor (Optional[int]): The ID of the ancestor Note.
+
         body_text (Optional[str]): The body of the Note.
-        children (Optional[List[int]]): The IDs of the children Notes.
+
         created_at (Optional[datetime]): The timestamp when the Note was created.
         id (Optional[int]): The ID of the Note.
         key (Optional[str]): The key of the Note.
@@ -330,11 +696,117 @@ class NoteModel(ImmutableBaseModel):
         uuid (Optional[str]): The UUID of the Note.
     """
 
+    table: str = Constants.NOTES
+
+    id: Field = Field(
+        autoincrement=True,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=True,
+        name="id",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=True,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    body_text: Field = Field(
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="body_text",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    created_at: Field = Field(
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="created_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    key: Field = Field(
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="key",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    title_text: Field = Field(
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="title_text",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    updated_at: Field = Field(
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="updated_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    uuid: Field = Field(
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="uuid",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     def __init__(
         self,
-        ancestor: Optional[int] = None,
         body_text: Optional[str] = None,
-        children: Optional[List[int]] = None,
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -346,9 +818,7 @@ class NoteModel(ImmutableBaseModel):
         Initializes a new instance of the NoteModel class.
 
         Args:
-            ancestor (Optional[int]): The ID of the ancestor Note.
             body_text (Optional[str]): The body of the Note.
-            children (Optional[List[int]]): The IDs of the children Notes.
             created_at (Optional[datetime]): The timestamp when the Note was created.
             id (Optional[int]): The ID of the Note.
             key (Optional[str]): The key of the Note.
@@ -362,167 +832,12 @@ class NoteModel(ImmutableBaseModel):
 
         # Call the parent class constructor
         super().__init__(
-            table="notes",
-            id=(
-                id
-                or Field(
-                    autoincrement=True,
-                    default=None,
-                    description="",
-                    foreign_key=None,
-                    index=True,
-                    name="id",
-                    nullable=True,
-                    on_delete="CASCADE",
-                    on_update="CASCADE",
-                    primary_key=True,
-                    size=None,
-                    type="INTEGER",
-                    unique=True,
-                )
-            ),
-            ancestor=(
-                ancestor
-                or Field(
-                    autoincrement=False,
-                    default=None,
-                    description="",
-                    foreign_key="notes(id)",
-                    index=False,
-                    name="ancestor",
-                    nullable=True,
-                    on_delete="CASCADE",
-                    on_update="CASCADE",
-                    primary_key=False,
-                    size=None,
-                    type="INTEGER",
-                    unique=False,
-                )
-            ),
-            body_text=(
-                body_text
-                or Field(
-                    autoincrement=False,
-                    default=None,
-                    description="",
-                    foreign_key=None,
-                    index=False,
-                    name="body_text",
-                    nullable=True,
-                    on_delete="CASCADE",
-                    on_update="CASCADE",
-                    primary_key=False,
-                    size=255,
-                    type="VARCHAR",
-                    unique=False,
-                )
-            ),
-            children=(
-                children
-                or Field(
-                    autoincrement=False,
-                    default=None,
-                    description="",
-                    foreign_key=None,
-                    index=False,
-                    name="children",
-                    nullable=True,
-                    on_delete="NO ACTION",
-                    on_update="NO ACTION",
-                    primary_key=False,
-                    size=None,
-                    type="JSON",
-                    unique=False,
-                )
-            ),
-            created_at=(
-                created_at
-                or Field(
-                    autoincrement=False,
-                    default=None,
-                    description="",
-                    foreign_key=None,
-                    index=False,
-                    name="created_at",
-                    nullable=True,
-                    on_delete="CASCADE",
-                    on_update="CASCADE",
-                    primary_key=False,
-                    size=None,
-                    type="DATETIME",
-                    unique=False,
-                )
-            ),
-            key=(
-                key
-                or Field(
-                    autoincrement=False,
-                    default=None,
-                    description="",
-                    foreign_key=None,
-                    index=False,
-                    name="key",
-                    nullable=True,
-                    on_delete="NO ACTION",
-                    on_update="NO ACTION",
-                    primary_key=False,
-                    size=255,
-                    type="VARCHAR",
-                    unique=False,
-                )
-            ),
-            title_text=(
-                title_text
-                or Field(
-                    autoincrement=False,
-                    default=None,
-                    description="",
-                    foreign_key=None,
-                    index=False,
-                    name="title_text",
-                    nullable=True,
-                    on_delete="NO ACTION",
-                    on_update="NO ACTION",
-                    primary_key=False,
-                    size=255,
-                    type="VARCHAR",
-                    unique=False,
-                )
-            ),
-            updated_at=(
-                updated_at
-                or Field(
-                    autoincrement=False,
-                    default=None,
-                    description="",
-                    foreign_key=None,
-                    index=False,
-                    name="updated_at",
-                    nullable=True,
-                    on_delete="NO ACTION",
-                    on_update="NO ACTION",
-                    primary_key=False,
-                    size=None,
-                    type="DATETIME",
-                    unique=False,
-                )
-            ),
-            uuid=(
-                uuid
-                or Field(
-                    autoincrement=False,
-                    default=None,
-                    description="",
-                    foreign_key=None,
-                    index=False,
-                    name="uuid",
-                    nullable=True,
-                    on_delete="NO ACTION",
-                    on_update="NO ACTION",
-                    primary_key=False,
-                    size=255,
-                    type="VARCHAR",
-                    unique=False,
-                )
-            ),
+            body_text=body_text,
+            created_at=created_at,
+            id=id,
+            key=key,
+            table=Constants.NOTES,
+            title_text=title_text,
+            updated_at=updated_at,
+            uuid=uuid,
         )

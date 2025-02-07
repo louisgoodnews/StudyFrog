@@ -242,22 +242,22 @@ class MutableBaseObject:
 
     def to_dict(
         self,
-        exclude: list[str] = [],
+        exclude: List[str] = [],
     ) -> Dict[str, Any]:
         """
         Returns a dictionary representation of the object.
 
         :param exclude: A list of attribute names to exclude from the dictionary.
-        :type exclude: list[str]
+        :type exclude: List[str]
 
         :return: A dictionary representation of the object.
         :rtype: Dict[str, Any]
         """
 
-        # Check if 'logger' is already in the excluded list
-        if "logger" not in exclude:
-            # Add the logger to the exclude list
-            exclude.append("logger")
+        # Check if '_logger' is already in the excluded list
+        if "_logger" not in exclude:
+            # Add the key "_logger" to the exclude list
+            exclude.append("_logger")
 
         # Return a dictionary representation of the object
         return {
