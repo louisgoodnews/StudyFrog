@@ -37,7 +37,6 @@ class ImmutableStack(ImmutableBaseObject):
     A stack is a collection of Flashards, Notes and Questions.
 
     Attributes:
-        contents (List[Dict[str, Any]]): The contents of the stack.
         created_at (datetime): The timestamp when the stack was created.
         id (int): The ID of the stack.
         key (str): The key of the stack.
@@ -49,7 +48,6 @@ class ImmutableStack(ImmutableBaseObject):
     def __init__(
         self,
         name: str,
-        contents: Optional[List[Dict[str, Any]]] = None,
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -61,7 +59,6 @@ class ImmutableStack(ImmutableBaseObject):
 
         Args:
             name (str): The name of the stack.
-            contents (Optional[List[Dict[str, Any]]]): The contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
@@ -71,7 +68,6 @@ class ImmutableStack(ImmutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
-            contents=contents,
             created_at=created_at,
             id=id,
             key=key,
@@ -99,7 +95,6 @@ class MutableStack(MutableBaseObject):
     A stack is a collection of Flashards, Notes and Questions.
 
     Attributes:
-        contents (List[Dict[str, Any]]): The contents of the stack.
         created_at (datetime): The timestamp when the stack was created.
         id (int): The ID of the stack.
         key (str): The key of the stack.
@@ -110,7 +105,6 @@ class MutableStack(MutableBaseObject):
 
     def __init__(
         self,
-        contents: Optional[List[Dict[str, Any]]] = None,
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -122,7 +116,6 @@ class MutableStack(MutableBaseObject):
         Initializes a new instance of the MutableStack class.
 
         Args:
-            contents (Optional[List[Dict[str, Any]]]): The contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
@@ -136,7 +129,6 @@ class MutableStack(MutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
-            contents=contents,
             created_at=created_at,
             id=id,
             key=key,
@@ -299,7 +291,6 @@ class StackFactory:
     @classmethod
     def create_stack(
         cls,
-        contents: Optional[List[Dict[str, Any]]] = None,
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -750,7 +741,7 @@ class StackModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="created_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -772,7 +763,7 @@ class StackModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     name: Field = Field(
@@ -798,7 +789,7 @@ class StackModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="updated_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,

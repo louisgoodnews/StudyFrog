@@ -739,8 +739,8 @@ class NoteModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=255,
-        type="VARCHAR",
+        size=None,
+        type="DATETIME",
         unique=False,
     )
 
@@ -756,7 +756,7 @@ class NoteModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     title_text: Field = Field(
@@ -771,7 +771,7 @@ class NoteModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     updated_at: Field = Field(
@@ -784,8 +784,8 @@ class NoteModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=255,
-        type="VARCHAR",
+        size=None,
+        type="DATETIME",
         unique=False,
     )
 
@@ -801,7 +801,7 @@ class NoteModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     def __init__(

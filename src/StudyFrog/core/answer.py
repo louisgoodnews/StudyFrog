@@ -690,13 +690,13 @@ class AnswerModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="answer_text",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     created_at: Field = Field(
@@ -706,7 +706,7 @@ class AnswerModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="created_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -726,9 +726,9 @@ class AnswerModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=None,
-        type="TEXT",
-        unique=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     updated_at: Field = Field(
@@ -738,7 +738,7 @@ class AnswerModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="updated_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -758,8 +758,8 @@ class AnswerModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=None,
-        type="TEXT",
+        size=255,
+        type="VARCHAR",
         unique=True,
     )
 

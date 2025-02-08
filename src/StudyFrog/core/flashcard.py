@@ -698,7 +698,7 @@ class FlashcardModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="back_text",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -714,7 +714,7 @@ class FlashcardModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="created_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -730,13 +730,13 @@ class FlashcardModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="front_text",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     key: Field = Field(
@@ -752,7 +752,7 @@ class FlashcardModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     updated_at: Field = Field(
@@ -762,7 +762,7 @@ class FlashcardModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="updated_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,

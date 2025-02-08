@@ -7,6 +7,7 @@ from typing import *
 
 from utils.database_service import DatabaseService
 from utils.field import Field
+from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.object import ImmutableBaseObject
 
@@ -28,6 +29,8 @@ class ImmutableBaseModel(ImmutableBaseObject):
     Attributes:
         logger (Logger): The logger instance associated with the object.
     """
+
+    logger: Logger = Logger.get_logger(name="ImmutableBaseModel")
 
     def __init__(
         self,
@@ -58,6 +61,9 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
         Returns:
             Optional[int]: The ID of the newly created entry, or None if an error occurred.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
         """
         try:
             # Convert object to dictionary and ensure DB-friendly format
@@ -101,19 +107,30 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
         Returns:
             None
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
         """
+        try:
+            # Build the SQL query
+            sql: str = (
+                f"CREATE TABLE IF NOT EXISTS {cls.table} ({", ".join([value.to_sql_string() for value in cls.__dict__.values() if isinstance(value, Field)])})"
+            )
 
-        # Build the SQL query
-        sql: str = (
-            f"CREATE TABLE IF NOT EXISTS {cls.table} ({", ".join([value.to_sql_string() for value in cls.__dict__.values() if isinstance(value, Field)])})"
-        )
+            # Execute the SQL query
+            await DatabaseService.execute(
+                database=database,
+                parameters=(),
+                sql=sql,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_table' method from '{cls.__name__}' class: {e}"
+            )
 
-        # Execute the SQL query
-        await DatabaseService.execute(
-            database=database,
-            parameters=(),
-            sql=sql,
-        )
+            # Return None indicating an exception occurred
+            return None
 
     async def delete(
         self,
@@ -127,20 +144,28 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
         Returns:
             bool: True if deletion was successful, False otherwise.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
         """
+        try:
+            # Build the SQL query
+            sql: str = f"DELETE FROM {self.table} WHERE id = ?"
 
-        # Build the SQL query
-        sql: str = f"DELETE FROM {self.table} WHERE id = ?"
-
-        # Execute the SQL query
-        return (
-            await DatabaseService.delete(
+            # Execute the SQL query
+            return await DatabaseService.delete(
                 database=database,
                 parameters=(self.id,),
                 sql=sql,
             )
-            > 0
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Return False indicating the operation failed
+            return False
 
     @classmethod
     async def drop_table(
@@ -155,17 +180,28 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
         Returns:
             bool: True if the table was dropped successfully, False otherwise.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
         """
+        try:
+            # Build the SQL query
+            sql: str = f"DROP TABLE IF EXISTS {cls.table}"
 
-        # Build the SQL query
-        sql: str = f"DROP TABLE IF EXISTS {cls.table}"
+            # Execute the SQL query
+            return await DatabaseService.execute(
+                database=database,
+                parameters=(),
+                sql=sql,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'drop_table' method from '{cls.__name__}' class: {e}"
+            )
 
-        # Execute the SQL query
-        return await DatabaseService.execute(
-            database=database,
-            parameters=(),
-            sql=sql,
-        )
+            # Return False indicating the operation failed
+            return False
 
     @classmethod
     async def execute(
@@ -185,13 +221,20 @@ class ImmutableBaseModel(ImmutableBaseObject):
         Returns:
             Any: The result of the query.
         """
+        try:
+            return await DatabaseService.execute(
+                database=database,
+                parameters=parameters,
+                sql=sql,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'execute' method from '{cls.__name__}' class: {e}"
+            )
 
-        # Execute the SQL query
-        return await DatabaseService.execute(
-            database=database,
-            parameters=parameters,
-            sql=sql,
-        )
+            # Return None indicating an exception occurred
+            return None
 
     @classmethod
     async def get_all(
@@ -206,20 +249,33 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
         Returns:
             List[T]: List of model instances.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
         """
+        try:
+            # Build the SQL query
+            sql: str = f"SELECT * FROM {cls.table}"
 
-        # Build the SQL query
-        sql: str = f"SELECT * FROM {cls.table}"
+            # Execute the SQL query
+            rows: List[Dict[str, Any]] = await DatabaseService.read_all(
+                database=database,
+                parameters=(),
+                sql=sql,
+            )
 
-        # Execute the SQL query
-        rows: List[Dict[str, Any]] = await DatabaseService.read_all(
-            database=database,
-            parameters=(),
-            sql=sql,
-        )
+            # Return the model instances
+            return [
+                cls(**Miscellaneous.convert_from_db_format(data=row)) for row in rows
+            ]
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{cls.__name__}' class: {e}"
+            )
 
-        # Return the model instances
-        return [cls(**Miscellaneous.convert_from_db_format(data=row)) for row in rows]
+            # Return an empty list indicating an exception occurred
+            return []
 
     @classmethod
     async def get_by(
@@ -239,18 +295,29 @@ class ImmutableBaseModel(ImmutableBaseObject):
         Returns:
             Optional[T]: The model instance if found, otherwise None.
         """
-        # Build the SQL query
-        sql: str = f"SELECT * FROM {cls.table} WHERE {column} = ?"
+        try:
+            # Build the SQL query
+            sql: str = f"SELECT * FROM {cls.table} WHERE {column} = ?"
 
-        # Execute the SQL query
-        row: Dict[str, Any] = await DatabaseService.read_one(
-            database=database,
-            parameters=(value,),
-            sql=sql,
-        )
+            # Execute the SQL query
+            row: Dict[str, Any] = await DatabaseService.read_one(
+                database=database,
+                parameters=(value,),
+                sql=sql,
+            )
 
-        # Return the model instance
-        return cls(**Miscellaneous.convert_from_db_format(data=row)) if row else None
+            # Return the model instance
+            return (
+                cls(**Miscellaneous.convert_from_db_format(data=row)) if row else None
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{cls.__name__}' class: {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
 
     @classmethod
     def to_sql_string(cls) -> str:
@@ -288,24 +355,32 @@ class ImmutableBaseModel(ImmutableBaseObject):
         Returns:
             bool: True if update was successful, False otherwise.
         """
+        try:
+            # Build the SQL query
+            updates: str = ", ".join([f"{key} = ?" for key in kwargs.keys()])
 
-        # Build the SQL query
-        updates: str = ", ".join([f"{key} = ?" for key in kwargs.keys()])
+            # Build the parameters tuple
+            parameters: Tuple[Any, ...] = tuple(
+                Miscellaneous.convert_to_db_format(data=kwargs).values()
+            ) + (self.id,)
 
-        # Build the parameters tuple
-        parameters: Tuple[Any, ...] = tuple(
-            Miscellaneous.convert_to_db_format(data=kwargs).values()
-        ) + (self.id,)
+            # Build the SQL query
+            sql: str = f"UPDATE {self.table} SET {updates} WHERE id = ?"
 
-        # Build the SQL query
-        sql: str = f"UPDATE {self.table} SET {updates} WHERE id = ?"
-
-        # Execute the SQL query
-        return (
-            await DatabaseService.update(
-                database=database,
-                parameters=parameters,
-                sql=sql,
+            # Execute the SQL query
+            return (
+                await DatabaseService.update(
+                    database=database,
+                    parameters=parameters,
+                    sql=sql,
+                )
+                > 0
             )
-            > 0
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Return False indicating an exception occurred
+            return False

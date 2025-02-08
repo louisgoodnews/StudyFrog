@@ -680,7 +680,7 @@ class TagModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="created_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -696,13 +696,13 @@ class TagModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="key",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     updated_at: Field = Field(
@@ -712,7 +712,7 @@ class TagModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="updated_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -728,13 +728,13 @@ class TagModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="uuid",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     value: Field = Field(
@@ -744,13 +744,13 @@ class TagModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="value",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     def __init__(

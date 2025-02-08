@@ -3,7 +3,11 @@ Author: lodego
 Date: 2025-02-06
 """
 
+import asyncio
+
 import json
+
+import threading
 
 from typing import *
 
@@ -207,6 +211,80 @@ class Miscellaneous:
             datetime: The current datetime.
         """
         return datetime.now()
+
+    @classmethod
+    def run_asynchronously(
+        cls,
+        func: Callable[..., Any],
+        *args,
+        **kwargs,
+    ) -> Optional[Any]:
+        """
+        Runs a function asynchronously.
+
+        Args:
+            func (Callable[..., Any]): The function to be run asynchronously.
+            *args: Additional positional arguments to be passed to the function.
+            **kwargs: Additional keyword arguments to be passed to the function.
+
+        Returns:
+            Optional[Any]: The return value of the function or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while running the function.
+        """
+        try:
+            # Attempt to run the function asynchronously and return the result
+            return asyncio.run(
+                main=func,
+                *args,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'run_asynchronously' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def run_in_thread(
+        cls,
+        func: Callable[..., Any],
+        *args,
+        **kwargs,
+    ) -> Optional[Any]:
+        """
+        Runs a function in a separate thread.
+
+        Args:
+            func (Callable[..., Any]): The function to be run in a separate thread.
+            *args: Additional positional arguments to be passed to the function.
+            **kwargs: Additional keyword arguments to be passed to the function.
+
+        Returns:
+            Optional[Any]: The return value of the function or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while running the function.
+        """
+        try:
+            # Run the function in a separate thread and return the result
+            return threading.Thread(
+                target=func,
+                args=args,
+                kwargs=kwargs,
+            ).start()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'run_in_thread' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
 
     @classmethod
     def snake_to_camel(

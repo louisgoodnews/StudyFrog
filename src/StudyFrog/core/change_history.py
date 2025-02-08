@@ -3,6 +3,8 @@ Author: lodego
 Date: 2025-02-06
 """
 
+import asyncio
+
 import uuid
 
 from datetime import datetime
@@ -13,6 +15,7 @@ from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
 from utils.manager import BaseObjectManager
+from utils.miscellaneous import Miscellaneous
 from utils.model import ImmutableBaseModel
 from utils.object import MutableBaseObject, ImmutableBaseObject
 
@@ -253,13 +256,13 @@ class ChangeHistoryManager(BaseObjectManager):
 
     def create(
         self,
-        change_history: Union[ChangeHistory, MutableChangeHistory],
+        change_history: Union[ChangeHistory, ChangeHistory],
     ) -> Optional[ChangeHistory]:
         """
         Creates a new change history in the database.
 
         Args:
-            change history (Union[ChangeHistory, MutableChangeHistory]): The change history to be created.
+            change history (Union[ChangeHistory, ChangeHistory]): The change history to be created.
 
         Returns:
             Optional[ChangeHistory]: The newly created immutable change history if no exception occurs. Otherwise, None.
@@ -274,7 +277,7 @@ class ChangeHistoryManager(BaseObjectManager):
                 ChangeHistory,
             ):
                 # If it is, convert it to a mutable change history
-                change_history = MutableChangeHistory(
+                change_history = ChangeHistory(
                     **change_history.to_dict(exclude=["_logger"])
                 )
 
@@ -336,13 +339,13 @@ class ChangeHistoryManager(BaseObjectManager):
 
     def delete(
         self,
-        change_history: Union[ChangeHistory, MutableChangeHistory],
+        change_history: Union[ChangeHistory, ChangeHistory],
     ) -> bool:
         """
         Deletes a change history from the database.
 
         Args:
-            change history (Union[ChangeHistory, MutableChangeHistory]): The change history to be deleted.
+            change history (Union[ChangeHistory, ChangeHistory]): The change history to be deleted.
 
         Returns:
             bool: True if the change history was deleted successfully. False otherwise.
@@ -517,13 +520,13 @@ class ChangeHistoryManager(BaseObjectManager):
 
     def update(
         self,
-        change_history: Union[ChangeHistory, MutableChangeHistory],
+        change_history: Union[ChangeHistory, ChangeHistory],
     ) -> Optional[ChangeHistory]:
         """
         Updates a change history with the given ID.
 
         Args:
-            change history (Union[ChangeHistory, MutableChangeHistory]): The change history to update.
+            change history (Union[ChangeHistory, ChangeHistory]): The change history to update.
 
         Returns:
             Optional[ChangeHistory]: The updated change history if no exception occurs. Otherwise, None.
@@ -614,7 +617,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="created_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -630,13 +633,13 @@ class ChangeHistoryModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="key",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     source: Field = Field(
@@ -646,7 +649,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="source",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -662,7 +665,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="updated_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -678,13 +681,13 @@ class ChangeHistoryModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="uuid",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     def __init__(
@@ -959,13 +962,13 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
     def create(
         self,
-        change_history_item: Union[ChangeHistoryItem, MutableChangeHistoryItem],
+        change_history_item: Union[ChangeHistoryItem, ChangeHistoryItem],
     ) -> Optional[ChangeHistoryItem]:
         """
         Creates a new change history item in the database.
 
         Args:
-            change history item (Union[ChangeHistoryItem, MutableChangeHistoryItem]): The change history item to be created.
+            change history item (Union[ChangeHistoryItem, ChangeHistoryItem]): The change history item to be created.
 
         Returns:
             Optional[ChangeHistoryItem]: The newly created immutable change history item if no exception occurs. Otherwise, None.
@@ -980,7 +983,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
                 ChangeHistoryItem,
             ):
                 # If it is, convert it to a mutable change history item
-                change_history_item = MutableChangeHistoryItem(
+                change_history_item = ChangeHistoryItem(
                     **change_history_item.to_dict(exclude=["_logger"])
                 )
 
@@ -1042,13 +1045,13 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
     def delete(
         self,
-        change_history_item: Union[ChangeHistoryItem, MutableChangeHistoryItem],
+        change_history_item: Union[ChangeHistoryItem, ChangeHistoryItem],
     ) -> bool:
         """
         Deletes a change history item from the database.
 
         Args:
-            change history item (Union[ChangeHistoryItem, MutableChangeHistoryItem]): The change history item to be deleted.
+            change history item (Union[ChangeHistoryItem, ChangeHistoryItem]): The change history item to be deleted.
 
         Returns:
             bool: True if the change history item was deleted successfully. False otherwise.
@@ -1226,13 +1229,13 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
     def update(
         self,
-        change_history_item: Union[ChangeHistoryItem, MutableChangeHistoryItem],
+        change_history_item: Union[ChangeHistoryItem, ChangeHistoryItem],
     ) -> Optional[ChangeHistoryItem]:
         """
         Updates a change history item with the given ID.
 
         Args:
-            change history item (Union[ChangeHistoryItem, MutableChangeHistoryItem]): The change history item to update.
+            change history item (Union[ChangeHistoryItem, ChangeHistoryItem]): The change history item to update.
 
         Returns:
             Optional[ChangeHistoryItem]: The updated change history item if no exception occurs. Otherwise, None.
@@ -1329,7 +1332,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="created_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1345,7 +1348,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="from_",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1361,13 +1364,13 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="key",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     source: Field = Field(
@@ -1377,7 +1380,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="source",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1393,7 +1396,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="to",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1409,7 +1412,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="updated_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1425,13 +1428,13 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="uuid",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=False,
+        unique=True,
     )
 
     def __init__(

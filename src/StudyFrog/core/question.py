@@ -49,7 +49,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         self,
         question_text: str,
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
-        correct_answer: Optional[Unoin[int, bool]] = None,
+        correct_answer: Optional[Union[int, bool]] = None,
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -61,7 +61,7 @@ class ImmutableQuestion(ImmutableBaseObject):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the question was created.
-            correct_answer (Optional[Unoin[int, bool]]): The ID of the correct Question or whether the question is correct.
+            correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             question_text (str): The text of the question.
@@ -103,7 +103,7 @@ class MutableQuestion(MutableBaseObject):
 
     Attributes:
         Questions (Optional[List[int]]): The IDs of the Questions.
-        correct_answer (Optional[Unoin[int, bool]]): The ID of the correct Question or whether the question is correct.
+        correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
         created_at (Optional[datetime]): The timestamp when the question was created.
         id (Optional[int]): The ID of the question.
         key (Optional[str]): The key of the question.
@@ -117,7 +117,7 @@ class MutableQuestion(MutableBaseObject):
         self,
         question_text: str,
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
-        correct_answer: Optional[Unoin[int, bool]] = None,
+        correct_answer: Optional[Union[int, bool]] = None,
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -130,7 +130,7 @@ class MutableQuestion(MutableBaseObject):
         Args:
             question_text (str): The text of the question.
             question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
-            correct_answer (Optional[Unoin[int, bool]]): The ID of the correct Question or whether the question is correct.
+            correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
             created_at (Optional[datetime]): The timestamp when the question was created.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
@@ -245,7 +245,7 @@ class QuestionFactory:
         cls,
         question_text: str,
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
-        correct_answer: Optional[Unoin[int, bool]] = None,
+        correct_answer: Optional[Union[int, bool]] = None,
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -258,7 +258,7 @@ class QuestionFactory:
         Args:
             question_text (str): The text of the question.
             question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
-            correct_answer (Optional[Unoin[int, bool]]): The ID of the correct Question or whether the question is correct.
+            correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
             created_at (Optional[datetime]): The timestamp when the question was created.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
@@ -698,7 +698,7 @@ class QuestionModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="correct_answer",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -714,7 +714,7 @@ class QuestionModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="created_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -734,9 +734,9 @@ class QuestionModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=None,
-        type="TEXT",
-        unique=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     question_text: Field = Field(
@@ -746,7 +746,7 @@ class QuestionModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="question_text",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -762,7 +762,7 @@ class QuestionModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="question_type",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -778,7 +778,7 @@ class QuestionModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="updated_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -798,14 +798,14 @@ class QuestionModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=None,
-        type="TEXT",
+        size=255,
+        type="VARCHAR",
         unique=True,
     )
 
     def __init__(
         self,
-        correct_answer: Optional[Unoin[int, bool]] = None,
+        correct_answer: Optional[Union[int, bool]] = None,
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -820,7 +820,7 @@ class QuestionModel(ImmutableBaseModel):
         Initializes a new instance of the MutableQuestion class.
 
         Args:
-            correct_answer (Optional[Unoin[int, bool]]): The ID of the correct Question or whether the question is correct.
+            correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
             created_at (Optional[datetime]): The timestamp when the question was created.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.

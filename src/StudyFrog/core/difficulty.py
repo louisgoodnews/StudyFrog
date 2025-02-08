@@ -603,9 +603,9 @@ class DifficultyModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=None,
-        type="TEXT",
-        unique=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     name: Field = Field(
@@ -617,9 +617,9 @@ class DifficultyModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=None,
-        type="TEXT",
-        unique=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     updated_at: Field = Field(
@@ -627,7 +627,7 @@ class DifficultyModel(ImmutableBaseModel):
         description="",
         index=False,
         name="updated_at",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -641,13 +641,13 @@ class DifficultyModel(ImmutableBaseModel):
         description="",
         index=False,
         name="uuid",
-        nullable=True,
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=None,
-        type="TEXT",
-        unique=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     value: Field = Field(
@@ -660,7 +660,7 @@ class DifficultyModel(ImmutableBaseModel):
         on_update=None,
         primary_key=False,
         size=None,
-        type="REAL",
+        type="DOUBLE",
         unique=False,
     )
 
