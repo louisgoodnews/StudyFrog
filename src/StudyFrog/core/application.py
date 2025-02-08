@@ -5,10 +5,13 @@ Date: 2025-02-06
 
 from typing import *
 
+from ui.main_ui import MainUI
+
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
+from utils.navigation import NavigationService
 
 
 __all__: List[str] = ["Application"]
@@ -58,6 +61,17 @@ class Application:
         # Initialize the dispatcher
         self.dispatcher: Dispatcher = Dispatcher()
 
+        # Initialize the navigation service
+        self.navigation_service: NavigationService = NavigationService(
+            dispatcher=self.dispatcher
+        )
+
+        # Initialize the main UI
+        self.main_ui: MainUI = MainUI(
+            dispatcher=self.dispatcher,
+            navigation_service=self.navigation_service,
+        )
+
     def start(self) -> None:
         try:
             # Dispatch the "APPLICATION_STARTED" event in the global namespace
@@ -65,6 +79,9 @@ class Application:
                 event=Events.APPLICATION_STARTED,
                 namespace=Constants.GLOBAL_NAMESPACE,
             )
+
+            # Show the main UI
+            self.main_ui.mainloop()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

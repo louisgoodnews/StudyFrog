@@ -38,7 +38,9 @@ class Constants:
     * USERS: The name of the table for users.
     * DEFAULT_FONT_FAMILIY: The default font family.
     * DEFAULT_FONT_SIZE: The default font size.
+    * DEFAULT_GEOMETRY: The default geometry of the main window.
     * GLOBAL_NAMESPACE: The namespace for global dispatching of events.
+    * MAIN_UI_NAMESPACE: The namespace for the main UI.
     * NOW: The current time.
     * TODAY: The current date.
     * TOMORROW: The current date plus one day.
@@ -88,7 +90,11 @@ class Constants:
     DEFAULT_FONT_FAMILIY: str = "Helvetica"
     DEFAULT_FONT_SIZE: int = 16
 
+    DEFAULT_GEOMETRY: str = "1920x1080"
+
     GLOBAL_NAMESPACE: str = "GLOBAL"
+
+    MAIN_UI_NAMESPACE: str = "MAIN_UI"
 
     NOW: datetime = datetime.now()
 

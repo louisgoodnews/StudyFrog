@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import *
 
 from utils.builder import BaseObjectBuilder
+from utils.constants import Constants
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.object import ImmutableBaseObject
@@ -321,7 +322,16 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         event: DispatcherEvent,
         id: int,
     ) -> None:
+        """
+        Initializes a new instance of the DispatcherEventSubscription class.
 
+        Args:
+            event (DispatcherEvent): The event associated with the subscription.
+            id (int): The ID of the subscription.
+
+        Returns:
+            None
+        """
         # Call the parent class constructor
         super().__init__(event=event, id=id)
 
