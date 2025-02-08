@@ -208,7 +208,7 @@ class NoteConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableNote class from the dictionary representation of the NoteModel instance
-            return ImmutableNote(**model.to_dict(exclude=["_logger"])["fields"])
+            return ImmutableNote(**model.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(

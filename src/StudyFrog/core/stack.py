@@ -246,7 +246,7 @@ class StackConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableStack class from the dictionary representation of the StackModel instance
-            return ImmutableStack(**model.to_dict(exclude=["_logger"])["fields"])
+            return ImmutableStack(**model.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(

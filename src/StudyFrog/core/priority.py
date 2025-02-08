@@ -115,7 +115,7 @@ class PriorityConverter:
         """
         try:
             # Attempt to create and return a new instance of the Priority class from the dictionary representation of the PriorityModel instance
-            return Priority(**model.to_dict(exclude=["_logger"])["fields"])
+            return Priority(**model.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(

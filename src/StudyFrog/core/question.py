@@ -197,7 +197,7 @@ class QuestionConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableQuestion class from the dictionary representation of the QuestionModel instance
-            return ImmutableQuestion(**model.to_dict(exclude=["_logger"])["fields"])
+            return ImmutableQuestion(**model.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(

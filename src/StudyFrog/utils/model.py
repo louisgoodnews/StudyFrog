@@ -46,11 +46,53 @@ class ImmutableBaseModel(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(**kwargs)
 
+    async def create(
+        self,
+        database: str,
+    ) -> Optional[int]:
+        """
+        Saves the current model instance to the database.
+
+        Args:
+            database (str): The path to the database.
+
+        Returns:
+            Optional[int]: The ID of the newly created entry, or None if an error occurred.
+        """
+        try:
+            # Convert object to dictionary and ensure DB-friendly format
+            converted_data = Miscellaneous.convert_to_db_format(
+                self.to_dict(exclude=["_logger"])
+            )
+
+            # Extract columns and values
+            columns = ", ".join(converted_data.keys())
+            placeholders = ", ".join(["?" for _ in converted_data])
+            parameters = tuple(converted_data.values())  # Convert to tuple
+
+            # Construct SQL query
+            sql = f"INSERT INTO {self.table} ({columns}) VALUES ({placeholders});"
+
+            # Execute SQL command and return the last row ID
+            return await DatabaseService.create(
+                database=database,
+                parameters=parameters,
+                sql=sql,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'save' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
+
     @classmethod
     async def create_table(
         cls,
         database: str,
-    ) -> bool:
+    ) -> None:
         """
         Creates the table based on the defined fields.
 
@@ -58,7 +100,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             database (str): Path to the SQLite database file.
 
         Returns:
-            bool: True if the table was created successfully, False otherwise.
+            None
         """
 
         # Build the SQL query
@@ -152,6 +194,34 @@ class ImmutableBaseModel(ImmutableBaseObject):
         )
 
     @classmethod
+    async def get_all(
+        cls: Type[T],
+        database: str,
+    ) -> List[T]:
+        """
+        Retrieves all rows from the model's table.
+
+        Args:
+            database (str): Path to the SQLite database file.
+
+        Returns:
+            List[T]: List of model instances.
+        """
+
+        # Build the SQL query
+        sql: str = f"SELECT * FROM {cls.table}"
+
+        # Execute the SQL query
+        rows: List[Dict[str, Any]] = await DatabaseService.read_all(
+            database=database,
+            parameters=(),
+            sql=sql,
+        )
+
+        # Return the model instances
+        return [cls(**Miscellaneous.convert_from_db_format(data=row)) for row in rows]
+
+    @classmethod
     async def get_by(
         cls: Type[T],
         database: str,
@@ -181,76 +251,6 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
         # Return the model instance
         return cls(**Miscellaneous.convert_from_db_format(data=row)) if row else None
-
-    @classmethod
-    async def get_all(
-        cls: Type[T],
-        database: str,
-    ) -> List[T]:
-        """
-        Retrieves all rows from the model's table.
-
-        Args:
-            database (str): Path to the SQLite database file.
-
-        Returns:
-            List[T]: List of model instances.
-        """
-
-        # Build the SQL query
-        sql: str = f"SELECT * FROM {cls.table}"
-
-        # Execute the SQL query
-        rows: List[Dict[str, Any]] = await DatabaseService.read_all(
-            database=database,
-            parameters=(),
-            sql=sql,
-        )
-
-        # Return the model instances
-        return [cls(**Miscellaneous.convert_from_db_format(data=row)) for row in rows]
-
-    async def create(
-        self,
-        database: str,
-    ) -> Optional[int]:
-        """
-        Saves the current model instance to the database.
-
-        Args:
-            database (str): The path to the database.
-
-        Returns:
-            Optional[int]: The ID of the newly created entry, or None if an error occurred.
-        """
-        try:
-            # Convert object to dictionary and ensure DB-friendly format
-            converted_data = Miscellaneous.convert_to_db_format(
-                self.to_dict(exclude=["_logger"])
-            )
-
-            # Extract columns and values
-            columns = ", ".join(converted_data.keys())
-            placeholders = ", ".join(["?" for _ in converted_data])
-            parameters = tuple(converted_data.values())  # Convert to tuple
-
-            # Construct SQL query
-            sql = f"INSERT INTO {self.table} ({columns}) VALUES ({placeholders});"
-
-            # Execute SQL command and return the last row ID
-            return await DatabaseService.create(
-                database=database,
-                parameters=parameters,
-                sql=sql,
-            )
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'save' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Return None indicating an exception occurred
-            return None
 
     @classmethod
     def to_sql_string(cls) -> str:

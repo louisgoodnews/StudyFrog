@@ -74,7 +74,7 @@ class Constants:
 
     ANSWERS: str = "answers"
     ASSOCIATIONS: str = "associations"
-    CHANGE_HISTORY: str = "change_history"
+    CHANGE_HISTORIES: str = "change_histories"
     CHANGE_HISTORY_ITEMS: str = "change_history_items"
     DIFFICULTIES: str = "difficulties"
     FLASHCARDS: str = "flashcards"

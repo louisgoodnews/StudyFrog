@@ -115,7 +115,7 @@ class DifficultyConverter:
         """
         try:
             # Attempt to create and return a new instance of the Difficulty class from the dictionary representation of the DifficultyModel instance
-            return Difficulty(**model.to_dict(exclude=["_logger"])["fields"])
+            return Difficulty(**model.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(

@@ -141,7 +141,7 @@ class AssociationConverter:
         """
         try:
             # Attempt to create and return a new instance of the Association class from the dictionary representation of the AssociationModel instance
-            return Association(**model.to_dict(exclude=["_logger"])["fields"])
+            return Association(**model.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
