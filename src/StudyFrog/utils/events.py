@@ -47,7 +47,7 @@ class Events:
         GENERIC_EVENT (DispatcherEvent): An event that indicates that a generic event has been triggered.
         HELP_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a help button has been clicked.
         MENU_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a menu button has been clicked.
-        NAVIGATE (DispatcherEvent): An event that indicates that a navigation has been requested.
+        NAVIGATION_COMPLETED (DispatcherEvent): An event that indicates that a navigation has been completed.
         NOTE_CREATED (DispatcherEvent): An event that indicates that a note has been created in the backend.
         NOTE_DELETED (DispatcherEvent): An event that indicates that a note has been deleted in the backend.
         NOTE_LOADED (DispatcherEvent): An event that indicates that a note has been loaed in the backend.
@@ -285,8 +285,10 @@ class Events:
         name="ui:menu:button:clicked"
     )
 
-    # An event that indicates that a navigation has been requested
-    NAVIGATE: DispatcherEvent = DispatcherEventFactory.create_event(name="ui:navigate")
+    # An event that indicates that a navigation has been completed
+    NAVIGATION_COMPLETED: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="ui:navigation:completed"
+    )
 
     # An event that indicates that a note has been created in the backend
     NOTE_CREATED: DispatcherEvent = DispatcherEventFactory.create_event(

@@ -3,10 +3,15 @@ Author: lodego
 Date: 2025-02-08
 """
 
+import tkinter
 import uuid
+
+from tkinter.constants import *
 
 
 from typing import *
+
+from core.ui.ui_registry import UIRegistry
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherEvent
@@ -153,22 +158,6 @@ class NavigationService:
         # Initialize a list of navigation items as an empty list and store it in an instance variable
         self.navigation_stack: List[NavigationItem] = []
 
-        # Register a function to be called when the REQUEST_BACKWARD_NAVIGATION event is dispatched
-        self.dispatcher.register(
-            event=Events.REQUEST_BACKWARD_NAVIGATION,
-            function=self.on_request_backward_navigation,
-            namespace=Constants.GLOBAL_NAMESPACE,
-            persistent=True,
-        )
-
-        # Register a function to be called when the REQUEST_FORWARD_NAVIGATION event is dispatched
-        self.dispatcher.register(
-            event=Events.REQUEST_FORWARD_NAVIGATION,
-            function=self.on_request_forward_navigation,
-            namespace=Constants.GLOBAL_NAMESPACE,
-            persistent=True,
-        )
-
     def navigate(
         self,
         source: str,
@@ -212,13 +201,33 @@ class NavigationService:
                 message=f"Attempting to navigate from '{source}' to '{target}'."
             )
 
-            # Dsipatch the passed event
+            # Attempt to get the UI class that corresponds to the target
+            ui_class: Optional[Type[tkinter.Misc]] = UIRegistry.get(name=target)
+
+            # Check if a UI class was found
+            if not ui_class:
+                # Log a warning message indicating that no UI class was found
+                self.logger.warning(
+                    message=f"No UI class was found for target '{target}'."
+                )
+
+                # Return early
+                return
+
+            # Call the __init__ method of the UI class with the passed kwargs
+            ui_class(**kwargs)
+
+            # Grid the UI class widget
+            ui_class.grid(
+                column=0,
+                row=0,
+                sitcky=NSEW,
+            )
+
+            # Dispatch the "NAVIGATION_COMPLETED" event
             self.dispatcher.dispatch(
-                event=Events.NAVIGATE,
+                event=Events.NAVIGATION_COMPLETED,
                 namespace=Constants.GLOBAL_NAMESPACE,
-                navigation_item=navigation_item,
-                target=target,
-                **kwargs,
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred

@@ -7,6 +7,7 @@ from typing import *
 
 from core.ui.main_ui import MainUI
 
+from utils.bootstrap_service import BootstrapService
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
@@ -49,7 +50,8 @@ class Application:
         """
         Initializes the Application instance.
 
-        Initializes the Application instance by setting a logger to the logger with the name of the class.
+        Initializes the Application instance by setting a logger to the logger with the name of the class,
+        bootstrapping the application services, and initializing the main UI.
 
         Returns:
             None
@@ -58,13 +60,15 @@ class Application:
         # Initialize a logger
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
-        # Initialize the dispatcher
-        self.dispatcher: Dispatcher = Dispatcher()
+        # Bootstrap the application services
+        bootstrap_service: BootstrapService = BootstrapService()
 
-        # Initialize the navigation service
-        self.navigation_service: NavigationService = NavigationService(
-            dispatcher=self.dispatcher
-        )
+        # Initialize the dispatcher, navigation service, and setting service
+        (
+            self.dispatcher,
+            self.navigation_service,
+            self.setting_service,
+        ) = bootstrap_service.run_startup_tasks()
 
         # Initialize the main UI
         self.main_ui: MainUI = MainUI(
@@ -78,6 +82,13 @@ class Application:
             self.dispatcher.dispatch(
                 event=Events.APPLICATION_STARTED,
                 namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Dispatch the "REQUEST_FORWARD_NAVIGATION" event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_FORWARD_NAVIGATION,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                target="dashboard",
             )
 
             # Show the main UI

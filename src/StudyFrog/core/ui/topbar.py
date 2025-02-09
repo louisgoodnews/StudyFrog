@@ -11,7 +11,7 @@ from tkinter.constants import *
 
 from typing import *
 
-from ui.ui_builder import UIBuilder
+from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher

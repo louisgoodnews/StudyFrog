@@ -450,8 +450,7 @@ class SettingManager(BaseObjectManager):
 
             # Convert the list of SettingModel objects to a list of Setting objects
             settings: List[Setting] = [
-                Setting(**model.to_dict(exclude=["_logger"]))
-                for model in models
+                Setting(**model.to_dict(exclude=["_logger"])) for model in models
             ]
 
             # Iterate over the list of immutable settings
@@ -890,7 +889,7 @@ class SettingService:
         """
 
         # Initialize the logger
-        self.logger: Logger = logging.getLogger(name=self.__class__.__name__)
+        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the default manager
         self.default_manager: DefaultManager = DefaultManager()

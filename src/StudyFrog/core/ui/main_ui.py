@@ -11,9 +11,9 @@ from tkinter.constants import *
 
 from typing import *
 
-from ui.topbar import TopBar
+from core.ui.topbar import TopBar
 
-from ui.ui_builder import UIBuilder
+from core.ui.ui_builder import UIBuilder
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events

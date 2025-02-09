@@ -11,11 +11,12 @@ from tkinter.constants import *
 
 from typing import *
 
+from core.ui.ui_builder import UIBuilder
+
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.logger import Logger
 from utils.navigation import NavigationItem, NavigationService
-from ui.ui_builder import UIBuilder
 
 
 __all__: List[str] = ["SettingUI"]
