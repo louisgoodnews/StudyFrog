@@ -38,6 +38,7 @@ class ImmutableStack(ImmutableBaseObject):
 
     Attributes:
         created_at (datetime): The timestamp when the stack was created.
+        customfield_values (List[Dict[str, Any]]): The custom field values of the stack.
         id (int): The ID of the stack.
         key (str): The key of the stack.
         name (str): The name of the stack.
@@ -49,6 +50,7 @@ class ImmutableStack(ImmutableBaseObject):
         self,
         name: str,
         created_at: Optional[datetime] = None,
+        customfield_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -60,6 +62,7 @@ class ImmutableStack(ImmutableBaseObject):
         Args:
             name (str): The name of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
+            customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
@@ -69,6 +72,7 @@ class ImmutableStack(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            customfield_values=customfield_values,
             id=id,
             key=key,
             name=name,
@@ -96,6 +100,7 @@ class MutableStack(MutableBaseObject):
 
     Attributes:
         created_at (datetime): The timestamp when the stack was created.
+        customfield_values (List[Dict[str, Any]]): The custom field values of the stack.
         id (int): The ID of the stack.
         key (str): The key of the stack.
         name (str): The name of the stack.
@@ -105,10 +110,11 @@ class MutableStack(MutableBaseObject):
 
     def __init__(
         self,
+        name: str,
         created_at: Optional[datetime] = None,
+        customfield_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
-        name: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -117,6 +123,7 @@ class MutableStack(MutableBaseObject):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the stack was created.
+            customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             name (Optional[str]): The name of the stack.
@@ -130,69 +137,13 @@ class MutableStack(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            customfield_values=customfield_values,
             id=id,
             key=key,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
         )
-
-    def add_to_contents(
-        self,
-        content: Any,
-    ) -> None:
-        """
-        Adds a content to the contents list.
-
-        Args:
-            content (Any): The content to be added to the contents list.
-
-        Returns:
-            None
-        """
-
-        # Append the content to the contents list
-        self.contents.append(
-            {
-                "id": content.id,
-                "type": content.__class__.__name__,
-                "uuid": content.uuid,
-            }
-        )
-
-        # Set the updated_at timestamp
-        self.updated_at = datetime.now()
-
-    def remove_from_contents(
-        self,
-        uuid: str,
-    ) -> bool:
-        """
-        Removes a content from the contents list.
-
-        Args:
-            uuid (str): The uuid of the content to be removed.
-
-        Returns:
-            bool: True if the content was removed, False otherwise.
-        """
-
-        # Iterate over the contents list
-        for content in self.contents:
-            # Check if the content has the same uuid as the one to be removed
-            if content["uuid"] == uuid:
-
-                # Remove the content from the contents list
-                self.contents.remove(content)
-
-                # Update the timestamp
-                self.updated_at = datetime.now()
-
-                # Return True indicating the content was removed
-                return True
-
-        # Raise a ValueError if the content was not found
-        raise ValueError(f"Content with uuid {uuid} not found")
 
     def to_immutable(self) -> ImmutableStack:
         """
@@ -291,10 +242,11 @@ class StackFactory:
     @classmethod
     def create_stack(
         cls,
+        name: str,
         created_at: Optional[datetime] = None,
+        customfield_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
-        name: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableStack]:
@@ -302,8 +254,8 @@ class StackFactory:
         Creates and returns a new instance of the ImmutableStack class.
 
         Args:
-            contents (Optional[List[Dict[str, Any]]]): The contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
+            customfield_values (Optional[List[Dict[str, Any]]]): The customfield values of the stack.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             name (Optional[str]): The name of the stack.
@@ -319,8 +271,8 @@ class StackFactory:
         try:
             # Attempt to create and return a new instance of the ImmutableStack class
             return ImmutableStack(
-                contents=contents,
                 created_at=created_at,
+                customfield_values=customfield_values,
                 id=id,
                 key=key,
                 name=name,
@@ -709,6 +661,7 @@ class StackModel(ImmutableBaseModel):
 
     Attributes:
         created_at (Optional[datetime]): The timestamp when the stack was created.
+        customfield_values (Optional[JSON]): The values of the custom fields.
         id (Optional[int]): The ID of the stack.
         key (Optional[str]): The key of the stack.
         name (Optional[str]): The name of the stack.
@@ -747,6 +700,22 @@ class StackModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    customfield_values: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="customfield_values",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
         unique=False,
     )
 
@@ -817,6 +786,7 @@ class StackModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        customfield_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -827,8 +797,8 @@ class StackModel(ImmutableBaseModel):
         Initializes a new instance of the StackModel class.
 
         Args:
-            contents (Optional[List[Dict[str, Any]]]): The contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
+            customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             name (Optional[str]): The name of the stack.
@@ -840,6 +810,7 @@ class StackModel(ImmutableBaseModel):
         """
         super().__init__(
             created_at=created_at,
+            customfield_values=customfield_values,
             id=id,
             key=key,
             name=name,

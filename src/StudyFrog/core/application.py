@@ -5,7 +5,7 @@ Date: 2025-02-06
 
 from typing import *
 
-from ui.main_ui import MainUI
+from core.ui.main_ui import MainUI
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher

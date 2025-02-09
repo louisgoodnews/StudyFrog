@@ -28,10 +28,12 @@ class Constants:
     * ASSOCIATIONS: The name of the table for associations.
     * CHANGE_HISTORY: The name of the table for change history.
     * CHANGE_HISTORY_ITEMS: The name of the table for change history items.
+    * CUSTOM_FIELDS: The name of the table for custom fields.
     * DEFAULTS: The name of the table for defaults.
     * DIFFICULTIES: The name of the table for difficulties.
     * FLASHCARDS: The name of the table for flashcards.
     * NOTES: The name of the table for notes.
+    * OPTIONS: The name of the table for options.
     * PRIORITIES: The name of the table for priorities.
     * QUESTIONS: The name of the table for questions.
     * SETTINGS: The name of the table for settings.
@@ -84,10 +86,12 @@ class Constants:
     ASSOCIATIONS: str = "associations"
     CHANGE_HISTORIES: str = "change_histories"
     CHANGE_HISTORY_ITEMS: str = "change_history_items"
+    CUSTOM_FIELDS: str = "custom_fields"
     DEFAULTS: str = "defaults"
     DIFFICULTIES: str = "difficulties"
     FLASHCARDS: str = "flashcards"
     NOTES: str = "notes"
+    OPTIONS: str = "options"
     PRIORITIES: str = "priorities"
     QUESTIONS: str = "questions"
     SETTINGS: str = "settings"

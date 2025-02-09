@@ -36,6 +36,7 @@ class ImmutableQuestion(ImmutableBaseObject):
 
     Attributes:
         created_at (datetime): The timestamp when the question was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
         id (int): The ID of the question.
         is_correct (bool): Whether the question is correct or not.
         key (str): The key of the question.
@@ -51,6 +52,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
         correct_answer: Optional[Union[int, bool]] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -60,8 +62,9 @@ class ImmutableQuestion(ImmutableBaseObject):
         Initializes a new instance of the ImmutableQuestion class.
 
         Args:
-            created_at (Optional[datetime]): The timestamp when the question was created.
             correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
+            created_at (Optional[datetime]): The timestamp when the question was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             question_text (str): The text of the question.
@@ -77,6 +80,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         super().__init__(
             correct_answer=correct_answer,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             id=id,
             key=key,
             question_text=question_text,
@@ -102,7 +106,6 @@ class MutableQuestion(MutableBaseObject):
     A mutable class representing a question.
 
     Attributes:
-        Questions (Optional[List[int]]): The IDs of the Questions.
         correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
         created_at (Optional[datetime]): The timestamp when the question was created.
         id (Optional[int]): The ID of the question.
@@ -119,6 +122,7 @@ class MutableQuestion(MutableBaseObject):
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
         correct_answer: Optional[Union[int, bool]] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -132,6 +136,7 @@ class MutableQuestion(MutableBaseObject):
             question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
             correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
             created_at (Optional[datetime]): The timestamp when the question was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
@@ -145,6 +150,7 @@ class MutableQuestion(MutableBaseObject):
         super().__init__(
             correct_answer=correct_answer,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             id=id,
             key=key,
             question_text=question_text,
@@ -238,6 +244,13 @@ class QuestionConverter:
 
 
 class QuestionFactory:
+    """
+    A factory class for creating question objects.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the QuestionFactory class.
+    """
+
     logger: Logger = Logger.get_logger(name="QuestionFactory")
 
     @classmethod
@@ -247,6 +260,7 @@ class QuestionFactory:
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
         correct_answer: Optional[Union[int, bool]] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -260,6 +274,7 @@ class QuestionFactory:
             question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
             correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
             created_at (Optional[datetime]): The timestamp when the question was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
@@ -273,6 +288,7 @@ class QuestionFactory:
             return MutableQuestion(
                 correct_answer=correct_answer,
                 created_at=created_at,
+                custom_field_values=custom_field_values,
                 id=id,
                 key=key,
                 question_text=question_text,
@@ -366,6 +382,9 @@ class QuestionManager(BaseObjectManager):
 
             # Set the created_at timestamp of the question
             question.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the custom_field_values of the question
+            question.custom_field_values = [] or question.custom_field_values
 
             # Set the key of the question
             question.key = f"QUESTION_{self.count() + 1}"
@@ -499,6 +518,55 @@ class QuestionManager(BaseObjectManager):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutableQuestion]:
+        """
+        Retrieves a question by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutableQuestion]: The question with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the question is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the question from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the question with the given field and value from the database
+            model: Optional[QuestionModel] = asyncio.run(
+                QuestionModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the question if it exists
+            if model is not None:
+                # Convert the QuestionModel object to an ImmutableQuestion object
+                return ImmutableQuestion(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the question does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -723,6 +791,22 @@ class QuestionModel(ImmutableBaseModel):
         unique=False,
     )
 
+    custom_field_values: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="custom_field_values",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -807,6 +891,7 @@ class QuestionModel(ImmutableBaseModel):
         self,
         correct_answer: Optional[Union[int, bool]] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[Dict[str, Any]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         question_text: Optional[str] = None,
@@ -822,6 +907,7 @@ class QuestionModel(ImmutableBaseModel):
         Args:
             correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
             created_at (Optional[datetime]): The timestamp when the question was created.
+            custom_field_values (Optional[Dict[str, Any]]): The values of the custom fields.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             question_text (Optional[str]): The text of the question.
@@ -837,6 +923,7 @@ class QuestionModel(ImmutableBaseModel):
         super().__init__(
             correct_answer=correct_answer,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             id=id,
             key=key,
             question_text=question_text,

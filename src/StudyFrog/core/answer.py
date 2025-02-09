@@ -39,6 +39,7 @@ class ImmutableAnswer(ImmutableBaseObject):
     Attributes:
         answer_text (str): The text of the answer.
         created_at (datetime): The timestamp when the answer was created.
+        custom_field_values (List[Dict[str, Any]]): A list of custom field values.
         id (int): The ID of the answer.
         is_correct (bool): Whether the answer is correct or not.
         key (str): The key of the answer.
@@ -50,6 +51,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         self,
         answer_text: str,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         is_correct: Optional[bool] = None,
         key: Optional[str] = None,
@@ -62,6 +64,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         Args:
             answer_text (str): The text of the answer.
             created_at (Optional[datetime]): The timestamp when the answer was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             id (Optional[int]): The ID of the answer.
             is_correct (Optional[bool]): Whether the answer is correct or not.
             key (Optional[str]): The key of the answer.
@@ -76,6 +79,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         super().__init__(
             answer_text=answer_text,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             id=id,
             is_correct=is_correct,
             key=key,
@@ -102,6 +106,7 @@ class MutableAnswer(MutableBaseObject):
     Attributes:
         answer_text (str): The text of the answer.
         created_at (datetime): The timestamp when the answer was created.
+        custom_field_values (List[Dict[str, Any]]): A list of custom field values.
         id (int): The ID of the answer.
         is_correct (bool): Whether the answer is correct or not.
         key (str): The key of the answer.
@@ -113,6 +118,7 @@ class MutableAnswer(MutableBaseObject):
         self,
         answer_text: str,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         is_correct: Optional[bool] = None,
         key: Optional[str] = None,
@@ -125,6 +131,7 @@ class MutableAnswer(MutableBaseObject):
         Args:
             answer_text (str): The text of the answer.
             created_at (Optional[datetime]): The timestamp when the answer was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             id (Optional[int]): The ID of the answer.
             is_correct (Optional[bool]): Whether the answer is correct or not.
             key (Optional[str]): The key of the answer.
@@ -139,6 +146,7 @@ class MutableAnswer(MutableBaseObject):
         super().__init__(
             answer_text=answer_text,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             id=id,
             is_correct=is_correct,
             key=key,
@@ -231,6 +239,13 @@ class AnswerConverter:
 
 
 class AnswerFactory:
+    """
+    A factory class for creating ImmutableAnswer instances.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the AnswerFactory class.
+    """
+
     logger: Logger = Logger.get_logger(name="AnswerFactory")
 
     @classmethod
@@ -238,6 +253,7 @@ class AnswerFactory:
         cls,
         answer_text: str,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         is_correct: Optional[bool] = None,
         key: Optional[str] = None,
@@ -250,6 +266,7 @@ class AnswerFactory:
         Args:
             answer_text (str): The text of the answer.
             created_at (Optional[datetime]): The timestamp when the answer was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             id (Optional[int]): The ID of the answer.
             is_correct (Optional[bool]): Whether the answer is correct or not.
             key (Optional[str]): The key of the answer.
@@ -267,6 +284,7 @@ class AnswerFactory:
             return ImmutableAnswer(
                 answer_text=answer_text,
                 created_at=created_at,
+                custom_field_values=custom_field_values,
                 id=id,
                 is_correct=is_correct,
                 key=key,
@@ -359,6 +377,9 @@ class AnswerManager(BaseObjectManager):
 
             # Set the created_at timestamp of the answer
             answer.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the custom_field_values of the answer
+            answer.custom_field_values = [] or answer.custom_field_values
 
             # Set the key of the answer
             answer.key = f"ANSWER_{self.count() + 1}"
@@ -492,6 +513,55 @@ class AnswerManager(BaseObjectManager):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutableAnswer]:
+        """
+        Retrieves a answer by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutableAnswer]: The answer with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the answer is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the answer from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the answer with the given field and value from the database
+            model: Optional[AnswerModel] = asyncio.run(
+                AnswerModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the answer if it exists
+            if model is not None:
+                # Convert the AnswerModel object to an ImmutableAnswer object
+                return ImmutableAnswer(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the answer does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -715,6 +785,22 @@ class AnswerModel(ImmutableBaseModel):
         unique=False,
     )
 
+    custom_field_values: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="custom_field_values",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -767,6 +853,7 @@ class AnswerModel(ImmutableBaseModel):
         self,
         answer_text: Optional[str] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         is_correct: Optional[bool] = None,
         key: Optional[str] = None,
@@ -779,6 +866,7 @@ class AnswerModel(ImmutableBaseModel):
         Args:
             answer_text (Optional[str]): The text of the answer.
             created_at (Optional[datetime]): The timestamp when the answer was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             id (Optional[int]): The ID of the answer.
             is_correct (Optional[bool]): Whether the answer is correct or not.
             key (Optional[str]): The key of the answer.

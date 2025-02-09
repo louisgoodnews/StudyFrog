@@ -15,7 +15,7 @@ from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.logger import Logger
 from utils.navigation import NavigationItem, NavigationService
-from utils.ui_builder import UIBuilder
+from ui.ui_builder import UIBuilder
 
 
 __all__: List[str] = ["DashboardUI"]

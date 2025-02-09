@@ -13,7 +13,7 @@ from typing import *
 
 from ui.topbar import TopBar
 
-from utils.ui_builder import UIBuilder
+from ui.ui_builder import UIBuilder
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events

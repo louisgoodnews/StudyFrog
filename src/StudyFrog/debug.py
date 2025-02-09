@@ -8,10 +8,12 @@ import asyncio
 from core.answer import AnswerModel
 from core.association import AssociationModel
 from core.change_history import ChangeHistoryModel, ChangeHistoryItemModel
+from core.custom_field import CustomFieldModel
 from core.default import DefaultModel
 from core.difficulty import DifficultyModel
 from core.flashcard import FlashcardModel
 from core.note import NoteModel
+from core.option import OptionModel
 from core.priority import PriorityModel
 from core.question import QuestionModel
 from core.setting import SettingModel
@@ -33,10 +35,12 @@ def debug() -> None:
         AssociationModel,
         ChangeHistoryItemModel,
         ChangeHistoryModel,
+        CustomFieldModel,
         DefaultModel,
         DifficultyModel,
         FlashcardModel,
         NoteModel,
+        OptionModel,
         PriorityModel,
         QuestionModel,
         SettingModel,

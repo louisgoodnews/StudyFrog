@@ -37,13 +37,12 @@ class ImmutableNote(ImmutableBaseObject):
     A Note is a learning tool used to aid memorization by providing a question on one side and the answer on the other.
 
     Attributes:
-        ancestor (int): The ID of the ancestor Note.
         body_text (str): The body of the Note.
-        children (List[int]): The IDs of the children Notes.
         created_at (datetime): The timestamp when the Note was created.
-        title_text (str): The title of the Note.
+        custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         id (int): The ID of the Note.
         key (str): The key of the Note.
+        title_text (str): The title of the Note.
         updated_at (datetime): The timestamp when the Note was last updated.
         uuid (str): The UUID of the Note.
     """
@@ -52,9 +51,8 @@ class ImmutableNote(ImmutableBaseObject):
         self,
         body_text: str,
         title_text: str,
-        ancestor: Optional[int] = None,
-        children: Optional[List[int]] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -66,9 +64,8 @@ class ImmutableNote(ImmutableBaseObject):
         Args:
             body_text (str): The body of the Note.
             title_text (str): The title of the Note.
-            ancestor (int): The ID of the ancestor Note.
-            children (List[int]): The IDs of the children Notes.
             created_at (datetime): The timestamp when the Note was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             id (int): The ID of the Note.
             key (str): The key of the Note.
             updated_at (datetime): The timestamp when the Note was last updated.
@@ -81,12 +78,11 @@ class ImmutableNote(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             body_text=body_text,
-            title_text=title_text,
-            ancestor=ancestor,
-            children=children,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             id=id,
             key=key,
+            title_text=title_text,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -110,13 +106,12 @@ class MutableNote(MutableBaseObject):
     A Note is a learning tool used to aid memorization by providing a question on one side and the answer on the other.
 
     Attributes:
-        ancestor (int): The ID of the ancestor Note.
         body_text (str): The body of the Note.
-        children (List[int]): The IDs of the children Notes.
         created_at (datetime): The timestamp when the Note was created.
-        title_text (str): The title of the Note.
+        custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         id (int): The ID of the Note.
         key (str): The key of the Note.
+        title_text (str): The title of the Note.
         updated_at (datetime): The timestamp when the Note was last updated.
         uuid (str): The UUID of the Note.
     """
@@ -263,9 +258,8 @@ class NoteFactory:
         cls,
         body_text: str,
         title_text: str,
-        ancestor: Optional[int] = None,
-        children: Optional[List[int]] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -277,9 +271,8 @@ class NoteFactory:
         Args:
             body_text (str): The body of the Note.
             title_text (str): The title of the Note.
-
-
             created_at (Optional[datetime]): The timestamp when the Note was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             id (Optional[int]): The ID of the Note.
             key (Optional[str]): The key of the Note.
             updated_at (Optional[datetime]): The timestamp when the Note was last updated.
@@ -295,12 +288,11 @@ class NoteFactory:
             # Attempt to create an d return an ImmutableNote object
             return ImmutableNote(
                 body_text=body_text,
-                title_text=title_text,
-                ancestor=ancestor,
-                children=children,
                 created_at=created_at,
+                custom_field_values=custom_field_values,
                 id=id,
                 key=key,
+                title_text=title_text,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -390,6 +382,9 @@ class NoteManager(BaseObjectManager):
 
             # Set the created_at timestamp of the note
             note.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the custom_field_values of the note
+            note.custom_field_values = [] or note.custom_field_values
 
             # Set the key of the note
             note.key = f"NOTE_{self.count() + 1}"
@@ -522,6 +517,55 @@ class NoteManager(BaseObjectManager):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutableNote]:
+        """
+        Retrieves a note by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutableNote]: The note with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the note is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the note from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the note with the given field and value from the database
+            model: Optional[NoteModel] = asyncio.run(
+                NoteModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the note if it exists
+            if model is not None:
+                # Convert the NoteModel object to an ImmutableNote object
+                return ImmutableNote(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the note does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -685,10 +729,9 @@ class NoteModel(ImmutableBaseModel):
     Represents the structure of a Note model.
 
     Attributes:
-
         body_text (Optional[str]): The body of the Note.
-
         created_at (Optional[datetime]): The timestamp when the Note was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): The custom fields of the Note.
         id (Optional[int]): The ID of the Note.
         key (Optional[str]): The key of the Note.
         title_text (Optional[str]): The title of the Note.
@@ -741,6 +784,21 @@ class NoteModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    custom_field_values: Field = Field(
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="custom_field_values",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
         unique=False,
     )
 
@@ -808,6 +866,7 @@ class NoteModel(ImmutableBaseModel):
         self,
         body_text: Optional[str] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         title_text: Optional[str] = None,
@@ -820,6 +879,7 @@ class NoteModel(ImmutableBaseModel):
         Args:
             body_text (Optional[str]): The body of the Note.
             created_at (Optional[datetime]): The timestamp when the Note was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The custom fields of the Note.
             id (Optional[int]): The ID of the Note.
             key (Optional[str]): The key of the Note.
             title_text (Optional[str]): The title of the Note.
@@ -834,6 +894,7 @@ class NoteModel(ImmutableBaseModel):
         super().__init__(
             body_text=body_text,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             id=id,
             key=key,
             table=Constants.NOTES,

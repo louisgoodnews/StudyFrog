@@ -39,6 +39,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
     Attributes:
         back_text (str): The back side of the flashcard.
         created_at (datetime): The timestamp when the flashcard was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         front_text (str): The front side of the flashcard.
         id (int): The ID of the flashcard.
         key (str): The key of the flashcard.
@@ -51,6 +52,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         back_text: str,
         front_text: str,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -62,6 +64,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         Args:
             back_text (str): The back side of the flashcard.
             created_at (datetime): The timestamp when the flashcard was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             front_text (str): The front side of the flashcard.
             id (int): The ID of the flashcard.
             key (str): The key of the flashcard.
@@ -76,6 +79,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         super().__init__(
             back_text=back_text,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             front_text=front_text,
             id=id,
             key=key,
@@ -104,6 +108,7 @@ class MutableFlashcard(MutableBaseObject):
     Attributes:
         back_text (str): The back side of the flashcard.
         created_at (datetime): The timestamp when the flashcard was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         front_text (str): The front side of the flashcard.
         id (int): The ID of the flashcard.
         key (str): The key of the flashcard.
@@ -116,6 +121,7 @@ class MutableFlashcard(MutableBaseObject):
         back_text: str,
         front_text: str,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -127,6 +133,7 @@ class MutableFlashcard(MutableBaseObject):
         Args:
             back_text (str): The back side of the flashcard.
             created_at (datetime): The timestamp when the flashcard was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             front_text (str): The front side of the flashcard.
             id (int): The ID of the flashcard.
             key (str): The key of the flashcard.
@@ -141,6 +148,7 @@ class MutableFlashcard(MutableBaseObject):
         super().__init__(
             back_text=back_text,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             front_text=front_text,
             id=id,
             key=key,
@@ -248,6 +256,7 @@ class FlashcardFactory:
         back_text: str,
         front_text: str,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -259,6 +268,7 @@ class FlashcardFactory:
         Args:
             back_text (str): The back side of the flashcard.
             created_at (Optional[datetime]): The timestamp when the flashcard was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             front_text (str): The front side of the flashcard.
             id (Optional[int]): The ID of the flashcard.
             key (Optional[str]): The key of the flashcard.
@@ -275,6 +285,7 @@ class FlashcardFactory:
             # Attempt to create an d return an ImmutableFlashcard object
             return ImmutableFlashcard(
                 created_at=created_at,
+                custom_field_values=custom_field_values,
                 back_text=back_text,
                 front_text=front_text,
                 id=id,
@@ -368,6 +379,9 @@ class FlashcardManager(BaseObjectManager):
 
             # Set the created_at timestamp of the flashcard
             flashcard.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the custom_field_values of the flashcard
+            flashcard.custom_field_values = [] or flashcard.custom_field_values
 
             # Set the key of the flashcard
             flashcard.key = f"FLASHCARD_{self.count() + 1}"
@@ -501,6 +515,55 @@ class FlashcardManager(BaseObjectManager):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutableFlashcard]:
+        """
+        Retrieves a flashcard by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutableFlashcard]: The flashcard with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the flashcard is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the flashcard from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the flashcard with the given field and value from the database
+            model: Optional[FlashcardModel] = asyncio.run(
+                FlashcardModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the flashcard if it exists
+            if model is not None:
+                # Convert the FlashcardModel object to an ImmutableFlashcard object
+                return ImmutableFlashcard(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the flashcard does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -723,6 +786,22 @@ class FlashcardModel(ImmutableBaseModel):
         unique=False,
     )
 
+    custom_field_values: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="custom_field_values",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     front_text: Field = Field(
         autoincrement=False,
         default=None,
@@ -791,6 +870,7 @@ class FlashcardModel(ImmutableBaseModel):
         self,
         back_text: Optional[str] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         front_text: Optional[str] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -803,6 +883,8 @@ class FlashcardModel(ImmutableBaseModel):
         Args:
             back_text (Optional[str]): The back side of the flashcard.
             created_at (Optional[datetime]): The timestamp when the flashcard was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            id (Optional[int]): The ID of the flashcard.
             front_text (Optional[str]): The front side of the flashcard.
             key (Optional[str]): The key of the flashcard.
             updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
@@ -816,6 +898,7 @@ class FlashcardModel(ImmutableBaseModel):
         super().__init__(
             back_text=back_text,
             created_at=created_at,
+            custom_field_values=custom_field_values,
             front_text=front_text,
             id=id,
             key=key,

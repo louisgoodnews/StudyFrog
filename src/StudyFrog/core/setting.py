@@ -23,8 +23,7 @@ from utils.object import MutableBaseObject, ImmutableBaseObject
 
 
 __all__: List[str] = [
-    "ImmutableSetting",
-    "MutableSetting",
+    "Setting",
     "SettingConverter",
     "SettingFactory",
     "SettingManager",
@@ -33,7 +32,7 @@ __all__: List[str] = [
 ]
 
 
-class ImmutableSetting(ImmutableBaseObject):
+class Setting(ImmutableBaseObject):
     """
     An immutable class representing a setting.
 
@@ -57,7 +56,7 @@ class ImmutableSetting(ImmutableBaseObject):
         uuid: Optional[str] = None,
     ) -> None:
         """
-        Initializes a new instance of the ImmutableSetting class.
+        Initializes a new instance of the Setting class.
 
         Args:
             name (str): The name of the setting.
@@ -131,23 +130,23 @@ class MutableSetting(MutableBaseObject):
             value=value,
         )
 
-    def to_immutable(self) -> ImmutableSetting:
+    def to_immutable(self) -> Setting:
         """
         Converts the mutable setting to an immutable setting.
 
         Returns:
-            ImmutableSetting: The immutable setting.
+            Setting: The immutable setting.
         """
 
         # Convert the mutable setting to an immutable setting
-        return ImmutableSetting(**self.to_dict(exclude=["_logger"]))
+        return Setting(**self.to_dict(exclude=["_logger"]))
 
 
 class SettingConverter:
     """
-    A converter class for transforming between SettingModel and ImmutableSetting instances.
+    A converter class for transforming between SettingModel and Setting instances.
 
-    This class provides methods to convert a SettingModel instance to an ImmutableSetting instance,
+    This class provides methods to convert a SettingModel instance to an Setting instance,
     and vice versa. It utilizes a logger to capture and log exceptions that may occur during the conversion process.
 
     Attributes:
@@ -160,22 +159,22 @@ class SettingConverter:
     def model_to_object(
         cls,
         model: "SettingModel",
-    ) -> Optional[ImmutableSetting]:
+    ) -> Optional[Setting]:
         """
-        Converts a given SettingModel instance to an ImmutableSetting instance.
+        Converts a given SettingModel instance to an Setting instance.
 
         Args:
             model (SettingModel): The SettingModel instance to be converted.
 
         Returns:
-            ImmutableSetting: The converted ImmutableSetting instance if no exception occurs. Otherwise, None.
+            Setting: The converted Setting instance if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to convert the SettingModel instance.
         """
         try:
-            # Attempt to create and return a new instance of the ImmutableSetting class from the dictionary representation of the SettingModel instance
-            return ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+            # Attempt to create and return a new instance of the Setting class from the dictionary representation of the SettingModel instance
+            return Setting(**model.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -188,22 +187,22 @@ class SettingConverter:
     @classmethod
     def object_to_model(
         cls,
-        object: ImmutableSetting,
+        object: Setting,
     ) -> Optional["SettingModel"]:
         """
-        Converts a given ImmutableSetting instance to a SettingModel instance.
+        Converts a given Setting instance to a SettingModel instance.
 
         Args:
-            object (ImmutableSetting): The ImmutableSetting instance to be converted.
+            object (Setting): The Setting instance to be converted.
 
         Returns:
             SettingModel: The converted SettingModel instance if no exception occurs. Otherwise, None.
 
         Raises:
-            Exception: If an exception occurs while attempting to convert the ImmutableSetting instance.
+            Exception: If an exception occurs while attempting to convert the Setting instance.
         """
         try:
-            # Attempt to create and return a new instance of the SettingModel class from the dictionary representation of the ImmutableSetting instance
+            # Attempt to create and return a new instance of the SettingModel class from the dictionary representation of the Setting instance
             return SettingModel(**object.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -217,7 +216,7 @@ class SettingConverter:
 
 class SettingFactory:
     """
-    A factory class used to create instances of ImmutableSetting class.
+    A factory class used to create instances of Setting class.
 
     Attributes:
         logger (Logger): The logger instance associated with the object.
@@ -235,9 +234,9 @@ class SettingFactory:
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
-    ) -> Optional[ImmutableSetting]:
+    ) -> Optional[Setting]:
         """
-        Creates and returns a new instance of the ImmutableSetting class.
+        Creates and returns a new instance of the Setting class.
 
         Args:
             name (str): The name of the setting.
@@ -249,14 +248,14 @@ class SettingFactory:
             uuid (Optional[str]): The UUID of the setting.
 
         Returns:
-            ImmutableSetting: The created ImmutableSetting instance if no exception occurs. Otherwise, None.
+            Setting: The created Setting instance if no exception occurs. Otherwise, None.
 
         Raises:
-            Exception: If an exception occurs while attempting to create the ImmutableSetting instance.
+            Exception: If an exception occurs while attempting to create the Setting instance.
         """
         try:
-            # Attempt to create and return a new instance of the ImmutableSetting class
-            return ImmutableSetting(
+            # Attempt to create and return a new instance of the Setting class
+            return Setting(
                 name=name,
                 value=value,
                 created_at=created_at,
@@ -326,29 +325,21 @@ class SettingManager(BaseObjectManager):
 
     def create(
         self,
-        setting: Union[ImmutableSetting, MutableSetting],
-    ) -> Optional[ImmutableSetting]:
+        setting: Union[Setting, MutableSetting],
+    ) -> Optional[Setting]:
         """
         Creates a new setting in the database.
 
         Args:
-            setting (Union[ImmutableSetting, MutableSetting]): The setting to be created.
+            setting (Union[Setting, MutableSetting]): The setting to be created.
 
         Returns:
-            Optional[ImmutableSetting]: The newly created immutable setting if no exception occurs. Otherwise, None.
+            Optional[Setting]: The newly created immutable setting if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while creating the setting.
         """
         try:
-            # Check if the setting object is immutable
-            if isinstance(
-                setting,
-                ImmutableSetting,
-            ):
-                # If it is, convert it to a mutable setting
-                setting = MutableSetting(**setting.to_dict(exclude=["_logger"]))
-
             # Set the created_at timestamp of the setting
             setting.created_at = Miscellaneous.get_current_datetime()
 
@@ -374,7 +365,7 @@ class SettingManager(BaseObjectManager):
                 setting.id = id
 
                 # Convert the setting to an immutable setting
-                setting = ImmutableSetting(**setting.to_dict(exclude=["_logger"]))
+                setting = Setting(**setting.to_dict(exclude=["_logger"]))
 
                 # Add the setting to the cache
                 self.add_to_cache(
@@ -403,13 +394,13 @@ class SettingManager(BaseObjectManager):
 
     def delete(
         self,
-        setting: Union[ImmutableSetting, MutableSetting],
+        setting: Union[Setting, MutableSetting],
     ) -> bool:
         """
         Deletes a setting from the database.
 
         Args:
-            setting (Union[ImmutableSetting, MutableSetting]): The setting to be deleted.
+            setting (Union[Setting, MutableSetting]): The setting to be deleted.
 
         Returns:
             bool: True if the setting was deleted successfully. False otherwise.
@@ -421,7 +412,7 @@ class SettingManager(BaseObjectManager):
             # Convert the setting to an immutable setting and delete the setting from the database
             result: bool = asyncio.run(
                 SettingConverter.object_to_model(
-                    object=ImmutableSetting(**setting.to_dict(exclude=["_logger"]))
+                    object=Setting(**setting.to_dict(exclude=["_logger"]))
                 ).delete()
             )
 
@@ -436,12 +427,12 @@ class SettingManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableSetting]]:
+    def get_all(self) -> Optional[List[Setting]]:
         """
         Returns a list of all settings in the database.
 
         Returns:
-            Optional[List[ImmutableSetting]]: A list of all settings in the database if no exception occurs. Otherwise, None.
+            Optional[List[Setting]]: A list of all settings in the database if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -457,9 +448,9 @@ class SettingManager(BaseObjectManager):
                 SettingModel.get_all(database=Constants.DATABASE_PATH)
             )
 
-            # Convert the list of SettingModel objects to a list of ImmutableSetting objects
-            settings: List[ImmutableSetting] = [
-                ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+            # Convert the list of SettingModel objects to a list of Setting objects
+            settings: List[Setting] = [
+                Setting(**model.to_dict(exclude=["_logger"]))
                 for model in models
             ]
 
@@ -493,7 +484,7 @@ class SettingManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
-    ) -> Optional[ImmutableSetting]:
+    ) -> Optional[Setting]:
         """
         Retrieves a setting by the given field and value.
 
@@ -502,7 +493,7 @@ class SettingManager(BaseObjectManager):
             value (Any): The value to search for.
 
         Returns:
-            Optional[ImmutableSetting]: The setting with the given field and value if no exception occurs. Otherwise, None.
+            Optional[Setting]: The setting with the given field and value if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -524,8 +515,8 @@ class SettingManager(BaseObjectManager):
 
             # Return the setting if it exists
             if model is not None:
-                # Convert the SettingModel object to an ImmutableSetting object
-                return ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                # Convert the SettingModel object to an Setting object
+                return Setting(**model.to_dict(exclude=["_logger"]))
             else:
                 # Return None indicating that the setting does not exist
                 return None
@@ -541,7 +532,7 @@ class SettingManager(BaseObjectManager):
     def get_by_id(
         self,
         id: int,
-    ) -> Optional[ImmutableSetting]:
+    ) -> Optional[Setting]:
         """
         Returns a setting with the given ID.
 
@@ -549,7 +540,7 @@ class SettingManager(BaseObjectManager):
             id (int): The ID of the setting.
 
         Returns:
-            Optional[ImmutableSetting]: The setting with the given ID if no exception occurs. Otherwise, None.
+            Optional[Setting]: The setting with the given ID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -571,8 +562,8 @@ class SettingManager(BaseObjectManager):
 
             # Return the setting if it exists
             if model is not None:
-                # Convert the SettingModel object to an ImmutableSetting object
-                return ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                # Convert the SettingModel object to an Setting object
+                return Setting(**model.to_dict(exclude=["_logger"]))
             else:
                 # Return None indicating that the setting does not exist
                 return None
@@ -588,7 +579,7 @@ class SettingManager(BaseObjectManager):
     def get_by_uuid(
         self,
         uuid: str,
-    ) -> Optional[ImmutableSetting]:
+    ) -> Optional[Setting]:
         """
         Returns a setting with the given UUID.
 
@@ -596,7 +587,7 @@ class SettingManager(BaseObjectManager):
             uuid (str): The UUID of the setting.
 
         Returns:
-            Optional[ImmutableSetting]: The setting with the given UUID if no exception occurs. Otherwise, None.
+            Optional[Setting]: The setting with the given UUID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -618,8 +609,8 @@ class SettingManager(BaseObjectManager):
 
             # Return the setting if it exists
             if model is not None:
-                # Convert the SettingModel object to an ImmutableSetting object
-                return ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                # Convert the SettingModel object to an Setting object
+                return Setting(**model.to_dict(exclude=["_logger"]))
             else:
                 # Return None indicating that the setting does not exist
                 return None
@@ -634,16 +625,16 @@ class SettingManager(BaseObjectManager):
 
     def update(
         self,
-        setting: Union[ImmutableSetting, MutableSetting],
-    ) -> Optional[ImmutableSetting]:
+        setting: Union[Setting, MutableSetting],
+    ) -> Optional[Setting]:
         """
         Updates a setting with the given ID.
 
         Args:
-            setting (Union[ImmutableSetting, MutableSetting]): The setting to update.
+            setting (Union[Setting, MutableSetting]): The setting to update.
 
         Returns:
-            Optional[ImmutableSetting]: The updated setting if no exception occurs. Otherwise, None.
+            Optional[Setting]: The updated setting if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -652,7 +643,7 @@ class SettingManager(BaseObjectManager):
             # Convert the setting to an immutable setting and update the setting in the database
             model: Optional[SettingModel] = asyncio.run(
                 SettingConverter.object_to_model(
-                    object=ImmutableSetting(**setting.to_dict(exclude=["_logger"]))
+                    object=Setting(**setting.to_dict(exclude=["_logger"]))
                 ).update(
                     **setting.to_dict(
                         exclude=[
@@ -667,8 +658,8 @@ class SettingManager(BaseObjectManager):
 
             # Return the updated setting if it exists
             if model is not None:
-                # Convert the SettingModel object to an ImmutableSetting object
-                setting = ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                # Convert the SettingModel object to an Setting object
+                setting = Setting(**model.to_dict(exclude=["_logger"]))
 
                 # Add the setting to the cache
                 self.update_in_cache(
@@ -911,7 +902,7 @@ class SettingService:
         self,
         name: str,
         value: str,
-    ) -> Optional[ImmutableSetting]:
+    ) -> Optional[Setting]:
         """
         Creates a new setting with the given name and value in the database.
 
@@ -920,14 +911,14 @@ class SettingService:
             value (str): The value of the setting to create.
 
         Returns:
-            Optional[ImmutableSetting]: The newly created immutable setting if no exception occurs. Otherwise, None.
+            Optional[Setting]: The newly created immutable setting if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while creating the setting.
         """
         try:
-            # Atttempt to create an ImmutableSetting object from the given name and value
-            setting: ImmutableSetting = SettingFactory.create_setting(
+            # Atttempt to create an Setting object from the given name and value
+            setting: Setting = SettingFactory.create_setting(
                 name=name,
                 value=value,
             )
@@ -947,7 +938,7 @@ class SettingService:
     def load_default(
         self,
         name: str,
-    ) -> Optional[ImmutableSetting]:
+    ) -> Optional[Setting]:
         """
         Loads a default setting with the given name from the database.
 
@@ -955,7 +946,7 @@ class SettingService:
             name (str): The name of the default setting to load.
 
         Returns:
-            Optional[ImmutableSetting]: The loaded immutable setting if no exception occurs. Otherwise, None.
+            Optional[Setting]: The loaded immutable setting if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -988,7 +979,7 @@ class SettingService:
     def load_setting(
         self,
         name: str,
-    ) -> Optional[ImmutableSetting]:
+    ) -> Optional[Setting]:
         """
         Loads a setting with the given name from the database.
 
@@ -996,14 +987,14 @@ class SettingService:
             name (str): The name of the setting to load.
 
         Returns:
-            Optional[ImmutableSetting]: The loaded immutable setting if no exception occurs. Otherwise, None.
+            Optional[Setting]: The loaded immutable setting if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
             # Attempt to load the setting from the database
-            setting: Optional[ImmutableSetting] = self.setting_manager.get_by(
+            setting: Optional[Setting] = self.setting_manager.get_by(
                 field="name",
                 value=name,
             )
@@ -1030,16 +1021,16 @@ class SettingService:
 
     def update_setting(
         self,
-        setting: Union[ImmutableSetting, MutableSetting],
-    ) -> Optional[ImmutableSetting]:
+        setting: Union[Setting, MutableSetting],
+    ) -> Optional[Setting]:
         """
         Updates a given setting in the database.
 
         Args:
-            setting (Union[ImmutableSetting, MutableSetting]): The setting to update.
+            setting (Union[Setting, MutableSetting]): The setting to update.
 
         Returns:
-            Optional[ImmutableSetting]: The updated immutable setting if no exception occurs. Otherwise, None.
+            Optional[Setting]: The updated immutable setting if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
