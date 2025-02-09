@@ -350,7 +350,7 @@ class AnswerManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_answer(
         self,
         answer: Union[ImmutableAnswer, MutableAnswer],
     ) -> Optional[ImmutableAnswer]:
@@ -382,7 +382,7 @@ class AnswerManager(BaseObjectManager):
             answer.custom_field_values = [] or answer.custom_field_values
 
             # Set the key of the answer
-            answer.key = f"ANSWER_{self.count() + 1}"
+            answer.key = f"ANSWER_{self.count_answers() + 1}"
 
             # Set the updated_at timestamp of the answer
             answer.updated_at = Miscellaneous.get_current_datetime()
@@ -430,7 +430,7 @@ class AnswerManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_answer(
         self,
         answer: Union[ImmutableAnswer, MutableAnswer],
     ) -> bool:
@@ -465,7 +465,7 @@ class AnswerManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableAnswer]]:
+    def get_all_answers(self) -> Optional[List[ImmutableAnswer]]:
         """
         Returns a list of all answers in the database.
 
@@ -518,7 +518,7 @@ class AnswerManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by(
+    def get_answer_by(
         self,
         field: str,
         value: Any,
@@ -567,7 +567,7 @@ class AnswerManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_answer_by_id(
         self,
         id: int,
     ) -> Optional[ImmutableAnswer]:
@@ -614,7 +614,7 @@ class AnswerManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_answer_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ImmutableAnswer]:
@@ -661,7 +661,7 @@ class AnswerManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_answer(
         self,
         answer: Union[ImmutableAnswer, MutableAnswer],
     ) -> Optional[ImmutableAnswer]:

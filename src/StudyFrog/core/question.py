@@ -328,7 +328,7 @@ class QuestionManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_questions(self) -> int:
         """
         Returns the number of questions in the database.
 
@@ -355,7 +355,7 @@ class QuestionManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_question(
         self,
         question: Union[ImmutableQuestion, MutableQuestion],
     ) -> Optional[ImmutableQuestion]:
@@ -387,7 +387,7 @@ class QuestionManager(BaseObjectManager):
             question.custom_field_values = [] or question.custom_field_values
 
             # Set the key of the question
-            question.key = f"QUESTION_{self.count() + 1}"
+            question.key = f"QUESTION_{self.count_questions() + 1}"
 
             # Set the updated_at timestamp of the question
             question.updated_at = Miscellaneous.get_current_datetime()
@@ -435,7 +435,7 @@ class QuestionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_question(
         self,
         question: Union[ImmutableQuestion, MutableQuestion],
     ) -> bool:
@@ -470,7 +470,7 @@ class QuestionManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableQuestion]]:
+    def get_all_questions(self) -> Optional[List[ImmutableQuestion]]:
         """
         Returns a list of all questions in the database.
 
@@ -523,7 +523,7 @@ class QuestionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by(
+    def get_question_by(
         self,
         field: str,
         value: Any,
@@ -572,7 +572,7 @@ class QuestionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_question_by_id(
         self,
         id: int,
     ) -> Optional[ImmutableQuestion]:
@@ -619,7 +619,7 @@ class QuestionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_question_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ImmutableQuestion]:
@@ -666,7 +666,7 @@ class QuestionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_question(
         self,
         question: Union[ImmutableQuestion, MutableQuestion],
     ) -> Optional[ImmutableQuestion]:

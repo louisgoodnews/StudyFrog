@@ -284,7 +284,7 @@ class DefaultManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def count(self) -> int:
+    def count_defaults(self) -> int:
         """
         Returns the number of defaults in the database.
 
@@ -311,7 +311,7 @@ class DefaultManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_default(
         self,
         default: Default,
     ) -> Optional[Default]:
@@ -332,7 +332,7 @@ class DefaultManager(BaseObjectManager):
             default.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the default
-            default.key = f"DEFAULT_{self.count() + 1}"
+            default.key = f"DEFAULT_{self.count_defaults() + 1}"
 
             # Set the updated_at timestamp of the default
             default.updated_at = Miscellaneous.get_current_datetime()
@@ -380,7 +380,7 @@ class DefaultManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_default(
         self,
         default: Default,
     ) -> bool:
@@ -415,7 +415,7 @@ class DefaultManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[Default]]:
+    def get_all_defaults(self) -> Optional[List[Default]]:
         """
         Returns a list of all defaults in the database.
 
@@ -467,7 +467,7 @@ class DefaultManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by(
+    def get_default_by(
         self,
         field: str,
         value: Any,
@@ -516,7 +516,7 @@ class DefaultManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_default_by_id(
         self,
         id: int,
     ) -> Optional[Default]:
@@ -563,7 +563,7 @@ class DefaultManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_default_by_uuid(
         self,
         uuid: str,
     ) -> Optional[Default]:
@@ -610,7 +610,7 @@ class DefaultManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_default(
         self,
         default: Default,
     ) -> Optional[Default]:

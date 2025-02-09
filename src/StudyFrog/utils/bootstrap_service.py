@@ -6,7 +6,21 @@ Date: 2025-02-09
 import tkinter
 from typing import *
 
-from core.setting import SettingService
+from core.answer import AnswerManager
+from core.association import AssociationManager
+from core.change_history import ChangeHistoryManager, ChangeHistoryItemManager
+from core.custom_field import CustomFieldManager
+from core.default import DefaultManager
+from core.difficulty import DifficultyManager
+from core.flashcard import FlashcardManager
+from core.note import NoteManager
+from core.option import OptionManager
+from core.priority import PriorityManager
+from core.question import QuestionManager
+from core.setting import SettingManager, SettingService
+from core.stack import StackManager
+from core.tag import TagManager
+from core.user import UserManager
 
 from core.ui.dashboard_ui import DashboardUI
 from core.ui.setting_ui import SettingUI
@@ -17,6 +31,7 @@ from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
 from utils.navigation import NavigationService
+from utils.unified_manager import UnifiedManager
 
 
 __all__: List[str] = ["BootstrapService"]
@@ -81,6 +96,9 @@ class BootstrapService:
 
         # Initialize the setting service instance
         self.setting_service: SettingService = SettingService()
+
+        # Initialize the unified manager instance
+        self.unified_manager: UnifiedManager = UnifiedManager()
 
     def register_handlers(self) -> None:
         """
@@ -158,10 +176,63 @@ class BootstrapService:
             # Re-raise the exception to the caller
             raise e
 
+    def register_managers(self) -> None:
+        """
+        Registers the managers with the UnifiedManager.
+
+        This method registers all manager classes with the UnifiedManager,
+        which allows them to be accessed and used elsewhere in the application.
+
+        Returns:
+            None
+        """
+        try:
+            # Store the manager classes in a dictionary
+            managers: Dict[str, Type[Any]] = {
+                "answer_manager": AnswerManager,
+                "association_manager": AssociationManager,
+                "change_history_manager": ChangeHistoryManager,
+                "change_history_item_manager": ChangeHistoryItemManager,
+                "custom_field_manager": CustomFieldManager,
+                "default_manager": DefaultManager,
+                "difficulty_manager": DifficultyManager,
+                "flashcard_manager": FlashcardManager,
+                "note_manager": NoteManager,
+                "option_manager": OptionManager,
+                "priority_manager": PriorityManager,
+                "question_manager": QuestionManager,
+                "setting_manager": SettingManager,
+                "stack_manager": StackManager,
+                "tag_manager": TagManager,
+                "user_manager": UserManager,
+            }
+
+            # Iterate over the managers and register each one with the UnifiedManager
+            for (
+                name,
+                manager,
+            ) in managers.items():
+                # Register the manager with the UnifiedManager
+                self.unified_manager.register_manager(
+                    name=name,
+                    manager=manager,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'register_managers' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
     def run_startup_tasks(
         self,
     ) -> Tuple[
-        Optional[Dispatcher], Optional[NavigationService], Optional[SettingService]
+        Optional[Dispatcher],
+        Optional[NavigationService],
+        Optional[SettingService],
+        Optional[UnifiedManager],
     ]:
         """
         Executes startup tasks for the application.
@@ -170,22 +241,29 @@ class BootstrapService:
         dispatcher, navigation service, and setting service.
 
         Returns:
-            Tuple[Optional[Dispatcher], Optional[NavigationService], Optional[SettingService]]:
+            Tuple[Optional[Dispatcher], Optional[NavigationService], Optional[SettingService], Optional[UnifiedManager]]:
             A tuple containing the dispatcher, navigation service, and setting service
             instances, or None values if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while running the startup tasks.
         """
         try:
             # Register the event handlers
             self.register_handlers()
 
+            # Register the managers with the UnifiedManager
+            self.register_managers()
+
             # Register the menus with the UIRegistry
             self.register_menus()
 
-            # Return the dispatcher, navigation service, and setting service instances
+            # Return the dispatcher, navigation service, setting service, and unified manager instances
             return (
                 self.dispatcher,
                 self.navigation_service,
                 self.setting_service,
+                self.unified_manager,
             )
         except Exception as e:
             # Log an error message to indicate an exception has occurred

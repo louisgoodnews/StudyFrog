@@ -311,7 +311,7 @@ class StackManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_stacks(self) -> int:
         """
         Returns the number of stacks in the database.
 
@@ -338,7 +338,7 @@ class StackManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_stack(
         self,
         stack: Union[ImmutableStack, MutableStack],
     ) -> Optional[ImmutableStack]:
@@ -367,7 +367,7 @@ class StackManager(BaseObjectManager):
             stack.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the stack
-            stack.key = f"STACK_{self.count() + 1}"
+            stack.key = f"STACK_{self.count_stacks() + 1}"
 
             # Set the updated_at timestamp of the stack
             stack.updated_at = Miscellaneous.get_current_datetime()
@@ -415,7 +415,7 @@ class StackManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_stack(
         self,
         stack: Union[ImmutableStack, MutableStack],
     ) -> bool:
@@ -450,7 +450,7 @@ class StackManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableStack]]:
+    def get_all_stacks(self) -> Optional[List[ImmutableStack]]:
         """
         Returns a list of all stacks in the database.
 
@@ -502,7 +502,62 @@ class StackManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_stack_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutableStack]:
+        """
+        Returns a stack with the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutableStack]: The stack with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Get the stack with the given field and value from the database
+            model: Optional[StackModel] = asyncio.run(
+                StackModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Convert the StackModel object to an immutable stack
+            stack: Optional[ImmutableStack] = StackConverter.model_to_object(
+                model=model
+            )
+
+            # Return the stack if it exists
+            if stack is not None:
+                # Add the stack to the cache
+                self.add_to_cache(
+                    key=stack.key,
+                    value=stack,
+                )
+
+                # Return the immutable stack
+                return stack
+            else:
+                # Return None indicating that the stack does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_stack_by_id(
         self,
         id: int,
     ) -> Optional[ImmutableStack]:
@@ -549,7 +604,7 @@ class StackManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_stack_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ImmutableStack]:
@@ -596,7 +651,7 @@ class StackManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_stack(
         self,
         stack: Union[ImmutableStack, MutableStack],
     ) -> Optional[ImmutableStack]:

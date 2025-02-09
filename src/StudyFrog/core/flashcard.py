@@ -325,7 +325,7 @@ class FlashcardManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_flashcards(self) -> int:
         """
         Returns the number of flashcards in the database.
 
@@ -352,7 +352,7 @@ class FlashcardManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_flashcard(
         self,
         flashcard: Union[ImmutableFlashcard, MutableFlashcard],
     ) -> Optional[ImmutableFlashcard]:
@@ -384,7 +384,7 @@ class FlashcardManager(BaseObjectManager):
             flashcard.custom_field_values = [] or flashcard.custom_field_values
 
             # Set the key of the flashcard
-            flashcard.key = f"FLASHCARD_{self.count() + 1}"
+            flashcard.key = f"FLASHCARD_{self.count_flashcards() + 1}"
 
             # Set the updated_at timestamp of the flashcard
             flashcard.updated_at = Miscellaneous.get_current_datetime()
@@ -432,7 +432,7 @@ class FlashcardManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_flashcard(
         self,
         flashcard: Union[ImmutableFlashcard, MutableFlashcard],
     ) -> bool:
@@ -467,7 +467,7 @@ class FlashcardManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableFlashcard]]:
+    def get_all_flashcards(self) -> Optional[List[ImmutableFlashcard]]:
         """
         Returns a list of all flashcards in the database.
 
@@ -520,7 +520,7 @@ class FlashcardManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by(
+    def get_flashcard_by(
         self,
         field: str,
         value: Any,
@@ -569,7 +569,7 @@ class FlashcardManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_flashcard_by_id(
         self,
         id: int,
     ) -> Optional[ImmutableFlashcard]:
@@ -616,7 +616,7 @@ class FlashcardManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_flashcard_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ImmutableFlashcard]:
@@ -663,7 +663,7 @@ class FlashcardManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_flashcard(
         self,
         flashcard: Union[ImmutableFlashcard, MutableFlashcard],
     ) -> Optional[ImmutableFlashcard]:

@@ -308,7 +308,7 @@ class AssociationManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def count(self) -> int:
+    def count_associations(self) -> int:
         """
         Returns the number of associations in the database.
 
@@ -335,7 +335,7 @@ class AssociationManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_association(
         self,
         association: Association,
     ) -> Optional[Association]:
@@ -356,7 +356,7 @@ class AssociationManager(BaseObjectManager):
             association.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the association
-            association.key = f"ASSOCIATION_{self.count() + 1}"
+            association.key = f"ASSOCIATION_{self.count_associations() + 1}"
 
             # Set the updated_at timestamp of the association
             association.updated_at = Miscellaneous.get_current_datetime()
@@ -406,7 +406,7 @@ class AssociationManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_association(
         self,
         association: Association,
     ) -> bool:
@@ -441,7 +441,7 @@ class AssociationManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[Association]]:
+    def get_all_associations(self) -> Optional[List[Association]]:
         """
         Returns a list of all associations in the database.
 
@@ -493,7 +493,56 @@ class AssociationManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_association_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[Association]:
+        """
+        Retrieves a association by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[Association]: The association with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the association is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the association from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the association with the given field and value from the database
+            model: Optional[AssociationModel] = asyncio.run(
+                AssociationModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the association if it exists
+            if model is not None:
+                # Convert the AssociationModel object to an Association object
+                return Association(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the association does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_association_by_id(
         self,
         id: int,
     ) -> Optional[Association]:
@@ -540,7 +589,7 @@ class AssociationManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_association_by_uuid(
         self,
         uuid: str,
     ) -> Optional[Association]:
@@ -587,7 +636,7 @@ class AssociationManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_association(
         self,
         association: Association,
     ) -> Optional[Association]:

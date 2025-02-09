@@ -297,7 +297,7 @@ class TagManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_tags(self) -> int:
         """
         Returns the number of tags in the database.
 
@@ -324,7 +324,7 @@ class TagManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_tag(
         self,
         tag: Union[ImmutableTag, MutableTag],
     ) -> Optional[ImmutableTag]:
@@ -353,7 +353,7 @@ class TagManager(BaseObjectManager):
             tag.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the tag
-            tag.key = f"TAG_{self.count() + 1}"
+            tag.key = f"TAG_{self.count_tags() + 1}"
 
             # Set the updated_at timestamp of the tag
             tag.updated_at = Miscellaneous.get_current_datetime()
@@ -401,7 +401,7 @@ class TagManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_tag(
         self,
         tag: Union[ImmutableTag, MutableTag],
     ) -> bool:
@@ -436,7 +436,7 @@ class TagManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableTag]]:
+    def get_all_tags(self) -> Optional[List[ImmutableTag]]:
         """
         Returns a list of all tags in the database.
 
@@ -488,7 +488,54 @@ class TagManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_tag_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutableTag]:
+        """
+        Returns a tag with the given field and value.
+
+        Args:
+            field (str): The field to search for.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutableTag]: The tag with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Get the tag with the given field and value from the database
+            model: Optional[TagModel] = asyncio.run(
+                TagModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Convert the TagModel object to an ImmutableTag object
+            tag: Optional[ImmutableTag] = TagConverter.model_to_object(model=model)
+
+            # Return the tag if it exists
+            if model is not None:
+                # Return the tag
+                return tag
+            else:
+                # Return None indicating that the tag does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_tag_by_id(
         self,
         id: int,
     ) -> Optional[ImmutableTag]:
@@ -535,7 +582,7 @@ class TagManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_tag_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ImmutableTag]:
@@ -582,7 +629,7 @@ class TagManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_tag(
         self,
         tag: Union[ImmutableTag, MutableTag],
     ) -> Optional[ImmutableTag]:

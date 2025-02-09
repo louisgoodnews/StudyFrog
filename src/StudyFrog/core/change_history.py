@@ -227,7 +227,7 @@ class ChangeHistoryManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_change_history_items(self) -> int:
         """
         Returns the number of change histories in the database.
 
@@ -254,7 +254,7 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_change_history_item(
         self,
         change_history: Union[ChangeHistory, ChangeHistory],
     ) -> Optional[ChangeHistory]:
@@ -285,7 +285,9 @@ class ChangeHistoryManager(BaseObjectManager):
             change_history.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the change history
-            change_history.key = f"CHANGE_HISTORY_{self.count() + 1}"
+            change_history.key = (
+                f"CHANGE_HISTORY_{self.count_change_history_items() + 1}"
+            )
 
             # Set the updated_at timestamp of the change history
             change_history.updated_at = Miscellaneous.get_current_datetime()
@@ -337,7 +339,7 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_change_history(
         self,
         change_history: Union[ChangeHistory, ChangeHistory],
     ) -> bool:
@@ -372,7 +374,7 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ChangeHistory]]:
+    def get_all_change_history_items(self) -> Optional[List[ChangeHistory]]:
         """
         Returns a list of all change histories in the database.
 
@@ -424,7 +426,56 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_change_history_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ChangeHistory]:
+        """
+        Retrieves a change history by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ChangeHistory]: The change history with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the change history is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the change history from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the change history with the given field and value from the database
+            model: Optional[ChangeHistoryModel] = asyncio.run(
+                ChangeHistoryModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the change history if it exists
+            if model is not None:
+                # Convert the ChangeHistoryModel object to an ChangeHistory object
+                return ChangeHistory(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the change history does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_change_history_by_id(
         self,
         id: int,
     ) -> Optional[ChangeHistory]:
@@ -471,7 +522,7 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_change_history_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ChangeHistory]:
@@ -518,7 +569,7 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_change_history(
         self,
         change_history: Union[ChangeHistory, ChangeHistory],
     ) -> Optional[ChangeHistory]:
@@ -934,7 +985,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_change_history_items(self) -> int:
         """
         Returns the number of change histories in the database.
 
@@ -961,7 +1012,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_change_history_item(
         self,
         change_history_item: Union[ChangeHistoryItem, ChangeHistoryItem],
     ) -> Optional[ChangeHistoryItem]:
@@ -992,7 +1043,9 @@ class ChangeHistoryItemManager(BaseObjectManager):
             change_history_item.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the change history item
-            change_history_item.key = f"CHANGE_HISTORY_{self.count() + 1}"
+            change_history_item.key = (
+                f"CHANGE_HISTORY_ITEM_{self.count_change_history_items() + 1}"
+            )
 
             # Set the updated_at timestamp of the change history item
             change_history_item.updated_at = Miscellaneous.get_current_datetime()
@@ -1044,7 +1097,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_change_history_item(
         self,
         change_history_item: Union[ChangeHistoryItem, ChangeHistoryItem],
     ) -> bool:
@@ -1081,7 +1134,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ChangeHistoryItem]]:
+    def get_all_change_history_items(self) -> Optional[List[ChangeHistoryItem]]:
         """
         Returns a list of all change histories in the database.
 
@@ -1134,7 +1187,56 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_change_history_item_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ChangeHistoryItem]:
+        """
+        Retrieves a change history item by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ChangeHistoryItem]: The change history item with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the change history item is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the change history item from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the change history item with the given field and value from the database
+            model: Optional[ChangeHistoryItemModel] = asyncio.run(
+                ChangeHistoryModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the change history if it exists
+            if model is not None:
+                # Convert the ChangeHistoryItemModel object to an ChangeHistoryItem object
+                return ChangeHistoryItem(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the change history does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_change_history_item_by_id(
         self,
         id: int,
     ) -> Optional[ChangeHistoryItem]:
@@ -1152,9 +1254,9 @@ class ChangeHistoryItemManager(BaseObjectManager):
         """
         try:
             # Check if the change history item is already in the cache
-            if self.is_key_in_cache(key=f"CHANGE_HISTORY_{id}"):
+            if self.is_key_in_cache(key=f"CHANGE_HISTORY_ITEM_{id}"):
                 # Return the change history item from the cache
-                return self.get_value_from_cache(key=f"CHANGE_HISTORY_{id}")
+                return self.get_value_from_cache(key=f"CHANGE_HISTORY_ITEM_{id}")
 
             # Get the change history item with the given ID from the database
             model: Optional[ChangeHistoryItemModel] = asyncio.run(
@@ -1181,7 +1283,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_change_history_item_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ChangeHistoryItem]:
@@ -1228,7 +1330,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_change_history_item(
         self,
         change_history_item: Union[ChangeHistoryItem, ChangeHistoryItem],
     ) -> Optional[ChangeHistoryItem]:

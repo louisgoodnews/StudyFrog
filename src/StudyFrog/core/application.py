@@ -63,11 +63,12 @@ class Application:
         # Bootstrap the application services
         bootstrap_service: BootstrapService = BootstrapService()
 
-        # Initialize the dispatcher, navigation service, and setting service
+        # Initialize the dispatcher, navigation service, setting service and unified manager
         (
             self.dispatcher,
             self.navigation_service,
             self.setting_service,
+            self.unified_manager,
         ) = bootstrap_service.run_startup_tasks()
 
         # Initialize the main UI

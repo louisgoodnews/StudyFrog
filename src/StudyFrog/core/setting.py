@@ -296,7 +296,7 @@ class SettingManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_settings(self) -> int:
         """
         Returns the number of settings in the database.
 
@@ -323,7 +323,7 @@ class SettingManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_setting(
         self,
         setting: Union[Setting, MutableSetting],
     ) -> Optional[Setting]:
@@ -344,7 +344,7 @@ class SettingManager(BaseObjectManager):
             setting.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the setting
-            setting.key = f"SETTING_{self.count() + 1}"
+            setting.key = f"SETTING_{self.count_settings() + 1}"
 
             # Set the updated_at timestamp of the setting
             setting.updated_at = Miscellaneous.get_current_datetime()
@@ -392,7 +392,7 @@ class SettingManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_setting(
         self,
         setting: Union[Setting, MutableSetting],
     ) -> bool:
@@ -427,7 +427,7 @@ class SettingManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[Setting]]:
+    def get_all_settings(self) -> Optional[List[Setting]]:
         """
         Returns a list of all settings in the database.
 
@@ -479,7 +479,7 @@ class SettingManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by(
+    def get_setting_by(
         self,
         field: str,
         value: Any,
@@ -528,7 +528,7 @@ class SettingManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_setting_by_id(
         self,
         id: int,
     ) -> Optional[Setting]:
@@ -575,7 +575,7 @@ class SettingManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_setting_by_uuid(
         self,
         uuid: str,
     ) -> Optional[Setting]:
@@ -622,7 +622,7 @@ class SettingManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_setting(
         self,
         setting: Union[Setting, MutableSetting],
     ) -> Optional[Setting]:
@@ -923,7 +923,7 @@ class SettingService:
             )
 
             # Store the Setting in the database and return it
-            return self.setting_manager.create(setting=setting)
+            return self.setting_manager.create_setting(setting=setting)
 
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -952,7 +952,7 @@ class SettingService:
         """
         try:
             # Attempt to load the default object from the database
-            default: Optional[Default] = self.default_manager.get_by(
+            default: Optional[Default] = self.default_manager.get_default_by(
                 field="name",
                 value=name,
             )
@@ -993,7 +993,7 @@ class SettingService:
         """
         try:
             # Attempt to load the setting from the database
-            setting: Optional[Setting] = self.setting_manager.get_by(
+            setting: Optional[Setting] = self.setting_manager.get_setting_by(
                 field="name",
                 value=name,
             )
@@ -1036,7 +1036,7 @@ class SettingService:
         """
         try:
             # Update the setting in the database
-            return self.setting_manager.update(setting=setting)
+            return self.setting_manager.update_setting(setting=setting)
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

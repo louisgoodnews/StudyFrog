@@ -227,7 +227,7 @@ class PriorityManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_priorities(self) -> int:
         """
         Returns the number of priorities in the database.
 
@@ -254,7 +254,7 @@ class PriorityManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_priority(
         self,
         priority: Priority,
     ) -> Optional[Priority]:
@@ -283,7 +283,7 @@ class PriorityManager(BaseObjectManager):
             priority.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the priority
-            priority.key = f"PRIORITY_{self.count() + 1}"
+            priority.key = f"PRIORITY_{self.count_priorities() + 1}"
 
             # Set the updated_at timestamp of the priority
             priority.updated_at = Miscellaneous.get_current_datetime()
@@ -331,7 +331,7 @@ class PriorityManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_priority(
         self,
         priority: Priority,
     ) -> bool:
@@ -366,7 +366,7 @@ class PriorityManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[Priority]]:
+    def get_all_priorities(self) -> Optional[List[Priority]]:
         """
         Returns a list of all priorities in the database.
 
@@ -418,7 +418,7 @@ class PriorityManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_priority_by_id(
         self,
         id: int,
     ) -> Optional[Priority]:
@@ -465,7 +465,7 @@ class PriorityManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_priority_by_uuid(
         self,
         uuid: str,
     ) -> Optional[Priority]:
@@ -512,7 +512,7 @@ class PriorityManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_priority(
         self,
         priority: Priority,
     ) -> Optional[Priority]:

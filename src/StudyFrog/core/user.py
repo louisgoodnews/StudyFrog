@@ -294,7 +294,7 @@ class UserManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_users(self) -> int:
         """
         Returns the number of users in the database.
 
@@ -321,7 +321,7 @@ class UserManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_user(
         self,
         user: Union[ImmutableUser, MutableUser],
     ) -> Optional[ImmutableUser]:
@@ -350,7 +350,7 @@ class UserManager(BaseObjectManager):
             user.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the user
-            user.key = f"USER_{self.count() + 1}"
+            user.key = f"USER_{self.count_users() + 1}"
 
             # Set the updated_at timestamp of the user
             user.updated_at = Miscellaneous.get_current_datetime()
@@ -398,7 +398,7 @@ class UserManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_user(
         self,
         user: Union[ImmutableUser, MutableUser],
     ) -> bool:
@@ -433,7 +433,7 @@ class UserManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableUser]]:
+    def get_all_users(self) -> Optional[List[ImmutableUser]]:
         """
         Returns a list of all users in the database.
 
@@ -485,7 +485,56 @@ class UserManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_user_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutableUser]:
+        """
+        Returns a user with the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutableUser]: The user with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Get the user with the given field and value from the database
+            model: Optional[UserModel] = asyncio.run(
+                UserModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Convert the UserModel object to an ImmutableUser object
+            user: Optional[ImmutableUser] = UserConverter.model_to_object(
+                model=model,
+            )
+
+            # Return the user if it exists
+            if model is not None:
+                # Return the user
+                return user
+            else:
+                # Return None indicating that the user does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_user_by_id(
         self,
         id: int,
     ) -> Optional[ImmutableUser]:
@@ -503,9 +552,9 @@ class UserManager(BaseObjectManager):
         """
         try:
             # Check if the user is already in the cache
-            if self.is_key_in_cache(key=f"TAG_{id}"):
+            if self.is_key_in_cache(key=f"USER_{id}"):
                 # Return the user from the cache
-                return self.get_value_from_cache(key=f"TAG_{id}")
+                return self.get_value_from_cache(key=f"USER_{id}")
 
             # Get the user with the given ID from the database
             model: Optional[UserModel] = asyncio.run(
@@ -532,7 +581,7 @@ class UserManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_user_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ImmutableUser]:
@@ -579,7 +628,7 @@ class UserManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_user(
         self,
         user: Union[ImmutableUser, MutableUser],
     ) -> Optional[ImmutableUser]:

@@ -301,7 +301,7 @@ class OptionManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_options(self) -> int:
         """
         Returns the number of options in the database.
 
@@ -328,7 +328,7 @@ class OptionManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_option(
         self,
         option: Union[ImmutableOption, MutableOption],
     ) -> Optional[ImmutableOption]:
@@ -357,7 +357,7 @@ class OptionManager(BaseObjectManager):
             option.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the option
-            option.key = f"OPTION_{self.count() + 1}"
+            option.key = f"OPTION_{self.count_options() + 1}"
 
             # Set the updated_at timestamp of the option
             option.updated_at = Miscellaneous.get_current_datetime()
@@ -405,7 +405,7 @@ class OptionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_option(
         self,
         option: Union[ImmutableOption, MutableOption],
     ) -> bool:
@@ -440,7 +440,7 @@ class OptionManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableOption]]:
+    def get_all_options(self) -> Optional[List[ImmutableOption]]:
         """
         Returns a list of all options in the database.
 
@@ -493,7 +493,7 @@ class OptionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by(
+    def get_option_by(
         self,
         field: str,
         value: Any,
@@ -542,7 +542,7 @@ class OptionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_option_by_id(
         self,
         id: int,
     ) -> Optional[ImmutableOption]:
@@ -589,7 +589,7 @@ class OptionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_option_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ImmutableOption]:
@@ -636,7 +636,7 @@ class OptionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_option(
         self,
         option: Union[ImmutableOption, MutableOption],
     ) -> Optional[ImmutableOption]:

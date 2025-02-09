@@ -229,7 +229,7 @@ class CustomFieldManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_custom_fields(self) -> int:
         """
         Returns the number of custom fields in the database.
 
@@ -256,7 +256,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_custom_field(
         self,
         custom_field: CustomField,
     ) -> Optional[CustomField]:
@@ -277,7 +277,7 @@ class CustomFieldManager(BaseObjectManager):
             custom_field.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the custom field
-            custom_field.key = f"SETTING_{self.count() + 1}"
+            custom_field.key = f"CUSTOM_FIELD_{self.count_custom_fields() + 1}"
 
             # Set the updated_at timestamp of the custom field
             custom_field.updated_at = Miscellaneous.get_current_datetime()
@@ -327,7 +327,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_custom_field(
         self,
         custom_field: CustomField,
     ) -> bool:
@@ -362,7 +362,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[CustomField]]:
+    def get_all_custom_fields(self) -> Optional[List[CustomField]]:
         """
         Returns a list of all custom fields in the database.
 
@@ -414,7 +414,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by(
+    def get_custom_field_by(
         self,
         field: str,
         value: Any,
@@ -463,7 +463,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_custom_field_by_id(
         self,
         id: int,
     ) -> Optional[CustomField]:
@@ -481,9 +481,9 @@ class CustomFieldManager(BaseObjectManager):
         """
         try:
             # Check if the custom field is already in the cache
-            if self.is_key_in_cache(key=f"SETTING_{id}"):
+            if self.is_key_in_cache(key=f"CUSTOM_FIELD_{id}"):
                 # Return the custom field from the cache
-                return self.get_value_from_cache(key=f"SETTING_{id}")
+                return self.get_value_from_cache(key=f"CUSTOM_FIELD_{id}")
 
             # Get the custom field with the given ID from the database
             model: Optional[CustomFieldModel] = asyncio.run(
@@ -510,7 +510,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_custom_field_by_uuid(
         self,
         uuid: str,
     ) -> Optional[CustomField]:
@@ -557,7 +557,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_custom_field(
         self,
         custom_field: CustomField,
     ) -> Optional[CustomField]:

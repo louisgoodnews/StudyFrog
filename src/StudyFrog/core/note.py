@@ -328,7 +328,7 @@ class NoteManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_notes(self) -> int:
         """
         Returns the number of notes in the database.
 
@@ -355,7 +355,7 @@ class NoteManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_note(
         self,
         note: Union[ImmutableNote, MutableNote],
     ) -> Optional[ImmutableNote]:
@@ -387,7 +387,7 @@ class NoteManager(BaseObjectManager):
             note.custom_field_values = [] or note.custom_field_values
 
             # Set the key of the note
-            note.key = f"NOTE_{self.count() + 1}"
+            note.key = f"NOTE_{self.count_notes() + 1}"
 
             # Set the updated_at timestamp of the note
             note.updated_at = Miscellaneous.get_current_datetime()
@@ -435,7 +435,7 @@ class NoteManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_note(
         self,
         note: Union[ImmutableNote, MutableNote],
     ) -> bool:
@@ -470,7 +470,7 @@ class NoteManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[ImmutableNote]]:
+    def get_all_notes(self) -> Optional[List[ImmutableNote]]:
         """
         Returns a list of all notes in the database.
 
@@ -522,7 +522,7 @@ class NoteManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by(
+    def get_note_by(
         self,
         field: str,
         value: Any,
@@ -571,7 +571,7 @@ class NoteManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_note_by_id(
         self,
         id: int,
     ) -> Optional[ImmutableNote]:
@@ -618,7 +618,7 @@ class NoteManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_note_by_uuid(
         self,
         uuid: str,
     ) -> Optional[ImmutableNote]:
@@ -665,7 +665,7 @@ class NoteManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_note(
         self,
         note: Union[ImmutableNote, MutableNote],
     ) -> Optional[ImmutableNote]:

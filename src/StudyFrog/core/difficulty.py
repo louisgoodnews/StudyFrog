@@ -227,7 +227,7 @@ class DifficultyManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_difficulties(self) -> int:
         """
         Returns the number of difficulties in the database.
 
@@ -254,7 +254,7 @@ class DifficultyManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create(
+    def create_difficulty(
         self,
         difficulty: Difficulty,
     ) -> Optional[Difficulty]:
@@ -275,7 +275,7 @@ class DifficultyManager(BaseObjectManager):
             difficulty.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the difficulty
-            difficulty.key = f"DIFFICULTY_{self.count() + 1}"
+            difficulty.key = f"DIFFICULTY_{self.count_difficulties() + 1}"
 
             # Set the updated_at timestamp of the difficulty
             difficulty.updated_at = Miscellaneous.get_current_datetime()
@@ -325,7 +325,7 @@ class DifficultyManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def delete(
+    def delete_difficulty(
         self,
         difficulty: Difficulty,
     ) -> bool:
@@ -360,7 +360,7 @@ class DifficultyManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all(self) -> Optional[List[Difficulty]]:
+    def get_all_difficulties(self) -> Optional[List[Difficulty]]:
         """
         Returns a list of all difficulties in the database.
 
@@ -412,7 +412,7 @@ class DifficultyManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_id(
+    def get_difficulty_by_id(
         self,
         id: int,
     ) -> Optional[Difficulty]:
@@ -459,7 +459,7 @@ class DifficultyManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_by_uuid(
+    def get_difficulty_by_uuid(
         self,
         uuid: str,
     ) -> Optional[Difficulty]:
@@ -506,7 +506,7 @@ class DifficultyManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def update(
+    def update_difficulty(
         self,
         difficulty: Difficulty,
     ) -> Optional[Difficulty]:
