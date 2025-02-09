@@ -333,7 +333,10 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             None
         """
         # Call the parent class constructor
-        super().__init__(event=event, id=id)
+        super().__init__(
+            event=event,
+            id=id,
+        )
 
         # Initialize the subscriptions dictionary as an empty dictionary
         self.subscriptions: Dict[str, Any] = {}
@@ -366,20 +369,20 @@ class DispatcherEventSubscription(ImmutableBaseObject):
                 self.subscriptions[namespace] = {}
 
             # Generate a UUID
-            uuid: str = str(uuid.uuid4())
+            code: str = str(uuid.uuid4())
 
             # Add the subscription to the subscriptions dictionary
-            self.subscriptions[namespace][uuid] = {
+            self.subscriptions[namespace][code] = {
                 "function": function,
                 "persistent": persistent,
             }
 
             # Return the generated UUID
-            return uuid
+            return code
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'add_subscription' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'add_subscription' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -507,7 +510,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'remove_subscription' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'remove_subscription' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -555,15 +558,57 @@ class DispatcherEventSubscriptionFactory:
 
 
 class Dispatcher:
+    """
+    A class used to manage event subscriptions and dispatch events to registered handlers.
+
+    This class provides methods to register, unregister, and dispatch events to registered handlers.
+    It is designed to be used as a singleton, meaning that only one instance of the class can
+    exist at any given time. The instance is accessible through the `Dispatcher.instance` property.
+
+    The class uses a dictionary to store event subscriptions, where the key is the event name and
+    the value is a dictionary containing the UUIDs of the subscriptions and the associated namespaces.
+
+    The class provides methods to register a function to be called when an event is dispatched,
+    unregister a function from an event, and dispatch an event to all registered handlers.
+
+    The class also provides a method to log messages to the console, which can be useful for debugging.
+
+    Attributes:
+        _shared_instance (Optional[Dispatcher]): The shared instance of the class.
+        logger (Logger): The logger instance associated with the object.
+        subscriptions (Dict[str, DispatcherEventSubscription]): The dictionary storing event subscriptions.
+    """
+
     _shared_instance: Optional["Dispatcher"] = None
 
     def __new__(cls) -> "Dispatcher":
+        """
+        Creates and returns a new instance of the Dispatcher class.
+
+        If the instance does not exist, creates a new one by calling the parent class constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            Dispatcher: The created or existing instance of Dispatcher class.
+        """
         if cls._shared_instance is None:
             cls._shared_instance = super().__new__(cls)
             cls._shared_instance.init()
         return cls._shared_instance
 
     def init(self) -> None:
+        """
+        Initializes the dispatcher by creating a logger instance and initializing an empty dictionary for subscriptions.
+
+        This method is called when the shared instance of the dispatcher is created. It initializes an instance of the Logger class and an empty dictionary for storing event subscriptions.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         # Initialize an instance of the Logger class
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
@@ -610,7 +655,12 @@ class Dispatcher:
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"An error occurred while dispatching event '{event.name}' in namespace '{namespace}': {e}",
+                message=f"Caught an exception while attempting to dispatch event '{event.name}' in namespace '{namespace}': {e}",
+            )
+
+            # Log additional information about the exception
+            self.logger.error(
+                message=f"An error occurred while dispatching event '{event.name}' in namespace '{namespace}'.",
             )
 
             # Return None indicating an exception has occurred
@@ -688,7 +738,7 @@ class Dispatcher:
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'register' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'register' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -744,7 +794,7 @@ class Dispatcher:
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'unregister' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'unregister' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred

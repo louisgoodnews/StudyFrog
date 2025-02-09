@@ -356,7 +356,7 @@ class AssociationManager(BaseObjectManager):
             association.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the association
-            association.key = f"FLASHCARD_{self.count() + 1}"
+            association.key = f"ASSOCIATION_{self.count() + 1}"
 
             # Set the updated_at timestamp of the association
             association.updated_at = Miscellaneous.get_current_datetime()
@@ -511,9 +511,9 @@ class AssociationManager(BaseObjectManager):
         """
         try:
             # Check if the association is already in the cache
-            if self.is_key_in_cache(key=f"FLASHCARD_{id}"):
+            if self.is_key_in_cache(key=f"ASSOCIATION_{id}"):
                 # Return the association from the cache
-                return self.get_value_from_cache(key=f"FLASHCARD_{id}")
+                return self.get_value_from_cache(key=f"ASSOCIATION_{id}")
 
             # Get the association with the given ID from the database
             model: Optional[AssociationModel] = asyncio.run(
@@ -651,13 +651,12 @@ class AssociationModel(ImmutableBaseModel):
     Represents the structure of a association model.
 
     Attributes:
-        ancestor (Optional[int]): The ID of the ancestor association.
-        back_text (Optional[str]): The back side of the association.
-        children (Optional[List[int]]): The IDs of the children associations.
+        association_type (Optional[str]): The type of the association.
         created_at (Optional[datetime]): The timestamp when the association was created.
-        front_text (Optional[str]): The front side of the association.
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
+        source (Optional[Dict[str, Any]]): The dictionary representation of the source object.
+        target (Optional[Dict[str, Any]]): The dictionary representation of the target object.
         updated_at (Optional[datetime]): The timestamp when the association was last updated.
         uuid (Optional[str]): The UUID of the association.
     """

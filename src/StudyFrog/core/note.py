@@ -392,7 +392,7 @@ class NoteManager(BaseObjectManager):
             note.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the note
-            note.key = f"FLASHCARD_{self.count() + 1}"
+            note.key = f"NOTE_{self.count() + 1}"
 
             # Set the updated_at timestamp of the note
             note.updated_at = Miscellaneous.get_current_datetime()
@@ -545,9 +545,9 @@ class NoteManager(BaseObjectManager):
         """
         try:
             # Check if the note is already in the cache
-            if self.is_key_in_cache(key=f"FLASHCARD_{id}"):
+            if self.is_key_in_cache(key=f"NOTE_{id}"):
                 # Return the note from the cache
-                return self.get_value_from_cache(key=f"FLASHCARD_{id}")
+                return self.get_value_from_cache(key=f"NOTE_{id}")
 
             # Get the note with the given ID from the database
             model: Optional[NoteModel] = asyncio.run(

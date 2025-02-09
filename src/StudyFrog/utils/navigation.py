@@ -5,12 +5,11 @@ Date: 2025-02-08
 
 import uuid
 
-import tkinter
 
 from typing import *
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherEvent
 from utils.events import Events
 from utils.logger import Logger
 from utils.object import ImmutableBaseObject
@@ -152,9 +151,6 @@ class NavigationService:
         self.dispatcher: Dispatcher = dispatcher
 
         # Initialize a list of navigation items as an empty list and store it in an instance variable
-        self.forward_stack: List[NavigationItem] = []
-
-        # Initialize a list of navigation items as an empty list and store it in an instance variable
         self.navigation_stack: List[NavigationItem] = []
 
         # Register a function to be called when the REQUEST_BACKWARD_NAVIGATION event is dispatched
@@ -173,9 +169,57 @@ class NavigationService:
             persistent=True,
         )
 
-    def navigate(self) -> None:
+    def navigate(
+        self,
+        source: str,
+        target: str,
+        **kwargs,
+    ) -> None:
+        """
+        Navigates to the given target.
+
+        Args:
+            source (str): The source of the navigation item.
+            target (str): The target of the navigation item.
+            **kwargs: Additional keyword arguments to be passed to the event handler.
+
+        Returns:
+            None
+        """
         try:
-            pass
+            # Attempt to create a new instance of NavigationItem
+            navigation_item: NavigationItem = (
+                NavigationItemFactory.create_navigation_item(
+                    source=source,
+                    target=target,
+                )
+            )
+
+            if not navigation_item:
+                # Log a warning message indicating that no navigation item was created
+                self.logger.warning(
+                    message=f"No navigation item was created for source '{source}' and target '{target}'."
+                )
+
+                # Return early
+                return
+
+            # Push to history stack
+            self.navigation_stack.append(navigation_item)
+
+            # Log an info message indicating navigation is being attempted
+            self.logger.info(
+                message=f"Attempting to navigate from '{source}' to '{target}'."
+            )
+
+            # Dsipatch the passed event
+            self.dispatcher.dispatch(
+                event=Events.NAVIGATE,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                navigation_item=navigation_item,
+                target=target,
+                **kwargs,
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -189,10 +233,64 @@ class NavigationService:
         self,
         **kwargs,
     ) -> None:
+        """
+        Handles backward navigation.
+
+        Moves the current navigation item to the forward stack and navigates to the previous item.
+
+        Args:
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            None
+        """
         try:
-            # Remove the last navigation item from the list
-            navigation_item: NavigationItem = self.navigation_stack.pop(
-                self.navigation_stack[-1]
+            # Get the target from the kwargs
+            target: Optional[Union[int, str]] = kwargs.get("target")
+
+            if target is None:
+                # Log a warning message indicating that no target was specified
+                self.logger.warning("No target specified for backward navigation.")
+
+                # Return early
+                return
+
+            if not isinstance(target, (int, str)):
+                # Log a warning message indicating an invalid target type
+                self.logger.warning(f"Invalid target type: {type(target)}")
+
+                # Return early
+                return
+
+            # Attempt to find the navigation item in the navigation stack
+            navigation_item: Optional[NavigationItem] = next(
+                (
+                    item
+                    for item in self.navigation_stack
+                    if item.id == target or item.uuid == target
+                ),
+                None,
+            )
+
+            if not navigation_item:
+                # Log a warning message indicating that no navigation item was found
+                self.logger.warning(
+                    message=f"No navigation item found for target: {target}"
+                )
+
+                # Return early
+                return
+
+            # Log an info message indicating that we are navigating backward
+            self.logger.info(
+                message=f"Navigating backward to '{navigation_item.target}'."
+            )
+
+            # Navigate to the found navigation item
+            self.navigate(
+                source=navigation_item.source,
+                target=navigation_item.target,
+                **kwargs,
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -205,20 +303,35 @@ class NavigationService:
 
     def on_request_forward_navigation(
         self,
-        source: str,
-        target: str,
+        **kwargs,
     ) -> None:
-        try:
-            # Create a new instance of NavigationItem
-            navigation_item: NavigationItem = (
-                NavigationItemFactory.create_navigation_item(
-                    source=source,
-                    target=target,
-                )
-            )
+        """
+        Handles forward navigation.
 
-            # Append the navigation item to the list
-            self.navigation_stack.append(navigation_item=navigation_item)
+        Moves an item from the forward stack back to the navigation stack and navigates to it.
+
+        Args:
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            None
+        """
+        try:
+            if "source" not in kwargs or "target" not in kwargs:
+                # Log a warning message indicating an invalid forward navigation request
+                self.logger.warning(
+                    "Invalid forward navigation request: 'source' or 'target' is missing."
+                )
+
+                # Return early
+                return
+
+            # Attempt to navigate to the target
+            self.navigate(
+                source=kwargs.pop("source"),
+                target=kwargs.pop("target"),
+                **kwargs,
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

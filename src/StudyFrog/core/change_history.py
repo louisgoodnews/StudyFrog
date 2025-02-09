@@ -720,6 +720,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
             id=id,
             key=key,
             source=source,
+            table=Constants.CHANGE_HISTORIES,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -1470,6 +1471,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
             id=id,
             key=key,
             source=source,
+            table=Constants.CHANGE_HISTORY_ITEMS,
             updated_at=updated_at,
             uuid=uuid,
         )

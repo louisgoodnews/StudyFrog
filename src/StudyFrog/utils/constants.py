@@ -28,16 +28,22 @@ class Constants:
     * ASSOCIATIONS: The name of the table for associations.
     * CHANGE_HISTORY: The name of the table for change history.
     * CHANGE_HISTORY_ITEMS: The name of the table for change history items.
+    * DEFAULTS: The name of the table for defaults.
     * DIFFICULTIES: The name of the table for difficulties.
     * FLASHCARDS: The name of the table for flashcards.
     * NOTES: The name of the table for notes.
     * PRIORITIES: The name of the table for priorities.
     * QUESTIONS: The name of the table for questions.
+    * SETTINGS: The name of the table for settings.
     * STACKS: The name of the table for stacks.
     * TAGS: The name of the table for tags.
     * USERS: The name of the table for users.
     * DEFAULT_FONT_FAMILIY: The default font family.
     * DEFAULT_FONT_SIZE: The default font size.
+    * INDIGO: The color indigo.
+    * GREY: The color grey.
+    * BLACK: The color black.
+    * WHITE: The color white.
     * DEFAULT_GEOMETRY: The default geometry of the main window.
     * GLOBAL_NAMESPACE: The namespace for global dispatching of events.
     * MAIN_UI_NAMESPACE: The namespace for the main UI.
@@ -78,11 +84,13 @@ class Constants:
     ASSOCIATIONS: str = "associations"
     CHANGE_HISTORIES: str = "change_histories"
     CHANGE_HISTORY_ITEMS: str = "change_history_items"
+    DEFAULTS: str = "defaults"
     DIFFICULTIES: str = "difficulties"
     FLASHCARDS: str = "flashcards"
     NOTES: str = "notes"
     PRIORITIES: str = "priorities"
     QUESTIONS: str = "questions"
+    SETTINGS: str = "settings"
     STACKS: str = "stacks"
     TAGS: str = "tags"
     USERS: str = "users"
@@ -91,6 +99,11 @@ class Constants:
     DEFAULT_FONT_SIZE: int = 16
 
     DEFAULT_GEOMETRY: str = "1920x1080"
+
+    BLACK: str = "#000000"
+    GREY: str = "#9e9e9e"
+    INDIGO: str = "#3f51b5"
+    WHITE: str = "#ffffff"
 
     GLOBAL_NAMESPACE: str = "GLOBAL"
 

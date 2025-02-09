@@ -7,6 +7,8 @@ import asyncio
 
 import json
 
+import random
+
 import threading
 
 from typing import *
@@ -285,6 +287,19 @@ class Miscellaneous:
 
             # Return None indicating an exception has occurred
             return None
+
+    @classmethod
+    def shuffle(iterable: Iterable[Any]) -> None:
+        """
+        Shuffles an iterable.
+
+        Args:
+            iterable (Iterable[Any]): The iterable to be shuffled.
+
+        Returns:
+            None
+        """
+        random.shuffle(iterable)
 
     @classmethod
     def snake_to_camel(

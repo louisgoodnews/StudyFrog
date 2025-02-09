@@ -283,7 +283,7 @@ class PriorityManager(BaseObjectManager):
             priority.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the priority
-            priority.key = f"FLASHCARD_{self.count() + 1}"
+            priority.key = f"PRIORITY_{self.count() + 1}"
 
             # Set the updated_at timestamp of the priority
             priority.updated_at = Miscellaneous.get_current_datetime()
@@ -436,9 +436,9 @@ class PriorityManager(BaseObjectManager):
         """
         try:
             # Check if the priority is already in the cache
-            if self.is_key_in_cache(key=f"FLASHCARD_{id}"):
+            if self.is_key_in_cache(key=f"PRIORITY_{id}"):
                 # Return the priority from the cache
-                return self.get_value_from_cache(key=f"FLASHCARD_{id}")
+                return self.get_value_from_cache(key=f"PRIORITY_{id}")
 
             # Get the priority with the given ID from the database
             model: Optional[PriorityModel] = asyncio.run(

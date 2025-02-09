@@ -1,0 +1,786 @@
+"""
+Author: lodego
+Date: 2025-02-09
+"""
+
+import asyncio
+
+from optparse import Option
+import uuid
+
+from datetime import datetime
+
+from typing import *
+
+from utils.constants import Constants
+from utils.field import Field
+from utils.logger import Logger
+from utils.manager import BaseObjectManager
+from utils.miscellaneous import Miscellaneous
+from utils.model import ImmutableBaseModel
+from utils.object import MutableBaseObject, ImmutableBaseObject
+
+
+__all__: List[str] = [
+    "ImmutableUser",
+    "MutableUser",
+    "UserConverter",
+    "UserFactory",
+    "UserManager",
+    "UserModel",
+]
+
+
+class ImmutableUser(ImmutableBaseObject):
+    """
+    An immutable class representing a user.
+
+    Attributes:
+        name (str): The name of the user.
+        created_at (Optional[datetime]): The timestamp when the user was created.
+        id (Optional[int]): The ID of the user.
+        key (Optional[str]): The key of the user.
+        updated_at (Optional[datetime]): The timestamp when the user was last updated.
+        uuid (Optional[str]): The UUID of the user.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        created_at: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance of the ImmutableUser class.
+
+        Args:
+            name (str): The name of the user.
+            created_at (Optional[datetime]): The timestamp when the user was created.
+            id (Optional[int]): The ID of the user.
+            key (Optional[str]): The key of the user.
+            updated_at (Optional[datetime]): The timestamp when the user was last updated.
+            uuid (Optional[str]): The UUID of the user.
+
+        Returns:
+            None
+        """
+        # Call the parent class constructor
+        super().__init__(
+            created_at=created_at,
+            id=id,
+            key=key,
+            name=name,
+            updated_at=updated_at,
+            uuid=uuid,
+        )
+
+    def to_mutable(self) -> "MutableUser":
+        """
+        Converts the immutable user to a mutable user.
+
+        Returns:
+            MutableUser: The mutable user.
+        """
+        return MutableUser(**self.to_dict(exclude=["_logger"]))
+
+
+class MutableUser(MutableBaseObject):
+    """
+    A mutable class representing a user.
+
+    Attributes:
+        name (str): The name of the user.
+        created_at (Optional[datetime]): The timestamp when the user was created.
+        id (Optional[int]): The ID of the user.
+        key (Optional[str]): The key of the user.
+        updated_at (Optional[datetime]): The timestamp when the user was last updated.
+        uuid (Optional[str]): The UUID of the user.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        created_at: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        uuid: Optional[str] = None,
+        updated_at: Optional[datetime] = None,
+    ) -> None:
+        """
+        Initializes a new instance of the MutableUser class.
+
+        Args:
+            name (str): The name of the user.
+            created_at (Optional[datetime]): The timestamp when the user was created.
+            id (Optional[int]): The ID of the user.
+            key (Optional[str]): The key of the user.
+            updated_at (Optional[datetime]): The timestamp when the user was last updated.
+            uuid (Optional[str]): The UUID of the user.
+
+        Returns:
+            None
+        """
+        # Call the parent class constructor
+        super().__init__(
+            created_at=created_at,
+            id=id,
+            key=key,
+            name=name,
+            updated_at=updated_at,
+            uuid=uuid,
+        )
+
+    def to_immutable(self) -> ImmutableUser:
+        """
+        Converts the mutable user to an immutable user.
+
+        Returns:
+            ImmutableUser: The immutable user.
+        """
+        return ImmutableUser(**self.to_dict(exclude=["_logger"]))
+
+
+class UserConverter:
+    """
+    A converter class for transforming between UserModel and ImmutableUser instances.
+
+    This class provides methods to convert a UserModel instance to an ImmutableUser instance,
+    and vice versa. It utilizes a logger to capture and log exceptions that may occur during the conversion process.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the UserConverter class.
+    """
+
+    logger: Logger = Logger.get_logger(name="UserConverter")
+
+    @classmethod
+    def model_to_object(
+        cls,
+        model: "UserModel",
+    ) -> Optional[ImmutableUser]:
+        """
+        Converts a given UserModel instance to an ImmutableUser instance.
+
+        Args:
+            model (UserModel): The UserModel instance to be converted.
+
+        Returns:
+            ImmutableUser: The converted ImmutableUser instance if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to convert the UserModel instance.
+        """
+        try:
+            # Attempt to create and return a new instance of the ImmutableUser class from the dictionary representation of the UserModel instance
+            return ImmutableUser(**model.to_dict(exclude=["_logger"]))
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def object_to_model(
+        cls,
+        object: ImmutableUser,
+    ) -> Optional["UserModel"]:
+        """
+        Converts a given ImmutableUser instance to a UserModel instance.
+
+        Args:
+            object (ImmutableUser): The ImmutableUser instance to be converted.
+
+        Returns:
+            UserModel: The converted UserModel instance if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to convert the ImmutableUser instance.
+        """
+        try:
+            # Attempt to create and return a new instance of the UserModel class from the dictionary representation of the ImmutableUser instance
+            return UserModel(**object.to_dict(exclude=["_logger"]))
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+
+class UserFactory:
+    """
+    A factory class for creating instances of the ImmutableUser class.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the UserFactory class.
+    """
+
+    logger: Logger = Logger.get_logger(name="UserFactory")
+
+    @classmethod
+    def create_user(
+        cls,
+        name: str,
+        created_at: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> Optional[ImmutableUser]:
+        """
+        Creates and returns a new instance of the ImmutableUser class.
+
+        Args:
+            name (str): The name of the user.
+            created_at (Optional[datetime]): The timestamp when the user was created.
+            id (Optional[int]): The ID of the user.
+            key (Optional[str]): The key of the user.
+            updated_at (Optional[datetime]): The timestamp when the user was last updated.
+            uuid (Optional[str]): The UUID of the user.
+
+        Returns:
+            ImmutableUser: The created ImmutableUser instance if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the ImmutableUser instance.
+        """
+        try:
+            # Attempt to create and return a new instance of the ImmutableUser class
+            return ImmutableUser(
+                name=name,
+                created_at=created_at,
+                id=id,
+                key=key,
+                updated_at=updated_at,
+                uuid=uuid,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_user' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+
+class UserManager(BaseObjectManager):
+    """
+    A manager class for managing users in the application.
+
+    This class extends the BaseObjectManager class and provides CRUD (Create, Read, Update, Delete) methods for users.
+
+    Attributes:
+        cache: (List[Any]): The cache for storing users.
+        logger (Logger): The logger instance associated with the object.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the UserManager class.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    def count(self) -> int:
+        """
+        Returns the number of users in the database.
+
+        Returns:
+            int: The number of users in the database.
+        """
+        try:
+            # Count the number of users in the database
+            result: Any = asyncio.run(
+                UserModel.execute(
+                    database=Constants.DATABASE_PATH,
+                    sql=f"SELECT COUNT(*) FROM {Constants.USERS};",
+                )
+            )
+
+            # Return the number of users in the database
+            return result[0][0] if result else 0
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'count' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return 0 indicating an exception has occurred
+            return 0
+
+    def create(
+        self,
+        user: Union[ImmutableUser, MutableUser],
+    ) -> Optional[ImmutableUser]:
+        """
+        Creates a new user in the database.
+
+        Args:
+            user (Union[ImmutableUser, MutableUser]): The user to be created.
+
+        Returns:
+            Optional[ImmutableUser]: The newly created immutable user if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the user.
+        """
+        try:
+            # Check if the user object is immutable
+            if isinstance(
+                user,
+                ImmutableUser,
+            ):
+                # If it is, convert it to a mutable user
+                user = MutableUser(**user.to_dict(exclude=["_logger"]))
+
+            # Set the created_at timestamp of the user
+            user.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the key of the user
+            user.key = f"USER_{self.count() + 1}"
+
+            # Set the updated_at timestamp of the user
+            user.updated_at = Miscellaneous.get_current_datetime()
+
+            # Set the uuid of the user
+            user.uuid = str(uuid.uuid4())
+
+            # Convert the user object to a UserModel object
+            model: UserModel = UserConverter.object_to_model(object=user)
+
+            # Create a new user in the database
+            id: Optional[int] = asyncio.run(
+                model.create(database=Constants.DATABASE_PATH)
+            )
+
+            if id:
+                # Set the ID of the user
+                user.id = id
+
+                # Convert the user to an immutable user
+                user = ImmutableUser(**user.to_dict(exclude=["_logger"]))
+
+                # Add the user to the cache
+                self.add_to_cache(
+                    key=user.key,
+                    value=user,
+                )
+
+                # Return the newly created immutable user
+                return user
+
+            # Log a warning message indicating an error has occurred
+            self.logger.warning(
+                message=f"It seems that an error has occured while attempting to create a user ({user}) in the database."
+            )
+
+            # Return None indicating an error has occurred
+            return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_user' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def delete(
+        self,
+        user: Union[ImmutableUser, MutableUser],
+    ) -> bool:
+        """
+        Deletes a user from the database.
+
+        Args:
+            user (Union[ImmutableUser, MutableUser]): The user to be deleted.
+
+        Returns:
+            bool: True if the user was deleted successfully. False otherwise.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Convert the user to an immutable user and delete the user from the database
+            result: bool = asyncio.run(
+                UserConverter.object_to_model(
+                    object=ImmutableUser(**user.to_dict(exclude=["_logger"]))
+                ).delete()
+            )
+
+            # Return True if the user was deleted successfully
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return False indicating an exception has occurred
+            return False
+
+    def get_all(self) -> Optional[List[ImmutableUser]]:
+        """
+        Returns a list of all users in the database.
+
+        Returns:
+            Optional[List[ImmutableUser]]: A list of all users in the database if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if cache and table size are equal
+            if self.cache and len(self._cache) == self.count():
+                # Return the list of immutable users from the cache
+                return self.get_cache_values()
+
+            # Get all users from the database
+            models: List[UserModel] = asyncio.run(
+                UserModel.get_all(database=Constants.DATABASE_PATH)
+            )
+
+            # Convert the list of UserModel objects to a list of ImmutableUser objects
+            users: List[ImmutableUser] = [
+                ImmutableUser(**model.to_dict(exclude=["_logger"])) for model in models
+            ]
+
+            # Iterate over the list of immutable users
+            for user in users:
+                if not self.is_key_in_cache(key=user.key):
+                    # Add the immutable user to the cache
+                    self.add_to_cache(
+                        key=user.key,
+                        value=user,
+                    )
+                else:
+                    # Update the immutable user in the cache
+                    self.update_in_cache(
+                        key=user.key,
+                        value=user,
+                    )
+
+            # Return the list of immutable users
+            return users
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_by_id(
+        self,
+        id: int,
+    ) -> Optional[ImmutableUser]:
+        """
+        Returns a user with the given ID.
+
+        Args:
+            id (int): The ID of the user.
+
+        Returns:
+            Optional[ImmutableUser]: The user with the given ID if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the user is already in the cache
+            if self.is_key_in_cache(key=f"TAG_{id}"):
+                # Return the user from the cache
+                return self.get_value_from_cache(key=f"TAG_{id}")
+
+            # Get the user with the given ID from the database
+            model: Optional[UserModel] = asyncio.run(
+                UserModel.get_by(
+                    column="id",
+                    database=Constants.DATABASE_PATH,
+                    value=id,
+                )
+            )
+
+            # Return the user if it exists
+            if model is not None:
+                # Convert the UserModel object to an ImmutableUser object
+                return ImmutableUser(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the user does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_id' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_by_uuid(
+        self,
+        uuid: str,
+    ) -> Optional[ImmutableUser]:
+        """
+        Returns a user with the given UUID.
+
+        Args:
+            uuid (str): The UUID of the user.
+
+        Returns:
+            Optional[ImmutableUser]: The user with the given UUID if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the user is already in the cache
+            if self.is_key_in_cache(key=uuid):
+                # Return the user from the cache
+                return self.get_value_from_cache(key=uuid)
+
+            # Get the user with the given UUID from the database
+            model: Optional[UserModel] = asyncio.run(
+                UserModel.get_by(
+                    column="uuid",
+                    database=Constants.DATABASE_PATH,
+                    value=uuid,
+                )
+            )
+
+            # Return the user if it exists
+            if model is not None:
+                # Convert the UserModel object to an ImmutableUser object
+                return ImmutableUser(**model.to_dict(exclude=["_logger"]))
+            else:
+                # Return None indicating that the user does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_uuid' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def update(
+        self,
+        user: Union[ImmutableUser, MutableUser],
+    ) -> Optional[ImmutableUser]:
+        """
+        Updates a user with the given ID.
+
+        Args:
+            user (Union[ImmutableUser, MutableUser]): The user to update.
+
+        Returns:
+            Optional[ImmutableUser]: The updated user if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Convert the user to an immutable user and update the user in the database
+            model: Optional[UserModel] = asyncio.run(
+                UserConverter.object_to_model(
+                    object=ImmutableUser(**user.to_dict(exclude=["_logger"]))
+                ).update(
+                    **user.to_dict(
+                        exclude=[
+                            "_id",
+                            "_key",
+                            "_logger",
+                            "_uuid",
+                        ]
+                    )
+                )
+            )
+
+            # Return the updated user if it exists
+            if model is not None:
+                # Convert the UserModel object to an ImmutableUser object
+                user = ImmutableUser(**model.to_dict(exclude=["_logger"]))
+
+                # Add the user to the cache
+                self.update_in_cache(
+                    key=user.key,
+                    value=user,
+                )
+
+                # Return the updated user
+                return user
+            else:
+                # Return None indicating that the user does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+
+class UserModel(ImmutableBaseModel):
+    """
+    Represents the structure of the user model.
+
+    Attributes:
+        created_at (Field): The timestamp when the user was created.
+        id (Field): The ID of the user.
+        key (Field): The key of the user.
+        name (Field): The name of the user.
+        table (str): The table name of the user model.
+        updated_at (Field): The timestamp when the user was last updated.
+        uuid (Field): The UUID of the user.
+    """
+
+    table: str = Constants.USERS
+
+    id: Field = Field(
+        autoincrement=True,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=True,
+        name="id",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=True,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    created_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="created_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    key: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="key",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
+    )
+
+    name: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="name",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
+    )
+
+    updated_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="updated_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    uuid: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="uuid",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
+    )
+
+    def __init__(
+        self,
+        created_at: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        name: Optional[str] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance of the UserModel class.
+
+        Args:
+            created_at (Optional[datetime]): The timestamp when the user was created.
+            id (Optional[int]): The ID of the user.
+            key (Optional[str]): The key of the user.
+            name (Optional[str]): The name of the user.
+            updated_at (Optional[datetime]): The timestamp when the user was last updated.
+            uuid (Optional[str]): The UUID of the user.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__(
+            created_at=created_at,
+            id=id,
+            key=key,
+            name=name,
+            table=Constants.USERS,
+            updated_at=updated_at,
+            uuid=uuid,
+        )

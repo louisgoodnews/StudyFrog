@@ -12,6 +12,7 @@ from tkinter import ttk
 from tkinter.constants import *
 
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
 
 
 __all__: List[str] = ["UIBuilder"]
@@ -159,6 +160,95 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_checkbutton' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_clock(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of tkinter.Label that displays the current datetime.
+
+        Args:
+            master (tkinter.Misc): The master widget.
+            **kwargs: Any additional keyword arguments to be passed to the tkinter.Label constructor.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created tkinter.Label instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Label.
+        """
+        try:
+
+            def update_clock() -> None:
+                """
+                Updates the text of the label to the current datetime.
+
+                This function is scheduled to be called every 1000 milliseconds using the after method of the label widget.
+
+                Returns:
+                    None
+                """
+                # Set the text of the label to the current datetime
+                result["label"]["text"] = Miscellaneous.datetime_to_string(
+                    datetime=Miscellaneous.get_current_datetime()
+                )
+
+                # Schedule the next call to update the clock
+                result["label"].after(
+                    ms=1000,
+                    func=update_clock,
+                )
+
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=Miscellaneous.datetime_to_string(
+                    datetime=Miscellaneous.get_current_datetime()
+                ),
+                **kwargs,
+            )
+
+            # Grid the "Label" label widget in the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Start the clock
+            update_clock()
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_clock' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured

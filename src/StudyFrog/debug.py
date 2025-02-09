@@ -8,13 +8,16 @@ import asyncio
 from core.answer import AnswerModel
 from core.association import AssociationModel
 from core.change_history import ChangeHistoryModel, ChangeHistoryItemModel
+from core.default import DefaultModel
 from core.difficulty import DifficultyModel
 from core.flashcard import FlashcardModel
 from core.note import NoteModel
 from core.priority import PriorityModel
 from core.question import QuestionModel
+from core.setting import SettingModel
 from core.stack import StackModel
 from core.tag import TagModel
+from core.user import UserModel
 
 from utils.constants import Constants
 from utils.logger import Logger
@@ -30,13 +33,16 @@ def debug() -> None:
         AssociationModel,
         ChangeHistoryItemModel,
         ChangeHistoryModel,
+        DefaultModel,
         DifficultyModel,
         FlashcardModel,
         NoteModel,
         PriorityModel,
         QuestionModel,
+        SettingModel,
         StackModel,
         TagModel,
+        UserModel,
     ]:
         # Drop the table
         asyncio.run(model_class.drop_table(database=Constants.DATABASE_PATH))

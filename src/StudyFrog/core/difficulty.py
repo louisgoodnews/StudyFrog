@@ -275,7 +275,7 @@ class DifficultyManager(BaseObjectManager):
             difficulty.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the difficulty
-            difficulty.key = f"FLASHCARD_{self.count() + 1}"
+            difficulty.key = f"DIFFICULTY_{self.count() + 1}"
 
             # Set the updated_at timestamp of the difficulty
             difficulty.updated_at = Miscellaneous.get_current_datetime()
@@ -430,9 +430,9 @@ class DifficultyManager(BaseObjectManager):
         """
         try:
             # Check if the difficulty is already in the cache
-            if self.is_key_in_cache(key=f"FLASHCARD_{id}"):
+            if self.is_key_in_cache(key=f"DIFFICULTY_{id}"):
                 # Return the difficulty from the cache
-                return self.get_value_from_cache(key=f"FLASHCARD_{id}")
+                return self.get_value_from_cache(key=f"DIFFICULTY_{id}")
 
             # Get the difficulty with the given ID from the database
             model: Optional[DifficultyModel] = asyncio.run(

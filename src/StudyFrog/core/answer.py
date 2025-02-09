@@ -317,7 +317,7 @@ class AnswerManager(BaseObjectManager):
             result: Any = asyncio.run(
                 AnswerModel.execute(
                     database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.FLASHCARDS};",
+                    sql=f"SELECT COUNT(*) FROM {Constants.ANSWERS};",
                 )
             )
 
@@ -361,7 +361,7 @@ class AnswerManager(BaseObjectManager):
             answer.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the answer
-            answer.key = f"FLASHCARD_{self.count() + 1}"
+            answer.key = f"ANSWER_{self.count() + 1}"
 
             # Set the updated_at timestamp of the answer
             answer.updated_at = Miscellaneous.get_current_datetime()
@@ -515,9 +515,9 @@ class AnswerManager(BaseObjectManager):
         """
         try:
             # Check if the answer is already in the cache
-            if self.is_key_in_cache(key=f"FLASHCARD_{id}"):
+            if self.is_key_in_cache(key=f"ANSWER_{id}"):
                 # Return the answer from the cache
-                return self.get_value_from_cache(key=f"FLASHCARD_{id}")
+                return self.get_value_from_cache(key=f"ANSWER_{id}")
 
             # Get the answer with the given ID from the database
             model: Optional[AnswerModel] = asyncio.run(

@@ -782,6 +782,7 @@ class TagModel(ImmutableBaseModel):
             created_at=created_at,
             id=id,
             key=key,
+            table=Constants.TAGS,
             updated_at=updated_at,
             uuid=uuid,
             value=value,

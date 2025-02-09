@@ -841,6 +841,7 @@ class QuestionModel(ImmutableBaseModel):
             key=key,
             question_text=question_text,
             question_type=question_type,
+            table=Constants.QUESTIONS,
             updated_at=updated_at,
             uuid=uuid,
         )
