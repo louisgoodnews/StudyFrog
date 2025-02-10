@@ -3,24 +3,32 @@ Author: lodego
 Date: 2025-02-09
 """
 
+import asyncio
+
 import tkinter
+
 from typing import *
 
-from core.answer import AnswerManager
-from core.association import AssociationManager
-from core.change_history import ChangeHistoryManager, ChangeHistoryItemManager
-from core.custom_field import CustomFieldManager
-from core.default import DefaultManager
-from core.difficulty import DifficultyManager
-from core.flashcard import FlashcardManager
-from core.note import NoteManager
-from core.option import OptionManager
-from core.priority import PriorityManager
-from core.question import QuestionManager
-from core.setting import SettingManager, SettingService
-from core.stack import StackManager
-from core.tag import TagManager
-from core.user import UserManager
+from core.answer import AnswerManager, AnswerModel
+from core.association import AssociationManager, AssociationModel
+from core.change_history import (
+    ChangeHistoryManager,
+    ChangeHistoryModel,
+    ChangeHistoryItemManager,
+    ChangeHistoryItemModel,
+)
+from core.custom_field import CustomFieldManager, CustomFieldModel
+from core.default import DefaultManager, DefaultModel
+from core.difficulty import DifficultyManager, DifficultyModel
+from core.flashcard import FlashcardManager, FlashcardModel
+from core.note import NoteManager, NoteModel
+from core.option import OptionManager, OptionModel
+from core.priority import PriorityManager, PriorityModel
+from core.question import QuestionManager, QuestionModel
+from core.setting import SettingManager, SettingModel, SettingService
+from core.stack import StackManager, StackModel
+from core.tag import TagManager, TagModel
+from core.user import UserManager, UserModel
 
 from core.ui.dashboard_ui import DashboardUI
 from core.ui.setting_ui import SettingUI
@@ -99,6 +107,53 @@ class BootstrapService:
 
         # Initialize the unified manager instance
         self.unified_manager: UnifiedManager = UnifiedManager()
+
+    def create_tables(self) -> None:
+        """
+        Creates the tables for the models in the database if they do not exist.
+
+        This method is used to create the tables for the models in the database
+        if they do not exist. It iterates over the defined models and then creates the table.
+
+        If an exception occurs while running the method, it logs an error message
+        indicating the exception and then reraises the exception to the caller.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while running the method.
+        """
+        try:
+            # Iterate over the defined models and create the tables
+            for model_class in [
+                AnswerModel,
+                AssociationModel,
+                ChangeHistoryItemModel,
+                ChangeHistoryModel,
+                CustomFieldModel,
+                DefaultModel,
+                DifficultyModel,
+                FlashcardModel,
+                NoteModel,
+                OptionModel,
+                PriorityModel,
+                QuestionModel,
+                SettingModel,
+                StackModel,
+                TagModel,
+                UserModel,
+            ]:
+                # Create the table
+                asyncio.run(model_class.create_table(database=Constants.DATABASE_PATH))
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to create tables: {e}"
+            )
+
+            # Reraise the exception to the caller
+            raise e
 
     def register_handlers(self) -> None:
         """
@@ -249,6 +304,9 @@ class BootstrapService:
             Exception: If an exception occurs while running the startup tasks.
         """
         try:
+            # Create the database tables
+            self.create_tables()
+
             # Register the event handlers
             self.register_handlers()
 
