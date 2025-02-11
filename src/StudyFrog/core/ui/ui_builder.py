@@ -533,6 +533,181 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_multi_line_text_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns various widgets required to create a multi-line text field.
+
+        The created widgets are stored in a dictionary and returned to the caller.
+
+        The dictionary contains the following keys:
+            - "root": The master widget (Call your geometry manager (.place, .grid, .pack, etc.) on this widget)
+            - "label": The label widget
+            - "text": The text widget
+            - "button": The button widget
+            - "clear": A function to clear all content from the text widget
+            - "get": A function to get the content of the text widget
+            - "set": A function to set the content of the text widget
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the widgets
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the content of the text widget.
+
+                Returns:
+                    None
+                """
+
+                # Delete all content from the text widget
+                result["text"].delete(
+                    0,
+                    END,
+                )
+
+            def get() -> str:
+                """
+                Retrieves the content of the text widget.
+
+                Returns:
+                    str: The content of the text widget.
+                """
+
+                # Get and return all content from the text widget
+                return result["text"].get(
+                    0,
+                    END,
+                )
+
+            def set(value: str) -> None:
+                """
+                Sets the content of the text widget to the given value.
+
+                Args:
+                    value (str): The value to set the content of the text widget to.
+
+                Returns:
+                    None
+                """
+
+                # Delete all content from the text widget
+                result["text"].delete(
+                    0,
+                    END,
+                )
+
+                # Insert the given value into the text widget
+                result["text"].insert(
+                    0,
+                    value,
+                )
+
+            # Create the "Root Frame" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root Frame" frame widget's 1st and 3rd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=(
+                    0,
+                    2,
+                ),
+                weight=0,
+            )
+
+            # Configure the "Root Frame" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root Frame" frame widget's 1st and 3rd column to weight 0
+            result["root"].grid_rowconfigure(
+                index=(
+                    0,
+                    2,
+                ),
+                weight=0,
+            )
+
+            # Configure the "Root Frame" frame widget's 1st row to weight 1
+            result["root"].grid_rowconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Configure the "Label" label widget's grid properties
+            result["label"].grid(
+                column=0,
+                columnspan=3,
+                row=0,
+                sticky="nsew",
+            )
+
+            # Create the "Text" text widget
+            result["text"] = cls.get_text(
+                master=result["root"],
+                **kwargs,
+            )
+
+            # Configure the "Text" text widget's grid properties
+            result["text"].grid(
+                column=1,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Create the "Clear" button widget
+            result["button"] = cls.get_button(
+                command=clear,
+                master=result["root"],
+                text="Clear",
+            )
+
+            # Configure the "Clear" button widget's grid properties
+            result["button"].grid(
+                column=2,
+                row=2,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_multi_line_text_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_progressbar(
         cls,
         master: tkinter.Misc,
@@ -654,6 +829,8 @@ class UIBuilder:
             Exception: If an exception occurs while attempting to create a new instance of a scrolled frame.
         """
         try:
+            # Initialise the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
 
             def on_frame_configure(event: tkinter.Event) -> None:
                 """
@@ -674,9 +851,6 @@ class UIBuilder:
                     anchor="nw",
                     width=result["canvas"].winfo_width(),
                 )
-
-            # Initialise the result dictionary as an empty dictionary
-            result: Dict[str, Any] = {}
 
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(

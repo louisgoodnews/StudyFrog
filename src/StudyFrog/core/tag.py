@@ -359,7 +359,7 @@ class TagManager(BaseObjectManager):
             tag.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the tag
-            tag.uuid = str(uuid.uuid4())
+            tag.uuid = Miscellaneous.get_uuid()
 
             # Convert the tag object to a TagModel object
             model: TagModel = TagConverter.object_to_model(object=tag)

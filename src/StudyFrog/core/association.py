@@ -34,77 +34,111 @@ class Association(ImmutableBaseObject):
     An immutable class representing an association between two entities.
 
     Attributes:
-        association_type (str): The type of the association.
-        source (Dict[str, Any]): The source of the association.
-        target (Dict[str, Any]): The target of the association.
-        created_at (datetime): The timestamp when the association was created.
-        id (int): The ID of the association.
-        key (str): The key of the association.
-        updated_at (datetime): The timestamp when the association was last updated.
-        uuid (str): The UUID of the association.
+        association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
+        answer (Optional[int]): The ID of the answer that is being associated with.
+        change_history (Optional[int]): The ID of the change history that is being associated with.
+        change_history_item (Optional[int]): The ID of the change history item that is being associated with.
+        created_at (Optional[datetime]): The timestamp when the association was created.
+        custom_field (Optional[int]): The ID of the custom field that is being associated with.
+        default (Optional[int]): The ID of the default that is being associated with.
+        difficulty (Optional[int]): The ID of the difficulty that is being associated with.
+        flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+        id (Optional[int]): The ID of the association.
+        key (Optional[str]): The key of the association.
+        note (Optional[int]): The ID of the note that is being associated with.
+        option (Optional[int]): The ID of the option that is being associated with.
+        priority (Optional[int]): The ID of the priority that is being associated with.
+        question (Optional[int]): The ID of the question that is being associated with.
+        setting (Optional[int]): The ID of the setting that is being associated with.
+        stack (Optional[int]): The ID of the stack that is being associated with.
+        tag (Optional[int]): The ID of the tag that is being associated with.
+        updated_at (Optional[datetime]): The timestamp when the association was last updated.
+        user (Optional[int]): The ID of the user that is being associated with.
+        uuid (Optional[str]): The UUID of the association.
     """
 
     def __init__(
         self,
-        association_type: str,
-        source: Dict[str, Any],
-        target: Dict[str, Any],
+        association_type: Literal[
+            "ancestor",
+            "dependant",
+            "depends_on",
+            "descendant",
+            "tagged_with",
+        ],
+        answer: Optional[int] = None,
+        change_history: Optional[int] = None,
+        change_history_item: Optional[int] = None,
         created_at: Optional[datetime] = None,
+        custom_field: Optional[int] = None,
+        default: Optional[int] = None,
+        difficulty: Optional[int] = None,
+        flashcard: Optional[int] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        note: Optional[int] = None,
+        option: Optional[int] = None,
+        priority: Optional[int] = None,
+        question: Optional[int] = None,
+        setting: Optional[int] = None,
+        stack: Optional[int] = None,
+        tag: Optional[int] = None,
         updated_at: Optional[datetime] = None,
+        user: Optional[int] = None,
         uuid: Optional[str] = None,
     ) -> None:
         """
         Initializes a new instance of the Association class.
 
         Args:
-            association_type (str): The type of the association.
-            source (Dict[str, Any]): The source of the association.
-            target (Dict[str, Any]): The target of the association.
+            association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
+            answer (Optional[int]): The ID of the answer that is being associated with.
+            change_history (Optional[int]): The ID of the change history that is being associated with.
+            change_history_item (Optional[int]): The ID of the change history item that is being associated with.
             created_at (Optional[datetime]): The timestamp when the association was created.
+            custom_field (Optional[int]): The ID of the custom field that is being associated with.
+            default (Optional[int]): The ID of the default that is being associated with.
+            difficulty (Optional[int]): The ID of the difficulty that is being associated with.
+            flashcard (Optional[int]): The ID of the flashcard that is being associated with.
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
+            note (Optional[int]): The ID of the note that is being associated with.
+            option (Optional[int]): The ID of the option that is being associated with.
+            priority (Optional[int]): The ID of the priority that is being associated with.
+            question (Optional[int]): The ID of the question that is being associated with.
+            setting (Optional[int]): The ID of the setting that is being associated with.
+            stack (Optional[int]): The ID of the stack that is being associated with.
+            tag (Optional[int]): The ID of the tag that is being associated with.
             updated_at (Optional[datetime]): The timestamp when the association was last updated.
+            user (Optional[int]): The ID of the user that is being associated with.
             uuid (Optional[str]): The UUID of the association.
 
         Returns:
             None
         """
 
-        if not all(
-            [
-                key in source
-                for key in [
-                    "id",
-                    "type",
-                    "uuid",
-                ]
-            ]
-        ):
-            raise ValueError("'source' must have id, type, and uuid.")
-
-        if not all(
-            [
-                key in target
-                for key in [
-                    "id",
-                    "type",
-                    "uuid",
-                ]
-            ]
-        ):
-            raise ValueError("'target' must have id, type, and uuid.")
-
         # Call the parent class constructor
         super().__init__(
+            answer=answer,
             association_type=association_type,
+            change_history=change_history,
+            change_history_item=change_history_item,
             created_at=created_at,
+            custom_field=custom_field,
+            default=default,
+            difficulty=difficulty,
+            flashcard=flashcard,
             id=id,
             key=key,
-            source=source,
-            target=target,
+            note=note,
+            option=option,
+            priority=priority,
+            question=question,
+            setting=setting,
+            stack=stack,
+            tag=tag,
             updated_at=updated_at,
+            user=user,
             uuid=uuid,
         )
 
@@ -194,26 +228,58 @@ class AssociationFactory:
     @classmethod
     def create_association(
         cls,
-        association_type: str,
-        source: Dict[str, Any],
-        target: Dict[str, Any],
+        association_type: Literal[
+            "ancestor",
+            "dependant",
+            "depends_on",
+            "descendant",
+            "tagged_with",
+        ],
+        answer: Optional[int] = None,
+        change_history: Optional[int] = None,
+        change_history_item: Optional[int] = None,
         created_at: Optional[datetime] = None,
+        custom_field: Optional[int] = None,
+        default: Optional[int] = None,
+        difficulty: Optional[int] = None,
+        flashcard: Optional[int] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        note: Optional[int] = None,
+        option: Optional[int] = None,
+        priority: Optional[int] = None,
+        question: Optional[int] = None,
+        setting: Optional[int] = None,
+        stack: Optional[int] = None,
+        tag: Optional[int] = None,
         updated_at: Optional[datetime] = None,
+        user: Optional[int] = None,
         uuid: Optional[str] = None,
     ) -> Optional[Association]:
         """
         Creates and returns a new instance of Association class.
 
         Args:
-            association_type (str): The type of the association.
-            source (Dict[str, Any]): The dictionary representation of the source object.
-            target (Dict[str, Any]): The dictionary representation of the target object.
+            association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
+            answer (Optional[int]): The ID of the answer that is being associated with.
+            change_history (Optional[int]): The ID of the change history that is being associated with.
+            change_history_item (Optional[int]): The ID of the change history item that is being associated with.
             created_at (Optional[datetime]): The timestamp when the association was created.
+            custom_field (Optional[int]): The ID of the custom field that is being associated with.
+            default (Optional[int]): The ID of the default that is being associated with.
+            difficulty (Optional[int]): The ID of the difficulty that is being associated with.
+            flashcard (Optional[int]): The ID of the flashcard that is being associated with.
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
+            note (Optional[int]): The ID of the note that is being associated with.
+            option (Optional[int]): The ID of the option that is being associated with.
+            priority (Optional[int]): The ID of the priority that is being associated with.
+            question (Optional[int]): The ID of the question that is being associated with.
+            setting (Optional[int]): The ID of the setting that is being associated with.
+            stack (Optional[int]): The ID of the stack that is being associated with.
+            tag (Optional[int]): The ID of the tag that is being associated with.
             updated_at (Optional[datetime]): The timestamp when the association was last updated.
+            user (Optional[int]): The ID of the user that is being associated with.
             uuid (Optional[str]): The UUID of the association.
 
         Returns:
@@ -225,13 +291,26 @@ class AssociationFactory:
         try:
             # Attempt to create an d return an Association object
             return Association(
+                answer=answer,
                 association_type=association_type,
+                change_history=change_history,
+                change_history_item=change_history_item,
                 created_at=created_at,
+                custom_field=custom_field,
+                default=default,
+                difficulty=difficulty,
+                flashcard=flashcard,
                 id=id,
                 key=key,
-                source=source,
-                target=target,
+                note=note,
+                option=option,
+                priority=priority,
+                question=question,
+                setting=setting,
+                stack=stack,
+                tag=tag,
                 updated_at=updated_at,
+                user=user,
                 uuid=uuid,
             )
         except Exception as e:
@@ -268,17 +347,49 @@ class AssociationManager(BaseObjectManager):
 
     def associate(
         self,
-        association_type: str,
-        source: Any,
-        target: Any,
+        association_type: Literal[
+            "ancestor",
+            "dependant",
+            "depends_on",
+            "descendant",
+            "tagged_with",
+        ],
+        answer: Optional[int] = None,
+        change_history: Optional[int] = None,
+        change_history_item: Optional[int] = None,
+        custom_field: Optional[int] = None,
+        default: Optional[int] = None,
+        difficulty: Optional[int] = None,
+        flashcard: Optional[int] = None,
+        note: Optional[int] = None,
+        option: Optional[int] = None,
+        priority: Optional[int] = None,
+        question: Optional[int] = None,
+        setting: Optional[int] = None,
+        stack: Optional[int] = None,
+        tag: Optional[int] = None,
+        user: Optional[int] = None,
     ) -> bool:
         """
         Associates two objects in the database by creating an Association.
 
         Args:
-            association_type (str): The type of the association.
-            source (Any): The first object in the association.
-            target (Any): The second object in the association.
+            association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
+            answer (Optional[int]): The ID of the answer that is being associated with.
+            change_history (Optional[int]): The ID of the change history that is being associated with.
+            change_history_item (Optional[int]): The ID of the change history item that is being associated with.
+            custom_field (Optional[int]): The ID of the custom field that is being associated with.
+            default (Optional[int]): The ID of the default that is being associated with.
+            difficulty (Optional[int]): The ID of the difficulty that is being associated with.
+            flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+            note (Optional[int]): The ID of the note that is being associated with.
+            option (Optional[int]): The ID of the option that is being associated with.
+            priority (Optional[int]): The ID of the priority that is being associated with.
+            question (Optional[int]): The ID of the question that is being associated with.
+            setting (Optional[int]): The ID of the setting that is being associated with.
+            stack (Optional[int]): The ID of the stack that is being associated with.
+            tag (Optional[int]): The ID of the tag that is being associated with.
+            user (Optional[int]): The ID of the user that is being associated with.
 
         Returns:
             bool: True if the association was created successfully, False otherwise.
@@ -289,13 +400,27 @@ class AssociationManager(BaseObjectManager):
         try:
             # Create an Association object
             association: Association = AssociationFactory.create_association(
+                answer=answer,
                 association_type=association_type,
-                source=source,
-                target=target,
+                change_history=change_history,
+                change_history_item=change_history_item,
+                created_at=created_at,
+                custom_field=custom_field,
+                default=default,
+                difficulty=difficulty,
+                flashcard=flashcard,
+                note=note,
+                option=option,
+                priority=priority,
+                question=question,
+                setting=setting,
+                stack=stack,
+                tag=tag,
+                user=user,
             )
 
             # Create the association in the database
-            self.create(association=association)
+            self.create_association(association=association)
 
             # Return True indicating the association was created successfully
             return True
@@ -362,7 +487,7 @@ class AssociationManager(BaseObjectManager):
             association.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the association
-            association.uuid = str(uuid.uuid4())
+            association.uuid = Miscellaneous.get_uuid()
 
             # Convert the association object to a AssociationModel object
             model: AssociationModel = AssociationConverter.object_to_model(
@@ -700,13 +825,26 @@ class AssociationModel(ImmutableBaseModel):
     Represents the structure of a association model.
 
     Attributes:
-        association_type (Optional[str]): The type of the association.
+        association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
+        answer (Optional[int]): The ID of the answer that is being associated with.
+        change_history (Optional[int]): The ID of the change history that is being associated with.
+        change_history_item (Optional[int]): The ID of the change history item that is being associated with.
         created_at (Optional[datetime]): The timestamp when the association was created.
+        custom_field (Optional[int]): The ID of the custom field that is being associated with.
+        default (Optional[int]): The ID of the default that is being associated with.
+        difficulty (Optional[int]): The ID of the difficulty that is being associated with.
+        flashcard (Optional[int]): The ID of the flashcard that is being associated with.
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
-        source (Optional[Dict[str, Any]]): The dictionary representation of the source object.
-        target (Optional[Dict[str, Any]]): The dictionary representation of the target object.
+        note (Optional[int]): The ID of the note that is being associated with.
+        option (Optional[int]): The ID of the option that is being associated with.
+        priority (Optional[int]): The ID of the priority that is being associated with.
+        question (Optional[int]): The ID of the question that is being associated with.
+        setting (Optional[int]): The ID of the setting that is being associated with.
+        stack (Optional[int]): The ID of the stack that is being associated with.
+        tag (Optional[int]): The ID of the tag that is being associated with.
         updated_at (Optional[datetime]): The timestamp when the association was last updated.
+        user (Optional[int]): The ID of the user that is being associated with.
         uuid (Optional[str]): The UUID of the association.
     """
 
@@ -728,6 +866,22 @@ class AssociationModel(ImmutableBaseModel):
         unique=False,
     )
 
+    answer: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.ANSWERS}(id)",
+        index=False,
+        name="answer",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     association_type: Field = Field(
         autoincrement=False,
         default=None,
@@ -741,6 +895,38 @@ class AssociationModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
+        unique=False,
+    )
+
+    change_history: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.CHANGE_HISTORIES}(id)",
+        index=False,
+        name="change_history",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    change_history_item: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.CHANGE_HISTORY_ITEMS}(id)",
+        index=False,
+        name="change_history_item",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
         unique=False,
     )
 
@@ -760,6 +946,70 @@ class AssociationModel(ImmutableBaseModel):
         unique=False,
     )
 
+    custom_field: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.CUSTOM_FIELDS}(id)",
+        index=False,
+        name="custom_field",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    default: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.DEFAULTS}(id)",
+        index=False,
+        name="default",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    difficulty: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.DIFFICULTIES}(id)",
+        index=False,
+        name="difficulty",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    flashcard: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.FLASHCARDS}(id)",
+        index=False,
+        name="flashcard",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -776,35 +1026,115 @@ class AssociationModel(ImmutableBaseModel):
         unique=True,
     )
 
-    source: Field = Field(
+    note: Field = Field(
         autoincrement=False,
         default=None,
         description="",
-        foreign_key=None,
+        foreign_key=f"{Constants.NOTES}(id)",
         index=False,
-        name="source",
+        name="note",
         nullable=False,
-        on_delete=None,
-        on_update=None,
+        on_delete="CASCADE",
+        on_update="CASCADE",
         primary_key=False,
         size=None,
-        type="JSON",
+        type="INTEGER",
         unique=False,
     )
 
-    target: Field = Field(
+    option: Field = Field(
         autoincrement=False,
         default=None,
         description="",
-        foreign_key=None,
+        foreign_key=f"{Constants.OPTIONS}(id)",
         index=False,
-        name="target",
+        name="option",
         nullable=False,
-        on_delete=None,
-        on_update=None,
+        on_delete="CASCADE",
+        on_update="CASCADE",
         primary_key=False,
         size=None,
-        type="JSON",
+        type="INTEGER",
+        unique=False,
+    )
+
+    priority: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.PRIORITIES}(id)",
+        index=False,
+        name="priority",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    question: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.QUESTIONS}(id)",
+        index=False,
+        name="question",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    setting: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.SETTINGS}(id)",
+        index=False,
+        name="setting",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    stack: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.STACKS}(id)",
+        index=False,
+        name="stack",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    tag: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.TAGS}(id)",
+        index=False,
+        name="tag",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
         unique=False,
     )
 
@@ -821,6 +1151,22 @@ class AssociationModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    user: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.USERS}(id)",
+        index=False,
+        name="user",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
         unique=False,
     )
 
@@ -842,40 +1188,87 @@ class AssociationModel(ImmutableBaseModel):
 
     def __init__(
         self,
-        association_type: Optional[str] = None,
+        answer: Optional[int] = None,
+        association_type: Optional[
+            Literal[
+                "ancestor",
+                "dependant",
+                "depends_on",
+                "descendant",
+                "tagged_with",
+            ]
+        ] = None,
+        change_history: Optional[int] = None,
+        change_history_item: Optional[int] = None,
         created_at: Optional[datetime] = None,
+        custom_field: Optional[int] = None,
+        default: Optional[int] = None,
+        difficulty: Optional[int] = None,
+        flashcard: Optional[int] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
-        source: Optional[Dict[str, Any]] = None,
-        target: Optional[Dict[str, Any]] = None,
+        note: Optional[int] = None,
+        option: Optional[int] = None,
+        priority: Optional[int] = None,
+        question: Optional[int] = None,
+        setting: Optional[int] = None,
+        stack: Optional[int] = None,
+        tag: Optional[int] = None,
         updated_at: Optional[datetime] = None,
+        user: Optional[int] = None,
         uuid: Optional[str] = None,
     ) -> None:
         """
         Initializes a new instance of the AssociationModel class.
 
         Args:
-            association_type (Optional[str]): The type of the association.
+            association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
+            answer (Optional[int]): The ID of the answer that is being associated with.
+            change_history (Optional[int]): The ID of the change history that is being associated with.
+            change_history_item (Optional[int]): The ID of the change history item that is being associated with.
             created_at (Optional[datetime]): The timestamp when the association was created.
+            custom_field (Optional[int]): The ID of the custom field that is being associated with.
+            default (Optional[int]): The ID of the default that is being associated with.
+            difficulty (Optional[int]): The ID of the difficulty that is being associated with.
+            flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+            id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
-            source (Optional[Dict[str, Any]]): The dictionary representation of the source object.
-            target (Optional[Dict[str, Any]]): The dictionary representation of the target object.
+            note (Optional[int]): The ID of the note that is being associated with.
+            option (Optional[int]): The ID of the option that is being associated with.
+            priority (Optional[int]): The ID of the priority that is being associated with.
+            question (Optional[int]): The ID of the question that is being associated with.
+            setting (Optional[int]): The ID of the setting that is being associated with.
+            stack (Optional[int]): The ID of the stack that is being associated with.
+            tag (Optional[int]): The ID of the tag that is being associated with.
             updated_at (Optional[datetime]): The timestamp when the association was last updated.
+            user (Optional[int]): The ID of the user that is being associated with.
             uuid (Optional[str]): The UUID of the association.
-
         Returns:
             None
         """
 
         # Call the parent class constructor
         super().__init__(
+            answer=answer,
             association_type=association_type,
+            change_history=change_history,
+            change_history_item=change_history_item,
             created_at=created_at,
+            custom_field=custom_field,
+            default=default,
+            difficulty=difficulty,
+            flashcard=flashcard,
             id=id,
             key=key,
-            source=source,
+            note=note,
+            option=option,
+            priority=priority,
+            question=question,
+            setting=setting,
+            stack=stack,
             table=Constants.ASSOCIATIONS,
-            target=target,
+            tag=tag,
             updated_at=updated_at,
+            user=user,
             uuid=uuid,
         )

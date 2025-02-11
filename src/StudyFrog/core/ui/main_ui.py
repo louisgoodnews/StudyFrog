@@ -18,7 +18,7 @@ from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
-from utils.navigation import NavigationService
+from utils.navigation import NavigationHistoryService
 
 
 __all__: List[str] = ["MainUI"]
@@ -31,12 +31,13 @@ class MainUI(tkinter.Tk):
     Attributes:
         dispatcher (Dispatcher): The dispatcher instance.
         logger (Logger): The logger instance.
+        navigation_service (NavigationHistoryService): The navigation history service instance.
     """
 
     def __init__(
         self,
         dispatcher: Dispatcher,
-        navigation_service: NavigationService,
+        navigation_service: NavigationHistoryService,
     ) -> None:
         """
         Initializes a new instance of the MainUI class.
@@ -58,7 +59,7 @@ class MainUI(tkinter.Tk):
         self.dispatcher: Dispatcher = dispatcher
 
         # Store the passed navigation service instance in an instance variable
-        self.navigation_service: NavigationService = navigation_service
+        self.navigation_service: NavigationHistoryService = navigation_service
 
         # Configure the MainUI widget's 1st column to weight 1
         self.grid_columnconfigure(
@@ -85,13 +86,13 @@ class MainUI(tkinter.Tk):
         self.wm_geometry(newGeometry=Constants.DEFAULT_GEOMETRY)
 
         # Register a handler for the "WM_DELETE_WINDOW" event
-        # self.wm_protocol(
-        #   name="WM_DELETE_WINDOW",
-        #   func=lambda: dispatcher.dispatch(
-        #       event=Events.REQUEST_APPLICATION_STOP,
-        #       namespace=Constants.GLOBAL_NAMESPACE,
-        #   ),
-        # )
+        self.wm_protocol(
+            name="WM_DELETE_WINDOW",
+            func=lambda: dispatcher.dispatch(
+                event=Events.REQUEST_EXIT_UI_MAINLOOP,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            ),
+        )
 
         # Set the window title
         self.wm_title(string=Constants.APPLICATION_NAME)

@@ -11,6 +11,8 @@ import random
 
 import threading
 
+import uuid
+
 from typing import *
 
 from datetime import datetime
@@ -213,6 +215,16 @@ class Miscellaneous:
             datetime: The current datetime.
         """
         return datetime.now()
+
+    @classmethod
+    def get_uuid(cls) -> str:
+        """
+        Returns a new UUID.
+
+        Returns:
+            str: A new UUID.
+        """
+        return str(uuid.uuid4())
 
     @classmethod
     def run_asynchronously(

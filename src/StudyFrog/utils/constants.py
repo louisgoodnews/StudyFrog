@@ -3,6 +3,8 @@ Author: lodego
 Date: 2025-02-06
 """
 
+import copy
+
 import os
 
 from os import path
@@ -118,3 +120,7 @@ class Constants:
     TODAY: datetime = datetime.today()
     TOMORROW: datetime = datetime.today() + timedelta(days=1)
     YESTERDAY: datetime = datetime.today() - timedelta(days=1)
+
+    @classmethod
+    def get_base_id(cls) -> int:
+        return copy.deepcopy(cls.BASE_ID)

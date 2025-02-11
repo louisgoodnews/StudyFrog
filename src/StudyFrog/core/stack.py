@@ -373,7 +373,7 @@ class StackManager(BaseObjectManager):
             stack.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the stack
-            stack.uuid = str(uuid.uuid4())
+            stack.uuid = Miscellaneous.get_uuid()
 
             # Convert the stack object to a StackModel object
             model: StackModel = StackConverter.object_to_model(object=stack)

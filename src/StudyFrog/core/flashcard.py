@@ -390,7 +390,7 @@ class FlashcardManager(BaseObjectManager):
             flashcard.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the flashcard
-            flashcard.uuid = str(uuid.uuid4())
+            flashcard.uuid = Miscellaneous.get_uuid()
 
             # Convert the flashcard object to a FlashcardModel object
             model: FlashcardModel = FlashcardConverter.object_to_model(object=flashcard)

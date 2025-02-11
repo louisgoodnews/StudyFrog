@@ -293,7 +293,7 @@ class ChangeHistoryManager(BaseObjectManager):
             change_history.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the change history
-            change_history.uuid = str(uuid.uuid4())
+            change_history.uuid = Miscellaneous.get_uuid()
 
             # Convert the change history object to a ChangeHistoryModel object
             model: ChangeHistoryModel = ChangeHistoryConverter.object_to_model(
@@ -1051,7 +1051,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
             change_history_item.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the change history item
-            change_history_item.uuid = str(uuid.uuid4())
+            change_history_item.uuid = Miscellaneous.get_uuid()
 
             # Convert the change history item object to a ChangeHistoryItemModel object
             model: ChangeHistoryItemModel = ChangeHistoryItemConverter.object_to_model(

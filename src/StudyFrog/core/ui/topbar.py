@@ -114,7 +114,7 @@ class TopBar(tkinter.Frame):
         # Create the "Menu Button" button widget
         menu_button: tkinter.Button = UIBuilder.get_button(
             background="#3F51B5",
-            command=self.dispatcher.dispatch(
+            command=lambda: self.dispatcher.dispatch(
                 event=Events.MENU_BUTTON_CLICKED,
                 namespace=Constants.GLOBAL_NAMESPACE,
             ),

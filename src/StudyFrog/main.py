@@ -23,10 +23,10 @@ def main() -> None:
     application: Application = Application()
 
     # Start the application
-    application.start()
+    application.start_application()
 
     # Stop the application
-    application.stop()
+    application.stop_application()
 
 
 if __name__ == "__main__":

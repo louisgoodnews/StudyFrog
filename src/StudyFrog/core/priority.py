@@ -289,7 +289,7 @@ class PriorityManager(BaseObjectManager):
             priority.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the priority
-            priority.uuid = str(uuid.uuid4())
+            priority.uuid = Miscellaneous.get_uuid()
 
             # Convert the priority object to a PriorityModel object
             model: PriorityModel = PriorityConverter.object_to_model(object=priority)

@@ -283,7 +283,7 @@ class CustomFieldManager(BaseObjectManager):
             custom_field.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the custom field
-            custom_field.uuid = str(uuid.uuid4())
+            custom_field.uuid = Miscellaneous.get_uuid()
 
             # Convert the custom field object to a CustomFieldModel object
             model: CustomFieldModel = CustomFieldConverter.object_to_model(

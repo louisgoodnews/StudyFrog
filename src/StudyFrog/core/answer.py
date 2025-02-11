@@ -388,7 +388,7 @@ class AnswerManager(BaseObjectManager):
             answer.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the answer
-            answer.uuid = str(uuid.uuid4())
+            answer.uuid = Miscellaneous.get_uuid()
 
             # Convert the answer object to a AnswerModel object
             model: AnswerModel = AnswerConverter.object_to_model(object=answer)

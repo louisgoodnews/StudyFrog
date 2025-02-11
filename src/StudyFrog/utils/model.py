@@ -222,6 +222,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             Any: The result of the query.
         """
         try:
+            # Execute the SQL query
             return await DatabaseService.execute(
                 database=database,
                 parameters=parameters,

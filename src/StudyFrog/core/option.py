@@ -363,7 +363,7 @@ class OptionManager(BaseObjectManager):
             option.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the option
-            option.uuid = str(uuid.uuid4())
+            option.uuid = Miscellaneous.get_uuid()
 
             # Convert the option object to a OptionModel object
             model: OptionModel = OptionConverter.object_to_model(object=option)

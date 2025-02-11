@@ -3,8 +3,6 @@ Author: lodego
 Date: 2025-02-06
 """
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -96,7 +94,7 @@ class DispatcherEventFactory:
         logger (Logger): The logger instance associated with the object.
     """
 
-    index: int = 10000
+    index: int = Constants.get_base_id()
 
     logger: Logger = Logger.get_logger(name="DispatcherEventFactory")
 
@@ -122,7 +120,7 @@ class DispatcherEventFactory:
             event: DispatcherEvent = DispatcherEvent(
                 id=cls.index,
                 name=name,
-                uuid=str(uuid.uuid4()),
+                uuid=Miscellaneous.get_uuid(),
             )
 
             # Increment the index for the next event
@@ -369,7 +367,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
                 self.subscriptions[namespace] = {}
 
             # Generate a UUID
-            code: str = str(uuid.uuid4())
+            code: str = Miscellaneous.get_uuid()
 
             # Add the subscription to the subscriptions dictionary
             self.subscriptions[namespace][code] = {
@@ -423,7 +421,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             result.namespace(value=namespace)
 
             # Set the start time of the notification
-            result.start(value=Miscellaneous.now())
+            result.start(value=Miscellaneous.get_current_datetime())
 
             # Iterate over the subscriptions in the namespace
             for (
@@ -455,7 +453,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
                 self.remove_subscription(uuid=uuid)
 
             # Set the end time of the notification
-            result.end(value=Miscellaneous.now())
+            result.end(value=Miscellaneous.get_current_datetime())
 
             # Calculate the duration of the notification
             result.duration(
@@ -526,7 +524,7 @@ class DispatcherEventSubscriptionFactory:
         logger (Logger): The logger instance associated with the object.
     """
 
-    index: int = 10000
+    index: int = Constants.get_base_id()
 
     logger: Logger = Logger.get_logger(name="DispatcherEventSubscriptionFactory")
 
@@ -638,7 +636,7 @@ class Dispatcher:
             # Check if the event exists in the subscriptions dictionary
             if event.name in self.subscriptions.keys():
                 # Attempt to dispatch the event
-                return self.subscriptions[event.name].dispatch(
+                return self.subscriptions[event.name].notify_subscriptions(
                     event=event,
                     namespace=namespace,
                     *args,

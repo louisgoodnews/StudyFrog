@@ -4,7 +4,6 @@ Date: 2025-02-08
 """
 
 import tkinter
-import uuid
 
 from tkinter.constants import *
 
@@ -14,28 +13,29 @@ from typing import *
 from core.ui.ui_registry import UIRegistry
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher, DispatcherEvent
+from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
 from utils.object import ImmutableBaseObject
 
 
 __all__: List[str] = [
-    "NavigationItem",
-    "NavigationItemFactory",
-    "NavigationService",
+    "NavigationHistoryItem",
+    "NavigationHistoryItemFactory",
+    "NavigationHistoryService",
 ]
 
 
-class NavigationItem(ImmutableBaseObject):
+class NavigationHistoryItem(ImmutableBaseObject):
     """
-    A class representing a navigation item in the application.
+    A class representing a navigation  history item in the application.
 
     Attributes:
-        id (int): The ID of the navigation item.
-        source (str): The source of the navigation item.
-        target (str): The target of the navigation item.
-        uuid (str): The UUID of the navigation item.
+        id (int): The ID of the navigation  history item.
+        source (str): The source of the navigation  history item.
+        target (str): The target of the navigation  history item.
+        uuid (str): The UUID of the navigation  history item.
     """
 
     def __init__(
@@ -46,13 +46,13 @@ class NavigationItem(ImmutableBaseObject):
         uuid: str,
     ) -> None:
         """
-        Initializes a new instance of the NavigationItem class.
+        Initializes a new instance of the NavigationHistoryItem class.
 
         Args:
-            id (int): The ID of the navigation item.
-            source (str): The source of the navigation item.
-            target (str): The target of the navigation item.
-            uuid (str): The UUID of the navigation item.
+            id (int): The ID of the navigation  history item.
+            source (str): The source of the navigation  history item.
+            target (str): The target of the navigation  history item.
+            uuid (str): The UUID of the navigation  history item.
 
         Returns:
             None
@@ -66,50 +66,50 @@ class NavigationItem(ImmutableBaseObject):
         )
 
 
-class NavigationItemFactory:
+class NavigationHistoryItemFactory:
     """
-    A factory class used to create instances of NavigationItem class.
+    A factory class used to create instances of NavigationHistoryItem class.
 
     Attributes:
-        index (int): The index used to create unique IDs for navigation items.
+        index (int): The index used to create unique IDs for navigation  history items.
         logger (Logger): The logger instance associated with the object.
     """
 
-    index: int = 10000
-    logger: Logger = Logger.get_logger(name="NavigationItemFactory")
+    index: int = Constants.get_base_id()
+    logger: Logger = Logger.get_logger(name="NavigationHistoryItemFactory")
 
     @classmethod
     def create_navigation_item(
         cls,
         source: str,
         target: str,
-    ) -> Optional[NavigationItem]:
+    ) -> Optional[NavigationHistoryItem]:
         """
-        Creates and returns a new instance of NavigationItem class.
+        Creates and returns a new instance of NavigationHistoryItem class.
 
         Args:
-            source (str): The source of the navigation item.
-            target (str): The target of the navigation item.
+            source (str): The source of the navigation  history item.
+            target (str): The target of the navigation  history item.
 
         Returns:
-            Optional[NavigationItem]: The created navigation item if no exception occurs. Otherwise, None.
+            Optional[NavigationHistoryItem]: The created navigation  history item if no exception occurs. Otherwise, None.
 
         Raises:
-            Exception: If an exception occurs while creating the navigation item.
+            Exception: If an exception occurs while creating the navigation  history item.
         """
         try:
-            # Attempt to create and return a new instance of NavigationItem
-            navigation_item: NavigationItem = NavigationItem(
+            # Attempt to create and return a new instance of NavigationHistoryItem
+            navigation_item: NavigationHistoryItem = NavigationHistoryItem(
                 id=cls.index,
                 source=source,
                 target=target,
-                uuid=str(uuid.uuid4()),
+                uuid=Miscellaneous.get_uuid(),
             )
 
-            # Increment the index for the next navigation item
+            # Increment the index for the next navigation  history item
             cls.index += 1
 
-            # Return the created navigation item
+            # Return the created navigation  history item
             return navigation_item
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -121,7 +121,7 @@ class NavigationItemFactory:
             return None
 
 
-class NavigationService:
+class NavigationHistoryService:
     """
     A service for managing navigation within the application.
 
@@ -141,7 +141,7 @@ class NavigationService:
         dispatcher: Dispatcher,
     ) -> None:
         """
-        Initializes a new instance of NavigationService class.
+        Initializes a new instance of NavigationHistoryService class.
 
         Args:
             dispatcher (Dispatcher): The dispatcher instance.
@@ -155,8 +155,8 @@ class NavigationService:
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
 
-        # Initialize a list of navigation items as an empty list and store it in an instance variable
-        self.navigation_stack: List[NavigationItem] = []
+        # Initialize a list of navigation  history items as an empty list and store it in an instance variable
+        self.navigation_stack: List[NavigationHistoryItem] = []
 
     def navigate(
         self,
@@ -168,26 +168,26 @@ class NavigationService:
         Navigates to the given target.
 
         Args:
-            source (str): The source of the navigation item.
-            target (str): The target of the navigation item.
+            source (str): The source of the navigation  history item.
+            target (str): The target of the navigation  history item.
             **kwargs: Additional keyword arguments to be passed to the event handler.
 
         Returns:
             None
         """
         try:
-            # Attempt to create a new instance of NavigationItem
-            navigation_item: NavigationItem = (
-                NavigationItemFactory.create_navigation_item(
+            # Attempt to create a new instance of NavigationHistoryItem
+            navigation_item: NavigationHistoryItem = (
+                NavigationHistoryItemFactory.create_navigation_item(
                     source=source,
                     target=target,
                 )
             )
 
             if not navigation_item:
-                # Log a warning message indicating that no navigation item was created
+                # Log a warning message indicating that no navigation  history item was created
                 self.logger.warning(
-                    message=f"No navigation item was created for source '{source}' and target '{target}'."
+                    message=f"No navigation  history item was created for source '{source}' and target '{target}'."
                 )
 
                 # Return early
@@ -245,7 +245,7 @@ class NavigationService:
         """
         Handles backward navigation.
 
-        Moves the current navigation item to the forward stack and navigates to the previous item.
+        Moves the current navigation  history item to the forward stack and navigates to the previous item.
 
         Args:
             **kwargs: Additional keyword arguments.
@@ -271,8 +271,8 @@ class NavigationService:
                 # Return early
                 return
 
-            # Attempt to find the navigation item in the navigation stack
-            navigation_item: Optional[NavigationItem] = next(
+            # Attempt to find the navigation  history item in the navigation stack
+            navigation_item: Optional[NavigationHistoryItem] = next(
                 (
                     item
                     for item in self.navigation_stack
@@ -282,9 +282,9 @@ class NavigationService:
             )
 
             if not navigation_item:
-                # Log a warning message indicating that no navigation item was found
+                # Log a warning message indicating that no navigation  history item was found
                 self.logger.warning(
-                    message=f"No navigation item found for target: {target}"
+                    message=f"No navigation  history item found for target: {target}"
                 )
 
                 # Return early
@@ -295,7 +295,7 @@ class NavigationService:
                 message=f"Navigating backward to '{navigation_item.target}'."
             )
 
-            # Navigate to the found navigation item
+            # Navigate to the found navigation  history item
             self.navigate(
                 source=navigation_item.source,
                 target=navigation_item.target,

@@ -5,6 +5,8 @@ Date: 2025-02-05
 
 import asyncio
 
+from typing import *
+
 from core.answer import AnswerModel
 from core.association import AssociationModel
 from core.change_history import ChangeHistoryModel, ChangeHistoryItemModel
@@ -23,14 +25,13 @@ from core.user import UserModel
 
 from utils.constants import Constants
 from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
+from utils.model import ImmutableBaseModel
 
 
 def debug() -> None:
     logger: Logger = Logger.get_logger(name="debug")
 
-    # Iterate an drop and create the tables
-    for model_class in [
+    model_classes: Set[Type[ImmutableBaseModel]] = {
         AnswerModel,
         AssociationModel,
         ChangeHistoryItemModel,
@@ -47,12 +48,30 @@ def debug() -> None:
         StackModel,
         TagModel,
         UserModel,
-    ]:
-        # Drop the table
-        asyncio.run(model_class.drop_table(database=Constants.DATABASE_PATH))
+    }
 
-        # Create the table
-        asyncio.run(model_class.create_table(database=Constants.DATABASE_PATH))
+    # Iterate an drop and create the tables
+    for model_class in model_classes:
+        try:
+            # Drop the table
+            asyncio.run(model_class.drop_table(database=Constants.DATABASE_PATH))
+
+            # Log an info message
+            logger.info(f"Dropped table '{model_class.__name__}'.")
+
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            logger.error(f"Failed to drop table '{model_class.__name__}': {str(e)}")
+
+        try:
+            # Create the table
+            asyncio.run(model_class.create_table(database=Constants.DATABASE_PATH))
+
+            # Log an info message
+            logger.info(f"Created table '{model_class.__name__}'.")
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            logger.error(f"Failed to create table '{model_class.__name__}': {str(e)}")
 
 
 if __name__ == "__main__":

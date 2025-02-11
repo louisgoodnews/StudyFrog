@@ -393,7 +393,7 @@ class NoteManager(BaseObjectManager):
             note.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the note
-            note.uuid = str(uuid.uuid4())
+            note.uuid = Miscellaneous.get_uuid()
 
             # Convert the note object to a NoteModel object
             model: NoteModel = NoteConverter.object_to_model(object=note)

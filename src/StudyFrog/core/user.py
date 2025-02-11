@@ -356,7 +356,7 @@ class UserManager(BaseObjectManager):
             user.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the user
-            user.uuid = str(uuid.uuid4())
+            user.uuid = Miscellaneous.get_uuid()
 
             # Convert the user object to a UserModel object
             model: UserModel = UserConverter.object_to_model(object=user)

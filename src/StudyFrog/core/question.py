@@ -393,7 +393,7 @@ class QuestionManager(BaseObjectManager):
             question.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the question
-            question.uuid = str(uuid.uuid4())
+            question.uuid = Miscellaneous.get_uuid()
 
             # Convert the question object to a QuestionModel object
             model: QuestionModel = QuestionConverter.object_to_model(object=question)

@@ -281,7 +281,7 @@ class DifficultyManager(BaseObjectManager):
             difficulty.updated_at = Miscellaneous.get_current_datetime()
 
             # Set the uuid of the difficulty
-            difficulty.uuid = str(uuid.uuid4())
+            difficulty.uuid = Miscellaneous.get_uuid()
 
             # Convert the difficulty object to a DifficultyModel object
             model: DifficultyModel = DifficultyConverter.object_to_model(

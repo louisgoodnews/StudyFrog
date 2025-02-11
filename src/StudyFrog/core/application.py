@@ -3,16 +3,17 @@ Author: lodego
 Date: 2025-02-06
 """
 
+from datetime import datetime
+
 from typing import *
 
 from core.ui.main_ui import MainUI
 
 from utils.bootstrap_service import BootstrapService
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
-from utils.navigation import NavigationService
+from utils.miscellaneous import Miscellaneous
 
 
 __all__: List[str] = ["Application"]
@@ -63,12 +64,13 @@ class Application:
         # Bootstrap the application services
         bootstrap_service: BootstrapService = BootstrapService()
 
-        # Initialize the dispatcher, navigation service, setting service and unified manager
+        # Initialize the dispatcher, navigation service, setting service, unified manager, and unified object service
         (
             self.dispatcher,
             self.navigation_service,
             self.setting_service,
             self.unified_manager,
+            self.unified_object_service,
         ) = bootstrap_service.run_startup_tasks()
 
         # Initialize the main UI
@@ -77,7 +79,10 @@ class Application:
             navigation_service=self.navigation_service,
         )
 
-    def start(self) -> None:
+        # Get the start time
+        self.start_time: datetime = Miscellaneous.get_current_datetime()
+
+    def start_application(self) -> None:
         try:
             # Dispatch the "APPLICATION_STARTED" event in the global namespace
             self.dispatcher.dispatch(
@@ -88,6 +93,7 @@ class Application:
             # Dispatch the "REQUEST_FORWARD_NAVIGATION" event in the global namespace
             self.dispatcher.dispatch(
                 event=Events.REQUEST_FORWARD_NAVIGATION,
+                master=self.main_ui.center_frame,
                 namespace=Constants.GLOBAL_NAMESPACE,
                 target="dashboard",
             )
@@ -103,8 +109,11 @@ class Application:
             # Exit the application with a non-zero exit code indicating an exception occurred
             exit(1)
 
-    def stop(self) -> None:
+    def stop_application(self) -> None:
         try:
+            # Get the end time
+            end_time: datetime = Miscellaneous.get_current_datetime()
+
             # Exit the application with a zero exit code indicating no exception occurred
             exit(0)
         except Exception as e:

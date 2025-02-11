@@ -47,6 +47,9 @@ class Events:
         GENERIC_EVENT (DispatcherEvent): An event that indicates that a generic event has been triggered.
         HELP_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a help button has been clicked.
         MENU_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a menu button has been clicked.
+        NAVIGATE (DispatcherEvent): An event that indicates that a navigate event has occurred.
+        NAVIGATE_VALIDATE_FAILURE (DispatcherEvent): An event that indicates that a navigate validation has failed.
+        NAVIGATE_VALIDATE_SUCCESS (DispatcherEvent): An event that indicates that a navigate validation has succeeded.
         NAVIGATION_COMPLETED (DispatcherEvent): An event that indicates that a navigation has been completed.
         NOTE_CREATED (DispatcherEvent): An event that indicates that a note has been created in the backend.
         NOTE_DELETED (DispatcherEvent): An event that indicates that a note has been deleted in the backend.
@@ -78,14 +81,23 @@ class Events:
         REQUEST_CHANGE_HISTORY_ITEM_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a change history item.
         REQUEST_CHANGE_HISTORY_ITEM_LOAD (DispatcherEvent): An event that indicates that the user wants to load a change history item.
         REQUEST_CHANGE_HISTORY_ITEM_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a change history item.
+        REQUEST_CUSTOM_FIELD_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new custom field.
+        REQUEST_CUSTOM_FIELD_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a custom field.
+        REQUEST_CUSTOM_FIELD_LOAD (DispatcherEvent): An event that indicates that the user wants to load a custom field.
+        REQUEST_CUSTOM_FIELD_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a custom field.
         REQUEST_DIFFICULTY_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new difficulty.
         REQUEST_DIFFICULTY_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a difficulty.
         REQUEST_DIFFICULTY_LOAD (DispatcherEvent): An event that indicates that the user wants to load a difficulty.
         REQUEST_DIFFICULTY_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a difficulty.
+        REQUEST_EXIT_UI_MAINLOOP (DispatcherEvent): An event that indicates that the user wants to exit the main UI loop.
         REQUEST_FLASHCARD_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new flashcard.
         REQUEST_FLASHCARD_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a flashcard.
         REQUEST_FLASHCARD_LOAD (DispatcherEvent): An event that indicates that the user wants to load a flashcard.
         REQUEST_FLASHCARD_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a flashcard.
+        REQUEST_OPTION_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new option.
+        REQUEST_OPTION_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a option.
+        REQUEST_OPTION_LOAD (DispatcherEvent): An event that indicates that the user wants to load a option.
+        REQUEST_OPTION_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a option.
         REQUEST_NOTE_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new note.
         REQUEST_NOTE_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a note.
         REQUEST_NOTE_LOAD (DispatcherEvent): An event that indicates that the user wants to load a note.
@@ -98,6 +110,10 @@ class Events:
         REQUEST_QUESTION_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a question.
         REQUEST_QUESTION_LOAD (DispatcherEvent): An event that indicates that the user wants to load a question.
         REQUEST_QUESTION_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a question.
+        REQUEST_SETTING_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new setting.
+        REQUEST_SETTING_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a setting.
+        REQUEST_SETTING_LOAD (DispatcherEvent): An event that indicates that the user wants to load a setting.
+        REQUEST_SETTING_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a setting.
         REQUEST_STACK_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new stack.
         REQUEST_STACK_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a stack.
         REQUEST_STACK_LOAD (DispatcherEvent): An event that indicates that the user wants to load a stack.
@@ -114,6 +130,7 @@ class Events:
         REQUEST_USER_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a user.
         REQUEST_USER_LOAD (DispatcherEvent): An event that indicates that the user wants to load a user.
         REQUEST_USER_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a user.
+        REQUEST_VALIDATE_NAVIGATION (DispatcherEvent): An event that indicates that the user wants to validate a navigate event.
         SEARCH_QUERY_CHANGED (DispatcherEvent): An event that indicates that the search query has been changed.
         STACK_CREATED (DispatcherEvent): An event that indicates that a stack has been created in the backend.
         STACK_DELETED (DispatcherEvent): An event that indicates that a stack has been deleted in the backend.
@@ -285,6 +302,19 @@ class Events:
         name="ui:menu:button:clicked"
     )
 
+    # An event that indicates that a navigate event has occurred
+    NAVIGATE: DispatcherEvent = DispatcherEventFactory.create_event(name="ui:navigate")
+
+    # An event that indicates that a navigate validation has failed
+    NAVIGATE_VALIDATE_FAILURE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="ui:navigate:validate:failure"
+    )
+
+    # An event that indicates that a navigate validation has succeeded
+    NAVIGATE_VALIDATE_SUCCESS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="ui:navigate:validate:success"
+    )
+
     # An event that indicates that a navigation has been completed
     NAVIGATION_COMPLETED: DispatcherEvent = DispatcherEventFactory.create_event(
         name="ui:navigation:completed"
@@ -453,6 +483,26 @@ class Events:
         )
     )
 
+    # An event that indicates that the user wants to create a new custom field
+    REQUEST_CUSTOM_FIELD_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:custom_field:create"
+    )
+
+    # An event that indicates that the user wants to delete a custom field
+    REQUEST_CUSTOM_FIELD_DELETE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:custom_field:delete"
+    )
+
+    # An event that indicates that the user wants to load a custom field
+    REQUEST_CUSTOM_FIELD_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:custom_field:load"
+    )
+
+    # An event that indicates that the user wants to update a custom field
+    REQUEST_CUSTOM_FIELD_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:custom_field:update"
+    )
+
     # An event that indicates that the user wants to create a new difficulty
     REQUEST_DIFFICULTY_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:difficulty:create"
@@ -471,6 +521,11 @@ class Events:
     # An event that indicates that the user wants to update a difficulty
     REQUEST_DIFFICULTY_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:difficulty:update"
+    )
+
+    # An event that indicates that the user wants to exit the main UI loop
+    REQUEST_EXIT_UI_MAINLOOP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:exit:mainloop"
     )
 
     # An event that indicates that the user wants to go forward in the navigation stack
@@ -518,6 +573,26 @@ class Events:
         name="global:request:note:update"
     )
 
+    # An event that indicates that the user wants to create a new option
+    REQUEST_OPTION_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:option:create"
+    )
+
+    # An event that indicates that the user wants to delete a option
+    REQUEST_OPTION_DELETE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:option:delete"
+    )
+
+    # An event that indicates that the user wants to load a option
+    REQUEST_OPTION_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:option:load"
+    )
+
+    # An event that indicates that the user wants to update a option
+    REQUEST_OPTION_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:option:update"
+    )
+
     # An event that indicates that the user wants to create a new priority
     REQUEST_PRIORITY_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:priority:create"
@@ -556,6 +631,26 @@ class Events:
     # An event that indicates that the user wants to update a question
     REQUEST_QUESTION_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:question:update"
+    )
+
+    # An event that indicates that the user wants to create a new setting
+    REQUEST_SETTING_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:setting:create"
+    )
+
+    # An event that indicates that the user wants to delete a setting
+    REQUEST_SETTING_DELETE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:setting:delete"
+    )
+
+    # An event that indicates that the user wants to load a setting
+    REQUEST_SETTING_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:setting:load"
+    )
+
+    # An event that indicates that the user wants to update a setting
+    REQUEST_SETTING_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:setting:update"
     )
 
     # An event that indicates that the user wants to create a new stack
@@ -636,6 +731,11 @@ class Events:
     # An event that indicates that the user wants to update a user
     REQUEST_USER_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:user:update"
+    )
+
+    # An event that indicates that the user wants to validate navigation
+    REQUEST_VALIDATE_NAVIGATION: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:validate:navigation"
     )
 
     # An event that indicates that the settings button has been clicked
@@ -823,6 +923,21 @@ class Events:
         ]
 
     @classmethod
+    def get_custom_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all custom field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all custom field events in the Events class.
+        """
+        return [
+            cls.REQUEST_CUSTOM_FIELD_CREATE,
+            cls.REQUEST_CUSTOM_FIELD_DELETE,
+            cls.REQUEST_CUSTOM_FIELD_LOAD,
+            cls.REQUEST_CUSTOM_FIELD_UPDATE,
+        ]
+
+    @classmethod
     def get_difficulty_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all difficulty events in the Events class.
@@ -881,6 +996,21 @@ class Events:
         ]
 
     @classmethod
+    def get_option_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all option events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all option events in the Events class.
+        """
+        return [
+            cls.REQUEST_OPTION_CREATE,
+            cls.REQUEST_OPTION_DELETE,
+            cls.REQUEST_OPTION_LOAD,
+            cls.REQUEST_OPTION_UPDATE,
+        ]
+
+    @classmethod
     def get_priority_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all priority events in the Events class.
@@ -908,6 +1038,21 @@ class Events:
             cls.REQUEST_QUESTION_DELETE,
             cls.REQUEST_QUESTION_LOAD,
             cls.REQUEST_QUESTION_UPDATE,
+        ]
+
+    @classmethod
+    def get_setting_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all setting events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all setting events in the Events class.
+        """
+        return [
+            cls.REQUEST_SETTING_CREATE,
+            cls.REQUEST_SETTING_DELETE,
+            cls.REQUEST_SETTING_LOAD,
+            cls.REQUEST_SETTING_UPDATE,
         ]
 
     @classmethod

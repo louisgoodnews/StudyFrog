@@ -1,6 +1,6 @@
 """
 Author: lodego
-Date: 2025-02-08
+Date: 2025-02-11
 """
 
 import tkinter
@@ -19,14 +19,19 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["DashboardUI"]
+__all__: List[str] = ["EditUI"]
 
 
-class DashboardUI(tkinter.Frame):
+class EditUI(tkinter.Frame):
     """
-    A class representing the dashboard user interface (UI) of the application.
+    A class representing the edit menu user interface (UI) of the application.
 
-    Atrributes:
+    This class is responsible for initializing and configuring the layout of the
+    edit menu UI, including setting up the main frames and populating them with
+    respective widgets. It extends the tkinter.Frame class and utilizes various
+    utility classes for managing navigation, logging, and other functionalities.
+
+    Attributes:
         dispatcher (Dispatcher): The dispatcher instance.
         logger (Logger): The logger instance.
         navigation_item (NavigationHistoryItem): The navigation history item instance.
@@ -43,7 +48,7 @@ class DashboardUI(tkinter.Frame):
         unified_manager: UnifiedObjectManager,
     ) -> None:
         """
-        Initializes a new instance of the DashboardUI class.
+        Initializes a new instance of the EditUI class.
 
         Args:
             dispatcher (Dispatcher): The dispatcher instance.
@@ -59,7 +64,7 @@ class DashboardUI(tkinter.Frame):
         # Call the parent class constructor
         super().__init__(
             master=master,
-            name="dashboard_ui",
+            name="edit_ui",
         )
 
         # Initialize the logger instance
@@ -80,10 +85,10 @@ class DashboardUI(tkinter.Frame):
         # Configure the grid
         self.configure_grid()
 
-        # Create the widgets
-        self.create_widgets()
+        # Edit the widgets
+        self.edit_widgets()
 
-        # Grid the dashboard widget in it's master
+        # Grid the edit menu widget in its master
         self.grid(
             column=0,
             row=0,
@@ -92,23 +97,23 @@ class DashboardUI(tkinter.Frame):
 
     def configure_grid(self) -> None:
         """
-        Configures the grid of the dashboard widget.
+        Configures the grid of the edit menu widget.
 
-        This method configures the grid of the dashboard widget by setting the
+        This method configures the grid of the edit menu widget by setting the
         weights of the columns and rows.
 
         Returns:
             None
         """
 
-        # Configure the dashboard widget's 1st column to weight 1.
+        # Configure the edit menu widget's 1st column to weight 1.
         # This means that the 1st column will stretch when the window is resized.
         self.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the dashboard widget's 1st and 3rd row to weight 0.
+        # Configure the edit menu widget's 1st and 3rd row to weight 0.
         # This means that the 1st and 3rd row will not stretch when the window is resized.
         self.grid_rowconfigure(
             index=(
@@ -118,19 +123,19 @@ class DashboardUI(tkinter.Frame):
             weight=0,
         )
 
-        # Configure the dashboard widget's 2nd row to weight 1.
+        # Configure the edit menu widget's 2nd row to weight 1.
         # This means that the 2nd row will stretch when the window is resized.
         self.grid_rowconfigure(
             index=1,
             weight=1,
         )
 
-    def create_widgets(self) -> None:
+    def edit_widgets(self) -> None:
         """
-        Creates and configures the main frames of the dashboard UI.
+        Edits and configures the main frames of the edit menu UI.
 
         This method initializes the top, center, and bottom frames within the
-        dashboard UI, setting their layout configuration and invoking methods
+        edit menu UI, setting their layout configuration and invoking methods
         to populate each frame with its respective widgets.
 
         Args:
@@ -140,7 +145,7 @@ class DashboardUI(tkinter.Frame):
             None
         """
 
-        # Create the "Top Frame" frame widget
+        # Edit the "Top Frame" frame widget
         top_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
 
         # Configure the "Top Frame" frame widget's 1st column to weight 1
@@ -162,7 +167,7 @@ class DashboardUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create the "Center Frame" frame widget
+        # Edit the "Center Frame" frame widget
         center_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
@@ -184,7 +189,7 @@ class DashboardUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create the "Bottom Frame" frame widget
+        # Edit the "Bottom Frame" frame widget
         bottom_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
 
         # Configure the "Bottom Frame" frame widget's 1st column to weight 1
@@ -206,24 +211,24 @@ class DashboardUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create the "Bottom Frame" frame widgets
-        self.create_bottom_frame_widgets(master=bottom_frame)
+        # Edit the "Bottom Frame" frame widgets
+        self.edit_bottom_frame_widgets(master=bottom_frame)
 
-        # Create the "Center Frame" frame widgets
-        self.create_center_frame_widgets(master=center_frame)
+        # Edit the "Center Frame" frame widgets
+        self.edit_center_frame_widgets(master=center_frame)
 
-        # Create the "Top Frame" frame widgets
-        self.create_top_frame_widgets(master=top_frame)
+        # Edit the "Top Frame" frame widgets
+        self.edit_top_frame_widgets(master=top_frame)
 
-    def create_bottom_frame_widgets(
+    def edit_bottom_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
         """
-        Creates and configures the main widgets of the bottom frame.
+        Edits and configures the main widgets of the bottom frame.
 
         This method initializes the main widgets of the bottom frame within the
-        dashboard UI, setting their layout configuration.
+        edit menu UI, setting their layout configuration.
 
         Args:
             master (tkinter.Misc): The parent widget.
@@ -233,15 +238,15 @@ class DashboardUI(tkinter.Frame):
         """
         pass
 
-    def create_center_frame_widgets(
+    def edit_center_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
         """
-        Creates and configures the main widgets of the center frame.
+        Edits and configures the main widgets of the center frame.
 
         This method initializes the main widgets of the center frame within the
-        dashboard UI, setting their layout configuration.
+        edit menu UI, setting their layout configuration.
 
         Args:
             master (tkinter.Misc): The parent widget.
@@ -251,15 +256,15 @@ class DashboardUI(tkinter.Frame):
         """
         pass
 
-    def create_top_frame_widgets(
+    def edit_top_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
         """
-        Creates and configures the main widgets of the top frame.
+        Edits and configures the main widgets of the top frame.
 
         This method initializes the main widgets of the top frame within the
-        dashboard UI, setting their layout configuration.
+        edit menu UI, setting their layout configuration.
 
         Args:
             master (tkinter.Misc): The parent widget.
@@ -267,59 +272,4 @@ class DashboardUI(tkinter.Frame):
         Returns:
             None
         """
-
-        # Configure the top frame widget's 1st column to weight 1
-        master.grid_columnconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Configure the top frame widget's 1st row to weight 1
-        master.grid_rowconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Create a left frame within the top frame
-        left_frame: tkinter.Frame = UIBuilder.get_frame(master=master)
-
-        # Configure the left frame widget's 1st column to weight 1
-        left_frame.grid_columnconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Configure the left frame widget's 1st row to weight 1
-        left_frame.grid_rowconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Place the left frame widget in the top frame
-        left_frame.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create a right frame within the top frame
-        right_frame: tkinter.Frame = UIBuilder.get_frame(master=master)
-
-        # Configure the right frame widget's 1st column to weight 1
-        right_frame.grid_columnconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Configure the right frame widget's 1st row to weight 1
-        right_frame.grid_rowconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Place the right frame widget in the top frame
-        right_frame.grid(
-            column=1,
-            row=0,
-            sticky=NSEW,
-        )
+        pass
