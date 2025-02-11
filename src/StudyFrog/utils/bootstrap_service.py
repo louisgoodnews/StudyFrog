@@ -115,7 +115,7 @@ class BootstrapService:
 
         # Initialize the unified object service instance
         self.unified_object_service: UnifiedObjectService = UnifiedObjectService(
-            unifiec_manager=self.unified_object_manager
+            unified_manager=self.unified_object_manager
         )
 
     def create_tables(self) -> None:
@@ -177,264 +177,264 @@ class BootstrapService:
             None
         """
         try:
-            # Store the subscription parameters in a nested list
-            subscriptions: List[List[Any]] = [
-                [
-                    Events.REQUEST_BACKWARD_NAVIGATION,
-                    self.navigation_history_service.on_request_backward_navigation,
-                ],
-                [
-                    Events.REQUEST_FORWARD_NAVIGATION,
-                    self.navigation_history_service.on_request_forward_navigation,
-                ],
-                [
-                    Events.REQUEST_ANSWER_CREATE,
-                    self.unified_object_service.on_request_answer_create,
-                ],
-                [
-                    Events.REQUEST_ANSWER_DELETE,
-                    self.unified_object_service.on_request_answer_delete,
-                ],
-                [
-                    Events.REQUEST_ANSWER_LOAD,
-                    self.unified_object_service.on_request_answer_load,
-                ],
-                [
-                    Events.REQUEST_ANSWER_UPDATE,
-                    self.unified_object_service.on_request_answer_update,
-                ],
-                [
-                    Events.REQUEST_ASSOCIATION_CREATE,
-                    self.unified_object_service.on_request_association_create,
-                ],
-                [
-                    Events.REQUEST_ASSOCIATION_DELETE,
-                    self.unified_object_service.on_request_association_delete,
-                ],
-                [
-                    Events.REQUEST_ASSOCIATION_LOAD,
-                    self.unified_object_service.on_request_association_load,
-                ],
-                [
-                    Events.REQUEST_ASSOCIATION_UPDATE,
-                    self.unified_object_service.on_request_association_update,
-                ],
-                [
-                    Events.REQUEST_CHANGE_HISTORY_CREATE,
-                    self.unified_object_service.on_request_change_history_create,
-                ],
-                [
-                    Events.REQUEST_CHANGE_HISTORY_DELETE,
-                    self.unified_object_service.on_request_change_history_delete,
-                ],
-                [
-                    Events.REQUEST_CHANGE_HISTORY_LOAD,
-                    self.unified_object_service.on_request_change_history_load,
-                ],
-                [
-                    Events.REQUEST_CHANGE_HISTORY_UPDATE,
-                    self.unified_object_service.on_request_change_history_update,
-                ],
-                [
-                    Events.REQUEST_CHANGE_HISTORY_ITEM_CREATE,
-                    self.unified_object_service.on_request_change_history_item_create,
-                ],
-                [
-                    Events.REQUEST_CHANGE_HISTORY_ITEM_DELETE,
-                    self.unified_object_service.on_request_change_history_item_delete,
-                ],
-                [
-                    Events.REQUEST_CHANGE_HISTORY_ITEM_LOAD,
-                    self.unified_object_service.on_request_change_history_item_load,
-                ],
-                [
-                    Events.REQUEST_CHANGE_HISTORY_ITEM_UPDATE,
-                    self.unified_object_service.on_request_change_history_item_update,
-                ],
-                [
-                    Events.REQUEST_CUSTOM_FIELD_CREATE,
-                    self.unified_object_service.on_request_custom_field_create,
-                ],
-                [
-                    Events.REQUEST_CUSTOM_FIELD_DELETE,
-                    self.unified_object_service.on_request_custom_field_delete,
-                ],
-                [
-                    Events.REQUEST_CUSTOM_FIELD_LOAD,
-                    self.unified_object_service.on_request_custom_field_load,
-                ],
-                [
-                    Events.REQUEST_CUSTOM_FIELD_UPDATE,
-                    self.unified_object_service.on_request_custom_field_update,
-                ],
-                [
-                    Events.REQUEST_DIFFICULTY_CREATE,
-                    self.unified_object_service.on_request_difficulty_create,
-                ],
-                [
-                    Events.REQUEST_DIFFICULTY_DELETE,
-                    self.unified_object_service.on_request_difficulty_delete,
-                ],
-                [
-                    Events.REQUEST_DIFFICULTY_LOAD,
-                    self.unified_object_service.on_request_difficulty_load,
-                ],
-                [
-                    Events.REQUEST_DIFFICULTY_UPDATE,
-                    self.unified_object_service.on_request_difficulty_update,
-                ],
-                [
-                    Events.REQUEST_FLASHCARD_CREATE,
-                    self.unified_object_service.on_request_flashcard_create,
-                ],
-                [
-                    Events.REQUEST_FLASHCARD_DELETE,
-                    self.unified_object_service.on_request_flashcard_delete,
-                ],
-                [
-                    Events.REQUEST_FLASHCARD_LOAD,
-                    self.unified_object_service.on_request_flashcard_load,
-                ],
-                [
-                    Events.REQUEST_FLASHCARD_UPDATE,
-                    self.unified_object_service.on_request_flashcard_update,
-                ],
-                [
-                    Events.REQUEST_NOTE_CREATE,
-                    self.unified_object_service.on_request_note_create,
-                ],
-                [
-                    Events.REQUEST_NOTE_DELETE,
-                    self.unified_object_service.on_request_note_delete,
-                ],
-                [
-                    Events.REQUEST_NOTE_LOAD,
-                    self.unified_object_service.on_request_note_load,
-                ],
-                [
-                    Events.REQUEST_NOTE_UPDATE,
-                    self.unified_object_service.on_request_note_update,
-                ],
-                [
-                    Events.REQUEST_OPTION_CREATE,
-                    self.unified_object_service.on_request_option_create,
-                ],
-                [
-                    Events.REQUEST_OPTION_DELETE,
-                    self.unified_object_service.on_request_option_delete,
-                ],
-                [
-                    Events.REQUEST_OPTION_LOAD,
-                    self.unified_object_service.on_request_option_load,
-                ],
-                [
-                    Events.REQUEST_OPTION_UPDATE,
-                    self.unified_object_service.on_request_option_update,
-                ],
-                [
-                    Events.REQUEST_PRIORITY_CREATE,
-                    self.unified_object_service.on_request_priority_create,
-                ],
-                [
-                    Events.REQUEST_PRIORITY_DELETE,
-                    self.unified_object_service.on_request_priority_delete,
-                ],
-                [
-                    Events.REQUEST_PRIORITY_LOAD,
-                    self.unified_object_service.on_request_priority_load,
-                ],
-                [
-                    Events.REQUEST_PRIORITY_UPDATE,
-                    self.unified_object_service.on_request_priority_update,
-                ],
-                [
-                    Events.REQUEST_QUESTION_CREATE,
-                    self.unified_object_service.on_request_question_create,
-                ],
-                [
-                    Events.REQUEST_QUESTION_DELETE,
-                    self.unified_object_service.on_request_question_delete,
-                ],
-                [
-                    Events.REQUEST_QUESTION_LOAD,
-                    self.unified_object_service.on_request_question_load,
-                ],
-                [
-                    Events.REQUEST_QUESTION_UPDATE,
-                    self.unified_object_service.on_request_question_update,
-                ],
-                [
-                    Events.REQUEST_SETTING_CREATE,
-                    self.setting_service.on_request_setting_create,
-                ],
-                [
-                    Events.REQUEST_SETTING_DELETE,
-                    self.setting_service.on_request_setting_delete,
-                ],
-                [
-                    Events.REQUEST_SETTING_LOAD,
-                    self.setting_service.on_request_setting_load,
-                ],
-                [
-                    Events.REQUEST_SETTING_UPDATE,
-                    self.setting_service.on_request_setting_update,
-                ],
-                [
-                    Events.REQUEST_STACK_CREATE,
-                    self.unified_object_service.on_request_stack_create,
-                ],
-                [
-                    Events.REQUEST_STACK_DELETE,
-                    self.unified_object_service.on_request_stack_delete,
-                ],
-                [
-                    Events.REQUEST_STACK_LOAD,
-                    self.unified_object_service.on_request_stack_load,
-                ],
-                [
-                    Events.REQUEST_STACK_UPDATE,
-                    self.unified_object_service.on_request_stack_update,
-                ],
-                [
-                    Events.REQUEST_TAG_CREATE,
-                    self.unified_object_service.on_request_tag_create,
-                ],
-                [
-                    Events.REQUEST_TAG_DELETE,
-                    self.unified_object_service.on_request_tag_delete,
-                ],
-                [
-                    Events.REQUEST_TAG_LOAD,
-                    self.unified_object_service.on_request_tag_load,
-                ],
-                [
-                    Events.REQUEST_TAG_UPDATE,
-                    self.unified_object_service.on_request_tag_update,
-                ],
-                [
-                    Events.REQUEST_USER_CREATE,
-                    self.unified_object_service.on_request_user_create,
-                ],
-                [
-                    Events.REQUEST_USER_DELETE,
-                    self.unified_object_service.on_request_user_delete,
-                ],
-                [
-                    Events.REQUEST_USER_LOAD,
-                    self.unified_object_service.on_request_user_load,
-                ],
-                [
-                    Events.REQUEST_USER_UPDATE,
-                    self.unified_object_service.on_request_user_update,
-                ],
-            ]
+            # Store the subscription parameters in a set
+            subscriptions: Set[Dict[str, Any]] = {
+                {
+                    "event": Events.REQUEST_BACKWARD_NAVIGATION,
+                    "function": self.navigation_history_service.on_request_backward_navigation,
+                },
+                {
+                    "event": Events.REQUEST_FORWARD_NAVIGATION,
+                    "function": self.navigation_history_service.on_request_forward_navigation,
+                },
+                {
+                    "event": Events.REQUEST_ANSWER_CREATE,
+                    "function": self.unified_object_service.on_request_answer_create,
+                },
+                {
+                    "event": Events.REQUEST_ANSWER_DELETE,
+                    "function": self.unified_object_service.on_request_answer_delete,
+                },
+                {
+                    "event": Events.REQUEST_ANSWER_LOAD,
+                    "function": self.unified_object_service.on_request_answer_load,
+                },
+                {
+                    "event": Events.REQUEST_ANSWER_UPDATE,
+                    "function": self.unified_object_service.on_request_answer_update,
+                },
+                {
+                    "event": Events.REQUEST_ASSOCIATION_CREATE,
+                    "function": self.unified_object_service.on_request_association_create,
+                },
+                {
+                    "event": Events.REQUEST_ASSOCIATION_DELETE,
+                    "function": self.unified_object_service.on_request_association_delete,
+                },
+                {
+                    "event": Events.REQUEST_ASSOCIATION_LOAD,
+                    "function": self.unified_object_service.on_request_association_load,
+                },
+                {
+                    "event": Events.REQUEST_ASSOCIATION_UPDATE,
+                    "function": self.unified_object_service.on_request_association_update,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_CREATE,
+                    "function": self.unified_object_service.on_request_change_history_create,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_DELETE,
+                    "function": self.unified_object_service.on_request_change_history_delete,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_LOAD,
+                    "function": self.unified_object_service.on_request_change_history_load,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_UPDATE,
+                    "function": self.unified_object_service.on_request_change_history_update,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_ITEM_CREATE,
+                    "function": self.unified_object_service.on_request_change_history_item_create,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_ITEM_DELETE,
+                    "function": self.unified_object_service.on_request_change_history_item_delete,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_ITEM_LOAD,
+                    "function": self.unified_object_service.on_request_change_history_item_load,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_ITEM_UPDATE,
+                    "function": self.unified_object_service.on_request_change_history_item_update,
+                },
+                {
+                    "event": Events.REQUEST_CUSTOM_FIELD_CREATE,
+                    "function": self.unified_object_service.on_request_custom_field_create,
+                },
+                {
+                    "event": Events.REQUEST_CUSTOM_FIELD_DELETE,
+                    "function": self.unified_object_service.on_request_custom_field_delete,
+                },
+                {
+                    "event": Events.REQUEST_CUSTOM_FIELD_LOAD,
+                    "function": self.unified_object_service.on_request_custom_field_load,
+                },
+                {
+                    "event": Events.REQUEST_CUSTOM_FIELD_UPDATE,
+                    "function": self.unified_object_service.on_request_custom_field_update,
+                },
+                {
+                    "event": Events.REQUEST_DIFFICULTY_CREATE,
+                    "function": self.unified_object_service.on_request_difficulty_create,
+                },
+                {
+                    "event": Events.REQUEST_DIFFICULTY_DELETE,
+                    "function": self.unified_object_service.on_request_difficulty_delete,
+                },
+                {
+                    "event": Events.REQUEST_DIFFICULTY_LOAD,
+                    "function": self.unified_object_service.on_request_difficulty_load,
+                },
+                {
+                    "event": Events.REQUEST_DIFFICULTY_UPDATE,
+                    "function": self.unified_object_service.on_request_difficulty_update,
+                },
+                {
+                    "event": Events.REQUEST_FLASHCARD_CREATE,
+                    "function": self.unified_object_service.on_request_flashcard_create,
+                },
+                {
+                    "event": Events.REQUEST_FLASHCARD_DELETE,
+                    "function": self.unified_object_service.on_request_flashcard_delete,
+                },
+                {
+                    "event": Events.REQUEST_FLASHCARD_LOAD,
+                    "function": self.unified_object_service.on_request_flashcard_load,
+                },
+                {
+                    "event": Events.REQUEST_FLASHCARD_UPDATE,
+                    "function": self.unified_object_service.on_request_flashcard_update,
+                },
+                {
+                    "event": Events.REQUEST_NOTE_CREATE,
+                    "function": self.unified_object_service.on_request_note_create,
+                },
+                {
+                    "event": Events.REQUEST_NOTE_DELETE,
+                    "function": self.unified_object_service.on_request_note_delete,
+                },
+                {
+                    "event": Events.REQUEST_NOTE_LOAD,
+                    "function": self.unified_object_service.on_request_note_load,
+                },
+                {
+                    "event": Events.REQUEST_NOTE_UPDATE,
+                    "function": self.unified_object_service.on_request_note_update,
+                },
+                {
+                    "event": Events.REQUEST_OPTION_CREATE,
+                    "function": self.unified_object_service.on_request_option_create,
+                },
+                {
+                    "event": Events.REQUEST_OPTION_DELETE,
+                    "function": self.unified_object_service.on_request_option_delete,
+                },
+                {
+                    "event": Events.REQUEST_OPTION_LOAD,
+                    "function": self.unified_object_service.on_request_option_load,
+                },
+                {
+                    "event": Events.REQUEST_OPTION_UPDATE,
+                    "function": self.unified_object_service.on_request_option_update,
+                },
+                {
+                    "event": Events.REQUEST_PRIORITY_CREATE,
+                    "function": self.unified_object_service.on_request_priority_create,
+                },
+                {
+                    "event": Events.REQUEST_PRIORITY_DELETE,
+                    "function": self.unified_object_service.on_request_priority_delete,
+                },
+                {
+                    "event": Events.REQUEST_PRIORITY_LOAD,
+                    "function": self.unified_object_service.on_request_priority_load,
+                },
+                {
+                    "event": Events.REQUEST_PRIORITY_UPDATE,
+                    "function": self.unified_object_service.on_request_priority_update,
+                },
+                {
+                    "event": Events.REQUEST_QUESTION_CREATE,
+                    "function": self.unified_object_service.on_request_question_create,
+                },
+                {
+                    "event": Events.REQUEST_QUESTION_DELETE,
+                    "function": self.unified_object_service.on_request_question_delete,
+                },
+                {
+                    "event": Events.REQUEST_QUESTION_LOAD,
+                    "function": self.unified_object_service.on_request_question_load,
+                },
+                {
+                    "event": Events.REQUEST_QUESTION_UPDATE,
+                    "function": self.unified_object_service.on_request_question_update,
+                },
+                {
+                    "event": Events.REQUEST_SETTING_CREATE,
+                    "function": self.setting_service.on_request_setting_create,
+                },
+                {
+                    "event": Events.REQUEST_SETTING_DELETE,
+                    "function": self.setting_service.on_request_setting_delete,
+                },
+                {
+                    "event": Events.REQUEST_SETTING_LOAD,
+                    "function": self.setting_service.on_request_setting_load,
+                },
+                {
+                    "event": Events.REQUEST_SETTING_UPDATE,
+                    "function": self.setting_service.on_request_setting_update,
+                },
+                {
+                    "event": Events.REQUEST_STACK_CREATE,
+                    "function": self.unified_object_service.on_request_stack_create,
+                },
+                {
+                    "event": Events.REQUEST_STACK_DELETE,
+                    "function": self.unified_object_service.on_request_stack_delete,
+                },
+                {
+                    "event": Events.REQUEST_STACK_LOAD,
+                    "function": self.unified_object_service.on_request_stack_load,
+                },
+                {
+                    "event": Events.REQUEST_STACK_UPDATE,
+                    "function": self.unified_object_service.on_request_stack_update,
+                },
+                {
+                    "event": Events.REQUEST_TAG_CREATE,
+                    "function": self.unified_object_service.on_request_tag_create,
+                },
+                {
+                    "event": Events.REQUEST_TAG_DELETE,
+                    "function": self.unified_object_service.on_request_tag_delete,
+                },
+                {
+                    "event": Events.REQUEST_TAG_LOAD,
+                    "function": self.unified_object_service.on_request_tag_load,
+                },
+                {
+                    "event": Events.REQUEST_TAG_UPDATE,
+                    "function": self.unified_object_service.on_request_tag_update,
+                },
+                {
+                    "event": Events.REQUEST_USER_CREATE,
+                    "function": self.unified_object_service.on_request_user_create,
+                },
+                {
+                    "event": Events.REQUEST_USER_DELETE,
+                    "function": self.unified_object_service.on_request_user_delete,
+                },
+                {
+                    "event": Events.REQUEST_USER_LOAD,
+                    "function": self.unified_object_service.on_request_user_load,
+                },
+                {
+                    "event": Events.REQUEST_USER_UPDATE,
+                    "function": self.unified_object_service.on_request_user_update,
+                },
+            }
 
             # Iterate over the list
             for subscription in subscriptions:
                 # Register the function
                 self.dispatcher.register(
-                    event=subscription[0],
-                    function=subscription[1],
+                    event=subscription["event"],
+                    function=subscription["function"],
                     namespace=Constants.GLOBAL_NAMESPACE,
                     persistent=True,
                 )
