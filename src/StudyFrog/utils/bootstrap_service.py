@@ -34,10 +34,14 @@ from core.ui.calendar_ui import CalendarUI
 from core.ui.create_ui import CreateUI
 from core.ui.dashboard_ui import DashboardUI
 from core.ui.edit_ui import EditUI
+from core.ui.help_ui import HelpUI
+from core.ui.notification_ui import NotificationUI
 from core.ui.report_ui import ReportUI
 from core.ui.search_ui import SearchUI
 from core.ui.setting_ui import SettingUI
 from core.ui.ui_registry import UIRegistry
+from core.ui.user_ui import UserUI
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -178,7 +182,7 @@ class BootstrapService:
         """
         try:
             # Store the subscription parameters in a set
-            subscriptions: Set[Dict[str, Any]] = {
+            subscriptions: List[Dict[str, Any]] = [
                 {
                     "event": Events.REQUEST_BACKWARD_NAVIGATION,
                     "function": self.navigation_history_service.on_request_backward_navigation,
@@ -427,7 +431,7 @@ class BootstrapService:
                     "event": Events.REQUEST_USER_UPDATE,
                     "function": self.unified_object_service.on_request_user_update,
                 },
-            }
+            ]
 
             # Iterate over the list
             for subscription in subscriptions:
@@ -464,9 +468,12 @@ class BootstrapService:
                 "create_ui": CreateUI,
                 "dashboard_ui": DashboardUI,
                 "edit_ui": EditUI,
+                "help_ui": HelpUI,
+                "notification_ui": NotificationUI,
                 "report_ui": ReportUI,
                 "search_ui": SearchUI,
                 "setting_ui": SettingUI,
+                "user_ui": UserUI,
             }
 
             # Iterate over the menus and register each one with the UIRegistry

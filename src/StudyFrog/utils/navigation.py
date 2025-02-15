@@ -163,7 +163,7 @@ class NavigationHistoryService:
         source: str,
         target: str,
         **kwargs,
-    ) -> None:
+    ) -> Optional[NavigationHistoryItem]:
         """
         Navigates to the given target.
 
@@ -173,7 +173,10 @@ class NavigationHistoryService:
             **kwargs: Additional keyword arguments to be passed to the event handler.
 
         Returns:
-            None
+            Optional[NavigationHistoryItem]: The created navigation  history item if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the navigation  history item.
         """
         try:
             # Attempt to create a new instance of NavigationHistoryItem
@@ -196,39 +199,8 @@ class NavigationHistoryService:
             # Push to history stack
             self.navigation_stack.append(navigation_item)
 
-            # Log an info message indicating navigation is being attempted
-            self.logger.info(
-                message=f"Attempting to navigate from '{source}' to '{target}'."
-            )
-
-            # Attempt to get the UI class that corresponds to the target
-            ui_class: Optional[Type[tkinter.Misc]] = UIRegistry.get(name=target)
-
-            # Check if a UI class was found
-            if not ui_class:
-                # Log a warning message indicating that no UI class was found
-                self.logger.warning(
-                    message=f"No UI class was found for target '{target}'."
-                )
-
-                # Return early
-                return
-
-            # Call the __init__ method of the UI class with the passed kwargs
-            ui_class(**kwargs)
-
-            # Grid the UI class widget
-            ui_class.grid(
-                column=0,
-                row=0,
-                sitcky=NSEW,
-            )
-
-            # Dispatch the "NAVIGATION_COMPLETED" event
-            self.dispatcher.dispatch(
-                event=Events.NAVIGATION_COMPLETED,
-                namespace=Constants.GLOBAL_NAMESPACE,
-            )
+            # Return the navigation  history item
+            return navigation_item
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -241,7 +213,7 @@ class NavigationHistoryService:
     def on_request_backward_navigation(
         self,
         **kwargs,
-    ) -> None:
+    ) -> Optional[NavigationHistoryItem]:
         """
         Handles backward navigation.
 
@@ -251,7 +223,10 @@ class NavigationHistoryService:
             **kwargs: Additional keyword arguments.
 
         Returns:
-            None
+            Optional[NavigationHistoryItem]: The navigation  history item that was navigated to. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while navigating backward.
         """
         try:
             # Get the target from the kwargs
@@ -296,7 +271,7 @@ class NavigationHistoryService:
             )
 
             # Navigate to the found navigation  history item
-            self.navigate(
+            return self.navigate(
                 source=navigation_item.source,
                 target=navigation_item.target,
                 **kwargs,
@@ -313,7 +288,7 @@ class NavigationHistoryService:
     def on_request_forward_navigation(
         self,
         **kwargs,
-    ) -> None:
+    ) -> Optional[NavigationHistoryItem]:
         """
         Handles forward navigation.
 
@@ -323,7 +298,10 @@ class NavigationHistoryService:
             **kwargs: Additional keyword arguments.
 
         Returns:
-            None
+            Optional[NavigationHistoryItem]: The navigation  history item that was navigated to. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while navigating forward.
         """
         try:
             if "source" not in kwargs or "target" not in kwargs:
@@ -336,7 +314,7 @@ class NavigationHistoryService:
                 return
 
             # Attempt to navigate to the target
-            self.navigate(
+            return self.navigate(
                 source=kwargs.pop("source"),
                 target=kwargs.pop("target"),
                 **kwargs,

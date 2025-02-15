@@ -77,6 +77,8 @@ class Application:
         self.main_ui: MainUI = MainUI(
             dispatcher=self.dispatcher,
             navigation_service=self.navigation_service,
+            setting_service=self.setting_service,
+            unified_manager=self.unified_manager,
         )
 
         # Get the start time
@@ -90,12 +92,13 @@ class Application:
                 namespace=Constants.GLOBAL_NAMESPACE,
             )
 
-            # Dispatch the "REQUEST_FORWARD_NAVIGATION" event in the global namespace
+            # Dispatch the "REQUEST_VALIDATE_NAVIGATION" event in the global namespace
             self.dispatcher.dispatch(
-                event=Events.REQUEST_FORWARD_NAVIGATION,
-                master=self.main_ui.center_frame,
+                direction="forward",
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
                 namespace=Constants.GLOBAL_NAMESPACE,
-                target="dashboard",
+                source="application",
+                target="dashboard_ui",
             )
 
             # Show the main UI
@@ -113,6 +116,12 @@ class Application:
         try:
             # Get the end time
             end_time: datetime = Miscellaneous.get_current_datetime()
+
+            # Dispatch the "APPLICATION_STOPPED" event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.APPLICATION_STOPPED,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
 
             # Exit the application with a zero exit code indicating no exception occurred
             exit(0)

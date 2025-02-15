@@ -30,8 +30,8 @@ class Field(ImmutableBaseObject):
         primary_key (bool): If the field is a primary key.
         size (int): The size of the field.
         type (str): The type of the field.
-            Possible values are "BLOB", "BOOLEAN", "DATE", "DATETIME", "FLOAT", "INTEGER", "JSON","TIME", "VARCHAR", "NULL", "REAL", "TEXT"
-        unique (bool): If the field is unique.
+            Possible values are "BLOB", "BOOLEAN", "DATE", "DATETIME", "FLOAT", "INTEGER", "JSON", "NUMERIC", "REAL", "TEXT", "TIME", "VARCHAR", "NULL"
+        unique (bool): If the field should be unique.
             If True, the field will be indexed and a unique constraint will be created.
         unique_together (List[str]): A list of fields that should be unique together.
     """
@@ -62,11 +62,12 @@ class Field(ImmutableBaseObject):
                 "FLOAT",
                 "INTEGER",
                 "JSON",
-                "TIME",
-                "VARCHAR",
                 "NULL",
+                "NUMERIC",
                 "REAL",
                 "TEXT",
+                "TIME",
+                "VARCHAR",
             ]
         ] = None,
         unique: Optional[bool] = None,
@@ -90,7 +91,7 @@ class Field(ImmutableBaseObject):
             primary_key (bool): If the field is a primary key.
             size (int): The size of the field.
             type (str): The type of the field.
-                Possible values are "BLOB", "BOOLEAN", "DATE", "DATETIME", "FLOAT", "INTEGER", "JSON","TIME", "VARCHAR", "NULL", "REAL", "TEXT"
+                Possible values are "BLOB", "BOOLEAN", "DATE", "DATETIME", "FLOAT", "INTEGER", "JSON", "NUMERIC", "REAL", "TEXT", "TIME", "VARCHAR", "NULL"
             unique (bool): If the field should be unique.
             unique_together (List[str]): A list of fields that should be unique together.
 

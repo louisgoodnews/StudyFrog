@@ -3,6 +3,7 @@ Author: lodego
 Date: 2025-02-08
 """
 
+from doctest import master
 import tkinter
 
 from typing import *
@@ -197,7 +198,8 @@ class UIBuilder:
                 """
                 # Set the text of the label to the current datetime
                 result["label"]["text"] = Miscellaneous.datetime_to_string(
-                    datetime=Miscellaneous.get_current_datetime()
+                    datetime=Miscellaneous.get_current_datetime(),
+                    format="%H:%M:%S",
                 )
 
                 # Schedule the next call to update the clock
@@ -228,7 +230,8 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=Miscellaneous.datetime_to_string(
-                    datetime=Miscellaneous.get_current_datetime()
+                    datetime=Miscellaneous.get_current_datetime(),
+                    format="%H:%M:%S",
                 ),
                 **kwargs,
             )
@@ -261,14 +264,14 @@ class UIBuilder:
         **kwargs,
     ) -> Optional[ttk.Combobox]:
         """
-        Creates and returns a new instance of tkinter.Combobox.
+        Creates and returns a new instance of ttk.Combobox.
 
         Args:
             master (tkinter.Misc): The master widget.
-            **kwargs: Any additional keyword arguments to be passed to the tkinter.Combobox constructor.
+            **kwargs: Any additional keyword arguments to be passed to the ttk.Combobox constructor.
 
         Returns:
-            Optional[ttk.Combobox]: The created tkinter.Combobox instance.
+            Optional[ttk.Combobox]: The created ttk.Combobox instance.
 
         Raises:
             Exception: If an exception occurs while attempting to create a new instance of tkinter.Combobox.
@@ -573,7 +576,7 @@ class UIBuilder:
 
                 # Delete all content from the text widget
                 result["text"].delete(
-                    0,
+                    "1.0",
                     END,
                 )
 
@@ -587,7 +590,7 @@ class UIBuilder:
 
                 # Get and return all content from the text widget
                 return result["text"].get(
-                    0,
+                    "1.0",
                     END,
                 )
 
@@ -604,13 +607,13 @@ class UIBuilder:
 
                 # Delete all content from the text widget
                 result["text"].delete(
-                    0,
+                    "1.0",
                     END,
                 )
 
                 # Insert the given value into the text widget
                 result["text"].insert(
-                    0,
+                    "1.0",
                     value,
                 )
 
@@ -656,9 +659,8 @@ class UIBuilder:
             # Configure the "Label" label widget's grid properties
             result["label"].grid(
                 column=0,
-                columnspan=3,
                 row=0,
-                sticky="nsew",
+                sticky=NSEW,
             )
 
             # Create the "Text" text widget
@@ -681,9 +683,11 @@ class UIBuilder:
                 text="Clear",
             )
 
-            # Configure the "Clear" button widget's grid properties
+            # Grid the button widget
             result["button"].grid(
                 column=2,
+                padx=5,
+                pady=5,
                 row=2,
             )
 
@@ -702,6 +706,40 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_multi_line_text_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_notebook(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[ttk.Notebook]:
+        """
+        Creates and returns a new instance of ttk.Notebook.
+
+        Args:
+            master (tkinter.Misc): The master widget.
+            **kwargs: Any additional keyword arguments to be passed to the ttk.Notebook constructor.
+
+        Returns:
+            Optional[ttk.Notebook]: The created ttk.Notebook instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of ttk.Notebook.
+        """
+        try:
+            # Attempt to create and return a new instance of ttk.Notebook
+            return ttk.Notebook(
+                master=master,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_notebook' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
@@ -1111,6 +1149,171 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_single_line_text_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a single-line text field widget.
+
+        The returned dictionary contains the following keys:
+            - "root": The master widget (Call your geometry manager (.place, .grid, .pack, etc.) on this widget)
+            - "label": The label widget
+            - "entry": The entry widget
+            - "button": The button widget
+            - "clear": A function to clear all content from the entry widget
+            - "get": A function to get the content of the entry widget
+            - "set": A function to set the content of the entry widget
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the widgets
+        """
+        try:
+            # Initialize the result dictionary as an empty
+            result: Dict[str, Any] = {}
+
+            # Create a method to clear the content of the entry widget
+            def clear() -> None:
+                """
+                Clears the content of the entry widget.
+
+                Returns:
+                    None
+                """
+
+                # Delete all content from the entry widget
+                result["entry"].delete(
+                    0,
+                    END,
+                )
+
+            # Create a method to get the content of the entry widget
+            def get() -> str:
+                """
+                Retrieves the content of the entry widget.
+
+                Returns:
+                    str: The content of the entry widget
+                """
+
+                # Return the content of the entry widget
+                return result["entry"].get()
+
+            # Create a method to set the content of the entry widget
+            def set(value: str) -> None:
+                """
+                Sets the content of the entry widget to the given value.
+
+                Args:
+                    value (str): The value to set in the entry widget.
+
+                Returns:
+                    None
+                """
+
+                # Clear the content of the entry widget
+                result["entry"].delete(
+                    0,
+                    END,
+                )
+
+                # Insert the given value into the entry widget
+                result["entry"].insert(
+                    0,
+                    value,
+                )
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=(
+                    0,
+                    2,
+                ),
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Grid the label widget
+            result["label"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the entry widget
+            result["entry"] = cls.get_entry(
+                master=result["root"],
+                **kwargs,
+            )
+
+            # Grid the entry widget
+            result["entry"].grid(
+                column=1,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the button widget
+            result["button"] = cls.get_button(
+                command=clear,
+                master=result["root"],
+                text="Clear",
+            )
+
+            # Grid the button widget
+            result["button"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=0,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_single_line_text_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_spinbox(
         cls,
         master: tkinter.Misc,
@@ -1182,6 +1385,35 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_style(
+        cls,
+        master: Optional[tkinter.Misc] = None,
+    ) -> Optional[ttk.Style]:
+        """
+        Creates and returns a new instance of ttk.Style.
+
+        Args:
+            master (Optional[tkinter.Misc]): The master widget.
+
+        Returns:
+            Optional[ttk.Style]: The created ttk.Style instance.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of ttk.Style.
+        """
+        try:
+            # Attempt to create and return a new instance of ttk.Style
+            return ttk.Style(master=master)
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_style' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_text(
         cls,
         master: tkinter.Misc,
@@ -1219,20 +1451,22 @@ class UIBuilder:
     def get_tk(
         cls,
         base_name: Optional[str] = None,
-        class_name: Optional[str] = None,
+        class_name: Optional[str] = "Tk",
         screen_name: Optional[str] = None,
         sync: Optional[bool] = False,
-        use_tk: Optional[bool] = False,
+        use: Optional[str] = None,
+        use_tk: Optional[bool] = True,
     ) -> Optional[tkinter.Tk]:
         """
         Creates and returns a new instance of tkinter.Tk.
 
         Args:
             base_name (Optional[str]): The base name of the root window.
-            class_name (Optional[str]): The class name of the root window.
+            class_name (Optional[str]): The class name of the root window. Defaults to "Tk".
             screen_name (Optional[str]): The name of the screen where the root window should appear.
-            sync (Optional[bool]): Whether to use synchronous mode or not.
-            use_tk (Optional[bool]): Whether to use Tk or not.
+            sync (Optional[bool]): Whether to use synchronous mode or not. Defaults to False.
+            use (Optional[str]): The use argument to be passed to the tkinter.Tk constructor.
+            use_tk (Optional[bool]): Whether to use Tk or not. Defaults to True.
 
         Returns:
             Optional[tkinter.Tk]: The created tkinter.Tk instance if no exception occurs. Otherwise, None.
@@ -1247,6 +1481,7 @@ class UIBuilder:
                 className=class_name,
                 screenName=screen_name,
                 sync=sync,
+                use=use,
                 useTk=use_tk,
             )
         except Exception as e:

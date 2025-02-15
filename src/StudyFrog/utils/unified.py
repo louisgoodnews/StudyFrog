@@ -81,37 +81,32 @@ class UnifiedObjectManager:
     def __getattr__(
         self,
         name: str,
-    ) -> Any:
+    ) -> Optional[Any]:
         """
-        Automatically routes method calls to the appropriate manager.
+        Allows dynamic access to methods of registered managers.
 
-        If `unified_manager.get_flashcard_by_id(1234)` is called,
-        this method automatically forwards it to `FlashcardManager.get_flashcard_by_id(1234)`.
+        Args:
+            name (str): The name of the method to retrieve.
+
+        Returns:
+            The method from the registered manager or raises AttributeError.
         """
 
-        # Check if the method is available on the UnifiedObjectManager instance
-        if not hasattr(
-            self,
-            name,
-        ):
-            # Iterate over the registered managers and check if the method is available
-            for (
-                manager_name,
-                manager_instance,
-            ) in self.managers.items():
-                if hasattr(
-                    manager_instance,
+        # Iterate over the registered managers
+        for manager in self.managers.values():
+            try:
+                # Attempt to get the attribute from the manager
+                return getattr(
+                    manager,
                     name,
-                ):
-                    return getattr(
-                        manager_instance,
-                        name,
-                    )
+                )
+            except AttributeError:
+                # Ignore the attribute error and try the next manager
+                pass
 
-        # If the method is available, return the result of calling it
-        return getattr(
-            self,
-            name,
+        # Raise an AttributeError if the attribute is not found in any manager
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{name}'"
         )
 
     def register_manager(

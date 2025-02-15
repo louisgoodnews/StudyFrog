@@ -37,11 +37,19 @@ class ImmutableStack(ImmutableBaseObject):
     A stack is a collection of Flashards, Notes and Questions.
 
     Attributes:
+        contents (List[Dict[str, Any]]): The list of the contents of the stack.
         created_at (datetime): The timestamp when the stack was created.
         customfield_values (List[Dict[str, Any]]): The custom field values of the stack.
+        description (str): The description of the stack.
+        difficulty (int): The difficulty of the stack.
+        due_by (datetime): The timestamp when the stack is due.
         id (int): The ID of the stack.
         key (str): The key of the stack.
+        last_viewed_at (datetime): The timestamp when the stack was last viewed.
         name (str): The name of the stack.
+        priority (int): The priority of the stack.
+        status (Literal["New", "Learning", "Review", "Completed"]): The status of the stack.
+        tags (List[int]): The IDs of the tags associated with the stack.
         updated_at (datetime): The timestamp when the stack was last updated.
         uuid (str): The UUID of the stack.
     """
@@ -49,10 +57,18 @@ class ImmutableStack(ImmutableBaseObject):
     def __init__(
         self,
         name: str,
+        contents: Optional[List[Dict[str, Any]]] = None,
         created_at: Optional[datetime] = None,
         customfield_values: Optional[List[Dict[str, Any]]] = None,
+        description: Optional[str] = None,
+        difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Literal["New", "Learning", "Review", "Completed"] = "New",
+        tags: Optional[List[int]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -61,21 +77,37 @@ class ImmutableStack(ImmutableBaseObject):
 
         Args:
             name (str): The name of the stack.
+            contents (Optional[List[Dict[str, Any]]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            description (Optional[str]): The description of the stack.
+            difficulty (Optional[int]): The ID of the difficulty associated with the stack.
+            due_by (Optional[datetime]): The timestamp when the stack is due.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
+            last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
+            priority (Optional[int]): The ID of the priority associated with the stack.
+            status (Literal["New", "Learning", "Review", "Completed"]): The status of the stack.
+            tags (Optional[List[int]]): The IDs of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
         """
 
         # Call the parent class constructor
         super().__init__(
+            contents=contents,
             created_at=created_at,
             customfield_values=customfield_values,
+            description=description,
+            difficulty=difficulty,
+            due_by=due_by,
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
             name=name,
+            priority=priority,
+            status=status,
+            tags=tags,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -99,11 +131,19 @@ class MutableStack(MutableBaseObject):
     A stack is a collection of Flashards, Notes and Questions.
 
     Attributes:
+        contents (List[Dict[str, Any]]): The list of the contents of the stack.
         created_at (datetime): The timestamp when the stack was created.
         customfield_values (List[Dict[str, Any]]): The custom field values of the stack.
+        description (str): The description of the stack.
+        difficulty (int): The difficulty of the stack.
+        due_by (datetime): The timestamp when the stack is due.
         id (int): The ID of the stack.
         key (str): The key of the stack.
+        last_viewed_at (datetime): The timestamp when the stack was last viewed.
         name (str): The name of the stack.
+        priority (int): The priority of the stack.
+        status (Literal["New", "Learning", "Review", "Completed"]): The status of the stack.
+        tags (List[int]): The IDs of the tags associated with the stack.
         updated_at (datetime): The timestamp when the stack was last updated.
         uuid (str): The UUID of the stack.
     """
@@ -111,10 +151,18 @@ class MutableStack(MutableBaseObject):
     def __init__(
         self,
         name: str,
+        contents: Optional[List[Dict[str, Any]]] = None,
         created_at: Optional[datetime] = None,
         customfield_values: Optional[List[Dict[str, Any]]] = None,
+        description: Optional[str] = None,
+        difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[Literal["New", "Learning", "Review", "Completed"]] = None,
+        tags: Optional[List[int]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -122,11 +170,19 @@ class MutableStack(MutableBaseObject):
         Initializes a new instance of the MutableStack class.
 
         Args:
+            contents (Optional[List[Dict[str, Any]]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            description (Optional[str]): The description of the stack.
+            difficulty (Optional[int]): The difficulty of the stack.
+            due_by (Optional[datetime]): The timestamp when the stack is due.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
+            last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
             name (Optional[str]): The name of the stack.
+            priority (Optional[int]): The priority of the stack.
+            status (Optional[Literal["New", "Learning", "Review", "Completed"]]): The status of the stack.
+            tags (Optional[List[int]]): The IDs of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
 
@@ -136,11 +192,19 @@ class MutableStack(MutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
+            contents=contents,
             created_at=created_at,
             customfield_values=customfield_values,
+            description=description,
+            difficulty=difficulty,
+            due_by=due_by,
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
             name=name,
+            priority=priority,
+            status=status,
+            tags=tags,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -243,10 +307,18 @@ class StackFactory:
     def create_stack(
         cls,
         name: str,
+        contents: Optional[List[Dict[str, Any]]] = None,
         created_at: Optional[datetime] = None,
         customfield_values: Optional[List[Dict[str, Any]]] = None,
+        description: Optional[str] = None,
+        difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[Literal["New", "Learning", "Review", "Completed"]] = None,
+        tags: Optional[List[int]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableStack]:
@@ -254,11 +326,19 @@ class StackFactory:
         Creates and returns a new instance of the ImmutableStack class.
 
         Args:
+            contents (Optional[List[Dict[str, Any]]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             customfield_values (Optional[List[Dict[str, Any]]]): The customfield values of the stack.
+            description (Optional[str]): The description of the stack.
+            difficulty (Optional[int]): The difficulty of the stack.
+            due_by (Optional[datetime]): The timestamp when the stack is due.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
+            last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
             name (Optional[str]): The name of the stack.
+            priority (Optional[int]): The priority of the stack.
+            status (Optional[Literal["New", "Learning", "Review", "Completed"]]): The status of the stack.
+            tags (Optional[List[int]]): The IDs of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
 
@@ -271,11 +351,19 @@ class StackFactory:
         try:
             # Attempt to create and return a new instance of the ImmutableStack class
             return ImmutableStack(
+                contents=contents,
                 created_at=created_at,
                 customfield_values=customfield_values,
+                description=description,
+                difficulty=difficulty,
+                due_by=due_by,
                 id=id,
                 key=key,
+                last_viewed_at=last_viewed_at,
                 name=name,
+                priority=priority,
+                status=status,
+                tags=tags,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -717,9 +805,16 @@ class StackModel(ImmutableBaseModel):
     Attributes:
         created_at (Optional[datetime]): The timestamp when the stack was created.
         customfield_values (Optional[JSON]): The values of the custom fields.
+        description (Optional[str]): The description of the stack.
+        difficulty (Optional[int]): The difficulty of the stack.
+        due_by (Optional[datetime]): The timestamp when the stack is due.
         id (Optional[int]): The ID of the stack.
         key (Optional[str]): The key of the stack.
+        last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
         name (Optional[str]): The name of the stack.
+        priority (Optional[int]): The priority of the stack.
+        status (Optional[int]): The status of the stack.
+        tags (Optional[List[str]]): The tags of the stack.
         updated_at (Optional[datetime]): The timestamp when the stack was last updated.
         uuid (Optional[str]): The UUID of the stack.
     """
@@ -739,6 +834,22 @@ class StackModel(ImmutableBaseModel):
         primary_key=True,
         size=None,
         type="INTEGER",
+        unique=False,
+    )
+
+    contents: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="contents",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
         unique=False,
     )
 
@@ -774,6 +885,54 @@ class StackModel(ImmutableBaseModel):
         unique=False,
     )
 
+    description: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="description",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    difficulty: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.DIFFICULTIES}(id)",
+        index=False,
+        name="difficulty",
+        nullable=False,
+        on_delete="NO ACTION",
+        on_update="NO ACTION",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    due_by: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="due_by",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -790,6 +949,22 @@ class StackModel(ImmutableBaseModel):
         unique=True,
     )
 
+    last_viewed_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="last_viewed_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
     name: Field = Field(
         autoincrement=False,
         default=None,
@@ -804,6 +979,54 @@ class StackModel(ImmutableBaseModel):
         size=255,
         type="VARCHAR",
         unique=True,
+    )
+
+    priority: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.PRIORITIES}(id)",
+        index=False,
+        name="priority",
+        nullable=False,
+        on_delete="NO ACTION",
+        on_update="NO ACTION",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    status: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="status",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    tags: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="tags",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
     )
 
     updated_at: Field = Field(
@@ -840,11 +1063,19 @@ class StackModel(ImmutableBaseModel):
 
     def __init__(
         self,
+        contents: Optional[List[Dict[str, Any]]] = None,
         created_at: Optional[datetime] = None,
         customfield_values: Optional[List[Dict[str, Any]]] = None,
+        description: Optional[str] = None,
+        difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[Literal["New", "Learning", "Review", "Completed"]] = None,
+        tags: Optional[List[int]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -852,11 +1083,19 @@ class StackModel(ImmutableBaseModel):
         Initializes a new instance of the StackModel class.
 
         Args:
+            contents (Optional[List[Dict[str, Any]]]): The contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            description (Optional[str]): The description of the stack.
+            difficulty (Optional[int]): The difficulty of the stack.
+            due_by (Optional[datetime]): The timestamp when the stack is due.
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
+            last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
             name (Optional[str]): The name of the stack.
+            priority (Optional[int]): The priority of the stack.
+            status (Optional[Literal["New", "Learning", "Review", "Completed"]]): The status of the stack.
+            tags (Optional[List[int]]): The IDs of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
 
@@ -864,11 +1103,19 @@ class StackModel(ImmutableBaseModel):
             None
         """
         super().__init__(
+            contents=contents,
             created_at=created_at,
             customfield_values=customfield_values,
+            description=description,
+            difficulty=difficulty,
+            due_by=due_by,
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
             name=name,
+            priority=priority,
+            status=status,
+            tags=tags,
             table=Constants.STACKS,
             updated_at=updated_at,
             uuid=uuid,

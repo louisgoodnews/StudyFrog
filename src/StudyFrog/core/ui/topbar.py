@@ -17,6 +17,8 @@ from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
+from utils.navigation import NavigationHistoryService
+from utils.unified import UnifiedObjectManager
 
 
 __all__: List[str] = ["TopBar"]
@@ -38,6 +40,8 @@ class TopBar(tkinter.Frame):
         self,
         dispatcher: Dispatcher,
         master: tkinter.Misc,
+        navigation_service: NavigationHistoryService,
+        unified_manager: UnifiedObjectManager,
     ) -> None:
         """
         Initializes a new instance of the TopBar class.
@@ -45,6 +49,8 @@ class TopBar(tkinter.Frame):
         Args:
             dispatcher (Dispatcher): The dispatcher instance.
             master (tkinter.Misc): The parent widget.
+            navigation_service (NavigationHistoryService): The navigation history service instance.
+            unified_manager (UnifiedObjectManager): The unified object manager instance.
 
         Returns:
             None
@@ -58,6 +64,12 @@ class TopBar(tkinter.Frame):
 
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
+
+        # Store the passed navigation service instance in an instance variable
+        self.navigation_service: NavigationHistoryService = navigation_service
+
+        # Store the passed unified object manager instance in an instance variable
+        self.unified_manager: UnifiedObjectManager = unified_manager
 
         # Configure the top bar widget's 1st column to weight 1
         self.grid_columnconfigure(
@@ -84,11 +96,11 @@ class TopBar(tkinter.Frame):
         )
 
         # Configure the top bar widget to have an indigo background color
-        self.configure(background="#3F51B5")
+        self.configure(background=Constants.INDIGO["500"])
 
         # Create the "Left Frame" frame widget
         left_frame: tkinter.Frame = UIBuilder.get_frame(
-            background="#3F51B5",
+            background=Constants.INDIGO["500"],
             master=self,
         )
 
@@ -113,17 +125,17 @@ class TopBar(tkinter.Frame):
 
         # Create the "Menu Button" button widget
         menu_button: tkinter.Button = UIBuilder.get_button(
-            background="#3F51B5",
+            background=Constants.INDIGO["500"],
             command=lambda: self.dispatcher.dispatch(
                 event=Events.MENU_BUTTON_CLICKED,
                 namespace=Constants.GLOBAL_NAMESPACE,
             ),
             font=(
-                "Roboto",
-                16,
-                "bold",
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+                Constants.BOLD,
             ),
-            foreground="#FFFFFF",
+            foreground=Constants.WHITE,
             master=left_frame,
             relief=FLAT,
             text="☰",
@@ -139,24 +151,24 @@ class TopBar(tkinter.Frame):
 
         # Bind the "<Enter>" and "<Leave>" events to the "Menu Button" widget
         menu_button.bind(
-            func=lambda e: menu_button.config(background="#C5CAE9"),
+            func=lambda e: menu_button.config(background=Constants.INDIGO["100"]),
             sequence="<Enter>",
         )
 
         menu_button.bind(
-            func=lambda e: menu_button.config(background="#3F51B5"),
+            func=lambda e: menu_button.config(background=Constants.INDIGO["500"]),
             sequence="<Leave>",
         )
 
         #  Create the "Logo Label" label widget
         logo_label: tkinter.Label = UIBuilder.get_label(
-            background="#3F51B5",
+            background=Constants.INDIGO["500"],
             font=(
-                "Roboto",
-                18,
-                "bold",
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+                Constants.BOLD,
             ),
-            foreground="#FFFFFF",
+            foreground=Constants.WHITE,
             master=left_frame,
             text=f"{Constants.APPLICATION_NAME} - Vers. {Constants.APPLICATION_VERSION}",
         )
@@ -211,7 +223,7 @@ class TopBar(tkinter.Frame):
 
             # Create the "Button" button widget
             button: ttk.Button = UIBuilder.get_button(
-                background="#3F51B5",
+                background=Constants.INDIGO["500"],
                 command=lambda event=value["event"], target=value[
                     "target"
                 ]: self.dispatcher.dispatch(
@@ -220,10 +232,10 @@ class TopBar(tkinter.Frame):
                     target=target,
                 ),
                 font=(
-                    "Roboto",
-                    14,
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
                 ),
-                foreground="#FFFFFF",
+                foreground=Constants.WHITE,
                 master=left_frame,
                 relief=FLAT,
                 text=key,
@@ -239,27 +251,35 @@ class TopBar(tkinter.Frame):
 
             # Bind the "<Enter>" and "<Leave>" events to the "Button" widget
             button.bind(
-                func=lambda e, btn=button: btn.config(background="#C5CAE9"),
+                func=lambda e, btn=button: btn.config(
+                    background=Constants.INDIGO["100"]
+                ),
                 sequence="<Enter>",
             )
 
             button.bind(
-                func=lambda e, btn=button: btn.config(background="#3F51B5"),
+                func=lambda e, btn=button: btn.config(
+                    background=Constants.INDIGO["500"]
+                ),
                 sequence="<Leave>",
             )
 
         # Create the "Create Button" button widget
         create_button: tkinter.Button = UIBuilder.get_button(
-            background="#3F51B5",
+            background=Constants.BLUE_GREY["500"],
             command=lambda: self.dispatcher.dispatch(
-                event=Events.CREATE_BUTTON_CLICKED,
+                direction="forward",
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
+                master=UIBuilder.get_toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
+                source="dashboard_ui",
+                target="create_ui",
             ),
             font=(
-                "Roboto",
-                16,
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
             ),
-            foreground="#FFFFFF",
+            foreground=Constants.WHITE,
             master=self,
             relief=FLAT,
             text="Create",
@@ -275,18 +295,18 @@ class TopBar(tkinter.Frame):
 
         # Bind the "<Enter>" and "<Leave>" events to the "Create Button" widget
         create_button.bind(
-            func=lambda e: create_button.config(background="#C5CAE9"),
+            func=lambda e: create_button.config(background=Constants.INDIGO["100"]),
             sequence="<Enter>",
         )
 
         create_button.bind(
-            func=lambda e: create_button.config(background="#3F51B5"),
+            func=lambda e: create_button.config(background=Constants.BLUE_GREY["500"]),
             sequence="<Leave>",
         )
 
         # Create the "Right Frame" frame widget
         right_frame: tkinter.Frame = UIBuilder.get_frame(
-            background="#3F51B5",
+            background=Constants.INDIGO["500"],
             master=self,
         )
 
@@ -315,21 +335,26 @@ class TopBar(tkinter.Frame):
 
         # Configure the "Button" button widget
         search_bar["button"].configure(
-            background="#3F51B5",
-            font=(
-                "Roboto",
-                16,
+            background=Constants.INDIGO["500"],
+            command=lambda: self.dispatcher.dispatch(
+                direction="forward",
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
+                master=UIBuilder.get_toplevel(),
+                namespace=Constants.GLOBAL_NAMESPACE,
+                source="dashboard_ui",
+                target="search_ui",
             ),
-            foreground="#FFFFFF",
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
             relief=FLAT,
         )
 
         # Configure the "Entry" entry widget
         search_bar["entry"].configure(
-            font=(
-                "Roboto",
-                16,
-            ),
+            font=(Constants.DEFAULT_FONT_FAMILIY, Constants.DEFAULT_FONT_SIZE),
         )
 
         # Grid the "Search Bar" search bar widget in the "Right Frame" frame widget
@@ -343,12 +368,16 @@ class TopBar(tkinter.Frame):
 
         # Bind the "<Enter>" and "<Leave>" events to the "Button" widget
         search_bar["button"].bind(
-            func=lambda e: search_bar["button"].config(background="#C5CAE9"),
+            func=lambda e: search_bar["button"].config(
+                background=Constants.INDIGO["100"]
+            ),
             sequence="<Enter>",
         )
 
         search_bar["button"].bind(
-            func=lambda e: search_bar["button"].config(background="#3F51B5"),
+            func=lambda e: search_bar["button"].config(
+                background=Constants.INDIGO["500"]
+            ),
             sequence="<Leave>",
         )
 
@@ -359,21 +388,21 @@ class TopBar(tkinter.Frame):
         )
 
         search_bar["entry"].bind(
-            func=lambda e: search_bar["entry"].config(background="#FFFFFF"),
+            func=lambda e: search_bar["entry"].config(background=Constants.WHITE),
             sequence="<FocusOut>",
         )
 
         icons: Dict[str, Any] = {
-            "🔔": Events.NOTIFICATIONS_BUTTON_CLICKED,
-            "❓": Events.HELP_BUTTON_CLICKED,
-            "⚙": Events.SETTINGS_BUTTON_CLICKED,
-            "👤": Events.USER_BUTTON_CLICKED,
+            "🔔": "notification_ui",
+            "❓": "help_ui",
+            "⚙": "settings_ui",
+            "👤": "user_ui",
         }
 
-        # Iterate over the icons and events
+        # Iterate over the icons and target
         for index, (
             icon,
-            event,
+            target,
         ) in enumerate(
             iterable=icons.items(),
             start=1,
@@ -386,16 +415,20 @@ class TopBar(tkinter.Frame):
 
             # Create the button widget
             button: tkinter.Button = UIBuilder.get_button(
-                background="#3F51B5",
+                background=Constants.INDIGO["500"],
                 command=lambda: self.dispatcher.dispatch(
-                    event=event,
+                    direction="forward",
+                    event=Events.REQUEST_VALIDATE_NAVIGATION,
+                    master=UIBuilder.get_toplevel(),
                     namespace=Constants.GLOBAL_NAMESPACE,
+                    source="dashboard_ui",
+                    target=icons[target],
                 ),
                 font=(
-                    "Roboto",
-                    16,
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
                 ),
-                foreground="#FFFFFF",
+                foreground=Constants.WHITE,
                 master=right_frame,
                 relief=FLAT,
                 text=icon,
@@ -411,11 +444,13 @@ class TopBar(tkinter.Frame):
 
             # Bind the "<Enter>" and "<Leave>" events to the button
             button.bind(
-                func=lambda e, btn=button: btn.config(foreground="#C5CAE9"),
+                func=lambda e, btn=button: btn.config(
+                    foreground=Constants.INDIGO["100"]
+                ),
                 sequence="<Enter>",
             )
 
             button.bind(
-                func=lambda e, btn=button: btn.config(foreground="#FFFFFF"),
+                func=lambda e, btn=button: btn.config(foreground=Constants.WHITE),
                 sequence="<Leave>",
             )

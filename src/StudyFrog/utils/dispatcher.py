@@ -427,7 +427,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             for (
                 uuid,
                 subscription,
-            ) in self.subscriptions[namespace]:
+            ) in self.subscriptions[namespace].items():
                 # Check if the subscription is persistent
                 if not subscription["persistent"]:
                     # Add the subscription to the subscriptions dictionary
@@ -435,12 +435,12 @@ class DispatcherEventSubscription(ImmutableBaseObject):
 
                 # Log a message indicating the function is beeing called
                 self.logger.info(
-                    message=f"Calling function '{subscription['function'].name}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
+                    message=f"Calling function '{subscription['function']}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
                 )
 
                 # Call the function associated with the subscription
                 result.result(
-                    key=subscription["function"].name,
+                    key=uuid,
                     value=subscription["function"](
                         *args,
                         **kwargs,
@@ -637,7 +637,6 @@ class Dispatcher:
             if event.name in self.subscriptions.keys():
                 # Attempt to dispatch the event
                 return self.subscriptions[event.name].notify_subscriptions(
-                    event=event,
                     namespace=namespace,
                     *args,
                     **kwargs,

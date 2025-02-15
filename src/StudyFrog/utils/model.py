@@ -68,7 +68,13 @@ class ImmutableBaseModel(ImmutableBaseObject):
         try:
             # Convert object to dictionary and ensure DB-friendly format
             converted_data = Miscellaneous.convert_to_db_format(
-                self.to_dict(exclude=["_logger"])
+                self.to_dict(
+                    exclude=[
+                        "_logger",
+                        "id",
+                        "table",
+                    ]
+                )
             )
 
             # Extract columns and values
@@ -78,6 +84,8 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
             # Construct SQL query
             sql = f"INSERT INTO {self.table} ({columns}) VALUES ({placeholders});"
+
+            self.logger.debug(message=sql)
 
             # Execute SQL command and return the last row ID
             return await DatabaseService.create(
@@ -385,3 +393,63 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
             # Return False indicating an exception occurred
             return False
+
+    @classmethod
+    async def upsert_table(
+        cls,
+        database: str,  # Path to the SQLite database file
+    ) -> None:
+        """
+        Creates the table if it does not exist or updates it if the schema has changed.
+
+        Args:
+            database (str): Path to the SQLite database file.
+
+        Returns:
+            None
+        """
+        try:
+            # Construct the SQL to create the table
+            create_sql: str = (
+                f"CREATE TABLE IF NOT EXISTS {cls.table} ({', '.join([value.to_sql_string() for value in cls.__dict__.values() if isinstance(value, Field)])})"
+            )
+
+            # Execute the CREATE TABLE statement
+            await DatabaseService.execute(
+                database=database,
+                parameters=(),  # Empty tuple
+                sql=create_sql,
+            )
+
+            # Get the existing columns
+            existing_columns_sql: str = f"PRAGMA table_info({cls.table});"
+            existing_columns: List[Dict[str, Any]] = await DatabaseService.read_all(
+                database=database,
+                parameters=(),  # Empty tuple
+                sql=existing_columns_sql,
+            )
+
+            # Add missing columns
+            for (
+                field_name,
+                field,
+            ) in cls.__dict__.items():
+                if isinstance(field, Field) and not any(
+                    column["name"] == field_name for column in existing_columns
+                ):
+                    # Build the SQL to add the missing column
+                    alter_sql: str = (
+                        f"ALTER TABLE {cls.table} ADD COLUMN {field.to_sql_string()};"
+                    )
+
+                    # Execute the ALTER TABLE statement
+                    await DatabaseService.execute(
+                        database=database,
+                        parameters=(),  # Empty tuple
+                        sql=alter_sql,
+                    )
+        except Exception as e:
+            # Log an error message indicating an exception occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'upsert_table' method from '{cls.__name__}' class: {e}"
+            )
