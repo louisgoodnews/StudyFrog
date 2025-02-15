@@ -9,11 +9,11 @@ from core.answer import ImmutableAnswer
 from core.association import Association
 from core.change_history import ChangeHistory, ChangeHistoryItem
 from core.custom_field import CustomField
-from core.difficulty import Difficulty
+from core.difficulty import ImmutableDifficulty
 from core.flashcard import ImmutableFlashcard
 from core.note import ImmutableNote
 from core.option import ImmutableOption
-from core.priority import Priority
+from core.priority import ImmutablePriority
 from core.question import ImmutableQuestion
 from core.stack import ImmutableStack
 from core.tag import ImmutableTag
@@ -72,6 +72,7 @@ class UnifiedObjectManager:
         Returns:
             None
         """
+
         # Create a logger instance for the UnifiedObjectManager class
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
@@ -608,16 +609,16 @@ class UnifiedObjectService:
 
     def on_request_difficulty_create(
         self,
-        difficulty: Difficulty,
-    ) -> Optional[Difficulty]:
+        difficulty: ImmutableDifficulty,
+    ) -> Optional[ImmutableDifficulty]:
         """
         Handles the 'request_difficulty_create' event and creates a new difficulty in the database.
 
         Args:
-            difficulty (Difficulty): The difficulty to be created.
+            difficulty (ImmutableDifficulty): The difficulty to be created.
 
         Returns:
-            Optional[Difficulty]: The newly created difficulty if no exception occurs. Otherwise, None.
+            Optional[ImmutableDifficulty]: The newly created difficulty if no exception occurs. Otherwise, None.
         """
 
         # Create and return the difficulty
@@ -625,13 +626,13 @@ class UnifiedObjectService:
 
     def on_request_difficulty_delete(
         self,
-        difficulty: Difficulty,
+        difficulty: ImmutableDifficulty,
     ) -> bool:
         """
         Handles the 'request_difficulty_delete' event and deletes a difficulty from the database.
 
         Args:
-            difficulty (Difficulty): The difficulty to be deleted.
+            difficulty (ImmutableDifficulty): The difficulty to be deleted.
 
         Returns:
             bool: True if the difficulty was deleted successfully. False otherwise.
@@ -643,7 +644,7 @@ class UnifiedObjectService:
     def on_request_difficulty_load(
         self,
         **kwargs,
-    ) -> Optional[List[Difficulty]]:
+    ) -> Optional[List[ImmutableDifficulty]]:
         """
         Handles the 'request_difficulty_load' event and loads difficulties from the database.
 
@@ -651,7 +652,7 @@ class UnifiedObjectService:
             **kwargs: Keyword arguments to be passed to the database query.
 
         Returns:
-            Optional[List[Difficulty]]: The loaded difficulties if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableDifficulty]]: The loaded difficulties if no exception occurs. Otherwise, None.
         """
 
         # Load the difficulties from the database
@@ -659,16 +660,16 @@ class UnifiedObjectService:
 
     def on_request_difficulty_update(
         self,
-        difficulty: Difficulty,
-    ) -> Optional[Difficulty]:
+        difficulty: ImmutableDifficulty,
+    ) -> Optional[ImmutableDifficulty]:
         """
         Handles the 'request_difficulty_update' event and updates a difficulty in the database.
 
         Args:
-            difficulty (Difficulty): The difficulty to be updated.
+            difficulty (ImmutableDifficulty): The difficulty to be updated.
 
         Returns:
-            Optional[Difficulty]: The updated difficulty if no exception occurs. Otherwise, None.
+            Optional[ImmutableDifficulty]: The updated difficulty if no exception occurs. Otherwise, None.
         """
 
         # Update and return the difficulty
@@ -878,16 +879,16 @@ class UnifiedObjectService:
 
     def on_request_priority_create(
         self,
-        priority: Priority,
-    ) -> Optional[Priority]:
+        priority: ImmutablePriority,
+    ) -> Optional[ImmutablePriority]:
         """
         Handles the 'request_priority_create' event and creates a new priority in the database.
 
         Args:
-            priority (Priority): The priority to be created.
+            priority (ImmutablePriority): The priority to be created.
 
         Returns:
-            Optional[Priority]: The created priority object if no exception occurs. Otherwise, None.
+            Optional[ImmutablePriority]: The created priority object if no exception occurs. Otherwise, None.
         """
 
         # Create and return the priority
@@ -895,13 +896,13 @@ class UnifiedObjectService:
 
     def on_request_priority_delete(
         self,
-        priority: Priority,
+        priority: ImmutablePriority,
     ) -> bool:
         """
         Handles the 'request_priority_delete' event and deletes a priority from the database.
 
         Args:
-            priority (Priority): The priority to be deleted.
+            priority (ImmutablePriority): The priority to be deleted.
 
         Returns:
             bool: True if no exception occurs. Otherwise, False.
@@ -913,7 +914,7 @@ class UnifiedObjectService:
     def on_request_priority_load(
         self,
         **kwargs,
-    ) -> Optional[List[Priority]]:
+    ) -> Optional[List[ImmutablePriority]]:
         """
         Handles the 'request_priority_load' event and loads a priority from the database.
 
@@ -921,7 +922,7 @@ class UnifiedObjectService:
             **kwargs: The keyword arguments to be used for querying the priority.
 
         Returns:
-            Optional[List[Priority]]: The loaded immutable priority if no exception occurs. Otherwise, None.
+            Optional[List[ImmutablePriority]]: The loaded immutable priority if no exception occurs. Otherwise, None.
         """
 
         # Load the priority from the database and return the loaded immutable priority
@@ -929,16 +930,16 @@ class UnifiedObjectService:
 
     def on_request_priority_update(
         self,
-        priority: Priority,
-    ) -> Optional[Priority]:
+        priority: ImmutablePriority,
+    ) -> Optional[ImmutablePriority]:
         """
         Handles the 'request_priority_update' event and updates a priority in the database.
 
         Args:
-            priority (Priority): The priority to be updated.
+            priority (ImmutablePriority): The priority to be updated.
 
         Returns:
-            Optional[Priority]: The updated priority object if no exception occurs. Otherwise, None.
+            Optional[ImmutablePriority]: The updated priority object if no exception occurs. Otherwise, None.
         """
 
         # Update the priority in the database and return the updated priority

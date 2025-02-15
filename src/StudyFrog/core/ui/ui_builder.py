@@ -3,7 +3,8 @@ Author: lodego
 Date: 2025-02-08
 """
 
-from doctest import master
+import re
+
 import tkinter
 
 from typing import *
@@ -12,6 +13,7 @@ from tkinter import ttk
 
 from tkinter.constants import *
 
+from utils.constants import Constants
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 
@@ -289,6 +291,246 @@ class UIBuilder:
             )
 
             # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_date_entry(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a date entry widget with associated label and button.
+
+        The returned dictionary contains the following keys:
+            - "root": The container frame for the widgets
+            - "label": The label widget
+            - "entry": The entry widget with validation
+            - "button": The button widget for clearing the entry
+            - "clearer": A function to clear the entry content
+            - "getter": A function to retrieve the entry content
+            - "setter": A function to set the entry content
+            - "validator": A function to validate the entry content
+
+        Args:
+            label (str): The text for the label widget.
+            master (tkinter.Misc): The master widget for placing the container frame.
+            **kwargs: Additional keyword arguments for the entry widget.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the content of the entry widget.
+
+                Returns:
+                    None
+                """
+
+                # Delete the content of the entry widget
+                result["entry"].delete(
+                    0,
+                    END,
+                )
+
+            def get() -> str:
+                """
+                Retrieves the content of the entry widget.
+
+                Returns:
+                    str: The content of the entry widget.
+                """
+
+                # Return the content of the entry widget
+                return result["entry"].get()
+
+            def on_key_release() -> None:
+                """
+                Validates the date format (YYYY-MM-DD) and checks if it's a valid calendar date.
+
+                Called when a key is released in the entry widget.
+
+                Returns:
+                    None
+                """
+
+                # Attempt to validate the date format and check if it's a valid calendar date
+                if validate(value=get()):
+                    # If the date is valid, set the entry background to white and the warning text to empty
+                    result["entry"].config(
+                        background=Constants.WHITE,
+                    )
+                    result["warner"].config(
+                        foreground=Constants.RED["200"],
+                        text="",
+                    )
+                else:
+                    # If the date is invalid, set the entry background to red and display a warning message
+                    result["entry"].config(
+                        background=Constants.RED["200"],
+                    )
+                    result["warner"].config(
+                        foreground=Constants.RED["200"],
+                        text="Invalid date format! Use YYYY-MM-DD",
+                    )
+
+            def set(value: str) -> None:
+                """
+                Sets the content of the entry widget.
+
+                Args:
+                    value (str): The content to set in the entry widget.
+
+                Returns:
+                    None
+                """
+
+                # Delete the content of the entry widget
+                result["entry"].delete(
+                    0,
+                    END,
+                )
+
+                # Insert the new content into the entry widget
+                result["entry"].insert(
+                    0,
+                    value,
+                )
+
+            def validate(value: str) -> bool:
+                """
+                Validates a date string against the default date format and checks if it's a valid date.
+
+                Args:
+                    value (str): The date string to validate.
+
+                Returns:
+                    bool: True if the date string is valid, False otherwise.
+                """
+
+                # Check if the value matches the default date format pattern
+                if not re.match(
+                    pattern=Constants.DEFAULT_DATE_FORMAT,
+                    string=value,
+                ):
+                    return False
+
+                try:
+                    # Attempt to convert the string to a datetime object
+                    Miscellaneous.string_to_datetime(
+                        date_string=value,
+                        format="%Y-%m-%d",
+                    )
+                    return True
+                except ValueError:
+                    # Return False if conversion raises a ValueError
+                    return False
+
+            # Create a container frame to hold the label, entry, and button widgets
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st and 2nd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=(
+                    0,
+                    2,
+                ),
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Place the "Label" widget within the "Root" frame
+            result["label"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Entry" widget
+            result["entry"] = cls.get_entry(
+                master=result["root"],
+                **kwargs,
+            )
+
+            # Configure the "Entry" widget with validation
+            result["entry"].bind(
+                func=lambda event: on_key_release,
+                sequence="<KeyRelease>",
+            )
+
+            # Place the "Entry" widget within the "Root" frame
+            result["entry"].grid(
+                column=1,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" widget
+            result["button"] = cls.get_button(
+                command=clear,
+                master=result["root"],
+                text="Clear",
+            )
+
+            # Place the "Button" widget within the "Root" frame widget
+            result["button"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=0,
+            )
+
+            # Create the "Warner" label
+            result["warner"] = cls.get_label(
+                foreground=Constants.RED["200"],
+                master=result["root"],
+                text="",
+            )
+
+            # Place the "Warner" label within the "Root" frame
+            result["warner"].grid_forget()
+
+            # Assign the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Assign the getter function to the result dictionary
+            result["getter"] = get
+
+            # Assign the setter function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_date_entry' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occurred
             return None
 
     @classmethod

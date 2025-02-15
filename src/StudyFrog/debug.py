@@ -5,7 +5,6 @@ Date: 2025-02-05
 
 import asyncio
 
-import tkinter
 from typing import *
 
 from core.answer import AnswerModel
@@ -21,11 +20,9 @@ from core.priority import PriorityModel
 from core.question import QuestionModel
 from core.setting import SettingModel
 from core.stack import StackModel
+from core.status import StatusModel
 from core.tag import TagModel
 from core.user import UserModel
-
-from core.ui.ui_builder import UIBuilder
-from core.ui.dashboard_ui import DashboardUI
 
 from utils.constants import Constants
 from utils.logger import Logger
@@ -50,6 +47,7 @@ def debug() -> None:
         QuestionModel,
         SettingModel,
         StackModel,
+        StatusModel,
         TagModel,
         UserModel,
     }

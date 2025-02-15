@@ -79,6 +79,32 @@ class Constants:
     * DEFAULT_GEOMETRY: The default geometry of the main window.
     * GLOBAL_NAMESPACE: The namespace for global dispatching of events.
 
+    * HIGHEST: The highest priority.
+    * HIGH: The high priority.
+    * MEDIUM: The medium priority.
+    * LOW: The low priority.
+    * LOWEST: The lowest priority.
+
+    * HARD: The hard difficulty.
+    * MEDIUM: The medium difficulty.
+    * EASY: The easy difficulty.
+
+    * ANSWER_NAMESPACE: The namespace for the answer UI.
+    * ASSOCIATION_NAMESPACE: The namespace for the association UI.
+    * CHANGE_HISTORY_NAMESPACE: The namespace for the change history UI.
+    * CHANGE_HISTORY_ITEM_NAMESPACE: The namespace for the change history item UI.
+    * CUSTOM_FIELD_NAMESPACE: The namespace for the custom field UI.
+    * DEFAULT_NAMESPACE: The namespace for the default UI.
+    * DIFFICULTY_NAMESPACE: The namespace for the difficulty UI.
+    * FLASHCARD_NAMESPACE: The namespace for the flashcard UI.
+    * NOTE_NAMESPACE: The namespace for the note UI.
+    * OPTION_NAMESPACE: The namespace for the option UI.
+    * PRIORITY_NAMESPACE: The namespace for the priority UI.
+    * QUESTION_NAMESPACE: The namespace for the question UI.
+    * STACK_NAMESPACE: The namespace for the stack UI.
+    * TAG_NAMESPACE: The namespace for the tag UI.
+    * USER_NAMESPACE: The namespace for the user UI.
+
     * CREATE_UI_NAMESPACE: The namespace for the create UI.
     * DASHBOARD_UI_NAMESPACE: The namespace for the dashboard UI.
     * EDIT_UI_NAMESPACE: The namespace for the edit UI.
@@ -134,6 +160,7 @@ class Constants:
     QUESTIONS: str = "questions"
     SETTINGS: str = "settings"
     STACKS: str = "stacks"
+    STATUSES: str = "statuses"
     TAGS: str = "tags"
     USERS: str = "users"
 
@@ -151,6 +178,11 @@ class Constants:
     UNDERLINE: str = "underline"
 
     DEFAULT_GEOMETRY: str = "1920x1080"
+
+    DEFAULT_DATE_FORMAT: str = r"^\d{4}-\d{2}-\d{2}$"
+    DEFAULT_TIME_FORMAT: str = r"^\d{2}:\d{2}:\d{2}$"
+
+    DEFAULT_DATETIME_FORMAT: str = f"{DEFAULT_DATE_FORMAT} {DEFAULT_TIME_FORMAT}"
 
     AMBER: Dict[str, Any] = {
         "default": "#FFC107",
@@ -487,6 +519,21 @@ class Constants:
     }
 
     GLOBAL_NAMESPACE: str = "GLOBAL"
+
+    HIGHEST: str = "highest"
+    HIGH: str = "high"
+    LOW: str = "low"
+    LOWEST: str = "lowest"
+
+    MEDIUM: str = "medium"
+
+    HARD: str = "hard"
+    EASY: str = "easy"
+
+    NEW: str = "new"
+    LEARNING: str = "learning"
+    REVIEW: str = "review"
+    COMPLETED: str = "completed"
 
     CREATE_UI_NAMESPACE: str = "CREATE_UI"
     DASHBOARD_UI_NAMESPACE: str = "DASHBOARD_UI"

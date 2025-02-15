@@ -200,7 +200,14 @@ class FlashcardConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableFlashcard class from the dictionary representation of the FlashcardModel instance
-            return ImmutableFlashcard(**model.to_dict(exclude=["_logger"]))
+            return ImmutableFlashcard(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -490,7 +497,14 @@ class FlashcardManager(BaseObjectManager):
 
             # Convert the list of FlashcardModel objects to a list of ImmutableFlashcard objects
             flashcards: List[ImmutableFlashcard] = [
-                ImmutableFlashcard(**model.to_dict(exclude=["_logger"]))
+                ImmutableFlashcard(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
                 for model in models
             ]
 
@@ -556,7 +570,14 @@ class FlashcardManager(BaseObjectManager):
             # Return the flashcard if it exists
             if model is not None:
                 # Convert the FlashcardModel object to an ImmutableFlashcard object
-                return ImmutableFlashcard(**model.to_dict(exclude=["_logger"]))
+                return ImmutableFlashcard(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the flashcard does not exist
                 return None
@@ -603,7 +624,14 @@ class FlashcardManager(BaseObjectManager):
             # Return the flashcard if it exists
             if model is not None:
                 # Convert the FlashcardModel object to an ImmutableFlashcard object
-                return ImmutableFlashcard(**model.to_dict(exclude=["_logger"]))
+                return ImmutableFlashcard(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the flashcard does not exist
                 return None
@@ -650,7 +678,14 @@ class FlashcardManager(BaseObjectManager):
             # Return the flashcard if it exists
             if model is not None:
                 # Convert the FlashcardModel object to an ImmutableFlashcard object
-                return ImmutableFlashcard(**model.to_dict(exclude=["_logger"]))
+                return ImmutableFlashcard(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the flashcard does not exist
                 return None
@@ -699,7 +734,14 @@ class FlashcardManager(BaseObjectManager):
             # Return the updated flashcard if it exists
             if model is not None:
                 # Convert the FlashcardModel object to an ImmutableFlashcard object
-                flashcard = ImmutableFlashcard(**model.to_dict(exclude=["_logger"]))
+                flashcard = ImmutableFlashcard(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the flashcard to the cache
                 self.update_in_cache(

@@ -85,8 +85,6 @@ class ImmutableBaseModel(ImmutableBaseObject):
             # Construct SQL query
             sql = f"INSERT INTO {self.table} ({columns}) VALUES ({placeholders});"
 
-            self.logger.debug(message=sql)
-
             # Execute SQL command and return the last row ID
             return await DatabaseService.create(
                 database=database,
@@ -292,9 +290,9 @@ class ImmutableBaseModel(ImmutableBaseObject):
         database: str,
         column: str,
         value: Any,
-    ) -> Optional[T]:
+    ) -> Optional[Union[T, List[T]]]:
         """
-        Retrieves a single model entry by a column value.
+        Looks up models in the database by a column value.
 
         Args:
             database (str): Path to the SQLite database file.
@@ -302,25 +300,36 @@ class ImmutableBaseModel(ImmutableBaseObject):
             value (Any): Value to match.
 
         Returns:
-            Optional[T]: The model instance if found, otherwise None.
+            Optional[Union[T, List[T]]]: The model instance if found, otherwise None.
         """
         try:
-            # Build the SQL query
-            sql: str = f"SELECT * FROM {cls.table} WHERE {column} = ?"
+            # Build the SQL query to find entries where the specified column matches the given value
+            sql: str = f"SELECT * FROM {cls.table} WHERE {column} LIKE ?"
 
-            # Execute the SQL query
-            row: Dict[str, Any] = await DatabaseService.read_one(
+            # Execute the SQL query and retrieve all matching rows
+            rows: List[Dict[str, Any]] = await DatabaseService.read_all(
                 database=database,
                 parameters=(value,),
                 sql=sql,
             )
 
-            # Return the model instance
-            return (
-                cls(**Miscellaneous.convert_from_db_format(data=row)) if row else None
-            )
+            # Check if no rows were returned
+            if len(rows) == 0:
+                # Return None if no entries are found
+                return None
+
+            # Check if only one row was returned
+            if len(rows) == 1:
+                # Convert the single row to a model instance and return it
+                return cls(**Miscellaneous.convert_from_db_format(data=rows[0]))
+            else:
+                # Return a list of model instances for all matching rows
+                return [
+                    cls(**Miscellaneous.convert_from_db_format(data=row))
+                    for row in rows
+                ]
         except Exception as e:
-            # Log an error message indicating an exception has occurred
+            # Log an error message indicating an exception occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_by' method from '{cls.__name__}' class: {e}"
             )
@@ -397,7 +406,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
     @classmethod
     async def upsert_table(
         cls,
-        database: str,  # Path to the SQLite database file
+        database: str,
     ) -> None:
         """
         Creates the table if it does not exist or updates it if the schema has changed.
@@ -409,24 +418,18 @@ class ImmutableBaseModel(ImmutableBaseObject):
             None
         """
         try:
-            # Construct the SQL to create the table
-            create_sql: str = (
-                f"CREATE TABLE IF NOT EXISTS {cls.table} ({', '.join([value.to_sql_string() for value in cls.__dict__.values() if isinstance(value, Field)])})"
-            )
-
             # Execute the CREATE TABLE statement
             await DatabaseService.execute(
                 database=database,
-                parameters=(),  # Empty tuple
-                sql=create_sql,
+                parameters=(),
+                sql=f"CREATE TABLE IF NOT EXISTS {cls.table} ({', '.join([value.to_sql_string() for value in cls.__dict__.values() if isinstance(value, Field)])})",
             )
 
             # Get the existing columns
-            existing_columns_sql: str = f"PRAGMA table_info({cls.table});"
             existing_columns: List[Dict[str, Any]] = await DatabaseService.read_all(
                 database=database,
-                parameters=(),  # Empty tuple
-                sql=existing_columns_sql,
+                parameters=(),
+                sql=f"PRAGMA table_info({cls.table});",
             )
 
             # Add missing columns
@@ -437,16 +440,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 if isinstance(field, Field) and not any(
                     column["name"] == field_name for column in existing_columns
                 ):
-                    # Build the SQL to add the missing column
-                    alter_sql: str = (
-                        f"ALTER TABLE {cls.table} ADD COLUMN {field.to_sql_string()};"
-                    )
-
                     # Execute the ALTER TABLE statement
                     await DatabaseService.execute(
                         database=database,
                         parameters=(),  # Empty tuple
-                        sql=alter_sql,
+                        sql=f"ALTER TABLE {cls.table} ADD COLUMN {field.to_sql_string()};",
                     )
         except Exception as e:
             # Log an error message indicating an exception occurred

@@ -175,7 +175,14 @@ class UserConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableUser class from the dictionary representation of the UserModel instance
-            return ImmutableUser(**model.to_dict(exclude=["_logger"]))
+            return ImmutableUser(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -456,7 +463,15 @@ class UserManager(BaseObjectManager):
 
             # Convert the list of UserModel objects to a list of ImmutableUser objects
             users: List[ImmutableUser] = [
-                ImmutableUser(**model.to_dict(exclude=["_logger"])) for model in models
+                ImmutableUser(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable users
@@ -568,7 +583,14 @@ class UserManager(BaseObjectManager):
             # Return the user if it exists
             if model is not None:
                 # Convert the UserModel object to an ImmutableUser object
-                return ImmutableUser(**model.to_dict(exclude=["_logger"]))
+                return ImmutableUser(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the user does not exist
                 return None
@@ -615,7 +637,14 @@ class UserManager(BaseObjectManager):
             # Return the user if it exists
             if model is not None:
                 # Convert the UserModel object to an ImmutableUser object
-                return ImmutableUser(**model.to_dict(exclude=["_logger"]))
+                return ImmutableUser(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the user does not exist
                 return None
@@ -664,7 +693,14 @@ class UserManager(BaseObjectManager):
             # Return the updated user if it exists
             if model is not None:
                 # Convert the UserModel object to an ImmutableUser object
-                user = ImmutableUser(**model.to_dict(exclude=["_logger"]))
+                user = ImmutableUser(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the user to the cache
                 self.update_in_cache(

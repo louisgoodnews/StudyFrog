@@ -142,6 +142,10 @@ class StackCreateForm(tkinter.Frame):
 
         # Create a single-line text field for the stack name.
         self.name: Dict[str, Any] = UIBuilder.get_single_line_text_field(
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
             label="Name* : ",
             master=self,
         )
@@ -200,6 +204,46 @@ class StackCreateForm(tkinter.Frame):
             sticky=NSEW,
         )
 
+        # Create a date entry widget for the due by date
+        self.due_by: Dict[str, Any] = UIBuilder.get_date_entry(
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            label="Due by*: ",
+            master=self,
+        )
+
+        self.due_by["button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        self.due_by["label"].configure(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+        )
+
+        self.due_by["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the date entry widget in the grid.
+        self.due_by["root"].grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=3,
+            sticky=NSEW,
+        )
+
+        # Set the default value to the next 30 days
+        self.due_by["setter"](
+            value=Miscellaneous.datetime_to_string(
+                datetime=Miscellaneous.get_date_increment(increment=30),
+                format="%Y-%m-%d",
+            )
+        )
+
     def get(self) -> Dict[str, Any]:
         """
         Retrieves the values from the form fields.
@@ -215,6 +259,7 @@ class StackCreateForm(tkinter.Frame):
             "created_at": Miscellaneous.get_current_datetime(),
             "customfield_values": [],
             "description": "",
+            "last_viewed_at": Miscellaneous.get_current_datetime(),
             "name": "",
             "updated_at": Miscellaneous.get_current_datetime(),
             "uuid": Miscellaneous.get_uuid(),
@@ -225,6 +270,9 @@ class StackCreateForm(tkinter.Frame):
 
         # Get the value of the stack description from the multi-line text field
         result["description"] = self.description["getter"]()
+
+        # Get the value of the due by date from the date entry widget
+        result["due_by"] = self.due_by["getter"]()
 
         # Return the result dictionary
         return result

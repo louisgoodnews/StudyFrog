@@ -203,7 +203,14 @@ class NoteConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableNote class from the dictionary representation of the NoteModel instance
-            return ImmutableNote(**model.to_dict(exclude=["_logger"]))
+            return ImmutableNote(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -493,7 +500,15 @@ class NoteManager(BaseObjectManager):
 
             # Convert the list of NoteModel objects to a list of ImmutableNote objects
             notes: List[ImmutableNote] = [
-                ImmutableNote(**model.to_dict(exclude=["_logger"])) for model in models
+                ImmutableNote(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable notes
@@ -558,7 +573,14 @@ class NoteManager(BaseObjectManager):
             # Return the note if it exists
             if model is not None:
                 # Convert the NoteModel object to an ImmutableNote object
-                return ImmutableNote(**model.to_dict(exclude=["_logger"]))
+                return ImmutableNote(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the note does not exist
                 return None
@@ -605,7 +627,14 @@ class NoteManager(BaseObjectManager):
             # Return the note if it exists
             if model is not None:
                 # Convert the NoteModel object to an ImmutableNote object
-                return ImmutableNote(**model.to_dict(exclude=["_logger"]))
+                return ImmutableNote(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the note does not exist
                 return None
@@ -652,7 +681,14 @@ class NoteManager(BaseObjectManager):
             # Return the note if it exists
             if model is not None:
                 # Convert the NoteModel object to an ImmutableNote object
-                return ImmutableNote(**model.to_dict(exclude=["_logger"]))
+                return ImmutableNote(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the note does not exist
                 return None
@@ -701,7 +737,14 @@ class NoteManager(BaseObjectManager):
             # Return the updated note if it exists
             if model is not None:
                 # Convert the NoteModel object to an ImmutableNote object
-                note = ImmutableNote(**model.to_dict(exclude=["_logger"]))
+                note = ImmutableNote(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the note to the cache
                 self.update_in_cache(

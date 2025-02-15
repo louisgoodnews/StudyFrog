@@ -11,8 +11,6 @@ from datetime import datetime
 
 from typing import *
 
-from core.default import Default, DefaultManager
-
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -182,7 +180,14 @@ class OptionConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableOption class from the dictionary representation of the OptionModel instance
-            return ImmutableOption(**model.to_dict(exclude=["_logger"]))
+            return ImmutableOption(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -463,7 +468,14 @@ class OptionManager(BaseObjectManager):
 
             # Convert the list of OptionModel objects to a list of ImmutableOption objects
             options: List[ImmutableOption] = [
-                ImmutableOption(**model.to_dict(exclude=["_logger"]))
+                ImmutableOption(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
                 for model in models
             ]
 
@@ -529,7 +541,14 @@ class OptionManager(BaseObjectManager):
             # Return the option if it exists
             if model is not None:
                 # Convert the OptionModel object to an ImmutableOption object
-                return ImmutableOption(**model.to_dict(exclude=["_logger"]))
+                return ImmutableOption(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the option does not exist
                 return None
@@ -576,7 +595,14 @@ class OptionManager(BaseObjectManager):
             # Return the option if it exists
             if model is not None:
                 # Convert the OptionModel object to an ImmutableOption object
-                return ImmutableOption(**model.to_dict(exclude=["_logger"]))
+                return ImmutableOption(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the option does not exist
                 return None
@@ -623,7 +649,14 @@ class OptionManager(BaseObjectManager):
             # Return the option if it exists
             if model is not None:
                 # Convert the OptionModel object to an ImmutableOption object
-                return ImmutableOption(**model.to_dict(exclude=["_logger"]))
+                return ImmutableOption(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the option does not exist
                 return None
@@ -672,7 +705,14 @@ class OptionManager(BaseObjectManager):
             # Return the updated option if it exists
             if model is not None:
                 # Convert the OptionModel object to an ImmutableOption object
-                option = ImmutableOption(**model.to_dict(exclude=["_logger"]))
+                option = ImmutableOption(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the option to the cache
                 self.update_in_cache(

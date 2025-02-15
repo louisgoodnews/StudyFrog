@@ -11,8 +11,6 @@ from datetime import datetime
 
 from typing import *
 
-from core.default import Default, DefaultManager
-
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -114,7 +112,14 @@ class CustomFieldConverter:
         """
         try:
             # Attempt to create and return a new instance of the CustomField class from the dictionary representation of the CustomFieldModel instance
-            return CustomField(**model.to_dict(exclude=["_logger"]))
+            return CustomField(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -385,7 +390,15 @@ class CustomFieldManager(BaseObjectManager):
 
             # Convert the list of CustomFieldModel objects to a list of CustomField objects
             custom_fields: List[CustomField] = [
-                CustomField(**model.to_dict(exclude=["_logger"])) for model in models
+                CustomField(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable custom fields
@@ -450,7 +463,14 @@ class CustomFieldManager(BaseObjectManager):
             # Return the custom field if it exists
             if model is not None:
                 # Convert the CustomFieldModel object to an CustomField object
-                return CustomField(**model.to_dict(exclude=["_logger"]))
+                return CustomField(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the custom field does not exist
                 return None
@@ -497,7 +517,14 @@ class CustomFieldManager(BaseObjectManager):
             # Return the custom field if it exists
             if model is not None:
                 # Convert the CustomFieldModel object to an CustomField object
-                return CustomField(**model.to_dict(exclude=["_logger"]))
+                return CustomField(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the custom field does not exist
                 return None
@@ -544,7 +571,14 @@ class CustomFieldManager(BaseObjectManager):
             # Return the custom field if it exists
             if model is not None:
                 # Convert the CustomFieldModel object to an CustomField object
-                return CustomField(**model.to_dict(exclude=["_logger"]))
+                return CustomField(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the custom field does not exist
                 return None
@@ -593,7 +627,14 @@ class CustomFieldManager(BaseObjectManager):
             # Return the updated custom field if it exists
             if model is not None:
                 # Convert the CustomFieldModel object to an CustomField object
-                custom_field = CustomField(**model.to_dict(exclude=["_logger"]))
+                custom_field = CustomField(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the custom field to the cache
                 self.update_in_cache(

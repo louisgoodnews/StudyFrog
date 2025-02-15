@@ -21,7 +21,8 @@ from utils.object import MutableBaseObject, ImmutableBaseObject
 
 
 __all__: List[str] = [
-    "Default",
+    "ImmutableDefault",
+    "MutableDefault",
     "DefaultConverter",
     "DefaultFactory",
     "DefaultManager",
@@ -29,7 +30,7 @@ __all__: List[str] = [
 ]
 
 
-class Default(ImmutableBaseObject):
+class ImmutableDefault(ImmutableBaseObject):
     """
     An immutable class representing a default.
 
@@ -56,7 +57,7 @@ class Default(ImmutableBaseObject):
         uuid: Optional[str] = None,
     ) -> None:
         """
-        Initializes a new instance of the Default class.
+        Initializes a new instance of the ImmutableDefault class.
 
         Args:
             name (str): The name of the default.
@@ -84,6 +85,84 @@ class Default(ImmutableBaseObject):
             value=value,
         )
 
+    def to_mutable(self) -> "MutableDefault":
+        """
+        Returns a mutable copy of the ImmutableDefault instance.
+
+        Returns:
+            MutableDefault: A mutable copy of the ImmutableDefault instance.
+        """
+
+        # Create a new MutableDefault instance from the dictionary representation of the ImmutableDefault instance
+        return MutableImmutableDefault(**self.to_dict(exclude=["_logger"]))
+
+
+class MutableImmutableDefault(MutableBaseObject):
+    """
+    A mutable class representing a default.
+
+    Attributes:
+        name (str): The name of the default.
+        type (str): The type of the default.
+        value (str): The value of the default.
+        created_at (datetime): The timestamp when the default was created.
+        id (int): The ID of the default.
+        key (str): The key of the default.
+        updated_at (datetime): The timestamp when the default was last updated.
+        uuid (str): The UUID of the default.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        type: str,
+        value: str,
+        created_at: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance of the MutableDefault class.
+
+        Args:
+            name (str): The name of the default.
+            type (str): The type of the default.
+            value (str): The value of the default.
+            created_at (Optional[datetime]): The timestamp when the default was created.
+            id (Optional[int]): The ID of the default.
+            key (Optional[str]): The key of the default.
+            updated_at (Optional[datetime]): The timestamp when the default was last updated.
+            uuid (Optional[str]): The UUID of the default.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__(
+            created_at=created_at,
+            id=id,
+            key=key,
+            name=name,
+            type=type,
+            updated_at=updated_at,
+            uuid=uuid,
+            value=value,
+        )
+
+    def to_immutable(self) -> "ImmutableDefault":
+        """
+        Returns an immutable copy of the MutableDefault instance.
+
+        Returns:
+            ImmutableDefault: An immutable copy of the MutableDefault instance.
+        """
+
+        # Create a new ImmutableDefault instance from the dictionary representation of the MutableDefault instance
+        return ImmutableDefault(**self.to_dict(exclude=["_logger"]))
+
 
 class DefaultConverter:
     """
@@ -102,7 +181,7 @@ class DefaultConverter:
     def model_to_object(
         cls,
         model: "DefaultModel",
-    ) -> Optional[Default]:
+    ) -> Optional[ImmutableDefault]:
         """
         Converts a given DefaultModel instance to an Default instance.
 
@@ -117,7 +196,14 @@ class DefaultConverter:
         """
         try:
             # Attempt to create and return a new instance of the Default class from the dictionary representation of the DefaultModel instance
-            return Default(**model.to_dict(exclude=["_logger"]))
+            return ImmutableDefault(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -130,7 +216,7 @@ class DefaultConverter:
     @classmethod
     def object_to_model(
         cls,
-        object: Default,
+        object: ImmutableDefault,
     ) -> Optional["DefaultModel"]:
         """
         Converts a given Default instance to a DefaultModel instance.
@@ -178,7 +264,7 @@ class DefaultFactory:
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
-    ) -> Optional[Default]:
+    ) -> Optional[ImmutableDefault]:
         """
         Creates a new instance of the Default class.
 
@@ -193,14 +279,14 @@ class DefaultFactory:
             uuid (Optional[str]): The UUID of the default.
 
         Returns:
-            Optional[Default]: The newly created instance of the Default class or None if an exception occurs.
+            Optional[ImmutableDefault]: The newly created instance of the Default class or None if an exception occurs.
 
         Raises:
             Exception: If an exception occurs while attempting to create the Default instance.
         """
         try:
             # Attempt to create and return a new instance of the Default class
-            return Default(
+            return ImmutableDefault(
                 name=name,
                 type=type,
                 value=value,
@@ -242,48 +328,6 @@ class DefaultManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def associate(
-        self,
-        default_type: str,
-        source: Any,
-        target: Any,
-    ) -> bool:
-        """
-        Associates two objects in the database by creating an Default.
-
-        Args:
-            default_type (str): The type of the default.
-            source (Any): The first object in the default.
-            target (Any): The second object in the default.
-
-        Returns:
-            bool: True if the default was created successfully, False otherwise.
-
-        Raises:
-            Exception: If an exception occurs while attempting to associate the objects.
-        """
-        try:
-            # Create an Default object
-            default: Default = DefaultFactory.create_default(
-                default_type=default_type,
-                source=source,
-                target=target,
-            )
-
-            # Create the default in the database
-            self.create(default=default)
-
-            # Return True indicating the default was created successfully
-            return True
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'associate' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Return False indicating an exception has occurred
-            return False
-
     def count_defaults(self) -> int:
         """
         Returns the number of defaults in the database.
@@ -313,8 +357,8 @@ class DefaultManager(BaseObjectManager):
 
     def create_default(
         self,
-        default: Default,
-    ) -> Optional[Default]:
+        default: ImmutableDefault,
+    ) -> Optional[ImmutableDefault]:
         """
         Creates a new default in the database.
 
@@ -322,12 +366,22 @@ class DefaultManager(BaseObjectManager):
             default (Default): The default to be created.
 
         Returns:
-            Optional[Default]: The newly created immutable default if no exception occurs. Otherwise, None.
+            Optional[ImmutableDefault]: The newly created immutable default if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while creating the default.
         """
         try:
+            # Check if the default object is immutable
+            if isinstance(
+                default,
+                ImmutableDefault,
+            ):
+                # If it is, convert it to a mutable default
+                default = MutableImmutableDefault(
+                    **default.to_dict(exclude=["_logger"])
+                )
+
             # Set the created_at timestamp of the default
             default.created_at = Miscellaneous.get_current_datetime()
 
@@ -353,7 +407,7 @@ class DefaultManager(BaseObjectManager):
                 default.id = id
 
                 # Convert the default to an immutable default
-                default = Default(**default.to_dict(exclude=["_logger"]))
+                default = ImmutableDefault(**default.to_dict(exclude=["_logger"]))
 
                 # Add the default to the cache
                 self.add_to_cache(
@@ -382,7 +436,7 @@ class DefaultManager(BaseObjectManager):
 
     def delete_default(
         self,
-        default: Default,
+        default: ImmutableDefault,
     ) -> bool:
         """
         Deletes a default from the database.
@@ -400,7 +454,7 @@ class DefaultManager(BaseObjectManager):
             # Convert the default to an immutable default and delete the default from the database
             result: bool = asyncio.run(
                 DefaultConverter.object_to_model(
-                    object=Default(**default.to_dict(exclude=["_logger"]))
+                    object=ImmutableDefault(**default.to_dict(exclude=["_logger"]))
                 ).delete()
             )
 
@@ -415,12 +469,12 @@ class DefaultManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_defaults(self) -> Optional[List[Default]]:
+    def get_all_defaults(self) -> Optional[List[ImmutableDefault]]:
         """
         Returns a list of all defaults in the database.
 
         Returns:
-            Optional[List[Default]]: A list of all defaults in the database if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableDefault]]: A list of all defaults in the database if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -437,8 +491,16 @@ class DefaultManager(BaseObjectManager):
             )
 
             # Convert the list of DefaultModel objects to a list of Default objects
-            defaults: List[Default] = [
-                Default(**model.to_dict(exclude=["_logger"])) for model in models
+            defaults: List[ImmutableDefault] = [
+                ImmutableDefault(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable defaults
@@ -471,16 +533,17 @@ class DefaultManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
-    ) -> Optional[Default]:
+    ) -> Optional[Union[ImmutableDefault, List[ImmutableDefault]]]:
         """
-        Retrieves a default by the given field and value.
+        Retrieves a default or list of defaults by the given field and value.
 
         Args:
             field (str): The field to search by.
             value (Any): The value to search for.
 
         Returns:
-            Optional[Default]: The default with the given field and value if no exception occurs. Otherwise, None.
+            Optional[Union[ImmutableDefault, List[ImmutableDefault]]]: The default(s) with the given field and value
+            if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -491,8 +554,8 @@ class DefaultManager(BaseObjectManager):
                 # Return the default from the cache
                 return self.get_value_from_cache(key=field)
 
-            # Get the default with the given field and value from the database
-            model: Optional[DefaultModel] = asyncio.run(
+            # Get the default(s) with the given field and value from the database
+            models: Optional[Union[DefaultModel, List[DefaultModel]]] = asyncio.run(
                 DefaultModel.get_by(
                     column=field,
                     database=Constants.DATABASE_PATH,
@@ -500,13 +563,38 @@ class DefaultManager(BaseObjectManager):
                 )
             )
 
-            # Return the default if it exists
-            if model is not None:
-                # Convert the DefaultModel object to an Default object
-                return Default(**model.to_dict(exclude=["_logger"]))
-            else:
-                # Return None indicating that the default does not exist
+            # Check if no default(s) are found
+            if models is None:
+                # Return None indicating that the default(s) do not exist
                 return None
+
+            # Convert the model(s) to ImmutableDefault(s)
+            if isinstance(
+                models,
+                list,
+            ):
+                # Return a list of ImmutableDefault objects
+                return [
+                    ImmutableDefault(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return a single ImmutableDefault object
+                return ImmutableDefault(
+                    **models.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -519,7 +607,7 @@ class DefaultManager(BaseObjectManager):
     def get_default_by_id(
         self,
         id: int,
-    ) -> Optional[Default]:
+    ) -> Optional[ImmutableDefault]:
         """
         Returns a default with the given ID.
 
@@ -527,7 +615,7 @@ class DefaultManager(BaseObjectManager):
             id (int): The ID of the default.
 
         Returns:
-            Optional[Default]: The default with the given ID if no exception occurs. Otherwise, None.
+            Optional[ImmutableDefault]: The default with the given ID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -550,7 +638,14 @@ class DefaultManager(BaseObjectManager):
             # Return the default if it exists
             if model is not None:
                 # Convert the DefaultModel object to an Default object
-                return Default(**model.to_dict(exclude=["_logger"]))
+                return ImmutableDefault(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the default does not exist
                 return None
@@ -566,7 +661,7 @@ class DefaultManager(BaseObjectManager):
     def get_default_by_uuid(
         self,
         uuid: str,
-    ) -> Optional[Default]:
+    ) -> Optional[ImmutableDefault]:
         """
         Returns a default with the given UUID.
 
@@ -574,7 +669,7 @@ class DefaultManager(BaseObjectManager):
             uuid (str): The UUID of the default.
 
         Returns:
-            Optional[Default]: The default with the given UUID if no exception occurs. Otherwise, None.
+            Optional[ImmutableDefault]: The default with the given UUID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -597,7 +692,14 @@ class DefaultManager(BaseObjectManager):
             # Return the default if it exists
             if model is not None:
                 # Convert the DefaultModel object to an Default object
-                return Default(**model.to_dict(exclude=["_logger"]))
+                return ImmutableDefault(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the default does not exist
                 return None
@@ -612,8 +714,8 @@ class DefaultManager(BaseObjectManager):
 
     def update_default(
         self,
-        default: Default,
-    ) -> Optional[Default]:
+        default: ImmutableDefault,
+    ) -> Optional[ImmutableDefault]:
         """
         Updates a default with the given ID.
 
@@ -621,7 +723,7 @@ class DefaultManager(BaseObjectManager):
             default (Default): The default to update.
 
         Returns:
-            Optional[Default]: The updated default if no exception occurs. Otherwise, None.
+            Optional[ImmutableDefault]: The updated default if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -630,7 +732,7 @@ class DefaultManager(BaseObjectManager):
             # Convert the default to an immutable default and update the default in the database
             model: Optional[DefaultModel] = asyncio.run(
                 DefaultConverter.object_to_model(
-                    object=Default(**default.to_dict(exclude=["_logger"]))
+                    object=ImmutableDefault(**default.to_dict(exclude=["_logger"]))
                 ).update(
                     **default.to_dict(
                         exclude=[
@@ -646,7 +748,14 @@ class DefaultManager(BaseObjectManager):
             # Return the updated default if it exists
             if model is not None:
                 # Convert the DefaultModel object to an Default object
-                default = Default(**model.to_dict(exclude=["_logger"]))
+                default = ImmutableDefault(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the default to the cache
                 self.update_in_cache(

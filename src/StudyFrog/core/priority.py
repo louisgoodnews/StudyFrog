@@ -21,7 +21,8 @@ from utils.object import MutableBaseObject, ImmutableBaseObject
 
 
 __all__: List[str] = [
-    "Priority",
+    "ImmutablePriority",
+    "MutablePriority",
     "PriorityConverter",
     "PriorityFactory",
     "PriorityManager",
@@ -29,7 +30,7 @@ __all__: List[str] = [
 ]
 
 
-class Priority(ImmutableBaseObject):
+class ImmutablePriority(ImmutableBaseObject):
     """
     An immutable class representing a priority.
 
@@ -56,7 +57,7 @@ class Priority(ImmutableBaseObject):
         uuid: Optional[str] = None,
     ) -> None:
         """
-        Initializes a new instance of the Priority class.
+        Initializes a new instance of the ImmutablePriority class.
 
         Args:
             name (str): The name of the priority.
@@ -82,12 +83,88 @@ class Priority(ImmutableBaseObject):
             value=value,
         )
 
+    def to_mutable(self) -> "MutablePriority":
+        """
+        Returns a MutablePriority instance corresponding to the current ImmutablePriority instance.
+
+        Returns:
+            MutablePriority: A MutablePriority instance corresponding to the current ImmutablePriority instance.
+        """
+
+        # Return a MutablePriority instance corresponding to the current ImmutablePriority instance
+        return MutablePriority(**self.to_dict(exclude=["_logger"]))
+
+
+class MutablePriority(MutableBaseObject):
+    """
+    A mutable class representing a priority.
+
+    A priority has a value between 0 and 1 that represents the importance of an object.
+
+    Attributes:
+        name (str): The name of the priority.
+        value (float): The value of the priority.
+        created_at (datetime): The timestamp when the priority was created.
+        id (int): The ID of the priority.
+        key (str): The key of the priority.
+        updated_at (datetime): The timestamp when the priority was last updated.
+        uuid (str): The UUID of the priority.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        value: float,
+        created_at: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance of the MutablePriority class.
+
+        Args:
+            name (str): The name of the priority.
+            value (float): The value of the priority.
+            created_at (Optional[datetime]): The timestamp when the priority was created.
+            id (Optional[int]): The ID of the priority.
+            key (Optional[str]): The key of the priority.
+            updated_at (Optional[datetime]): The timestamp when the priority was last updated.
+            uuid (Optional[str]): The UUID of the priority.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__(
+            created_at=created_at,
+            id=id,
+            key=key,
+            name=name,
+            updated_at=updated_at,
+            uuid=uuid,
+            value=value,
+        )
+
+    def to_immutable(self) -> ImmutablePriority:
+        """
+        Returns an ImmutablePriority instance corresponding to the current MutablePriority instance.
+
+        Returns:
+            ImmutablePriority: An ImmutablePriority instance corresponding to the current MutablePriority instance.
+        """
+
+        # Return a MutablePriority instance corresponding to the current ImmutablePriority instance
+        return ImmutablePriority(**self.to_dict(exclude=["_logger"]))
+
 
 class PriorityConverter:
     """
-    A converter class for transforming between PriorityModel and Priority instances.
+    A converter class for transforming between PriorityModel and ImmutablePriority instances.
 
-    This class provides methods to convert a PriorityModel instance to an Priority instance,
+    This class provides methods to convert a PriorityModel instance to an ImmutablePriority instance,
     and vice versa. It utilizes a logger to capture and log exceptions that may occur during the conversion process.
 
     Attributes:
@@ -100,22 +177,29 @@ class PriorityConverter:
     def model_to_object(
         cls,
         model: "PriorityModel",
-    ) -> Optional[Priority]:
+    ) -> Optional[ImmutablePriority]:
         """
-        Converts a given PriorityModel instance to an Priority instance.
+        Converts a given PriorityModel instance to an ImmutablePriority instance.
 
         Args:
             model (PriorityModel): The PriorityModel instance to be converted.
 
         Returns:
-            Priority: The converted Priority instance if no exception occurs. Otherwise, None.
+            ImmutablePriority: The converted ImmutablePriority instance if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to convert the PriorityModel instance.
         """
         try:
             # Attempt to create and return a new instance of the Priority class from the dictionary representation of the PriorityModel instance
-            return Priority(**model.to_dict(exclude=["_logger"]))
+            return ImmutablePriority(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -128,22 +212,22 @@ class PriorityConverter:
     @classmethod
     def object_to_model(
         cls,
-        object: Priority,
+        object: ImmutablePriority,
     ) -> Optional["PriorityModel"]:
         """
-        Converts a given Priority instance to a PriorityModel instance.
+        Converts a given ImmutablePriority instance to a PriorityModel instance.
 
         Args:
-            object (Priority): The Priority instance to be converted.
+            object (ImmutablePriority): The ImmutablePriority instance to be converted.
 
         Returns:
             PriorityModel: The converted PriorityModel instance if no exception occurs. Otherwise, None.
 
         Raises:
-            Exception: If an exception occurs while attempting to convert the Priority instance.
+            Exception: If an exception occurs while attempting to convert the ImmutablePriority instance.
         """
         try:
-            # Attempt to create and return a new instance of the PriorityModel class from the dictionary representation of the Priority instance
+            # Attempt to create and return a new instance of the PriorityModel class from the dictionary representation of the ImmutablePriority instance
             return PriorityModel(**object.to_dict(exclude=["_logger"]))
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -168,9 +252,9 @@ class PriorityFactory:
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
-    ) -> Optional[Priority]:
+    ) -> Optional[ImmutablePriority]:
         """
-        Creates a new instance of the Priority class.
+        Creates a new instance of the ImmutablePriority class.
 
         Args:
             created_at (Optional[datetime]): The timestamp when the priority was created.
@@ -182,11 +266,11 @@ class PriorityFactory:
             value (Optional[float]): The value of the priority.
 
         Returns:
-            Optional[Priority]: The new instance of the Priority class.
+            Optional[ImmutablePriority]: The new instance of the ImmutablePriority class.
         """
         try:
             # Attempt to create and return a Priority object
-            return Priority(
+            return ImmutablePriority(
                 created_at=created_at,
                 id=id,
                 key=key,
@@ -256,16 +340,16 @@ class PriorityManager(BaseObjectManager):
 
     def create_priority(
         self,
-        priority: Priority,
-    ) -> Optional[Priority]:
+        priority: ImmutablePriority,
+    ) -> Optional[ImmutablePriority]:
         """
         Creates a new priority in the database.
 
         Args:
-            priority (Priority): The priority to be created.
+            priority (ImmutablePriority): The priority to be created.
 
         Returns:
-            Optional[Priority]: The newly created immutable priority if no exception occurs. Otherwise, None.
+            Optional[ImmutablePriority]: The newly created immutable priority if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while creating the priority.
@@ -274,10 +358,10 @@ class PriorityManager(BaseObjectManager):
             # Check if the priority object is immutable
             if isinstance(
                 priority,
-                Priority,
+                ImmutablePriority,
             ):
                 # If it is, convert it to a mutable priority
-                priority = Priority(**priority.to_dict(exclude=["_logger"]))
+                priority = MutablePriority(**priority.to_dict(exclude=["_logger"]))
 
             # Set the created_at timestamp of the priority
             priority.created_at = Miscellaneous.get_current_datetime()
@@ -304,7 +388,7 @@ class PriorityManager(BaseObjectManager):
                 priority.id = id
 
                 # Convert the priority to an immutable priority
-                priority = Priority(**priority.to_dict(exclude=["_logger"]))
+                priority = ImmutablePriority(**priority.to_dict(exclude=["_logger"]))
 
                 # Add the priority to the cache
                 self.add_to_cache(
@@ -333,13 +417,13 @@ class PriorityManager(BaseObjectManager):
 
     def delete_priority(
         self,
-        priority: Priority,
+        priority: ImmutablePriority,
     ) -> bool:
         """
         Deletes a priority from the database.
 
         Args:
-            priority (Priority): The priority to be deleted.
+            priority (ImmutablePriority): The priority to be deleted.
 
         Returns:
             bool: True if the priority was deleted successfully. False otherwise.
@@ -351,7 +435,7 @@ class PriorityManager(BaseObjectManager):
             # Convert the priority to an immutable priority and delete the priority from the database
             result: bool = asyncio.run(
                 PriorityConverter.object_to_model(
-                    object=Priority(**priority.to_dict(exclude=["_logger"]))
+                    object=ImmutablePriority(**priority.to_dict(exclude=["_logger"]))
                 ).delete()
             )
 
@@ -366,12 +450,12 @@ class PriorityManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_priorities(self) -> Optional[List[Priority]]:
+    def get_all_priorities(self) -> Optional[List[ImmutablePriority]]:
         """
         Returns a list of all priorities in the database.
 
         Returns:
-            Optional[List[Priority]]: A list of all priorities in the database if no exception occurs. Otherwise, None.
+            Optional[List[ImmutablePriority]]: A list of all priorities in the database if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -388,8 +472,16 @@ class PriorityManager(BaseObjectManager):
             )
 
             # Convert the list of PriorityModel objects to a list of Priority objects
-            priorities: List[Priority] = [
-                Priority(**model.to_dict(exclude=["_logger"])) for model in models
+            priorities: List[ImmutablePriority] = [
+                Priority(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable priorities
@@ -418,10 +510,150 @@ class PriorityManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def get_default_priorities(self) -> Optional[List[ImmutablePriority]]:
+        """
+        Retrieves the default priorities from the database.
+
+        Returns:
+            Optional[List[ImmutablePriority]]: A list of default priorities if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If no 'priority' defaults are found or any other exception occurs.
+        """
+        try:
+            # Import necessary classes
+            from core.default import ImmutableDefault, DefaultManager
+
+            # Initialize an empty list to store the priorities
+            result: List[ImmutablePriority] = []
+
+            # Retrieve defaults with the name 'priority'
+            defaults: Optional[List[ImmutableDefault]] = [
+                DefaultManager().get_default_by(
+                    field="name",
+                    value=f"priority:{priority}",
+                )
+                for priority in [
+                    Constants.HIGHEST,
+                    Constants.HIGH,
+                    Constants.MEDIUM,
+                    Constants.LOW,
+                    Constants.LOWEST,
+                ]
+            ]
+
+            # Raise exception if no defaults are found
+            if not defaults:
+                raise Exception("Found no 'priority' defaults in the database.")
+
+            # Iterate over each default
+            for default in defaults:
+                # Check if the priority already exists
+                existing_priority: Optional[ImmutablePriority] = self.get_priority_by(
+                    field="name",
+                    value=default.value,
+                )
+
+                if not existing_priority:
+                    # Create a new priority if it doesn't exist
+                    priority: ImmutablePriority = PriorityFactory.create_priority(
+                        name=default.value,
+                        value=(
+                            float(5 / 5)
+                            if default.value.lower() == Constants.HIGHEST
+                            else (
+                                float(4 / 5)
+                                if default.value.lower() == Constants.HIGH
+                                else (
+                                    float(3 / 5)
+                                    if default.value.lower() == Constants.MEDIUM
+                                    else (
+                                        float(2 / 5)
+                                        if default.value.lower() == Constants.LOW
+                                        else float(1 / 5)
+                                    )
+                                )
+                            )
+                        ),
+                    )
+
+                    # Add the newly created priority to the result
+                    result.append(self.create_priority(priority=priority))
+                else:
+                    # If the priority exists, retrieve it from the database
+                    result.append(existing_priority)
+
+            # Return the list of priorities
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_default_priorities' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_priority_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutablePriority]:
+        """
+        Retrieves a priority by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutablePriority]: The priority with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the priority is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the priority from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the priority with the given field and value from the database
+            model: Optional[PriorityModel] = asyncio.run(
+                PriorityModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the priority if it exists
+            if model is not None:
+                # Convert the PriorityModel object to an Priority object
+                return ImmutablePriority(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+            else:
+                # Return None indicating that the priority does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def get_priority_by_id(
         self,
         id: int,
-    ) -> Optional[Priority]:
+    ) -> Optional[ImmutablePriority]:
         """
         Returns a priority with the given ID.
 
@@ -429,7 +661,7 @@ class PriorityManager(BaseObjectManager):
             id (int): The ID of the priority.
 
         Returns:
-            Optional[Priority]: The priority with the given ID if no exception occurs. Otherwise, None.
+            Optional[ImmutablePriority]: The priority with the given ID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -451,8 +683,15 @@ class PriorityManager(BaseObjectManager):
 
             # Return the priority if it exists
             if model is not None:
-                # Convert the PriorityModel object to an Priority object
-                return Priority(**model.to_dict(exclude=["_logger"]))
+                # Convert the PriorityModel object to an ImmutablePriority object
+                return ImmutablePriority(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the priority does not exist
                 return None
@@ -468,7 +707,7 @@ class PriorityManager(BaseObjectManager):
     def get_priority_by_uuid(
         self,
         uuid: str,
-    ) -> Optional[Priority]:
+    ) -> Optional[ImmutablePriority]:
         """
         Returns a priority with the given UUID.
 
@@ -476,7 +715,7 @@ class PriorityManager(BaseObjectManager):
             uuid (str): The UUID of the priority.
 
         Returns:
-            Optional[Priority]: The priority with the given UUID if no exception occurs. Otherwise, None.
+            Optional[ImmutablePriority]: The priority with the given UUID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -498,8 +737,15 @@ class PriorityManager(BaseObjectManager):
 
             # Return the priority if it exists
             if model is not None:
-                # Convert the PriorityModel object to an Priority object
-                return Priority(**model.to_dict(exclude=["_logger"]))
+                # Convert the PriorityModel object to an ImmutablePriority object
+                return ImmutablePriority(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the priority does not exist
                 return None
@@ -514,16 +760,16 @@ class PriorityManager(BaseObjectManager):
 
     def update_priority(
         self,
-        priority: Priority,
-    ) -> Optional[Priority]:
+        priority: ImmutablePriority,
+    ) -> Optional[ImmutablePriority]:
         """
         Updates a priority with the given ID.
 
         Args:
-            priority (Priority): The priority to update.
+            priority (ImmutablePriority): The priority to update.
 
         Returns:
-            Optional[Priority]: The updated priority if no exception occurs. Otherwise, None.
+            Optional[ImmutablePriority]: The updated priority if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -532,7 +778,7 @@ class PriorityManager(BaseObjectManager):
             # Convert the priority to an immutable priority and update the priority in the database
             model: Optional[PriorityModel] = asyncio.run(
                 PriorityConverter.object_to_model(
-                    object=Priority(**priority.to_dict(exclude=["_logger"]))
+                    object=ImmutablePriority(**priority.to_dict(exclude=["_logger"]))
                 ).update(
                     **priority.to_dict(
                         exclude=[
@@ -547,8 +793,15 @@ class PriorityManager(BaseObjectManager):
 
             # Return the updated priority if it exists
             if model is not None:
-                # Convert the PriorityModel object to an Priority object
-                priority = Priority(**model.to_dict(exclude=["_logger"]))
+                # Convert the PriorityModel object to an ImmutablePriority object
+                priority = ImmutablePriority(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the priority to the cache
                 self.update_in_cache(

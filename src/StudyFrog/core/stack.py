@@ -48,7 +48,7 @@ class ImmutableStack(ImmutableBaseObject):
         last_viewed_at (datetime): The timestamp when the stack was last viewed.
         name (str): The name of the stack.
         priority (int): The priority of the stack.
-        status (Literal["New", "Learning", "Review", "Completed"]): The status of the stack.
+        status (int): The status of the stack.
         tags (List[int]): The IDs of the tags associated with the stack.
         updated_at (datetime): The timestamp when the stack was last updated.
         uuid (str): The UUID of the stack.
@@ -67,7 +67,7 @@ class ImmutableStack(ImmutableBaseObject):
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
-        status: Literal["New", "Learning", "Review", "Completed"] = "New",
+        status: Optional[int] = None,
         tags: Optional[List[int]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -87,7 +87,7 @@ class ImmutableStack(ImmutableBaseObject):
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
             priority (Optional[int]): The ID of the priority associated with the stack.
-            status (Literal["New", "Learning", "Review", "Completed"]): The status of the stack.
+            status (Optional[int]): The ID of the status associated with the stack.
             tags (Optional[List[int]]): The IDs of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
@@ -142,7 +142,7 @@ class MutableStack(MutableBaseObject):
         last_viewed_at (datetime): The timestamp when the stack was last viewed.
         name (str): The name of the stack.
         priority (int): The priority of the stack.
-        status (Literal["New", "Learning", "Review", "Completed"]): The status of the stack.
+        status (int): The status of the stack.
         tags (List[int]): The IDs of the tags associated with the stack.
         updated_at (datetime): The timestamp when the stack was last updated.
         uuid (str): The UUID of the stack.
@@ -161,7 +161,7 @@ class MutableStack(MutableBaseObject):
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
-        status: Optional[Literal["New", "Learning", "Review", "Completed"]] = None,
+        status: Optional[int] = None,
         tags: Optional[List[int]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -181,7 +181,7 @@ class MutableStack(MutableBaseObject):
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
-            status (Optional[Literal["New", "Learning", "Review", "Completed"]]): The status of the stack.
+            status (Optional[int]): The status of the stack.
             tags (Optional[List[int]]): The IDs of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
@@ -253,7 +253,14 @@ class StackConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableStack class from the dictionary representation of the StackModel instance
-            return ImmutableStack(**model.to_dict(exclude=["_logger"]))
+            return ImmutableStack(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -317,7 +324,7 @@ class StackFactory:
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
-        status: Optional[Literal["New", "Learning", "Review", "Completed"]] = None,
+        status: Optional[int] = None,
         tags: Optional[List[int]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -337,7 +344,7 @@ class StackFactory:
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
-            status (Optional[Literal["New", "Learning", "Review", "Completed"]]): The status of the stack.
+            status (Optional[int]): The status of the stack.
             tags (Optional[List[int]]): The IDs of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
@@ -561,7 +568,15 @@ class StackManager(BaseObjectManager):
 
             # Convert the list of StackModel objects to a list of ImmutableStack objects
             stacks: List[ImmutableStack] = [
-                ImmutableStack(**model.to_dict(exclude=["_logger"])) for model in models
+                ImmutableStack(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable stacks
@@ -679,7 +694,14 @@ class StackManager(BaseObjectManager):
             # Return the stack if it exists
             if model is not None:
                 # Convert the StackModel object to an ImmutableStack object
-                return ImmutableStack(**model.to_dict(exclude=["_logger"]))
+                return ImmutableStack(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the stack does not exist
                 return None
@@ -726,7 +748,14 @@ class StackManager(BaseObjectManager):
             # Return the stack if it exists
             if model is not None:
                 # Convert the StackModel object to an ImmutableStack object
-                return ImmutableStack(**model.to_dict(exclude=["_logger"]))
+                return ImmutableStack(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the stack does not exist
                 return None
@@ -775,7 +804,14 @@ class StackManager(BaseObjectManager):
             # Return the updated stack if it exists
             if model is not None:
                 # Convert the StackModel object to an ImmutableStack object
-                stack = ImmutableStack(**model.to_dict(exclude=["_logger"]))
+                stack = ImmutableStack(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the stack to the cache
                 self.update_in_cache(
@@ -924,7 +960,7 @@ class StackModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="due_by",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -956,7 +992,7 @@ class StackModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="last_viewed_at",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1001,15 +1037,15 @@ class StackModel(ImmutableBaseModel):
         autoincrement=False,
         default=None,
         description="",
-        foreign_key=None,
+        foreign_key=f"{Constants.STATUSES}(id)",
         index=False,
         name="status",
         nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=255,
-        type="VARCHAR",
+        size=None,
+        type="INTEGER",
         unique=False,
     )
 
@@ -1020,7 +1056,7 @@ class StackModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="tags",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,

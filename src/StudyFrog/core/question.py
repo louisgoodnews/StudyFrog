@@ -203,7 +203,14 @@ class QuestionConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableQuestion class from the dictionary representation of the QuestionModel instance
-            return ImmutableQuestion(**model.to_dict(exclude=["_logger"]))
+            return ImmutableQuestion(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -493,7 +500,14 @@ class QuestionManager(BaseObjectManager):
 
             # Convert the list of QuestionModel objects to a list of ImmutableQuestion objects
             questions: List[ImmutableQuestion] = [
-                ImmutableQuestion(**model.to_dict(exclude=["_logger"]))
+                ImmutableQuestion(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
                 for model in models
             ]
 
@@ -559,7 +573,14 @@ class QuestionManager(BaseObjectManager):
             # Return the question if it exists
             if model is not None:
                 # Convert the QuestionModel object to an ImmutableQuestion object
-                return ImmutableQuestion(**model.to_dict(exclude=["_logger"]))
+                return ImmutableQuestion(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the question does not exist
                 return None
@@ -606,7 +627,14 @@ class QuestionManager(BaseObjectManager):
             # Return the question if it exists
             if model is not None:
                 # Convert the QuestionModel object to an ImmutableQuestion object
-                return ImmutableQuestion(**model.to_dict(exclude=["_logger"]))
+                return ImmutableQuestion(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the question does not exist
                 return None
@@ -653,7 +681,14 @@ class QuestionManager(BaseObjectManager):
             # Return the question if it exists
             if model is not None:
                 # Convert the QuestionModel object to an ImmutableQuestion object
-                return ImmutableQuestion(**model.to_dict(exclude=["_logger"]))
+                return ImmutableQuestion(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the question does not exist
                 return None
@@ -702,7 +737,14 @@ class QuestionManager(BaseObjectManager):
             # Return the updated question if it exists
             if model is not None:
                 # Convert the QuestionModel object to an ImmutableQuestion object
-                question = ImmutableQuestion(**model.to_dict(exclude=["_logger"]))
+                question = ImmutableQuestion(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the question to the cache
                 self.update_in_cache(

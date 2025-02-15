@@ -12,10 +12,13 @@ from tkinter import ttk
 from typing import *
 
 from core.answer import AnswerFactory, ImmutableAnswer
+from core.difficulty import ImmutableDifficulty
 from core.flashcard import FlashcardFactory, ImmutableFlashcard
+from core.priority import ImmutablePriority
 from core.question import QuestionFactory, ImmutableQuestion
 from core.setting import SettingService
 from core.stack import StackFactory, ImmutableStack
+from core.status import ImmutableStatus
 
 from core.ui.ui_builder import UIBuilder
 from core.ui.form.flashcard_create_form import FlashcardCreateForm
@@ -600,7 +603,11 @@ class CreateUI(tkinter.Frame):
         Returns:
             None
         """
-        pass
+        if isinstance(
+            self.master,
+            tkinter.Toplevel,
+        ):
+            self.master.destroy()
 
     def on_create_button_click(self) -> None:
         """
@@ -620,6 +627,25 @@ class CreateUI(tkinter.Frame):
 
         # Get the type of form
         type: str = self.combobox.get()
+
+        medium_difficulty: ImmutableDifficulty = self.unified_manager.get_difficulty_by(
+            field="name",
+            value=Constants.MEDIUM,
+        )
+
+        medium_priority: ImmutablePriority = self.unified_manager.get_priority_by(
+            field="name",
+            value=Constants.MEDIUM,
+        )
+
+        new_status: ImmutableStatus = self.unified_manager.get_status_by(
+            field="name",
+            value=Constants.NEW,
+        )
+
+        data["difficulty"] = medium_difficulty.id
+        data["priority"] = medium_priority.id
+        data["status"] = new_status.id
 
         # Create an object of the appropriate type based on the form data
         if type.lower() == "flashcard":

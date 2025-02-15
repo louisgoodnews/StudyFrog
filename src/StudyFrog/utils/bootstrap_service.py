@@ -18,7 +18,7 @@ from core.change_history import (
     ChangeHistoryItemModel,
 )
 from core.custom_field import CustomFieldManager, CustomFieldModel
-from core.default import DefaultManager, DefaultModel
+from core.default import ImmutableDefault, DefaultFactory, DefaultManager, DefaultModel
 from core.difficulty import DifficultyManager, DifficultyModel
 from core.flashcard import FlashcardManager, FlashcardModel
 from core.note import NoteManager, NoteModel
@@ -27,6 +27,7 @@ from core.priority import PriorityManager, PriorityModel
 from core.question import QuestionManager, QuestionModel
 from core.setting import SettingManager, SettingModel, SettingService
 from core.stack import StackManager, StackModel
+from core.status import StatusManager, StatusModel
 from core.tag import TagManager, TagModel
 from core.user import UserManager, UserModel
 
@@ -122,6 +123,153 @@ class BootstrapService:
             unified_manager=self.unified_object_manager
         )
 
+    def create_default_difficulties(self) -> None:
+        """
+        Creates default difficulty entries in the database if they do not exist.
+
+        This method checks for the existence of default difficulties in the database,
+        and creates them if they are not found. It uses the unified object manager
+        to retrieve and create default difficulties.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while creating default difficulties.
+        """
+        try:
+            # Define a list of difficulty names
+            difficulties: List[str] = [
+                Constants.HARD,
+                Constants.MEDIUM,
+                Constants.EASY,
+            ]
+
+            # Iterate over the difficulty names
+            for difficulty in difficulties:
+                # Check if the default difficulty exists in the database
+                if not self.unified_object_manager.get_default_by(
+                    field="name",
+                    value=f"difficulty:{difficulty}",
+                ):
+                    # Create the default difficulty if it does not exist
+                    self.unified_object_manager.create_default(
+                        default=DefaultFactory.create_default(
+                            name=f"difficulty:{difficulty}",
+                            type="difficulty",
+                            value=difficulty.capitalize(),
+                        )
+                    )
+
+            # Retrieve the default difficulties from the database
+            self.unified_object_manager.get_default_difficulties()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default_difficulties' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
+    def create_default_priorities(self) -> None:
+        """
+        Creates default priority entries in the database if they do not exist.
+
+        This method checks for the existence of default priorities in the database,
+        and creates them if they are not found. It uses the unified object manager
+        to retrieve and create default priorities.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while creating default priorities.
+        """
+        try:
+            # Define a list of priority names
+            priorities: List[str] = [
+                Constants.HIGHEST,
+                Constants.HIGH,
+                Constants.MEDIUM,
+                Constants.LOW,
+                Constants.LOWEST,
+            ]
+
+            # Iterate over the priority names
+            for priority in priorities:
+                # Check if the default priority exists in the database
+                if not self.unified_object_manager.get_default_by(
+                    field="name",
+                    value=f"priority:{priority}",
+                ):
+                    # Create the default priority if it does not exist
+                    self.unified_object_manager.create_default(
+                        default=DefaultFactory.create_default(
+                            name=f"priority:{priority}",
+                            type="priority",
+                            value=priority.capitalize(),
+                        )
+                    )
+
+            # Retrieve the default priorities from the database
+            self.unified_object_manager.get_default_priorities()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default_priorities' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
+    def create_default_statuses(self) -> None:
+        """
+        Creates default status entries in the database if they do not exist.
+
+        This method checks for the existence of default statuses in the database,
+        and creates them if they are not found. It uses the unified object manager
+        to retrieve and create default statuses.
+
+        Raises:
+            Exception: If an exception occurs while creating default statuses.
+        """
+        try:
+            # Define a list of default status names
+            statuses: List[str] = [
+                Constants.NEW,
+                Constants.LEARNING,
+                Constants.REVIEW,
+                Constants.COMPLETED,
+            ]
+
+            # Iterate over the status names
+            for status in statuses:
+                # Check if the default status exists in the database
+                if not self.unified_object_manager.get_default_by(
+                    field="name",
+                    value=f"status:{status}",
+                ):
+                    # Create the default status if it does not exist
+                    self.unified_object_manager.create_default(
+                        default=DefaultFactory.create_default(
+                            name=f"status:{status}",
+                            type="status",
+                            value=status.capitalize(),
+                        )
+                    )
+
+            # Retrieve the default statuses from the database
+            self.unified_object_manager.get_default_statuses()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default_statuses' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
     def create_tables(self) -> None:
         """
         Creates the tables for the models in the database if they do not exist.
@@ -155,6 +303,7 @@ class BootstrapService:
                 QuestionModel,
                 SettingModel,
                 StackModel,
+                StatusModel,
                 TagModel,
                 UserModel,
             ]:
@@ -522,6 +671,7 @@ class BootstrapService:
                 "question_manager": QuestionManager,
                 "setting_manager": SettingManager,
                 "stack_manager": StackManager,
+                "status_manager": StatusManager,
                 "tag_manager": TagManager,
                 "user_manager": UserManager,
             }
@@ -581,6 +731,15 @@ class BootstrapService:
 
             # Register the menus with the UIRegistry
             self.register_menus()
+
+            # Create the default difficulties
+            self.create_default_difficulties()
+
+            # Create the default priorities
+            self.create_default_priorities()
+
+            # Create the default statuses
+            self.create_default_statuses()
 
             # Return the dispatcher, navigation service, setting service, and unified object manager instances
             return (

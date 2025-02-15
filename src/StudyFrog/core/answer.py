@@ -198,7 +198,14 @@ class AnswerConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableAnswer class from the dictionary representation of the AnswerModel instance
-            return ImmutableAnswer(**model.to_dict(exclude=["_logger"]))
+            return ImmutableAnswer(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -488,7 +495,14 @@ class AnswerManager(BaseObjectManager):
 
             # Convert the list of AnswerModel objects to a list of ImmutableAnswer objects
             answers: List[ImmutableAnswer] = [
-                ImmutableAnswer(**model.to_dict(exclude=["_logger"]))
+                ImmutableAnswer(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
                 for model in models
             ]
 
@@ -554,7 +568,14 @@ class AnswerManager(BaseObjectManager):
             # Return the answer if it exists
             if model is not None:
                 # Convert the AnswerModel object to an ImmutableAnswer object
-                return ImmutableAnswer(**model.to_dict(exclude=["_logger"]))
+                return ImmutableAnswer(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the answer does not exist
                 return None
@@ -601,7 +622,14 @@ class AnswerManager(BaseObjectManager):
             # Return the answer if it exists
             if model is not None:
                 # Convert the AnswerModel object to an ImmutableAnswer object
-                return ImmutableAnswer(**model.to_dict(exclude=["_logger"]))
+                return ImmutableAnswer(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the answer does not exist
                 return None
@@ -648,7 +676,14 @@ class AnswerManager(BaseObjectManager):
             # Return the answer if it exists
             if model is not None:
                 # Convert the AnswerModel object to an ImmutableAnswer object
-                return ImmutableAnswer(**model.to_dict(exclude=["_logger"]))
+                return ImmutableAnswer(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the answer does not exist
                 return None
@@ -697,7 +732,14 @@ class AnswerManager(BaseObjectManager):
             # Return the updated answer if it exists
             if model is not None:
                 # Convert the AnswerModel object to an ImmutableAnswer object
-                answer = ImmutableAnswer(**model.to_dict(exclude=["_logger"]))
+                answer = ImmutableAnswer(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the answer to the cache
                 self.update_in_cache(

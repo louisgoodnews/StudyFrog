@@ -15,7 +15,7 @@ import uuid
 
 from typing import *
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from utils.logger import Logger
 
@@ -90,7 +90,10 @@ class Miscellaneous:
             result: Dict[str, Any] = {}
 
             # Iterate over the keys and values in the dictionary
-            for key, value in data.items():
+            for (
+                key,
+                value,
+            ) in data.items():
                 # Check if the value is a string (since DB stores JSON/datetime as strings)
                 if isinstance(
                     value,
@@ -225,6 +228,38 @@ class Miscellaneous:
             str: A new UUID.
         """
         return str(uuid.uuid4())
+
+    @classmethod
+    def get_date_decrement(
+        cls,
+        decrement: int,
+    ) -> datetime:
+        """
+        Returns the current datetime decremented by a given amount.
+
+        Args:
+            decrement (int): The amount to decrement the datetime by.
+
+        Returns:
+            datetime: The decremented datetime.
+        """
+        return cls.get_current_datetime() - timedelta(days=decrement)
+
+    @classmethod
+    def get_date_increment(
+        cls,
+        increment: int,
+    ) -> datetime:
+        """
+        Returns the current datetime incremented by a given amount.
+
+        Args:
+            increment (int): The amount to increment the datetime by.
+
+        Returns:
+            datetime: The incremented datetime.
+        """
+        return datetime.now() + timedelta(days=increment)
 
     @classmethod
     def run_asynchronously(
@@ -364,6 +399,6 @@ class Miscellaneous:
             datetime: A datetime object representing the given date and time.
         """
         return datetime.strptime(
-            date_string=date_string,
-            format=format,
+            date_string,
+            format,
         )

@@ -116,7 +116,14 @@ class ChangeHistoryConverter:
         """
         try:
             # Attempt to create and return a new instance of the ChangeHistory class from the dictionary representation of the ChangeHistoryModel instance
-            return ChangeHistory(**model.to_dict(exclude=["_logger"]))
+            return ChangeHistory(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -397,7 +404,15 @@ class ChangeHistoryManager(BaseObjectManager):
 
             # Convert the list of ChangeHistoryModel objects to a list of ChangeHistory objects
             change_histories: List[ChangeHistory] = [
-                ChangeHistory(**model.to_dict(exclude=["_logger"])) for model in models
+                ChangeHistory(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable change histories
@@ -462,7 +477,14 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return the change history if it exists
             if model is not None:
                 # Convert the ChangeHistoryModel object to an ChangeHistory object
-                return ChangeHistory(**model.to_dict(exclude=["_logger"]))
+                return ChangeHistory(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the change history does not exist
                 return None
@@ -509,7 +531,14 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return the change history if it exists
             if model is not None:
                 # Convert the ChangeHistoryModel object to an ChangeHistory object
-                return ChangeHistory(**model.to_dict(exclude=["_logger"]))
+                return ChangeHistory(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the change history does not exist
                 return None
@@ -556,7 +585,14 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return the change history if it exists
             if model is not None:
                 # Convert the ChangeHistoryModel object to an ChangeHistory object
-                return ChangeHistory(**model.to_dict(exclude=["_logger"]))
+                return ChangeHistory(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the change history does not exist
                 return None
@@ -605,7 +641,14 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return the updated change history if it exists
             if model is not None:
                 # Convert the ChangeHistoryModel object to an ChangeHistory object
-                change_history = ChangeHistory(**model.to_dict(exclude=["_logger"]))
+                change_history = ChangeHistory(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the change history to the cache
                 self.update_in_cache(
@@ -863,7 +906,14 @@ class ChangeHistoryItemConverter:
         """
         try:
             # Attempt to create and return a new instance of the ChangeHistoryItem class from the dictionary representation of the ChangeHistoryItemModel instance
-            return ChangeHistoryItem(**model.to_dict(exclude=["_logger"]))
+            return ChangeHistoryItem(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -1157,7 +1207,14 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
             # Convert the list of ChangeHistoryItemModel objects to a list of ChangeHistoryItem objects
             change_histories: List[ChangeHistoryItem] = [
-                ChangeHistoryItem(**model.to_dict(exclude=["_logger"]))
+                ChangeHistoryItem(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
                 for model in models
             ]
 
@@ -1223,7 +1280,14 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return the change history if it exists
             if model is not None:
                 # Convert the ChangeHistoryItemModel object to an ChangeHistoryItem object
-                return ChangeHistoryItem(**model.to_dict(exclude=["_logger"]))
+                return ChangeHistoryItem(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the change history does not exist
                 return None
@@ -1270,7 +1334,14 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return the change history item if it exists
             if model is not None:
                 # Convert the ChangeHistoryItemModel object to an ChangeHistoryItem object
-                return ChangeHistoryItem(**model.to_dict(exclude=["_logger"]))
+                return ChangeHistoryItem(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the change history item does not exist
                 return None
@@ -1317,7 +1388,14 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Return the change history item if it exists
             if model is not None:
                 # Convert the ChangeHistoryItemModel object to an ChangeHistoryItem object
-                return ChangeHistoryItem(**model.to_dict(exclude=["_logger"]))
+                return ChangeHistoryItem(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the change history item does not exist
                 return None

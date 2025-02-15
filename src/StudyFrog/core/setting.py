@@ -9,7 +9,7 @@ from datetime import datetime
 
 from typing import *
 
-from core.default import Default, DefaultManager
+from core.default import ImmutableDefault, DefaultManager
 
 from utils.constants import Constants
 from utils.field import Field
@@ -172,7 +172,14 @@ class SettingConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableSetting class from the dictionary representation of the SettingModel instance
-            return ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+            return ImmutableSetting(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -448,7 +455,14 @@ class SettingManager(BaseObjectManager):
 
             # Convert the list of SettingModel objects to a list of ImmutableSetting objects
             settings: List[ImmutableSetting] = [
-                ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                ImmutableSetting(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
                 for model in models
             ]
 
@@ -514,7 +528,14 @@ class SettingManager(BaseObjectManager):
             # Return the setting if it exists
             if model is not None:
                 # Convert the SettingModel object to an ImmutableSetting object
-                return ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                return ImmutableSetting(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the setting does not exist
                 return None
@@ -561,7 +582,14 @@ class SettingManager(BaseObjectManager):
             # Return the setting if it exists
             if model is not None:
                 # Convert the SettingModel object to an ImmutableSetting object
-                return ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                return ImmutableSetting(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the setting does not exist
                 return None
@@ -608,7 +636,14 @@ class SettingManager(BaseObjectManager):
             # Return the setting if it exists
             if model is not None:
                 # Convert the SettingModel object to an ImmutableSetting object
-                return ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                return ImmutableSetting(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the setting does not exist
                 return None
@@ -657,7 +692,14 @@ class SettingManager(BaseObjectManager):
             # Return the updated setting if it exists
             if model is not None:
                 # Convert the SettingModel object to an ImmutableSetting object
-                setting = ImmutableSetting(**model.to_dict(exclude=["_logger"]))
+                setting = ImmutableSetting(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the setting to the cache
                 self.update_in_cache(
@@ -951,7 +993,7 @@ class SettingService:
         """
         try:
             # Attempt to load the default object from the database
-            default: Optional[Default] = self.default_manager.get_default_by(
+            default: Optional[ImmutableDefault] = self.default_manager.get_default_by(
                 field="name",
                 value=name,
             )
@@ -1100,11 +1142,8 @@ class SettingService:
 
             # Return None indicating an exception has occurred
             return None
-    
-    def on_request_setting_load(
-        self,
-        **kwargs
-    ) -> Optional[List[ImmutableSetting]]:
+
+    def on_request_setting_load(self, **kwargs) -> Optional[List[ImmutableSetting]]:
         """
         Loads settings from the database.
 

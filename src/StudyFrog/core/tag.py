@@ -178,7 +178,14 @@ class TagConverter:
         """
         try:
             # Attempt to create and return a new instance of the ImmutableTag class from the dictionary representation of the TagModel instance
-            return ImmutableTag(**model.to_dict(exclude=["_logger"]))
+            return ImmutableTag(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -459,7 +466,15 @@ class TagManager(BaseObjectManager):
 
             # Convert the list of TagModel objects to a list of ImmutableTag objects
             tags: List[ImmutableTag] = [
-                ImmutableTag(**model.to_dict(exclude=["_logger"])) for model in models
+                ImmutableTag(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable tags
@@ -569,7 +584,14 @@ class TagManager(BaseObjectManager):
             # Return the tag if it exists
             if model is not None:
                 # Convert the TagModel object to an ImmutableTag object
-                return ImmutableTag(**model.to_dict(exclude=["_logger"]))
+                return ImmutableTag(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the tag does not exist
                 return None
@@ -616,7 +638,14 @@ class TagManager(BaseObjectManager):
             # Return the tag if it exists
             if model is not None:
                 # Convert the TagModel object to an ImmutableTag object
-                return ImmutableTag(**model.to_dict(exclude=["_logger"]))
+                return ImmutableTag(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the tag does not exist
                 return None
@@ -665,7 +694,14 @@ class TagManager(BaseObjectManager):
             # Return the updated tag if it exists
             if model is not None:
                 # Convert the TagModel object to an ImmutableTag object
-                tag = ImmutableTag(**model.to_dict(exclude=["_logger"]))
+                tag = ImmutableTag(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the tag to the cache
                 self.update_in_cache(

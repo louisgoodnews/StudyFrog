@@ -51,6 +51,7 @@ class Association(ImmutableBaseObject):
         question (Optional[int]): The ID of the question that is being associated with.
         setting (Optional[int]): The ID of the setting that is being associated with.
         stack (Optional[int]): The ID of the stack that is being associated with.
+        status (Optional[int]): The ID of the status that is being associated with.
         tag (Optional[int]): The ID of the tag that is being associated with.
         updated_at (Optional[datetime]): The timestamp when the association was last updated.
         user (Optional[int]): The ID of the user that is being associated with.
@@ -82,6 +83,7 @@ class Association(ImmutableBaseObject):
         question: Optional[int] = None,
         setting: Optional[int] = None,
         stack: Optional[int] = None,
+        status: Optional[int] = None,
         tag: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         user: Optional[int] = None,
@@ -108,6 +110,7 @@ class Association(ImmutableBaseObject):
             question (Optional[int]): The ID of the question that is being associated with.
             setting (Optional[int]): The ID of the setting that is being associated with.
             stack (Optional[int]): The ID of the stack that is being associated with.
+            status (Optional[int]): The ID of the status that is being associated with.
             tag (Optional[int]): The ID of the tag that is being associated with.
             updated_at (Optional[datetime]): The timestamp when the association was last updated.
             user (Optional[int]): The ID of the user that is being associated with.
@@ -136,6 +139,7 @@ class Association(ImmutableBaseObject):
             question=question,
             setting=setting,
             stack=stack,
+            status=status,
             tag=tag,
             updated_at=updated_at,
             user=user,
@@ -175,7 +179,14 @@ class AssociationConverter:
         """
         try:
             # Attempt to create and return a new instance of the Association class from the dictionary representation of the AssociationModel instance
-            return Association(**model.to_dict(exclude=["_logger"]))
+            return Association(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -251,6 +262,7 @@ class AssociationFactory:
         question: Optional[int] = None,
         setting: Optional[int] = None,
         stack: Optional[int] = None,
+        status: Optional[int] = None,
         tag: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         user: Optional[int] = None,
@@ -277,6 +289,7 @@ class AssociationFactory:
             question (Optional[int]): The ID of the question that is being associated with.
             setting (Optional[int]): The ID of the setting that is being associated with.
             stack (Optional[int]): The ID of the stack that is being associated with.
+            status (Optional[int]): The ID of the status that is being associated with.
             tag (Optional[int]): The ID of the tag that is being associated with.
             updated_at (Optional[datetime]): The timestamp when the association was last updated.
             user (Optional[int]): The ID of the user that is being associated with.
@@ -308,6 +321,7 @@ class AssociationFactory:
                 question=question,
                 setting=setting,
                 stack=stack,
+                status=status,
                 tag=tag,
                 updated_at=updated_at,
                 user=user,
@@ -367,6 +381,7 @@ class AssociationManager(BaseObjectManager):
         question: Optional[int] = None,
         setting: Optional[int] = None,
         stack: Optional[int] = None,
+        status: Optional[int] = None,
         tag: Optional[int] = None,
         user: Optional[int] = None,
     ) -> bool:
@@ -388,6 +403,7 @@ class AssociationManager(BaseObjectManager):
             question (Optional[int]): The ID of the question that is being associated with.
             setting (Optional[int]): The ID of the setting that is being associated with.
             stack (Optional[int]): The ID of the stack that is being associated with.
+            status (Optional[int]): The ID of the status that is being associated with.
             tag (Optional[int]): The ID of the tag that is being associated with.
             user (Optional[int]): The ID of the user that is being associated with.
 
@@ -415,6 +431,7 @@ class AssociationManager(BaseObjectManager):
                 question=question,
                 setting=setting,
                 stack=stack,
+                status=status,
                 tag=tag,
                 user=user,
             )
@@ -589,7 +606,15 @@ class AssociationManager(BaseObjectManager):
 
             # Convert the list of AssociationModel objects to a list of Association objects
             associations: List[Association] = [
-                Association(**model.to_dict(exclude=["_logger"])) for model in models
+                Association(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
             ]
 
             # Iterate over the list of immutable associations
@@ -654,7 +679,14 @@ class AssociationManager(BaseObjectManager):
             # Return the association if it exists
             if model is not None:
                 # Convert the AssociationModel object to an Association object
-                return Association(**model.to_dict(exclude=["_logger"]))
+                return Association(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the association does not exist
                 return None
@@ -701,7 +733,14 @@ class AssociationManager(BaseObjectManager):
             # Return the association if it exists
             if model is not None:
                 # Convert the AssociationModel object to an Association object
-                return Association(**model.to_dict(exclude=["_logger"]))
+                return Association(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the association does not exist
                 return None
@@ -748,7 +787,14 @@ class AssociationManager(BaseObjectManager):
             # Return the association if it exists
             if model is not None:
                 # Convert the AssociationModel object to an Association object
-                return Association(**model.to_dict(exclude=["_logger"]))
+                return Association(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
             else:
                 # Return None indicating that the association does not exist
                 return None
@@ -797,7 +843,14 @@ class AssociationManager(BaseObjectManager):
             # Return the updated association if it exists
             if model is not None:
                 # Convert the AssociationModel object to an Association object
-                association = Association(**model.to_dict(exclude=["_logger"]))
+                association = Association(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
 
                 # Add the association to the cache
                 self.update_in_cache(
@@ -842,6 +895,7 @@ class AssociationModel(ImmutableBaseModel):
         question (Optional[int]): The ID of the question that is being associated with.
         setting (Optional[int]): The ID of the setting that is being associated with.
         stack (Optional[int]): The ID of the stack that is being associated with.
+        status (Optional[int]): The ID of the status that is being associated with.
         tag (Optional[int]): The ID of the tag that is being associated with.
         updated_at (Optional[datetime]): The timestamp when the association was last updated.
         user (Optional[int]): The ID of the user that is being associated with.
@@ -1122,6 +1176,22 @@ class AssociationModel(ImmutableBaseModel):
         unique=False,
     )
 
+    status: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.STACKS}(id)",
+        index=False,
+        name="status",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     tag: Field = Field(
         autoincrement=False,
         default=None,
@@ -1213,6 +1283,7 @@ class AssociationModel(ImmutableBaseModel):
         question: Optional[int] = None,
         setting: Optional[int] = None,
         stack: Optional[int] = None,
+        status: Optional[int] = None,
         tag: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         user: Optional[int] = None,
@@ -1239,6 +1310,7 @@ class AssociationModel(ImmutableBaseModel):
             question (Optional[int]): The ID of the question that is being associated with.
             setting (Optional[int]): The ID of the setting that is being associated with.
             stack (Optional[int]): The ID of the stack that is being associated with.
+            status (Optional[int]): The ID of the status that is being associated with.
             tag (Optional[int]): The ID of the tag that is being associated with.
             updated_at (Optional[datetime]): The timestamp when the association was last updated.
             user (Optional[int]): The ID of the user that is being associated with.
@@ -1266,6 +1338,7 @@ class AssociationModel(ImmutableBaseModel):
             question=question,
             setting=setting,
             stack=stack,
+            status=status,
             table=Constants.ASSOCIATIONS,
             tag=tag,
             updated_at=updated_at,
