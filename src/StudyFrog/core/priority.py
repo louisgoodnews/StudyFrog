@@ -462,7 +462,7 @@ class PriorityManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_priorities():
                 # Return the list of immutable priorities from the cache
                 return self.get_cache_values()
 
@@ -471,9 +471,9 @@ class PriorityManager(BaseObjectManager):
                 PriorityModel.get_all(database=Constants.DATABASE_PATH)
             )
 
-            # Convert the list of PriorityModel objects to a list of Priority objects
+            # Convert the list of PriorityModel objects to a list of ImmutablePriority objects
             priorities: List[ImmutablePriority] = [
-                Priority(
+                ImmutablePriority(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -780,6 +780,7 @@ class PriorityManager(BaseObjectManager):
                 PriorityConverter.object_to_model(
                     object=ImmutablePriority(**priority.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **priority.to_dict(
                         exclude=[
                             "_id",
@@ -787,7 +788,7 @@ class PriorityManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

@@ -444,7 +444,7 @@ class SettingManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_settings():
                 # Return the list of immutable settings from the cache
                 return self.get_cache_values()
 
@@ -678,6 +678,7 @@ class SettingManager(BaseObjectManager):
                 SettingConverter.object_to_model(
                     object=ImmutableSetting(**setting.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **setting.to_dict(
                         exclude=[
                             "_id",

@@ -455,7 +455,7 @@ class TagManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_tags():
                 # Return the list of immutable tags from the cache
                 return self.get_cache_values()
 
@@ -680,6 +680,7 @@ class TagManager(BaseObjectManager):
                 TagConverter.object_to_model(
                     object=ImmutableTag(**tag.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **tag.to_dict(
                         exclude=[
                             "_id",
@@ -687,7 +688,7 @@ class TagManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

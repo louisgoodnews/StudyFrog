@@ -18,7 +18,6 @@ from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
-from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
@@ -43,12 +42,14 @@ class StackCreateForm(tkinter.Frame):
     def __init__(
         self,
         master: tkinter.Misc,
+        unified_manager: UnifiedObjectManager,
     ) -> None:
         """
         Initializes a new instance of the StackCreateForm class.
 
         Args:
             master (tkinter.Misc): The parent widget.
+            unified_manager (UnifiedObjectManager): The unified object manager instance.
         """
 
         # Call the parent class constructor
@@ -56,6 +57,9 @@ class StackCreateForm(tkinter.Frame):
 
         # Create a logger instance
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+
+        # Store the passed unified manager instance in an instance variable
+        self.unified_manager: UnifiedObjectManager = unified_manager
 
         self.configure(background=Constants.BLUE_GREY["700"])
 
@@ -91,19 +95,7 @@ class StackCreateForm(tkinter.Frame):
 
         # Configure the stack create form widget's 1st row to weight 0.
         self.grid_rowconfigure(
-            index=0,
-            weight=0,
-        )
-
-        # Configure the stack create form widget's 2nd row to weight 0.
-        self.grid_rowconfigure(
-            index=1,
-            weight=0,
-        )
-
-        # Configure the stack create form widget's 3rd row to weight 1.
-        self.grid_rowconfigure(
-            index=2,
+            index=tuple(range(6)),
             weight=0,
         )
 
@@ -112,8 +104,7 @@ class StackCreateForm(tkinter.Frame):
         Creates and configures the main widgets of the stack create form widget.
 
         This method creates and configures the main widgets of the stack create form
-        widget. The main widgets are: a single-line text field for the stack name
-        and a multi-line text field for the stack description.
+        widget.
 
         Returns:
             None
@@ -172,6 +163,92 @@ class StackCreateForm(tkinter.Frame):
             sticky=NSEW,
         )
 
+        # Create a stack field for the difficulty
+        self.difficulty_field: Dict[str, Any] = UIBuilder.get_combobox_select_field(
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            label="Difficulty* : ",
+            master=self,
+            value=Constants.MEDIUM.capitalize(),
+            values=[
+                difficulty.name
+                for difficulty in self.unified_manager.get_all_difficulties()
+            ],
+        )
+
+        # Set the default value for the difficulty field
+        self.difficulty_field["setter"](value=Constants.MEDIUM.capitalize())
+
+        # Style the stack field "Button" button widget
+        self.difficulty_field["button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Label" label widget
+        self.difficulty_field["label"].configure(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Root" frame widget
+        self.difficulty_field["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the stack field in the grid
+        self.difficulty_field["root"].grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
+
+        # Create a stack field for the priority
+        self.priority_field: Dict[str, Any] = UIBuilder.get_combobox_select_field(
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            label="Priority* : ",
+            master=self,
+            values=[
+                priority.name for priority in self.unified_manager.get_all_priorities()
+            ],
+        )
+
+        # Set the default value for the priority field
+        self.priority_field["setter"](value=Constants.MEDIUM.capitalize())
+
+        # Style the stack field "Button" button widget
+        self.priority_field["button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Label" label widget
+        self.priority_field["label"].configure(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Root" frame widget
+        self.priority_field["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the stack field in the grid
+        self.priority_field["root"].grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=3,
+            sticky=NSEW,
+        )
+
         # Create a multi-line text field for the stack description.
         self.description: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
             font=(
@@ -200,7 +277,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=2,
+            row=4,
             sticky=NSEW,
         )
 
@@ -232,7 +309,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=3,
+            row=5,
             sticky=NSEW,
         )
 
@@ -255,24 +332,49 @@ class StackCreateForm(tkinter.Frame):
 
         # Initialize the result dictionary as an empty dictionary
         result: Dict[str, Any] = {
-            "contents": [],
-            "created_at": Miscellaneous.get_current_datetime(),
-            "customfield_values": [],
-            "description": "",
-            "last_viewed_at": Miscellaneous.get_current_datetime(),
-            "name": "",
-            "updated_at": Miscellaneous.get_current_datetime(),
-            "uuid": Miscellaneous.get_uuid(),
+            "object_data": {
+                "contents": [],
+                "created_at": Miscellaneous.get_current_datetime(),
+                "custom_field_values": [],
+                "description": "",
+                "last_viewed_at": Miscellaneous.get_current_datetime(),
+                "name": "",
+                "updated_at": Miscellaneous.get_current_datetime(),
+                "uuid": Miscellaneous.get_uuid(),
+            },
+            "related_objects": {},
         }
 
         # Get the value of the stack name from the single-line text field
-        result["name"] = self.name["getter"]()
+        result["object_data"]["name"] = self.name["getter"]()
 
         # Get the value of the stack description from the multi-line text field
-        result["description"] = self.description["getter"]()
+        result["object_data"]["description"] = self.description["getter"]()
 
         # Get the value of the due by date from the date entry widget
-        result["due_by"] = self.due_by["getter"]()
+        result["object_data"]["due_by"] = self.due_by["getter"]()
+
+        # Get the difficulty from the difficulty field
+        result["related_objects"]["difficulty"] = (
+            self.unified_manager.get_difficulty_by(
+                field="name",
+                value=self.difficulty_field["getter"](),
+            )
+        )
+
+        # Get the value of the difficulty from the difficulty field
+        result["object_data"]["difficulty"] = result["related_objects"]["difficulty"][
+            "id"
+        ]
+
+        # Get the priority from the priority field
+        result["related_objects"]["priority"] = self.unified_manager.get_priority_by(
+            field="name",
+            value=self.priority_field["getter"](),
+        )
+
+        # Get the value of the priority from the priority field
+        result["object_data"]["priority"] = result["related_objects"]["priority"]["id"]
 
         # Return the result dictionary
         return result

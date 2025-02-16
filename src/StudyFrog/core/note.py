@@ -489,7 +489,7 @@ class NoteManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_notes():
                 # Return the list of immutable notes from the cache
                 return self.get_cache_values()
 
@@ -723,6 +723,7 @@ class NoteManager(BaseObjectManager):
                 NoteConverter.object_to_model(
                     object=ImmutableNote(**note.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **note.to_dict(
                         exclude=[
                             "_id",
@@ -730,7 +731,7 @@ class NoteManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

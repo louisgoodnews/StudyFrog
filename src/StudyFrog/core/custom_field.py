@@ -379,7 +379,7 @@ class CustomFieldManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_custom_fields():
                 # Return the list of immutable custom fields from the cache
                 return self.get_cache_values()
 
@@ -613,6 +613,7 @@ class CustomFieldManager(BaseObjectManager):
                 CustomFieldConverter.object_to_model(
                     object=CustomField(**custom_field.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **custom_field.to_dict(
                         exclude=[
                             "_id",
@@ -620,7 +621,7 @@ class CustomFieldManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

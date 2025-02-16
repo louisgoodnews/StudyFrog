@@ -484,7 +484,7 @@ class AnswerManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_answers():
                 # Return the list of immutable answers from the cache
                 return self.get_cache_values()
 
@@ -718,6 +718,7 @@ class AnswerManager(BaseObjectManager):
                 AnswerConverter.object_to_model(
                     object=ImmutableAnswer(**answer.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **answer.to_dict(
                         exclude=[
                             "_id",
@@ -725,7 +726,7 @@ class AnswerManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

@@ -5,8 +5,6 @@ Date: 2025-02-05
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -40,9 +38,13 @@ class ImmutableFlashcard(ImmutableBaseObject):
         back_text (str): The back side of the flashcard.
         created_at (datetime): The timestamp when the flashcard was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+        difficulty (int): The ID of the difficulty the flashcard is associated with.
         front_text (str): The front side of the flashcard.
         id (int): The ID of the flashcard.
         key (str): The key of the flashcard.
+        last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
+        priority (int): The ID of the priority the flashcard is associated with.
+        status (int): The ID of the status the flashcard is associated with.
         updated_at (datetime): The timestamp when the flashcard was last updated.
         uuid (str): The UUID of the flashcard.
     """
@@ -53,8 +55,12 @@ class ImmutableFlashcard(ImmutableBaseObject):
         front_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        difficulty: Optional[int] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -65,9 +71,13 @@ class ImmutableFlashcard(ImmutableBaseObject):
             back_text (str): The back side of the flashcard.
             created_at (datetime): The timestamp when the flashcard was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            difficulty (int): The ID of the difficulty the flashcard is associated with.
             front_text (str): The front side of the flashcard.
             id (int): The ID of the flashcard.
             key (str): The key of the flashcard.
+            last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
+            priority (int): The ID of the priority the flashcard is associated with.
+            status (int): The ID of the status the flashcard is associated with.
             updated_at (datetime): The timestamp when the flashcard was last updated.
             uuid (str): The UUID of the flashcard.
 
@@ -80,9 +90,13 @@ class ImmutableFlashcard(ImmutableBaseObject):
             back_text=back_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            difficulty=difficulty,
             front_text=front_text,
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
+            priority=priority,
+            status=status,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -101,7 +115,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
 
 class MutableFlashcard(MutableBaseObject):
     """
-    An immutable class representing a flashcard.
+    A mutable class representing a flashcard.
 
     A flashcard is a learning tool used to aid memorization by providing a question on one side and the answer on the other.
 
@@ -109,9 +123,13 @@ class MutableFlashcard(MutableBaseObject):
         back_text (str): The back side of the flashcard.
         created_at (datetime): The timestamp when the flashcard was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+        difficulty (int): The ID of the difficulty the flashcard is associated with.
         front_text (str): The front side of the flashcard.
         id (int): The ID of the flashcard.
         key (str): The key of the flashcard.
+        last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
+        priority (int): The ID of the priority the flashcard is associated with.
+        status (int): The ID of the status the flashcard is associated with.
         updated_at (datetime): The timestamp when the flashcard was last updated.
         uuid (str): The UUID of the flashcard.
     """
@@ -122,8 +140,12 @@ class MutableFlashcard(MutableBaseObject):
         front_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        difficulty: Optional[int] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -134,9 +156,13 @@ class MutableFlashcard(MutableBaseObject):
             back_text (str): The back side of the flashcard.
             created_at (datetime): The timestamp when the flashcard was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            difficulty (int): The ID of the difficulty the flashcard is associated with.
             front_text (str): The front side of the flashcard.
             id (int): The ID of the flashcard.
             key (str): The key of the flashcard.
+            last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
+            priority (int): The ID of the priority the flashcard is associated with.
+            status (int): The ID of the status the flashcard is associated with.
             updated_at (datetime): The timestamp when the flashcard was last updated.
             uuid (str): The UUID of the flashcard.
 
@@ -149,9 +175,13 @@ class MutableFlashcard(MutableBaseObject):
             back_text=back_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            difficulty=difficulty,
             front_text=front_text,
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
+            priority=priority,
+            status=status,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -264,8 +294,12 @@ class FlashcardFactory:
         front_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        difficulty: Optional[int] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableFlashcard]:
@@ -276,9 +310,13 @@ class FlashcardFactory:
             back_text (str): The back side of the flashcard.
             created_at (Optional[datetime]): The timestamp when the flashcard was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            difficulty (Optional[int]): The ID of the difficulty the flashcard is associated with.
             front_text (str): The front side of the flashcard.
             id (Optional[int]): The ID of the flashcard.
             key (Optional[str]): The key of the flashcard.
+            last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
+            priority (Optional[int]): The ID of the priority the flashcard is associated with.
+            status (Optional[int]): The ID of the status the flashcard is associated with.
             updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
             uuid (Optional[str]): The UUID of the flashcard.
 
@@ -295,8 +333,12 @@ class FlashcardFactory:
                 custom_field_values=custom_field_values,
                 back_text=back_text,
                 front_text=front_text,
+                difficulty=difficulty,
                 id=id,
                 key=key,
+                last_viewed_at=last_viewed_at,
+                priority=priority,
+                status=status,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -486,7 +528,7 @@ class FlashcardManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_flashcards():
                 # Return the list of immutable flashcards from the cache
                 return self.get_cache_values()
 
@@ -698,6 +740,53 @@ class FlashcardManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_flashcards(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableFlashcard]]]:
+        """
+        Searches for flashcards in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the FlashcardModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableFlashcard]]]: The found flashcards if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for flashcards in the database
+            models: Optional[List[FlashcardModel]] = asyncio.run(
+                FlashcardModel.search(**kwargs)
+            )
+
+            # Return the found flashcards if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableFlashcard(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no flashcards were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_flashcard(
         self,
         flashcard: Union[ImmutableFlashcard, MutableFlashcard],
@@ -720,6 +809,7 @@ class FlashcardManager(BaseObjectManager):
                 FlashcardConverter.object_to_model(
                     object=ImmutableFlashcard(**flashcard.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **flashcard.to_dict(
                         exclude=[
                             "_id",
@@ -727,7 +817,7 @@ class FlashcardManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 
@@ -771,9 +861,14 @@ class FlashcardModel(ImmutableBaseModel):
     Attributes:
         back_text (Optional[str]): The back side of the flashcard.
         created_at (Optional[datetime]): The timestamp when the flashcard was created.
+        custom_field_values (Optional[str]): The custom field values of the flashcard.
+        difficulty (Optional[int]): The difficulty of the flashcard.
         front_text (Optional[str]): The front side of the flashcard.
         id (Optional[int]): The ID of the flashcard.
         key (Optional[str]): The key of the flashcard.
+        last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
+        priority (Optional[int]): The priority of the flashcard.
+        status (Optional[int]): The status of the flashcard.
         updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
         uuid (Optional[str]): The UUID of the flashcard.
     """
@@ -807,8 +902,8 @@ class FlashcardModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=255,
-        type="VARCHAR",
+        size=None,
+        type="TEXT",
         unique=False,
     )
 
@@ -844,6 +939,22 @@ class FlashcardModel(ImmutableBaseModel):
         unique=False,
     )
 
+    difficulty: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.PRIORITIES}(id)",
+        index=False,
+        name="difficulty",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     front_text: Field = Field(
         autoincrement=False,
         default=None,
@@ -855,8 +966,8 @@ class FlashcardModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=255,
-        type="VARCHAR",
+        size=None,
+        type="TEXT",
         unique=True,
     )
 
@@ -874,6 +985,54 @@ class FlashcardModel(ImmutableBaseModel):
         size=255,
         type="VARCHAR",
         unique=True,
+    )
+
+    last_viewed_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="last_viewed_at",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    priority: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.PRIORITIES}(id)",
+        index=False,
+        name="priority",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    status: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.STATUSES}(id)",
+        index=False,
+        name="status",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
     )
 
     updated_at: Field = Field(
@@ -913,9 +1072,13 @@ class FlashcardModel(ImmutableBaseModel):
         back_text: Optional[str] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        difficulty: Optional[int] = None,
         front_text: Optional[str] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -926,9 +1089,13 @@ class FlashcardModel(ImmutableBaseModel):
             back_text (Optional[str]): The back side of the flashcard.
             created_at (Optional[datetime]): The timestamp when the flashcard was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
-            id (Optional[int]): The ID of the flashcard.
+            difficulty (Optional[int]): The difficulty of the flashcard.
             front_text (Optional[str]): The front side of the flashcard.
+            id (Optional[int]): The ID of the flashcard.
             key (Optional[str]): The key of the flashcard.
+            last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
+            priority (Optional[int]): The priority of the flashcard.
+            status (Optional[int]): The status of the flashcard.
             updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
             uuid (Optional[str]): The UUID of the flashcard.
 
@@ -941,9 +1108,13 @@ class FlashcardModel(ImmutableBaseModel):
             back_text=back_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            difficulty=difficulty,
             front_text=front_text,
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
+            priority=priority,
+            status=status,
             table=Constants.FLASHCARDS,
             updated_at=updated_at,
             uuid=uuid,

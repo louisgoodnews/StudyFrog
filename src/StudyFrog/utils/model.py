@@ -338,6 +338,154 @@ class ImmutableBaseModel(ImmutableBaseObject):
             return None
 
     @classmethod
+    async def search(
+        cls,
+        **kwargs,
+    ) -> Optional[Union[T, List[T]]]:
+        """
+        Searches for entries in the database using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to use as search conditions.
+
+        Returns:
+            Optional[Union[T, List[T]]]: The model instance if only one entry was found, a list of model instances if multiple entries were found, or None if no entries were found in the database.
+        """
+        try:
+            # Initialize the conditions list as an empty list
+            conditions: List[str] = []
+
+            # Initialize the parameters list as an empty list
+            parameters: List[Any] = []
+
+            # Iterate over the keyword arguments
+            for (
+                key,
+                value,
+            ) in kwargs.items():
+                # Check the type of the field
+                if cls["key"]["type"] == "INTEGER":
+                    # Add a condition to the SQL query to filter by the INTEGER field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "TEXT":
+                    # Add a condition to the SQL query to filter by the TEXT field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "REAL":
+                    # Add a condition to the SQL query to filter by the REAL field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "FLOAT":
+                    # Add a condition to the SQL query to filter by the FLOAT field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "INTEGER":
+                    # Add a condition to the SQL query to filter by the INTEGER field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "NUMERIC":
+                    # Add a condition to the SQL query to filter by the NUMERIC field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "NULL":
+                    # Add a condition to the SQL query to filter by the NULL field
+                    conditions.append(f"{key} IS NULL")
+
+                elif cls["key"]["type"] == "DATE":
+                    # Add a condition to the SQL query to filter by the DATE field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "DATETIME":
+                    # Add a condition to the SQL query to filter by the DATETIME field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "TIME":
+                    # Add a condition to the SQL query to filter by the TIME field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "BLOB":
+                    # Add a condition to the SQL query to filter by the BLOB field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "BOOLEAN":
+                    # Add a condition to the SQL query to filter by the BOOLEAN field
+                    conditions.append(f"{key} = ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "JSON":
+                    # Add a condition to the SQL query to filter by the JSON field
+                    conditions.append(f"JSON_CONTAINS({key}, ?)")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif cls["key"]["type"] == "ARRAY":
+                    # Add a condition to the SQL query to filter by the ARRAY field
+                    conditions.append(f"JSON_CONTAINS({key}, ?)")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                else:
+                    # Log a warning message indicating an unsupported field type
+                    cls.logger.warning(
+                        message=f"Unsupported field type: '{cls['key']['type']}' in '{cls.__name__}' class. This is likely a bug."
+                    )
+
+            # Build the SQL query to search for entries that match the given keyword arguments
+            sql: str = f"SELECT * FROM {cls.table} WHERE {' AND '.join(conditions)}"
+
+            # Execute the SQL query and retrieve all matching rows
+            rows: List[Dict[str, Any]] = await DatabaseService.read_all(
+                database=database,
+                parameters=parameters,
+                sql=sql,
+            )
+
+            # Check, if the result list is empty
+            if len(rows) == 0:
+                # Return None indicating no entries were found in the database
+                return None
+
+            # Check, if only one entry was found
+            if len(rows) == 1:
+                # Return the single model instance if only one entry was found
+                return cls(**Miscellaneous.convert_from_db_format(data=rows[0]))
+
+            # Return the list of model instances if multiple entries were found
+            return [
+                cls(**Miscellaneous.convert_from_db_format(data=row)) for row in rows
+            ]
+        except Exception as e:
+            # Log an error message indicating an exception occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{cls.__name__}' class: {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
+
+    @classmethod
     def to_sql_string(cls) -> str:
         """
         Returns a SQL string representation of the model's fields.

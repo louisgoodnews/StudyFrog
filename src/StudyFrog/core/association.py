@@ -595,7 +595,7 @@ class AssociationManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_associations():
                 # Return the list of immutable associations from the cache
                 return self.get_cache_values()
 
@@ -829,6 +829,7 @@ class AssociationManager(BaseObjectManager):
                 AssociationConverter.object_to_model(
                     object=Association(**association.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **association.to_dict(
                         exclude=[
                             "_id",
@@ -836,7 +837,7 @@ class AssociationManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

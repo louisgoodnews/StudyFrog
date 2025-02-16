@@ -301,7 +301,7 @@ class StatusManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count_statuss(self) -> int:
+    def count_statuses(self) -> int:
         """
         Returns the number of statuss in the database.
 
@@ -357,7 +357,7 @@ class StatusManager(BaseObjectManager):
             status.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the status
-            status.key = f"STATUS_{self.count_statuss() + 1}"
+            status.key = f"STATUS_{self.count_statuses() + 1}"
 
             # Set the updated_at timestamp of the status
             status.updated_at = Miscellaneous.get_current_datetime()
@@ -452,7 +452,7 @@ class StatusManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_statuses():
                 # Return the list of immutable statuss from the cache
                 return self.get_cache_values()
 
@@ -752,6 +752,7 @@ class StatusManager(BaseObjectManager):
                 StatusConverter.object_to_model(
                     object=ImmutableStatus(**status.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **status.to_dict(
                         exclude=[
                             "_id",

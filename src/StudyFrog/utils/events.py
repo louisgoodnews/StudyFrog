@@ -56,6 +56,7 @@ class Events:
         NOTE_LOADED (DispatcherEvent): An event that indicates that a note has been loaed in the backend.
         NOTE_UPDATED (DispatcherEvent): An event that indicates that a note has been updated in the backend.
         NOTIFICATIONS_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a notifications button has been clicked.
+        OKAY_BUTTON_CLICKED (DispatcherEvent): An event that indicates that an okay button has been clicked.
         PRIORITY_CREATED (DispatcherEvent): An event that indicates that a priority has been created in the backend.
         PRIORITY_DELETED (DispatcherEvent): An event that indicates that a priority has been deleted in the backend.
         PRIORITY_LOADED (DispatcherEvent): An event that indicates that a priority has been loaed in the backend.
@@ -343,6 +344,11 @@ class Events:
     # An event that indicates that a notifications button has been clicked
     NOTIFICATIONS_BUTTON_CLICKED: DispatcherEvent = DispatcherEventFactory.create_event(
         name="ui:notifications:button:clicked"
+    )
+
+    # An event that indicates that an okay button has been clicked
+    OKAY_BUTTON_CLICKED: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="ui:button:okay:clicked"
     )
 
     # An event that indicates that a priority has been created in the backend
@@ -800,7 +806,7 @@ class Events:
 
     # An event that indicates that the user button has been clicked
     USER_BUTTON_CLICKED: DispatcherEvent = DispatcherEventFactory.create_event(
-        name="ui:user:button:clicked"
+        name="ui:button:user:clicked"
     )
 
     # An event that indicates that a user has been created in the backend

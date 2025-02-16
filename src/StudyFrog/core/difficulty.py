@@ -477,7 +477,7 @@ class DifficultyManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_difficulties():
                 # Return the list of immutable difficulties from the cache
                 return self.get_cache_values()
 
@@ -791,6 +791,7 @@ class DifficultyManager(BaseObjectManager):
                         **difficulty.to_dict(exclude=["_logger"])
                     )
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **difficulty.to_dict(
                         exclude=[
                             "_id",

@@ -14,6 +14,8 @@ from tkinter import ttk
 from tkinter.constants import *
 
 from utils.constants import Constants
+from utils.dispatcher import Dispatcher
+from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 
@@ -294,6 +296,158 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_combobox_select_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a combobox widget with associated label and button.
+
+        The returned dictionary contains the following keys:
+            - "root": The container frame for the widgets
+            - "label": The label widget
+            - "combobox": The combobox widget
+            - "button": The button widget
+
+        Args:
+            label (str): The text for the label widget.
+            master (tkinter.Misc): The master widget for placing the container frame.
+            **kwargs: Additional keyword arguments for the combobox widget.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created combobox widget dictionary.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the combobox widget.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the content of the combobox widget.
+
+                Returns:
+                    None
+                """
+
+                # Set the content of the combobox widget to an empty string
+                result["combobox"].set("")
+
+            def get() -> str:
+                """
+                Retrieves the content of the combobox widget.
+
+                Returns:
+                    str: The content of the combobox widget.
+                """
+
+                # Return the content of the combobox widget
+                return result["combobox"].get()
+
+            def set(value: str) -> None:
+                """
+                Sets the content of the combobox widget.
+
+                Args:
+                    value (str): The value to set the combobox widget to.
+
+                Returns:
+                    None
+                """
+
+                # Set the content of the combobox widget to the given value
+                result["combobox"].set(value)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st and 3rd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=(
+                    0,
+                    2,
+                ),
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Grid the "Label" label widget in the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Combobox" combobox widget
+            result["combobox"] = cls.get_combobox(
+                master=result["root"],
+                **kwargs,
+            )
+
+            # Grid the "Combobox" combobox widget in the "Root" frame widget
+            result["combobox"].grid(
+                column=1,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                command=clear,
+                master=result["root"],
+                text="Clear",
+            )
+
+            # Grid the "Button" button widget in the "Root" frame widget
+            result["button"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=0,
+            )
+
+            # Add the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_combobox_select_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_date_entry(
         cls,
         label: str,
@@ -366,18 +520,33 @@ class UIBuilder:
                     result["entry"].config(
                         background=Constants.WHITE,
                     )
+
+                    # Configure the "Warner" label widget to display no text
                     result["warner"].config(
                         foreground=Constants.RED["200"],
                         text="",
                     )
+
+                    # Hide the "Warner" label widget
+                    result["warner"].grid_forget()
                 else:
                     # If the date is invalid, set the entry background to red and display a warning message
                     result["entry"].config(
                         background=Constants.RED["200"],
                     )
+
+                    # Display a warning message
                     result["warner"].config(
                         foreground=Constants.RED["200"],
                         text="Invalid date format! Use YYYY-MM-DD",
+                    )
+
+                    # Place the "Warner" label widget within the "Root" frame widget
+                    result["warner"].grid(
+                        column=1,
+                        padx=5,
+                        pady=5,
+                        row=1,
                     )
 
             def set(value: str) -> None:
@@ -982,6 +1151,167 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_notebook' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_okay(
+        cls,
+        dispatcher: Dispatcher,
+        message: str,
+        title: str,
+        master: Optional[tkinter.Misc],
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a dialog with an "Okay" button.
+
+        Args:
+            dispatcher (Dispatcher): The dispatcher to use for dispatching events.
+            message (str): The message to display in the dialog.
+            title (str): The title of the dialog.
+            master (Optional[tkinter.Misc]): The master widget.
+            **kwargs: Any additional keyword arguments to be passed to the get_toplevel method.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created dialog instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of the dialog.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def on_okay_click() -> None:
+                """
+                Called when the "Okay" button is clicked.
+
+                Dispatches an event to the global namespace with the target "okay".
+
+                Returns:
+                    None
+                """
+                dispatcher.dispatch(
+                    event=Events.OKAY_BUTTON_CLICKED,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    source="ui:dialog:okay",
+                    target="okay",
+                )
+
+                # Set the result to "okay"
+                result["result"] = "okay"
+
+                # Destroy the "Root" toplevel widget
+                result["root"].destroy()
+
+            def get() -> Optional[str]:
+                """
+                Gets the value at key "result" in dictionary "result" and returns it.
+
+                Returns:
+                    Optional[str]: The value at key "result" in dictionary "result" or None if the key is not found.
+                """
+                # Return the value at key "result" in dictionary "result"
+                return result.get(
+                    "result",
+                    None,
+                )
+
+            # Create the "Root" toplevel widget
+            result["root"] = cls.get_toplevel(
+                master=master,
+                **kwargs,
+            )
+
+            # Configure the "Root" toplevel widget's 1st column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" toplevel widget's 1st and 3rd row to weight 0
+            result["root"].grid_rowconfigure(
+                index=(
+                    0,
+                    2,
+                ),
+                weight=0,
+            )
+
+            # Configure the "Root" toplevel widget's 2nd row to weight 1
+            result["root"].grid_rowconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Create the "Title" label widget
+            result["title_label"] = cls.get_label(
+                master=result["root"],
+                text=title,
+            )
+
+            # Place the "Title" label widget within the "Root" toplevel widget
+            result["title_label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Message" label widget
+            result["message_label"] = cls.get_label(
+                master=result["root"],
+                text=message,
+            )
+
+            # Place the "Message" label widget within the "Root" toplevel widget
+            result["message_label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                master=result["root"],
+                text="Okay",
+            )
+
+            # Place the "Button" button widget within the "Root" toplevel widget
+            result["button"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=2,
+            )
+
+            # Configure the "Root" toplevel widget to be initially minimized
+            result["root"].iconify()
+
+            # Set the "Root" toplevel widget to have grab set
+            result["root"].grab_set()
+
+            # Set the "Root" toplevel widget to have focus
+            result["root"].focus_set()
+
+            # Ring the bell
+            result["root"].bell()
+
+            # Wait for the "Root" toplevel widget to be closed
+            result["root"].wait_window()
+
+            # Return the result
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_okay' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured

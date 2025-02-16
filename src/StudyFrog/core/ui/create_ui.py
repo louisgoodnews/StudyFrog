@@ -17,7 +17,7 @@ from core.flashcard import FlashcardFactory, ImmutableFlashcard
 from core.priority import ImmutablePriority
 from core.question import QuestionFactory, ImmutableQuestion
 from core.setting import SettingService
-from core.stack import StackFactory, ImmutableStack
+from core.stack import StackFactory, ImmutableStack, MutableStack
 from core.status import ImmutableStatus
 
 from core.ui.ui_builder import UIBuilder
@@ -26,7 +26,7 @@ from core.ui.form.question_create_form import QuestionCreateForm
 from core.ui.form.stack_create_form import StackCreateForm
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
@@ -91,7 +91,10 @@ class CreateUI(tkinter.Frame):
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
 
-        #
+        # Create a boolean variable in an instance variable
+        self.create_another: tkinter.BooleanVar = tkinter.BooleanVar(value=True)
+
+        # Initialize the form instance variable as None
         self.form: Optional[tkinter.Misc] = None
 
         # Store the passed navigation item instance in an instance variable
@@ -358,7 +361,7 @@ class CreateUI(tkinter.Frame):
         )
 
         # Create the "Create Another" check button widget
-        self.create_another: tkinter.Checkbutton = UIBuilder.get_checkbutton(
+        create_another: tkinter.Checkbutton = UIBuilder.get_checkbutton(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -366,10 +369,11 @@ class CreateUI(tkinter.Frame):
             ),
             foreground=Constants.WHITE,
             master=left_frame,
+            variable=self.create_another,
         )
 
         # Place the "Create Another" check button widget in the "Left Frame"
-        self.create_another.grid(
+        create_another.grid(
             column=0,
             padx=5,
             pady=5,
@@ -572,6 +576,103 @@ class CreateUI(tkinter.Frame):
             sticky=NSEW,
         )
 
+    def handle_flashcard_creation(
+        self,
+        object_data: Dict[str, Any],
+        related_objects: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        try:
+            # Create a new flashcard
+            flashcard: ImmutableFlashcard = self.unified_manager.create_flashcard(
+                flashcard=FlashcardFactory.create_flashcard(**object_data)
+            )
+
+            if related_objects.get("stack"):
+                # Set the stack to be mutable
+                stack: MutableStack = related_objects["stack"].to_mutable()
+
+                # Add the flashcard key to the stack contents
+                stack.contents.append(flashcard.key)
+
+                # Update the stack in the database
+                self.unified_manager.update_stack(stack=stack)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'handle_flashcard_creation' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
+    def handle_question_creation(
+        self,
+        object_data: Dict[str, Any],
+        related_objects: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        try:
+            # Create a new question
+            question: ImmutableQuestion = QuestionFactory.create_question(**object_data)
+
+            create_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_QUESTION_CREATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    question=question,
+                )
+            )
+
+            if create_response is None:
+                # Log a warning message indicating that the creation was not successful
+                self.logger.warning(
+                    message=f"Attempt to create question {question} was not successfull: {create_response}."
+                )
+
+                # Return early
+                return
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'handle_question_creation' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
+    def handle_stack_creation(
+        self,
+        object_data: Dict[str, Any],
+        related_objects: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        try:
+            # Create a new stack
+            stack: ImmutableStack = StackFactory.create_stack(**object_data)
+
+            create_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STACK_CREATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    stack=stack,
+                )
+            )
+
+            if create_response is None:
+                # Log a warning message indicating that the creation was not successful
+                self.logger.warning(
+                    message=f"Attempt to create stack {stack} was not successfull: {create_response}."
+                )
+
+                # Return early
+                return
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'handle_stack_creation' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
     def on_combobox_select(self) -> None:
         """
         Handles the selection event of the combobox widget.
@@ -594,7 +695,10 @@ class CreateUI(tkinter.Frame):
         self.clear()
 
         # Create a new form widget based on the selected value
-        self.form = forms[self.combobox.get().lower()](master=self.center_frame)
+        self.form = forms[self.combobox.get().lower()](
+            master=self.center_frame,
+            unified_manager=self.unified_manager,
+        )
 
     def on_cancel_button_click(self) -> None:
         """
@@ -603,15 +707,24 @@ class CreateUI(tkinter.Frame):
         Returns:
             None
         """
+
+        # Check if the master widget is of type toplevel
         if isinstance(
             self.master,
             tkinter.Toplevel,
         ):
+            # Destroy the toplevel widget
             self.master.destroy()
 
     def on_create_button_click(self) -> None:
         """
         Handles the click event of the "Create" button.
+
+        This method first checks if a form is present. If not, it returns early.
+        Then, it retrieves the data from the form and the type of form.
+        It attempts to retrieve the "new" status from the database and adds it
+        to the object data and related objects.
+        Finally, it calls the appropriate creation method based on the form type.
 
         Returns:
             None
@@ -623,57 +736,37 @@ class CreateUI(tkinter.Frame):
             return
 
         # Get the data from the form
-        data: Dict[str, Any] = self.form.get()
+        form_data: Dict[str, Any] = self.form.get()
 
         # Get the type of form
         type: str = self.combobox.get()
 
-        medium_difficulty: ImmutableDifficulty = self.unified_manager.get_difficulty_by(
-            field="name",
-            value=Constants.MEDIUM,
-        )
-
-        medium_priority: ImmutablePriority = self.unified_manager.get_priority_by(
-            field="name",
-            value=Constants.MEDIUM,
-        )
-
-        new_status: ImmutableStatus = self.unified_manager.get_status_by(
+        # Attempt to retrieve the "new" status from the database
+        new_status: Optional[ImmutableStatus] = self.unified_manager.get_status_by(
             field="name",
             value=Constants.NEW,
         )
 
-        data["difficulty"] = medium_difficulty.id
-        data["priority"] = medium_priority.id
-        data["status"] = new_status.id
+        # Add the status to the object data
+        form_data["object_data"]["status"] = new_status.id
 
-        # Create an object of the appropriate type based on the form data
-        if type.lower() == "flashcard":
-            # Create a new flashcard
-            flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(**data)
+        # Add the status to the related objects
+        form_data["related_objects"]["status"] = new_status
 
-            response: Optional[Any] = self.dispatcher.dispatch(
-                event=Events.REQUEST_FLASHCARD_CREATE,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                flashcard=flashcard,
-            )
-        elif type.lower() == "question":
-            # Create a new question
-            question: ImmutableQuestion = QuestionFactory.create_question(**data)
+        # Call the appropriate creation method based on the form type
+        getattr(
+            self,
+            f"handle_{type.lower()}_creation",
+        )(
+            object_data=form_data["object_data"],
+            related_objects=form_data["related_objects"],
+        )
 
-            response: Optional[Any] = self.dispatcher.dispatch(
-                event=Events.REQUEST_QUESTION_CREATE,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                question=question,
-            )
-        elif type.lower() == "stack":
-            # Create a new stack
-            stack: ImmutableStack = StackFactory.create_stack(**data)
-
-            response: Optional[Any] = self.dispatcher.dispatch(
-                event=Events.REQUEST_STACK_CREATE,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                stack=stack,
-            )
-
-            self.logger.debug(message=response)
+        if not self.create_another.get():
+            # Check if the master widget is of type toplevel
+            if isinstance(
+                self.master,
+                tkinter.Toplevel,
+            ):
+                # Destroy the toplevel widget
+                self.master.destroy()

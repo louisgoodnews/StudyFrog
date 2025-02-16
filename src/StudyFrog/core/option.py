@@ -457,7 +457,7 @@ class OptionManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_options():
                 # Return the list of immutable options from the cache
                 return self.get_cache_values()
 
@@ -691,6 +691,7 @@ class OptionManager(BaseObjectManager):
                 OptionConverter.object_to_model(
                     object=ImmutableOption(**option.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **option.to_dict(
                         exclude=[
                             "_id",
@@ -698,7 +699,7 @@ class OptionManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

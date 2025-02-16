@@ -393,7 +393,7 @@ class ChangeHistoryManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_change_history_items():
                 # Return the list of immutable change histories from the cache
                 return self.get_cache_values()
 
@@ -627,6 +627,7 @@ class ChangeHistoryManager(BaseObjectManager):
                 ChangeHistoryConverter.object_to_model(
                     object=ChangeHistory(**change_history.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **change_history.to_dict(
                         exclude=[
                             "_id",
@@ -634,7 +635,7 @@ class ChangeHistoryManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 
@@ -1196,7 +1197,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_change_histories():
                 # Return the list of immutable change histories from the cache
                 return self.get_cache_values()
 
@@ -1432,6 +1433,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
                         **change_history_item.to_dict(exclude=["_logger"])
                     )
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **change_history_item.to_dict(
                         exclude=[
                             "_id",
@@ -1439,7 +1441,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

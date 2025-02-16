@@ -39,7 +39,7 @@ class ImmutableStack(ImmutableBaseObject):
     Attributes:
         contents (List[Dict[str, Any]]): The list of the contents of the stack.
         created_at (datetime): The timestamp when the stack was created.
-        customfield_values (List[Dict[str, Any]]): The custom field values of the stack.
+        custom_field_values (List[Dict[str, Any]]): The custom field values of the stack.
         description (str): The description of the stack.
         difficulty (int): The difficulty of the stack.
         due_by (datetime): The timestamp when the stack is due.
@@ -57,9 +57,9 @@ class ImmutableStack(ImmutableBaseObject):
     def __init__(
         self,
         name: str,
-        contents: Optional[List[Dict[str, Any]]] = None,
+        contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
-        customfield_values: Optional[List[Dict[str, Any]]] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
@@ -77,9 +77,9 @@ class ImmutableStack(ImmutableBaseObject):
 
         Args:
             name (str): The name of the stack.
-            contents (Optional[List[Dict[str, Any]]]): The list of the contents of the stack.
+            contents(Optional[List[str]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
-            customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The ID of the difficulty associated with the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -97,7 +97,7 @@ class ImmutableStack(ImmutableBaseObject):
         super().__init__(
             contents=contents,
             created_at=created_at,
-            customfield_values=customfield_values,
+            custom_field_values=custom_field_values,
             description=description,
             difficulty=difficulty,
             due_by=due_by,
@@ -133,7 +133,7 @@ class MutableStack(MutableBaseObject):
     Attributes:
         contents (List[Dict[str, Any]]): The list of the contents of the stack.
         created_at (datetime): The timestamp when the stack was created.
-        customfield_values (List[Dict[str, Any]]): The custom field values of the stack.
+        custom_field_values (List[Dict[str, Any]]): The custom field values of the stack.
         description (str): The description of the stack.
         difficulty (int): The difficulty of the stack.
         due_by (datetime): The timestamp when the stack is due.
@@ -151,9 +151,9 @@ class MutableStack(MutableBaseObject):
     def __init__(
         self,
         name: str,
-        contents: Optional[List[Dict[str, Any]]] = None,
+        contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
-        customfield_values: Optional[List[Dict[str, Any]]] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
@@ -170,9 +170,9 @@ class MutableStack(MutableBaseObject):
         Initializes a new instance of the MutableStack class.
 
         Args:
-            contents (Optional[List[Dict[str, Any]]]): The list of the contents of the stack.
+            contents(Optional[List[str]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
-            customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -194,7 +194,7 @@ class MutableStack(MutableBaseObject):
         super().__init__(
             contents=contents,
             created_at=created_at,
-            customfield_values=customfield_values,
+            custom_field_values=custom_field_values,
             description=description,
             difficulty=difficulty,
             due_by=due_by,
@@ -314,9 +314,9 @@ class StackFactory:
     def create_stack(
         cls,
         name: str,
-        contents: Optional[List[Dict[str, Any]]] = None,
+        contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
-        customfield_values: Optional[List[Dict[str, Any]]] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
@@ -333,9 +333,9 @@ class StackFactory:
         Creates and returns a new instance of the ImmutableStack class.
 
         Args:
-            contents (Optional[List[Dict[str, Any]]]): The list of the contents of the stack.
+            contents(Optional[List[str]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
-            customfield_values (Optional[List[Dict[str, Any]]]): The customfield values of the stack.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The customfield values of the stack.
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -360,7 +360,7 @@ class StackFactory:
             return ImmutableStack(
                 contents=contents,
                 created_at=created_at,
-                customfield_values=customfield_values,
+                custom_field_values=custom_field_values,
                 description=description,
                 difficulty=difficulty,
                 due_by=due_by,
@@ -557,7 +557,7 @@ class StackManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_stacks():
                 # Return the list of immutable stacks from the cache
                 return self.get_cache_values()
 
@@ -771,25 +771,26 @@ class StackManager(BaseObjectManager):
     def update_stack(
         self,
         stack: Union[ImmutableStack, MutableStack],
-    ) -> Optional[ImmutableStack]:
+    ) -> bool:
         """
-        Updates a stack with the given ID.
+        Updates a given stack in the database.
 
         Args:
             stack (Union[ImmutableStack, MutableStack]): The stack to update.
 
         Returns:
-            Optional[ImmutableStack]: The updated stack if no exception occurs. Otherwise, None.
+            bool: True if update was successful, False otherwise.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Convert the stack to an immutable stack and update the stack in the database
-            model: Optional[StackModel] = asyncio.run(
+            # Convert the stack to an immutable stack and attempte to update the stack in the database
+            return asyncio.run(
                 StackConverter.object_to_model(
                     object=ImmutableStack(**stack.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **stack.to_dict(
                         exclude=[
                             "_id",
@@ -797,41 +798,17 @@ class StackManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
-
-            # Return the updated stack if it exists
-            if model is not None:
-                # Convert the StackModel object to an ImmutableStack object
-                stack = ImmutableStack(
-                    **model.to_dict(
-                        exclude=[
-                            "_logger",
-                            "table",
-                        ]
-                    )
-                )
-
-                # Add the stack to the cache
-                self.update_in_cache(
-                    key=stack.key,
-                    value=stack,
-                )
-
-                # Return the updated stack
-                return stack
-            else:
-                # Return None indicating that the stack does not exist
-                return None
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Return None indicating an exception has occurred
-            return None
+            # Return False indicating an exception has occurred
+            return False
 
 
 class StackModel(ImmutableBaseModel):
@@ -840,7 +817,7 @@ class StackModel(ImmutableBaseModel):
 
     Attributes:
         created_at (Optional[datetime]): The timestamp when the stack was created.
-        customfield_values (Optional[JSON]): The values of the custom fields.
+        custom_field_values (Optional[JSON]): The values of the custom fields.
         description (Optional[str]): The description of the stack.
         difficulty (Optional[int]): The difficulty of the stack.
         due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -905,13 +882,13 @@ class StackModel(ImmutableBaseModel):
         unique=False,
     )
 
-    customfield_values: Field = Field(
+    custom_field_values: Field = Field(
         autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
         index=False,
-        name="customfield_values",
+        name="custom_field_values",
         nullable=False,
         on_delete=None,
         on_update=None,
@@ -932,8 +909,8 @@ class StackModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=255,
-        type="VARCHAR",
+        size=None,
+        type="TEXT",
         unique=False,
     )
 
@@ -1099,9 +1076,9 @@ class StackModel(ImmutableBaseModel):
 
     def __init__(
         self,
-        contents: Optional[List[Dict[str, Any]]] = None,
+        contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
-        customfield_values: Optional[List[Dict[str, Any]]] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
@@ -1119,9 +1096,9 @@ class StackModel(ImmutableBaseModel):
         Initializes a new instance of the StackModel class.
 
         Args:
-            contents (Optional[List[Dict[str, Any]]]): The contents of the stack.
+            contents(Optional[List[str]]): The contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
-            customfield_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            custom_field_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -1141,7 +1118,7 @@ class StackModel(ImmutableBaseModel):
         super().__init__(
             contents=contents,
             created_at=created_at,
-            customfield_values=customfield_values,
+            custom_field_values=custom_field_values,
             description=description,
             difficulty=difficulty,
             due_by=due_by,

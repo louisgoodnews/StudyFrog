@@ -481,7 +481,7 @@ class DefaultManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_defaults():
                 # Return the list of immutable defaults from the cache
                 return self.get_cache_values()
 
@@ -734,6 +734,7 @@ class DefaultManager(BaseObjectManager):
                 DefaultConverter.object_to_model(
                     object=ImmutableDefault(**default.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **default.to_dict(
                         exclude=[
                             "_id",

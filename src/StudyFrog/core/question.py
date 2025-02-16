@@ -489,7 +489,7 @@ class QuestionManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count():
+            if self.cache and len(self._cache) == self.count_questions():
                 # Return the list of immutable questions from the cache
                 return self.get_cache_values()
 
@@ -723,6 +723,7 @@ class QuestionManager(BaseObjectManager):
                 QuestionConverter.object_to_model(
                     object=ImmutableQuestion(**question.to_dict(exclude=["_logger"]))
                 ).update(
+                    database=Constants.DATABASE_PATH,
                     **question.to_dict(
                         exclude=[
                             "_id",
@@ -730,7 +731,7 @@ class QuestionManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 
