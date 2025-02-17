@@ -548,6 +548,7 @@ class Constants:
     REPORT_UI_NAMESPACE: str = "REPORT_UI"
     SEARCH_UI_NAMESPACE: str = "SEARCH_UI"
     SETTING_UI_NAMESPACE: str = "SETTING_UI"
+    SETTING_UI_NAMESPACE: str = "SETTING_UI"
 
     NOW: datetime = datetime.now()
 

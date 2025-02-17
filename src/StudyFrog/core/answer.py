@@ -41,7 +41,6 @@ class ImmutableAnswer(ImmutableBaseObject):
         created_at (datetime): The timestamp when the answer was created.
         custom_field_values (List[Dict[str, Any]]): A list of custom field values.
         id (int): The ID of the answer.
-        is_correct (bool): Whether the answer is correct or not.
         key (str): The key of the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
         uuid (str): The UUID of the answer.
@@ -53,7 +52,6 @@ class ImmutableAnswer(ImmutableBaseObject):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
-        is_correct: Optional[bool] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -66,7 +64,6 @@ class ImmutableAnswer(ImmutableBaseObject):
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             id (Optional[int]): The ID of the answer.
-            is_correct (Optional[bool]): Whether the answer is correct or not.
             key (Optional[str]): The key of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
@@ -81,7 +78,6 @@ class ImmutableAnswer(ImmutableBaseObject):
             created_at=created_at,
             custom_field_values=custom_field_values,
             id=id,
-            is_correct=is_correct,
             key=key,
             updated_at=updated_at,
             uuid=uuid,
@@ -108,7 +104,6 @@ class MutableAnswer(MutableBaseObject):
         created_at (datetime): The timestamp when the answer was created.
         custom_field_values (List[Dict[str, Any]]): A list of custom field values.
         id (int): The ID of the answer.
-        is_correct (bool): Whether the answer is correct or not.
         key (str): The key of the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
         uuid (str): The UUID of the answer.
@@ -120,7 +115,6 @@ class MutableAnswer(MutableBaseObject):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
-        is_correct: Optional[bool] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -133,7 +127,6 @@ class MutableAnswer(MutableBaseObject):
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             id (Optional[int]): The ID of the answer.
-            is_correct (Optional[bool]): Whether the answer is correct or not.
             key (Optional[str]): The key of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
@@ -148,7 +141,6 @@ class MutableAnswer(MutableBaseObject):
             created_at=created_at,
             custom_field_values=custom_field_values,
             id=id,
-            is_correct=is_correct,
             key=key,
             updated_at=updated_at,
             uuid=uuid,
@@ -262,7 +254,6 @@ class AnswerFactory:
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
-        is_correct: Optional[bool] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -275,7 +266,6 @@ class AnswerFactory:
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             id (Optional[int]): The ID of the answer.
-            is_correct (Optional[bool]): Whether the answer is correct or not.
             key (Optional[str]): The key of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
@@ -293,7 +283,6 @@ class AnswerFactory:
                 created_at=created_at,
                 custom_field_values=custom_field_values,
                 id=id,
-                is_correct=is_correct,
                 key=key,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -835,7 +824,6 @@ class AnswerModel(ImmutableBaseModel):
         answer_text (Optional[str]): The text of the answer.
         created_at (Optional[datetime]): The timestamp when the answer was created.
         id (Optional[int]): The ID of the answer.
-        is_correct (Optional[bool]): Whether the answer is correct or not.
         key (Optional[str]): The key of the answer.
         table (str): The table name of the answer model.
         updated_at (Optional[datetime]): The timestamp when the answer was last updated.
@@ -908,22 +896,6 @@ class AnswerModel(ImmutableBaseModel):
         unique=False,
     )
 
-    is_correct: Field = Field(
-        autoincrement=False,
-        default=None,
-        description="",
-        foreign_key=None,
-        index=False,
-        name="is_correct",
-        nullable=True,
-        on_delete=None,
-        on_update=None,
-        primary_key=False,
-        size=None,
-        type="BOOLEAN",
-        unique=False,
-    )
-
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -978,7 +950,6 @@ class AnswerModel(ImmutableBaseModel):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
-        is_correct: Optional[bool] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -991,7 +962,6 @@ class AnswerModel(ImmutableBaseModel):
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             id (Optional[int]): The ID of the answer.
-            is_correct (Optional[bool]): Whether the answer is correct or not.
             key (Optional[str]): The key of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
@@ -1005,7 +975,6 @@ class AnswerModel(ImmutableBaseModel):
             answer_text=answer_text,
             created_at=created_at,
             id=id,
-            is_correct=is_correct,
             key=key,
             table=Constants.ANSWERS,
             updated_at=updated_at,

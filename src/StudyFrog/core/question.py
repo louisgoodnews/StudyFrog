@@ -33,10 +33,11 @@ class ImmutableQuestion(ImmutableBaseObject):
     An immutable class representing a question.
 
     Attributes:
+        answers (Optional[List[str]]): The answers to the question.
+        correct_answers (Optional[List[str]]): The correct answers to the question.
         created_at (datetime): The timestamp when the question was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
         id (int): The ID of the question.
-        is_correct (bool): Whether the question is correct or not.
         key (str): The key of the question.
         question_text (str): The text of the question.
         question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
@@ -48,7 +49,8 @@ class ImmutableQuestion(ImmutableBaseObject):
         self,
         question_text: str,
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
-        correct_answer: Optional[Union[int, bool]] = None,
+        answers: Optional[List[str]] = None,
+        correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
@@ -60,13 +62,14 @@ class ImmutableQuestion(ImmutableBaseObject):
         Initializes a new instance of the ImmutableQuestion class.
 
         Args:
-            correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
+            question_text (str): The text of the question.
+            question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
+            answers (Optional[List[str]]): The answers to the question.
+            correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
-            question_text (str): The text of the question.
-            question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -76,7 +79,8 @@ class ImmutableQuestion(ImmutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
-            correct_answer=correct_answer,
+            answers=answers,
+            correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
             id=id,
@@ -104,8 +108,10 @@ class MutableQuestion(MutableBaseObject):
     A mutable class representing a question.
 
     Attributes:
-        correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
+        answers (Optional[List[str]]): The answers to the question.
+        correct_answers (Optional[List[str]]): The correct answers to the question.
         created_at (Optional[datetime]): The timestamp when the question was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
         id (Optional[int]): The ID of the question.
         key (Optional[str]): The key of the question.
         question_text (str): The text of the question.
@@ -118,7 +124,8 @@ class MutableQuestion(MutableBaseObject):
         self,
         question_text: str,
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
-        correct_answer: Optional[Union[int, bool]] = None,
+        answers: Optional[List[str]] = None,
+        correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
@@ -132,7 +139,8 @@ class MutableQuestion(MutableBaseObject):
         Args:
             question_text (str): The text of the question.
             question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
-            correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
+            answers (Optional[List[str]]): The answers to the question.
+            correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             id (Optional[int]): The ID of the question.
@@ -146,7 +154,8 @@ class MutableQuestion(MutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
-            correct_answer=correct_answer,
+            answers=answers,
+            correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
             id=id,
@@ -263,7 +272,8 @@ class QuestionFactory:
         cls,
         question_text: str,
         question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
-        correct_answer: Optional[Union[int, bool]] = None,
+        answers: Optional[List[str]] = None,
+        correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
@@ -277,7 +287,8 @@ class QuestionFactory:
         Args:
             question_text (str): The text of the question.
             question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
-            correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
+            answers (Optional[List[str]]): The answers to the question.
+            correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             id (Optional[int]): The ID of the question.
@@ -291,7 +302,8 @@ class QuestionFactory:
         try:
             # Attempt to create an d return an MutableQuestion object
             return MutableQuestion(
-                correct_answer=correct_answer,
+                answers=answers,
+                correct_answers=correct_answers,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
                 id=id,
@@ -772,7 +784,8 @@ class QuestionModel(ImmutableBaseModel):
 
     Attributes:
         id (Field): The ID field of the question.
-        correct_answer (Field): The correct answer of the question.
+        answers (Field): The answers of the question.
+        correct_answers (Field): The correct answers of the question.
         created_at (Field): The timestamp when the question was created.
         key (Field): The key of the question.
         question_text (Field): The text of the question.
@@ -800,19 +813,35 @@ class QuestionModel(ImmutableBaseModel):
         unique=False,
     )
 
-    correct_answer: Field = Field(
+    answers: Field = Field(
         autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
         index=False,
-        name="correct_answer",
-        nullable=False,
+        name="answers",
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=None,
-        type="INTEGER",
+        type="JSON",
+        unique=False,
+    )
+
+    correct_answers: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="correct_answers",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
         unique=False,
     )
 
@@ -875,8 +904,8 @@ class QuestionModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=255,
-        type="VARCHAR",
+        size=None,
+        type="TEXT",
         unique=False,
     )
 
@@ -930,7 +959,8 @@ class QuestionModel(ImmutableBaseModel):
 
     def __init__(
         self,
-        correct_answer: Optional[Union[int, bool]] = None,
+        answers: Optional[List[str]] = None,
+        correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[Dict[str, Any]] = None,
         id: Optional[int] = None,
@@ -946,7 +976,8 @@ class QuestionModel(ImmutableBaseModel):
         Initializes a new instance of the MutableQuestion class.
 
         Args:
-            correct_answer (Optional[Union[int, bool]]): The ID of the correct Question or whether the question is correct.
+            answers (Optional[List[str]]): The answers to the question.
+            correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[Dict[str, Any]]): The values of the custom fields.
             id (Optional[int]): The ID of the question.
@@ -962,7 +993,8 @@ class QuestionModel(ImmutableBaseModel):
 
         # Call the parent class constructor
         super().__init__(
-            correct_answer=correct_answer,
+            answers=answers,
+            correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
             id=id,
