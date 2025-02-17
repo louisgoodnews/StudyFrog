@@ -123,6 +123,48 @@ class BootstrapService:
             unified_manager=self.unified_object_manager
         )
 
+    def create_default_answers(self) -> None:
+        """
+        Creates default answer entries in the database if they do not exist.
+
+        This method checks for the existence of default answers in the database,
+        and creates them if they are not found. It uses the unified object manager
+        to retrieve and create default answers.
+        """
+        try:
+            # Define a list of answer names
+            answers: List[str] = [
+                Constants.TRUE,
+                Constants.FALSE,
+            ]
+
+            # Iterate over the answer names
+            for answer in answers:
+                # Check if the default answer exists in the database
+                if not self.unified_object_manager.get_default_by(
+                    field="name",
+                    value=f"answer:{answer}",
+                ):
+                    # Create the default answer if it does not exist
+                    self.unified_object_manager.create_default(
+                        default=DefaultFactory.create_default(
+                            name=f"answer:{answer}",
+                            type="answer",
+                            value=answer.capitalize(),
+                        )
+                    )
+
+            # Retrieve the default answers from the database
+            self.unified_object_manager.get_default_answers()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default_answers' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
     def create_default_difficulties(self) -> None:
         """
         Creates default difficulty entries in the database if they do not exist.
@@ -731,6 +773,9 @@ class BootstrapService:
 
             # Register the menus with the UIRegistry
             self.register_menus()
+
+            # Create the default answers
+            self.create_default_answers()
 
             # Create the default difficulties
             self.create_default_difficulties()

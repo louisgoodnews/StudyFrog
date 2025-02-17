@@ -5,8 +5,6 @@ Date: 2025-02-05
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -841,7 +839,7 @@ class QuestionModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="custom_field_values",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,

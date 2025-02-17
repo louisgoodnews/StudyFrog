@@ -330,7 +330,7 @@ class AnswerManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count(self) -> int:
+    def count_answers(self) -> int:
         """
         Returns the number of answers in the database.
 
@@ -696,6 +696,70 @@ class AnswerManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def get_default_answers(self) -> Optional[List[ImmutableAnswer]]:
+        """
+        Retrieves the default answers from the database.
+
+        Returns:
+            Optional[List[ImmutableAnswer]]: A list of default answers if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If no 'difficulty' defaults are found or any other exception occurs.
+        """
+        try:
+            # Import necessary classes
+            from core.default import ImmutableDefault, DefaultManager
+
+            # Initialize an empty list to store the answers
+            result: List[ImmutableAnswer] = []
+
+            # Retrieve defaults with the name 'answer'
+            defaults: Optional[List[ImmutableDefault]] = [
+                DefaultManager().get_default_by(
+                    field="name",
+                    value=f"answer:{answer}",
+                )
+                for answer in [
+                    Constants.TRUE,
+                    Constants.FALSE,
+                ]
+            ]
+
+            # Raise exception if no defaults are found
+            if not defaults:
+                raise Exception("Found no 'answer' defaults in the database.")
+
+            # Iterate over each default
+            for default in defaults:
+                # Check if the answer already exists
+                existing_answer: Optional[ImmutableAnswer] = self.get_answer_by(
+                    field="answer_text",
+                    value=default.value,
+                )
+
+                if not existing_answer:
+                    # Create a new answer if it doesn't exist
+                    answer: ImmutableAnswer = AnswerFactory.create_answer(
+                        answer_text=default.value,
+                    )
+
+                    # Add the newly created answer to the result
+                    result.append(self.create_answer(answer=answer))
+                else:
+                    # If the answer exists, retrieve it from the database
+                    result.append(existing_answer)
+
+            # Return the list of answers
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_default_answers' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_answer(
         self,
         answer: Union[ImmutableAnswer, MutableAnswer],
@@ -835,12 +899,28 @@ class AnswerModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="custom_field_values",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=None,
         type="JSON",
+        unique=False,
+    )
+
+    is_correct: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="is_correct",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="BOOLEAN",
         unique=False,
     )
 

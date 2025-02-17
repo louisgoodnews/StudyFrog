@@ -799,7 +799,7 @@ class DifficultyManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

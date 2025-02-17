@@ -89,6 +89,9 @@ class Constants:
     * MEDIUM: The medium difficulty.
     * EASY: The easy difficulty.
 
+    * TRUE: The true value.
+    * FALSE: The false value.
+
     * ANSWER_NAMESPACE: The namespace for the answer UI.
     * ASSOCIATION_NAMESPACE: The namespace for the association UI.
     * CHANGE_HISTORY_NAMESPACE: The namespace for the change history UI.
@@ -534,6 +537,9 @@ class Constants:
     LEARNING: str = "learning"
     REVIEW: str = "review"
     COMPLETED: str = "completed"
+
+    TRUE: str = "true"
+    FALSE: str = "false"
 
     CREATE_UI_NAMESPACE: str = "CREATE_UI"
     DASHBOARD_UI_NAMESPACE: str = "DASHBOARD_UI"

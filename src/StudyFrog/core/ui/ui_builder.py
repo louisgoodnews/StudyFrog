@@ -1537,6 +1537,12 @@ class UIBuilder:
                 sequence="<Configure>",
             )
 
+            # Configure the "Frame" frame widget's 1st column to weight 1
+            result["frame"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
             # Return the result dictionary
             return result
         except Exception as e:

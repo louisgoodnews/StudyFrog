@@ -145,7 +145,7 @@ class FlashcardCreateForm(tkinter.Frame):
             ),
             foreground=Constants.WHITE,
             master=self,
-            text="Please fill in the fields below to create a new stack.\nFields marked with an asterisk (*) are required.",
+            text="Please fill in the fields below to create a new flashcard.\nFields marked with an asterisk (*) are required.",
         )
 
         # Place the instruction label in the grid

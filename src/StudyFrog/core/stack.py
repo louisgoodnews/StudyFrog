@@ -889,7 +889,7 @@ class StackModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="custom_field_values",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
