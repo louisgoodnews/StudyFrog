@@ -563,8 +563,8 @@ class CreateUI(tkinter.Frame):
 
         # Bind the combobox widget to the on_combobox_select method
         self.combobox.bind(
-            sequence="<<ComboboxSelected>>",
             func=lambda event: self.on_combobox_select(),
+            sequence="<<ComboboxSelected>>",
         )
 
         # Place the combobox widget in the top frame

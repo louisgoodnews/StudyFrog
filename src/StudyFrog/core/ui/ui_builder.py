@@ -337,16 +337,24 @@ class UIBuilder:
                 # Set the content of the combobox widget to an empty string
                 result["combobox"].set("")
 
-            def get() -> str:
+            def get() -> Optional[str]:
                 """
                 Retrieves the content of the combobox widget.
 
                 Returns:
-                    str: The content of the combobox widget.
+                    Optional[str]: The content of the combobox widget.
                 """
 
+                # Attempt to obtain the current value of the combobox widget
+                string: Optional[str] = result["combobox"].get()
+
+                # Check, if the content of the combobox widget is an empty string
+                if string == "" or string is None:
+                    # Return early
+                    return None
+
                 # Return the content of the combobox widget
-                return result["combobox"].get()
+                return string
 
             def set(value: str) -> None:
                 """
@@ -493,16 +501,24 @@ class UIBuilder:
                     END,
                 )
 
-            def get() -> str:
+            def get() -> Optional[str]:
                 """
                 Retrieves the content of the entry widget.
 
                 Returns:
-                    str: The content of the entry widget.
+                    Optional[str]: The content of the entry widget.
                 """
 
+                # Attempt to obtain the current value of the entry widget
+                string: Optional[str] = result["entry"].get()
+
+                # Check, if the content of the entry widget is an empty string
+                if string == "" or string is None:
+                    # Return early
+                    return None
+
                 # Return the content of the entry widget
-                return result["entry"].get()
+                return string
 
             def on_key_release() -> None:
                 """
@@ -517,12 +533,12 @@ class UIBuilder:
                 # Attempt to validate the date format and check if it's a valid calendar date
                 if validate(value=get()):
                     # If the date is valid, set the entry background to white and the warning text to empty
-                    result["entry"].config(
+                    result["entry"].configure(
                         background=Constants.WHITE,
                     )
 
                     # Configure the "Warner" label widget to display no text
-                    result["warner"].config(
+                    result["warner"].configure(
                         foreground=Constants.RED["200"],
                         text="",
                     )
@@ -531,12 +547,12 @@ class UIBuilder:
                     result["warner"].grid_forget()
                 else:
                     # If the date is invalid, set the entry background to red and display a warning message
-                    result["entry"].config(
+                    result["entry"].configure(
                         background=Constants.RED["200"],
                     )
 
                     # Display a warning message
-                    result["warner"].config(
+                    result["warner"].configure(
                         foreground=Constants.RED["200"],
                         text="Invalid date format! Use YYYY-MM-DD",
                     )
@@ -737,6 +753,186 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_float_spinbox_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        step_size: float = 1.0,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a tkinter widgets dictionary for a float spinbox field.
+
+        The returned dictionary contains the following keys:
+            - "root": The container frame for the widgets
+            - "label": The label widget
+            - "variable": The tkinter.DoubleVar variable
+            - "decrement_button": The decrement button widget
+            - "entry": The entry widget
+            - "increment_button": The increment button widget
+            - "clearer": A function to clear the value of the variable
+            - "getter": A function to retrieve the value of the variable
+            - "setter": A function to set the value of the variable
+
+        Args:
+            label (str): The text for the label widget.
+            master (tkinter.Misc): The master widget for placing the container frame.
+            step_size (float): The step size for the float spinbox. Defaults to 1.0.
+            **kwargs: Additional keyword arguments for the entry widget.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the tkinter widgets dictionary.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the value of the variable.
+
+                Returns:
+                    None
+                """
+
+                # Set the value of the variable to 0
+                result["variable"].set(value=0.0)
+
+            def decrement() -> None:
+                """
+                Decrements the value of the variable by the step size.
+
+                Returns:
+                    None
+                """
+
+                # Decrement the value of the variable
+                result["variable"].set(result["variable"].get() - step_size)
+
+            def get() -> float:
+                """
+                Returns the current value of the variable.
+
+                Returns:
+                    float: The current value of the variable.
+                """
+
+                # Return the value of the variable
+                return result["variable"].get()
+
+            def increment() -> None:
+                """
+                Increments the value of the variable by the step size.
+
+                Returns:
+                    None
+                """
+
+                # Increment the value of the variable
+                result["variable"].set(result["variable"].get() + step_size)
+
+            def set(value: float) -> None:
+                """
+                Sets the value of the variable.
+
+                Args:
+                    value (float): The value to set the variable to.
+
+                Returns:
+                    None
+                """
+
+                # Set the value of the variable
+                result["variable"].set(value=value)
+
+            # Create the "Variable" tkinter.DoubleVar variable
+            result["variable"] = cls.get_double_variable(value=0.0)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 0th column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=3,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Create the "Decrement" button widget
+            result["decrement_button"] = cls.get_button(
+                command=decrement,
+                master=result["root"],
+                text="-",
+            )
+
+            # Create the "Entry" entry widget
+            result["entry"] = cls.get_entry(
+                master=result["root"],
+                state="readonly",
+                textvariable=result["variable"],
+                **kwargs,
+            )
+
+            # Create the "Increment" button widget
+            result["increment_button"] = cls.get_button(
+                command=increment,
+                master=result["root"],
+                text="+",
+            )
+
+            # Add the clear function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_float_spinbox_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_float_variable(
         cls,
         master: Optional[tkinter.Misc] = None,
@@ -845,6 +1041,186 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_integer_spinbox_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        setp_size: int = 1,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a tkinter widgets dictionary for an integer spinbox field.
+
+        The returned dictionary contains the following keys:
+            - "root": The container frame for the widgets
+            - "label": The label widget
+            - "variable": The tkinter.IntVar variable
+            - "decrement_button": The decrement button widget
+            - "entry": The entry widget
+            - "increment_button": The increment button widget
+            - "clearer": A function to clear the value of the variable
+            - "getter": A function to retrieve the value of the variable
+            - "setter": A function to set the value of the variable
+
+        Args:
+            label (str): The text for the label widget.
+            master (tkinter.Misc): The master widget for placing the container frame.
+            setp_size (int): The step size for the integer spinbox. Defaults to 1.
+            **kwargs: Additional keyword arguments for the entry widget.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.IntVar.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the value of the variable.
+
+                Returns:
+                    None
+                """
+
+                # Set the value of the variable to 0
+                result["variable"].set(value=0)
+
+            def decrement() -> None:
+                """
+                Decrements the value of the variable by the step size.
+
+                Returns:
+                    None
+                """
+
+                # Decrement the value of the variable
+                result["variable"].set(result["variable"].get() - setp_size)
+
+            def get() -> int:
+                """
+                Returns the current value of the variable.
+
+                Returns:
+                    int: The current value of the variable.
+                """
+
+                # Return the value of the variable
+                return result["variable"].get()
+
+            def increment() -> None:
+                """
+                Increments the value of the variable by the step size.
+
+                Returns:
+                    None
+                """
+
+                # Increment the value of the variable
+                result["variable"].set(result["variable"].get() + setp_size)
+
+            def set(value: int) -> None:
+                """
+                Sets the value of the variable.
+
+                Args:
+                    value (int): The value to set the variable to.
+
+                Returns:
+                    None
+                """
+
+                # Set the value of the variable
+                result["variable"].set(value=value)
+
+            # Create the "Variable" tkinter.IntVar variable
+            result["variable"] = cls.get_int_variable(value=0)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 0th column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=3,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Create the "Decrement" button widget
+            result["decrement_button"] = cls.get_button(
+                command=decrement,
+                master=result["root"],
+                text="-",
+            )
+
+            # Create the "Entry" entry widget
+            result["entry"] = cls.get_entry(
+                master=result["root"],
+                state="readonly",
+                textvariable=result["variable"],
+                **kwargs,
+            )
+
+            # Create the "Increment" button widget
+            result["increment_button"] = cls.get_button(
+                command=increment,
+                master=result["root"],
+                text="+",
+            )
+
+            # Add the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_integer_spinbox_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_label(
         cls,
         master: tkinter.Misc,
@@ -947,6 +1323,145 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_multiple_choice_answer_field(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the value of the multiple choice answer field.
+
+                Returns:
+                    None
+                """
+
+                # Delete the current content of the entry widget
+                result["entry"].delete(
+                    0,
+                    END,
+                )
+
+            def get() -> Optional[Dict[str, Any]]:
+                """
+                Retrieves the value of the multiple choice answer field.
+
+                The value is stored in a dictionary with the following keys:
+                    - "value": The value of the multiple choice answer field.
+                    - "is_correct": A boolean indicating whether the answer is correct or not.
+
+                If the value is an empty string or the is_correct variable is None, the value is set to None.
+
+                Returns:
+                    Optional[Dict[str, Any]]: The dictionary containing the value of the multiple choice answer field or None if an exception occurs.
+                """
+
+                # Initialize the dictionary as an empty dictionary
+                dictionary: Dict[str, Any] = {}
+
+                # Get the value of the is_correct variable
+                dictionary["is_correct"] = result["is_correct"].get()
+
+                # Get the value of the entry widget
+                dictionary["value"] = result["entry"].get()
+
+                if dictionary["value"] == "" or dictionary["is_correct"] is None:
+                    # If the value is empty or the is_correct variable is None, set the value to None
+                    dictionary["value"] = None
+
+                # Return the dictionary
+                return dictionary
+
+            def set(value: str) -> None:
+                """
+                Sets the value of the multiple choice answer field.
+
+                Args:
+                    value (str): The value to set.
+
+                Returns:
+                    None
+                """
+
+                # Delete the current content of the entry widget
+                result["entry"].delete(
+                    0,
+                    END,
+                )
+
+                # Insert the new value into the entry widget
+                result["entry"].insert(
+                    0,
+                    value,
+                )
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 0
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Create the "Is correct" boolean variable
+            result["is_correct"] = cls.get_bool_variable(value=False)
+
+            # Create the "Check button" checkbutton widget
+            result["checkbutton"] = cls.get_checkbutton(
+                master=result["root"],
+                text="Is correct? ",
+                variable=result["is_correct"],
+            )
+
+            # Place the "Check button" checkbutton widget in the "Root" frame widget
+            result["checkbutton"].grid(
+                row=0,
+                column=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Entry" entry widget
+            result["entry"] = cls.get_entry(
+                master=result["root"],
+                **kwargs,
+            )
+
+            # Place the "Entry" entry widget in the "Root" frame widget
+            result["entry"].grid(
+                row=0,
+                column=1,
+                sticky=NSEW,
+            )
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_multiple_choice_answer_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_multi_line_text_field(
         cls,
         label: str,
@@ -991,19 +1506,27 @@ class UIBuilder:
                     END,
                 )
 
-            def get() -> str:
+            def get() -> Optional[str]:
                 """
                 Retrieves the content of the text widget.
 
                 Returns:
-                    str: The content of the text widget.
+                    Optional[str]: The content of the text widget.
                 """
 
-                # Get and return all content from the text widget
-                return result["text"].get(
+                # Attempt to obtain the current value of the text widget
+                string: Optional[str] = result["text"].get(
                     "1.0",
                     END,
                 )
+
+                # Check, if the content of the text widget is an empty string
+                if string == "":
+                    # Return early
+                    return None
+
+                # Return the content of the text widget
+                return string
 
             def set(value: str) -> None:
                 """
@@ -1442,26 +1965,6 @@ class UIBuilder:
             # Initialise the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            def on_frame_configure(event: tkinter.Event) -> None:
-                """
-                Resizes the canvas whenever the containing frame is resized.
-
-                This method is called whenever the containing frame is resized. It resizes the
-                canvas to fit the new size of the frame.
-
-                Args:
-                    event (tkinter.Event): The event that triggered this method call.
-
-                Returns:
-                    None
-                """
-                result["canvas"].configure(scrollregion=result["canvas"].bbox("all"))
-                result["canvas"].itemconfig(
-                    id,
-                    anchor="nw",
-                    width=result["canvas"].winfo_width(),
-                )
-
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(
                 master=master,
@@ -1487,7 +1990,8 @@ class UIBuilder:
 
             # Create the "Scrollbar" scrollbar widget
             result["scrollbar"] = cls.get_scrollbar(
-                master=master,
+                master=result["root"],
+                orient=VERTICAL,
             )
 
             # Grid the "Scrollbar" scrollbar widget in the "Root" frame widget
@@ -1499,15 +2003,7 @@ class UIBuilder:
 
             # Create the "Canvas" canvas widget
             result["canvas"] = cls.get_canvas(
-                master=master,
-                yscrollcommand=result["scrollbar"].set,
-            )
-
-            # Grid the "Canvas" canvas widget in the "Root" frame widget
-            result["canvas"].grid(
-                column=0,
-                row=0,
-                sticky=NSEW,
+                master=result["root"],
             )
 
             # Create the "Frame" frame widget
@@ -1516,13 +2012,25 @@ class UIBuilder:
                 **kwargs,
             )
 
+            # Configure the "Frame" frame widget's 1st column to weight 1
+            result["frame"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Frame" frame widget's 1st row to weight 1
+            result["frame"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
             # Configure the "Scrollbar" scrollbar widget to the canvas
-            result["scrollbar"].config(
+            result["scrollbar"].configure(
                 command=result["canvas"].yview,
             )
 
             # Add the "Frame" frame widget to the "Canvas" canvas widget
-            id: int = result["canvas"].create_window(
+            result["window_id"] = result["canvas"].create_window(
                 (
                     0,
                     0,
@@ -1531,16 +2039,30 @@ class UIBuilder:
                 window=result["frame"],
             )
 
+            # Configure the "Canvas" canvas widget to use the "Scrollbar" scrollbar widget
+            result["canvas"].configure(yscrollcommand=result["scrollbar"].set)
+
             # Bind the "Frame" frame widget to the "Configure" event
             result["frame"].bind(
-                func=on_frame_configure,
+                func=lambda event: (
+                    result["canvas"].configure(scrollregion=result["canvas"].bbox(ALL)),
+                    result["canvas"].itemconfig(
+                        result["window_id"], width=result["canvas"].winfo_width()
+                    ),
+                ),
                 sequence="<Configure>",
             )
 
-            # Configure the "Frame" frame widget's 1st column to weight 1
-            result["frame"].grid_columnconfigure(
-                index=0,
-                weight=1,
+            # Configure the "Frame" widget in the "Canvas" widget
+            result["canvas"].itemconfig(
+                result["window_id"], width=result["canvas"].winfo_width()
+            )
+
+            # Grid the "Canvas" canvas widget in the "Root" frame widget
+            result["canvas"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
             )
 
             # Return the result dictionary
@@ -1552,6 +2074,313 @@ class UIBuilder:
             )
 
             # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_scrolled_text(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a scrolled text widget.
+
+        This function creates a new instance of a scrolled text widget, which
+        consists of a text widget and an associated vertical scrollbar. The
+        text widget can be used to display or edit multi-line text content.
+
+        The dictionary contains:
+            - "root": The "Root" frame widget.
+            - "text": The text widget.
+            - "scrollbar": The scrollbar widget.
+
+        Args:
+            master (tkinter.Misc): The master widget.
+            **kwargs: Any additional keyword arguments to be passed to the
+                text widget's constructor.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created scrolled text widget
+            instance.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a
+                new instance of the scrolled text widget.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the contents of the scrolled text widget.
+
+                This function is called when the "Clear" button is pressed.
+
+                Returns:
+                    None
+                """
+
+                # Delete the contents of the text widget
+                result["text"].delete(
+                    "1.0",
+                    END,
+                )
+
+            def get() -> str:
+                """
+                Gets the contents of the scrolled text widget.
+
+                Returns:
+                    str: The contents of the scrolled text widget.
+                """
+
+                # Return the contents of the text widget
+                return result["text"].get(
+                    "1.0",
+                    END,
+                )
+
+            def set(value: str) -> None:
+                """
+                Sets the contents of the scrolled text widget.
+
+                Args:
+                    value (str): The new contents for the scrolled text widget.
+                """
+
+                # Delete the current content of the text widget
+                result["text"].delete(
+                    "1.0",
+                    END,
+                )
+
+                # Insert the new contents into the text widget
+                result["text"].insert(
+                    "1.0",
+                    value,
+                )
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 1 (expandable)
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 0 (fixed size)
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 1 (expandable)
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Text" text widget
+            result["text"] = cls.get_text(
+                master=result["root"],
+                **kwargs,
+            )
+
+            # Place the "Text" text widget in the "Root" frame widget with sticky positioning
+            result["text"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Scrollbar" scrollbar widget
+            result["scrollbar"] = cls.get_scrollbar(
+                master=result["root"],
+                orient=VERTICAL,
+            )
+
+            # Place the "Scrollbar" scrollbar widget in the "Root" frame widget
+            result["scrollbar"].grid(
+                column=1,
+                row=0,
+                sticky=NS,
+            )
+
+            # Configure the "Text" text widget to use the "Scrollbar" for vertical scrolling
+            result["text"].configure(yscrollcommand=result["scrollbar"].set)
+
+            # Configure the "Scrollbar" to control the "Text" text widget's vertical view
+            result["scrollbar"].configure(command=result["text"].yview)
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary containing the scrolled text widget components
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_scrolled_text' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
+
+    @classmethod
+    def get_scrolled_text_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a scrolled text field widget.
+
+        A scrolled text field widget is a frame that contains a label widget,
+        a scrolled text widget, and a button widget. The label widget is used
+        to label the scrolled text widget. The scrolled text widget is used to
+        input a text query and the button widget is used to execute the text
+        query.
+
+        The dictionary contains:
+            - "root": The root frame widget of the scrolled text field
+                widget.
+            - "label": The label widget of the scrolled text field
+                widget.
+            - "scrolled_text_field": The scrolled text widget of the
+                scrolled text field widget.
+            - "button": The button widget of the scrolled text field
+                widget.
+            - "clearer": A function to clear the scrolled text widget.
+            - "getter": A function to get the value of the scrolled text
+                widget.
+            - "setter": A function to set the value of the scrolled text
+                widget.
+
+
+        Args:
+            label: The label of the scrolled text widget.
+            master: The master widget of the scrolled text widget.
+            **kwargs: Any additional keyword arguments to be passed to the
+                scrolled text widget.
+
+        Returns:
+            Optional[Dict[str, Any]]: A dictionary containing the widgets.
+
+        Raises:
+            Exception: If an exception occurs while attempting to run the
+                method.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 0 (fixed size)
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1 (flexible size)
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd column to weight 0 (fixed size)
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 0 (fixed size)
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd row to weight 1 (flexible size)
+            result["root"].grid_rowconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd row to weight 0 (fixed size)
+            result["root"].grid_rowconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Place the "Label" label widget in the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "ScrolledText" scrolled text widget
+            result["scrolled_text_field"] = cls.get_scrolled_text(
+                master=result["root"],
+                **kwargs,
+            )
+
+            # Place the "ScrolledText" scrolled text widget in the "Root" frame widget
+            result["scrolled_text_field"]["root"].grid(
+                column=1,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                command=result["scrolled_text_field"]["clearer"],
+                master=result["root"],
+                text="Clear",
+            )
+
+            # Place the "Button" button widget in the "Root" frame widget
+            result["button"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=2,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = result["scrolled_text_field"]["clearer"]
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = result["scrolled_text_field"]["getter"]
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = result["scrolled_text_field"]["setter"]
+
+            # Return the result dictionary containing the scrolled text widget components
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_scrolled_text_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occurred
             return None
 
     @classmethod
@@ -1601,17 +2430,24 @@ class UIBuilder:
                     END,
                 )
 
-            def get() -> str:
+            def get() -> Optional[str]:
                 """
-                Returns the current value of the entry widget.
-
-                Returns the current value of the entry widget. This is the
-                string that is currently displayed in the entry widget.
+                Retrieves the content of the entry widget.
 
                 Returns:
-                    str: The current value of the entry widget.
+                    Optional[str]: The content of the entry widget.
                 """
-                return result["entry"].get()
+
+                # Attempt to obtain the current value of the entry widget
+                string: Optional[str] = result["entry"].get()
+
+                # Check, if the content of the entry widget is an empty string
+                if string == "":
+                    # Return early
+                    return None
+
+                # Return the content of the entry widget
+                return string
 
             def set(value: str) -> None:
                 """
@@ -1771,16 +2607,24 @@ class UIBuilder:
                 )
 
             # Create a method to get the content of the entry widget
-            def get() -> str:
+            def get() -> Optional[str]:
                 """
                 Retrieves the content of the entry widget.
 
                 Returns:
-                    str: The content of the entry widget
+                    Optional[str]: The content of the entry widget.
                 """
 
+                # Attempt to obtain the current value of the entry widget
+                string: Optional[str] = result["entry"].get()
+
+                # Check, if the content of the entry widget is an empty string
+                if string == "" or string is None:
+                    # Return early
+                    return None
+
                 # Return the content of the entry widget
-                return result["entry"].get()
+                return string
 
             # Create a method to set the content of the entry widget
             def set(value: str) -> None:

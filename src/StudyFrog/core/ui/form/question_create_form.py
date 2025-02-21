@@ -63,6 +63,9 @@ class QuestionCreateForm(tkinter.Frame):
         # Store the unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager
 
+        # Store the question type in an instance variable
+        self.question_type: str = ""
+
         # Set the background color of the question create form widget
         self.configure(background=Constants.BLUE_GREY["700"])
 
@@ -102,9 +105,15 @@ class QuestionCreateForm(tkinter.Frame):
             weight=0,
         )
 
-        # Configure the question create form widget's 2nd row to weight 1
+        # Configure the question create form widget's 2nd row to weight 0
         self.grid_rowconfigure(
             index=1,
+            weight=0,
+        )
+
+        # Configure the question create form widget's 3rd row to weight 1
+        self.grid_rowconfigure(
+            index=2,
             weight=1,
         )
 
@@ -141,21 +150,39 @@ class QuestionCreateForm(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create a scrolled frame to hold the question create form widget
-        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=self)
+        # Create a separator widget to divide the question create form widget
+        separator: ttk.Separator = UIBuilder.get_separator(
+            master=self,
+            orient=VERTICAL,
+        )
 
-        # Style the scrolled frame "Frame" widget
-        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "Root" frame widget
-        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the scrolled frame in the grid
-        scrolled_frame["root"].grid(
+        # Place the separator in the grid
+        separator.grid(
             column=0,
             padx=5,
             pady=5,
             row=1,
+            sticky=EW,
+        )
+
+        # Create a scrolled frame to hold the question create form widget
+        self.scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=self)
+
+        # Style the scrolled frame "Canvas" widget
+        self.scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Frame" widget
+        self.scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Root" frame widget
+        self.scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the scrolled frame in the grid
+        self.scrolled_frame["root"].grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
             sticky=NSEW,
         )
 
@@ -166,7 +193,7 @@ class QuestionCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Stack*: ",
-            master=scrolled_frame["frame"],
+            master=self.scrolled_frame["frame"],
             state="readonly",
             values=[stack.name for stack in self.unified_manager.get_all_stacks()],
         )
@@ -198,13 +225,14 @@ class QuestionCreateForm(tkinter.Frame):
         )
 
         # Create a multi-line text field for the question text of the question
-        self.question_text_field: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
+        self.question_text_field: Dict[str, Any] = UIBuilder.get_scrolled_text_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
+            height=15,
             label="Question Text*: ",
-            master=scrolled_frame["frame"],
+            master=self.scrolled_frame["frame"],
         )
 
         # Style the question text field "Button" button widget
@@ -242,10 +270,11 @@ class QuestionCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Question Type*: ",
-            master=scrolled_frame["frame"],
+            master=self.scrolled_frame["frame"],
             state="readonly",
             values=[
                 "Multiple Choice",
+                "Open Answer",
                 "True/False",
             ],
         )
@@ -267,6 +296,11 @@ class QuestionCreateForm(tkinter.Frame):
         # Style the question type field "Root" frame widget
         self.question_type_field["root"].configure(
             background=Constants.BLUE_GREY["700"]
+        )
+
+        self.question_type_field["combobox"].bind(
+            func=lambda e: self.on_question_type_select(),
+            sequence="<<ComboboxSelected>>",
         )
 
         # Place the question type field in the grid
@@ -332,9 +366,126 @@ class QuestionCreateForm(tkinter.Frame):
             # Return None indicating an exception has occurred
             return None
 
+    def on_add_answer_button_click(self) -> None:
+        """
+        Handles the event when the "Add Answer" button is clicked.
+
+        This method is called when the "Add Answer" button is clicked. It creates a
+        new multiple choice answer field and adds it to the list of fields.
+        """
+        try:
+            # Check if the answer_fields list attribute exists
+            if not hasattr(
+                self,
+                "answer_fields",
+            ):
+                # Initialize the answer_fields list attribute
+                self.answer_fields: List[tkinter.Misc] = []
+
+            # Create a new multiple choice answer field
+            answer_field: Dict[str, Any] = UIBuilder.get_multiple_choice_answer_field(
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                master=self.scrolled_frame["frame"],
+            )
+
+            # Configure the answer field's checkbutton widget
+            answer_field["checkbutton"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+            )
+
+            # Configure the answer field's entry widget
+            answer_field["entry"].configure(
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+            )
+
+            # Add the answer field to the list of fields
+            self.answer_fields.append(answer_field)
+
+            # Place the answer field in the grid
+            answer_field["root"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=(3 + len(self.answer_fields)),
+                sticky=NSEW,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_add_answer_button_click' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def on_question_type_select(self) -> None:
         try:
-            pass
+            # Attempt to obtain the current value of the question type field
+            value: Optional[str] = self.question_type_field["getter"]()
+
+            # Check if the value is an empty string or None
+            if value == "" or value is None:
+                # Return early
+                return
+
+            # Update the question type instance variable
+            self.question_type = value
+
+            # Check if the question type value is any of "Multiple Choice", "Open Answer" or "True/False"
+            if value == "Multiple Choice":
+                # Check if the answer_fields list attribute exists
+                if hasattr(
+                    self,
+                    "answer_fields",
+                ):
+                    # Clear the answer_fields list attribute
+                    self.answer_fields.clear()
+
+                # Configure the scrolled frame's 4th row to weight 0
+                self.scrolled_frame["frame"].grid_rowconfigure(
+                    index=3,
+                    weight=0,
+                )
+
+                # Create a button with the text "Add Answer"
+                button: tkinter.Button = UIBuilder.get_button(
+                    background=Constants.BLUE_GREY["700"],
+                    command=self.on_add_answer_button_click,
+                    foreground=Constants.WHITE,
+                    master=self.scrolled_frame["frame"],
+                    text="Add Answer",
+                )
+
+                # Place the button within the scrolled frame
+                button.grid(
+                    column=0,
+                    padx=5,
+                    pady=5,
+                    row=3,
+                )
+            elif value == "Open Answer":
+                pass
+            elif value == "True/False":
+                pass
+            else:
+                # Log a warning message, if the question type is not supported
+                self.logger.warning(
+                    message=f"Unsupported question type '{value}'. This is likely a bug."
+                )
+
+                # Set the question type to "Multiple Choice"
+                self.question_type = "Multiple Choice"
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
