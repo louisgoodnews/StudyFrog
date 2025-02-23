@@ -141,18 +141,24 @@ class StackCreateForm(tkinter.Frame):
             master=self,
         )
 
+        # Style the single-line text field "Button" button widget
         self.name["button"].configure(
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
+        # Style the single-line text field "Label" widget
         self.name["label"].configure(
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
         )
 
+        # Style the single-line text field "Root" frame widget
         self.name["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Focus the name entry field
+        self.name["entry"].focus_set()
 
         # Place the single-line text field in the grid.
         self.name["root"].grid(

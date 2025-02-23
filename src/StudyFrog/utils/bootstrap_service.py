@@ -349,6 +349,11 @@ class BootstrapService:
                 TagModel,
                 UserModel,
             ]:
+                # Log an info message indicating that the table is being created
+                self.logger.info(
+                    message=f"Attempting to create '{model_class.table}' table."
+                )
+
                 # Create the table
                 asyncio.run(model_class.create_table(database=Constants.DATABASE_PATH))
         except Exception as e:

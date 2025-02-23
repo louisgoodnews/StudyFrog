@@ -25,9 +25,6 @@ def main() -> None:
     # Start the application
     application.start_application()
 
-    # Stop the application
-    application.stop_application()
-
 
 if __name__ == "__main__":
     main()
