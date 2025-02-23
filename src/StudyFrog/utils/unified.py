@@ -9,13 +9,16 @@ from core.answer import ImmutableAnswer
 from core.association import Association
 from core.change_history import ChangeHistory, ChangeHistoryItem
 from core.custom_field import CustomField
+from core.default import ImmutableDefault
 from core.difficulty import ImmutableDifficulty
 from core.flashcard import ImmutableFlashcard
 from core.note import ImmutableNote
 from core.option import ImmutableOption
 from core.priority import ImmutablePriority
 from core.question import ImmutableQuestion
+from core.setting import ImmutableSetting
 from core.stack import ImmutableStack
+from core.status import ImmutableStatus
 from core.tag import ImmutableTag
 from core.user import ImmutableUser
 
@@ -726,6 +729,192 @@ class UnifiedObjectService:
         # Load the flashcards from the database and return them
         return self.unified_manager.get_flashcard_by(**kwargs)
 
+    def on_request_flashcard_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableFlashcard]]:
+        """
+        Handles the 'request_flashcard_lookup' event and retrieves a list of flashcards from the database.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the unified manager's search_flashcards method.
+
+        Returns:
+            Optional[List[ImmutableFlashcard]]: A list of flashcards retrieved from the database if no exception occurs. Otherwise, None.
+        """
+
+        # Search for flashcards in the database and return them
+        return self.unified_manager.search_flashcards(**kwargs)
+
+    def on_request_get_all_answers(self) -> Optional[List[ImmutableAnswer]]:
+        """
+        Handles the 'request_get_all_answers' event and gets all answers from the database.
+
+        Returns:
+            Optional[List[ImmutableAnswer]]: A list of all answers if no exception occurs. Otherwise, None.
+        """
+
+        # Get all answers from the database and return them
+        return self.unified_manager.get_all_answers()
+
+    def on_request_get_all_change_histories(
+        self,
+    ) -> Optional[List[ChangeHistory]]:
+        """
+        Handles the 'request_all_change_histories' event and gets all change histories from the database.
+
+        Returns:
+            Optional[List[ImmutableChangeHistory]]: A list of all change histories if no exception occurs. Otherwise, None.
+        """
+
+        # Get all change histories from the database and return them
+        return self.unified_manager.get_all_change_histories()
+
+    def on_request_get_all_change_history_items(
+        self,
+    ) -> Optional[List[ChangeHistoryItem]]:
+        """
+        Handles the 'request_all_change_history_items' event and gets all change history items from the database.
+
+        Returns:
+            Optional[List[ImmutableChangeHistoryItem]]: A list of all change history items if no exception occurs. Otherwise, None.
+        """
+
+        # Get all change history items from the database and return them
+        return self.unified_manager.get_all_change_history_items()
+
+    def on_request_get_all_custom_fields(self) -> Optional[List[CustomField]]:
+        """
+        Handles the 'request_get_all_custom_fields' event and gets all custom fields from the database.
+
+        Returns:
+            Optional[List[ImmutableCustomField]]: A list of all custom fields if no exception occurs. Otherwise, None.
+        """
+
+        # Get all custom fields from the database and return them
+        return self.unified_manager.get_all_custom_fields()
+
+    def on_request_get_all_defaults(self) -> Optional[List[ImmutableDefault]]:
+        """
+        Handles the 'request_all_defaults' event and gets all defaults from the database.
+
+        Returns:
+            Optional[List[ImmutableDefault]]: A list of all defaults if no exception occurs. Otherwise, None.
+        """
+
+        # Get all defaults from the database and return them
+        return self.unified_manager.get_all_defaults()
+
+    def on_request_get_all_difficulties(self) -> Optional[List[ImmutableDifficulty]]:
+        """
+        Handles the 'request_get_all_difficulties' event and gets all difficulties from the database.
+
+        Returns:
+            Optional[List[ImmutableDifficulty]]: A list of all difficulties if no exception occurs. Otherwise, None.
+        """
+
+        # Get all difficulties from the database and return them
+        return self.unified_manager.get_all_difficulties()
+
+    def on_request_get_all_flashcards(self) -> Optional[List[ImmutableFlashcard]]:
+        """
+        Handles the 'request_all_flashcards' event and gets all flashcards from the database.
+
+        Returns:
+            Optional[List[ImmutableFlashcard]]: A list of all flashcards if no exception occurs. Otherwise, None.
+        """
+
+        # Get all flashcards from the database and return them
+        return self.unified_manager.get_all_flashcards()
+
+    def on_request_get_all_notes(self) -> Optional[List[ImmutableNote]]:
+        """
+        Handles the 'request_all_notes' event and gets all notes from the database.
+
+        Returns:
+            Optional[List[ImmutableNote]]: A list of all notes if no exception occurs. Otherwise, None.
+        """
+
+        # Get all notes from the database and return them
+        return self.unified_manager.get_all_notes()
+
+    def on_request_get_all_priorities(self) -> Optional[List[ImmutablePriority]]:
+        """
+        Handles the 'request_get_all_priorities' event and gets all priorities from the database.
+
+        Returns:
+            Optional[List[ImmutablePriority]]: A list of all priorities if no exception occurs. Otherwise, None.
+        """
+
+        # Get all priorities from the database and return them
+        return self.unified_manager.get_all_priorities()
+
+    def on_request_get_all_questions(self) -> Optional[List[ImmutableQuestion]]:
+        """
+        Handles the 'request_get_all_questions' event and gets all questions from the database.
+
+        Returns:
+            Optional[List[ImmutableQuestion]]: A list of all questions if no exception occurs. Otherwise, None.
+        """
+
+        # Get all questions from the database and return them
+        return self.unified_manager.get_all_questions()
+
+    def on_request_get_all_settings(self) -> Optional[List[ImmutableSetting]]:
+        """
+        Handles the 'request_get_all_settings' event and gets all settings from the database.
+
+        Returns:
+            Optional[List[ImmutableSetting]]: A list of all settings if no exception occurs. Otherwise, None.
+        """
+
+        # Get all settings from the database and return them
+        return self.unified_manager.get_all_settings()
+
+    def on_request_get_all_stacks(self) -> Optional[List[ImmutableStack]]:
+        """
+        Handles the 'request_get_all_stacks' event and gets all stacks from the database.
+
+        Returns:
+            Optional[List[ImmutableStack]]: A list of all stacks if no exception occurs. Otherwise, None.
+        """
+
+        # Get all stacks from the database and return them
+        return self.unified_manager.get_all_stacks()
+
+    def on_request_get_all_statuses(self) -> Optional[List[ImmutableStatus]]:
+        """
+        Handles the 'request_get_all_statuses' event and gets all statuses from the database.
+
+        Returns:
+            Optional[List[ImmutableStatus]]: A list of all statuses if no exception occurs. Otherwise, None.
+        """
+
+        # Get all statuses from the database and return them
+        return self.unified_manager.get_all_statuses()
+
+    def on_request_get_all_tags(self) -> Optional[List[ImmutableTag]]:
+        """
+        Handles the 'request_get_all_tags' event and gets all tags from the database.
+
+        Returns:
+            Optional[List[ImmutableTag]]: A list of all tags if no exception occurs. Otherwise, None.
+        """
+
+        # Get all tags from the database and return them
+        return self.unified_manager.get_all_tags()
+
+    def on_request_get_all_users(self) -> Optional[List[ImmutableUser]]:
+        """
+        Handles the 'request_get_all_users' event and gets all users from the database.
+
+        Returns:
+            Optional[List[ImmutableUser]]: A list of all users if no exception occurs. Otherwise, None.
+        """
+
+        # Get all users from the database and return them
+        return self.unified_manager.get_all_users()
+
     def on_request_flashcard_update(
         self,
         flashcard: ImmutableFlashcard,
@@ -1063,6 +1252,23 @@ class UnifiedObjectService:
 
         # Load stacks using the provided keyword arguments and return them
         return self.unified_manager.get_stack_by(**kwargs)
+
+    def on_request_stack_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableStack]]:
+        """
+        Handles the 'request_stack_lookup' event and searches for stacks in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for searching stacks.
+
+        Returns:
+            Optional[List[ImmutableStack]]: A list of found stacks if no exception occurs. Otherwise, None.
+        """
+
+        # Search for stacks using the provided keyword arguments and return them
+        return self.unified_manager.search_stacks(**kwargs)
 
     def on_request_stack_update(
         self,

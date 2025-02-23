@@ -27,6 +27,7 @@ class Events:
         ASSOCIATION_LOADED (DispatcherEvent): An event that indicates that an association has been loaed in the backend.
         ASSOCIATION_UPDATED (DispatcherEvent): An event that indicates that an association has been updated in the backend.
         BUTTON_CLICKED (DispatcherEvent): An event that indicates that a button has been clicked.
+        CANCEL_BUTTON_CLICKED (DispatcherEvent): An event that indicates that the cancel button has been clicked.
         CHANGE_HISTORY_CREATED (DispatcherEvent): An event that indicates that a change history has been created in the backend.
         CHANGE_HISTORY_DELETED (DispatcherEvent): An event that indicates that a change history has been deleted in the backend.
         CHANGE_HISTORY_LOADED (DispatcherEvent): An event that indicates that a change history has been loaed in the backend.
@@ -95,6 +96,7 @@ class Events:
         REQUEST_FLASHCARD_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a flashcard.
         REQUEST_FLASHCARD_LOAD (DispatcherEvent): An event that indicates that the user wants to load a flashcard.
         REQUEST_FLASHCARD_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a flashcard.
+        REQUEST_GET_ALL_STACKS (DispatcherEvent): An event that indicates that the user wants to get all stacks.
         REQUEST_OPTION_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new option.
         REQUEST_OPTION_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a option.
         REQUEST_OPTION_LOAD (DispatcherEvent): An event that indicates that the user wants to load a option.
@@ -118,6 +120,7 @@ class Events:
         REQUEST_STACK_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new stack.
         REQUEST_STACK_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a stack.
         REQUEST_STACK_LOAD (DispatcherEvent): An event that indicates that the user wants to load a stack.
+        REQUEST_STACK_LOOKUP (DispatcherEvent): An event that indicates that the user wants to lookup a stack.
         REQUEST_STACK_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a stack.
         REQUEST_TAG_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new tag.
         REQUEST_TAG_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a tag.
@@ -201,6 +204,11 @@ class Events:
     # An event that indicates that a button has been clicked
     BUTTON_CLICKED: DispatcherEvent = DispatcherEventFactory.create_event(
         name="ui:button:clicked"
+    )
+
+    # An event that indicates that the cancel button has been clicked
+    CANCEL_BUTTON_CLICKED: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="ui:cancel_button:clicked"
     )
 
     # An event that indicates that a change history has been created in the backend
@@ -559,6 +567,11 @@ class Events:
         name="global:request:flashcard:update"
     )
 
+    # An event that indicates that the user wants to get all stacks
+    REQUEST_GET_ALL_STACKS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:stacks"
+    )
+
     # An event that indicates that the user wants to create a new note
     REQUEST_NOTE_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:note:create"
@@ -672,6 +685,11 @@ class Events:
     # An event that indicates that the user wants to load a stack
     REQUEST_STACK_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:stack:load"
+    )
+
+    # An event that indicates that the user wants to lookup a stack
+    REQUEST_STACK_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:stack:lookup"
     )
 
     # An event that indicates that the user wants to update a stack
@@ -1072,7 +1090,9 @@ class Events:
         return [
             cls.REQUEST_STACK_CREATE,
             cls.REQUEST_STACK_DELETE,
+            cls.REQUEST_GET_ALL_STACKS,
             cls.REQUEST_STACK_LOAD,
+            cls.REQUEST_STACK_LOOKUP,
             cls.REQUEST_STACK_UPDATE,
         ]
 

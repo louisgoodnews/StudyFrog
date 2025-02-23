@@ -63,6 +63,7 @@ class CreateUI(tkinter.Frame):
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
         unified_manager: UnifiedObjectManager,
+        type: Optional[str] = None,
     ) -> None:
         """
         Initializes a new instance of the CreateUI class.
@@ -143,6 +144,14 @@ class CreateUI(tkinter.Frame):
                 index=0,
                 weight=1,
             )
+
+        # Check, if a type string was passed
+        if type is not None:
+            # Set the combobox value to the passed type
+            self.combobox.set(value=type.capitalize())
+
+            # Call the on_combobox_select method
+            self.on_combobox_select()
 
     def configure_grid(self) -> None:
         """

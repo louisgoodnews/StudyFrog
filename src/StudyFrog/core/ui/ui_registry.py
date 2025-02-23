@@ -24,6 +24,7 @@ class UIRegistry:
     """
 
     registry: Dict[str, Type[tkinter.Misc]] = {}
+
     logger: Logger = Logger.get_logger(name="UIRegistry")
 
     @classmethod

@@ -139,25 +139,127 @@ class DispatcherEventFactory:
 
 
 class DispatcherNotification(ImmutableBaseObject):
+    """
+    A class representing a notification that is dispatched via the dispatcher.
+
+    Attributes:
+        duration (float): The duration of the notification in seconds.
+        end (datetime): The timestamp when the notification ended.
+        event (DispatcherEvent): The event associated with the notification.
+        id (int): The unique identifier of the notification.
+        namespace (str): The namespace under which the notification was created.
+        result (Any): The result of the notification.
+        start (datetime): The timestamp when the notification started.
+    """
+
     def __init__(
         self,
         duration: float,
         end: datetime,
         event: DispatcherEvent,
+        id: int,
         namespace: str,
         result: Any,
         start: datetime,
     ) -> None:
+        """
+        Initializes a new instance of the DispatcherNotification class.
+
+        Args:
+            duration (float): The duration of the notification in seconds.
+            end (datetime): The timestamp when the notification ended.
+            event (DispatcherEvent): The event associated with the notification.
+            id (int): The unique identifier of the notification.
+            namespace (str): The namespace under which the notification was created.
+            result (Any): The result of the notification.
+            start (datetime): The timestamp when the notification started.
+
+        Returns:
+            None
+        """
 
         # Call the parent constructor
         super().__init__(
             duration=duration,
             end=end,
             event=event,
+            id=id,
             namespace=namespace,
             result=result,
             start=start,
         )
+
+
+class DispatcherNotificationFactory:
+    """
+    A factory class for creating instances of the DispatcherNotification class.
+
+    The class provides a method to create and initialize a new
+    DispatcherNotification object with a given set of attributes. The method
+    utilizes a logger to capture and log exceptions that may occur during the
+    creation process.
+
+    Attributes:
+        index (int): The index used to create unique IDs for notifications.
+        logger (Logger): The logger instance associated with the object.
+    """
+
+    index: int = Constants.get_base_id()
+
+    logger: Logger = Logger.get_logger(name="DispatcherNotificationFactory")
+
+    @classmethod
+    def create_notification(
+        cls,
+        duration: float,
+        end: datetime,
+        event: DispatcherEvent,
+        namespace: str,
+        result: Any,
+        start: datetime,
+    ) -> Optional[DispatcherNotification]:
+        """
+        Creates a new instance of the DispatcherNotification class.
+
+        Args:
+            duration (float): The duration of the notification in seconds.
+            end (datetime): The timestamp when the notification ended.
+            event (DispatcherEvent): The event associated with the notification.
+            namespace (str): The namespace under which the notification was created.
+            result (Any): The result of the notification.
+            start (datetime): The timestamp when the notification started.
+
+        Returns:
+            Optional[DispatcherNotification]: The created notification object if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the notification.
+        """
+        try:
+            # Create a new notification object
+            notification: DispatcherNotification = DispatcherNotification(
+                duration=duration,
+                end=end,
+                event=event,
+                id=cls.index,
+                namespace=namespace,
+                result=result,
+                start=start,
+            )
+
+            # Increment the index for the next notification
+            cls.index += 1
+
+            # Return the created notification object
+            return notification
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_notification' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class DispatcherNotificationBuilder(BaseObjectBuilder):
@@ -202,7 +304,9 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         """
         try:
             # Attempt to create and return a new instance of the DispatcherNotification class
-            return DispatcherNotification(**self.configuration)
+            return DispatcherNotificationFactory.create_notification(
+                **self.configuration
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

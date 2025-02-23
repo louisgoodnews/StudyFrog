@@ -14,7 +14,7 @@ from tkinter import ttk
 from tkinter.constants import *
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherEvent
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
@@ -1802,6 +1802,7 @@ class UIBuilder:
 
             # Create the "Button" button widget
             result["button"] = cls.get_button(
+                command=on_okay_click,
                 master=result["root"],
                 text="Okay",
             )
@@ -1809,6 +1810,219 @@ class UIBuilder:
             # Place the "Button" button widget within the "Root" toplevel widget
             result["button"].grid(
                 column=0,
+                padx=5,
+                pady=5,
+                row=2,
+            )
+
+            # Configure the "Root" toplevel widget to be initially minimized
+            result["root"].iconify()
+
+            # Set the "Root" toplevel widget to have grab set
+            result["root"].grab_set()
+
+            # Set the "Root" toplevel widget to have focus
+            result["root"].focus_set()
+
+            # Ring the bell
+            result["root"].bell()
+
+            # Wait for the "Root" toplevel widget to be closed
+            result["root"].wait_window()
+
+            # Return the result
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_okay' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_okay_cancel(
+        cls,
+        dispatcher: Dispatcher,
+        message: str,
+        title: str,
+        master: Optional[tkinter.Misc],
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a dialog with "Okay" and "Cancel" buttons.
+
+        Args:
+            dispatcher (Dispatcher): The dispatcher to use for dispatching events.
+            message (str): The message to display in the dialog.
+            title (str): The title of the dialog.
+            master (Optional[tkinter.Misc]): The master widget.
+            **kwargs: Any additional keyword arguments to be passed to the get_toplevel method.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created dialog instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of the dialog.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def on_button_click(string: str) -> None:
+                """
+                Called when any of the "Okay" or "Cancel" buttons is clicked.
+
+                Dispatches an event to the global namespace with the target from the button.
+                Sets the result to the target and destroys the "Root" toplevel widget.
+
+                Args:
+                    string (str): The string passed from the button. Can be either of "Okay" or "Cancel".
+
+                Returns:
+                    None
+                """
+
+                # Obtain an event based on the passed string
+                event: DispatcherEvent = (
+                    Events.CANCEL_BUTTON_CLICKED
+                    if string == "Cancel"
+                    else Events.OKAY_BUTTON_CLICKED
+                )
+
+                # Dispatch the event to the global namespace with the target from the button
+                dispatcher.dispatch(
+                    event=event,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    source=f"ui:dialog:{string}",
+                    target=string,
+                )
+
+                # Set the result to the target
+                result["result"] = string
+
+                # Destroy the "Root" toplevel widget
+                result["root"].destroy()
+
+            def get() -> Optional[str]:
+                """
+                Gets the value at key "result" in dictionary "result" and returns it.
+
+                Returns:
+                    Optional[str]: The value at key "result" in dictionary "result" or None if the key is not found.
+                """
+                # Return the value at key "result" in dictionary "result"
+                return result.get(
+                    "result",
+                    None,
+                )
+
+            # Create the "Root" toplevel widget
+            result["root"] = cls.get_toplevel(
+                master=master,
+                **kwargs,
+            )
+
+            # Configure the "Root" toplevel widget's 1st column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" toplevel widget's 1st and 3rd row to weight 0
+            result["root"].grid_rowconfigure(
+                index=(
+                    0,
+                    2,
+                ),
+                weight=0,
+            )
+
+            # Configure the "Root" toplevel widget's 2nd row to weight 1
+            result["root"].grid_rowconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Create the "Title" label widget
+            result["title_label"] = cls.get_label(
+                master=result["root"],
+                text=title,
+            )
+
+            # Place the "Title" label widget within the "Root" toplevel widget
+            result["title_label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Message" label widget
+            result["message_label"] = cls.get_label(
+                master=result["root"],
+                text=message,
+            )
+
+            # Place the "Message" label widget within the "Root" toplevel widget
+            result["message_label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Create the "Button Frame" frame widget
+            result["button_frame"] = cls.get_frame(
+                master=result["root"],
+            )
+
+            # Configure the "Button Frame" frame widget's 1st and 2nd column to weight 1
+            result["button_frame"].grid_columnconfigure(
+                index=(
+                    0,
+                    1,
+                ),
+                weight=1,
+            )
+
+            # Place the "Button Frame" frame widget within the "Root" toplevel widget
+            result["button_frame"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=2,
+                sticky=NSEW,
+            )
+
+            # Create the "Cancel" button widget
+            result["cancel_button"] = cls.get_button(
+                command=lambda string="cancel": on_button_click(string=string),
+                master=result["button_frame"],
+                text="Cancel",
+            )
+
+            # Place the "Cancel" button widget within the "Button Frame" frame widget
+            result["cancel_button"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=2,
+            )
+
+            # Create the "Okay" button widget
+            result["okay_button"] = cls.get_button(
+                command=lambda string="okay": on_button_click(string=string),
+                master=result["button_frame"],
+                text="Okay",
+            )
+
+            # Place the "Okay" button widget within the "Button Frame" frame widget
+            result["okay_button"].grid(
+                column=1,
                 padx=5,
                 pady=5,
                 row=2,
@@ -1903,6 +2117,201 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_radiobutton' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_radiobutton_field(
+        cls,
+        labels: Iterable[str],
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a radiobutton field.
+
+        The created radiobutton field contains a frame widget as its root widget,
+        and a checkbutton widget for each label passed as argument.
+
+        The value of each checkbutton is stored in a tkinter.BooleanVar instance,
+        which is stored in a dictionary under the key "variable_{index}".
+
+        The checkbutton widgets are stored in a dictionary under the key "checkbuttons".
+        The keys of the dictionary are the keys of the "checkbuttons" dictionary,
+        and the values are the checkbutton widgets.
+
+        The method returns a dictionary containing the created radiobutton field widgets and functions.
+
+        Args:
+            labels (Iterable[str]): The labels of the checkbuttons.
+            master (tkinter.Misc): The master widget.
+            **kwargs: Any additional keyword arguments to be passed to the tkinter.Checkbutton constructor.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created radiobutton field widgets and functions.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Checkbutton.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Deselects all checkbuttons.
+
+                Returns:
+                    None
+                """
+
+                # Iterate over all checkbuttons in the "Checkbuttons" dictionary
+                for value in result["checkbuttons"].values():
+                    # Deselect the checkbutton
+                    value.deselect()
+
+            def get() -> Optional[Dict[str, Any]]:
+                """
+                Retrieves the values of the checkbuttons and returns them in a dictionary.
+
+                The keys of the dictionary are the keys of the "checkbuttons" dictionary,
+                and the values are the values of the checkbuttons.
+
+                Returns:
+                    Optional[Dict[str, Any]]: The dictionary containing the values of the checkbuttons.
+                """
+
+                # Initialize the dictionary as an empty dictionary
+                dictionary: Dict[str, Any] = {}
+
+                # Iterate over the checkbuttons in the "Checkbuttons" dictionary
+                for (
+                    key,
+                    value,
+                ) in result["checkbuttons"].items():
+                    # Get the value of the checkbutton
+                    dictionary[key] = value.get()
+
+                # Return the dictionary
+                return dictionary
+
+            def on_checkbutton_click(string: str) -> None:
+                """
+                Handles the click event of a checkbutton.
+
+                Deselects all checkbuttons except the one that was clicked.
+
+                Args:
+                    string (str): The key of the checkbutton that was clicked.
+
+                Returns:
+                    None
+                """
+
+                # Iterate over all checkbuttons in the "Checkbuttons" dictionary
+                for (
+                    key,
+                    value,
+                ) in result["checkbuttons"].items():
+                    # Check if the key is not the one that was clicked
+                    if key != string:
+                        # Deselect the checkbutton
+                        value.deselect()
+
+            def set(
+                key: str,
+                value: bool,
+            ) -> None:
+                """
+                Sets the value of the checkbutton with the given key to the given value.
+
+                Args:
+                    key (str): The key of the checkbutton to be set.
+                    value (bool): The value to which the checkbutton should be set.
+
+                Returns:
+                    None
+                """
+
+                # Check if the key is present in the "Checkbuttons" dictionary
+                if key in result["checkbuttons"].keys():
+                    # Set the value of the checkbutton with the given key to the given value
+                    result["checkbuttons"][key].set(value=value)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Initialize the "Checkbuttons" dictionary as an empty dictionary
+            result["checkbuttons"] = {}
+
+            # Iterate over the passed labels
+            for (
+                index,
+                label,
+            ) in enumerate(iterable=labels):
+                # Create a "Variable_{index}" tkinter.BooleanVar
+                result[f"variable_{index}"] = cls.get_bool_variable(
+                    master=result["root"],
+                    value=False,
+                )
+
+                # Create a "Frame_{index}" frame widget
+                result[f"frame_{index}"] = cls.get_frame(master=result["root"])
+
+                # Configure the "Frame_{index}" frame widget's 1st column to weight 1
+                result[f"frame_{index}"].grid_columnconfigure(
+                    index=0,
+                    weight=1,
+                )
+
+                # Create a "Checkbutton_{index}" checkbutton widget
+                result[f"checkbutton_{index}"] = cls.get_checkbutton(
+                    command=lambda string=f"checkbutton_{index}": on_checkbutton_click(
+                        string=string
+                    ),
+                    master=result[f"frame_{index}"],
+                    text=label,
+                    variable=result[f"variable_{index}"],
+                    **kwargs,
+                )
+
+                # Place the "Checkbutton_{index}" checkbutton widget in the "Frame_{index}" frame widget
+                result[f"checkbutton_{index}"].grid(
+                    column=0,
+                    padx=5,
+                    pady=5,
+                    row=index,
+                    sticky=NSEW,
+                )
+
+                # Append the "Checkbutton_{index}" checkbutton widget to the "Checkbuttons" dictionary
+                result["checkbuttons"][f"checkbutton_{index}"] = result[
+                    f"checkbutton_{index}"
+                ]
+
+            # Add the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_radiobutton_field' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
@@ -2830,6 +3239,231 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_style' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_tabbed_view(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a tabbed view widget.
+
+        A tabbed view widget is a frame that contains a top frame widget and a center frame widget.
+        The top frame widget contains a series of buttons and the center frame widget contains a series
+        of widgets. Each button in the top frame widget is associated with a widget in the center frame
+        widget. When a button is clicked, all widgets in the center frame widget are hidden and the
+        associated widget is shown.
+
+        The dictionary contains:
+            - "root": The root frame widget of the tabbed view widget.
+            - "children": A dictionary of the widgets in the center frame widget.
+            - "top_frame": The top frame widget of the tabbed view widget.
+            - "{label.lower()}_button": A button widget in the top frame widget.
+
+        Args:
+            master (tkinter.Misc): The master widget.
+            **kwargs: Any additional keyword arguments to be passed to the tkinter.Frame constructor.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created tabbed view widget.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of a tabbed view
+                widget.
+        """
+
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            # Initialize the children dictionary as an empty dictionary
+            result["children"] = {}
+
+            def add(
+                label: str,
+                widget: Type[tkinter.Misc],
+                state: Literal[NORMAL, DISABLED, HIDDEN] = NORMAL,
+                sticky: str = NSEW,
+            ) -> None:
+                """
+                Adds a widget to the 'children' dictionary and configures its placement.
+
+                Args:
+                    label (str): The label for the widget.
+                    widget (Type[tkinter.Misc]): The widget instance to be added.
+                    state (Literal[NORMAL, DISABLED, HIDDEN], optional): The state of the widget. Defaults to NORMAL.
+                    sticky (str, optional): The sticky configuration for the widget. Defaults to NSEW.
+
+                Returns:
+                    None
+                """
+
+                # Add the widget to the "children" dictionary under the key "label"
+                result["children"][label] = {
+                    "state": state,
+                    "sticky": sticky,
+                    "widget": widget,
+                }
+
+                # Get the number of children in the "children" dictionary
+                num_children: int = len(result["children"])
+
+                # Create the "{label.lower()}_button" button widget
+                result[f"{label.lower()}_button"] = cls.get_button(
+                    command=lambda string=label: on_button_click(string=string),
+                    master=result["top_frame"],
+                    text=label,
+                )
+
+                # Place the button widget within the "Top frame" frame widget
+                result[f"{label.lower()}_button"].grid(
+                    column=num_children - 1,
+                    row=0,
+                    sticky=sticky,
+                )
+
+                # Check if the widget is the only one added to the "children" dictionary
+                if num_children == 1:
+                    # Place the widget within the "Center frame" frame widget
+                    widget.grid(
+                        column=0,
+                        row=0,
+                        sticky=sticky,
+                    )
+
+                    # Disable the button
+                    result[f"{label.lower()}_button"].configure(state=DISABLED)
+                else:
+                    # Hide the widget
+                    widget.grid_forget()
+
+            def on_button_click(string: str) -> None:
+                """
+                Called when any of the buttons in the "children" dictionary is clicked.
+
+                Hides all widgets in the "children" dictionary and shows the widget with the key
+                "string".
+
+                Args:
+                    string (str): The key of the widget to be shown.
+
+                Returns:
+                    None
+                """
+
+                # Check if the string could be found in the "children" dictionary
+                if string not in set([label for label in result["children"].keys()]):
+                    # Log a warning message, that the string could not be found
+                    cls.logger.warning(
+                        message=f"'{string}' could not be found in the 'children' dictionary. This is likely a bug.",
+                    )
+
+                    # Return early
+                    return
+
+                # Hide all widgets in the "children" dictionary
+                for child in set(
+                    [value["widget"] for value in result["children"].values()]
+                ):
+                    child.grid_forget()
+
+                # Iterate over the items in the result dictionary
+                for (
+                    key,
+                    value,
+                ) in [
+                    (
+                        key,
+                        value,
+                    )
+                    for (
+                        key,
+                        value,
+                    ) in result.items()
+                    if "_button" in key
+                ]:
+                    # Check, if the key and the string are identical
+                    if string.lower() not in key:
+                        # Enable the widget if it is not the one that was clicked
+                        value.configure(state=NORMAL)
+                    else:
+                        # Disable the widget if it is the one that was clicked
+                        value.configure(state=DISABLED)
+
+                # Show the widget in the "children" dictionary with the key "string"
+                result["children"][string]["widget"].grid(
+                    column=0,
+                    row=0,
+                    sticky=result["children"][string]["sticky"],
+                )
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 0
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd row to weight 1
+            result["root"].grid_rowconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Create the "Top frame" frame widget
+            result["top_frame"] = cls.get_frame(master=result["root"])
+
+            # Place the "Top frame" widget within the "Root" frame widget
+            result["top_frame"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Center frame" frame widget
+            result["center_frame"] = cls.get_frame(master=result["root"])
+
+            # Configure the "Center frame" frame widget's 1st column to weight 1
+            result["center_frame"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Center frame" frame widget's 1st row to weight 1
+            result["center_frame"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Place the "Center frame" widget within the "Root" frame widget
+            result["center_frame"].grid(
+                column=0,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Add the adder function to the result dictionary
+            result["adder"] = add
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_tabbed_view' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured

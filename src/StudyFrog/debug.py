@@ -60,7 +60,6 @@ def debug() -> None:
 
             # Log an info message
             logger.info(f"Dropped table '{model_class.__name__}'.")
-
         except Exception as e:
             # Log an error message indicating an exception has occurred
             logger.error(f"Failed to drop table '{model_class.__name__}': {str(e)}")

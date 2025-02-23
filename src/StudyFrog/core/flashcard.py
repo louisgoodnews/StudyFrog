@@ -759,7 +759,10 @@ class FlashcardManager(BaseObjectManager):
         try:
             # Search for flashcards in the database
             models: Optional[List[FlashcardModel]] = asyncio.run(
-                FlashcardModel.search(**kwargs)
+                FlashcardModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
             )
 
             # Return the found flashcards if any

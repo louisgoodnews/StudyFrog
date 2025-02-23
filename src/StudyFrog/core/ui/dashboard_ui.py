@@ -16,7 +16,7 @@ from core.setting import SettingService
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
@@ -105,6 +105,9 @@ class DashboardUI(tkinter.Frame):
             row=0,
             sticky=NSEW,
         )
+
+        # Debug function to look up the stacks
+        self.lookup_stacks()
 
     def configure_grid(self) -> None:
         """
@@ -330,10 +333,9 @@ class DashboardUI(tkinter.Frame):
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
                 master=UIBuilder.get_toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
-                navigation_service=self.navigation_service,
                 source="dashboard_ui",
                 target="create_ui",
-                unified_manager=self.unified_manager,
+                type="stack",
             ),
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -441,11 +443,14 @@ class DashboardUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create the "Notebook" widget
-        notebook: ttk.Notebook = UIBuilder.get_notebook(master=right_frame)
+        # Create the "Notebook" frame widget
+        notebook: Dict[str, Any] = UIBuilder.get_tabbed_view(master=right_frame)
 
-        # Place the "Notebook" widget in the master frame
-        notebook.grid(
+        # Style the "Notebook" frame "Top Frame" widget
+        notebook["top_frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the "Notebook" frame widget in the master frame
+        notebook["root"].grid(
             column=0,
             row=1,
             sticky=NSEW,
@@ -456,7 +461,7 @@ class DashboardUI(tkinter.Frame):
 
     def create_notebook_widgets(
         self,
-        master: ttk.Notebook,
+        master: Dict[str, Any],
     ) -> None:
         """
         Creates and configures the main widgets of the notebook.
@@ -465,7 +470,7 @@ class DashboardUI(tkinter.Frame):
         dashboard UI, setting their layout configuration.
 
         Args:
-            master (ttk.Notebook): The parent ttk.Notebook widget.
+            master (Dict[str, Any]): The parent widget assembly dictionary.
 
         Returns:
             None
@@ -473,48 +478,238 @@ class DashboardUI(tkinter.Frame):
 
         # Create the "Active Stacks" frame widget
         active_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["100"],
-            master=master,
+            background=Constants.BLUE_GREY["700"],
+            master=master["center_frame"],
         )
 
         # Add the "Active Stacks" frame widget to the notebook
-        master.add(
-            child=active_stacks_frame,
-            text="My Active Stacks",
+        master["adder"](
+            label="My Active Stacks",
+            sticky=NSEW,
+            widget=active_stacks_frame,
         )
 
-        # Place the "Active Stacks" frame widget in the notebook
-        active_stacks_frame.grid()
+        # Configure the "My Active Stacks" button
+        master["my active stacks_button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
 
         # Create the "Recently Viewed" frame widget
         recently_viewed_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["100"],
-            master=master,
+            background=Constants.BLUE_GREY["700"],
+            master=master["center_frame"],
         )
 
         # Add the "Recently Viewed" frame widget to the notebook
-        master.add(
-            child=recently_viewed_frame,
-            text="Recently Viewed",
+        master["adder"](
+            label="Recently Viewed",
+            sticky=NSEW,
+            widget=recently_viewed_frame,
         )
 
-        # Place the "Recently Viewed" frame widget in the notebook
-        recently_viewed_frame.grid()
+        # Configure the "Recently Viewed" button
+        master["recently viewed_button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
 
         # Create the "Completed Stacks" frame widget
         completed_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["100"],
-            master=master,
+            background=Constants.BLUE_GREY["700"],
+            master=master["center_frame"],
         )
 
         # Add the "Completed Stacks" frame widget to the notebook
-        master.add(
-            child=completed_stacks_frame,
-            text="Completed Stacks",
+        master["adder"](
+            label="Completed Stacks",
+            sticky=NSEW,
+            widget=completed_stacks_frame,
         )
 
-        # Place the "Completed Stacks" frame widget in the notebook
-        completed_stacks_frame.grid()
+        # Configure the "Completed Stacks" button
+        master["completed stacks_button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Create the "Active Stacks" frame widgets
+        self.create_active_stacks_frame_widgets(master=active_stacks_frame)
+
+        # Create the "Recently Viewed" frame widgets
+        self.create_recently_viewed_stacks_frame_widgets(master=recently_viewed_frame)
+
+        # Create the "Completed Stacks" frame widgets
+        self.create_completed_stacks_frame_widgets(master=completed_stacks_frame)
+
+    def create_active_stacks_frame_widgets(
+        self,
+        master: tkinter.Misc,
+    ) -> None:
+        """
+        Creates and configures the main widgets of the active stacks frame.
+
+        This method initializes the main widgets of the active stacks frame
+        within the dashboard UI, setting their layout configuration.
+
+        Args:
+            master (tkinter.Misc): The parent widget.
+
+        Returns:
+            None
+        """
+
+        # Configure the master widget's 1st column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master widget's 1st row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Get a new scrolled frame widget
+        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=master)
+
+        # Style the scrolled frame "Canvas" widget
+        # Set the background color to the main background color
+        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Frame" widget
+        # Set the background color to the main background color
+        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Root" widget
+        # Set the background color to the main background color
+        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the scrolled frame widget in the main window
+        scrolled_frame["root"].grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+    def create_recently_viewed_stacks_frame_widgets(
+        self,
+        master: tkinter.Misc,
+    ) -> None:
+        """
+        Creates and configures the recently viewed stacks frame widgets.
+
+        This method initializes a scrolled frame widget for displaying recently viewed stacks
+        and configures its layout and styling within the dashboard UI.
+
+        Args:
+            master (tkinter.Misc): The parent widget.
+
+        Returns:
+            None
+        """
+
+        # Configure the master widget's 1st column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master widget's 1st row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Get a new scrolled frame widget
+        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=master)
+
+        # Style the scrolled frame "Canvas" widget
+        # Set the background color to the main background color
+        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Frame" widget
+        # Set the background color to the main background color
+        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Root" widget
+        # Set the background color to the main background color
+        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the scrolled frame widget in the main window
+        scrolled_frame["root"].grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+    def create_completed_stacks_frame_widgets(
+        self,
+        master: tkinter.Misc,
+    ) -> None:
+        """
+        Creates and configures the completed stacks frame widgets.
+
+        This method initializes a scrolled frame widget for displaying
+        completed stacks and configures its layout and styling within the
+        dashboard UI.
+
+        Args:
+            master (tkinter.Misc): The parent widget.
+
+        Returns:
+            None
+        """
+
+        # Configure the master widget's 1st column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master widget's 1st row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Get a new scrolled frame widget
+        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=master)
+
+        # Style the scrolled frame "Canvas" widget
+        # Set the background color to the main background color
+        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Frame" widget
+        # Set the background color to the main background color
+        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Root" widget
+        # Set the background color to the main background color
+        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the scrolled frame widget in the main window
+        scrolled_frame["root"].grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
 
     def create_top_frame_widgets(
         self,
@@ -533,12 +728,15 @@ class DashboardUI(tkinter.Frame):
             None
         """
 
-        # Configure the top frame widget's 1st and 2nd column to weight 1
+        # Configure the top frame widget's 1st column to weight 0
         master.grid_columnconfigure(
-            index=(
-                0,
-                1,
-            ),
+            index=0,
+            weight=0,
+        )
+
+        # Configure the top frame widget's 2nd column to weight 1
+        master.grid_columnconfigure(
+            index=1,
             weight=1,
         )
 
@@ -630,7 +828,7 @@ class DashboardUI(tkinter.Frame):
             ),
             foreground=Constants.WHITE,
             master=right_frame,
-            text="Continue, from where you left",
+            text="Welcome back! Continue from where you left.",
         )
 
         # Place the continue label within the right frame
@@ -640,4 +838,26 @@ class DashboardUI(tkinter.Frame):
             pady=5,
             row=0,
             sticky=EW,
+        )
+
+    def lookup_stacks(self) -> None:
+        """
+        Looks up the stacks and displays them.
+
+        This method sends a request to retrieve the stacks
+        and displays them in the dashboard UI.
+
+        Returns:
+            None
+        """
+
+        # Dispatch the REQUEST_GET_ALL_STACKS event
+        notification: DispatcherNotification = self.dispatcher.dispatch(
+            event=Events.REQUEST_GET_ALL_STACKS,
+            namespace=Constants.GLOBAL_NAMESPACE,
+        )
+
+        # Log a debug message indicating the number of stacks found
+        self.logger.debug(
+            message=f"Found {len(notification['result'].values())} stack(s) in the database."
         )

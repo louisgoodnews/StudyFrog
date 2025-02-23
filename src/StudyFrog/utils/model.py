@@ -340,12 +340,14 @@ class ImmutableBaseModel(ImmutableBaseObject):
     @classmethod
     async def search(
         cls,
+        database: str,
         **kwargs,
     ) -> Optional[Union[T, List[T]]]:
         """
         Searches for entries in the database using the provided keyword arguments.
 
         Args:
+            database (str): Path to the SQLite database file.
             **kwargs: The keyword arguments to use as search conditions.
 
         Returns:

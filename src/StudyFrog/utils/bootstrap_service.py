@@ -495,6 +495,10 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_flashcard_update,
                 },
                 {
+                    "event": Events.REQUEST_GET_ALL_STACKS,
+                    "function": self.unified_object_service.on_request_get_all_stacks,
+                },
+                {
                     "event": Events.REQUEST_NOTE_CREATE,
                     "function": self.unified_object_service.on_request_note_create,
                 },
@@ -585,6 +589,10 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_STACK_LOAD,
                     "function": self.unified_object_service.on_request_stack_load,
+                },
+                {
+                    "event": Events.REQUEST_STACK_LOOKUP,
+                    "function": self.unified_object_service.on_request_stack_lookup,
                 },
                 {
                     "event": Events.REQUEST_STACK_UPDATE,
