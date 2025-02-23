@@ -342,7 +342,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
         cls,
         database: str,
         **kwargs,
-    ) -> Optional[Union[T, List[T]]]:
+    ) -> Optional[List[T]]:
         """
         Searches for entries in the database using the provided keyword arguments.
 
@@ -351,7 +351,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             **kwargs: The keyword arguments to use as search conditions.
 
         Returns:
-            Optional[Union[T, List[T]]]: The model instance if only one entry was found, a list of model instances if multiple entries were found, or None if no entries were found in the database.
+            Optional[List[T]]: A list of model instances if multiple entries were found, or None if no entries were found in the database.
         """
         try:
             # Initialize the conditions list as an empty list
@@ -365,84 +365,96 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 key,
                 value,
             ) in kwargs.items():
+                # Get the field object
+                field: Field = getattr(
+                    cls,
+                    key,
+                )
+
                 # Check the type of the field
-                if cls["key"]["type"] == "INTEGER":
+                if field["type"] == "INTEGER":
                     # Add a condition to the SQL query to filter by the INTEGER field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "TEXT":
+                elif field["type"] == "TEXT":
                     # Add a condition to the SQL query to filter by the TEXT field
-                    conditions.append(f"{key} = ?")
+                    conditions.append(f"{key} LIKE ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "REAL":
+                elif field["type"] == "VARCHAR":
+                    # Add a condition to the SQL query to filter by the VARCHAR field
+                    conditions.append(f"{key} LIKE ?")
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif field["type"] == "REAL":
                     # Add a condition to the SQL query to filter by the REAL field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "FLOAT":
+                elif field["type"] == "FLOAT":
                     # Add a condition to the SQL query to filter by the FLOAT field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "INTEGER":
+                elif field["type"] == "INTEGER":
                     # Add a condition to the SQL query to filter by the INTEGER field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "NUMERIC":
+                elif field["type"] == "NUMERIC":
                     # Add a condition to the SQL query to filter by the NUMERIC field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "NULL":
+                elif field["type"] == "NULL":
                     # Add a condition to the SQL query to filter by the NULL field
                     conditions.append(f"{key} IS NULL")
 
-                elif cls["key"]["type"] == "DATE":
+                elif field["type"] == "DATE":
                     # Add a condition to the SQL query to filter by the DATE field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "DATETIME":
+                elif field["type"] == "DATETIME":
                     # Add a condition to the SQL query to filter by the DATETIME field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "TIME":
+                elif field["type"] == "TIME":
                     # Add a condition to the SQL query to filter by the TIME field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "BLOB":
+                elif field["type"] == "BLOB":
                     # Add a condition to the SQL query to filter by the BLOB field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "BOOLEAN":
+                elif field["type"] == "BOOLEAN":
                     # Add a condition to the SQL query to filter by the BOOLEAN field
                     conditions.append(f"{key} = ?")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "JSON":
+                elif field["type"] == "JSON":
                     # Add a condition to the SQL query to filter by the JSON field
                     conditions.append(f"JSON_CONTAINS({key}, ?)")
                     # Add the value to the parameters list
                     parameters.append(value)
 
-                elif cls["key"]["type"] == "ARRAY":
+                elif field["type"] == "ARRAY":
                     # Add a condition to the SQL query to filter by the ARRAY field
                     conditions.append(f"JSON_CONTAINS({key}, ?)")
                     # Add the value to the parameters list
@@ -451,7 +463,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 else:
                     # Log a warning message indicating an unsupported field type
                     cls.logger.warning(
-                        message=f"Unsupported field type: '{cls['key']['type']}' in '{cls.__name__}' class. This is likely a bug."
+                        message=f"Unsupported field type: '{cls.__dict__[key]['type']}' in '{cls.__name__}' class. This is likely a bug."
                     )
 
             # Build the SQL query to search for entries that match the given keyword arguments
@@ -468,11 +480,6 @@ class ImmutableBaseModel(ImmutableBaseObject):
             if len(rows) == 0:
                 # Return None indicating no entries were found in the database
                 return None
-
-            # Check, if only one entry was found
-            if len(rows) == 1:
-                # Return the single model instance if only one entry was found
-                return cls(**Miscellaneous.convert_from_db_format(data=rows[0]))
 
             # Return the list of model instances if multiple entries were found
             return [

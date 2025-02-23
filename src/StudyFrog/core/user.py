@@ -657,6 +657,56 @@ class UserManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_users(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableUser]]]:
+        """
+        Searches for users in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the UserModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableUser]]]: The found users if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for users in the database
+            models: Optional[List[UserModel]] = asyncio.run(
+                UserModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found users if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableUser(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no users were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_user(
         self,
         user: Union[ImmutableUser, MutableUser],

@@ -730,6 +730,66 @@ class StatusManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_statuses(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableStatus]]]:
+        """
+        Searches for statuses in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the StatusModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableStatus]]]: The found statuses if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for statuses in the database
+            models: Optional[List[StatusModel]] = asyncio.run(
+                StatusModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Check, if no models were found
+            if not models:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"No statuses matching '{kwargs}' were found in the database."
+                )
+
+                # Return early
+                return
+
+            # Return the found statuses if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableStatus(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no statuses were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_status(
         self,
         status: Union[ImmutableStatus, MutableStatus],
@@ -760,7 +820,7 @@ class StatusManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

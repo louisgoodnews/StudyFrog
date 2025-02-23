@@ -712,6 +712,56 @@ class DefaultManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_defaults(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableDefault]]]:
+        """
+        Searches for defaults in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the DefaultModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableDefault]]]: The found defaults if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for defaults in the database
+            models: Optional[List[DefaultModel]] = asyncio.run(
+                DefaultModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found defaults if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableDefault(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no defaults were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_default(
         self,
         default: ImmutableDefault,
@@ -742,7 +792,7 @@ class DefaultManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

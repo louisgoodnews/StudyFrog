@@ -605,6 +605,56 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_change_histories(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ChangeHistory]]]:
+        """
+        Searches for change histories in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the ChangeHistoryModel class.
+
+        Returns:
+            Optional[Union[List[ChangeHistory]]]: The found change histories if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for change histories in the database
+            models: Optional[List[ChangeHistoryModel]] = asyncio.run(
+                ChangeHistoryModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found change histories if any
+            if models is not None and len(models) > 0:
+                return [
+                    ChangeHistory(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no change histories were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_change_history(
         self,
         change_history: Union[ChangeHistory, ChangeHistory],
@@ -1404,6 +1454,56 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_by_uuid' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def search_change_history_items(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ChangeHistoryItem]]]:
+        """
+        Searches for change history items in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the ChangeHistoryItemModel class.
+
+        Returns:
+            Optional[Union[List[ChangeHistoryItem]]]: The found change history items if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for change history items in the database
+            models: Optional[List[ChangeHistoryItemModel]] = asyncio.run(
+                ChangeHistoryItemModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found change history items if any
+            if models is not None and len(models) > 0:
+                return [
+                    ChangeHistoryItem(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no change histories were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred

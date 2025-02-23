@@ -658,6 +658,56 @@ class TagManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_tags(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableTag]]]:
+        """
+        Searches for tags in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the TagModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableTag]]]: The found tags if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for tags in the database
+            models: Optional[List[TagModel]] = asyncio.run(
+                TagModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found tags if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableTag(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no tags were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_tag(
         self,
         tag: Union[ImmutableTag, MutableTag],

@@ -189,6 +189,48 @@ class DispatcherNotification(ImmutableBaseObject):
             start=start,
         )
 
+    def get_all_results(self) -> List[Any]:
+        """
+        Returns the result of the notification.
+
+        Returns:
+            List[Any]: The result of the notification.
+        """
+
+        # Get the result of the notification
+        return self["result"].values()
+
+    def get_result(
+        self,
+        key: str,
+    ) -> Optional[Any]:
+        """
+        Returns the result of the notification with the given key.
+
+        If the key is not found in the result, a warning message is logged and
+        None is returned.
+
+        Args:
+            key (str): The key of the result to retrieve.
+
+        Returns:
+            Optional[Any]: The result of the notification with the given key if
+                the key is found. Otherwise, None.
+        """
+
+        # Check, if the key is present in the result
+        if key not in self["result"].keys():
+            # Log a warning message
+            self.logger.warning(
+                message=f"Key '{key}' not found in result of notification '{self['name']}'"
+            )
+
+            # Return early
+            return
+
+        # Return the result
+        return self["result"][key]
+
 
 class DispatcherNotificationFactory:
     """
@@ -539,12 +581,12 @@ class DispatcherEventSubscription(ImmutableBaseObject):
 
                 # Log a message indicating the function is beeing called
                 self.logger.info(
-                    message=f"Calling function '{subscription['function']}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
+                    message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
                 )
 
                 # Call the function associated with the subscription
                 result.result(
-                    key=uuid,
+                    key=subscription["function"].__name__,
                     value=subscription["function"](
                         *args,
                         **kwargs,

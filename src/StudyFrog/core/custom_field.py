@@ -591,6 +591,56 @@ class CustomFieldManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_custom_fields(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[CustomField]]]:
+        """
+        Searches for custom fields in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the CustomFieldModel class.
+
+        Returns:
+            Optional[Union[List[CustomField]]]: The found custom fields if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for custom fields in the database
+            models: Optional[List[CustomFieldModel]] = asyncio.run(
+                CustomFieldModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found custom fields if any
+            if models is not None and len(models) > 0:
+                return [
+                    CustomField(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no custom fields were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_custom_field(
         self,
         custom_field: CustomField,

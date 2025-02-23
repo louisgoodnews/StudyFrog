@@ -851,13 +851,20 @@ class DashboardUI(tkinter.Frame):
             None
         """
 
-        # Dispatch the REQUEST_GET_ALL_STACKS event
-        notification: DispatcherNotification = self.dispatcher.dispatch(
-            event=Events.REQUEST_GET_ALL_STACKS,
+        status_notification: DispatcherNotification = self.dispatcher.dispatch(
+            event=Events.REQUEST_STATUS_LOOKUP,
+            name="New",
             namespace=Constants.GLOBAL_NAMESPACE,
         )
 
-        # Log a debug message indicating the number of stacks found
-        self.logger.debug(
-            message=f"Found {len(notification['result'].values())} stack(s) in the database."
+        # Dispatch the REQUEST_GET_ALL_STACKS event
+        stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
+            event=Events.REQUEST_STACK_LOOKUP,
+            namespace=Constants.GLOBAL_NAMESPACE,
+            status=status_notification.get_result(key="on_request_status_lookup")[0][
+                "id"
+            ],
         )
+
+        # Log a debug message indicating the number of stacks found
+        self.logger.debug(message=stacks_notification)

@@ -669,6 +669,56 @@ class OptionManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_options(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableOption]]]:
+        """
+        Searches for options in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the OptionModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableOption]]]: The found options if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for options in the database
+            models: Optional[List[OptionModel]] = asyncio.run(
+                OptionModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found options if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableOption(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no options were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_option(
         self,
         option: Union[ImmutableOption, MutableOption],

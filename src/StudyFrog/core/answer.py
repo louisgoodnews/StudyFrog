@@ -749,6 +749,56 @@ class AnswerManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_answers(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableAnswer]]]:
+        """
+        Searches for answers in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the AnswerModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableAnswer]]]: The found answers if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for answers in the database
+            models: Optional[List[AnswerModel]] = asyncio.run(
+                AnswerModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found answers if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableAnswer(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no answers were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_answer(
         self,
         answer: Union[ImmutableAnswer, MutableAnswer],

@@ -656,6 +656,56 @@ class SettingManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_settings(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableSetting]]]:
+        """
+        Searches for settings in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the SettingModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableSetting]]]: The found settings if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for settings in the database
+            models: Optional[List[SettingModel]] = asyncio.run(
+                SettingModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found settings if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableSetting(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no settings were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_setting(
         self,
         setting: Union[ImmutableSetting, Mutable],
@@ -686,7 +736,7 @@ class SettingManager(BaseObjectManager):
                             "_logger",
                             "_uuid",
                         ]
-                    )
+                    ),
                 )
             )
 

@@ -15,140 +15,7 @@ class Events:
     """
     A collection of application-level events.
 
-    Attributes:
-        ANSWER_CREATED (DispatcherEvent): An event that indicates that an answer has been created in the backend.
-        ANSWER_DELETED (DispatcherEvent): An event that indicates that an answer has been deleted in the backend.
-        ANSWER_LOADED (DispatcherEvent): An event that indicates that an answer has been loaed in the backend.
-        ANSWER_UPDATED (DispatcherEvent): An event that indicates that an answer has been updated in the backend.
-        APPLICATION_STARTED (DispatcherEvent): An event that indicates that the application has started.
-        APPLICATION_STOPPED (DispatcherEvent): An event that indicates that the application has stopped.
-        ASSOCIATION_CREATED (DispatcherEvent): An event that indicates that an association has been created in the backend.
-        ASSOCIATION_DELETED (DispatcherEvent): An event that indicates that an association has been deleted in the backend.
-        ASSOCIATION_LOADED (DispatcherEvent): An event that indicates that an association has been loaed in the backend.
-        ASSOCIATION_UPDATED (DispatcherEvent): An event that indicates that an association has been updated in the backend.
-        BUTTON_CLICKED (DispatcherEvent): An event that indicates that a button has been clicked.
-        CANCEL_BUTTON_CLICKED (DispatcherEvent): An event that indicates that the cancel button has been clicked.
-        CHANGE_HISTORY_CREATED (DispatcherEvent): An event that indicates that a change history has been created in the backend.
-        CHANGE_HISTORY_DELETED (DispatcherEvent): An event that indicates that a change history has been deleted in the backend.
-        CHANGE_HISTORY_LOADED (DispatcherEvent): An event that indicates that a change history has been loaed in the backend.
-        CHANGE_HISTORY_UPDATED (DispatcherEvent): An event that indicates that a change history has been updated in the backend.
-        CHANGE_HISTORY_ITEM_CREATED (DispatcherEvent): An event that indicates that a change history item has been created in the backend.
-        CHANGE_HISTORY_ITEM_DELETED (DispatcherEvent): An event that indicates that a change history item has been deleted in the backend.
-        CHANGE_HISTORY_ITEM_LOADED (DispatcherEvent): An event that indicates that a change history item has been loaed in the backend.
-        CHANGE_HISTORY_ITEM_UPDATED (DispatcherEvent): An event that indicates that a change history item has been updated in the backend.
-        CREATE_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a create button has been clicked.
-        DIFFICULTY_CREATED (DispatcherEvent): An event that indicates that a difficulty has been created in the backend.
-        DIFFICULTY_DELETED (DispatcherEvent): An event that indicates that a difficulty has been deleted in the backend.
-        DIFFICULTY_LOADED (DispatcherEvent): An event that indicates that a difficulty has been loaed in the backend.
-        DIFFICULTY_UPDATED (DispatcherEvent): An event that indicates that a difficulty has been updated in the backend.
-        FLASHCARD_CREATED (DispatcherEvent): An event that indicates that a flashcard has been created in the backend.
-        FLASHCARD_DELETED (DispatcherEvent): An event that indicates that a flashcard has been deleted in the backend.
-        FLASHCARD_LOADED (DispatcherEvent): An event that indicates that a flashcard has been loaed in the backend.
-        FLASHCARD_UPDATED (DispatcherEvent): An event that indicates that a flashcard has been updated in the backend.
-        GENERIC_EVENT (DispatcherEvent): An event that indicates that a generic event has been triggered.
-        HELP_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a help button has been clicked.
-        MENU_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a menu button has been clicked.
-        NAVIGATE (DispatcherEvent): An event that indicates that a navigate event has occurred.
-        NAVIGATE_VALIDATE_FAILURE (DispatcherEvent): An event that indicates that a navigate validation has failed.
-        NAVIGATE_VALIDATE_SUCCESS (DispatcherEvent): An event that indicates that a navigate validation has succeeded.
-        NAVIGATION_COMPLETED (DispatcherEvent): An event that indicates that a navigation has been completed.
-        NOTE_CREATED (DispatcherEvent): An event that indicates that a note has been created in the backend.
-        NOTE_DELETED (DispatcherEvent): An event that indicates that a note has been deleted in the backend.
-        NOTE_LOADED (DispatcherEvent): An event that indicates that a note has been loaed in the backend.
-        NOTE_UPDATED (DispatcherEvent): An event that indicates that a note has been updated in the backend.
-        NOTIFICATIONS_BUTTON_CLICKED (DispatcherEvent): An event that indicates that a notifications button has been clicked.
-        OKAY_BUTTON_CLICKED (DispatcherEvent): An event that indicates that an okay button has been clicked.
-        PRIORITY_CREATED (DispatcherEvent): An event that indicates that a priority has been created in the backend.
-        PRIORITY_DELETED (DispatcherEvent): An event that indicates that a priority has been deleted in the backend.
-        PRIORITY_LOADED (DispatcherEvent): An event that indicates that a priority has been loaed in the backend.
-        PRIORITY_UPDATED (DispatcherEvent): An event that indicates that a priority has been updated in the backend.
-        QUESTION_CREATED (DispatcherEvent): An event that indicates that a question has been created in the backend.
-        QUESTION_DELETED (DispatcherEvent): An event that indicates that a question has been deleted in the backend.
-        QUESTION_LOADED (DispatcherEvent): An event that indicates that a question has been loaed in the backend.
-        QUESTION_UPDATED (DispatcherEvent): An event that indicates that a question has been updated in the backend.
-        REQUEST_ANSWER_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new answer.
-        REQUEST_ANSWER_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a answer.
-        REQUEST_ANSWER_LOAD (DispatcherEvent): An event that indicates that the user wants to load a answer.
-        REQUEST_ANSWER_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a answer.
-        REQUEST_APPLICATION_STOP (DispatcherEvent): An event that indicates that the application should be stopped.
-        REQUEST_ASSOCIATION_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new association.
-        REQUEST_ASSOCIATION_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a association.
-        REQUEST_ASSOCIATION_LOAD (DispatcherEvent): An event that indicates that the user wants to load a association.
-        REQUEST_ASSOCIATION_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a association.
-        REQUEST_CHANGE_HISTORY_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new change history.
-        REQUEST_CHANGE_HISTORY_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a change history.
-        REQUEST_CHANGE_HISTORY_LOAD (DispatcherEvent): An event that indicates that the user wants to load a change history.
-        REQUEST_CHANGE_HISTORY_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a change history.
-        REQUEST_CHANGE_HISTORY_ITEM_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new change history item.
-        REQUEST_CHANGE_HISTORY_ITEM_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a change history item.
-        REQUEST_CHANGE_HISTORY_ITEM_LOAD (DispatcherEvent): An event that indicates that the user wants to load a change history item.
-        REQUEST_CHANGE_HISTORY_ITEM_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a change history item.
-        REQUEST_CUSTOM_FIELD_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new custom field.
-        REQUEST_CUSTOM_FIELD_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a custom field.
-        REQUEST_CUSTOM_FIELD_LOAD (DispatcherEvent): An event that indicates that the user wants to load a custom field.
-        REQUEST_CUSTOM_FIELD_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a custom field.
-        REQUEST_DIFFICULTY_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new difficulty.
-        REQUEST_DIFFICULTY_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a difficulty.
-        REQUEST_DIFFICULTY_LOAD (DispatcherEvent): An event that indicates that the user wants to load a difficulty.
-        REQUEST_DIFFICULTY_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a difficulty.
-        REQUEST_EXIT_UI_MAINLOOP (DispatcherEvent): An event that indicates that the user wants to exit the main UI loop.
-        REQUEST_FLASHCARD_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new flashcard.
-        REQUEST_FLASHCARD_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a flashcard.
-        REQUEST_FLASHCARD_LOAD (DispatcherEvent): An event that indicates that the user wants to load a flashcard.
-        REQUEST_FLASHCARD_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a flashcard.
-        REQUEST_GET_ALL_STACKS (DispatcherEvent): An event that indicates that the user wants to get all stacks.
-        REQUEST_OPTION_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new option.
-        REQUEST_OPTION_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a option.
-        REQUEST_OPTION_LOAD (DispatcherEvent): An event that indicates that the user wants to load a option.
-        REQUEST_OPTION_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a option.
-        REQUEST_NOTE_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new note.
-        REQUEST_NOTE_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a note.
-        REQUEST_NOTE_LOAD (DispatcherEvent): An event that indicates that the user wants to load a note.
-        REQUEST_NOTE_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a note.
-        REQUEST_PRIORITY_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new priority.
-        REQUEST_PRIORITY_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a priority.
-        REQUEST_PRIORITY_LOAD (DispatcherEvent): An event that indicates that the user wants to load a priority.
-        REQUEST_PRIORITY_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a priority.
-        REQUEST_QUESTION_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new question.
-        REQUEST_QUESTION_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a question.
-        REQUEST_QUESTION_LOAD (DispatcherEvent): An event that indicates that the user wants to load a question.
-        REQUEST_QUESTION_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a question.
-        REQUEST_SETTING_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new setting.
-        REQUEST_SETTING_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a setting.
-        REQUEST_SETTING_LOAD (DispatcherEvent): An event that indicates that the user wants to load a setting.
-        REQUEST_SETTING_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a setting.
-        REQUEST_STACK_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new stack.
-        REQUEST_STACK_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a stack.
-        REQUEST_STACK_LOAD (DispatcherEvent): An event that indicates that the user wants to load a stack.
-        REQUEST_STACK_LOOKUP (DispatcherEvent): An event that indicates that the user wants to lookup a stack.
-        REQUEST_STACK_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a stack.
-        REQUEST_TAG_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new tag.
-        REQUEST_TAG_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a tag.
-        REQUEST_TAG_LOAD (DispatcherEvent): An event that indicates that the user wants to load a tag.
-        REQUEST_TAG_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a tag.
-        REQUEST_TIMER_PAUSE (DispatcherEvent): An event that indicates that the user wants to pause a timer.
-        REQUEST_TIMER_RESUME (DispatcherEvent): An event that indicates that the user wants to resume a timer.
-        REQUEST_TIMER_START (DispatcherEvent): An event that indicates that the user wants to start a timer.
-        REQUEST_TIMER_STOP (DispatcherEvent): An event that indicates that the user wants to stop a timer.
-        REQUEST_USER_CREATE (DispatcherEvent): An event that indicates that the user wants to create a new user.
-        REQUEST_USER_DELETE (DispatcherEvent): An event that indicates that the user wants to delete a user.
-        REQUEST_USER_LOAD (DispatcherEvent): An event that indicates that the user wants to load a user.
-        REQUEST_USER_UPDATE (DispatcherEvent): An event that indicates that the user wants to update a user.
-        REQUEST_VALIDATE_NAVIGATION (DispatcherEvent): An event that indicates that the user wants to validate a navigate event.
-        SEARCH_QUERY_CHANGED (DispatcherEvent): An event that indicates that the search query has been changed.
-        STACK_CREATED (DispatcherEvent): An event that indicates that a stack has been created in the backend.
-        STACK_DELETED (DispatcherEvent): An event that indicates that a stack has been deleted in the backend.
-        STACK_LOADED (DispatcherEvent): An event that indicates that a stack has been loaed in the backend.
-        STACK_UPDATED (DispatcherEvent): An event that indicates that a stack has been updated in the backend.
-        TAG_CREATED (DispatcherEvent): An event that indicates that a tag has been created in the backend.
-        TAG_DELETED (DispatcherEvent): An event that indicates that a tag has been deleted in the backend.
-        TAG_LOADED (DispatcherEvent): An event that indicates that a tag has been loaed in the backend.
-        TAG_UPDATED (DispatcherEvent): An event that indicates that a tag has been updated in the backend.
-        REQUEST_APPLICATION_STOP (DispatcherEvent): An event that indicates that the application should be stopped.
-        REQUEST_FORWARD_NAVIGATION (DispatcherEvent): An event that indicates that the user wants to go forward in the navigation stack.
-        REQUEST_BACKWARD_NAVIGATION (DispatcherEvent): An event that indicates that the user wants to go backward in the navigation stack.
-        SETTINGS_BUTTON_CLICKED (DispatcherEvent): An event that indicates that the settings button has been clicked.
-        USER_BUTTON_CLICKED (DispatcherEvent): An event that indicates that the user button has been clicked.
+    These events are dispatched using the Dispatcher class.
     """
 
     # An event that indicates that an answer has been created in the backend
@@ -414,6 +281,11 @@ class Events:
         name="global:request:answer:load"
     )
 
+    # An event that indicates that the user wants to lookup an answer
+    REQUEST_ANSWER_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:answer:lookup"
+    )
+
     # An event that indicates that the user wants to update an answer
     REQUEST_ANSWER_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:answer:update"
@@ -439,6 +311,11 @@ class Events:
         name="global:request:association:load"
     )
 
+    # An event that indicates that the user wants to lookup an association
+    REQUEST_ASSOCIATION_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:association:lookup"
+    )
+
     # An event that indicates that the user wants to update an association
     REQUEST_ASSOCIATION_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:association:update"
@@ -462,6 +339,11 @@ class Events:
     # An event that indicates that the user wants to load a change history
     REQUEST_CHANGE_HISTORY_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:change_history:load"
+    )
+
+    # An event that indicates that the user wants to lookup a change history
+    REQUEST_CHANGE_HISTORY_LOOKUP: DispatcherEvent = (
+        DispatcherEventFactory.create_event(name="global:request:change_history:lookup")
     )
 
     # An event that indicates that the user wants to update a change history
@@ -490,6 +372,13 @@ class Events:
         )
     )
 
+    # An event that indicates that the user wants to lookup a change history item
+    REQUEST_CHANGE_HISTORY_ITEM_LOOKUP: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:change_history_item:lookup"
+        )
+    )
+
     # An event that indicates that the user wants to update a change history item
     REQUEST_CHANGE_HISTORY_ITEM_UPDATE: DispatcherEvent = (
         DispatcherEventFactory.create_event(
@@ -512,6 +401,11 @@ class Events:
         name="global:request:custom_field:load"
     )
 
+    # An event that indicates that the user wants to lookup a custom field
+    REQUEST_CUSTOM_FIELD_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:custom_field:lookup"
+    )
+
     # An event that indicates that the user wants to update a custom field
     REQUEST_CUSTOM_FIELD_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:custom_field:update"
@@ -530,6 +424,11 @@ class Events:
     # An event that indicates that the user wants to load a difficulty
     REQUEST_DIFFICULTY_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:difficulty:load"
+    )
+
+    # An event that indicates that the user wants to lookup a difficulty
+    REQUEST_DIFFICULTY_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:difficulty:lookup"
     )
 
     # An event that indicates that the user wants to update a difficulty
@@ -562,14 +461,103 @@ class Events:
         name="global:request:flashcard:load"
     )
 
+    # An event that indicates that the user wants to lookup a flashcard
+    REQUEST_FLASHCARD_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:flashcard:lookup"
+    )
+
     # An event that indicates that the user wants to update a flashcard
     REQUEST_FLASHCARD_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:flashcard:update"
     )
 
+    # An event that indicates that the user wants to get all answers
+    REQUEST_GET_ALL_ANSWERS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:answers"
+    )
+
+    # An event that indicates that the user wants to get all associations
+    REQUEST_GET_ALL_ASSOCIATIONS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:associations"
+    )
+
+    # An event that indicates that the user wants to get all change histories
+    REQUEST_GET_ALL_CHANGE_HISTORIES: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:get:all:change:histories"
+        )
+    )
+
+    # An event that indicates that the user wants to get all change history items
+    REQUEST_GET_ALL_CHANGE_HISTORY_ITEMS: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:get:all:change:history:items"
+        )
+    )
+
+    # An event that indicates that the user wants to get all custom fields
+    REQUEST_GET_ALL_CUSTOM_FIELDS: DispatcherEvent = (
+        DispatcherEventFactory.create_event(name="global:request:get:all:custom:fields")
+    )
+
+    # An event that indicates that the user wants to get all defaults
+    REQUEST_GET_ALL_DEFAULTS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:defaults"
+    )
+
+    # An event that indicates that the user wants to get all difficulties
+    REQUEST_GET_ALL_DIFFICULTIES: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:difficulties"
+    )
+
+    # An event that indicates that the user wants to get all flashcards
+    REQUEST_GET_ALL_FLASHCARDS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:flashcards"
+    )
+
+    # An event that indicates that the user wants to get all notes
+    REQUEST_GET_ALL_NOTES: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:notes"
+    )
+
+    # An event that indicates that the user wants to get all options
+    REQUEST_GET_ALL_OPTIONS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:options"
+    )
+
+    # An event that indicates that the user wants to get all priorities
+    REQUEST_GET_ALL_PRIORITIES: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:priorities"
+    )
+
+    # An event that indicates that the user wants to get all questions
+    REQUEST_GET_ALL_QUESTIONS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:questions"
+    )
+
+    # An event that indicates that the user wants to get all settings
+    REQUEST_GET_ALL_SETTINGS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:settings"
+    )
+
     # An event that indicates that the user wants to get all stacks
     REQUEST_GET_ALL_STACKS: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:get:all:stacks"
+    )
+
+    # An event that indicates that the user wants to get all statuses
+    REQUEST_GET_ALL_STATUSES: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:statuses"
+    )
+
+    # An event that indicates that the user wants to get all tags
+    REQUEST_GET_ALL_TAGS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:tags"
+    )
+
+    # An event that indicates that the user wants to get all users
+    REQUEST_GET_ALL_USERS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:all:users"
     )
 
     # An event that indicates that the user wants to create a new note
@@ -585,6 +573,11 @@ class Events:
     # An event that indicates that the user wants to load a note
     REQUEST_NOTE_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:note:load"
+    )
+
+    # An event that indicates that the user wants to lookup a note
+    REQUEST_NOTE_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:note:lookup"
     )
 
     # An event that indicates that the user wants to update a note
@@ -607,6 +600,11 @@ class Events:
         name="global:request:option:load"
     )
 
+    # An event that indicates that the user wants to lookup an option
+    REQUEST_OPTION_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:option:lookup"
+    )
+
     # An event that indicates that the user wants to update a option
     REQUEST_OPTION_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:option:update"
@@ -625,6 +623,11 @@ class Events:
     # An event that indicates that the user wants to load a priority
     REQUEST_PRIORITY_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:priority:load"
+    )
+
+    # An event that indicates that the user wants to lookup a priority
+    REQUEST_PRIORITY_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:priority:lookup"
     )
 
     # An event that indicates that the user wants to update a priority
@@ -647,6 +650,11 @@ class Events:
         name="global:request:question:load"
     )
 
+    # An event that indicates that the user wants to lookup a question
+    REQUEST_QUESTION_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:question:lookup"
+    )
+
     # An event that indicates that the user wants to update a question
     REQUEST_QUESTION_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:question:update"
@@ -665,6 +673,11 @@ class Events:
     # An event that indicates that the user wants to load a setting
     REQUEST_SETTING_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:setting:load"
+    )
+
+    # An event that indicates that the user wants to lookup a setting
+    REQUEST_SETTING_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:setting:lookup"
     )
 
     # An event that indicates that the user wants to update a setting
@@ -697,6 +710,31 @@ class Events:
         name="global:request:stack:update"
     )
 
+    # An event that indicates that the user wants to create a new status
+    REQUEST_STATUS_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:status:create"
+    )
+
+    # An event that indicates that the user wants to delete a status
+    REQUEST_STATUS_DELETE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:status:delete"
+    )
+
+    # An event that indicates that the user wants to load a status
+    REQUEST_STATUS_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:status:load"
+    )
+
+    # An event that indicates that the user wants to lookup a status
+    REQUEST_STATUS_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:status:lookup"
+    )
+
+    # An event that indicates that the user wants to update a status
+    REQUEST_STATUS_UPDATE: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:status:update"
+    )
+
     # An event that indicates that the user wants to create a new tag
     REQUEST_TAG_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:tag:create"
@@ -710,6 +748,11 @@ class Events:
     # An event that indicates that the user wants to load a tag
     REQUEST_TAG_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:tag:load"
+    )
+
+    # An event that indicates that the user wants to lookup a tag
+    REQUEST_TAG_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:tag:lookup"
     )
 
     # An event that indicates that the user wants to update a tag
@@ -750,6 +793,11 @@ class Events:
     # An event that indicates that the user wants to load a user
     REQUEST_USER_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:user:load"
+    )
+
+    # An event that indicates that the user wants to lookup a user
+    REQUEST_USER_LOOKUP: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:user:lookup"
     )
 
     # An event that indicates that the user wants to update a user
@@ -898,6 +946,7 @@ class Events:
             cls.REQUEST_ANSWER_CREATE,
             cls.REQUEST_ANSWER_DELETE,
             cls.REQUEST_ANSWER_LOAD,
+            cls.REQUEST_ANSWER_LOOKUP,
             cls.REQUEST_ANSWER_UPDATE,
         ]
 
@@ -913,6 +962,7 @@ class Events:
             cls.REQUEST_ASSOCIATION_CREATE,
             cls.REQUEST_ASSOCIATION_DELETE,
             cls.REQUEST_ASSOCIATION_LOAD,
+            cls.REQUEST_ASSOCIATION_LOOKUP,
             cls.REQUEST_ASSOCIATION_UPDATE,
         ]
 
@@ -928,6 +978,7 @@ class Events:
             cls.REQUEST_CHANGE_HISTORY_CREATE,
             cls.REQUEST_CHANGE_HISTORY_DELETE,
             cls.REQUEST_CHANGE_HISTORY_LOAD,
+            cls.REQUEST_CHANGE_HISTORY_LOOKUP,
             cls.REQUEST_CHANGE_HISTORY_UPDATE,
         ]
 
@@ -943,6 +994,7 @@ class Events:
             cls.REQUEST_CHANGE_HISTORY_ITEM_CREATE,
             cls.REQUEST_CHANGE_HISTORY_ITEM_DELETE,
             cls.REQUEST_CHANGE_HISTORY_ITEM_LOAD,
+            cls.REQUEST_CHANGE_HISTORY_ITEM_LOOKUP,
             cls.REQUEST_CHANGE_HISTORY_ITEM_UPDATE,
         ]
 
@@ -958,6 +1010,7 @@ class Events:
             cls.REQUEST_CUSTOM_FIELD_CREATE,
             cls.REQUEST_CUSTOM_FIELD_DELETE,
             cls.REQUEST_CUSTOM_FIELD_LOAD,
+            cls.REQUEST_CUSTOM_FIELD_LOOKUP,
             cls.REQUEST_CUSTOM_FIELD_UPDATE,
         ]
 
@@ -973,6 +1026,7 @@ class Events:
             cls.REQUEST_DIFFICULTY_CREATE,
             cls.REQUEST_DIFFICULTY_DELETE,
             cls.REQUEST_DIFFICULTY_LOAD,
+            cls.REQUEST_DIFFICULTY_LOOKUP,
             cls.REQUEST_DIFFICULTY_UPDATE,
         ]
 
@@ -988,6 +1042,7 @@ class Events:
             cls.REQUEST_FLASHCARD_CREATE,
             cls.REQUEST_FLASHCARD_DELETE,
             cls.REQUEST_FLASHCARD_LOAD,
+            cls.REQUEST_FLASHCARD_LOOKUP,
             cls.REQUEST_FLASHCARD_UPDATE,
         ]
 
@@ -1016,6 +1071,7 @@ class Events:
             cls.REQUEST_NOTE_CREATE,
             cls.REQUEST_NOTE_DELETE,
             cls.REQUEST_NOTE_LOAD,
+            cls.REQUEST_NOTE_LOOKUP,
             cls.REQUEST_NOTE_UPDATE,
         ]
 
@@ -1031,6 +1087,7 @@ class Events:
             cls.REQUEST_OPTION_CREATE,
             cls.REQUEST_OPTION_DELETE,
             cls.REQUEST_OPTION_LOAD,
+            cls.REQUEST_OPTION_LOOKUP,
             cls.REQUEST_OPTION_UPDATE,
         ]
 
@@ -1046,6 +1103,7 @@ class Events:
             cls.REQUEST_PRIORITY_CREATE,
             cls.REQUEST_PRIORITY_DELETE,
             cls.REQUEST_PRIORITY_LOAD,
+            cls.REQUEST_PRIORITY_LOOKUP,
             cls.REQUEST_PRIORITY_UPDATE,
         ]
 
@@ -1061,6 +1119,7 @@ class Events:
             cls.REQUEST_QUESTION_CREATE,
             cls.REQUEST_QUESTION_DELETE,
             cls.REQUEST_QUESTION_LOAD,
+            cls.REQUEST_QUESTION_LOOKUP,
             cls.REQUEST_QUESTION_UPDATE,
         ]
 
@@ -1076,6 +1135,7 @@ class Events:
             cls.REQUEST_SETTING_CREATE,
             cls.REQUEST_SETTING_DELETE,
             cls.REQUEST_SETTING_LOAD,
+            cls.REQUEST_SETTING_LOOKUP,
             cls.REQUEST_SETTING_UPDATE,
         ]
 
@@ -1097,6 +1157,22 @@ class Events:
         ]
 
     @classmethod
+    def get_status_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all status events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all status events in the Events class.
+        """
+        return [
+            cls.REQUEST_STATUS_CREATE,
+            cls.REQUEST_STATUS_DELETE,
+            cls.REQUEST_STATUS_LOAD,
+            cls.REQUEST_STATUS_LOOKUP,
+            cls.REQUEST_STATUS_UPDATE,
+        ]
+
+    @classmethod
     def get_tag_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all tag events in the Events class.
@@ -1108,6 +1184,7 @@ class Events:
             cls.REQUEST_TAG_CREATE,
             cls.REQUEST_TAG_DELETE,
             cls.REQUEST_TAG_LOAD,
+            cls.REQUEST_TAG_LOOKUP,
             cls.REQUEST_TAG_UPDATE,
         ]
 
@@ -1138,5 +1215,6 @@ class Events:
             cls.REQUEST_USER_CREATE,
             cls.REQUEST_USER_DELETE,
             cls.REQUEST_USER_LOAD,
+            cls.REQUEST_USER_LOOKUP,
             cls.REQUEST_USER_UPDATE,
         ]

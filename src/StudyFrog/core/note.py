@@ -701,6 +701,56 @@ class NoteManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_notes(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableNote]]]:
+        """
+        Searches for notes in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the NoteModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableNote]]]: The found notes if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for notes in the database
+            models: Optional[List[NoteModel]] = asyncio.run(
+                NoteModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found notes if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableNote(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no notes were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_note(
         self,
         note: Union[ImmutableNote, MutableNote],

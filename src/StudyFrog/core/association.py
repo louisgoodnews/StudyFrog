@@ -807,6 +807,56 @@ class AssociationManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_associations(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[Association]]]:
+        """
+        Searches for associations in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the AssociationModel class.
+
+        Returns:
+            Optional[Union[List[Association]]]: The found associations if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for associations in the database
+            models: Optional[List[AssociationModel]] = asyncio.run(
+                AssociationModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found associations if any
+            if models is not None and len(models) > 0:
+                return [
+                    Association(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no associations were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_association(
         self,
         association: Association,

@@ -377,7 +377,7 @@ class BootstrapService:
             None
         """
         try:
-            # Store the subscription parameters in a set
+            # Store the subscription parameters in a list
             subscriptions: List[Dict[str, Any]] = [
                 {
                     "event": Events.REQUEST_BACKWARD_NAVIGATION,
@@ -400,6 +400,10 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_answer_load,
                 },
                 {
+                    "event": Events.REQUEST_ANSWER_LOOKUP,
+                    "function": self.unified_object_service.on_request_answer_lookup,
+                },
+                {
                     "event": Events.REQUEST_ANSWER_UPDATE,
                     "function": self.unified_object_service.on_request_answer_update,
                 },
@@ -414,6 +418,10 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_ASSOCIATION_LOAD,
                     "function": self.unified_object_service.on_request_association_load,
+                },
+                {
+                    "event": Events.REQUEST_ASSOCIATION_LOOKUP,
+                    "function": self.unified_object_service.on_request_association_lookup,
                 },
                 {
                     "event": Events.REQUEST_ASSOCIATION_UPDATE,
@@ -432,6 +440,10 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_change_history_load,
                 },
                 {
+                    "event": Events.REQUEST_CHANGE_HISTORY_LOOKUP,
+                    "function": self.unified_object_service.on_request_change_history_lookup,
+                },
+                {
                     "event": Events.REQUEST_CHANGE_HISTORY_UPDATE,
                     "function": self.unified_object_service.on_request_change_history_update,
                 },
@@ -446,6 +458,10 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_CHANGE_HISTORY_ITEM_LOAD,
                     "function": self.unified_object_service.on_request_change_history_item_load,
+                },
+                {
+                    "event": Events.REQUEST_CHANGE_HISTORY_ITEM_LOOKUP,
+                    "function": self.unified_object_service.on_request_change_history_item_lookup,
                 },
                 {
                     "event": Events.REQUEST_CHANGE_HISTORY_ITEM_UPDATE,
@@ -464,6 +480,10 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_custom_field_load,
                 },
                 {
+                    "event": Events.REQUEST_CUSTOM_FIELD_LOOKUP,
+                    "function": self.unified_object_service.on_request_custom_field_lookup,
+                },
+                {
                     "event": Events.REQUEST_CUSTOM_FIELD_UPDATE,
                     "function": self.unified_object_service.on_request_custom_field_update,
                 },
@@ -478,6 +498,10 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_DIFFICULTY_LOAD,
                     "function": self.unified_object_service.on_request_difficulty_load,
+                },
+                {
+                    "event": Events.REQUEST_DIFFICULTY_LOOKUP,
+                    "function": self.unified_object_service.on_request_difficulty_lookup,
                 },
                 {
                     "event": Events.REQUEST_DIFFICULTY_UPDATE,
@@ -496,12 +520,68 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_flashcard_load,
                 },
                 {
+                    "event": Events.REQUEST_FLASHCARD_LOOKUP,
+                    "function": self.unified_object_service.on_request_flashcard_lookup,
+                },
+                {
                     "event": Events.REQUEST_FLASHCARD_UPDATE,
                     "function": self.unified_object_service.on_request_flashcard_update,
                 },
                 {
+                    "event": Events.REQUEST_GET_ALL_ANSWERS,
+                    "function": self.unified_object_service.on_request_get_all_answers,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_ASSOCIATIONS,
+                    "function": self.unified_object_service.on_request_get_all_associations,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_CUSTOM_FIELDS,
+                    "function": self.unified_object_service.on_request_get_all_custom_fields,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_DEFAULTS,
+                    "function": self.unified_object_service.on_request_get_all_defaults,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_DIFFICULTIES,
+                    "function": self.unified_object_service.on_request_get_all_difficulties,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_FLASHCARDS,
+                    "function": self.unified_object_service.on_request_get_all_flashcards,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_NOTES,
+                    "function": self.unified_object_service.on_request_get_all_notes,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_OPTIONS,
+                    "function": self.unified_object_service.on_request_get_all_options,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_PRIORITIES,
+                    "function": self.unified_object_service.on_request_get_all_priorities,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_QUESTIONS,
+                    "function": self.unified_object_service.on_request_get_all_questions,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_SETTINGS,
+                    "function": self.unified_object_service.on_request_get_all_settings,
+                },
+                {
                     "event": Events.REQUEST_GET_ALL_STACKS,
                     "function": self.unified_object_service.on_request_get_all_stacks,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_STATUSES,
+                    "function": self.unified_object_service.on_request_get_all_statuses,
+                },
+                {
+                    "event": Events.REQUEST_GET_ALL_USERS,
+                    "function": self.unified_object_service.on_request_get_all_users,
                 },
                 {
                     "event": Events.REQUEST_NOTE_CREATE,
@@ -514,6 +594,10 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_NOTE_LOAD,
                     "function": self.unified_object_service.on_request_note_load,
+                },
+                {
+                    "event": Events.REQUEST_NOTE_LOOKUP,
+                    "function": self.unified_object_service.on_request_note_lookup,
                 },
                 {
                     "event": Events.REQUEST_NOTE_UPDATE,
@@ -532,6 +616,10 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_option_load,
                 },
                 {
+                    "event": Events.REQUEST_OPTION_LOOKUP,
+                    "function": self.unified_object_service.on_request_option_lookup,
+                },
+                {
                     "event": Events.REQUEST_OPTION_UPDATE,
                     "function": self.unified_object_service.on_request_option_update,
                 },
@@ -546,6 +634,10 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_PRIORITY_LOAD,
                     "function": self.unified_object_service.on_request_priority_load,
+                },
+                {
+                    "event": Events.REQUEST_PRIORITY_LOOKUP,
+                    "function": self.unified_object_service.on_request_priority_lookup,
                 },
                 {
                     "event": Events.REQUEST_PRIORITY_UPDATE,
@@ -564,24 +656,32 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_question_load,
                 },
                 {
+                    "event": Events.REQUEST_QUESTION_LOOKUP,
+                    "function": self.unified_object_service.on_request_question_lookup,
+                },
+                {
                     "event": Events.REQUEST_QUESTION_UPDATE,
                     "function": self.unified_object_service.on_request_question_update,
                 },
                 {
                     "event": Events.REQUEST_SETTING_CREATE,
-                    "function": self.setting_service.on_request_setting_create,
+                    "function": self.unified_object_service.on_request_setting_create,
                 },
                 {
                     "event": Events.REQUEST_SETTING_DELETE,
-                    "function": self.setting_service.on_request_setting_delete,
+                    "function": self.unified_object_service.on_request_setting_delete,
                 },
                 {
                     "event": Events.REQUEST_SETTING_LOAD,
-                    "function": self.setting_service.on_request_setting_load,
+                    "function": self.unified_object_service.on_request_setting_load,
+                },
+                {
+                    "event": Events.REQUEST_SETTING_LOOKUP,
+                    "function": self.unified_object_service.on_request_setting_lookup,
                 },
                 {
                     "event": Events.REQUEST_SETTING_UPDATE,
-                    "function": self.setting_service.on_request_setting_update,
+                    "function": self.unified_object_service.on_request_setting_update,
                 },
                 {
                     "event": Events.REQUEST_STACK_CREATE,
@@ -604,6 +704,26 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_stack_update,
                 },
                 {
+                    "event": Events.REQUEST_STATUS_CREATE,
+                    "function": self.unified_object_service.on_request_status_create,
+                },
+                {
+                    "event": Events.REQUEST_STATUS_DELETE,
+                    "function": self.unified_object_service.on_request_status_delete,
+                },
+                {
+                    "event": Events.REQUEST_STATUS_LOAD,
+                    "function": self.unified_object_service.on_request_status_load,
+                },
+                {
+                    "event": Events.REQUEST_STATUS_LOOKUP,
+                    "function": self.unified_object_service.on_request_status_lookup,
+                },
+                {
+                    "event": Events.REQUEST_STATUS_UPDATE,
+                    "function": self.unified_object_service.on_request_status_update,
+                },
+                {
                     "event": Events.REQUEST_TAG_CREATE,
                     "function": self.unified_object_service.on_request_tag_create,
                 },
@@ -614,6 +734,10 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_TAG_LOAD,
                     "function": self.unified_object_service.on_request_tag_load,
+                },
+                {
+                    "event": Events.REQUEST_TAG_LOOKUP,
+                    "function": self.unified_object_service.on_request_tag_lookup,
                 },
                 {
                     "event": Events.REQUEST_TAG_UPDATE,
@@ -630,6 +754,10 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_USER_LOAD,
                     "function": self.unified_object_service.on_request_user_load,
+                },
+                {
+                    "event": Events.REQUEST_USER_LOOKUP,
+                    "function": self.unified_object_service.on_request_user_lookup,
                 },
                 {
                     "event": Events.REQUEST_USER_UPDATE,

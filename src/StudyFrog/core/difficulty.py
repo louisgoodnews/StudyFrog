@@ -767,6 +767,56 @@ class DifficultyManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def search_difficulties(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableDifficulty]]]:
+        """
+        Searches for difficulties in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the DifficultyModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableDifficulty]]]: The found difficulties if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for difficulties in the database
+            models: Optional[List[DifficultyModel]] = asyncio.run(
+                DifficultyModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found difficulties if any
+            if models is not None and len(models) > 0:
+                return [
+                    ImmutableDifficulty(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+            else:
+                # Return None indicating that no difficulties were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def update_difficulty(
         self,
         difficulty: ImmutableDifficulty,

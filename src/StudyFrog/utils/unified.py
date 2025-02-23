@@ -315,6 +315,23 @@ class UnifiedObjectService:
         # Load the answer and return it
         return self.unified_manager.get_answer_by(**kwargs)
 
+    def on_request_answer_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableAnswer]]:
+        """
+        Handles the 'request_answer_lookup' event and looks up answers in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the answers.
+
+        Returns:
+            Optional[List[ImmutableAnswer]]: The loaded immutable answers if no exception occurs. Otherwise, None.
+        """
+
+        # Search for answers using the provided keyword arguments and return them
+        return self.unified_manager.search_answers(**kwargs)
+
     def on_request_answer_update(
         self,
         answer: ImmutableAnswer,
@@ -383,6 +400,23 @@ class UnifiedObjectService:
         # Retrieve associations using the provided keyword arguments
         return self.unified_manager.get_association_by(**kwargs)
 
+    def on_request_association_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[Association]]:
+        """
+        Handles the 'request_association_lookup' event and looks up associations in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the associations.
+
+        Returns:
+            Optional[List[Association]]: The loaded associations if no exception occurs. Otherwise, None.
+        """
+
+        # Search for associations using the provided keyword arguments and return them
+        return self.unified_manager.search_associations(**kwargs)
+
     def on_request_association_update(
         self,
         association: Association,
@@ -450,6 +484,23 @@ class UnifiedObjectService:
 
         # Retrieve change histories using the provided keyword arguments
         return self.unified_manager.get_change_history_by(**kwargs)
+
+    def on_request_change_history_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ChangeHistory]]:
+        """
+        Handles the 'request_change_history_lookup' event and looks up change histories in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the change histories.
+
+        Returns:
+            Optional[List[ChangeHistory]]: The loaded change histories if no exception occurs. Otherwise, None.
+        """
+
+        # Search for change histories using the provided keyword arguments and return them
+        return self.unified_manager.search_change_histories(**kwargs)
 
     def on_request_change_history_update(
         self,
@@ -523,6 +574,23 @@ class UnifiedObjectService:
         # Retrieve change history items using the provided keyword arguments
         return self.unified_manager.get_change_history_item_by(**kwargs)
 
+    def on_request_change_history_item_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ChangeHistoryItem]]:
+        """
+        Handles the 'request_change_history_item_lookup' event and looks up change history items in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the change history items.
+
+        Returns:
+            Optional[List[ChangeHistoryItem]]: The loaded change history items if no exception occurs. Otherwise, None.
+        """
+
+        # Search for change history items using the provided keyword arguments and return them
+        return self.unified_manager.search_change_history_items(**kwargs)
+
     def on_request_change_history_item_update(
         self,
         change_history_item: ChangeHistoryItem,
@@ -593,6 +661,23 @@ class UnifiedObjectService:
         # Retrieve custom fields using the provided keyword arguments
         return self.unified_manager.get_custom_field_by(**kwargs)
 
+    def on_request_custom_field_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[CustomField]]:
+        """
+        Handles the 'request_custom_field_lookup' event and looks up custom fields in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the custom fields.
+
+        Returns:
+            Optional[List[CustomField]]: The loaded custom fields if no exception occurs. Otherwise, None.
+        """
+
+        # Search for custom fields using the provided keyword arguments and return them
+        return self.unified_manager.search_custom_fields(**kwargs)
+
     def on_request_custom_field_update(
         self,
         custom_field: CustomField,
@@ -659,6 +744,23 @@ class UnifiedObjectService:
         """
 
         # Load the difficulties from the database
+        return self.unified_manager.get_difficulty_by(**kwargs)
+
+    def on_request_difficulty_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableDifficulty]]:
+        """
+        Handles the 'request_difficulty_lookup' event and looks up difficulties in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the difficulty.
+
+        Returns:
+            Optional[List[ImmutableDifficulty]]: The loaded immutable difficulties if no exception occurs. Otherwise, None.
+        """
+
+        # Load the difficulty from the database and return the loaded immutable difficulty
         return self.unified_manager.get_difficulty_by(**kwargs)
 
     def on_request_difficulty_update(
@@ -746,6 +848,23 @@ class UnifiedObjectService:
         # Search for flashcards in the database and return them
         return self.unified_manager.search_flashcards(**kwargs)
 
+    def on_request_flashcard_update(
+        self,
+        flashcard: ImmutableFlashcard,
+    ) -> Optional[ImmutableFlashcard]:
+        """
+        Handles the 'request_flashcard_update' event and updates a flashcard in the database.
+
+        Args:
+            flashcard (ImmutableFlashcard): The flashcard to be updated.
+
+        Returns:
+            Optional[ImmutableFlashcard]: The updated flashcard if no exception occurs. Otherwise, None.
+        """
+
+        # Update and return the flashcard
+        return self.unified_manager.update_flashcard(flashcard=flashcard)
+
     def on_request_get_all_answers(self) -> Optional[List[ImmutableAnswer]]:
         """
         Handles the 'request_get_all_answers' event and gets all answers from the database.
@@ -756,6 +875,17 @@ class UnifiedObjectService:
 
         # Get all answers from the database and return them
         return self.unified_manager.get_all_answers()
+
+    def on_request_get_all_associations(self) -> Optional[List[Association]]:
+        """
+        Handles the 'request_get_all_associations' event and gets all associations from the database.
+
+        Returns:
+            Optional[List[Association]]: A list of all associations if no exception occurs. Otherwise, None.
+        """
+
+        # Get all associations from the database and return them
+        return self.unified_manager.get_all_associations()
 
     def on_request_get_all_change_histories(
         self,
@@ -838,6 +968,17 @@ class UnifiedObjectService:
         # Get all notes from the database and return them
         return self.unified_manager.get_all_notes()
 
+    def on_request_get_all_options(self) -> Optional[List[ImmutableOption]]:
+        """
+        Handles the 'request_get_all_options' event and gets all options from the database.
+
+        Returns:
+            Optional[List[ImmutableOption]]: A list of all options if no exception occurs. Otherwise, None.
+        """
+
+        # Get all options from the database and return them
+        return self.unified_manager.get_all_options()
+
     def on_request_get_all_priorities(self) -> Optional[List[ImmutablePriority]]:
         """
         Handles the 'request_get_all_priorities' event and gets all priorities from the database.
@@ -915,89 +1056,6 @@ class UnifiedObjectService:
         # Get all users from the database and return them
         return self.unified_manager.get_all_users()
 
-    def on_request_flashcard_update(
-        self,
-        flashcard: ImmutableFlashcard,
-    ) -> Optional[ImmutableFlashcard]:
-        """
-        Handles the 'request_flashcard_update' event and updates a flashcard in the database.
-
-        Args:
-            flashcard (ImmutableFlashcard): The flashcard to be updated.
-
-        Returns:
-            Optional[ImmutableFlashcard]: The updated flashcard if no exception occurs. Otherwise, None.
-        """
-
-        # Update and return the flashcard
-        return self.unified_manager.update_flashcard(flashcard=flashcard)
-
-    def on_request_option_create(
-        self,
-        option: ImmutableOption,
-    ) -> Optional[ImmutableOption]:
-        """
-        Handles the 'request_option_create' event and creates a new option in the database.
-
-        Args:
-            option (ImmutableOption): The option to be created.
-
-        Returns:
-            Optional[ImmutableOption]: The newly created option if no exception occurs. Otherwise, None.
-        """
-
-        # Create and return the option
-        return self.unified_manager.create_option(option=option)
-
-    def on_request_option_delete(
-        self,
-        option: ImmutableOption,
-    ) -> bool:
-        """
-        Handles the 'request_option_delete' event and deletes an option from the database.
-
-        Args:
-            option (ImmutableOption): The option to be deleted.
-
-        Returns:
-            bool: True if the option was deleted successfully. False otherwise.
-        """
-
-        # Delete the option from the database and return the result of the deletion
-        return self.unified_manager.delete_option(option=option)
-
-    def on_request_option_load(
-        self,
-        **kwargs,
-    ) -> Optional[List[ImmutableOption]]:
-        """
-        Handles the 'request_option_load' event and loads options from the database.
-
-        Args:
-            **kwargs: Keyword arguments for filtering the options.
-
-        Returns:
-            Optional[List[ImmutableOption]]: A list of immutable options if found. None otherwise.
-        """
-        return self.unified_manager.get_option_by(**kwargs)
-
-    def on_request_option_update(
-        self,
-        option: ImmutableOption,
-    ) -> Optional[ImmutableOption]:
-        """
-        Handles the 'request_option_update' event and updates an option in the database.
-
-        Args:
-            option (ImmutableOption): The option to be updated.
-
-        Returns:
-            Optional[ImmutableOption]: The updated immutable option if no exception occurs. Otherwise, None.
-        """
-
-        # Update the option in the database and return the updated option
-        return self.unified_manager.update_option(option=option)
-
     def on_request_note_create(
         self,
         note: ImmutableNote,
@@ -1049,6 +1107,23 @@ class UnifiedObjectService:
         # Load the note from the database and return the loaded immutable note
         return self.unified_manager.get_note_by(**kwargs)
 
+    def on_request_note_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[ImmutableNote]:
+        """
+        Handles the 'request_note_lookup' event and looks up notes in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the note.
+
+        Returns:
+            Optional[ImmutableNote]: The loaded immutable note if no exception occurs. Otherwise, None.
+        """
+
+        # Retrieve notes using the provided keyword arguments
+        return self.unified_manager.search_notes(**kwargs)
+
     def on_request_note_update(
         self,
         note: ImmutableNote,
@@ -1065,6 +1140,89 @@ class UnifiedObjectService:
 
         # Update the note in the database and return the updated note
         return self.unified_manager.update_note(note=note)
+
+    def on_request_option_create(
+        self,
+        option: ImmutableOption,
+    ) -> Optional[ImmutableOption]:
+        """
+        Handles the 'request_option_create' event and creates a new option in the database.
+
+        Args:
+            option (ImmutableOption): The option to be created.
+
+        Returns:
+            Optional[ImmutableOption]: The newly created option if no exception occurs. Otherwise, None.
+        """
+
+        # Create and return the option
+        return self.unified_manager.create_option(option=option)
+
+    def on_request_option_delete(
+        self,
+        option: ImmutableOption,
+    ) -> bool:
+        """
+        Handles the 'request_option_delete' event and deletes an option from the database.
+
+        Args:
+            option (ImmutableOption): The option to be deleted.
+
+        Returns:
+            bool: True if the option was deleted successfully. False otherwise.
+        """
+
+        # Delete the option from the database and return the result of the deletion
+        return self.unified_manager.delete_option(option=option)
+
+    def on_request_option_load(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableOption]]:
+        """
+        Handles the 'request_option_load' event and loads options from the database.
+
+        Args:
+            **kwargs: Keyword arguments for filtering the options.
+
+        Returns:
+            Optional[List[ImmutableOption]]: A list of immutable options if found. None otherwise.
+        """
+        return self.unified_manager.get_option_by(**kwargs)
+
+    def on_request_option_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableOption]]:
+        """
+        Handles the 'request_option_lookup' event and looks up options in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the option.
+
+        Returns:
+            Optional[List[ImmutableOption]]: A list of found options if no exception occurs. Otherwise, None.
+        """
+
+        # Search for options using the provided keyword arguments and return them
+        return self.unified_manager.search_options(**kwargs)
+
+    def on_request_option_update(
+        self,
+        option: ImmutableOption,
+    ) -> Optional[ImmutableOption]:
+        """
+        Handles the 'request_option_update' event and updates an option in the database.
+
+        Args:
+            option (ImmutableOption): The option to be updated.
+
+        Returns:
+            Optional[ImmutableOption]: The updated immutable option if no exception occurs. Otherwise, None.
+        """
+
+        # Update the option in the database and return the updated option
+        return self.unified_manager.update_option(option=option)
 
     def on_request_priority_create(
         self,
@@ -1106,6 +1264,23 @@ class UnifiedObjectService:
     ) -> Optional[List[ImmutablePriority]]:
         """
         Handles the 'request_priority_load' event and loads a priority from the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the priority.
+
+        Returns:
+            Optional[List[ImmutablePriority]]: The loaded immutable priority if no exception occurs. Otherwise, None.
+        """
+
+        # Load the priority from the database and return the loaded immutable priority
+        return self.unified_manager.get_priority_by(**kwargs)
+
+    def on_request_priority_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutablePriority]]:
+        """
+        Handles the 'request_priority_lookup' event and looks up priorities in the database.
 
         Args:
             **kwargs: The keyword arguments to be used for querying the priority.
@@ -1185,6 +1360,23 @@ class UnifiedObjectService:
         # Load the questions from the database using the provided keyword arguments
         return self.unified_manager.get_question_by(**kwargs)
 
+    def on_request_question_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableQuestion]]:
+        """
+        Handles the 'request_question_lookup' event and searches for questions in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for searching questions.
+
+        Returns:
+            Optional[List[ImmutableQuestion]]: A list of found questions if no exception occurs. Otherwise, None.
+        """
+
+        # Search for questions using the provided keyword arguments and return them
+        return self.unified_manager.search_questions(**kwargs)
+
     def on_request_question_update(
         self,
         question: ImmutableQuestion,
@@ -1201,6 +1393,91 @@ class UnifiedObjectService:
 
         # Update the question in the database and return the result of the update
         return self.unified_manager.update_question(question=question)
+
+    def on_request_setting_create(
+        self,
+        setting: ImmutableSetting,
+    ) -> Optional[ImmutableSetting]:
+        """
+        Handles the 'request_setting_create' event and creates a new setting in the database.
+
+        Args:
+            setting (ImmutableSetting): The setting to be created.
+
+        Returns:
+            Optional[ImmutableSetting]: The created immutable setting if no exception occurs. Otherwise, None.
+        """
+
+        # Create a new setting in the database and return the created setting
+        return self.unified_manager.create_setting(setting=setting)
+
+    def on_request_setting_delete(
+        self,
+        setting: ImmutableSetting,
+    ) -> Optional[ImmutableSetting]:
+        """
+        Handles the 'request_setting_delete' event and deletes a setting from the database.
+
+        Args:
+            setting (ImmutableSetting): The setting to be deleted.
+
+        Returns:
+            Optional[ImmutableSetting]: The deleted immutable setting if no exception occurs. Otherwise, None.
+        """
+
+        # Delete the setting from the database and return the deleted setting
+        return self.unified_manager.delete_setting(setting=setting)
+
+    def on_request_setting_load(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableSetting]]:
+        """
+        Handles the 'request_setting_load' event and loads settings from the database.
+
+        Args:
+            **kwargs: Keyword arguments to be passed to the database query.
+
+        Returns:
+            Optional[List[ImmutableSetting]]: The loaded settings if no exception occurs. Otherwise, None.
+        """
+
+        # Load the settings from the database and return them
+        return self.unified_manager.load_settings(**kwargs)
+
+    def on_request_setting_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableSetting]]:
+        """
+        Handles the 'request_setting_lookup' event and searches for settings in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for searching settings.
+
+        Returns:
+            Optional[List[ImmutableSetting]]: The found settings if no exception occurs. Otherwise, None.
+        """
+
+        # Search for settings using the provided keyword arguments and return them
+        return self.unified_manager.search_settings(**kwargs)
+
+    def on_request_setting_update(
+        self,
+        setting: ImmutableSetting,
+    ) -> Optional[ImmutableSetting]:
+        """
+        Handles the 'request_setting_update' event and updates an existing setting in the database.
+
+        Args:
+            setting (ImmutableSetting): The setting to be updated.
+
+        Returns:
+            Optional[ImmutableSetting]: The updated immutable setting if no exception occurs. Otherwise, None.
+        """
+
+        # Update the setting in the database and return the updated setting
+        return self.unified_manager.update_setting(setting=setting)
 
     def on_request_stack_create(
         self,
@@ -1287,6 +1564,91 @@ class UnifiedObjectService:
         # Update the stack in the database and return the result of the update
         return self.unified_manager.update_stack(stack=stack)
 
+    def on_request_status_create(
+        self,
+        status: ImmutableStatus,
+    ) -> Optional[ImmutableStatus]:
+        """
+        Handles the 'request_status_create' event and creates a new status in the database.
+
+        Args:
+            status (ImmutableStatus): The status to be created.
+
+        Returns:
+            Optional[ImmutableStatus]: The created immutable status if no exception occurs. Otherwise, None.
+        """
+
+        # Create a new status in the database and return the created status
+        return self.unified_manager.create_status(status=status)
+
+    def on_request_status_delete(
+        self,
+        status: ImmutableStatus,
+    ) -> bool:
+        """
+        Handles the 'request_status_delete' event and deletes a status from the database.
+
+        Args:
+            status (ImmutableStatus): The status to be deleted.
+
+        Returns:
+            bool: True if the status is deleted successfully, False otherwise.
+        """
+
+        # Delete the status from the database and return the result of the deletion
+        return self.unified_manager.delete_status(status=status)
+
+    def on_request_status_load(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableStatus]]:
+        """
+        Handles the 'request_status_load' event and loads statuses from the database.
+
+         Args:
+            **kwargs: The keyword arguments to be used for loading statuses.
+
+        Returns:
+            Optional[List[ImmutableStatus]]: A list of loaded statuses if no exception occurs. Otherwise, None.
+        """
+
+        # Load statuses using the provided keyword arguments and return them
+        return self.unified_manager.get_status_by(**kwargs)
+
+    def on_request_status_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableStatus]]:
+        """
+        Handles the 'request_status_lookup' event and searches for statuses in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for searching statuses.
+
+        Returns:
+            Optional[List[ImmutableStatus]]: A list of found statuses if no exception occurs. Otherwise, None.
+        """
+
+        # Search for statuses using the provided keyword arguments and return them
+        return self.unified_manager.search_statuses(**kwargs)
+
+    def on_request_status_update(
+        self,
+        status: ImmutableStatus,
+    ) -> Optional[ImmutableStatus]:
+        """
+        Handles the 'request_status_update' event and updates a status in the database.
+
+        Args:
+            status (ImmutableStatus): The status to be updated.
+
+        Returns:
+            Optional[ImmutableStatus]: The updated immutable status if no exception occurs. Otherwise, None.
+        """
+
+        # Update the status in the database and return the result of the update
+        return self.unified_manager.update_status(status=status)
+
     def on_request_tag_create(
         self,
         tag: ImmutableTag,
@@ -1337,6 +1699,23 @@ class UnifiedObjectService:
 
         # Retrieve tags using the provided keyword arguments
         return self.unified_manager.get_tag_by(**kwargs)
+
+    def on_request_tag_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableTag]]:
+        """
+        Handles the 'request_tag_lookup' event and looks up tags in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying tags.
+
+        Returns:
+            Optional[List[ImmutableTag]]: A list of loaded tags if no exception occurs. Otherwise, None.
+        """
+
+        # Retrieve tags using the provided keyword arguments
+        return self.unified_manager.search_tags(**kwargs)
 
     def on_request_tag_update(
         self,
@@ -1405,6 +1784,23 @@ class UnifiedObjectService:
 
         # Retrieve users using the provided keyword arguments
         return self.unified_manager.get_user_by(**kwargs)
+
+    def on_request_user_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[List[ImmutableUser]]:
+        """
+        Handles the 'request_user_lookup' event and looks up users in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying users.
+
+        Returns:
+            Optional[List[ImmutableUser]]: A list of loaded users if no exception occurs. Otherwise, None.
+        """
+
+        # Retrieve users using the provided keyword arguments
+        return self.unified_manager.search_users(**kwargs)
 
     def on_request_user_update(
         self,

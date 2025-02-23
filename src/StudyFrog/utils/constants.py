@@ -122,7 +122,7 @@ class Constants:
     * YESTERDAY: The current date minus one day.
     """
 
-    APPLICATION_NAME: str = "StudyFrog"
+    APPLICATION_NAME: str = "🐸 StudyFrog"
     APPLICATION_VERSION: float = 0.1
 
     BASE_ID: int = 10000
