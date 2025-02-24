@@ -761,7 +761,7 @@ class UnifiedObjectService:
         """
 
         # Load the difficulty from the database and return the loaded immutable difficulty
-        return self.unified_manager.get_difficulty_by(**kwargs)
+        return self.unified_manager.search_difficulties(**kwargs)
 
     def on_request_difficulty_update(
         self,
@@ -1290,7 +1290,7 @@ class UnifiedObjectService:
         """
 
         # Load the priority from the database and return the loaded immutable priority
-        return self.unified_manager.get_priority_by(**kwargs)
+        return self.unified_manager.search_priorities(**kwargs)
 
     def on_request_priority_update(
         self,

@@ -580,10 +580,65 @@ class DashboardUI(tkinter.Frame):
             weight=1,
         )
 
-        # Configure the master widget's 1st row to weight 1
+        # Configure the master widget's 1st row to weight 0
         master.grid_rowconfigure(
             index=0,
+            weight=0,
+        )
+
+        # Configure the master widget's 2nd row to weight 1
+        master.grid_rowconfigure(
+            index=1,
             weight=1,
+        )
+
+        # Create a tkinter.Frame widget
+        frame: tkinter.Frame = UIBuilder.get_frame(master=master)
+
+        for (
+            index,
+            column,
+        ) in enumerate(
+            iterable=[
+                "icon",
+                "name",
+                "priority",
+                "difficulty",
+                "last viewed at",
+                "status",
+                "due by",
+            ]
+        ):
+            # Configure the frame widget's column to weight 1
+            frame.grid_columnconfigure(
+                index=index,
+                weight=1,
+            )
+
+            # Create a tkinter.Label widget
+            label: tkinter.Label = UIBuilder.get_label(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                master=frame,
+                text=column.capitalize(),
+            )
+
+            # Place the tkinter.Label widget in the tkinter.Frame widget
+            label.grid(
+                column=index,
+                row=0,
+                sticky=NSEW,
+            )
+
+        # Place the frame widget in the master widget
+        frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
         )
 
         # Get a new scrolled frame widget
@@ -604,7 +659,7 @@ class DashboardUI(tkinter.Frame):
         # Place the scrolled frame widget in the main window
         scrolled_frame["root"].grid(
             column=0,
-            row=0,
+            row=1,
             sticky=NSEW,
         )
 
@@ -634,10 +689,65 @@ class DashboardUI(tkinter.Frame):
             weight=1,
         )
 
-        # Configure the master widget's 1st row to weight 1
+        # Configure the master widget's 1st row to weight 0
         master.grid_rowconfigure(
             index=0,
+            weight=0,
+        )
+
+        # Configure the master widget's 2nd row to weight 1
+        master.grid_rowconfigure(
+            index=1,
             weight=1,
+        )
+
+        # Create a tkinter.Frame widget
+        frame: tkinter.Frame = UIBuilder.get_frame(master=master)
+
+        for (
+            index,
+            column,
+        ) in enumerate(
+            iterable=[
+                "icon",
+                "name",
+                "priority",
+                "difficulty",
+                "last viewed at",
+                "status",
+                "due by",
+            ]
+        ):
+            # Configure the frame widget's column to weight 1
+            frame.grid_columnconfigure(
+                index=index,
+                weight=1,
+            )
+
+            # Create a tkinter.Label widget
+            label: tkinter.Label = UIBuilder.get_label(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                master=frame,
+                text=column.capitalize(),
+            )
+
+            # Place the tkinter.Label widget in the tkinter.Frame widget
+            label.grid(
+                column=index,
+                row=0,
+                sticky=NSEW,
+            )
+
+        # Place the frame widget in the master widget
+        frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
         )
 
         # Get a new scrolled frame widget
@@ -658,7 +768,7 @@ class DashboardUI(tkinter.Frame):
         # Place the scrolled frame widget in the main window
         scrolled_frame["root"].grid(
             column=0,
-            row=0,
+            row=1,
             sticky=NSEW,
         )
 
@@ -689,10 +799,65 @@ class DashboardUI(tkinter.Frame):
             weight=1,
         )
 
-        # Configure the master widget's 1st row to weight 1
+        # Configure the master widget's 1st row to weight 0
         master.grid_rowconfigure(
             index=0,
+            weight=0,
+        )
+
+        # Configure the master widget's 2nd row to weight 1
+        master.grid_rowconfigure(
+            index=1,
             weight=1,
+        )
+
+        # Create a tkinter.Frame widget
+        frame: tkinter.Frame = UIBuilder.get_frame(master=master)
+
+        for (
+            index,
+            column,
+        ) in enumerate(
+            iterable=[
+                "icon",
+                "name",
+                "priority",
+                "difficulty",
+                "last viewed at",
+                "status",
+                "due by",
+            ]
+        ):
+            # Configure the frame widget's column to weight 1
+            frame.grid_columnconfigure(
+                index=index,
+                weight=1,
+            )
+
+            # Create a tkinter.Label widget
+            label: tkinter.Label = UIBuilder.get_label(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                master=frame,
+                text=column.capitalize(),
+            )
+
+            # Place the tkinter.Label widget in the tkinter.Frame widget
+            label.grid(
+                column=index,
+                row=0,
+                sticky=NSEW,
+            )
+
+        # Place the frame widget in the master widget
+        frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
         )
 
         # Get a new scrolled frame widget
@@ -713,7 +878,7 @@ class DashboardUI(tkinter.Frame):
         # Place the scrolled frame widget in the main window
         scrolled_frame["root"].grid(
             column=0,
-            row=0,
+            row=1,
             sticky=NSEW,
         )
 
@@ -924,17 +1089,99 @@ class DashboardUI(tkinter.Frame):
                 return
 
             for stack in stacks:
+                # Dispatch the REQUEST_DIFFICULTY_LOOKUP event
+                difficulty_notification: DispatcherNotification = (
+                    self.dispatcher.dispatch(
+                        event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                        id=stack["difficulty"],
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                    )
+                )
+
+                # Dispatch the REQUEST_PRIORITY_LOOKUP event
+                priority_notification: DispatcherNotification = (
+                    self.dispatcher.dispatch(
+                        event=Events.REQUEST_PRIORITY_LOOKUP,
+                        id=stack["priority"],
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                    )
+                )
+
+                # Dispatch the REQUEST_STATUS_LOOKUP event
+                status_notification: DispatcherNotification = self.dispatcher.dispatch(
+                    event=Events.REQUEST_STATUS_LOOKUP,
+                    id=stack["status"],
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+
                 # Create a tkinter.Frame widget
                 frame: tkinter.Frame = UIBuilder.get_frame(
                     background=Constants.GREY["default"],
                     master=self.active_stacks_frame,
                 )
 
-                # Configure the tkinter.Frame widget's 1st column to weight 1
-                frame.grid_columnconfigure(
-                    index=0,
-                    weight=1,
-                )
+                for (
+                    index,
+                    column,
+                ) in enumerate(
+                    iterable=[
+                        "icon",
+                        "name",
+                        "priority",
+                        "difficulty",
+                        "last_viewed_at",
+                        "status",
+                        "due_by",
+                    ]
+                ):
+                    # Configure the frame widget's column to weight 1
+                    frame.grid_columnconfigure(
+                        index=index,
+                        weight=1,
+                    )
+
+                    data: Dict[str, Any] = Miscellaneous.convert_to_db_format(
+                        data=stack.to_dict(exclude=["_logger"])
+                    )
+
+                    text: str
+
+                    if column == "priority":
+                        text = priority_notification.get_result(
+                            key="on_request_priority_lookup"
+                        )[0]["emoji"]
+
+                    elif column == "difficulty":
+                        text = difficulty_notification.get_result(
+                            key="on_request_difficulty_lookup"
+                        )[0]["emoji"]
+
+                    elif column == "status":
+                        text = status_notification.get_result(
+                            key="on_request_status_lookup"
+                        )[0]["emoji"]
+
+                    else:
+                        text = data[column]
+
+                    # Create a tkinter.Label widget
+                    label: tkinter.Label = UIBuilder.get_label(
+                        background=Constants.BLUE_GREY["700"],
+                        font=(
+                            Constants.DEFAULT_FONT_FAMILIY,
+                            Constants.DEFAULT_FONT_SIZE,
+                        ),
+                        foreground=Constants.WHITE,
+                        master=frame,
+                        text=text,
+                    )
+
+                    # Place the tkinter.Label widget in the tkinter.Frame widget
+                    label.grid(
+                        column=index,
+                        row=0,
+                        sticky=NSEW,
+                    )
 
                 # Place the tkinter.Frame widget within the active stacks frame
                 frame.grid(
@@ -942,26 +1189,6 @@ class DashboardUI(tkinter.Frame):
                     padx=5,
                     pady=10,
                     row=len(self.active_stacks_frame.winfo_children()),
-                    sticky=NSEW,
-                )
-
-                # Create a tkinter.Label widget
-                label: tkinter.Label = UIBuilder.get_label(
-                    background=Constants.GREY["default"],
-                    font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
-                        Constants.MEDIUM_FONT_SIZE,
-                    ),
-                    foreground=Constants.BLACK,
-                    justify=LEFT,
-                    master=frame,
-                    text=f"{stack.key} | {stack.name}",
-                )
-
-                # Place the tkinter.Label widget within the tkinter.Frame widget
-                label.grid(
-                    column=0,
-                    row=0,
                     sticky=NSEW,
                 )
         except Exception as e:
@@ -1001,11 +1228,99 @@ class DashboardUI(tkinter.Frame):
                 master=self.active_stacks_frame,
             )
 
-            # Configure the tkinter.Frame widget's 1st column to weight 1
-            frame.grid_columnconfigure(
-                index=0,
-                weight=1,
+            # Dispatch the REQUEST_DIFFICULTY_LOOKUP event
+            difficulty_notification: DispatcherNotification = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                    id=stack["difficulty"],
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
+
+            # Dispatch the REQUEST_PRIORITY_LOOKUP event
+            priority_notification: DispatcherNotification = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_PRIORITY_LOOKUP,
+                    id=stack["priority"],
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            )
+
+            # Dispatch the REQUEST_STATUS_LOOKUP event
+            status_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                id=stack["status"],
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Create a tkinter.Frame widget
+            frame: tkinter.Frame = UIBuilder.get_frame(
+                background=Constants.GREY["default"],
+                master=self.active_stacks_frame,
+            )
+
+            for (
+                index,
+                column,
+            ) in enumerate(
+                iterable=[
+                    "icon",
+                    "name",
+                    "priority",
+                    "difficulty",
+                    "last_viewed_at",
+                    "status",
+                    "due_by",
+                ]
+            ):
+                # Configure the frame widget's column to weight 1
+                frame.grid_columnconfigure(
+                    index=index,
+                    weight=1,
+                )
+
+                data: Dict[str, Any] = Miscellaneous.convert_to_db_format(
+                    data=stack.to_dict(exclude=["_logger"])
+                )
+
+                text: str
+
+                if column == "priority":
+                    text = priority_notification.get_result(
+                        key="on_request_priority_lookup"
+                    )[0]["emoji"]
+
+                elif column == "difficulty":
+                    text = difficulty_notification.get_result(
+                        key="on_request_difficulty_lookup"
+                    )[0]["emoji"]
+
+                elif column == "status":
+                    text = status_notification.get_result(
+                        key="on_request_status_lookup"
+                    )[0]["emoji"]
+
+                else:
+                    text = data[column]
+
+                # Create a tkinter.Label widget
+                label: tkinter.Label = UIBuilder.get_label(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    master=frame,
+                    text=text,
+                )
+
+                # Place the tkinter.Label widget in the tkinter.Frame widget
+                label.grid(
+                    column=index,
+                    row=0,
+                    sticky=NSEW,
+                )
 
             # Place the tkinter.Frame widget within the active stacks frame
             frame.grid(
@@ -1013,26 +1328,6 @@ class DashboardUI(tkinter.Frame):
                 padx=5,
                 pady=10,
                 row=len(self.active_stacks_frame.winfo_children()),
-                sticky=NSEW,
-            )
-
-            # Create a tkinter.Label widget
-            label: tkinter.Label = UIBuilder.get_label(
-                background=Constants.GREY["default"],
-                font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
-                    Constants.MEDIUM_FONT_SIZE,
-                ),
-                foreground=Constants.BLACK,
-                justify=LEFT,
-                master=frame,
-                text=f"{stack.key} | {stack.name}",
-            )
-
-            # Place the tkinter.Label widget within the tkinter.Frame widget
-            label.grid(
-                column=0,
-                row=0,
                 sticky=NSEW,
             )
         except Exception as e:

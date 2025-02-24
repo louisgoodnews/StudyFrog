@@ -35,6 +35,7 @@ class ImmutableStatus(ImmutableBaseObject):
     Attributes:
         created_at (Optional[datetime]): The timestamp when the status was created.
         description (Optional[str]): The description of the status.
+        emoji (Optional[str]): The emoji of the status.
         icon (Optional[str]): The icon of the status.
         id (Optional[int]): The ID of the status.
         key (Optional[str]): The key of the status.
@@ -48,6 +49,7 @@ class ImmutableStatus(ImmutableBaseObject):
         name: str,
         created_at: Optional[datetime] = None,
         description: Optional[str] = None,
+        emoji: Optional[str] = None,
         icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -61,6 +63,7 @@ class ImmutableStatus(ImmutableBaseObject):
             name (str): The name of the status.
             created_at (Optional[datetime]): The timestamp when the status was created.
             description (Optional[str]): The description of the status.
+            emoji (Optional[str]): The emoji of the status.
             icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
@@ -72,6 +75,7 @@ class ImmutableStatus(ImmutableBaseObject):
         super().__init__(
             created_at=created_at,
             description=description,
+            emoji=emoji,
             icon=icon,
             id=id,
             key=key,
@@ -99,6 +103,7 @@ class MutableStatus(MutableBaseObject):
     Attributes:
         created_at (Optional[datetime]): The timestamp when the status was created.
         description (Optional[str]): The description of the status.
+        emoji (Optional[str]): The emoji of the status.
         icon (Optional[str]): The icon of the status.
         id (Optional[int]): The ID of the status.
         key (Optional[str]): The key of the status.
@@ -112,6 +117,7 @@ class MutableStatus(MutableBaseObject):
         name: str,
         created_at: Optional[datetime] = None,
         description: Optional[str] = None,
+        emoji: Optional[str] = None,
         icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -125,6 +131,7 @@ class MutableStatus(MutableBaseObject):
             name (str): The name of the status.
             created_at (Optional[datetime]): The timestamp when the status was created.
             description (Optional[str]): The description of the status.
+            emoji (Optional[str]): The emoji of the status.
             icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
@@ -136,6 +143,7 @@ class MutableStatus(MutableBaseObject):
         super().__init__(
             created_at=created_at,
             description=description,
+            emoji=emoji,
             icon=icon,
             id=id,
             key=key,
@@ -244,6 +252,7 @@ class StatusFactory:
         name: str,
         created_at: Optional[datetime] = None,
         description: Optional[str] = None,
+        emoji: Optional[str] = None,
         icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -257,6 +266,7 @@ class StatusFactory:
             name (str): The name of the status.
             created_at (Optional[datetime]): The timestamp when the status was created.
             description (Optional[str]): The description of the status.
+            emoji (Optional[str]): The emoji of the status.
             icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
@@ -272,6 +282,7 @@ class StatusFactory:
                 name=name,
                 created_at=created_at,
                 description=description,
+                emoji=emoji,
                 icon=icon,
                 id=id,
                 key=key,
@@ -555,6 +566,19 @@ class StatusManager(BaseObjectManager):
                 if not existing_status:
                     # Create a new status if it doesn't exist
                     status: ImmutableStatus = StatusFactory.create_status(
+                        emoji=(
+                            "🆕"
+                            if default.value == Constants.NEW.capitalize()
+                            else (
+                                "📖"
+                                if default.value == Constants.LEARNING.capitalize()
+                                else (
+                                    "🔄"
+                                    if default.value == Constants.REVIEW.capitalize()
+                                    else "✅"
+                                )
+                            )
+                        ),
                         name=default.value,
                     )
 
@@ -873,6 +897,7 @@ class StatusModel(ImmutableBaseModel):
     Attributes:
         created_at (datetime): The timestamp when the status was created.
         description (str): The description of the status.
+        emoji (str): The emoji of the status.
         icon (str): The icon of the status. Defaults to "🏷️".
         id (int): The ID of the status.
         key (str): The key of the status.
@@ -929,6 +954,22 @@ class StatusModel(ImmutableBaseModel):
         size=255,
         type="VARCHAR",
         unique=False,
+    )
+
+    emoji: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="emoji",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     icon: Field = Field(
@@ -1015,6 +1056,7 @@ class StatusModel(ImmutableBaseModel):
         self,
         created_at: Optional[datetime] = None,
         description: Optional[str] = None,
+        emoji: Optional[str] = None,
         icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -1028,6 +1070,7 @@ class StatusModel(ImmutableBaseModel):
         Args:
             created_at (Optional[datetime]): The timestamp when the status was created.
             description (Optional[str]): The description of the status.
+            emoji (Optional[str]): The emoji of the status.
             icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
@@ -1043,6 +1086,7 @@ class StatusModel(ImmutableBaseModel):
         super().__init__(
             created_at=created_at,
             description=description,
+            emoji=emoji,
             icon="🏷️",
             id=id,
             key=key,
