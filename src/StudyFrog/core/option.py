@@ -5,8 +5,6 @@ Date: 2025-02-09
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -36,6 +34,7 @@ class ImmutableOption(ImmutableBaseModel):
 
     Attributes:
         created_at (Optional[datetime]): The timestamp when the Option was created.
+        icon (Optional[str]): The icon of the Option.
         id (Optional[int]): The ID of the Option.
         key (Optional[str]): The key of the Option.
         updated_at (Optional[datetime]): The timestamp when the Option was last updated.
@@ -47,6 +46,7 @@ class ImmutableOption(ImmutableBaseModel):
         self,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🎚️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -58,6 +58,7 @@ class ImmutableOption(ImmutableBaseModel):
         Args:
             value (str): The value of the instance.
             created_at (Optional[datetime]): The timestamp when the instance was created.
+            icon (Optional[str]): The icon of the instance. Defaults to "🎚️".
             id (Optional[int]): The ID of the instance.
             key (Optional[str]): The key of the instance.
             updated_at (Optional[datetime]): The timestamp when the instance was last updated.
@@ -70,6 +71,7 @@ class ImmutableOption(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             updated_at=updated_at,
@@ -95,6 +97,7 @@ class MutableOption(MutableBaseObject):
 
     Attributes:
         created_at (Optional[datetime]): The timestamp when the Option was created.
+        icon (Optional[str]): The icon of the Option.
         id (Optional[int]): The ID of the Option.
         key (Optional[str]): The key of the Option.
         updated_at (Optional[datetime]): The timestamp when the Option was last updated.
@@ -106,6 +109,7 @@ class MutableOption(MutableBaseObject):
         self,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🎚️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -117,6 +121,7 @@ class MutableOption(MutableBaseObject):
         Args:
             value (str): The value of the instance.
             created_at (Optional[datetime]): The timestamp when the instance was created.
+            icon (Optional[str]): The icon of the instance. Defaults to "🎚️".
             id (Optional[int]): The ID of the instance.
             key (Optional[str]): The key of the instance.
             updated_at (Optional[datetime]): The timestamp when the instance was last updated.
@@ -129,6 +134,7 @@ class MutableOption(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             updated_at=updated_at,
@@ -242,6 +248,7 @@ class OptionFactory:
         cls,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🎚️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -253,6 +260,7 @@ class OptionFactory:
         Args:
             value (str): The value of the Option.
             created_at (Optional[datetime]): The timestamp when the Option was created.
+            icon (Optional[str]): The icon of the Option. Defaults to "🎚️".
             id (Optional[int]): The ID of the Option.
             key (Optional[str]): The key of the Option.
             updated_at (Optional[datetime]): The timestamp when the Option was last updated.
@@ -269,6 +277,7 @@ class OptionFactory:
             return ImmutableOption(
                 value=value,
                 created_at=created_at,
+                icon=icon,
                 id=id,
                 key=key,
                 updated_at=updated_at,
@@ -792,6 +801,7 @@ class OptionModel(ImmutableBaseModel):
 
     Attributes:
         created_at (Optional[datetime]): The timestamp when the option was created.
+        icon (Optional[str]): The icon of the option. Defaults to "🎚️".
         id (Optional[int]): The ID of the option.
         key (Optional[str]): The key of the option.
         updated_at (Optional[datetime]): The timestamp when the option was last updated.
@@ -830,6 +840,22 @@ class OptionModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="🎚️",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -901,6 +927,7 @@ class OptionModel(ImmutableBaseModel):
         self,
         id: Optional[int] = None,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🎚️",
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -912,6 +939,7 @@ class OptionModel(ImmutableBaseModel):
         Args:
             id (Optional[int]): The ID of the option.
             created_at (Optional[datetime]): The timestamp when the option was created.
+            icon (Optional[str]): The icon of the option. Defaults to "🎚️".
             key (Optional[str]): The key of the option.
             updated_at (Optional[datetime]): The timestamp when the option was last updated.
             uuid (Optional[str]): The UUID of the option.
@@ -924,6 +952,7 @@ class OptionModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon="🎚️",
             id=id,
             key=key,
             updated_at=updated_at,

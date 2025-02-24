@@ -39,6 +39,7 @@ class ImmutableDefault(ImmutableBaseObject):
         type (str): The type of the default.
         value (str): The value of the default.
         created_at (datetime): The timestamp when the default was created.
+        icon (str): The icon of the default.
         id (int): The ID of the default.
         key (str): The key of the default.
         updated_at (datetime): The timestamp when the default was last updated.
@@ -51,6 +52,7 @@ class ImmutableDefault(ImmutableBaseObject):
         type: str,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -64,6 +66,7 @@ class ImmutableDefault(ImmutableBaseObject):
             type (str): The type of the default.
             value (str): The value of the default.
             created_at (Optional[datetime]): The timestamp when the default was created.
+            icon (Optional[str]): The icon of the default. Defaults to "⚙️".
             id (Optional[int]): The ID of the default.
             key (Optional[str]): The key of the default.
             updated_at (Optional[datetime]): The timestamp when the default was last updated.
@@ -76,6 +79,7 @@ class ImmutableDefault(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -106,6 +110,7 @@ class MutableImmutableDefault(MutableBaseObject):
         type (str): The type of the default.
         value (str): The value of the default.
         created_at (datetime): The timestamp when the default was created.
+        icon (str): The icon of the default.
         id (int): The ID of the default.
         key (str): The key of the default.
         updated_at (datetime): The timestamp when the default was last updated.
@@ -118,6 +123,7 @@ class MutableImmutableDefault(MutableBaseObject):
         type: str,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -131,6 +137,7 @@ class MutableImmutableDefault(MutableBaseObject):
             type (str): The type of the default.
             value (str): The value of the default.
             created_at (Optional[datetime]): The timestamp when the default was created.
+            icon (Optional[str]): The icon of the default. Defaults to "⚙️".
             id (Optional[int]): The ID of the default.
             key (Optional[str]): The key of the default.
             updated_at (Optional[datetime]): The timestamp when the default was last updated.
@@ -143,6 +150,7 @@ class MutableImmutableDefault(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -260,6 +268,7 @@ class DefaultFactory:
         type: str,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -273,6 +282,7 @@ class DefaultFactory:
             type (str): The type of the default.
             value (str): The value of the default.
             created_at (Optional[datetime]): The timestamp when the default was created.
+            icon (Optional[str]): The icon of the default. Defaults to "⚙️".
             id (Optional[int]): The ID of the default.
             key (Optional[str]): The key of the default.
             updated_at (Optional[datetime]): The timestamp when the default was last updated.
@@ -291,6 +301,7 @@ class DefaultFactory:
                 type=type,
                 value=value,
                 created_at=created_at,
+                icon=icon,
                 id=id,
                 key=key,
                 updated_at=updated_at,
@@ -835,6 +846,7 @@ class DefaultModel(ImmutableBaseModel):
 
     Attributes:
         created_at (Optional[datetime]): The timestamp when the default was created.
+        icon (Optional[str]): The icon of the default. Defaults to "⚙️".
         id (Optional[int]): The ID of the default.
         key (Optional[str]): The key of the default.
         name (Optional[str]): The name of the default.
@@ -878,20 +890,20 @@ class DefaultModel(ImmutableBaseModel):
         unique=False,
     )
 
-    name: Field = Field(
+    icon: Field = Field(
         autoincrement=False,
-        default=None,
+        default="⚙️",
         description="",
         foreign_key=None,
         index=False,
-        name="name",
+        name="icon",
         nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
         size=255,
         type="VARCHAR",
-        unique=True,
+        unique=False,
     )
 
     key: Field = Field(
@@ -901,6 +913,22 @@ class DefaultModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="key",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
+    )
+
+    name: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="name",
         nullable=False,
         on_delete=None,
         on_update=None,
@@ -977,6 +1005,7 @@ class DefaultModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -990,6 +1019,8 @@ class DefaultModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the default was created.
+            icon (Optional[str]): The icon of the default. Defaults to "⚙️".
+            id (Optional[int]): The ID of the default.
             key (Optional[str]): The key of the default.
             name (Optional[str]): The name of the default.
             type (Optional[str]): The type of the default.
@@ -1004,6 +1035,7 @@ class DefaultModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon="⚙️",
             id=id,
             key=key,
             name=name,

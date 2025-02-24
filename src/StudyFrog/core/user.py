@@ -5,9 +5,6 @@ Date: 2025-02-09
 
 import asyncio
 
-from optparse import Option
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -38,6 +35,7 @@ class ImmutableUser(ImmutableBaseObject):
     Attributes:
         name (str): The name of the user.
         created_at (Optional[datetime]): The timestamp when the user was created.
+        icon (Optional[str]): The icon of the user.
         id (Optional[int]): The ID of the user.
         key (Optional[str]): The key of the user.
         updated_at (Optional[datetime]): The timestamp when the user was last updated.
@@ -48,6 +46,7 @@ class ImmutableUser(ImmutableBaseObject):
         self,
         name: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "👤",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -59,6 +58,7 @@ class ImmutableUser(ImmutableBaseObject):
         Args:
             name (str): The name of the user.
             created_at (Optional[datetime]): The timestamp when the user was created.
+            icon (Optional[str]): The icon of the user. Defaults to "👤".
             id (Optional[int]): The ID of the user.
             key (Optional[str]): The key of the user.
             updated_at (Optional[datetime]): The timestamp when the user was last updated.
@@ -70,6 +70,7 @@ class ImmutableUser(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -94,6 +95,7 @@ class MutableUser(MutableBaseObject):
     Attributes:
         name (str): The name of the user.
         created_at (Optional[datetime]): The timestamp when the user was created.
+        icon (Optional[str]): The icon of the user.
         id (Optional[int]): The ID of the user.
         key (Optional[str]): The key of the user.
         updated_at (Optional[datetime]): The timestamp when the user was last updated.
@@ -104,10 +106,11 @@ class MutableUser(MutableBaseObject):
         self,
         name: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "👤",
         id: Optional[int] = None,
         key: Optional[str] = None,
-        uuid: Optional[str] = None,
         updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
     ) -> None:
         """
         Initializes a new instance of the MutableUser class.
@@ -115,6 +118,7 @@ class MutableUser(MutableBaseObject):
         Args:
             name (str): The name of the user.
             created_at (Optional[datetime]): The timestamp when the user was created.
+            icon (Optional[str]): The icon of the user. Defaults to "👤".
             id (Optional[int]): The ID of the user.
             key (Optional[str]): The key of the user.
             updated_at (Optional[datetime]): The timestamp when the user was last updated.
@@ -126,6 +130,7 @@ class MutableUser(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -237,6 +242,7 @@ class UserFactory:
         cls,
         name: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "👤",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -248,6 +254,7 @@ class UserFactory:
         Args:
             name (str): The name of the user.
             created_at (Optional[datetime]): The timestamp when the user was created.
+            icon (Optional[str]): The icon of the user. Defaults to "👤".
             id (Optional[int]): The ID of the user.
             key (Optional[str]): The key of the user.
             updated_at (Optional[datetime]): The timestamp when the user was last updated.
@@ -262,10 +269,11 @@ class UserFactory:
         try:
             # Attempt to create and return a new instance of the ImmutableUser class
             return ImmutableUser(
-                name=name,
                 created_at=created_at,
+                icon=icon,
                 id=id,
                 key=key,
+                name=name,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -781,6 +789,7 @@ class UserModel(ImmutableBaseModel):
     Attributes:
         created_at (Field): The timestamp when the user was created.
         id (Field): The ID of the user.
+        icon (Field): The icon of the user. Defaults to "👤".
         key (Field): The key of the user.
         name (Field): The name of the user.
         table (str): The table name of the user model.
@@ -819,6 +828,22 @@ class UserModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="👤",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -889,6 +914,7 @@ class UserModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "👤",
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -900,6 +926,7 @@ class UserModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the user was created.
+            icon (Optional[str]): The icon of the user. Defaults to "👤".
             id (Optional[int]): The ID of the user.
             key (Optional[str]): The key of the user.
             name (Optional[str]): The name of the user.
@@ -913,6 +940,7 @@ class UserModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon="👤",
             id=id,
             key=key,
             name=name,

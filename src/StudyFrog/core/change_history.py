@@ -43,6 +43,7 @@ class ChangeHistory(ImmutableBaseObject):
     Attributes:
         source (Dict[str, Any]): The source of the change_history.
         created_at (Optional[datetime]): The timestamp when the change history was created.
+        icon (Optional[str]): The icon of the change_history.
         id (Optional[int]): The ID of the change_history.
         key (Optional[str]): The key of the change_history.
         updated_at (Optional[datetime]): The timestamp when the change history was last updated.
@@ -53,6 +54,7 @@ class ChangeHistory(ImmutableBaseObject):
         self,
         source: Dict[str, Any],
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -64,6 +66,7 @@ class ChangeHistory(ImmutableBaseObject):
         Args:
             source (Dict[str, Any]): The source of the change_history.
             created_at (Optional[datetime]): The timestamp when the change history was created.
+            icon (Optional[str]): The icon of the change_history. Defaults to "🕒".
             id (Optional[int]): The ID of the change_history.
             key (Optional[str]): The key of the change_history.
             updated_at (Optional[datetime]): The timestamp when the change history was last updated.
@@ -76,6 +79,7 @@ class ChangeHistory(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             source=source,
@@ -171,6 +175,7 @@ class ChangeHistoryFactory:
         cls,
         source: Dict[str, Any],
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -182,6 +187,7 @@ class ChangeHistoryFactory:
         Args:
             source (Dict[str, Any]): The source of the change_history.
             created_at (Optional[datetime]): The timestamp when the change history was created.
+            icon (Optional[str]): The icon of the change_history. Defaults to "🕒".
             id (Optional[int]): The ID of the change_history.
             key (Optional[str]): The key of the change_history.
             updated_at (Optional[datetime]): The timestamp when the change history was last updated.
@@ -197,6 +203,7 @@ class ChangeHistoryFactory:
             return ChangeHistory(
                 source=source,
                 created_at=created_at,
+                icon=icon,
                 id=id,
                 key=key,
                 updated_at=updated_at,
@@ -731,6 +738,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
     Attributes:
         id (Field): The ID field of the change_history.
         created_at (Field): The timestamp when the change history was created.
+        icon (Field): The icon of the change_history. Defaults to "🕒".
         key (Field): The key of the change_history.
         source (Field): The source of the change_history.
         updated_at (Field): The timestamp when the change history was last updated.
@@ -768,6 +776,22 @@ class ChangeHistoryModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="🕒",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -838,6 +862,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
         source: Optional[Dict[str, Any]] = None,
@@ -849,6 +874,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the change history was created.
+            icon (Optional[str]): The icon of the change_history. Defaults to "🕒".
             id (Optional[int]): The ID of the change_history.
             key (Optional[str]): The key of the change_history.
             source (Optional[Dict[str, Any]]): The source of the change_history.
@@ -862,6 +888,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon="🕒",
             id=id,
             key=key,
             source=source,
@@ -881,6 +908,7 @@ class ChangeHistoryItem(ImmutableBaseObject):
         from_ (Any): The original value of the item.
         to (Any): The new value of the item.
         created_at (Optional[datetime]): The timestamp when the item was created.
+        icon (Optional[str]): The icon of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -892,6 +920,7 @@ class ChangeHistoryItem(ImmutableBaseObject):
         from_: Any,
         to: Any,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -904,6 +933,7 @@ class ChangeHistoryItem(ImmutableBaseObject):
             from_ (Any): The original value of the item.
             to (Any): The new value of the item.
             created_at (Optional[datetime]): The timestamp when the item was created.
+            icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -917,6 +947,7 @@ class ChangeHistoryItem(ImmutableBaseObject):
         super().__init__(
             created_at=created_at,
             from_=from_,
+            icon=icon,
             id=id,
             key=key,
             to=to,
@@ -1582,6 +1613,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
     Attributes:
         created_at (Optional[datetime]): The timestamp when the item was created.
         from_ (Optional[Any]): The original value of the item.
+        icon (Optional[str]): The icon of the item. Defaults to "🕒".
         id (Optional[int]): The ID of the item.
         key (Optional[Any]): The key of the item.
         source (Optional[Dict[str, Any]]): The source of the item.
@@ -1631,6 +1663,22 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="from_",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="🕒",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
         nullable=False,
         on_delete=None,
         on_update=None,
@@ -1724,6 +1772,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         self,
         created_at: Optional[datetime] = None,
         from_: Optional[Any] = None,
+        icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[Any] = None,
         source: Optional[Dict[str, Any]] = None,
@@ -1736,6 +1785,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         Args:
             created_at (Optional[datetime]): The timestamp when the item was created.
             from_ (Optional[Any]): The original value of the item.
+            icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
             key (Optional[Any]): The key of the item.
             source (Optional[Dict[str, Any]]): The source of the item.
@@ -1750,6 +1800,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         super().__init__(
             created_at=created_at,
             from_=from_,
+            icon="🕒",
             id=id,
             key=key,
             source=source,

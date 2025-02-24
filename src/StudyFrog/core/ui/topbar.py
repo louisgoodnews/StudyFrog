@@ -127,8 +127,11 @@ class TopBar(tkinter.Frame):
         menu_button: tkinter.Button = UIBuilder.get_button(
             background=Constants.INDIGO["500"],
             command=lambda: self.dispatcher.dispatch(
-                event=Events.MENU_BUTTON_CLICKED,
+                event=Events.REQUEST_FORWARD_NAVIGATION,
+                master=UIBuilder.get_toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
+                source="topbar",
+                target="menu_ui",
             ),
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,

@@ -40,6 +40,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         answer_text (str): The text of the answer.
         created_at (datetime): The timestamp when the answer was created.
         custom_field_values (List[Dict[str, Any]]): A list of custom field values.
+        icon (str): The icon of the answer.
         id (int): The ID of the answer.
         key (str): The key of the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
@@ -51,6 +52,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         answer_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -63,6 +65,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             answer_text (str): The text of the answer.
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
@@ -77,6 +80,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             answer_text=answer_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            icon=icon,
             id=id,
             key=key,
             updated_at=updated_at,
@@ -103,6 +107,7 @@ class MutableAnswer(MutableBaseObject):
         answer_text (str): The text of the answer.
         created_at (datetime): The timestamp when the answer was created.
         custom_field_values (List[Dict[str, Any]]): A list of custom field values.
+        icon (str): The icon of the answer.
         id (int): The ID of the answer.
         key (str): The key of the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
@@ -114,6 +119,7 @@ class MutableAnswer(MutableBaseObject):
         answer_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -126,6 +132,7 @@ class MutableAnswer(MutableBaseObject):
             answer_text (str): The text of the answer.
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
@@ -140,6 +147,7 @@ class MutableAnswer(MutableBaseObject):
             answer_text=answer_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            icon=icon,
             id=id,
             key=key,
             updated_at=updated_at,
@@ -253,6 +261,7 @@ class AnswerFactory:
         answer_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -265,6 +274,7 @@ class AnswerFactory:
             answer_text (str): The text of the answer.
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
@@ -282,6 +292,7 @@ class AnswerFactory:
                 answer_text=answer_text,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
+                icon=icon,
                 id=id,
                 key=key,
                 updated_at=updated_at,
@@ -873,6 +884,7 @@ class AnswerModel(ImmutableBaseModel):
     Attributes:
         answer_text (Optional[str]): The text of the answer.
         created_at (Optional[datetime]): The timestamp when the answer was created.
+        icon (Optional[str]): The icon of the answer. Defaults to "💬".
         id (Optional[int]): The ID of the answer.
         key (Optional[str]): The key of the answer.
         table (str): The table name of the answer model.
@@ -946,6 +958,22 @@ class AnswerModel(ImmutableBaseModel):
         unique=False,
     )
 
+    icon: Field = Field(
+        autoincrement=False,
+        default="💬",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -999,6 +1027,7 @@ class AnswerModel(ImmutableBaseModel):
         answer_text: Optional[str] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -1011,6 +1040,7 @@ class AnswerModel(ImmutableBaseModel):
             answer_text (Optional[str]): The text of the answer.
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+            icon (Optional[str]): The icon of the answer.
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
@@ -1024,6 +1054,7 @@ class AnswerModel(ImmutableBaseModel):
         super().__init__(
             answer_text=answer_text,
             created_at=created_at,
+            icon="💬",
             id=id,
             key=key,
             table=Constants.ANSWERS,

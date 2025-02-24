@@ -5,8 +5,6 @@ Date: 2025-02-05
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -43,6 +41,7 @@ class ImmutableStack(ImmutableBaseObject):
         description (str): The description of the stack.
         difficulty (int): The difficulty of the stack.
         due_by (datetime): The timestamp when the stack is due.
+        icon (str): The icon of the stack.
         id (int): The ID of the stack.
         key (str): The key of the stack.
         last_viewed_at (datetime): The timestamp when the stack was last viewed.
@@ -63,6 +62,7 @@ class ImmutableStack(ImmutableBaseObject):
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
+        icon: Optional[str] = "📚",
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
@@ -83,6 +83,7 @@ class ImmutableStack(ImmutableBaseObject):
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The ID of the difficulty associated with the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
+            icon (Optional[str]): The icon of the stack. Defaults to "📚".
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
@@ -101,6 +102,7 @@ class ImmutableStack(ImmutableBaseObject):
             description=description,
             difficulty=difficulty,
             due_by=due_by,
+            icon=icon,
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
@@ -137,6 +139,7 @@ class MutableStack(MutableBaseObject):
         description (str): The description of the stack.
         difficulty (int): The difficulty of the stack.
         due_by (datetime): The timestamp when the stack is due.
+        icon (str): The icon of the stack.
         id (int): The ID of the stack.
         key (str): The key of the stack.
         last_viewed_at (datetime): The timestamp when the stack was last viewed.
@@ -157,6 +160,7 @@ class MutableStack(MutableBaseObject):
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
+        icon: Optional[str] = "📚",
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
@@ -176,6 +180,7 @@ class MutableStack(MutableBaseObject):
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
+            icon (Optional[str]): The icon of the stack. Defaults to "📚".
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
@@ -198,6 +203,7 @@ class MutableStack(MutableBaseObject):
             description=description,
             difficulty=difficulty,
             due_by=due_by,
+            icon=icon,
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
@@ -320,6 +326,7 @@ class StackFactory:
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
+        icon: Optional[str] = "📚",
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
@@ -339,6 +346,7 @@ class StackFactory:
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
+            icon (Optional[str]): The icon of the stack. Defaults to "📚".
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
@@ -364,6 +372,7 @@ class StackFactory:
                 description=description,
                 difficulty=difficulty,
                 due_by=due_by,
+                icon=icon,
                 id=id,
                 key=key,
                 last_viewed_at=last_viewed_at,
@@ -871,6 +880,7 @@ class StackModel(ImmutableBaseModel):
         description (Optional[str]): The description of the stack.
         difficulty (Optional[int]): The difficulty of the stack.
         due_by (Optional[datetime]): The timestamp when the stack is due.
+        icon (Optional[str]): The icon of the stack. Defaults to "📚".
         id (Optional[int]): The ID of the stack.
         key (Optional[str]): The key of the stack.
         last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
@@ -993,6 +1003,22 @@ class StackModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="📚",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -1132,6 +1158,7 @@ class StackModel(ImmutableBaseModel):
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
+        icon: Optional[str] = "📚",
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -1152,6 +1179,7 @@ class StackModel(ImmutableBaseModel):
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
+            icon (Optional[str]): The icon of the stack. Defaults to "📚".
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
@@ -1172,6 +1200,7 @@ class StackModel(ImmutableBaseModel):
             description=description,
             difficulty=difficulty,
             due_by=due_by,
+            icon="📚",
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,

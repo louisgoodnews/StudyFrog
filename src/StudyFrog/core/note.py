@@ -5,8 +5,6 @@ Date: 2025-02-05
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -40,6 +38,7 @@ class ImmutableNote(ImmutableBaseObject):
         body_text (str): The body of the Note.
         created_at (datetime): The timestamp when the Note was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+        icon (str): The icon of the Note.
         id (int): The ID of the Note.
         key (str): The key of the Note.
         title_text (str): The title of the Note.
@@ -53,6 +52,7 @@ class ImmutableNote(ImmutableBaseObject):
         title_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "📝",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -66,6 +66,7 @@ class ImmutableNote(ImmutableBaseObject):
             title_text (str): The title of the Note.
             created_at (datetime): The timestamp when the Note was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            icon (str): The icon of the Note. Defaults to "📝".
             id (int): The ID of the Note.
             key (str): The key of the Note.
             updated_at (datetime): The timestamp when the Note was last updated.
@@ -80,6 +81,7 @@ class ImmutableNote(ImmutableBaseObject):
             body_text=body_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            icon=icon,
             id=id,
             key=key,
             title_text=title_text,
@@ -109,6 +111,7 @@ class MutableNote(MutableBaseObject):
         body_text (str): The body of the Note.
         created_at (datetime): The timestamp when the Note was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+        icon (str): The icon of the Note.
         id (int): The ID of the Note.
         key (str): The key of the Note.
         title_text (str): The title of the Note.
@@ -123,6 +126,7 @@ class MutableNote(MutableBaseObject):
         ancestor: Optional[int] = None,
         children: Optional[List[int]] = None,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "📝",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -137,6 +141,7 @@ class MutableNote(MutableBaseObject):
             ancestor (int): The ID of the ancestor Note.
             children (List[int]): The IDs of the children Notes.
             created_at (datetime): The timestamp when the Note was created.
+            icon (str): The icon of the Note. Defaults to "📝".
             id (int): The ID of the Note.
             key (str): The key of the Note.
             updated_at (datetime): The timestamp when the Note was last updated.
@@ -153,6 +158,7 @@ class MutableNote(MutableBaseObject):
             ancestor=ancestor,
             children=children,
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             updated_at=updated_at,
@@ -267,6 +273,7 @@ class NoteFactory:
         title_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "📝",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -280,6 +287,7 @@ class NoteFactory:
             title_text (str): The title of the Note.
             created_at (Optional[datetime]): The timestamp when the Note was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            icon (Optional[str]): The icon of the Note. Defaults to "📝".
             id (Optional[int]): The ID of the Note.
             key (Optional[str]): The key of the Note.
             updated_at (Optional[datetime]): The timestamp when the Note was last updated.
@@ -297,6 +305,7 @@ class NoteFactory:
                 body_text=body_text,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
+                icon=icon,
                 id=id,
                 key=key,
                 title_text=title_text,
@@ -826,6 +835,7 @@ class NoteModel(ImmutableBaseModel):
         body_text (Optional[str]): The body of the Note.
         created_at (Optional[datetime]): The timestamp when the Note was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): The custom fields of the Note.
+        icon (Optional[str]): The icon of the Note. Defaults to "📝".
         id (Optional[int]): The ID of the Note.
         key (Optional[str]): The key of the Note.
         title_text (Optional[str]): The title of the Note.
@@ -852,6 +862,7 @@ class NoteModel(ImmutableBaseModel):
     )
 
     body_text: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
@@ -867,6 +878,7 @@ class NoteModel(ImmutableBaseModel):
     )
 
     created_at: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
@@ -882,6 +894,7 @@ class NoteModel(ImmutableBaseModel):
     )
 
     custom_field_values: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
@@ -896,7 +909,24 @@ class NoteModel(ImmutableBaseModel):
         unique=False,
     )
 
+    icon: Field = Field(
+        autoincrement=False,
+        default="📝",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     key: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
@@ -912,6 +942,7 @@ class NoteModel(ImmutableBaseModel):
     )
 
     title_text: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
@@ -927,6 +958,7 @@ class NoteModel(ImmutableBaseModel):
     )
 
     updated_at: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
@@ -942,6 +974,7 @@ class NoteModel(ImmutableBaseModel):
     )
 
     uuid: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         foreign_key=None,
@@ -961,6 +994,7 @@ class NoteModel(ImmutableBaseModel):
         body_text: Optional[str] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "📝",
         id: Optional[int] = None,
         key: Optional[str] = None,
         title_text: Optional[str] = None,
@@ -974,6 +1008,7 @@ class NoteModel(ImmutableBaseModel):
             body_text (Optional[str]): The body of the Note.
             created_at (Optional[datetime]): The timestamp when the Note was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The custom fields of the Note.
+            icon (Optional[str]): The icon of the Note. Defaults to "📝".
             id (Optional[int]): The ID of the Note.
             key (Optional[str]): The key of the Note.
             title_text (Optional[str]): The title of the Note.
@@ -989,6 +1024,7 @@ class NoteModel(ImmutableBaseModel):
             body_text=body_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            icon="📝",
             id=id,
             key=key,
             table=Constants.NOTES,

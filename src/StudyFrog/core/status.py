@@ -5,8 +5,6 @@ Date: 2025-02-15
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -37,6 +35,7 @@ class ImmutableStatus(ImmutableBaseObject):
     Attributes:
         created_at (Optional[datetime]): The timestamp when the status was created.
         description (Optional[str]): The description of the status.
+        icon (Optional[str]): The icon of the status.
         id (Optional[int]): The ID of the status.
         key (Optional[str]): The key of the status.
         name (str): The name of the status.
@@ -49,6 +48,7 @@ class ImmutableStatus(ImmutableBaseObject):
         name: str,
         created_at: Optional[datetime] = None,
         description: Optional[str] = None,
+        icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -61,6 +61,7 @@ class ImmutableStatus(ImmutableBaseObject):
             name (str): The name of the status.
             created_at (Optional[datetime]): The timestamp when the status was created.
             description (Optional[str]): The description of the status.
+            icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
             updated_at (Optional[datetime]): The timestamp when the status was last updated.
@@ -71,6 +72,7 @@ class ImmutableStatus(ImmutableBaseObject):
         super().__init__(
             created_at=created_at,
             description=description,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -97,6 +99,7 @@ class MutableStatus(MutableBaseObject):
     Attributes:
         created_at (Optional[datetime]): The timestamp when the status was created.
         description (Optional[str]): The description of the status.
+        icon (Optional[str]): The icon of the status.
         id (Optional[int]): The ID of the status.
         key (Optional[str]): The key of the status.
         name (str): The name of the status.
@@ -109,6 +112,7 @@ class MutableStatus(MutableBaseObject):
         name: str,
         created_at: Optional[datetime] = None,
         description: Optional[str] = None,
+        icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -121,6 +125,7 @@ class MutableStatus(MutableBaseObject):
             name (str): The name of the status.
             created_at (Optional[datetime]): The timestamp when the status was created.
             description (Optional[str]): The description of the status.
+            icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
             updated_at (Optional[datetime]): The timestamp when the status was last updated.
@@ -131,6 +136,7 @@ class MutableStatus(MutableBaseObject):
         super().__init__(
             created_at=created_at,
             description=description,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -238,6 +244,7 @@ class StatusFactory:
         name: str,
         created_at: Optional[datetime] = None,
         description: Optional[str] = None,
+        icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -250,6 +257,7 @@ class StatusFactory:
             name (str): The name of the status.
             created_at (Optional[datetime]): The timestamp when the status was created.
             description (Optional[str]): The description of the status.
+            icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
             updated_at (Optional[datetime]): The timestamp when the status was last updated.
@@ -264,6 +272,7 @@ class StatusFactory:
                 name=name,
                 created_at=created_at,
                 description=description,
+                icon=icon,
                 id=id,
                 key=key,
                 updated_at=updated_at,
@@ -864,6 +873,7 @@ class StatusModel(ImmutableBaseModel):
     Attributes:
         created_at (datetime): The timestamp when the status was created.
         description (str): The description of the status.
+        icon (str): The icon of the status. Defaults to "🏷️".
         id (int): The ID of the status.
         key (str): The key of the status.
         name (str): The name of the status.
@@ -913,6 +923,22 @@ class StatusModel(ImmutableBaseModel):
         index=False,
         name="description",
         nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="🏷️",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -989,6 +1015,7 @@ class StatusModel(ImmutableBaseModel):
         self,
         created_at: Optional[datetime] = None,
         description: Optional[str] = None,
+        icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -1001,6 +1028,7 @@ class StatusModel(ImmutableBaseModel):
         Args:
             created_at (Optional[datetime]): The timestamp when the status was created.
             description (Optional[str]): The description of the status.
+            icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
             name (Optional[str]): The name of the status.
@@ -1015,6 +1043,7 @@ class StatusModel(ImmutableBaseModel):
         super().__init__(
             created_at=created_at,
             description=description,
+            icon="🏷️",
             id=id,
             key=key,
             name=name,

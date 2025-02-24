@@ -37,6 +37,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         correct_answers (Optional[List[str]]): The correct answers to the question.
         created_at (datetime): The timestamp when the question was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+        icon (Optional[str]): The icon of the question.
         id (int): The ID of the question.
         key (str): The key of the question.
         question_text (str): The text of the question.
@@ -53,6 +54,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -68,6 +70,7 @@ class ImmutableQuestion(ImmutableBaseObject):
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+            icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
@@ -83,6 +86,7 @@ class ImmutableQuestion(ImmutableBaseObject):
             correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            icon=icon,
             id=id,
             key=key,
             question_text=question_text,
@@ -112,6 +116,7 @@ class MutableQuestion(MutableBaseObject):
         correct_answers (Optional[List[str]]): The correct answers to the question.
         created_at (Optional[datetime]): The timestamp when the question was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+        icon (Optional[str]): The icon of the question.
         id (Optional[int]): The ID of the question.
         key (Optional[str]): The key of the question.
         question_text (str): The text of the question.
@@ -128,6 +133,7 @@ class MutableQuestion(MutableBaseObject):
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -143,6 +149,7 @@ class MutableQuestion(MutableBaseObject):
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+            icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
@@ -158,6 +165,7 @@ class MutableQuestion(MutableBaseObject):
             correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            icon=icon,
             id=id,
             key=key,
             question_text=question_text,
@@ -276,6 +284,7 @@ class QuestionFactory:
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -291,6 +300,7 @@ class QuestionFactory:
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+            icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
@@ -306,6 +316,7 @@ class QuestionFactory:
                 correct_answers=correct_answers,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
+                icon=icon,
                 id=id,
                 key=key,
                 question_text=question_text,
@@ -837,6 +848,7 @@ class QuestionModel(ImmutableBaseModel):
         answers (Field): The answers of the question.
         correct_answers (Field): The correct answers of the question.
         created_at (Field): The timestamp when the question was created.
+        icon (Field): The icon of the question. Defaults to "❓".
         key (Field): The key of the question.
         question_text (Field): The text of the question.
         question_type (Field): The type of the question.
@@ -927,6 +939,22 @@ class QuestionModel(ImmutableBaseModel):
         unique=False,
     )
 
+    icon: Field = Field(
+        autoincrement=False,
+        default="❓",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -1013,6 +1041,7 @@ class QuestionModel(ImmutableBaseModel):
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[Dict[str, Any]] = None,
+        icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
         question_text: Optional[str] = None,
@@ -1030,6 +1059,7 @@ class QuestionModel(ImmutableBaseModel):
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[Dict[str, Any]]): The values of the custom fields.
+            icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             question_text (Optional[str]): The text of the question.
@@ -1047,6 +1077,7 @@ class QuestionModel(ImmutableBaseModel):
             correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            icon="❓",
             id=id,
             key=key,
             question_text=question_text,

@@ -41,6 +41,7 @@ class ImmutablePriority(ImmutableBaseObject):
         name (str): The name of the priority.
         value (float): The value of the priority.
         created_at (datetime): The timestamp when the priority was created.
+        icon (str): The icon of the priority.
         id (int): The ID of the priority.
         key (str): The key of the priority.
         updated_at (datetime): The timestamp when the priority was last updated.
@@ -53,6 +54,7 @@ class ImmutablePriority(ImmutableBaseObject):
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🔥",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -66,6 +68,7 @@ class ImmutablePriority(ImmutableBaseObject):
             name (str): The name of the priority.
             value (float): The value of the priority.
             created_at (Optional[datetime]): The timestamp when the priority was created.
+            icon (Optional[str]): The icon of the priority. Defaults to "🔥".
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
             updated_at (Optional[datetime]): The timestamp when the priority was last updated.
@@ -79,6 +82,7 @@ class ImmutablePriority(ImmutableBaseObject):
         super().__init__(
             created_at=created_at,
             emoji=emoji,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -110,6 +114,7 @@ class MutablePriority(MutableBaseObject):
         name (str): The name of the priority.
         value (float): The value of the priority.
         created_at (datetime): The timestamp when the priority was created.
+        icon (str): The icon of the priority.
         id (int): The ID of the priority.
         key (str): The key of the priority.
         updated_at (datetime): The timestamp when the priority was last updated.
@@ -122,6 +127,7 @@ class MutablePriority(MutableBaseObject):
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🔥",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -135,6 +141,7 @@ class MutablePriority(MutableBaseObject):
             name (str): The name of the priority.
             value (float): The value of the priority.
             created_at (Optional[datetime]): The timestamp when the priority was created.
+            icon (Optional[str]): The icon of the priority.
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
             updated_at (Optional[datetime]): The timestamp when the priority was last updated.
@@ -148,6 +155,7 @@ class MutablePriority(MutableBaseObject):
         super().__init__(
             created_at=created_at,
             emoji=emoji,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -264,6 +272,7 @@ class PriorityFactory:
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🔥",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -275,6 +284,7 @@ class PriorityFactory:
         Args:
             created_at (Optional[datetime]): The timestamp when the priority was created.
             emoji (Optional[str]): The emoji of the priority.
+            icon (Optional[str]): The icon of the priority. Defaults to "🔥".
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
             name (str): The name of the priority.
@@ -290,6 +300,7 @@ class PriorityFactory:
             return ImmutablePriority(
                 created_at=created_at,
                 emoji=emoji,
+                icon=icon,
                 id=id,
                 key=key,
                 name=name,
@@ -920,6 +931,7 @@ class PriorityModel(ImmutableBaseModel):
         id (int): The ID of the priority.
         created_at (datetime): The timestamp when the priority was created.
         emoji (str): The emoji of the priority.
+        icon (str): The icon of the priority. Defaults to "🔥".
         key (str): The key of the priority.
         name (str): The name of the priority.
         updated_at (datetime): The timestamp when the priority was last updated.
@@ -946,6 +958,7 @@ class PriorityModel(ImmutableBaseModel):
     )
 
     created_at: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -960,6 +973,7 @@ class PriorityModel(ImmutableBaseModel):
     )
 
     emoji: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -973,7 +987,23 @@ class PriorityModel(ImmutableBaseModel):
         unique=True,
     )
 
+    icon: Field = Field(
+        autoincrement=False,
+        default="🔥",
+        description="",
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     key: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -988,6 +1018,7 @@ class PriorityModel(ImmutableBaseModel):
     )
 
     name: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -1002,6 +1033,7 @@ class PriorityModel(ImmutableBaseModel):
     )
 
     updated_at: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -1016,6 +1048,7 @@ class PriorityModel(ImmutableBaseModel):
     )
 
     uuid: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -1030,6 +1063,7 @@ class PriorityModel(ImmutableBaseModel):
     )
 
     value: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -1047,6 +1081,7 @@ class PriorityModel(ImmutableBaseModel):
         self,
         created_at: Optional[datetime] = None,
         emoji: Optional[str] = None,
+        icon: Optional[str] = "🔥",
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -1060,6 +1095,7 @@ class PriorityModel(ImmutableBaseModel):
         Args:
             created_at (Optional[datetime]): The timestamp when the priority was created.
             emoji (Optional[str]): The emoji of the priority.
+            icon (Optional[str]): The icon of the priority. Defaults to "🔥".
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
             name (Optional[str]): The name of the priority.
@@ -1075,6 +1111,7 @@ class PriorityModel(ImmutableBaseModel):
         super().__init__(
             created_at=created_at,
             emoji=emoji,
+            icon="🔥",
             id=id,
             key=key,
             name=name,

@@ -43,6 +43,7 @@ class Association(ImmutableBaseObject):
         default (Optional[int]): The ID of the default that is being associated with.
         difficulty (Optional[int]): The ID of the difficulty that is being associated with.
         flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+        icon (Optional[str]): The icon of the association..
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
         note (Optional[int]): The ID of the note that is being associated with.
@@ -75,6 +76,7 @@ class Association(ImmutableBaseObject):
         default: Optional[int] = None,
         difficulty: Optional[int] = None,
         flashcard: Optional[int] = None,
+        icon: Optional[str] = "🔗",
         id: Optional[int] = None,
         key: Optional[str] = None,
         note: Optional[int] = None,
@@ -102,6 +104,7 @@ class Association(ImmutableBaseObject):
             default (Optional[int]): The ID of the default that is being associated with.
             difficulty (Optional[int]): The ID of the difficulty that is being associated with.
             flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+            icon (Optional[str]): The icon of the association. Defaults to "🔗".
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
             note (Optional[int]): The ID of the note that is being associated with.
@@ -131,6 +134,7 @@ class Association(ImmutableBaseObject):
             default=default,
             difficulty=difficulty,
             flashcard=flashcard,
+            icon=icon,
             id=id,
             key=key,
             note=note,
@@ -254,6 +258,7 @@ class AssociationFactory:
         default: Optional[int] = None,
         difficulty: Optional[int] = None,
         flashcard: Optional[int] = None,
+        icon: Optional[str] = "🔗",
         id: Optional[int] = None,
         key: Optional[str] = None,
         note: Optional[int] = None,
@@ -281,6 +286,7 @@ class AssociationFactory:
             default (Optional[int]): The ID of the default that is being associated with.
             difficulty (Optional[int]): The ID of the difficulty that is being associated with.
             flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+            icon (Optional[str]): The icon of the association. Defaults to "🔗".
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
             note (Optional[int]): The ID of the note that is being associated with.
@@ -313,6 +319,7 @@ class AssociationFactory:
                 default=default,
                 difficulty=difficulty,
                 flashcard=flashcard,
+                icon=icon,
                 id=id,
                 key=key,
                 note=note,
@@ -938,6 +945,7 @@ class AssociationModel(ImmutableBaseModel):
         default (Optional[int]): The ID of the default that is being associated with.
         difficulty (Optional[int]): The ID of the difficulty that is being associated with.
         flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+        icon (Optional[str]): The icon of the association. Defaults to "🔗".
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
         note (Optional[int]): The ID of the note that is being associated with.
@@ -1112,6 +1120,22 @@ class AssociationModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="INTEGER",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="🔗",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -1326,6 +1350,7 @@ class AssociationModel(ImmutableBaseModel):
         default: Optional[int] = None,
         difficulty: Optional[int] = None,
         flashcard: Optional[int] = None,
+        icon: Optional[str] = "🔗",
         id: Optional[int] = None,
         key: Optional[str] = None,
         note: Optional[int] = None,
@@ -1353,6 +1378,7 @@ class AssociationModel(ImmutableBaseModel):
             default (Optional[int]): The ID of the default that is being associated with.
             difficulty (Optional[int]): The ID of the difficulty that is being associated with.
             flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+            icon (Optional[str]): The icon of the association. Defaults to "🔗".
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
             note (Optional[int]): The ID of the note that is being associated with.
@@ -1381,6 +1407,7 @@ class AssociationModel(ImmutableBaseModel):
             default=default,
             difficulty=difficulty,
             flashcard=flashcard,
+            icon="🔗",
             id=id,
             key=key,
             note=note,

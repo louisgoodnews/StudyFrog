@@ -39,6 +39,7 @@ class SearchUI(tkinter.Frame):
         navigation_item (NavigationHistoryItem): The navigation history item instance.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
+        type (Optional[str]): The type of the search.
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -50,6 +51,7 @@ class SearchUI(tkinter.Frame):
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
         unified_manager: UnifiedObjectManager,
+        type: Optional[str] = None,
     ) -> None:
         """
         Initializes a new instance of the SearchUI class.
@@ -60,6 +62,7 @@ class SearchUI(tkinter.Frame):
             navigation_item (NavigationHistoryItem): The navigation history item instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
+            type (Optional[str]): The type of the search.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
         Returns:

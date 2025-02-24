@@ -5,8 +5,6 @@ Date: 2025-02-09
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -47,6 +45,7 @@ class CustomField(ImmutableBaseObject):
         name: str,
         type: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -59,6 +58,7 @@ class CustomField(ImmutableBaseObject):
             name (str): The name of the custom field.
             type (str): The type of the custom field.
             created_at (Optional[datetime]): The timestamp when the custom field was created.
+            icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
             id (Optional[int]): The ID of the custom field.
             key (Optional[str]): The key of the custom field.
             updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
@@ -71,6 +71,7 @@ class CustomField(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -160,6 +161,13 @@ class CustomFieldConverter:
 
 
 class CustomFieldFactory:
+    """
+    A factory class for creating instances of the CustomField class.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the CustomFieldFactory class.
+    """
+
     logger: Logger = Logger.get_logger(name="CustomFieldFactory")
 
     @classmethod
@@ -168,6 +176,7 @@ class CustomFieldFactory:
         name: str,
         type: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -180,6 +189,7 @@ class CustomFieldFactory:
             name (str): The name of the custom field.
             type (str): The type of the custom field.
             created_at (datetime): The timestamp when the custom field was created.
+            icon (str): The icon of the custom field. Defaults to "🎛️".
             id (int): The ID of the custom field.
             key (str): The key of the custom field.
             updated_at (datetime): The timestamp when the custom field was last updated.
@@ -195,6 +205,7 @@ class CustomFieldFactory:
             # Attempt to create and return a new instance of the CustomField class
             return CustomField(
                 created_at=created_at,
+                icon=icon,
                 id=id,
                 key=key,
                 name=name,
@@ -714,6 +725,7 @@ class CustomFieldModel(ImmutableBaseModel):
 
     Attributes:
         created_at (datetime): The timestamp when the custom field was created.
+        icon (str): The icon of the custom field. Defaults to "🎛️".
         id (int): The ID of the custom field.
         key (str): The key of the custom field.
         name (str): The name of the custom field.
@@ -753,6 +765,22 @@ class CustomFieldModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="🎛️",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -839,6 +867,7 @@ class CustomFieldModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -851,6 +880,7 @@ class CustomFieldModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the custom field was created.
+            icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
             id (Optional[int]): The ID of the custom field.
             key (Optional[str]): The key of the custom field.
             name (Optional[str]): The name of the custom field.
@@ -865,6 +895,7 @@ class CustomFieldModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon="🎛️",
             id=id,
             key=key,
             name=name,

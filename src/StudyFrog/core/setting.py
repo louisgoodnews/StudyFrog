@@ -38,6 +38,7 @@ class ImmutableSetting(ImmutableBaseObject):
         name (str): The name of the setting.
         value (str): The value of the setting.
         created_at (datetime): The timestamp when the setting was created.
+        icon (str): The icon of the setting.
         id (int): The ID of the setting.
         updated_at (datetime): The timestamp when the setting was last updated.
         uuid (str): The UUID of the setting.
@@ -48,6 +49,7 @@ class ImmutableSetting(ImmutableBaseObject):
         name: str,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -60,7 +62,9 @@ class ImmutableSetting(ImmutableBaseObject):
             name (str): The name of the setting.
             value (str): The value of the setting.
             created_at (Optional[datetime]): The timestamp when the setting was created.
+            icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
             id (Optional[int]): The ID of the setting.
+            key (Optional[str]): The key of the setting.
             updated_at (Optional[datetime]): The timestamp when the setting was last updated.
             uuid (Optional[str]): The UUID of the setting.
 
@@ -71,6 +75,7 @@ class ImmutableSetting(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -92,11 +97,26 @@ class ImmutableSetting(ImmutableBaseObject):
 
 
 class Mutable(MutableBaseObject):
+    """
+    A mutable class representing a setting.
+
+    Attributes:
+        name (str): The name of the setting.
+        value (str): The value of the setting.
+        created_at (Optional[datetime]): The timestamp when the setting was created.
+        icon (Optional[str]): The icon of the setting.
+        id (Optional[int]): The ID of the setting.
+        key (Optional[str]): The key of the setting.
+        updated_at (Optional[datetime]): The timestamp when the setting was last updated.
+        uuid (Optional[str]): The UUID of the setting.
+    """
+
     def __init__(
         self,
         name: str,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -109,7 +129,9 @@ class Mutable(MutableBaseObject):
             name (str): The name of the setting.
             value (str): The value of the setting.
             created_at (Optional[datetime]): The timestamp when the setting was created.
+            icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
             id (Optional[int]): The ID of the setting.
+            key (Optional[str]): The key of the setting.
             updated_at (Optional[datetime]): The timestamp when the setting was last updated.
             uuid (Optional[str]): The UUID of the setting.
 
@@ -120,6 +142,7 @@ class Mutable(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -235,6 +258,7 @@ class SettingFactory:
         name: str,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -247,6 +271,7 @@ class SettingFactory:
             name (str): The name of the setting.
             value (str): The value of the setting.
             created_at (Optional[datetime]): The timestamp when the setting was created.
+            icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
             id (Optional[int]): The ID of the setting.
             key (Optional[str]): The key of the setting.
             updated_at (Optional[datetime]): The timestamp when the setting was last updated.
@@ -264,6 +289,7 @@ class SettingFactory:
                 name=name,
                 value=value,
                 created_at=created_at,
+                icon=icon,
                 id=id,
                 key=key,
                 updated_at=updated_at,
@@ -779,6 +805,7 @@ class SettingModel(ImmutableBaseModel):
 
     Attributes:
         created_at (Optional[datetime]): The timestamp when the setting was created.
+        icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
         id (Optional[int]): The ID of the setting.
         key (Optional[str]): The key of the setting.
         name (Optional[str]): The name of the setting.
@@ -818,6 +845,22 @@ class SettingModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="⚙️",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -904,6 +947,7 @@ class SettingModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -916,6 +960,8 @@ class SettingModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the setting was created.
+            icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
+            id (Optional[int]): The ID of the setting.
             key (Optional[str]): The key of the setting.
             name (Optional[str]): The name of the setting.
             updated_at (Optional[datetime]): The timestamp when the setting was last updated.
@@ -929,6 +975,7 @@ class SettingModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon="⚙️",
             id=id,
             key=key,
             name=name,

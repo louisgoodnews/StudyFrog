@@ -5,8 +5,6 @@ Date: 2025-02-08
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
 
 from typing import *
@@ -36,6 +34,7 @@ class ImmutableTag(ImmutableBaseObject):
 
     Attributes:
         created_at (datetime): The timestamp when the tag was created.
+        icon (str): The icon of the tag.
         id (int): The ID of the tag.
         key (str): The key of the tag.
         updated_at (datetime): The timestamp when the tag was last updated.
@@ -47,6 +46,7 @@ class ImmutableTag(ImmutableBaseObject):
         self,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🔖",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -58,6 +58,7 @@ class ImmutableTag(ImmutableBaseObject):
         Args:
             value (str): The value of the tag.
             created_at (Optional[datetime]): The timestamp when the tag was created.
+            icon (Optional[str]): The icon of the tag. Defaults to "🔖".
             id (Optional[int]): The ID of the tag.
             key (Optional[str]): The key of the tag.
             updated_at (Optional[datetime]): The timestamp when the tag was last updated.
@@ -70,6 +71,7 @@ class ImmutableTag(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             updated_at=updated_at,
@@ -93,6 +95,7 @@ class MutableTag(MutableBaseObject):
 
     Attributes:
         created_at (datetime): The timestamp when the tag was created.
+        icon (str): The icon of the tag.
         id (int): The ID of the tag.
         key (str): The key of the tag.
         updated_at (datetime): The timestamp when the tag was last updated.
@@ -104,6 +107,7 @@ class MutableTag(MutableBaseObject):
         self,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🔖",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -115,6 +119,7 @@ class MutableTag(MutableBaseObject):
         Args:
             value (str): The value of the tag.
             created_at (Optional[datetime]): The timestamp when the tag was created.
+            icon (Optional[str]): The icon of the tag. Defaults to "🔖".
             id (Optional[int]): The ID of the tag.
             key (Optional[str]): The key of the tag.
             updated_at (Optional[datetime]): The timestamp when the tag was last updated.
@@ -127,6 +132,7 @@ class MutableTag(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon=icon,
             id=id,
             key=key,
             updated_at=updated_at,
@@ -240,6 +246,7 @@ class TagFactory:
         cls,
         value: str,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🔖",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -251,6 +258,7 @@ class TagFactory:
         Args:
             value (str): The value of the tag.
             created_at (Optional[datetime]): The timestamp when the tag was created.
+            icon (Optional[str]): The icon of the tag. Defaults to "🔖".
             id (Optional[int]): The ID of the tag.
             key (Optional[str]): The key of the tag.
             updated_at (Optional[datetime]): The timestamp when the tag was last updated.
@@ -266,6 +274,7 @@ class TagFactory:
             # Attempt to create and return a new instance of the ImmutableTag class
             return ImmutableTag(
                 created_at=created_at,
+                icon=icon,
                 id=id,
                 key=key,
                 updated_at=updated_at,
@@ -783,6 +792,7 @@ class TagModel(ImmutableBaseModel):
         table (str): The table name of the tag model.
         id (Field): The ID of the tag.
         created_at (Field): The timestamp when the tag was created.
+        icon (Field): The icon of the tag. Defaults to "🔖".
         key (Field): The key of the tag.
         updated_at (Field): The timestamp when the tag was last updated.
         uuid (Field): The UUID of the tag.
@@ -820,6 +830,22 @@ class TagModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    icon: Field = Field(
+        autoincrement=False,
+        default="🔖",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -890,6 +916,7 @@ class TagModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🔖",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -901,6 +928,7 @@ class TagModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the tag was created.
+            icon (Optional[str]): The icon of the tag. Defaults to "🔖".
             id (Optional[int]): The ID of the tag.
             key (Optional[str]): The key of the tag.
             updated_at (Optional[datetime]): The timestamp when the tag was last updated.
@@ -914,6 +942,7 @@ class TagModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            icon="🔖",
             id=id,
             key=key,
             table=Constants.TAGS,

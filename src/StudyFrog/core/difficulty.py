@@ -41,6 +41,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
         name (str): The name of the difficulty.
         value (float): The value of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
+        icon (str): The icon of the difficulty.
         id (int): The ID of the difficulty.
         key (str): The key of the difficulty.
         updated_at (datetime): The timestamp when the difficulty was last updated.
@@ -53,6 +54,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -66,6 +68,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
             name (str): The name of the difficulty.
             value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
+            icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
@@ -79,6 +82,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
         super().__init__(
             created_at=created_at,
             emoji=emoji,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -110,6 +114,7 @@ class MutableDifficulty(MutableBaseObject):
         name (str): The name of the difficulty.
         value (float): The value of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
+        icon (str): The icon of the difficulty.
         id (int): The ID of the difficulty.
         key (str): The key of the difficulty.
         updated_at (datetime): The timestamp when the difficulty was last updated.
@@ -122,6 +127,7 @@ class MutableDifficulty(MutableBaseObject):
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -135,6 +141,7 @@ class MutableDifficulty(MutableBaseObject):
             name (str): The name of the difficulty.
             value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
+            icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
@@ -148,6 +155,7 @@ class MutableDifficulty(MutableBaseObject):
         super().__init__(
             created_at=created_at,
             emoji=emoji,
+            icon=icon,
             id=id,
             key=key,
             name=name,
@@ -264,6 +272,7 @@ class DifficultyFactory:
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -277,6 +286,7 @@ class DifficultyFactory:
             name (str): The name of the difficulty.
             value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
+            icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
@@ -290,6 +300,7 @@ class DifficultyFactory:
             return ImmutableDifficulty(
                 created_at=created_at,
                 emoji=emoji,
+                icon=icon,
                 id=id,
                 key=key,
                 name=name,
@@ -916,6 +927,7 @@ class DifficultyModel(ImmutableBaseModel):
         id (int): The ID of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
         emoji (str): The emoji of the difficulty.
+        icon (str): The icon of the difficulty. Defaults to "⭐".
         key (str): The key of the difficulty.
         name (str): The name of the difficulty.
         value (float): The value of the difficulty.
@@ -958,6 +970,7 @@ class DifficultyModel(ImmutableBaseModel):
     )
 
     emoji: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -971,7 +984,23 @@ class DifficultyModel(ImmutableBaseModel):
         unique=True,
     )
 
+    icon: Field = Field(
+        autoincrement=False,
+        default="⭐",
+        description="",
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     key: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -986,6 +1015,7 @@ class DifficultyModel(ImmutableBaseModel):
     )
 
     name: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -1000,6 +1030,7 @@ class DifficultyModel(ImmutableBaseModel):
     )
 
     updated_at: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -1014,6 +1045,7 @@ class DifficultyModel(ImmutableBaseModel):
     )
 
     uuid: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -1028,6 +1060,7 @@ class DifficultyModel(ImmutableBaseModel):
     )
 
     value: Field = Field(
+        autoincrement=False,
         default=None,
         description="",
         index=False,
@@ -1045,6 +1078,7 @@ class DifficultyModel(ImmutableBaseModel):
         self,
         created_at: Optional[datetime] = None,
         emoji: Optional[str] = None,
+        icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -1058,6 +1092,7 @@ class DifficultyModel(ImmutableBaseModel):
         Args:
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
             emoji (Optional[str]): The emoji of the difficulty.
+            icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
             name (Optional[str]): The name of the difficulty.
@@ -1073,6 +1108,7 @@ class DifficultyModel(ImmutableBaseModel):
         super().__init__(
             created_at=created_at,
             emoji=emoji,
+            icon="⭐",
             id=id,
             key=key,
             name=name,

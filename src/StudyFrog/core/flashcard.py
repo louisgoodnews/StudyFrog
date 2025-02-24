@@ -40,6 +40,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         difficulty (int): The ID of the difficulty the flashcard is associated with.
         front_text (str): The front side of the flashcard.
+        icon (str): The icon of the flashcard.
         id (int): The ID of the flashcard.
         key (str): The key of the flashcard.
         last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
@@ -56,6 +57,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        icon: Optional[str] = "📇",
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
@@ -73,6 +75,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             difficulty (int): The ID of the difficulty the flashcard is associated with.
             front_text (str): The front side of the flashcard.
+            icon (str): The icon of the flashcard. Defaults to "📇".
             id (int): The ID of the flashcard.
             key (str): The key of the flashcard.
             last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
@@ -92,6 +95,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             custom_field_values=custom_field_values,
             difficulty=difficulty,
             front_text=front_text,
+            icon=icon,
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
@@ -125,6 +129,7 @@ class MutableFlashcard(MutableBaseObject):
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         difficulty (int): The ID of the difficulty the flashcard is associated with.
         front_text (str): The front side of the flashcard.
+        icon (str): The icon of the flashcard.
         id (int): The ID of the flashcard.
         key (str): The key of the flashcard.
         last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
@@ -141,6 +146,7 @@ class MutableFlashcard(MutableBaseObject):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        icon: Optional[str] = "📇",
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
@@ -158,6 +164,7 @@ class MutableFlashcard(MutableBaseObject):
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             difficulty (int): The ID of the difficulty the flashcard is associated with.
             front_text (str): The front side of the flashcard.
+            icon (str): The icon of the flashcard. Defaults to "📇".
             id (int): The ID of the flashcard.
             key (str): The key of the flashcard.
             last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
@@ -177,6 +184,7 @@ class MutableFlashcard(MutableBaseObject):
             custom_field_values=custom_field_values,
             difficulty=difficulty,
             front_text=front_text,
+            icon=icon,
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
@@ -295,6 +303,7 @@ class FlashcardFactory:
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        icon: Optional[str] = "📇",
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
@@ -312,6 +321,7 @@ class FlashcardFactory:
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             difficulty (Optional[int]): The ID of the difficulty the flashcard is associated with.
             front_text (str): The front side of the flashcard.
+            icon (Optional[str]): The icon of the flashcard. Defaults to "📇".
             id (Optional[int]): The ID of the flashcard.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
@@ -335,6 +345,7 @@ class FlashcardFactory:
                 front_text=front_text,
                 difficulty=difficulty,
                 id=id,
+                icon=icon,
                 key=key,
                 last_viewed_at=last_viewed_at,
                 priority=priority,
@@ -867,6 +878,7 @@ class FlashcardModel(ImmutableBaseModel):
         custom_field_values (Optional[str]): The custom field values of the flashcard.
         difficulty (Optional[int]): The difficulty of the flashcard.
         front_text (Optional[str]): The front side of the flashcard.
+        icon (Optional[str]): The icon of the flashcard. Defaults to "📇".
         id (Optional[int]): The ID of the flashcard.
         key (Optional[str]): The key of the flashcard.
         last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
@@ -974,6 +986,22 @@ class FlashcardModel(ImmutableBaseModel):
         unique=True,
     )
 
+    icon: Field = Field(
+        autoincrement=False,
+        default="📇",
+        description="",
+        foreign_key=None,
+        index=False,
+        name="icon",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -1077,6 +1105,7 @@ class FlashcardModel(ImmutableBaseModel):
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
         front_text: Optional[str] = None,
+        icon: Optional[str] = "📇",
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
@@ -1094,6 +1123,7 @@ class FlashcardModel(ImmutableBaseModel):
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             difficulty (Optional[int]): The difficulty of the flashcard.
             front_text (Optional[str]): The front side of the flashcard.
+            icon (Optional[str]): The icon of the flashcard. Defaults to "📇".
             id (Optional[int]): The ID of the flashcard.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
@@ -1113,6 +1143,7 @@ class FlashcardModel(ImmutableBaseModel):
             custom_field_values=custom_field_values,
             difficulty=difficulty,
             front_text=front_text,
+            icon="📇",
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
