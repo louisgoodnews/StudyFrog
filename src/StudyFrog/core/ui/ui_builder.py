@@ -1255,6 +1255,40 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_listbox(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[tkinter.Listbox]:
+        """
+        Creates and returns a new instance of tkinter.Listbox.
+
+        Args:
+            master (tkinter.Misc): The master widget.
+            **kwargs: Any additional keyword arguments to be passed to the tkinter.Listbox constructor.
+
+        Returns:
+            Optional[tkinter.Listbox]: The created tkinter.Listbox instance.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Listbox.
+        """
+        try:
+            # Attempt to create and return a new instance of tkinter.Listbox
+            return tkinter.Listbox(
+                master=master,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_listbox' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_menu(
         cls,
         master: tkinter.Misc,
@@ -1640,6 +1674,128 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_multi_line_text_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_multi_select_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        values: List[str],
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            # Initialize the "Listbox" key as None
+            result["listbox"] = None
+
+            # Initialize the "Toplevel" key as None
+            result["toplevel"] = None
+
+            # Initialize the "Selection" key as an empty list
+            result["selection"] = []
+
+            def clear() -> None:
+                pass
+
+            def get() -> Optional[List[str]]:
+                pass
+
+            def on_listbox_select(event: Optional[tkinter.Event] = None) -> None:
+                pass
+
+            def on_select_button_click() -> None:
+                # Check, if the "Toplevel" key is associated with a value
+                if not result.get(
+                    "toplevel",
+                    None,
+                ):
+                    # Create the "Toplevel" toplevel widget
+                    result["toplevel"] = cls.get_toplevel()
+
+            def set(value: List[str]) -> None:
+                pass
+
+            def update_selection_display() -> None:
+                pass
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Create the "Label" widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Place the "Label" label widget in the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Container" frame widget
+            result["container"] = cls.get_frame(master=result["root"])
+
+            # Place the "Container" frame widget in the "Root" frame widget
+            result["container"].grid(
+                column=1,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Select button" button widget
+            result["select_button"] = cls.get_button(
+                master=result["root"],
+                text="Select",
+            )
+
+            # Place the "Select button" button widget in the "Root" frame widget
+            result["select_button"].grid(
+                column=2,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Add the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_multi_select_field' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
@@ -3139,6 +3295,349 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_single_line_text_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_single_select_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        values: List[str],
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a single select field widget with associated label and button.
+
+        The returned dictionary contains the following keys:
+            - "root": The container frame for the widgets
+            - "label": The label widget
+            - "container": The container for the selected value
+            - "button": The button widget to open the selection
+            - "listbox": The listbox widget for selection (created on demand)
+            - "selection": The currently selected value
+            - "toplevel": The toplevel widget for listbox (created on demand)
+            - "values": The list of values to select from
+            - "getter": A function to retrieve the selected value
+
+        Args:
+            label (str): The text for the label widget.
+            master (tkinter.Misc): The master widget for placing the container frame.
+            values (List[str]): The list of values to select from.
+            **kwargs: Additional keyword arguments for the widgets.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the widgets.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            # Initialize the listbox widget as None
+            result["listbox"] = None
+
+            # Initialize the selection key as None
+            result["selection"] = None
+
+            # Initialize the toplevel widget as None
+            result["toplevel"] = None
+
+            # Add the values to the result dictionary
+            result["values"] = values
+
+            def get() -> Optional[str]:
+                """
+                Gets the selected value from the single select field.
+
+                Returns:
+                    Optional[str]: The selected value or None if no value is selected.
+                """
+
+                # Check, if a value is associated with the "selection" key
+                if not result.get(
+                    "selection",
+                    None,
+                ):
+                    # Return early
+                    return None
+
+                # Return the value associated with the "selection" key
+                return result["selection"]
+
+            def on_listbox_select(event: Optional[tkinter.Event] = None) -> None:
+                """
+                Called when an item is selected from the listbox widget.
+
+                Gets the selected value from the listbox widget and sets it to the "selection" key of the result dictionary.
+
+                If no selection is made, sets the value associated with the "selection" key to None.
+
+                Args:
+                    event (Optional[tkinter.Event]): The event object.
+
+                Returns:
+                    None
+                """
+
+                # Get the selection indices of the listbox widget
+                selection_indices: Optional[Tuple[int]] = result[
+                    "listbox"
+                ].curselection()
+
+                # Check, if selection indices are available
+                if not selection_indices:
+                    # Set the value associated with the "selection" key to None
+                    result["selection"] = None
+                else:
+                    # Set the value associated with the "selection" key to the value at the 0th index of the selection indices tuple
+                    result["selection"] = result["listbox"].get(selection_indices[0])
+
+                    # Iterate over the children of the "Container" frame widget
+                    for child in result["container"].winfo_children():
+                        # Destroy each child widget
+                        child.destroy()
+
+                    # Create the "Value frame" frame widget
+                    result["value_frame"] = cls.get_frame(master=result["container"])
+
+                    # Configure the "Value frame" frame widget's 1st column to weight 1
+                    result["value_frame"].grid_columnconfigure(
+                        index=0,
+                        weight=1,
+                    )
+
+                    # Configure the "Value frame" frame widget's 2nd column to weight 0
+                    result["value_frame"].grid_columnconfigure(
+                        index=1,
+                        weight=0,
+                    )
+
+                    # Place the "Value frame" frame widget within the "Container" frame widget
+                    result["value_frame"].grid(
+                        column=0,
+                        padx=5,
+                        pady=5,
+                        row=0,
+                        sticky=NSEW,
+                    )
+
+                    # Create the "Value label" label widget
+                    result["value_label"] = cls.get_label(
+                        master=result["value_frame"],
+                        text=result["selection"],
+                        **kwargs,
+                    )
+
+                    # Place the "Value label" label widget within the "Value frame" frame widget
+                    result["value_label"].grid(
+                        column=0,
+                        padx=5,
+                        pady=5,
+                        row=0,
+                        sticky=NSEW,
+                    )
+
+                    # Create the "Value remove button" button widget
+                    result["value_remove_button"] = cls.get_button(
+                        command=on_value_remove_button_click,
+                        master=result["value_frame"],
+                        **kwargs,
+                    )
+
+                    # Place the "Value remove button" button widget within the "Value frame" frame widget
+                    result["value_remove_button"].grid(
+                        column=1,
+                        padx=5,
+                        pady=5,
+                        row=0,
+                    )
+
+                    # Check, if a value is associated with the "toplevel" key
+                    if result.get(
+                        "toplevel",
+                        None,
+                    ):
+                        # Destroy the toplevel widget
+                        result["toplevel"].destroy()
+
+                        # Set the value associated with the "toplevel" key to None
+                        result["toplevel"] = None
+
+                        # Set the value associated with the "listbox" key to None
+                        result["listbox"] = None
+
+            def on_value_remove_button_click() -> None:
+                """
+                Called when the "Value remove button" button widget is clicked.
+
+                Clears the content of the "Container" frame widget and sets the value associated with the "selection" key to None.
+
+                Returns:
+                    None
+                """
+
+                # Iterate over the children of the "Container" frame widget
+                for child in result["container"].winfo_children():
+                    # Destroy each child widget
+                    child.destroy()
+
+                # Set the value associated with the "selection" key to None
+                result["selection"] = None
+
+            def on_select_button_click() -> None:
+                """
+                Called when the "Select" button is clicked.
+
+                Creates and displays a toplevel widget with a listbox widget containing the values to be selected from.
+
+                Returns:
+                    None
+                """
+
+                # Check, if a value is associated with the "toplevel" key
+                if not result.get(
+                    "toplevel",
+                    None,
+                ):
+                    # Create the "Toplevel" toplevel widget
+                    result["toplevel"] = cls.get_toplevel()
+
+                # Configure the "Toplevel" toplevel widget's 1st column to weight 1
+                result["toplevel"].grid_columnconfigure(
+                    index=0,
+                    weight=1,
+                )
+
+                # Configure the "Toplevel" toplevel widget's 2nd column to weight 0
+                result["toplevel"].grid_columnconfigure(
+                    index=1,
+                    weight=0,
+                )
+
+                # Create the "Listbox" listbox widget
+                result["listbox"] = cls.get_listbox(
+                    activestyle="underline",
+                    master=result["toplevel"],
+                    selectmode="single",
+                    **kwargs,
+                )
+
+                # Place the "listbox" listbox widget in the "Toplevel" toplevel widget
+                result["listbox"].grid(
+                    column=0,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Add the values to the "Listbox" listbox widget
+                [
+                    result["listbox"].insert(
+                        index=index,
+                        value=value,
+                    )
+                    for (
+                        index,
+                        value,
+                    ) in enumerate(iterable=result["values"])
+                ]
+
+                # Bind the "<<ListboxSelect>>" event to the "on_listbox_select" function
+                result["listbox"].bind(
+                    func=on_listbox_select,
+                    sequence="<<ListboxSelect>>",
+                )
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 0
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+                **kwargs,
+            )
+
+            # Place the "Label" widget within the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Container" frame widget
+            result["container"] = cls.get_frame(master=result["root"])
+
+            # Configure the "Container" frame widget's 1st column to weight 1
+            result["container"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Container" frame widget's 1st row to weight 1
+            result["container"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Place the "Container" frame widget within the "Root" frame widget
+            result["container"].grid(
+                column=1,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                command=on_select_button_click,
+                master=result["root"],
+                text="Select",
+            )
+
+            # Place the "Button" button widget within the "Root" frame widget
+            result["button"].grid(
+                column=0,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_single_select_field' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured

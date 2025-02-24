@@ -95,7 +95,7 @@ class StackCreateForm(tkinter.Frame):
 
         # Configure the stack create form widget's 1st row to weight 0.
         self.grid_rowconfigure(
-            index=tuple(range(6)),
+            index=tuple(range(7)),
             weight=0,
         )
 
@@ -129,6 +129,21 @@ class StackCreateForm(tkinter.Frame):
             pady=5,
             row=0,
             sticky=NSEW,
+        )
+
+        # Create a separator widget to divide the flashcard create form widget
+        separator: ttk.Separator = UIBuilder.get_separator(
+            master=self,
+            orient=HORIZONTAL,
+        )
+
+        # Place the separator in the grid
+        separator.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=EW,
         )
 
         # Create a single-line text field for the stack name.
@@ -165,7 +180,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=1,
+            row=2,
             sticky=NSEW,
         )
 
@@ -209,7 +224,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=2,
+            row=3,
             sticky=NSEW,
         )
 
@@ -251,7 +266,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=3,
+            row=4,
             sticky=NSEW,
         )
 
@@ -283,7 +298,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=4,
+            row=5,
             sticky=NSEW,
         )
 
@@ -315,7 +330,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=5,
+            row=6,
             sticky=NSEW,
         )
 

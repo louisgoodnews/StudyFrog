@@ -102,25 +102,7 @@ class FlashcardCreateForm(tkinter.Frame):
 
         # Configure the flashcard create form widget's 1st row to weight 0.
         self.grid_rowconfigure(
-            index=0,
-            weight=0,
-        )
-
-        # Configure the flashcard create form widget's 2nd row to weight 0.
-        self.grid_rowconfigure(
-            index=1,
-            weight=0,
-        )
-
-        # Configure the flashcard create form widget's 3rd row to weight 0.
-        self.grid_rowconfigure(
-            index=2,
-            weight=0,
-        )
-
-        # Configure the flashcard create form widget's 4th row to weight 0.
-        self.grid_rowconfigure(
-            index=3,
+            index=tuple(range(5)),
             weight=0,
         )
 
@@ -157,6 +139,21 @@ class FlashcardCreateForm(tkinter.Frame):
             sticky=NSEW,
         )
 
+        # Create a separator widget to divide the flashcard create form widget
+        separator: ttk.Separator = UIBuilder.get_separator(
+            master=self,
+            orient=HORIZONTAL,
+        )
+
+        # Place the separator in the grid
+        separator.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=EW,
+        )
+
         # Create a combobox widget to select a stack
         self.stack_field = UIBuilder.get_combobox_select_field(
             font=(
@@ -191,7 +188,7 @@ class FlashcardCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=1,
+            row=2,
             sticky=NSEW,
         )
 
@@ -227,7 +224,7 @@ class FlashcardCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=2,
+            row=3,
             sticky=NSEW,
         )
 
@@ -263,7 +260,7 @@ class FlashcardCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=3,
+            row=4,
             sticky=NSEW,
         )
 
