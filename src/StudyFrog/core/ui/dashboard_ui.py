@@ -363,11 +363,9 @@ class DashboardUI(tkinter.Frame):
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
                 master=UIBuilder.get_toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
-                navigation_service=self.navigation_service,
                 source="dashboard_ui",
                 target="search_ui",
                 type="recent:staple",
-                unified_manager=self.unified_manager,
             ),
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -608,6 +606,9 @@ class DashboardUI(tkinter.Frame):
             sticky=NSEW,
         )
 
+        # Store the scrolled frame's "Frame" widget in an instance variable
+        self.active_stacks_frame = scrolled_frame["frame"]
+
     def create_recently_viewed_stacks_frame_widgets(
         self,
         master: tkinter.Misc,
@@ -658,6 +659,9 @@ class DashboardUI(tkinter.Frame):
             row=0,
             sticky=NSEW,
         )
+
+        # Store the scrolled frame's "Frame" widget in an instance variable
+        self.recently_viewed_stacks_frame = scrolled_frame["frame"]
 
     def create_completed_stacks_frame_widgets(
         self,
@@ -710,6 +714,9 @@ class DashboardUI(tkinter.Frame):
             row=0,
             sticky=NSEW,
         )
+
+        # Store the scrolled frame's "Frame" widget in an instance variable
+        self.completed_stacks_frame = scrolled_frame["frame"]
 
     def create_top_frame_widgets(
         self,
@@ -851,6 +858,7 @@ class DashboardUI(tkinter.Frame):
             None
         """
 
+        # Dispatch the REQUEST_GET_ALL_STACKS event
         status_notification: DispatcherNotification = self.dispatcher.dispatch(
             event=Events.REQUEST_STATUS_LOOKUP,
             name="New",
@@ -867,4 +875,6 @@ class DashboardUI(tkinter.Frame):
         )
 
         # Log a debug message indicating the number of stacks found
-        self.logger.debug(message=stacks_notification)
+        self.logger.debug(
+            message=stacks_notification.get_result(key="on_request_stack_lookup")
+        )

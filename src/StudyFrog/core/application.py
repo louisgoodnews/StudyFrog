@@ -3,7 +3,7 @@ Author: lodego
 Date: 2025-02-06
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from typing import *
 
@@ -62,7 +62,7 @@ class Application:
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
         # Bootstrap the application services
-        bootstrap_service: BootstrapService = BootstrapService()
+        self.bootstrap_service: BootstrapService = BootstrapService()
 
         # Initialize the dispatcher, navigation service, setting service, unified manager, and unified object service
         (
@@ -71,7 +71,7 @@ class Application:
             self.setting_service,
             self.unified_manager,
             self.unified_object_service,
-        ) = bootstrap_service.run_startup_tasks()
+        ) = self.bootstrap_service.run_startup_tasks()
 
         # Initialize the main UI
         self.main_ui: MainUI = MainUI(
@@ -83,6 +83,14 @@ class Application:
 
         # Get the start time
         self.start_time: datetime = Miscellaneous.get_current_datetime()
+
+        # Register the stop application function with the dispatcher
+        self.dispatcher.register(
+            event=Events.REQUEST_APPLICATION_STOP,
+            function=self.stop_application,
+            namespace=Constants.GLOBAL_NAMESPACE,
+            persistent=False,
+        )
 
     def start_application(self) -> None:
         try:
@@ -101,6 +109,9 @@ class Application:
                 target="dashboard_ui",
             )
 
+            # Log a info message indicating the application has started
+            self.logger.info(message=f"Started {Constants.APPLICATION_NAME}")
+
             # Show the main UI
             self.main_ui.mainloop()
         except Exception as e:
@@ -113,7 +124,21 @@ class Application:
             exit(1)
 
     def stop_application(self) -> None:
+        """
+        Stops the application.
+
+        Runs the shutdown tasks and dispatches the "APPLICATION_STOPPED" event in the global namespace.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while running the shutdown tasks.
+        """
         try:
+            # Run the shutdown tasks
+            self.bootstrap_service.run_shutdown_tasks()
+
             # Get the end time
             end_time: datetime = Miscellaneous.get_current_datetime()
 
@@ -121,6 +146,19 @@ class Application:
             self.dispatcher.dispatch(
                 event=Events.APPLICATION_STOPPED,
                 namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Get the duration of the application
+            duration: timedelta = end_time - self.start_time
+
+            # Log an info message indicating the application has been stopped
+            self.logger.info(
+                message=f"{Constants.APPLICATION_NAME} ran for {duration.total_seconds()} seconds"
+            )
+
+            # Log an info message indicating the application has been stopped
+            self.logger.info(
+                message=f"{Constants.APPLICATION_NAME} has been stopped. Goodbye!"
             )
 
             # Exit the application with a zero exit code indicating no exception occurred

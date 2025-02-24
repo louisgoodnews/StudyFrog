@@ -9,6 +9,8 @@ from tkinter.constants import *
 
 from typing import *
 
+from core.setting import SettingService
+
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
@@ -36,6 +38,7 @@ class CalendarUI(tkinter.Frame):
         logger (Logger): The logger instance.
         navigation_item (NavigationHistoryItem): The navigation history item instance.
         navigation_service (NavigationHistoryService): The navigation history service instance.
+        setting_service (SettingService): The setting service instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -45,6 +48,7 @@ class CalendarUI(tkinter.Frame):
         master: tkinter.Misc,
         navigation_item: NavigationHistoryItem,
         navigation_service: NavigationHistoryService,
+        setting_service: SettingService,
         unified_manager: UnifiedObjectManager,
     ) -> None:
         """
@@ -55,6 +59,7 @@ class CalendarUI(tkinter.Frame):
             master (tkinter.Misc): The parent widget.
             navigation_item (NavigationHistoryItem): The navigation history item instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
+            setting_service (SettingService): The setting service instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
         Returns:
@@ -78,6 +83,9 @@ class CalendarUI(tkinter.Frame):
 
         # Store the passed navigation service instance in an instance variable
         self.navigation_service: NavigationHistoryService = navigation_service
+
+        # Store the passed setting service instance in an instance variable
+        self.setting_service: SettingService = setting_service
 
         # Store the passed unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager

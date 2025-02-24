@@ -115,6 +115,9 @@ class BootstrapService:
         # Initialize the setting service instance
         self.setting_service: SettingService = SettingService()
 
+        # Initialize the list of subscriptions
+        self.subscriptions: List[str] = []
+
         # Initialize the unified object manager instance
         self.unified_object_manager: UnifiedObjectManager = UnifiedObjectManager()
 
@@ -767,12 +770,15 @@ class BootstrapService:
 
             # Iterate over the list
             for subscription in subscriptions:
-                # Register the function
-                self.dispatcher.register(
-                    event=subscription["event"],
-                    function=subscription["function"],
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    persistent=True,
+                # Register the subscription and append the UUID code to the subscriptions list
+                self.subscriptions.append(
+                    # Register the function
+                    self.dispatcher.register(
+                        event=subscription["event"],
+                        function=subscription["function"],
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                        persistent=True,
+                    )
                 )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -878,6 +884,28 @@ class BootstrapService:
             # Re-raise the exception to the caller
             raise e
 
+    def run_shutdown_tasks(self) -> None:
+        """
+        Runs shutdown tasks.
+
+        This method performs any necessary cleanup tasks after the application has
+        finished running. It typically includes closing databases or other resources.
+
+        Returns:
+            None
+        """
+        try:
+            # Unregister all event handlers from the dispatcher
+            self.unregister_handlers()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'run_shutdown_tasks' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
     def run_startup_tasks(
         self,
     ) -> Tuple[
@@ -943,3 +971,30 @@ class BootstrapService:
 
             # Return None to indicate an exception has occurred
             return None, None, None, None, None
+
+    def unregister_handlers(self) -> None:
+        """
+        Unregisters all event handlers from the dispatcher.
+
+        This method iterates over all subscriptions and unregisters each one
+        by calling the dispatcher's `unregister` method with the UUID.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the unregistration process.
+        """
+        try:
+            # Iterate over each subscription's UUID
+            for uuid in self.subscriptions:
+                # Unregister the handler for the given UUID
+                self.dispatcher.unregister(uuid=uuid)
+        except Exception as e:
+            # Log an error message to indicate an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'unregister_handlers' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e

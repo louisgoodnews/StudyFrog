@@ -592,9 +592,28 @@ class CreateUI(tkinter.Frame):
     ) -> None:
         try:
             # Create a new flashcard
-            flashcard: ImmutableFlashcard = self.unified_manager.create_flashcard(
-                flashcard=FlashcardFactory.create_flashcard(**object_data)
+            flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
+                **object_data
             )
+
+            # Dispatch a request to create the flashcard
+            create_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_FLASHCARD_CREATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    flashcard=flashcard,
+                )
+            )
+
+            # Check if the creation response is None, indicating failure
+            if create_response is None:
+                # Log a warning message indicating that the creation was not successful
+                self.logger.warning(
+                    message=f"Attempt to create flashcard {flashcard} was not successfull: {create_response}."
+                )
+
+                # Return early
+                return
 
             if related_objects.get("stack"):
                 # Set the stack to be mutable
@@ -605,6 +624,13 @@ class CreateUI(tkinter.Frame):
 
                 # Update the stack in the database
                 self.unified_manager.update_stack(stack=stack)
+
+            # Dispatch the FLASHCARD_CREATED event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.FLASHCARD_CREATED,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                flashcard=flashcard,
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -619,10 +645,21 @@ class CreateUI(tkinter.Frame):
         object_data: Dict[str, Any],
         related_objects: Optional[Dict[str, Any]] = None,
     ) -> None:
+        """
+        Handles the creation of a new question.
+
+        Args:
+            object_data (Dict[str, Any]): The data required to create a question.
+            related_objects (Optional[Dict[str, Any]], optional): Related objects, if any. Defaults to None.
+
+        Raises:
+            Exception: If an error occurs during question creation.
+        """
         try:
             # Create a new question
             question: ImmutableQuestion = QuestionFactory.create_question(**object_data)
 
+            # Dispatch a request to create the question
             create_response: Optional[DispatcherNotification] = (
                 self.dispatcher.dispatch(
                     event=Events.REQUEST_QUESTION_CREATE,
@@ -631,6 +668,7 @@ class CreateUI(tkinter.Frame):
                 )
             )
 
+            # Check if the creation response is None, indicating failure
             if create_response is None:
                 # Log a warning message indicating that the creation was not successful
                 self.logger.warning(
@@ -639,6 +677,13 @@ class CreateUI(tkinter.Frame):
 
                 # Return early
                 return
+
+            # Dispatch the QUESTION_CREATED event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.QUESTION_CREATED,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                question=question,
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -653,10 +698,24 @@ class CreateUI(tkinter.Frame):
         object_data: Dict[str, Any],
         related_objects: Optional[Dict[str, Any]] = None,
     ) -> None:
+        """
+        Handles the creation of a new stack.
+
+        Args:
+            object_data (Dict[str, Any]): The data required to create a stack.
+            related_objects (Optional[Dict[str, Any]]): Related objects, if any.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during stack creation.
+        """
         try:
-            # Create a new stack
+            # Create a new stack using the provided object data
             stack: ImmutableStack = StackFactory.create_stack(**object_data)
 
+            # Dispatch a request to create the stack
             create_response: Optional[DispatcherNotification] = (
                 self.dispatcher.dispatch(
                     event=Events.REQUEST_STACK_CREATE,
@@ -665,14 +724,22 @@ class CreateUI(tkinter.Frame):
                 )
             )
 
+            # Check if the creation response is None, indicating failure
             if create_response is None:
                 # Log a warning message indicating that the creation was not successful
                 self.logger.warning(
-                    message=f"Attempt to create stack {stack} was not successfull: {create_response}."
+                    message=f"Attempt to create stack {stack} was not successful: {create_response}."
                 )
 
                 # Return early
                 return
+
+            # Dispatch the STACK_CREATED event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.STACK_CREATED,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                stack=stack,
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

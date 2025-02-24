@@ -183,27 +183,27 @@ class TopBar(tkinter.Frame):
         navigations: Dict[str, Dict[str, Any]] = {
             "📚 Learning": {
                 "event": Events.REQUEST_FORWARD_NAVIGATION,
-                "target": "LearningDashboard",
+                "target": "learning_dashboard_ui",
             },
             "📝 Notes": {
                 "event": Events.REQUEST_FORWARD_NAVIGATION,
-                "target": "NotesView",
+                "target": "notes_view_ui",
             },
             "📖 Flashcards": {
                 "event": Events.REQUEST_FORWARD_NAVIGATION,
-                "target": "FlashcardsView",
+                "target": "flashcards_view_ui",
             },
             "❓ Questions": {
                 "event": Events.REQUEST_FORWARD_NAVIGATION,
-                "target": "QuestionsView",
+                "target": "questions_view_ui",
             },
             "📋 Stacks": {
                 "event": Events.REQUEST_FORWARD_NAVIGATION,
-                "target": "StacksView",
+                "target": "stacks_view_ui",
             },
             "📊 Statistics": {
                 "event": Events.REQUEST_FORWARD_NAVIGATION,
-                "target": "StatisticsView",
+                "target": "statistics_view_ui",
             },
         }
 
@@ -229,6 +229,7 @@ class TopBar(tkinter.Frame):
                 ]: self.dispatcher.dispatch(
                     event=event,
                     namespace=Constants.GLOBAL_NAMESPACE,
+                    source="topbar",
                     target=target,
                 ),
                 font=(
@@ -272,7 +273,7 @@ class TopBar(tkinter.Frame):
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
                 master=UIBuilder.get_toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
-                source="dashboard_ui",
+                source="topbar",
                 target="create_ui",
             ),
             font=(
@@ -341,7 +342,7 @@ class TopBar(tkinter.Frame):
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
                 master=UIBuilder.get_toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
-                source="dashboard_ui",
+                source="topbar",
                 target="search_ui",
             ),
             font=(
@@ -421,8 +422,8 @@ class TopBar(tkinter.Frame):
                     event=Events.REQUEST_VALIDATE_NAVIGATION,
                     master=UIBuilder.get_toplevel(),
                     namespace=Constants.GLOBAL_NAMESPACE,
-                    source="dashboard_ui",
-                    target=icons[target],
+                    source="topbar",
+                    target=target,
                 ),
                 font=(
                     Constants.DEFAULT_FONT_FAMILIY,

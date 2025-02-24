@@ -105,10 +105,7 @@ class MainUI(tkinter.Tk):
         # Register a handler for the "WM_DELETE_WINDOW" event
         self.wm_protocol(
             name="WM_DELETE_WINDOW",
-            func=lambda: dispatcher.dispatch(
-                event=Events.REQUEST_EXIT_UI_MAINLOOP,
-                namespace=Constants.GLOBAL_NAMESPACE,
-            ),
+            func=self.on_exit_ui_mainloop,
         )
 
         # Set the window title
@@ -295,6 +292,32 @@ class MainUI(tkinter.Tk):
         Returns:
             None
         """
+
+        # Quit the Tcl interpreter and destroy all widgets
+        super().quit()
+
+    def on_exit_ui_mainloop(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
+        """
+        A handler method for the REQUEST_EXIT_UI_MAINLOOP event.
+
+        Dispatches the REQUEST_APPLICATION_STOP event in the global namespace
+        and quits the Tcl interpreter. All widgets will be destroyed.
+
+        Args:
+            event (Optional[tkinter.Event], optional): The event that triggered this handler. Defaults to None.
+
+        Returns:
+            None
+        """
+
+        # Dispatch the REQUEST_APPLICATION_STOP event in the global namespace
+        self.dispatcher.dispatch(
+            event=Events.REQUEST_APPLICATION_STOP,
+            namespace=Constants.GLOBAL_NAMESPACE,
+        )
 
         # Quit the Tcl interpreter and destroy all widgets
         super().quit()
