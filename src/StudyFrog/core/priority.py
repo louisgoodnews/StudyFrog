@@ -37,6 +37,7 @@ class ImmutablePriority(ImmutableBaseObject):
     A priority has a value between 0 and 1 that represents the importance of an object.
 
     Attributes:
+        emoji (str): The emoji of the priority.
         name (str): The name of the priority.
         value (float): The value of the priority.
         created_at (datetime): The timestamp when the priority was created.
@@ -48,6 +49,7 @@ class ImmutablePriority(ImmutableBaseObject):
 
     def __init__(
         self,
+        emoji: str,
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
@@ -60,6 +62,7 @@ class ImmutablePriority(ImmutableBaseObject):
         Initializes a new instance of the ImmutablePriority class.
 
         Args:
+            emoji (str): The emoji of the priority.
             name (str): The name of the priority.
             value (float): The value of the priority.
             created_at (Optional[datetime]): The timestamp when the priority was created.
@@ -75,6 +78,7 @@ class ImmutablePriority(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            emoji=emoji,
             id=id,
             key=key,
             name=name,
@@ -102,6 +106,7 @@ class MutablePriority(MutableBaseObject):
     A priority has a value between 0 and 1 that represents the importance of an object.
 
     Attributes:
+        emoji (str): The emoji of the priority.
         name (str): The name of the priority.
         value (float): The value of the priority.
         created_at (datetime): The timestamp when the priority was created.
@@ -113,6 +118,7 @@ class MutablePriority(MutableBaseObject):
 
     def __init__(
         self,
+        emoji: str,
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
@@ -125,6 +131,7 @@ class MutablePriority(MutableBaseObject):
         Initializes a new instance of the MutablePriority class.
 
         Args:
+            emoji (str): The emoji of the priority.
             name (str): The name of the priority.
             value (float): The value of the priority.
             created_at (Optional[datetime]): The timestamp when the priority was created.
@@ -140,6 +147,7 @@ class MutablePriority(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            emoji=emoji,
             id=id,
             key=key,
             name=name,
@@ -240,11 +248,19 @@ class PriorityConverter:
 
 
 class PriorityFactory:
+    """
+    Factory class for creating ImmutablePriority instances.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the PriorityFactory class.
+    """
+
     logger: Logger = Logger.get_logger(name="PriorityFactory")
 
     @classmethod
     def create_priority(
         cls,
+        emoji: str,
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
@@ -258,6 +274,7 @@ class PriorityFactory:
 
         Args:
             created_at (Optional[datetime]): The timestamp when the priority was created.
+            emoji (Optional[str]): The emoji of the priority.
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
             name (str): The name of the priority.
@@ -272,6 +289,7 @@ class PriorityFactory:
             # Attempt to create and return a Priority object
             return ImmutablePriority(
                 created_at=created_at,
+                emoji=emoji,
                 id=id,
                 key=key,
                 name=name,
@@ -557,6 +575,23 @@ class PriorityManager(BaseObjectManager):
                 if not existing_priority:
                     # Create a new priority if it doesn't exist
                     priority: ImmutablePriority = PriorityFactory.create_priority(
+                        emoji=(
+                            "🔴"
+                            if default.value.lower() == Constants.HIGHEST
+                            else (
+                                "🟠"
+                                if default.value.lower() == Constants.HIGH
+                                else (
+                                    "🟡"
+                                    if default.value.lower() == Constants.MEDIUM
+                                    else (
+                                        "🔵"
+                                        if default.value.lower() == Constants.LOW
+                                        else "🟢"
+                                    )
+                                )
+                            )
+                        ),
                         name=default.value,
                         value=(
                             float(5 / 5)
@@ -882,7 +917,13 @@ class PriorityModel(ImmutableBaseModel):
     A priority has a value between 0 and 1 that represents the importance of an object.
 
     Attributes:
+        id (int): The ID of the priority.
+        created_at (datetime): The timestamp when the priority was created.
+        emoji (str): The emoji of the priority.
+        key (str): The key of the priority.
         name (str): The name of the priority.
+        updated_at (datetime): The timestamp when the priority was last updated.
+        uuid (str): The UUID of the priority.
         value (float): The value of the priority.
     """
 
@@ -916,6 +957,20 @@ class PriorityModel(ImmutableBaseModel):
         size=None,
         type="DATETIME",
         unique=False,
+    )
+
+    emoji: Field = Field(
+        default=None,
+        description="",
+        index=False,
+        name="emoji",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     key: Field = Field(
@@ -991,6 +1046,7 @@ class PriorityModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        emoji: Optional[str] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -1003,6 +1059,7 @@ class PriorityModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the priority was created.
+            emoji (Optional[str]): The emoji of the priority.
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
             name (Optional[str]): The name of the priority.
@@ -1017,6 +1074,7 @@ class PriorityModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            emoji=emoji,
             id=id,
             key=key,
             name=name,

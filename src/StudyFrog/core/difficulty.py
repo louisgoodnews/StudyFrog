@@ -37,6 +37,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
     A difficulty has a value between 0 and 1 that represents the importance of an object.
 
     Attributes:
+        emoji (str): The emoji of the difficulty.
         name (str): The name of the difficulty.
         value (float): The value of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
@@ -48,6 +49,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
 
     def __init__(
         self,
+        emoji: str,
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
@@ -60,6 +62,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
         Initializes a new instance of the Difficulty class.
 
         Args:
+            emoji (str): The emoji of the difficulty.
             name (str): The name of the difficulty.
             value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
@@ -75,6 +78,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            emoji=emoji,
             id=id,
             key=key,
             name=name,
@@ -102,6 +106,7 @@ class MutableDifficulty(MutableBaseObject):
     A difficulty has a value between 0 and 1 that represents the importance of an object.
 
     Attributes:
+        emoji (str): The emoji of the difficulty.
         name (str): The name of the difficulty.
         value (float): The value of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
@@ -113,6 +118,7 @@ class MutableDifficulty(MutableBaseObject):
 
     def __init__(
         self,
+        emoji: str,
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
@@ -125,6 +131,7 @@ class MutableDifficulty(MutableBaseObject):
         Initializes a new instance of the MutableDifficulty class.
 
         Args:
+            emoji (str): The emoji of the difficulty.
             name (str): The name of the difficulty.
             value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
@@ -140,6 +147,7 @@ class MutableDifficulty(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            emoji=emoji,
             id=id,
             key=key,
             name=name,
@@ -252,6 +260,7 @@ class DifficultyFactory:
     @classmethod
     def create_difficulty(
         cls,
+        emoji: str,
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
@@ -264,6 +273,7 @@ class DifficultyFactory:
         Creates a new instance of the Difficulty class.
 
         Args:
+            emoji (str): The emoji of the difficulty.
             name (str): The name of the difficulty.
             value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
@@ -278,13 +288,14 @@ class DifficultyFactory:
         try:
             # Attempt to create and return a Difficulty object
             return ImmutableDifficulty(
-                name=name,
-                value=value,
                 created_at=created_at,
+                emoji=emoji,
                 id=id,
                 key=key,
+                name=name,
                 updated_at=updated_at,
                 uuid=uuid,
+                value=value,
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -573,6 +584,15 @@ class DifficultyManager(BaseObjectManager):
                     # Create a new difficulty if it doesn't exist
                     difficulty: ImmutableDifficulty = (
                         DifficultyFactory.create_difficulty(
+                            emoji=(
+                                "⭐"
+                                if default.value.lower() == Constants.EASY
+                                else (
+                                    "⭐⭐"
+                                    if default.value.lower() == Constants.MEDIUM
+                                    else "⭐⭐⭐"
+                                )
+                            ),
                             name=default.value,
                             value=(
                                 float(1 / 3)
@@ -893,8 +913,14 @@ class DifficultyModel(ImmutableBaseModel):
     A difficulty has a value between 0 and 1 that represents the importance of an object.
 
     Attributes:
+        id (int): The ID of the difficulty.
+        created_at (datetime): The timestamp when the difficulty was created.
+        emoji (str): The emoji of the difficulty.
+        key (str): The key of the difficulty.
         name (str): The name of the difficulty.
         value (float): The value of the difficulty.
+        updated_at (datetime): The timestamp when the difficulty was last updated.
+        uuid (str): The UUID of the difficulty.
     """
 
     table: str = Constants.DIFFICULTIES
@@ -929,6 +955,20 @@ class DifficultyModel(ImmutableBaseModel):
         size=None,
         type="DATETIME",
         unique=False,
+    )
+
+    emoji: Field = Field(
+        default=None,
+        description="",
+        index=False,
+        name="emoji",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     key: Field = Field(
@@ -1004,6 +1044,7 @@ class DifficultyModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        emoji: Optional[str] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -1016,6 +1057,7 @@ class DifficultyModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
+            emoji (Optional[str]): The emoji of the difficulty.
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
             name (Optional[str]): The name of the difficulty.
@@ -1030,6 +1072,7 @@ class DifficultyModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            emoji=emoji,
             id=id,
             key=key,
             name=name,

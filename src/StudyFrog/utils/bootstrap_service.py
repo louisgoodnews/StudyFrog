@@ -36,6 +36,7 @@ from core.ui.create_ui import CreateUI
 from core.ui.dashboard_ui import DashboardUI
 from core.ui.edit_ui import EditUI
 from core.ui.help_ui import HelpUI
+from core.ui.menu_ui import MenuUI
 from core.ui.notification_ui import NotificationUI
 from core.ui.report_ui import ReportUI
 from core.ui.search_ui import SearchUI
@@ -807,6 +808,7 @@ class BootstrapService:
                 "dashboard_ui": DashboardUI,
                 "edit_ui": EditUI,
                 "help_ui": HelpUI,
+                "menu_ui": MenuUI,
                 "notification_ui": NotificationUI,
                 "report_ui": ReportUI,
                 "search_ui": SearchUI,

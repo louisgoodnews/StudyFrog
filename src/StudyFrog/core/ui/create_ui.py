@@ -615,6 +615,9 @@ class CreateUI(tkinter.Frame):
                 # Return early
                 return
 
+            # Retrieve the created flashcard
+            flashcard = create_response.get_result(key="on_request_flashcard_create")
+
             if related_objects.get("stack"):
                 # Set the stack to be mutable
                 stack: MutableStack = related_objects["stack"].to_mutable()
@@ -678,6 +681,11 @@ class CreateUI(tkinter.Frame):
                 # Return early
                 return
 
+            # Retrieve the created question
+            question: ImmutableQuestion = create_response.get_result(
+                key="on_request_question_create"
+            )
+
             # Dispatch the QUESTION_CREATED event in the global namespace
             self.dispatcher.dispatch(
                 event=Events.QUESTION_CREATED,
@@ -733,6 +741,9 @@ class CreateUI(tkinter.Frame):
 
                 # Return early
                 return
+
+            # Retrieve the created stack
+            stack = create_response.get_result(key="on_request_stack_create")
 
             # Dispatch the STACK_CREATED event in the global namespace
             self.dispatcher.dispatch(

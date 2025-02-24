@@ -2317,63 +2317,63 @@ class UIBuilder:
 
             def clear() -> None:
                 """
-                Deselects all checkbuttons.
+                Deselects all radiobuttons.
 
                 Returns:
                     None
                 """
 
-                # Iterate over all checkbuttons in the "Checkbuttons" dictionary
-                for value in result["checkbuttons"].values():
-                    # Deselect the checkbutton
+                # Iterate over all radiobuttons in the "Radiobuttons" dictionary
+                for value in result["radiobuttons"].values():
+                    # Deselect the radiobutton
                     value.deselect()
 
             def get() -> Optional[Dict[str, Any]]:
                 """
-                Retrieves the values of the checkbuttons and returns them in a dictionary.
+                Retrieves the values of the radiobuttons and returns them in a dictionary.
 
-                The keys of the dictionary are the keys of the "checkbuttons" dictionary,
-                and the values are the values of the checkbuttons.
+                The keys of the dictionary are the keys of the "radiobuttons" dictionary,
+                and the values are the values of the radiobuttons.
 
                 Returns:
-                    Optional[Dict[str, Any]]: The dictionary containing the values of the checkbuttons.
+                    Optional[Dict[str, Any]]: The dictionary containing the values of the radiobuttons.
                 """
 
                 # Initialize the dictionary as an empty dictionary
                 dictionary: Dict[str, Any] = {}
 
-                # Iterate over the checkbuttons in the "Checkbuttons" dictionary
+                # Iterate over the radiobuttons in the "Radiobuttons" dictionary
                 for (
                     key,
                     value,
-                ) in result["checkbuttons"].items():
-                    # Get the value of the checkbutton
+                ) in result["radiobuttons"].items():
+                    # Get the value of the radiobutton
                     dictionary[key] = value.get()
 
                 # Return the dictionary
                 return dictionary
 
-            def on_checkbutton_click(string: str) -> None:
+            def on_radiobutton_click(string: str) -> None:
                 """
-                Handles the click event of a checkbutton.
+                Handles the click event of a radiobutton.
 
-                Deselects all checkbuttons except the one that was clicked.
+                Deselects all radiobuttons except the one that was clicked.
 
                 Args:
-                    string (str): The key of the checkbutton that was clicked.
+                    string (str): The key of the radiobutton that was clicked.
 
                 Returns:
                     None
                 """
 
-                # Iterate over all checkbuttons in the "Checkbuttons" dictionary
+                # Iterate over all radiobuttons in the "Radiobuttons" dictionary
                 for (
                     key,
                     value,
-                ) in result["checkbuttons"].items():
+                ) in result["radiobuttons"].items():
                     # Check if the key is not the one that was clicked
                     if key != string:
-                        # Deselect the checkbutton
+                        # Deselect the radiobutton
                         value.deselect()
 
             def set(
@@ -2381,20 +2381,20 @@ class UIBuilder:
                 value: bool,
             ) -> None:
                 """
-                Sets the value of the checkbutton with the given key to the given value.
+                Sets the value of the radiobutton with the given key to the given value.
 
                 Args:
-                    key (str): The key of the checkbutton to be set.
-                    value (bool): The value to which the checkbutton should be set.
+                    key (str): The key of the radiobutton to be set.
+                    value (bool): The value to which the radiobutton should be set.
 
                 Returns:
                     None
                 """
 
-                # Check if the key is present in the "Checkbuttons" dictionary
-                if key in result["checkbuttons"].keys():
-                    # Set the value of the checkbutton with the given key to the given value
-                    result["checkbuttons"][key].set(value=value)
+                # Check if the key is present in the "Radiobuttons" dictionary
+                if key in result["radiobuttons"].keys():
+                    # Set the value of the radiobutton with the given key to the given value
+                    result["radiobuttons"][key].set(value=value)
 
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(master=master)
@@ -2405,8 +2405,8 @@ class UIBuilder:
                 weight=1,
             )
 
-            # Initialize the "Checkbuttons" dictionary as an empty dictionary
-            result["checkbuttons"] = {}
+            # Initialize the "Radiobuttons" dictionary as an empty dictionary
+            result["radiobuttons"] = {}
 
             # Iterate over the passed labels
             for (
@@ -2428,9 +2428,9 @@ class UIBuilder:
                     weight=1,
                 )
 
-                # Create a "Checkbutton_{index}" checkbutton widget
-                result[f"checkbutton_{index}"] = cls.get_checkbutton(
-                    command=lambda string=f"checkbutton_{index}": on_checkbutton_click(
+                # Create a "Radiobutton_{index}" radiobutton widget
+                result[f"radiobutton_{index}"] = cls.get_radiobutton(
+                    command=lambda string=f"radiobutton_{index}": on_radiobutton_click(
                         string=string
                     ),
                     master=result[f"frame_{index}"],
@@ -2439,8 +2439,8 @@ class UIBuilder:
                     **kwargs,
                 )
 
-                # Place the "Checkbutton_{index}" checkbutton widget in the "Frame_{index}" frame widget
-                result[f"checkbutton_{index}"].grid(
+                # Place the "Radiobutton_{index}" radiobutton widget in the "Frame_{index}" frame widget
+                result[f"radiobutton_{index}"].grid(
                     column=0,
                     padx=5,
                     pady=5,
@@ -2448,9 +2448,9 @@ class UIBuilder:
                     sticky=NSEW,
                 )
 
-                # Append the "Checkbutton_{index}" checkbutton widget to the "Checkbuttons" dictionary
-                result["checkbuttons"][f"checkbutton_{index}"] = result[
-                    f"checkbutton_{index}"
+                # Append the "Radiobutton_{index}" radiobutton widget to the "Checkbuttons" dictionary
+                result["radiouttons"][f"radiobutton_{index}"] = result[
+                    f"radiobutton_{index}"
                 ]
 
             # Add the clearer function to the result dictionary

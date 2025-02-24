@@ -7,11 +7,10 @@ import tkinter
 
 from tkinter.constants import *
 
-from tkinter import ttk
-
 from typing import *
 
 from core.setting import SettingService
+from core.stack import ImmutableStack
 
 from core.ui.ui_builder import UIBuilder
 
@@ -92,6 +91,9 @@ class DashboardUI(tkinter.Frame):
 
         # Configure the DasboardUI's background to be grey
         self.configure(background=Constants.BLUE_GREY["700"])
+
+        # Subscribe to events relevant for this class
+        self.subscribe_to_events()
 
         # Configure the grid
         self.configure_grid()
@@ -847,6 +849,35 @@ class DashboardUI(tkinter.Frame):
             sticky=EW,
         )
 
+    def destroy(self) -> None:
+        """
+        Cleans up resources and unsubscribes from events.
+
+        This method attempts to unsubscribe from all events
+        and calls the parent class's destroy method to clean
+        up resources. Logs any exceptions that occur.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during the destroy process.
+        """
+        try:
+            # Attempt to unsubscribe from all events
+            self.unsubscribe_from_events()
+
+            # Call the parent class's destroy method
+            super().destroy()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'destroy' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
     def lookup_stacks(self) -> None:
         """
         Looks up the stacks and displays them.
@@ -856,25 +887,234 @@ class DashboardUI(tkinter.Frame):
 
         Returns:
             None
+
+        Raises:
+            Exception: If an error occurs during the lookup process.
         """
+        try:
+            # Dispatch the REQUEST_GET_ALL_STACKS event
+            status_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                name="New",
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
 
-        # Dispatch the REQUEST_GET_ALL_STACKS event
-        status_notification: DispatcherNotification = self.dispatcher.dispatch(
-            event=Events.REQUEST_STATUS_LOOKUP,
-            name="New",
-            namespace=Constants.GLOBAL_NAMESPACE,
-        )
+            # Dispatch the REQUEST_GET_ALL_STACKS event
+            stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_STACK_LOOKUP,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                status=status_notification.get_result(key="on_request_status_lookup")[
+                    0
+                ]["id"],
+            )
 
-        # Dispatch the REQUEST_GET_ALL_STACKS event
-        stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
-            event=Events.REQUEST_STACK_LOOKUP,
-            namespace=Constants.GLOBAL_NAMESPACE,
-            status=status_notification.get_result(key="on_request_status_lookup")[0][
-                "id"
-            ],
-        )
+            # Lookup the stacks from the DispatcherNotification
+            stacks: Optional[List[ImmutableStack]] = stacks_notification.get_result(
+                key="on_request_stack_lookup"
+            )
 
-        # Log a debug message indicating the number of stacks found
-        self.logger.debug(
-            message=stacks_notification.get_result(key="on_request_stack_lookup")
-        )
+            # Check, if the stacks list is None
+            if not stacks:
+                # Log a warning message indicating that no stacks were found
+                self.logger.warning(
+                    message="No stacks found while looking up stacks.",
+                )
+
+                # Return early
+                return
+
+            for stack in stacks:
+                # Create a tkinter.Frame widget
+                frame: tkinter.Frame = UIBuilder.get_frame(
+                    background=Constants.GREY["default"],
+                    master=self.active_stacks_frame,
+                )
+
+                # Configure the tkinter.Frame widget's 1st column to weight 1
+                frame.grid_columnconfigure(
+                    index=0,
+                    weight=1,
+                )
+
+                # Place the tkinter.Frame widget within the active stacks frame
+                frame.grid(
+                    column=0,
+                    padx=5,
+                    pady=10,
+                    row=len(self.active_stacks_frame.winfo_children()),
+                    sticky=NSEW,
+                )
+
+                # Create a tkinter.Label widget
+                label: tkinter.Label = UIBuilder.get_label(
+                    background=Constants.GREY["default"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.MEDIUM_FONT_SIZE,
+                    ),
+                    foreground=Constants.BLACK,
+                    justify=LEFT,
+                    master=frame,
+                    text=f"{stack.key} | {stack.name}",
+                )
+
+                # Place the tkinter.Label widget within the tkinter.Frame widget
+                label.grid(
+                    column=0,
+                    row=0,
+                    sticky=NSEW,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'lookup_stacks' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_stack_created(
+        self,
+        stack: ImmutableStack,
+    ) -> None:
+        """
+        Handles the STACK_CREATED event and creates a new tkinter.Frame widget
+        within the active stacks frame.
+
+        This method creates a new tkinter.Frame widget and places it within the
+        active stacks frame. It also creates a tkinter.Label widget within the
+        tkinter.Frame widget and sets its text to the name of the stack.
+
+        Args:
+            stack (ImmutableStack): The immutable stack that was created.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during the lookup process.
+        """
+        try:
+            # Create a tkinter.Frame widget
+            frame: tkinter.Frame = UIBuilder.get_frame(
+                background=Constants.GREY["default"],
+                master=self.active_stacks_frame,
+            )
+
+            # Configure the tkinter.Frame widget's 1st column to weight 1
+            frame.grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Place the tkinter.Frame widget within the active stacks frame
+            frame.grid(
+                column=0,
+                padx=5,
+                pady=10,
+                row=len(self.active_stacks_frame.winfo_children()),
+                sticky=NSEW,
+            )
+
+            # Create a tkinter.Label widget
+            label: tkinter.Label = UIBuilder.get_label(
+                background=Constants.GREY["default"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.MEDIUM_FONT_SIZE,
+                ),
+                foreground=Constants.BLACK,
+                justify=LEFT,
+                master=frame,
+                text=f"{stack.key} | {stack.name}",
+            )
+
+            # Place the tkinter.Label widget within the tkinter.Frame widget
+            label.grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_stack_created' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def subscribe_to_events(self) -> None:
+        """
+        Subscribes to all events in the subscriptions dictionary.
+
+        This method iterates over the events and functions in the subscriptions
+        dictionary and registers them with the dispatcher. It also stores the
+        UUIDs of the subscriptions in the subscriptions list.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs while subscribing to events.
+        """
+        try:
+            # Check if a "subscriptions" list exists as instance variable
+            if not hasattr(
+                self,
+                "subscriptions",
+            ):
+                # Initialize the subscriptions list as an empty list
+                self.subscriptions: List[str] = []
+
+            # Iterate over the events and functions in the subscriptions dictionary
+            for (
+                event,
+                function,
+            ) in {
+                Events.STACK_CREATED: self.on_stack_created,
+            }.items():
+                # Store the UUID of the subscription in the subscriptions list
+                self.subscriptions.append(
+                    self.dispatcher.register(
+                        event=event,
+                        function=function,
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                        persistent=True,
+                    )
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'subscribe_to_events' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def unsubscribe_from_events(self) -> None:
+        """
+        Unsubscribes from all events subscribed in the dashboard UI.
+
+        This method iterates over the UUIDs in the subscriptions dictionary and
+        unregisters the event handlers associated with each UUID.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs while unsubscribing from events.
+        """
+        try:
+            # Iterate over the UUIDs in the subscriptions dictionary
+            for uuid in self.subscriptions:
+                # Unregister the handler for the given UUID
+                self.dispatcher.unregister(uuid=uuid)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'unsubscribe_from_events' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e

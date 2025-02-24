@@ -172,6 +172,7 @@ class Constants:
 
     VERY_LARGE_FONT_SIZE: int = 48
     LARGE_FONT_SIZE: int = 24
+    MEDIUM_FONT_SIZE: int = 16
     SMALL_FONT_SIZE: int = 12
 
     BOLD: str = "bold"
