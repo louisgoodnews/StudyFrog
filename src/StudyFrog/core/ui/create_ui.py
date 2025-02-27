@@ -598,6 +598,11 @@ class CreateUI(tkinter.Frame):
         related_objects: Optional[Dict[str, Any]] = None,
     ) -> None:
         try:
+            # Check if related objects have been provided
+            if not related_objects:
+                # Initialize the related objects dictionary as an empty dictionary
+                related_objects = {}
+
             # Create a new flashcard
             flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
                 **object_data
@@ -666,6 +671,11 @@ class CreateUI(tkinter.Frame):
             Exception: If an error occurs during question creation.
         """
         try:
+            # Check if related objects have been provided
+            if not related_objects:
+                # Initialize the related objects dictionary as an empty dictionary
+                related_objects = {}
+
             # Create a new question
             question: ImmutableQuestion = QuestionFactory.create_question(**object_data)
 
@@ -727,6 +737,11 @@ class CreateUI(tkinter.Frame):
             Exception: If an error occurs during stack creation.
         """
         try:
+            # Check if related objects have been provided
+            if not related_objects:
+                # Initialize the related objects dictionary as an empty dictionary
+                related_objects = {}
+
             # Create a new stack using the provided object data
             stack: ImmutableStack = StackFactory.create_stack(**object_data)
 
@@ -751,6 +766,24 @@ class CreateUI(tkinter.Frame):
 
             # Retrieve the created stack
             stack = create_response.get_result(key="on_request_stack_create")
+
+            # Check, if the "ancestor_stack" key exists in the related objects
+            if related_objects.get(
+                "ancestor_stack",
+                None,
+            ):
+                # Get and convert the ancestor stack to a mutable object
+                ancestor: MutableStack = related_objects["ancestor_stack"].to_mutable()
+
+                # Add the created stack to the list of descendants
+                ancestor.descendants.append(stack.key)
+
+                # Dispatch a request to update the ancestor stack
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STACK_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    stack=ancestor,
+                )
 
             # Dispatch the STACK_CREATED event in the global namespace
             self.dispatcher.dispatch(

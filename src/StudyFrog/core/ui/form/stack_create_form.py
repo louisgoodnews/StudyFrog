@@ -93,10 +93,19 @@ class StackCreateForm(tkinter.Frame):
             weight=1,
         )
 
-        # Configure the stack create form widget's 1st row to weight 0.
+        # Configure the stack create form widget's 0th and 1st row to weight 0.
         self.grid_rowconfigure(
-            index=tuple(range(7)),
+            index=(
+                0,
+                1,
+            ),
             weight=0,
+        )
+
+        # Configure the stack create form widget's 2nd row to weight 1.
+        self.grid_rowconfigure(
+            index=2,
+            weight=1,
         )
 
     def create_widgets(self) -> None:
@@ -146,6 +155,137 @@ class StackCreateForm(tkinter.Frame):
             sticky=EW,
         )
 
+        # Create tabbed view widgets
+        notebook: Dict[str, Any] = UIBuilder.get_tabbed_view(master=self)
+
+        # Style the notebook "Center frame" frame widget
+        notebook["center_frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the notebook "Root" frame widget
+        notebook["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the notebook "Top frame" frame widget
+        notebook["top_frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the tabbed view widget frame in the grid
+        notebook["root"].grid(
+            column=0,
+            row=2,
+            sticky=NSEW,
+        )
+
+        # Create a scrolled frame to hold the question create form widget
+        core_attributes_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
+            master=notebook["center_frame"]
+        )
+
+        # Style the scrolled frame "Canvas" widget
+        core_attributes_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Frame" widget
+        core_attributes_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Root" frame widget
+        core_attributes_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Create a scrolled frame to hold the question create form widget
+        secondary_attributes_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
+            master=notebook["center_frame"]
+        )
+
+        # Style the scrolled frame "Canvas" widget
+        secondary_attributes_frame["canvas"].configure(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Style the scrolled frame "Frame" widget
+        secondary_attributes_frame["frame"].configure(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Style the scrolled frame "Root" frame widget
+        secondary_attributes_frame["root"].configure(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Add the scrolled frame to the notebook widget's children
+        notebook["adder"](
+            label="Core Attributes",
+            state=NORMAL,
+            sticky=NSEW,
+            widget=core_attributes_frame["root"],
+        )
+
+        # Style the scrolled frame "Core attributes" button widget
+        notebook["core attributes_button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.MEDIUM_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Add the scrolled frame to the notebook widget's children
+        notebook["adder"](
+            label="Secondary Attributes",
+            state=NORMAL,
+            sticky=NSEW,
+            widget=secondary_attributes_frame["root"],
+        )
+
+        # Style the scrolled frame "Secondary attributes" button widget
+        notebook["secondary attributes_button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.MEDIUM_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Create a combobox widget to select a stack
+        self.ancestor_stack_field = UIBuilder.get_combobox_select_field(
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            label="Ancestor Stack: ",
+            master=core_attributes_frame["frame"],
+            state="readonly",
+            values=[stack.name for stack in self.unified_manager.get_all_stacks()],
+        )
+
+        # Style the stack field "Button" button widget
+        self.ancestor_stack_field["button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Label" label widget
+        self.ancestor_stack_field["label"].configure(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Root" frame widget
+        self.ancestor_stack_field["root"].configure(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Place the stack field in the grid
+        self.ancestor_stack_field["root"].grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
         # Create a single-line text field for the stack name.
         self.name: Dict[str, Any] = UIBuilder.get_single_line_text_field(
             font=(
@@ -153,7 +293,7 @@ class StackCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Name* : ",
-            master=self,
+            master=core_attributes_frame["frame"],
         )
 
         # Style the single-line text field "Button" button widget
@@ -180,7 +320,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=2,
+            row=1,
             sticky=NSEW,
         )
 
@@ -191,7 +331,7 @@ class StackCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Difficulty* : ",
-            master=self,
+            master=core_attributes_frame["frame"],
             state="readonly",
             value=Constants.MEDIUM.capitalize(),
             values=[
@@ -225,7 +365,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=3,
+            row=2,
             sticky=NSEW,
         )
 
@@ -236,7 +376,7 @@ class StackCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Priority* : ",
-            master=self,
+            master=core_attributes_frame["frame"],
             state="readonly",
             values=[
                 priority.name for priority in self.unified_manager.get_all_priorities()
@@ -268,7 +408,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=4,
+            row=3,
             sticky=NSEW,
         )
 
@@ -279,7 +419,7 @@ class StackCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Description: ",
-            master=self,
+            master=core_attributes_frame["frame"],
         )
 
         self.description["button"].configure(
@@ -300,7 +440,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=5,
+            row=4,
             sticky=NSEW,
         )
 
@@ -311,7 +451,7 @@ class StackCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Due by*: ",
-            master=self,
+            master=core_attributes_frame["frame"],
         )
 
         self.due_by["button"].configure(
@@ -332,7 +472,7 @@ class StackCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=6,
+            row=5,
             sticky=NSEW,
         )
 
@@ -386,6 +526,12 @@ class StackCreateForm(tkinter.Frame):
         result["object_data"]["due_by"] = self.due_by["getter"]()
 
         # Get the difficulty from the difficulty field
+        result["related_objects"]["ancestor_stack"] = self.unified_manager.get_stack_by(
+            field="name",
+            value=self.ancestor_stack_field["getter"](),
+        )
+
+        # Get the difficulty from the difficulty field
         result["related_objects"]["difficulty"] = (
             self.unified_manager.get_difficulty_by(
                 field="name",
@@ -393,19 +539,29 @@ class StackCreateForm(tkinter.Frame):
             )
         )
 
-        # Get the value of the difficulty from the difficulty field
-        result["object_data"]["difficulty"] = result["related_objects"]["difficulty"][
-            "id"
-        ]
-
         # Get the priority from the priority field
         result["related_objects"]["priority"] = self.unified_manager.get_priority_by(
             field="name",
             value=self.priority_field["getter"](),
         )
 
-        # Get the value of the priority from the priority field
-        result["object_data"]["priority"] = result["related_objects"]["priority"]["id"]
+        if result["related_objects"]["ancestor_stack"]:
+            # Get the value of the difficulty from the difficulty field
+            result["object_data"]["ancestor"] = result["related_objects"][
+                "ancestor_stack"
+            ]["id"]
+
+        if result["related_objects"]["difficulty"]:
+            # Get the value of the difficulty from the difficulty field
+            result["object_data"]["difficulty"] = result["related_objects"][
+                "difficulty"
+            ]["id"]
+
+        if result["related_objects"]["priority"]:
+            # Get the value of the priority from the priority field
+            result["object_data"]["priority"] = result["related_objects"]["priority"][
+                "id"
+            ]
 
         # Return the result dictionary
         return result
