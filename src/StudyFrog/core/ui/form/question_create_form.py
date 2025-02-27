@@ -60,11 +60,14 @@ class QuestionCreateForm(tkinter.Frame):
         # Create a logger instance for the class
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
-        # Store the unified manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
+        # Initialize an empty list for the answer fields
+        self.answer_fields: List[tkinter.Misc] = []
 
         # Store the question type in an instance variable
         self.question_type: str = ""
+
+        # Store the unified manager instance in an instance variable
+        self.unified_manager: UnifiedObjectManager = unified_manager
 
         # Set the background color of the question create form widget
         self.configure(background=Constants.BLUE_GREY["700"])
@@ -82,11 +85,33 @@ class QuestionCreateForm(tkinter.Frame):
             sticky=NSEW,
         )
 
+    def clear(self) -> None:
+        """
+        Clears the content of the answers frame widget.
+
+        This method clears the content of the answers frame widget by destroying all its children
+        widgets.
+
+        Returns:
+            None
+        """
+
+        # Get a list of all children widgets in the answers frame widget
+        children: List[tkinter.Misc] = self.answers_frame.winfo_children()
+
+        # Check if the answers frame widget has any children widgets
+        if len(children) == 0:
+            # Return early if there are no children widgets
+            return
+
+        # Iterate over the children of the answers frame widget
+        for child in children:
+            # Destroy each child widget
+            child.destroy()
+
     def configure_grid(self) -> None:
         """
         Configures the grid of the question create form widget.
-
-        This method configures the grid of the question create form widget by setting the
         weights of the columns and rows.
 
         Returns:
@@ -185,22 +210,36 @@ class QuestionCreateForm(tkinter.Frame):
         )
 
         # Create a scrolled frame to hold the question create form widget
-        self.core_attributes_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
+        core_attributes_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
             master=notebook["center_frame"]
         )
 
         # Style the scrolled frame "Canvas" widget
-        self.core_attributes_frame["canvas"].configure(
+        core_attributes_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Frame" widget
+        core_attributes_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Root" frame widget
+        core_attributes_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Create a scrolled frame to hold the question create form widget
+        secondary_attributes_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
+            master=notebook["center_frame"]
+        )
+
+        # Style the scrolled frame "Canvas" widget
+        secondary_attributes_frame["canvas"].configure(
             background=Constants.BLUE_GREY["700"]
         )
 
         # Style the scrolled frame "Frame" widget
-        self.core_attributes_frame["frame"].configure(
+        secondary_attributes_frame["frame"].configure(
             background=Constants.BLUE_GREY["700"]
         )
 
         # Style the scrolled frame "Root" frame widget
-        self.core_attributes_frame["root"].configure(
+        secondary_attributes_frame["root"].configure(
             background=Constants.BLUE_GREY["700"]
         )
 
@@ -209,11 +248,30 @@ class QuestionCreateForm(tkinter.Frame):
             label="Core Attributes",
             state=NORMAL,
             sticky=NSEW,
-            widget=self.core_attributes_frame["root"],
+            widget=core_attributes_frame["root"],
         )
 
         # Style the scrolled frame "Core attributes" button widget
         notebook["core attributes_button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.MEDIUM_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Add the scrolled frame to the notebook widget's children
+        notebook["adder"](
+            label="Secondary Attributes",
+            state=NORMAL,
+            sticky=NSEW,
+            widget=secondary_attributes_frame["root"],
+        )
+
+        # Style the scrolled frame "Secondary attributes" button widget
+        notebook["secondary attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -230,7 +288,7 @@ class QuestionCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Stack*: ",
-            master=self.core_attributes_frame["frame"],
+            master=core_attributes_frame["frame"],
             state="readonly",
             values=[stack.name for stack in self.unified_manager.get_all_stacks()],
         )
@@ -269,7 +327,7 @@ class QuestionCreateForm(tkinter.Frame):
             ),
             height=15,
             label="Question Text*: ",
-            master=self.core_attributes_frame["frame"],
+            master=core_attributes_frame["frame"],
         )
 
         # Style the question text field "Button" button widget
@@ -307,7 +365,7 @@ class QuestionCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Question Type*: ",
-            master=self.core_attributes_frame["frame"],
+            master=core_attributes_frame["frame"],
             state="readonly",
             values=[
                 "Multiple Choice",
@@ -346,6 +404,21 @@ class QuestionCreateForm(tkinter.Frame):
             padx=5,
             pady=5,
             row=2,
+            sticky=NSEW,
+        )
+
+        # Create the answers frame
+        self.answers_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=core_attributes_frame["frame"],
+        )
+
+        # Place the answers frame in the grid
+        self.answers_frame.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=3,
             sticky=NSEW,
         )
 
@@ -411,21 +484,13 @@ class QuestionCreateForm(tkinter.Frame):
         new multiple choice answer field and adds it to the list of fields.
         """
         try:
-            # Check if the answer_fields list attribute exists
-            if not hasattr(
-                self,
-                "answer_fields",
-            ):
-                # Initialize the answer_fields list attribute
-                self.answer_fields: List[tkinter.Misc] = []
-
             # Create a new multiple choice answer field
             answer_field: Dict[str, Any] = UIBuilder.get_multiple_choice_answer_field(
                 font=(
                     Constants.DEFAULT_FONT_FAMILIY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
-                master=self.core_attributes_frame["frame"],
+                master=self.answers_frame,
             )
 
             # Configure the answer field's checkbutton widget
@@ -449,12 +514,18 @@ class QuestionCreateForm(tkinter.Frame):
             # Add the answer field to the list of fields
             self.answer_fields.append(answer_field)
 
+            # Configure the answers frame's xth row to weight 0
+            self.answers_frame.grid_rowconfigure(
+                index=(1 + len(self.answer_fields)),
+                weight=0,
+            )
+
             # Place the answer field in the grid
             answer_field["root"].grid(
                 column=0,
                 padx=5,
                 pady=5,
-                row=(3 + len(self.answer_fields)),
+                row=(1 + len(self.answer_fields)),
                 sticky=NSEW,
             )
         except Exception as e:
@@ -467,31 +538,78 @@ class QuestionCreateForm(tkinter.Frame):
             return None
 
     def on_question_type_select(self) -> None:
+        """
+        Handles the event when the question type field selection is changed.
+
+        This method is called when the question type field selection is changed.
+        It attempts to obtain the current value of the question type field and
+        updates the question type instance variable. Depending on the selected
+        question type, it creates the corresponding widgets.
+
+        The question type field can have the following values:
+
+            - "Multiple Choice"
+            - "Open Answer"
+            - "True/False"
+
+        If the question type value is not one of the above, this method logs a
+        warning message and returns early.
+
+        If the question type value is "Multiple Choice", this method creates a
+        button with the text "Add Answer" and places it within the scrolled
+        frame. The button is configured to call the
+        on_add_answer_button_click method when clicked.
+
+        If the question type value is "Open Answer", this method creates an open
+        answer field and places it within the scrolled frame.
+
+        If the question type value is "True/False", this method creates a true
+        false answer field and places it within the scrolled frame.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
         try:
             # Attempt to obtain the current value of the question type field
             value: Optional[str] = self.question_type_field["getter"]()
 
             # Check if the value is an empty string or None
-            if value == "" or value is None:
+            if not value or value not in [
+                "Multiple Choice",
+                "Open Answer",
+                "True/False",
+            ]:
+                # Log a warning message, if the question type is not supported
+                self.logger.warning(
+                    message=f"Unsupported question type '{value}'. This is likely a bug."
+                )
+
                 # Return early
-                return
+                return None
 
             # Update the question type instance variable
             self.question_type = value
 
+            # Clear the answers frame widget
+            self.clear()
+
+            # Clear the answer_fields list attribute
+            self.answer_fields.clear()
+
             # Check if the question type value is any of "Multiple Choice", "Open Answer" or "True/False"
             if value == "Multiple Choice":
-                # Check if the answer_fields list attribute exists
-                if hasattr(
-                    self,
-                    "answer_fields",
-                ):
-                    # Clear the answer_fields list attribute
-                    self.answer_fields.clear()
+                # Configure the answers frame widget's 0th column to weight 0
+                self.answers_frame.grid_columnconfigure(
+                    index=0,
+                    weight=1,
+                )
 
-                # Configure the scrolled frame's 4th row to weight 0
-                self.core_attributes_frame["frame"].grid_rowconfigure(
-                    index=3,
+                # Configure the answers frame widget's 1st row to weight 0
+                self.answers_frame.grid_rowconfigure(
+                    index=0,
                     weight=0,
                 )
 
@@ -504,7 +622,7 @@ class QuestionCreateForm(tkinter.Frame):
                         Constants.MEDIUM_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
-                    master=self.core_attributes_frame["frame"],
+                    master=self.answers_frame,
                     relief=FLAT,
                     text="Add Answer",
                 )
@@ -514,25 +632,139 @@ class QuestionCreateForm(tkinter.Frame):
                     column=0,
                     padx=5,
                     pady=5,
-                    row=3,
+                    row=0,
                 )
             elif value == "Open Answer":
-                pass
+                # Configure the answers frame widget's 0th column to weight 1
+                self.answers_frame.grid_columnconfigure(
+                    index=0,
+                    weight=1,
+                )
+
+                # Configure the answers frame widget's 1st row to weight 1
+                self.answers_frame.grid_rowconfigure(
+                    index=0,
+                    weight=1,
+                )
+
+                # Create the open answer field widgets
+                open_answer_field: Dict[str, Any] = UIBuilder.get_open_answer_field(
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    master=self.answers_frame,
+                )
+
+                # Style the open answer field's "button" widget
+                open_answer_field["button"].configure(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    relief=FLAT,
+                )
+
+                # Style the open answer field's "container" frame widget
+                open_answer_field["container"].configure(
+                    background=Constants.BLUE_GREY["700"]
+                )
+
+                # Style the open answer field's "label" widget
+                open_answer_field["label"].configure(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                )
+
+                # Style the open answer field's "root" frame widget
+                open_answer_field["root"].configure(
+                    background=Constants.BLUE_GREY["700"]
+                )
+
+                # Place the open answer field's "root" frame widget within the answers frame widget
+                open_answer_field["root"].grid(
+                    column=0,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Append the open answer field to the answer fields list
+                self.answer_fields.append(open_answer_field)
             elif value == "True/False":
-                pass
-            else:
-                # Log a warning message, if the question type is not supported
-                self.logger.warning(
-                    message=f"Unsupported question type '{value}'. This is likely a bug."
+                # Configure the answers frame widget's 0th column to weight 1
+                self.answers_frame.grid_columnconfigure(
+                    index=0,
+                    weight=1,
                 )
 
-                # Set the question type to "Multiple Choice"
-                self.question_type = self.question_type_field["setter"](
-                    value="Multiple Choice"
+                # Configure the answers frame widget's 1st row to weight 1
+                self.answers_frame.grid_rowconfigure(
+                    index=0,
+                    weight=1,
                 )
 
-                # Re-call the on_question_type_select method
-                self.on_question_type_select()
+                # Create the true/false answer field widgets
+                true_false_answer_field: Dict[str, Any] = (
+                    UIBuilder.get_true_false_answer_field(
+                        master=self.answers_frame,
+                    )
+                )
+
+                # Style the true/false answer field's "container" frame widget
+                true_false_answer_field["container"].configure(
+                    background=Constants.BLUE_GREY["700"]
+                )
+
+                # Style the true/false answer field's "false_radiobutton" widget
+                true_false_answer_field["false_radiobutton"].configure(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                )
+
+                # Style the true/false answer field's "label" widget
+                true_false_answer_field["label"].configure(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                )
+
+                # Style the true/false answer field's "root" frame widget
+                true_false_answer_field["root"].configure(
+                    background=Constants.BLUE_GREY["700"]
+                )
+
+                # Style the true/false answer field's "true_radiobutton" widget
+                true_false_answer_field["true_radiobutton"].configure(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                )
+
+                # Place the true/false answer field's "root" frame widget within the answers frame widget
+                true_false_answer_field["root"].grid(
+                    column=0,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Append the true/false answer field to the answer fields list
+                self.answer_fields.append(true_false_answer_field)
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

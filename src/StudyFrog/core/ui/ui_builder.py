@@ -2398,7 +2398,7 @@ class UIBuilder:
 
             # Create the "v_scrollbar" Scrollbar widget
             result["v_scrollbar"] = cls.get_scrollbar(
-                command=result["container"].yview,
+                command=result["text"].yview,
                 master=result["container"],
                 orient=VERTICAL,
             )
@@ -2412,7 +2412,7 @@ class UIBuilder:
 
             # Create the "h_scrollbar" Scrollbar widget
             result["h_scrollbar"] = cls.get_scrollbar(
-                command=result["container"].xview,
+                command=result["text"].xview,
                 master=result["container"],
                 orient=HORIZONTAL,
             )
@@ -2439,10 +2439,10 @@ class UIBuilder:
 
             # Place the "button" Button widget within the "root" frame widget
             result["button"].grid(
-                column=1,
+                column=2,
                 padx=5,
                 pady=5,
-                row=1,
+                row=2,
             )
 
             # Add the clearer function to the result dictionary
@@ -4383,6 +4383,7 @@ class UIBuilder:
         The widgets contained in the dictionary are:
             - "root" (tkinter.Frame): The root widget of the true false answer field.
             - "label" (tkinter.Label): The label widget of the true false answer field.
+            - "container" (tkinter.Frame): The container widget of the true false answer field.
             - "true_var" (tkinter.IntVar): The variable for the true radio button.
             - "false_var" (tkinter.IntVar): The variable for the false radio button.
             - "true_radiobutton" (tkinter.Radiobutton): The true radio button.
@@ -4533,10 +4534,35 @@ class UIBuilder:
                 sticky=NSEW,
             )
 
+            # Create the "Container" frame widget
+            result["container"] = cls.get_frame(master=result["root"])
+
+            # Configure the "Container" frame widget's 0th and 1st column to weight 0
+            result["container"].grid_columnconfigure(
+                index=(
+                    0,
+                    1,
+                ),
+                weight=0,
+            )
+
+            # Configure the "Container" frame widget's 0th row to weight 0
+            result["container"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Place the "Container" frame widget within the "Root" frame widget
+            result["container"].grid(
+                column=1,
+                row=1,
+                sticky=NSEW,
+            )
+
             # Create the "True" boolean variable
             result["true_var"] = cls.get_bool_variable(
                 master=result["root"],
-                value=False,
+                value=True,
             )
 
             # Create the "False" boolean variable
@@ -4548,34 +4574,34 @@ class UIBuilder:
             # Create the "true_radiobutton" radiobutton widget
             result["true_radiobutton"] = cls.get_radiobutton(
                 command=on_true_radiobutton_click,
-                master=result["root"],
+                master=result["container"],
                 text="True",
                 variable=result["true_var"],
             )
 
-            # Place the "True" radiobutton widget within the "Root" frame widget
+            # Place the "True" radiobutton widget within the "Container" frame widget
             result["true_radiobutton"].grid(
                 column=0,
                 padx=5,
                 pady=5,
-                row=1,
+                row=0,
                 sticky=NSEW,
             )
 
             # Create the "false_radiobutton" radiobutton widget
             result["false_radiobutton"] = cls.get_radiobutton(
                 command=on_false_radiobutton_click,
-                master=result["root"],
+                master=result["container"],
                 text="False",
                 variable=result["false_var"],
             )
 
-            # Place the "False" radiobutton widget within the "Root" frame widget
+            # Place the "False" radiobutton widget within the "Container" frame widget
             result["false_radiobutton"].grid(
                 column=1,
                 padx=5,
                 pady=5,
-                row=1,
+                row=0,
                 sticky=NSEW,
             )
 
