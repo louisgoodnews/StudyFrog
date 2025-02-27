@@ -108,8 +108,14 @@ class DashboardUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Debug function to look up the stacks
-        self.lookup_stacks()
+        # Lookup the new stacks
+        self.lookup_new_stacks()
+
+        # Lookup the recently viewed stacks
+        self.lookup_recently_viewed_stacks()
+
+        # Lookup the completed stacks
+        self.lookup_completed_stacks()
 
     def configure_grid(self) -> None:
         """
@@ -476,21 +482,21 @@ class DashboardUI(tkinter.Frame):
             None
         """
 
-        # Create the "Active Stacks" frame widget
-        active_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
+        # Create the "New Stacks" frame widget
+        new_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=master["center_frame"],
         )
 
-        # Add the "Active Stacks" frame widget to the notebook
+        # Add the "New Stacks" frame widget to the notebook
         master["adder"](
-            label="My Active Stacks",
+            label="My New Stacks",
             sticky=NSEW,
-            widget=active_stacks_frame,
+            widget=new_stacks_frame,
         )
 
-        # Configure the "My Active Stacks" button
-        master["my active stacks_button"].configure(
+        # Configure the "My New Stacks" button
+        master["my new stacks_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -548,8 +554,8 @@ class DashboardUI(tkinter.Frame):
             relief=FLAT,
         )
 
-        # Create the "Active Stacks" frame widgets
-        self.create_active_stacks_frame_widgets(master=active_stacks_frame)
+        # Create the "New Stacks" frame widgets
+        self.create_new_stacks_frame_widgets(master=new_stacks_frame)
 
         # Create the "Recently Viewed" frame widgets
         self.create_recently_viewed_stacks_frame_widgets(master=recently_viewed_frame)
@@ -557,14 +563,14 @@ class DashboardUI(tkinter.Frame):
         # Create the "Completed Stacks" frame widgets
         self.create_completed_stacks_frame_widgets(master=completed_stacks_frame)
 
-    def create_active_stacks_frame_widgets(
+    def create_new_stacks_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
         """
-        Creates and configures the main widgets of the active stacks frame.
+        Creates and configures the main widgets of the new stacks frame.
 
-        This method initializes the main widgets of the active stacks frame
+        This method initializes the main widgets of the new stacks frame
         within the dashboard UI, setting their layout configuration.
 
         Args:
@@ -664,7 +670,7 @@ class DashboardUI(tkinter.Frame):
         )
 
         # Store the scrolled frame's "Frame" widget in an instance variable
-        self.active_stacks_frame = scrolled_frame["frame"]
+        self.new_stacks_frame = scrolled_frame["frame"]
 
     def create_recently_viewed_stacks_frame_widgets(
         self,
@@ -885,6 +891,140 @@ class DashboardUI(tkinter.Frame):
         # Store the scrolled frame's "Frame" widget in an instance variable
         self.completed_stacks_frame = scrolled_frame["frame"]
 
+    def create_stack_item_widgets(
+        self,
+        master: tkinter.Misc,
+        stack: ImmutableStack,
+    ) -> None:
+        """
+        Creates and configures widgets for a single stack item.
+
+        This method initializes a frame for the stack item and populates it with
+        labels displaying various stack attributes, such as priority, difficulty,
+        and status, each represented by an emoji.
+
+        Args:
+            master (tkinter.Misc): The parent widget.
+            stack (ImmutableStack): The immutable stack data.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during widget creation or data lookup.
+        """
+        try:
+            # Create a tkinter.Frame widget for the stack item
+            frame: tkinter.Frame = UIBuilder.get_frame(
+                background=Constants.GREY["default"],
+                master=master,
+            )
+
+            # Dispatch events to lookup stack attribute details
+            difficulty_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                id=stack["difficulty"],
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+            priority_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_PRIORITY_LOOKUP,
+                id=stack["priority"],
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+            status_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                id=stack["status"],
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Iterate over stack attributes to configure the frame and create labels
+            for index, column in enumerate(
+                iterable=[
+                    "icon",
+                    "name",
+                    "priority",
+                    "difficulty",
+                    "last_viewed_at",
+                    "status",
+                    "due_by",
+                ]
+            ):
+                # Configure the frame widget's column to weight 1
+                frame.grid_columnconfigure(
+                    index=index,
+                    weight=1,
+                )
+
+                # Convert stack data to database format
+                data: Dict[str, Any] = Miscellaneous.convert_to_db_format(
+                    data=stack.to_dict(exclude=["_logger"])
+                )
+
+                # Determine the text to display based on column type
+                if column == "priority":
+                    text = priority_notification.get_result(
+                        key="on_request_priority_lookup"
+                    )[0]["emoji"]
+                elif column == "difficulty":
+                    text = difficulty_notification.get_result(
+                        key="on_request_difficulty_lookup"
+                    )[0]["emoji"]
+                elif column == "status":
+                    text = status_notification.get_result(
+                        key="on_request_status_lookup"
+                    )[0]["emoji"]
+                else:
+                    text = data[column]
+
+                # Create a tkinter.Label widget for each stack attribute
+                label: tkinter.Label = UIBuilder.get_label(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    master=frame,
+                    text=text,
+                )
+
+                # Place the label widget in the stack item frame
+                label.grid(
+                    column=index,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Bind the label widget to a command that dispatches an event when clicked
+                label.bind(
+                    func=lambda event, stack=stack: self.dispatcher.dispatch(
+                        direction="forward",
+                        event=Events.REQUEST_VALIDATE_NAVIGATION,
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                        source="dashboard_ui",
+                        stack=stack,
+                        target="edit_ui",
+                    ),
+                    sequence="<ButtonRelease-1>",
+                )
+
+            # Place the stack item frame within the new stacks frame
+            frame.grid(
+                column=0,
+                padx=5,
+                pady=10,
+                row=len(self.new_stacks_frame.winfo_children()),
+                sticky=NSEW,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to create stack item widgets: {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
     def create_top_frame_widgets(
         self,
         master: tkinter.Misc,
@@ -1043,7 +1183,68 @@ class DashboardUI(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def lookup_stacks(self) -> None:
+    def lookup_completed_stacks(self) -> None:
+        """
+        Looks up the stacks and displays them.
+
+        This method sends a request to retrieve the stacks
+        and displays them in the dashboard UI.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during the lookup process.
+        """
+        try:
+            # Dispatch the REQUEST_GET_ALL_STACKS event
+            status_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                name="Completed",
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Dispatch the REQUEST_GET_ALL_STACKS event
+            stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_STACK_LOOKUP,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                status=status_notification.get_result(key="on_request_status_lookup")[
+                    0
+                ]["id"],
+            )
+
+            # Lookup the stacks from the DispatcherNotification
+            stacks: Optional[List[ImmutableStack]] = stacks_notification.get_result(
+                key="on_request_stack_lookup"
+            )
+
+            # Check, if the stacks list is None
+            if not stacks:
+                # Log a warning message indicating that no stacks were found
+                self.logger.warning(
+                    message="No stacks found while looking up stacks.",
+                )
+
+                # Return early
+                return
+
+            # Iterate over the list of stacks
+            for stack in stacks:
+                # Create the stack item widgets
+                self.create_stack_item_widgets(
+                    master=self.completed_stacks_frame,
+                    stack=stack,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'lookup_stacks' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def lookup_new_stacks(self) -> None:
         """
         Looks up the stacks and displays them.
 
@@ -1088,113 +1289,94 @@ class DashboardUI(tkinter.Frame):
                 # Return early
                 return
 
+            # Iterate over the list of stacks
             for stack in stacks:
-                # Dispatch the REQUEST_DIFFICULTY_LOOKUP event
-                difficulty_notification: DispatcherNotification = (
-                    self.dispatcher.dispatch(
-                        event=Events.REQUEST_DIFFICULTY_LOOKUP,
-                        id=stack["difficulty"],
-                        namespace=Constants.GLOBAL_NAMESPACE,
-                    )
-                )
-
-                # Dispatch the REQUEST_PRIORITY_LOOKUP event
-                priority_notification: DispatcherNotification = (
-                    self.dispatcher.dispatch(
-                        event=Events.REQUEST_PRIORITY_LOOKUP,
-                        id=stack["priority"],
-                        namespace=Constants.GLOBAL_NAMESPACE,
-                    )
-                )
-
-                # Dispatch the REQUEST_STATUS_LOOKUP event
-                status_notification: DispatcherNotification = self.dispatcher.dispatch(
-                    event=Events.REQUEST_STATUS_LOOKUP,
-                    id=stack["status"],
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
-
-                # Create a tkinter.Frame widget
-                frame: tkinter.Frame = UIBuilder.get_frame(
-                    background=Constants.GREY["default"],
-                    master=self.active_stacks_frame,
-                )
-
-                for (
-                    index,
-                    column,
-                ) in enumerate(
-                    iterable=[
-                        "icon",
-                        "name",
-                        "priority",
-                        "difficulty",
-                        "last_viewed_at",
-                        "status",
-                        "due_by",
-                    ]
-                ):
-                    # Configure the frame widget's column to weight 1
-                    frame.grid_columnconfigure(
-                        index=index,
-                        weight=1,
-                    )
-
-                    data: Dict[str, Any] = Miscellaneous.convert_to_db_format(
-                        data=stack.to_dict(exclude=["_logger"])
-                    )
-
-                    text: str
-
-                    if column == "priority":
-                        text = priority_notification.get_result(
-                            key="on_request_priority_lookup"
-                        )[0]["emoji"]
-
-                    elif column == "difficulty":
-                        text = difficulty_notification.get_result(
-                            key="on_request_difficulty_lookup"
-                        )[0]["emoji"]
-
-                    elif column == "status":
-                        text = status_notification.get_result(
-                            key="on_request_status_lookup"
-                        )[0]["emoji"]
-
-                    else:
-                        text = data[column]
-
-                    # Create a tkinter.Label widget
-                    label: tkinter.Label = UIBuilder.get_label(
-                        background=Constants.BLUE_GREY["700"],
-                        font=(
-                            Constants.DEFAULT_FONT_FAMILIY,
-                            Constants.DEFAULT_FONT_SIZE,
-                        ),
-                        foreground=Constants.WHITE,
-                        master=frame,
-                        text=text,
-                    )
-
-                    # Place the tkinter.Label widget in the tkinter.Frame widget
-                    label.grid(
-                        column=index,
-                        row=0,
-                        sticky=NSEW,
-                    )
-
-                # Place the tkinter.Frame widget within the active stacks frame
-                frame.grid(
-                    column=0,
-                    padx=5,
-                    pady=10,
-                    row=len(self.active_stacks_frame.winfo_children()),
-                    sticky=NSEW,
+                # Create the stack item widgets
+                self.create_stack_item_widgets(
+                    master=self.new_stacks_frame,
+                    stack=stack,
                 )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'lookup_stacks' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def lookup_recently_viewed_stacks(self) -> None:
+        """
+        Looks up the recently viewed stacks and displays them.
+
+        This method sends a request to retrieve the stacks
+        and displays them in the dashboard UI.
+
+        The stacks are filtered to only include stacks that were viewed
+        within the current week.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during the lookup process.
+        """
+        try:
+            # Dispatch the REQUEST_GET_ALL_STACKS event
+            stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_ALL_STACKS,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Lookup the stacks from the DispatcherNotification
+            stacks: Optional[List[ImmutableStack]] = stacks_notification.get_result(
+                key="on_request_get_all_stacks"
+            )
+
+            # Check, if the stacks list is None
+            if not stacks:
+                # Log a warning message indicating that no stacks were found
+                self.logger.warning(
+                    message="No stacks found while looking up stacks.",
+                )
+
+                # Return early
+                return
+
+            # Iterate over the list of stacks
+            for stack in filter(
+                # Filter the stacks to only include stacks that were viewed
+                # within the current week
+                lambda stack: Constants.START_OF_WEEK
+                <= stack["last_viewed_at"]
+                <= Constants.END_OF_WEEK,
+                stacks,
+            ):
+                # Create the stack item widgets
+                self.create_stack_item_widgets(
+                    master=self.recently_viewed_stacks_frame,
+                    stack=stack,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'lookup_stacks' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_label_clicked(
+        self,
+        stack: ImmutableStack,
+    ) -> None:
+        try:
+            # Log a debug message indicating that the label was clicked
+            self.logger.debug(message=f"Clicked on label for stack: {stack}.")
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_label_clicked' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller
@@ -1206,10 +1388,10 @@ class DashboardUI(tkinter.Frame):
     ) -> None:
         """
         Handles the STACK_CREATED event and creates a new tkinter.Frame widget
-        within the active stacks frame.
+        within the new stacks frame.
 
         This method creates a new tkinter.Frame widget and places it within the
-        active stacks frame. It also creates a tkinter.Label widget within the
+        new stacks frame. It also creates a tkinter.Label widget within the
         tkinter.Frame widget and sets its text to the name of the stack.
 
         Args:
@@ -1222,113 +1404,10 @@ class DashboardUI(tkinter.Frame):
             Exception: If an error occurs during the lookup process.
         """
         try:
-            # Create a tkinter.Frame widget
-            frame: tkinter.Frame = UIBuilder.get_frame(
-                background=Constants.GREY["default"],
-                master=self.active_stacks_frame,
-            )
-
-            # Dispatch the REQUEST_DIFFICULTY_LOOKUP event
-            difficulty_notification: DispatcherNotification = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
-                    id=stack["difficulty"],
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
-            )
-
-            # Dispatch the REQUEST_PRIORITY_LOOKUP event
-            priority_notification: DispatcherNotification = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_PRIORITY_LOOKUP,
-                    id=stack["priority"],
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
-            )
-
-            # Dispatch the REQUEST_STATUS_LOOKUP event
-            status_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_STATUS_LOOKUP,
-                id=stack["status"],
-                namespace=Constants.GLOBAL_NAMESPACE,
-            )
-
-            # Create a tkinter.Frame widget
-            frame: tkinter.Frame = UIBuilder.get_frame(
-                background=Constants.GREY["default"],
-                master=self.active_stacks_frame,
-            )
-
-            for (
-                index,
-                column,
-            ) in enumerate(
-                iterable=[
-                    "icon",
-                    "name",
-                    "priority",
-                    "difficulty",
-                    "last_viewed_at",
-                    "status",
-                    "due_by",
-                ]
-            ):
-                # Configure the frame widget's column to weight 1
-                frame.grid_columnconfigure(
-                    index=index,
-                    weight=1,
-                )
-
-                data: Dict[str, Any] = Miscellaneous.convert_to_db_format(
-                    data=stack.to_dict(exclude=["_logger"])
-                )
-
-                text: str
-
-                if column == "priority":
-                    text = priority_notification.get_result(
-                        key="on_request_priority_lookup"
-                    )[0]["emoji"]
-
-                elif column == "difficulty":
-                    text = difficulty_notification.get_result(
-                        key="on_request_difficulty_lookup"
-                    )[0]["emoji"]
-
-                elif column == "status":
-                    text = status_notification.get_result(
-                        key="on_request_status_lookup"
-                    )[0]["emoji"]
-
-                else:
-                    text = data[column]
-
-                # Create a tkinter.Label widget
-                label: tkinter.Label = UIBuilder.get_label(
-                    background=Constants.BLUE_GREY["700"],
-                    font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
-                        Constants.DEFAULT_FONT_SIZE,
-                    ),
-                    foreground=Constants.WHITE,
-                    master=frame,
-                    text=text,
-                )
-
-                # Place the tkinter.Label widget in the tkinter.Frame widget
-                label.grid(
-                    column=index,
-                    row=0,
-                    sticky=NSEW,
-                )
-
-            # Place the tkinter.Frame widget within the active stacks frame
-            frame.grid(
-                column=0,
-                padx=5,
-                pady=10,
-                row=len(self.active_stacks_frame.winfo_children()),
-                sticky=NSEW,
+            # Create the stack item widgets
+            self.create_stack_item_widgets(
+                master=self.new_stacks_frame,
+                stack=stack,
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -1362,20 +1441,27 @@ class DashboardUI(tkinter.Frame):
                 # Initialize the subscriptions list as an empty list
                 self.subscriptions: List[str] = []
 
+            # Create a dictionary of events and functions
+            subscriptions: Dict[Any, Dict[str, Any]] = {
+                Events.STACK_CREATED: {
+                    "function": self.on_stack_created,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+            }
+
             # Iterate over the events and functions in the subscriptions dictionary
             for (
                 event,
-                function,
-            ) in {
-                Events.STACK_CREATED: self.on_stack_created,
-            }.items():
+                subscription,
+            ) in subscriptions.items():
                 # Store the UUID of the subscription in the subscriptions list
                 self.subscriptions.append(
                     self.dispatcher.register(
                         event=event,
-                        function=function,
-                        namespace=Constants.GLOBAL_NAMESPACE,
-                        persistent=True,
+                        function=subscription["function"],
+                        namespace=subscription["namespace"],
+                        persistent=subscription["persistent"],
                     )
                 )
         except Exception as e:

@@ -165,25 +165,62 @@ class QuestionCreateForm(tkinter.Frame):
             sticky=EW,
         )
 
-        # Create a scrolled frame to hold the question create form widget
-        self.scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=self)
+        # Create tabbed view widgets
+        notebook: Dict[str, Any] = UIBuilder.get_tabbed_view(master=self)
 
-        # Style the scrolled frame "Canvas" widget
-        self.scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the notebook "Center frame" frame widget
+        notebook["center_frame"].configure(background=Constants.BLUE_GREY["700"])
 
-        # Style the scrolled frame "Frame" widget
-        self.scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the notebook "Root" frame widget
+        notebook["root"].configure(background=Constants.BLUE_GREY["700"])
 
-        # Style the scrolled frame "Root" frame widget
-        self.scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the notebook "Top frame" frame widget
+        notebook["top_frame"].configure(background=Constants.BLUE_GREY["700"])
 
-        # Place the scrolled frame in the grid
-        self.scrolled_frame["root"].grid(
+        # Place the tabbed view widget frame in the grid
+        notebook["root"].grid(
             column=0,
-            padx=5,
-            pady=5,
             row=2,
             sticky=NSEW,
+        )
+
+        # Create a scrolled frame to hold the question create form widget
+        self.core_attributes_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
+            master=notebook["center_frame"]
+        )
+
+        # Style the scrolled frame "Canvas" widget
+        self.core_attributes_frame["canvas"].configure(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Style the scrolled frame "Frame" widget
+        self.core_attributes_frame["frame"].configure(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Style the scrolled frame "Root" frame widget
+        self.core_attributes_frame["root"].configure(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Add the scrolled frame to the notebook widget's children
+        notebook["adder"](
+            label="Core Attributes",
+            state=NORMAL,
+            sticky=NSEW,
+            widget=self.core_attributes_frame["root"],
+        )
+
+        # Style the scrolled frame "Core attributes" button widget
+        notebook["core attributes_button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.MEDIUM_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
         )
 
         # Create a combobox widget to select a stack
@@ -193,7 +230,7 @@ class QuestionCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Stack*: ",
-            master=self.scrolled_frame["frame"],
+            master=self.core_attributes_frame["frame"],
             state="readonly",
             values=[stack.name for stack in self.unified_manager.get_all_stacks()],
         )
@@ -232,7 +269,7 @@ class QuestionCreateForm(tkinter.Frame):
             ),
             height=15,
             label="Question Text*: ",
-            master=self.scrolled_frame["frame"],
+            master=self.core_attributes_frame["frame"],
         )
 
         # Style the question text field "Button" button widget
@@ -270,7 +307,7 @@ class QuestionCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Question Type*: ",
-            master=self.scrolled_frame["frame"],
+            master=self.core_attributes_frame["frame"],
             state="readonly",
             values=[
                 "Multiple Choice",
@@ -388,7 +425,7 @@ class QuestionCreateForm(tkinter.Frame):
                     Constants.DEFAULT_FONT_FAMILIY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
-                master=self.scrolled_frame["frame"],
+                master=self.core_attributes_frame["frame"],
             )
 
             # Configure the answer field's checkbutton widget
@@ -453,7 +490,7 @@ class QuestionCreateForm(tkinter.Frame):
                     self.answer_fields.clear()
 
                 # Configure the scrolled frame's 4th row to weight 0
-                self.scrolled_frame["frame"].grid_rowconfigure(
+                self.core_attributes_frame["frame"].grid_rowconfigure(
                     index=3,
                     weight=0,
                 )
@@ -462,8 +499,13 @@ class QuestionCreateForm(tkinter.Frame):
                 button: tkinter.Button = UIBuilder.get_button(
                     background=Constants.BLUE_GREY["700"],
                     command=self.on_add_answer_button_click,
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.MEDIUM_FONT_SIZE,
+                    ),
                     foreground=Constants.WHITE,
-                    master=self.scrolled_frame["frame"],
+                    master=self.core_attributes_frame["frame"],
+                    relief=FLAT,
                     text="Add Answer",
                 )
 
@@ -485,7 +527,12 @@ class QuestionCreateForm(tkinter.Frame):
                 )
 
                 # Set the question type to "Multiple Choice"
-                self.question_type = "Multiple Choice"
+                self.question_type = self.question_type_field["setter"](
+                    value="Multiple Choice"
+                )
+
+                # Re-call the on_question_type_select method
+                self.on_question_type_select()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

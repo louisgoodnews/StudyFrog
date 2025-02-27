@@ -557,6 +557,17 @@ class Constants:
     TOMORROW: datetime = datetime.today() + timedelta(days=1)
     YESTERDAY: datetime = datetime.today() - timedelta(days=1)
 
+    START_OF_WEEK: datetime = datetime.today() - timedelta(
+        days=datetime.today().weekday()
+    )
+    END_OF_WEEK: datetime = START_OF_WEEK + timedelta(days=6)
+
+    START_OF_MONTH: datetime = datetime.today().replace(day=1)
+    END_OF_MONTH: datetime = START_OF_MONTH + timedelta(days=31)
+
+    START_OF_YEAR: datetime = datetime.today().replace(month=1, day=1)
+    END_OF_YEAR: datetime = START_OF_YEAR + timedelta(days=365)
+
     @classmethod
     def get_base_id(cls) -> int:
         return copy.deepcopy(cls.BASE_ID)

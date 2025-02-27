@@ -35,9 +35,11 @@ class ImmutableStack(ImmutableBaseObject):
     A stack is a collection of Flashards, Notes and Questions.
 
     Attributes:
+        ancestor (int): The ID of the ancestor stack.
         contents (List[Dict[str, Any]]): The list of the contents of the stack.
         created_at (datetime): The timestamp when the stack was created.
         custom_field_values (List[Dict[str, Any]]): The custom field values of the stack.
+        descendants (List[str]): The keys of the descendants stacks.
         description (str): The description of the stack.
         difficulty (int): The difficulty of the stack.
         due_by (datetime): The timestamp when the stack is due.
@@ -56,9 +58,11 @@ class ImmutableStack(ImmutableBaseObject):
     def __init__(
         self,
         name: str,
+        ancestor: Optional[int] = None,
         contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        descendants: Optional[List[str]] = None,
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
@@ -77,9 +81,11 @@ class ImmutableStack(ImmutableBaseObject):
 
         Args:
             name (str): The name of the stack.
+            ancestor (Optional[int]): The ID of the ancestor stack.
             contents(Optional[List[str]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            descendants (Optional[List[str]]): The keys of the descendants stacks.
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The ID of the difficulty associated with the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -96,9 +102,11 @@ class ImmutableStack(ImmutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
+            ancestor=ancestor,
             contents=contents,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            descendants=descendants,
             description=description,
             difficulty=difficulty,
             due_by=due_by,
@@ -133,9 +141,11 @@ class MutableStack(MutableBaseObject):
     A stack is a collection of Flashards, Notes and Questions.
 
     Attributes:
+        ancestor (int): The ID of the ancestor stack.
         contents (List[Dict[str, Any]]): The list of the contents of the stack.
         created_at (datetime): The timestamp when the stack was created.
         custom_field_values (List[Dict[str, Any]]): The custom field values of the stack.
+        descendants (List[str]): The keys of the descendants stacks.
         description (str): The description of the stack.
         difficulty (int): The difficulty of the stack.
         due_by (datetime): The timestamp when the stack is due.
@@ -154,9 +164,11 @@ class MutableStack(MutableBaseObject):
     def __init__(
         self,
         name: str,
+        ancestor: Optional[int] = None,
         contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        descendants: Optional[List[str]] = None,
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
@@ -174,9 +186,11 @@ class MutableStack(MutableBaseObject):
         Initializes a new instance of the MutableStack class.
 
         Args:
+            ancestor (Optional[int]): The ID of the ancestor stack.
             contents(Optional[List[str]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            descendants (Optional[List[str]]): The list of the descendants of the stack.
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -197,9 +211,11 @@ class MutableStack(MutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
+            ancestor=ancestor,
             contents=contents,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            descendants=descendants,
             description=description,
             difficulty=difficulty,
             due_by=due_by,
@@ -320,9 +336,11 @@ class StackFactory:
     def create_stack(
         cls,
         name: str,
+        ancestor: Optional[int] = None,
         contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        descendants: Optional[List[str]] = None,
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
@@ -340,9 +358,11 @@ class StackFactory:
         Creates and returns a new instance of the ImmutableStack class.
 
         Args:
+            ancestor (Optional[int]): The ID of the ancestor stack.
             contents(Optional[List[str]]): The list of the contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The customfield values of the stack.
+            descendants (Optional[List[str]]): The list of the descendants of the stack.
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -366,9 +386,11 @@ class StackFactory:
         try:
             # Attempt to create and return a new instance of the ImmutableStack class
             return ImmutableStack(
+                ancestor=ancestor,
                 contents=contents,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
+                descendants=descendants,
                 description=description,
                 difficulty=difficulty,
                 due_by=due_by,
@@ -875,6 +897,7 @@ class StackModel(ImmutableBaseModel):
     Represents the structure of a stack model.
 
     Attributes:
+        ancestor (Optional[int]): The ID of the ancestor stack.
         created_at (Optional[datetime]): The timestamp when the stack was created.
         custom_field_values (Optional[JSON]): The values of the custom fields.
         description (Optional[str]): The description of the stack.
@@ -905,6 +928,22 @@ class StackModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=True,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    ancestor: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.STACKS}(id)",
+        index=False,
+        name="ancestor",
+        nullable=True,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
         size=None,
         type="INTEGER",
         unique=False,
@@ -949,6 +988,22 @@ class StackModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="custom_field_values",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
+    descendants: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="descendants",
         nullable=True,
         on_delete=None,
         on_update=None,
@@ -1152,9 +1207,11 @@ class StackModel(ImmutableBaseModel):
 
     def __init__(
         self,
+        ancestor: Optional[int] = None,
         contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        descendants: Optional[List[str]] = None,
         description: Optional[str] = None,
         difficulty: Optional[int] = None,
         due_by: Optional[datetime] = None,
@@ -1173,9 +1230,11 @@ class StackModel(ImmutableBaseModel):
         Initializes a new instance of the StackModel class.
 
         Args:
+            ancestor (Optional[int]): The ID of the ancestor stack.
             contents(Optional[List[str]]): The contents of the stack.
             created_at (Optional[datetime]): The timestamp when the stack was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The custom field values of the stack.
+            descendants (Optional[List[str]]): The descendants of the stack.
             description (Optional[str]): The description of the stack.
             difficulty (Optional[int]): The difficulty of the stack.
             due_by (Optional[datetime]): The timestamp when the stack is due.
@@ -1193,10 +1252,14 @@ class StackModel(ImmutableBaseModel):
         Returns:
             None
         """
+
+        # Call the parent class constructor
         super().__init__(
+            ancestor=ancestor,
             contents=contents,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            descendants=descendants,
             description=description,
             difficulty=difficulty,
             due_by=due_by,

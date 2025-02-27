@@ -416,13 +416,19 @@ class CreateUI(tkinter.Frame):
             master=master,
         )
 
-        # Configure the "Right Frame" frame widget's 1st and 2nd column to weight 1
+        # Configure the "Right Frame" frame widget's 1st column to weight 1
+        right_frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the "Right Frame" frame widget's 2nd and 3rd column to weight 0
         right_frame.grid_columnconfigure(
             index=(
-                0,
                 1,
+                2,
             ),
-            weight=1,
+            weight=0,
         )
 
         # Configure the "Right Frame" frame widget's 1st row to weight 1
@@ -454,7 +460,7 @@ class CreateUI(tkinter.Frame):
 
         # Place the "Cancel" button widget in the "Right Frame" frame widget
         cancel_button.grid(
-            column=0,
+            column=1,
             padx=5,
             pady=5,
             row=0,
@@ -463,7 +469,7 @@ class CreateUI(tkinter.Frame):
 
         # Create the "Create" button widget
         create_button: tkinter.Button = UIBuilder.get_button(
-            background=Constants.BLUE_GREY["500"],
+            background=Constants.BLUE_GREY["700"],
             command=self.on_create_button_click,
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -471,12 +477,13 @@ class CreateUI(tkinter.Frame):
             ),
             foreground=Constants.WHITE,
             master=right_frame,
+            relief=FLAT,
             text="Create",
         )
 
         # Place the "Create" button widget in the "Right Frame" frame widget
         create_button.grid(
-            column=1,
+            column=2,
             padx=5,
             pady=5,
             row=0,

@@ -2211,6 +2211,261 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_open_answer_field(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a dictionary containing widgets to facilitate a open answer field.
+
+        The widgets contained are:
+            - "root" (tkinter.Frame): The root widget of the open answer field.
+            - "label" (tkinter.Label): The label widget of the open answer field.
+            - "container" (tkinter.Frame): The container widget of the text and scrollbar widgets.
+            - "text" (tkinter.Text): The text widget of the open answer field.
+            - "h_scrollbar" (tkinter.Scrollbar): The horizontal scrollbar of the text widget.
+            - "v_scrollbar" (tkinter.Scrollbar): The vertical scrollbar of the text widget.
+            - "button" (tkinter.Button): The clear button of the open answer field.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the widgets
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the value in the "text" Text widget.
+                """
+
+                # Delete the value in the "text" Text widget
+                result["text"].delete(
+                    "1.0",
+                    END,
+                )
+
+            def get() -> Optional[str]:
+                """
+                Gets the value in the "text" Text widget and returns it.
+
+                If the value is empty, None is returned.
+
+                Returns:
+                    Optional[str]: The value in the "text" Text widget or None if the value is empty.
+                """
+
+                # Get the value in the "text" Text widget
+                string: str = result["text"].get(
+                    "1.0",
+                    END,
+                )
+
+                # If the string is empty, return None
+                if string == "":
+                    return None
+
+                # Otherwise return the string
+                return string
+
+            def set(value: str) -> None:
+                """
+                Sets the value in the "text" Text widget.
+
+                Args:
+                    value (str): The value to set in the "text" Text widget.
+
+                Returns:
+                    None
+                """
+
+                # Delete the value in the "text" Text widget
+                result["text"].delete(
+                    "1.0",
+                    END,
+                )
+
+                # Set the value in the "text" Text widget
+                result["text"].insert(
+                    "1.0",
+                    value,
+                )
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 0
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd row to weight 1
+            result["root"].grid_rowconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd row to weight 0
+            result["root"].grid_rowconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text="Enter here: ",
+            )
+
+            # Place the "Label" label widget within the "root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Container" frame widget
+            result["container"] = cls.get_frame(master=result["root"])
+
+            # Configure the "Container" frame widget's 1st column to weight 1
+            result["container"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Container" frame widget's 2nd column to weight 0
+            result["container"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Container" frame widget's 1st row to weight 0
+            result["container"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Container" frame widget's 2nd row to weight 0
+            result["container"].grid_rowconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Place the "container" frame widget within the "root" frame widget
+            result["container"].grid(
+                column=1,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Create the "text" Text widget
+            result["text"] = cls.get_text(
+                master=result["container"],
+                **kwargs,
+            )
+
+            # Place the "text" Text widget within the "container" frame widget
+            result["text"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "v_scrollbar" Scrollbar widget
+            result["v_scrollbar"] = cls.get_scrollbar(
+                command=result["container"].yview,
+                master=result["container"],
+                orient=VERTICAL,
+            )
+
+            # Place the "v_scrollbar" Scrollbar widget within the "container" frame widget
+            result["v_scrollbar"].grid(
+                column=1,
+                row=0,
+                sticky=NS,
+            )
+
+            # Create the "h_scrollbar" Scrollbar widget
+            result["h_scrollbar"] = cls.get_scrollbar(
+                command=result["container"].xview,
+                master=result["container"],
+                orient=HORIZONTAL,
+            )
+
+            # Place the "h_scrollbar" Scrollbar widget within the "container" frame widget
+            result["h_scrollbar"].grid(
+                column=0,
+                row=1,
+                sticky=EW,
+            )
+
+            # Configure the "text" Text widget's xscrollcommand to result["h_scrollbar"].set
+            result["text"].configure(
+                xscrollcommand=result["h_scrollbar"].set,
+                yscrollcommand=result["v_scrollbar"].set,
+            )
+
+            # Create the "button" Button widget
+            result["button"] = cls.get_button(
+                command=clear,
+                master=result["root"],
+                text="Clear",
+            )
+
+            # Place the "button" Button widget within the "root" frame widget
+            result["button"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=1,
+            )
+
+            # Add the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_open_answer_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_progressbar(
         cls,
         master: tkinter.Misc,
@@ -4111,6 +4366,234 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_treeview' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_true_false_answer_field(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a dictionary containing widgets to facilitate a true false answer field.
+
+        The widgets contained in the dictionary are:
+            - "root" (tkinter.Frame): The root widget of the true false answer field.
+            - "label" (tkinter.Label): The label widget of the true false answer field.
+            - "true_var" (tkinter.IntVar): The variable for the true radio button.
+            - "false_var" (tkinter.IntVar): The variable for the false radio button.
+            - "true_radiobutton" (tkinter.Radiobutton): The true radio button.
+            - "false_radiobutton" (tkinter.Radiobutton): The false radio button.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the widgets.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            # Initialize the "value" key to False
+            result["value"] = False
+
+            def clear() -> None:
+                """
+                Clears the result dictionary by setting the "value" key to False and the "true_var" and "false_var" keys to their default values.
+
+                Returns:
+                    None
+                """
+                # Set the "value" key to False
+                result["value"] = False
+
+                # Set the "true_var" key to False
+                result["true_var"].set(value=False)
+
+                # Set the "false_var" key to True
+                result["false_var"].set(value=True)
+
+            def get() -> bool:
+                """
+                Retrieves the value of the result dictionary.
+
+                Returns:
+                    bool: The value of the result dictionary.
+                """
+                # Return the value of the "value" key
+                return result["value"]
+
+            def set(value: Union[bool, int]) -> None:
+                """
+                Sets the value of the result dictionary to the value of the "value" argument.
+
+                Args:
+                    value (Union[bool,int]): The value to set the result dictionary to.
+
+                Returns:
+                    None
+                """
+                # Set the "value" key to the value of the "value" argument
+                result["value"] = bool(value)
+
+                # Set the "true_var" key to the value of the "value" argument
+                result["true_var"].set(value=value)
+
+                # Set the "false_var" key to the inverse of the value of the "value" argument
+                result["false_var"].set(value=not value)
+
+            def on_true_radiobutton_click() -> None:
+                """
+                Called when the true radio button is clicked.
+
+                Sets the "value" key to True and the "true_var" key to True.
+                Sets the "false_var" key to False.
+
+                Returns:
+                    None
+                """
+                # Set the "value" key to True
+                result["value"] = True
+
+                # Set the "true_var" key to True
+                result["true_var"].set(value=True)
+
+                # Set the "false_var" key to False
+                result["false_var"].set(value=False)
+
+            def on_false_radiobutton_click() -> None:
+                """
+                Called when the false radio button is clicked.
+
+                Sets the "value" key to False and the "true_var" key to False.
+                Sets the "false_var" key to True.
+
+                Returns:
+                    None
+                """
+                # Set the "value" key to False
+                result["value"] = False
+
+                # Set the "true_var" key to False
+                result["true_var"].set(value=False)
+
+                # Set the "false_var" key to True
+                result["false_var"].set(value=True)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 3rd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 0
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd row to weight 0
+            result["root"].grid_rowconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text="Select one of: ",
+                **kwargs,
+            )
+
+            # Place the "Label" label widget within the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "True" boolean variable
+            result["true_var"] = cls.get_bool_variable(
+                master=result["root"],
+                value=False,
+            )
+
+            # Create the "False" boolean variable
+            result["false_var"] = cls.get_bool_variable(
+                master=result["root"],
+                value=False,
+            )
+
+            # Create the "true_radiobutton" radiobutton widget
+            result["true_radiobutton"] = cls.get_radiobutton(
+                command=on_true_radiobutton_click,
+                master=result["root"],
+                text="True",
+                variable=result["true_var"],
+            )
+
+            # Place the "True" radiobutton widget within the "Root" frame widget
+            result["true_radiobutton"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Create the "false_radiobutton" radiobutton widget
+            result["false_radiobutton"] = cls.get_radiobutton(
+                command=on_false_radiobutton_click,
+                master=result["root"],
+                text="False",
+                variable=result["false_var"],
+            )
+
+            # Place the "False" radiobutton widget within the "Root" frame widget
+            result["false_radiobutton"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Add the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_true_false_answer_field' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured

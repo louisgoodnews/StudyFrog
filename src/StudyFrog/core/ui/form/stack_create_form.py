@@ -192,6 +192,7 @@ class StackCreateForm(tkinter.Frame):
             ),
             label="Difficulty* : ",
             master=self,
+            state="readonly",
             value=Constants.MEDIUM.capitalize(),
             values=[
                 difficulty.name
@@ -236,6 +237,7 @@ class StackCreateForm(tkinter.Frame):
             ),
             label="Priority* : ",
             master=self,
+            state="readonly",
             values=[
                 priority.name for priority in self.unified_manager.get_all_priorities()
             ],
@@ -354,12 +356,20 @@ class StackCreateForm(tkinter.Frame):
         # Initialize the result dictionary as an empty dictionary
         result: Dict[str, Any] = {
             "object_data": {
+                "ancestor": None,
                 "contents": [],
                 "created_at": Miscellaneous.get_current_datetime(),
                 "custom_field_values": [],
+                "descendants": [],
                 "description": "",
+                "due_by": None,
+                "difficulty": None,
+                "icon": "📚",
                 "last_viewed_at": Miscellaneous.get_current_datetime(),
                 "name": "",
+                "priority": None,
+                "status": None,
+                "tags": [],
                 "updated_at": Miscellaneous.get_current_datetime(),
                 "uuid": Miscellaneous.get_uuid(),
             },

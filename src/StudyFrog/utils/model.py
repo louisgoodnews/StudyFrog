@@ -583,7 +583,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             )
 
             # Get the existing columns
-            existing_columns: List[Dict[str, Any]] = await DatabaseService.read_all(
+            existing_columns: List[Tuple[Any, ...]] = await DatabaseService.execute(
                 database=database,
                 parameters=(),
                 sql=f"PRAGMA table_info({cls.table});",
@@ -595,7 +595,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 field,
             ) in cls.__dict__.items():
                 if isinstance(field, Field) and not any(
-                    column["name"] == field_name for column in existing_columns
+                    column[1] == field_name for column in existing_columns
                 ):
                     # Execute the ALTER TABLE statement
                     await DatabaseService.execute(
@@ -603,8 +603,21 @@ class ImmutableBaseModel(ImmutableBaseObject):
                         parameters=(),  # Empty tuple
                         sql=f"ALTER TABLE {cls.table} ADD COLUMN {field.to_sql_string()};",
                     )
+
+            # Remove extra columns
+            for column in existing_columns:
+                if column[1] not in cls.__dict__:
+                    # Execute the ALTER TABLE statement
+                    await DatabaseService.execute(
+                        database=database,
+                        parameters=(),  # Empty tuple
+                        sql=f"ALTER TABLE {cls.table} DROP COLUMN {column[1]};",
+                    )
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'upsert_table' method from '{cls.__name__}' class: {e}"
             )
+
+            # Raise the exception to the caller
+            raise e

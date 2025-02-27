@@ -100,10 +100,19 @@ class FlashcardCreateForm(tkinter.Frame):
             weight=1,
         )
 
-        # Configure the flashcard create form widget's 1st row to weight 0.
+        # Configure the flashcard create form widget's 1st and 2nd row to weight 0.
         self.grid_rowconfigure(
-            index=tuple(range(5)),
+            index=(
+                0,
+                1,
+            ),
             weight=0,
+        )
+
+        # Configure the flashcard create form widget's 3rd row to weight 1.
+        self.grid_rowconfigure(
+            index=2,
+            weight=1,
         )
 
     def create_widgets(self) -> None:
@@ -154,6 +163,27 @@ class FlashcardCreateForm(tkinter.Frame):
             sticky=EW,
         )
 
+        # Create the scrolled frame widgets
+        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=self)
+
+        # Style the scrolled frame "Canvas" widget
+        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Frame" widget
+        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Root" frame widget
+        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the "Root frame" frame widget within the passed master widget
+        scrolled_frame["root"].grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
+
         # Create a combobox widget to select a stack
         self.stack_field = UIBuilder.get_combobox_select_field(
             font=(
@@ -161,7 +191,7 @@ class FlashcardCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Stack*: ",
-            master=self,
+            master=scrolled_frame["frame"],
             state="readonly",
             values=[stack.name for stack in self.unified_manager.get_all_stacks()],
         )
@@ -188,18 +218,18 @@ class FlashcardCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=2,
+            row=0,
             sticky=NSEW,
         )
 
-        # Create a single-line text field for the front text of the flashcard
-        self.front_field: Dict[str, Any] = UIBuilder.get_single_line_text_field(
+        # Create a multi-line text field for the front text of the flashcard
+        self.front_field: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Front Text*: ",
-            master=self,
+            master=scrolled_frame["frame"],
         )
 
         # Style the front field "Button" button widget
@@ -224,7 +254,7 @@ class FlashcardCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=3,
+            row=1,
             sticky=NSEW,
         )
 
@@ -235,7 +265,7 @@ class FlashcardCreateForm(tkinter.Frame):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Back Text*: ",
-            master=self,
+            master=scrolled_frame["frame"],
         )
 
         # Style the back field "Button" button widget
@@ -260,7 +290,7 @@ class FlashcardCreateForm(tkinter.Frame):
             column=0,
             padx=5,
             pady=5,
-            row=4,
+            row=2,
             sticky=NSEW,
         )
 

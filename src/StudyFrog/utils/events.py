@@ -168,6 +168,11 @@ class Events:
         name="global:generic:event"
     )
 
+    # An event that indicates that a label has been clicked
+    LABEL_CLICKED: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="ui:label:clicked"
+    )
+
     # An event that indicates that a help button has been clicked
     HELP_BUTTON_CLICKED: DispatcherEvent = DispatcherEventFactory.create_event(
         name="ui:help:button:clicked"
