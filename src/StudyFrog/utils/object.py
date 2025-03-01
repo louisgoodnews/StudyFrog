@@ -194,6 +194,52 @@ class MutableBaseObject:
         # Return a string representation of the object
         return self.__repr__()
 
+    def compare_to(
+        self,
+        key: Union[str, Iterable[str]],
+        other: "MutableBaseObject",
+    ) -> bool:
+        """
+        Checks, if the values associated with the given keys are equal within this and the given object.
+
+        :param key: The key to check.
+        :type key: str
+
+        :param other: The object to compare to.
+        :type other: MutableBaseObject
+
+        :return: True if the object contains the given key, False otherwise.
+        :rtype: bool
+        """
+
+        # Check if the passed key argument is a string
+        if isinstance(
+            key,
+            str,
+        ):
+            # Convert the key to a list if it is a string
+            key = [key]
+
+        # Check if the values associated with the given keys are equal
+        return all(self[key] == other[key] for key in key)
+
+    def contains(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Checks if the object contains the given key.
+
+        :param key: The key to check.
+        :type key: str
+
+        :return: True if the object contains the given key, False otherwise.
+        :rtype: bool
+        """
+
+        # Check if the object contains the given key
+        return key in self.__dict__
+
     def get(
         self,
         name: str,

@@ -15,7 +15,7 @@ from core.answer import AnswerFactory, ImmutableAnswer
 from core.difficulty import ImmutableDifficulty
 from core.flashcard import FlashcardFactory, ImmutableFlashcard
 from core.priority import ImmutablePriority
-from core.question import QuestionFactory, ImmutableQuestion
+from core.question import MutableQuestion, QuestionFactory, ImmutableQuestion
 from core.setting import SettingService
 from core.stack import StackFactory, ImmutableStack, MutableStack
 from core.status import ImmutableStatus
@@ -655,6 +655,135 @@ class CreateUI(tkinter.Frame):
             # Raise the exception to the caller
             raise e
 
+    def handle_answer_creation(
+        self,
+        question: ImmutableQuestion,
+        related_objects: Optional[Dict[str, Any]] = None,
+    ) -> MutableQuestion:
+        """
+        Handles the creation of answers for a question.
+
+        Args:
+            question (ImmutableQuestion): The question to be associated with the answer.
+            related_objects (Optional[Dict[str, Any]], optional): Related objects, if any. Defaults to None.
+
+        Returns:
+            MutableQuestion: The question with the answers associated.
+
+        Raises:
+            Exception: If an error occurs during answer creation.
+        """
+        try:
+            # Convert the immutable question object into a mutable object
+            question = question.to_mutable()
+
+            # Handle answer creation depending on the question type
+            if question["question_type"] == "MULTIPLE_CHOICE":
+                # Iterate over the answers for the multiple choice question
+                for answer_dict in related_objects.get(
+                    "answers",
+                    [],
+                ):
+                    # Create a new answer
+                    answer: ImmutableAnswer = AnswerFactory.create_answer(
+                        answer_text=answer_dict["value"]
+                    )
+
+                    # Dispatch a request to create the answer
+                    create_response: Optional[DispatcherNotification] = (
+                        self.dispatcher.dispatch(
+                            answer=answer,
+                            event=Events.REQUEST_ANSWER_CREATE,
+                            namespace=Constants.GLOBAL_NAMESPACE,
+                        )
+                    )
+
+                    # Retrieve the created answer
+                    answer = create_response.get_result(key="on_request_answer_create")
+
+                    # Add the answer to the question
+                    question.add_to_answers(answer=answer)
+
+                    # If the answer is correct, add it to the correct answers
+                    if answer_dict["is_correct"]:
+                        question.add_to_correct_answers(answer=answer)
+
+            elif question["question_type"] == "OPEN_ANSWER":
+                # Create a new answer
+                answer: ImmutableAnswer = AnswerFactory.create_answer(
+                    answer_text=related_objects["answers"][0]
+                )
+
+                # Dispatch a request to create the answer
+                create_response: Optional[DispatcherNotification] = (
+                    self.dispatcher.dispatch(
+                        answer=answer,
+                        event=Events.REQUEST_ANSWER_CREATE,
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                    )
+                )
+
+                # Retrieve the created answer
+                answer = create_response.get_result(key="on_request_answer_create")
+
+                # Add the answer to the question
+                question.add_to_answers(answer=answer)
+
+                # Add the answer to the correct answers
+                question.add_to_correct_answers(answer=answer)
+
+            elif question["question_type"] == "TRUE_FALSE":
+                # Get the true answer
+                true_answer_response: Optional[DispatcherNotification] = (
+                    self.dispatcher.dispatch(
+                        answer_text="True",
+                        event=Events.REQUEST_ANSWER_LOOKUP,
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                    )
+                )
+
+                # Get the true answer from the response
+                true_answer: ImmutableAnswer = true_answer_response.get_result(
+                    key="on_request_answer_lookup"
+                )[0]
+
+                # Get the false answer
+                false_answer_response: Optional[DispatcherNotification] = (
+                    self.dispatcher.dispatch(
+                        answer_text="False",
+                        event=Events.REQUEST_ANSWER_LOOKUP,
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                    )
+                )
+
+                # Get the false answer from the response
+                false_answer: ImmutableAnswer = false_answer_response.get_result(
+                    key="on_request_answer_lookup"
+                )[0]
+
+                # Add the true answer to the question
+                question.add_to_answers(answer=true_answer)
+
+                # Add the false answer to the question
+                question.add_to_answers(answer=false_answer)
+
+                # Add the correct answer to the correct answers
+                if related_objects["answers"][0]:
+                    question.add_to_correct_answers(answer=true_answer)
+                else:
+                    question.add_to_correct_answers(answer=false_answer)
+
+            # Return the question with the answers associated
+            return question
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'handle_answer_creation' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
     def handle_question_creation(
         self,
         object_data: Dict[str, Any],
@@ -702,6 +831,44 @@ class CreateUI(tkinter.Frame):
             question: ImmutableQuestion = create_response.get_result(
                 key="on_request_question_create"
             )
+
+            # Check, if the "answer" key exists in the related objects
+            if related_objects.get(
+                "answers",
+                None,
+            ):
+                # Create answers and update the question
+                question = self.handle_answer_creation(
+                    question=question,
+                    related_objects=related_objects,
+                )
+
+                # Dispatch a request to update the question
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_QUESTION_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    question=question,
+                )
+
+            if related_objects.get(
+                "stack",
+                None,
+            ):
+                # Retrieve the stack from related objects
+                stack: ImmutableStack = related_objects["stack"]
+
+                # Convert the stack to a mutable stack
+                stack = stack.to_mutable()
+
+                # Add the question to the contents of the stack
+                stack.add_to_contents(obj=question)
+
+                # Dispatch a request to update the stack
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STACK_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    stack=stack,
+                )
 
             # Dispatch the QUESTION_CREATED event in the global namespace
             self.dispatcher.dispatch(
@@ -869,16 +1036,22 @@ class CreateUI(tkinter.Frame):
         type: str = self.combobox.get()
 
         # Attempt to retrieve the "new" status from the database
-        new_status: Optional[ImmutableStatus] = self.unified_manager.get_status_by(
-            field="name",
-            value=Constants.NEW,
+        status_response: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+            event=Events.REQUEST_STATUS_LOOKUP,
+            name="New",
+            namespace=Constants.GLOBAL_NAMESPACE,
         )
 
+        # Retrieve the status from the response
+        status: Optional[ImmutableStatus] = status_response.get_result(
+            key="on_request_status_lookup",
+        )[0]
+
         # Add the status to the object data
-        form_data["object_data"]["status"] = new_status.id
+        form_data["object_data"]["status"] = status["id"]
 
         # Add the status to the related objects
-        form_data["related_objects"]["status"] = new_status
+        form_data["related_objects"]["status"] = status
 
         # Call the appropriate creation method based on the form type
         getattr(

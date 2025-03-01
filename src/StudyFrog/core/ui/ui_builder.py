@@ -1484,9 +1484,19 @@ class UIBuilder:
                 sticky=NSEW,
             )
 
+            # Add the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
             # Return the result dictionary
             return result
         except Exception as e:
+            # Log an error message indicating an exception has occurred
             # Log an error message indicating an exception has occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_multiple_choice_answer_field' method from '{cls.__name__}': {e}"
@@ -4298,6 +4308,187 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_tk' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_toast(
+        cls,
+        dispatcher: Dispatcher,
+        message: str,
+        title: str,
+        master: Optional[tkinter.Misc] = None,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def begin_fade(
+                widget: tkinter.Misc,
+                end: float = 1.0,
+                interval: int = 50,
+                start: float = 0.0,
+                step: float = 0.05,
+            ) -> None:
+                if start > end:
+                    start += step
+                    widget.attributes(
+                        "-alpha",
+                        min(
+                            start,
+                            end,
+                        ),
+                    )
+                    widget.after(
+                        interval,
+                        lambda: begin_fade(
+                            end=end,
+                            interval=interval,
+                            step=step,
+                            start=start,
+                            widget=widget,
+                        ),
+                    )
+
+            def end_fade(
+                widget: tkinter.Misc,
+                start: float = 0.0,
+                end: float = 1.0,
+                step: float = 0.05,
+                interval: int = 50,
+            ) -> None:
+                if start <= end:
+                    start += step
+                    widget.attributes(
+                        "-alpha",
+                        min(
+                            start,
+                            end,
+                        ),
+                    )
+                    widget.after(
+                        interval,
+                        lambda: end_fade(
+                            end=end,
+                            interval=interval,
+                            start=start,
+                            step=step,
+                            widget=widget,
+                        ),
+                    )
+
+            def show() -> None:
+                """
+                Makes the root widget visible by deiconifying it.
+
+                Returns:
+                    None
+                """
+
+                # Deiconify the root widget to make it visible
+                result["root"].deiconify()
+
+            def hide() -> None:
+                """
+                Hides the root widget by withdrawing it.
+
+                Returns:
+                    None
+                """
+
+                # Withdraw the root widget to hide it
+                result["root"].withdraw()
+
+            # Store the UUID of the toas in a variable
+            result["uuid"] = Miscellaneous.get_uuid()
+
+            # Create the "Root" toplevel widget
+            result["root"] = cls.get_toplevel(master=master)
+
+            result["root"].wm_geometry(newGeometry="100x100")
+
+            # Configure the "Root" toplevel widget's 0th column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" toplevel widget's 0th row to weight 0
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" toplevel widget's 1st row to weight 1
+            result["root"].grid_rowconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Create the "Title" label widget
+            result["title"] = cls.get_label(
+                master=result["root"],
+                text=title,
+                **kwargs,
+            )
+
+            # Bind the "<ButtonRelease-1>" (left mouse click) event to the "Title" label widget
+            result["title"].bind(
+                func=lambda event: dispatcher.dispatch(
+                    event=Events.TOAST_CLICKED,
+                    message=message,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    title=title,
+                    uuid=result["uuid"],
+                ),
+                sequence="<ButtonRelease-1>",
+            )
+
+            # Place the "Title" label widget within the "Root" toplevel widget
+            result["title"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Message" label widget
+            result["message"] = cls.get_label(
+                master=result["root"],
+                text=message,
+                **kwargs,
+            )
+
+            # Bind the "<ButtonRelease-1>" (left mouse click) event to the "Message" label widget
+            result["message"].bind(
+                func=lambda event: dispatcher.dispatch(
+                    event=Events.TOAST_CLICKED,
+                    message=message,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    title=title,
+                    uuid=result["uuid"],
+                ),
+                sequence="<ButtonRelease-1>",
+            )
+
+            # Place the "Message" label widget within the "Root" toplevel widget
+            result["message"].grid(
+                column=0,
+                row=1,
+                sticky=NSEW,
+            )
+
+            # Hide the "Root" toplevel widget
+            hide()
+
+            # Return the result dictonary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_toast' method from '{cls.__class__.__name__}': {e}",
             )
 
             # Return None indicating an exception occured

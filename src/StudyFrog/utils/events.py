@@ -865,6 +865,16 @@ class Events:
         name="backend:tag:updated"
     )
 
+    # An event that indicates that a toast has been clicked
+    TOAST_CLICKED: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="ui:toast:clicked"
+    )
+
+    # An event that indicates that a toast has been destroyed
+    TOAST_DESTROYED: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="ui:toast:destroyed"
+    )
+
     # An event that indicates that the timer has been started
     TIMER_STARTED: DispatcherEvent = DispatcherEventFactory.create_event(
         name="ui:timer:started"

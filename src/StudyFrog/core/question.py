@@ -33,15 +33,19 @@ class ImmutableQuestion(ImmutableBaseObject):
     An immutable class representing a question.
 
     Attributes:
-        answers (Optional[List[str]]): The answers to the question.
-        correct_answers (Optional[List[str]]): The correct answers to the question.
+        answers (List[str]): The answers to the question.
+        correct_answers (List[str]): The correct answers to the question.
         created_at (datetime): The timestamp when the question was created.
-        custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
-        icon (Optional[str]): The icon of the question.
+        custom_field_values (List[Dict[str, Any]]): The values of the custom fields.
+        difficulty (int): The difficulty of the question.
+        icon (str): The icon of the question.
         id (int): The ID of the question.
         key (str): The key of the question.
+        last_viewed_at (datetime): The timestamp when the question was last viewed.
+        priority (int): The priority of the question.
+        status (int): The status of the question.
         question_text (str): The text of the question.
-        question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
+        question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
         updated_at (datetime): The timestamp when the question was last updated.
         uuid (str): The UUID of the question.
     """
@@ -49,14 +53,18 @@ class ImmutableQuestion(ImmutableBaseObject):
     def __init__(
         self,
         question_text: str,
-        question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
+        question_type: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
         answers: Optional[List[str]] = None,
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        difficulty: Optional[int] = None,
         icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -65,14 +73,19 @@ class ImmutableQuestion(ImmutableBaseObject):
 
         Args:
             question_text (str): The text of the question.
-            question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
+            question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
             answers (Optional[List[str]]): The answers to the question.
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+            difficulty (Optional[int]): The difficulty of the question.
             icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
+            last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
+            priority (Optional[int]): The priority of the question.
+            status (Optional[int]): The status of the question.
+            status (Optional[int]): The status of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -86,11 +99,15 @@ class ImmutableQuestion(ImmutableBaseObject):
             correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            difficulty=difficulty,
             icon=icon,
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
+            priority=priority,
             question_text=question_text,
             question_type=question_type,
+            status=status,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -112,30 +129,38 @@ class MutableQuestion(MutableBaseObject):
     A mutable class representing a question.
 
     Attributes:
-        answers (Optional[List[str]]): The answers to the question.
-        correct_answers (Optional[List[str]]): The correct answers to the question.
-        created_at (Optional[datetime]): The timestamp when the question was created.
-        custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
-        icon (Optional[str]): The icon of the question.
-        id (Optional[int]): The ID of the question.
-        key (Optional[str]): The key of the question.
+        answers (List[str]): The answers to the question.
+        correct_answers (List[str]): The correct answers to the question.
+        created_at (datetime): The timestamp when the question was created.
+        custom_field_values (List[Dict[str, Any]]): The values of the custom fields.
+        difficulty (int): The difficulty of the question.
+        icon (str): The icon of the question.
+        id (int): The ID of the question.
+        key (str): The key of the question.
+        last_viewed_at (datetime): The timestamp when the question was last viewed.
+        priority (int): The priority of the question.
+        status (int): The status of the question.
         question_text (str): The text of the question.
-        question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
-        updated_at (Optional[datetime]): The timestamp when the question was last updated.
-        uuid (Optional[str]): The UUID of the question.
+        question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
+        updated_at (datetime): The timestamp when the question was last updated.
+        uuid (str): The UUID of the question.
     """
 
     def __init__(
         self,
         question_text: str,
-        question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
+        question_type: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
         answers: Optional[List[str]] = None,
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        difficulty: Optional[int] = None,
         icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -144,14 +169,18 @@ class MutableQuestion(MutableBaseObject):
 
         Args:
             question_text (str): The text of the question.
-            question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
+            question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
             answers (Optional[List[str]]): The answers to the question.
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+            difficulty (Optional[int]): The difficulty of the question.
             icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
+            last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
+            priority (Optional[int]): The priority of the question.
+            status (Optional[int]): The status of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -165,14 +194,94 @@ class MutableQuestion(MutableBaseObject):
             correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            difficulty=difficulty,
             icon=icon,
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
+            priority=priority,
             question_text=question_text,
             question_type=question_type,
+            status=status,
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    def add_to_answers(
+        self,
+        answer: Any,
+    ) -> None:
+        """
+        Adds the given answer key to the list of answers.
+
+        Args:
+            answer (Any): The answer to be added to the list of answers.
+        """
+
+        # Check, if the answers list exists
+        if not self["answers"]:
+            # Initialize the answers list as an empty list
+            self["answers"] = []
+
+        # Append the answer key to the list of answers
+        self["answers"].append(answer["key"])
+
+    def add_to_correct_answers(
+        self,
+        answer: Any,
+    ) -> None:
+        """
+        Adds the given correct answer key to the list of correct answers.
+
+        Args:
+            answer (Any): The correct answer to be added to the list of correct answers.
+        """
+
+        # Check if the correct_answers list exists
+        if not self["correct_answers"]:
+            # Initialize the correct_answers list as an empty list
+            self["correct_answers"] = []
+
+        # Append the correct answer key to the list of correct answers
+        self["correct_answers"].append(answer["key"])
+
+    def remove_from_answers(
+        self,
+        answer: Any,
+    ) -> None:
+        """
+        Removes the given answer key from the list of answers.
+
+        Args:
+            answer (Any): The answer to be removed from the list of answers.
+        """
+
+        # Check if the answers list is empty
+        if not self["answers"]:
+            # Return early if there are no answers to remove
+            return
+
+        # Remove the answer key from the list of answers
+        self["answers"].remove(answer["key"])
+
+    def remove_from_correct_answers(
+        self,
+        answer: Any,
+    ) -> None:
+        """
+        Removes the given correct answer key from the list of correct answers.
+
+        Args:
+            answer (Any): The correct answer to be removed from the list of correct answers.
+        """
+
+        # Check if the correct_answers list is empty
+        if not self["correct_answers"]:
+            # Return early if there are no correct answers to remove
+            return
+
+        # Remove the correct answer key from the list of correct answers
+        self["correct_answers"].remove(answer["key"])
 
     def to_immutable(self) -> ImmutableQuestion:
         """
@@ -279,14 +388,18 @@ class QuestionFactory:
     def create_question(
         cls,
         question_text: str,
-        question_type: Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"],
+        question_type: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
         answers: Optional[List[str]] = None,
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        difficulty: Optional[int] = None,
         icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
+        status: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> MutableQuestion:
@@ -295,14 +408,18 @@ class QuestionFactory:
 
         Args:
             question_text (str): The text of the question.
-            question_type (Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]): The type of the question.
+            question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
             answers (Optional[List[str]]): The answers to the question.
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
+            difficulty (Optional[int]): The difficulty of the question.
             icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
+            last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
+            priority (Optional[int]): The priority of the question.
+            status (Optional[int]): The status of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -316,11 +433,15 @@ class QuestionFactory:
                 correct_answers=correct_answers,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
+                difficulty=difficulty,
                 icon=icon,
                 id=id,
                 key=key,
+                last_viewed_at=last_viewed_at,
+                priority=priority,
                 question_text=question_text,
                 question_type=question_type,
+                status=status,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -789,8 +910,19 @@ class QuestionManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check if the question object is immutable
+            if isinstance(
+                question,
+                ImmutableQuestion,
+            ):
+                # If it is, convert it to a mutable question
+                question = MutableQuestion(**question.to_dict(exclude=["_logger"]))
+
+            # Update the updated_at timestamp of the question
+            question.updated_at = Miscellaneous.get_current_datetime()
+
             # Convert the question to an immutable question and update the question in the database
-            model: Optional[QuestionModel] = asyncio.run(
+            result: bool = asyncio.run(
                 QuestionConverter.object_to_model(
                     object=ImmutableQuestion(**question.to_dict(exclude=["_logger"]))
                 ).update(
@@ -806,18 +938,8 @@ class QuestionManager(BaseObjectManager):
                 )
             )
 
-            # Return the updated question if it exists
-            if model is not None:
-                # Convert the QuestionModel object to an ImmutableQuestion object
-                question = ImmutableQuestion(
-                    **model.to_dict(
-                        exclude=[
-                            "_logger",
-                            "table",
-                        ]
-                    )
-                )
-
+            # Check, if the question was updated successfully
+            if result:
                 # Add the question to the cache
                 self.update_in_cache(
                     key=question.key,
@@ -848,10 +970,14 @@ class QuestionModel(ImmutableBaseModel):
         answers (Field): The answers of the question.
         correct_answers (Field): The correct answers of the question.
         created_at (Field): The timestamp when the question was created.
+        difficulty (Field): The difficulty of the question.
         icon (Field): The icon of the question. Defaults to "❓".
         key (Field): The key of the question.
+        last_viewed_at (Field): The timestamp when the question was last viewed.
+        priority (Field): The priority of the question.
         question_text (Field): The text of the question.
         question_type (Field): The type of the question.
+        status (Field): The status of the question.
         table (str): The table name of the question model.
         updated_at (Field): The timestamp when the question was last updated.
         uuid (Field): The UUID of the question.
@@ -939,6 +1065,22 @@ class QuestionModel(ImmutableBaseModel):
         unique=False,
     )
 
+    difficulty: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.DIFFICULTIES}(id)",
+        index=False,
+        name="difficulty",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     icon: Field = Field(
         autoincrement=False,
         default="❓",
@@ -971,6 +1113,38 @@ class QuestionModel(ImmutableBaseModel):
         unique=True,
     )
 
+    last_viewed_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="last_viewed_at",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    priority: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.PRIORITIES}(id)",
+        index=False,
+        name="priority",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     question_text: Field = Field(
         autoincrement=False,
         default=None,
@@ -1000,6 +1174,22 @@ class QuestionModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
+        unique=False,
+    )
+
+    status: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.STATUSES}(id)",
+        index=False,
+        name="status",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
         unique=False,
     )
 
@@ -1041,13 +1231,17 @@ class QuestionModel(ImmutableBaseModel):
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[Dict[str, Any]] = None,
+        difficulty: Optional[int] = None,
         icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        priority: Optional[int] = None,
         question_text: Optional[str] = None,
         question_type: Optional[
-            Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]
+            Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]
         ] = None,
+        status: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1059,11 +1253,15 @@ class QuestionModel(ImmutableBaseModel):
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[Dict[str, Any]]): The values of the custom fields.
+            difficulty (Optional[int]): The difficulty of the question.
             icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
+            last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
+            priority (Optional[int]): The priority of the question.
             question_text (Optional[str]): The text of the question.
-            question_type (Optional[Literal["MULTIPLE_CHOICE", "TRUE_FALSE", "FILL_IN_THE_BLANKS"]]): The type of the question.
+            question_type (Optional[Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]]): The type of the question.
+            status (Optional[int]): The ID of the status of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -1077,11 +1275,15 @@ class QuestionModel(ImmutableBaseModel):
             correct_answers=correct_answers,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            difficulty=difficulty,
             icon="❓",
             id=id,
             key=key,
+            last_viewed_at=last_viewed_at,
+            priority=priority,
             question_text=question_text,
             question_type=question_type,
+            status=status,
             table=Constants.QUESTIONS,
             updated_at=updated_at,
             uuid=uuid,

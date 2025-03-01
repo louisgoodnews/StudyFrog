@@ -443,6 +443,13 @@ class QuestionCreateForm(tkinter.Frame):
                     "created_at": Miscellaneous.get_current_datetime(),
                     "custom_field_values": [],
                     "last_viewed_at": Miscellaneous.get_current_datetime(),
+                    "question_text": self.question_text_field["getter"](),
+                    "question_type": Miscellaneous.any_to_snake(
+                        string=self.question_type_field["getter"]().replace(
+                            "/",
+                            "_",
+                        )
+                    ).upper(),
                     "updated_at": Miscellaneous.get_current_datetime(),
                     "uuid": Miscellaneous.get_uuid(),
                 },
@@ -464,6 +471,22 @@ class QuestionCreateForm(tkinter.Frame):
             result["object_data"]["priority"] = result["related_objects"]["stack"][
                 "priority"
             ]
+
+            if result["object_data"]["question_type"] == "MULTIPLE_CHOICE":
+                # Get the answers from the answer fields
+                result["related_objects"]["answers"] = [
+                    answer_field["getter"]() for answer_field in self.answer_fields
+                ]
+            elif result["object_data"]["question_type"] == "OPEN_ANSWER":
+                # Get the open answer from the open answer field
+                result["related_objects"]["answers"] = [
+                    self.answer_fields[0]["getter"]()
+                ]
+            elif result["object_data"]["question_type"] == "TRUE_FALSE":
+                # Get the true false answer from the true false answer field
+                result["related_objects"]["answers"] = [
+                    self.answer_fields[0]["getter"]()
+                ]
 
             # Return the result dictionary
             return result

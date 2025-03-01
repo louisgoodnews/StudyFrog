@@ -38,6 +38,38 @@ class Miscellaneous:
     logger: Logger = Logger.get_logger(name="Miscellaneous")
 
     @classmethod
+    def any_to_camel(
+        cls,
+        string: str,
+    ) -> str:
+        """
+        Converts any string to camelCase.
+
+        Args:
+            string (str): The string to be converted.
+
+        Returns:
+            str: The camelCase version of the input string.
+        """
+        return string.lower().replace(" ", "").replace("_", " ")
+
+    @classmethod
+    def any_to_snake(
+        cls,
+        string: str,
+    ) -> str:
+        """
+        Converts any string to snake_case.
+
+        Args:
+            string (str): The string to be converted.
+
+        Returns:
+            str: The snake_case version of the input string.
+        """
+        return string.lower().replace(" ", "_")
+
+    @classmethod
     def camel_to_pascal(
         cls,
         string: str,

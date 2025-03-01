@@ -231,6 +231,82 @@ class MutableStack(MutableBaseObject):
             uuid=uuid,
         )
 
+    def add_to_contents(
+        self,
+        obj: Any,
+    ) -> None:
+        """
+        Adds a given object to the contents of the stack.
+
+        Args:
+            obj (Any): The object to add to the contents of the stack.
+        """
+
+        # If the stack currently has no contents, create an empty list
+        if not self["contents"]:
+            # Initialize the contents list as an empty list
+            self["contents"] = []
+
+        # Append the key of the given object to the stack's contents
+        self["contents"].append(obj.key)
+
+    def add_to_descendants(
+        self,
+        obj: Any,
+    ) -> None:
+        """
+        Adds a given object to the descendants of the stack.
+
+        Args:
+            obj (Any): The object to add to the descendants of the stack.
+        """
+
+        # If the stack currently has no descendants, create an empty list
+        if not self["descendants"]:
+            # Initialize the descendants list as an empty list
+            self["descendants"] = []
+
+        # Append the key of the given object to the stack's descendants
+        self["descendants"].append(obj.key)
+
+    def remove_from_contents(
+        self,
+        obj: Any,
+    ) -> None:
+        """
+        Removes a given object from the contents of the stack.
+
+        Args:
+            obj (Any): The object to remove from the contents of the stack.
+        """
+
+        # If the stack currently has no contents, return
+        if not self["contents"]:
+            # Return early
+            return
+
+        # Remove the key of the given object from the stack's contents
+        self["contents"].remove(obj.key)
+
+    def remove_from_descendants(
+        self,
+        obj: Any,
+    ) -> None:
+        """
+        Removes a given object from the descendants of the stack.
+
+        Args:
+            obj (Any): The object to remove from the descendants of the stack.
+        """
+
+        # If the stack currently has no descendants, return
+        if not self["descendants"]:
+            # Return early
+            return
+
+        # Remove the key of the given object from the stack's descendants
+        self["descendants"].remove(obj.key)
+
     def to_immutable(self) -> ImmutableStack:
         """
         Returns an immutable copy of the MutableStack instance.
@@ -852,22 +928,33 @@ class StackManager(BaseObjectManager):
     def update_stack(
         self,
         stack: Union[ImmutableStack, MutableStack],
-    ) -> bool:
+    ) -> Optional[ImmutableStack]:
         """
-        Updates a given stack in the database.
+        Updates a stack with the given ID.
 
         Args:
             stack (Union[ImmutableStack, MutableStack]): The stack to update.
 
         Returns:
-            bool: True if update was successful, False otherwise.
+            Optional[ImmutableStack]: The updated stack if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Convert the stack to an immutable stack and attempte to update the stack in the database
-            return asyncio.run(
+            # Check if the stack object is immutable
+            if isinstance(
+                stack,
+                ImmutableStack,
+            ):
+                # If it is, convert it to a mutable stack
+                stack = MutableStack(**stack.to_dict(exclude=["_logger"]))
+
+            # Update the updated_at timestamp of the stack
+            stack.updated_at = Miscellaneous.get_current_datetime()
+
+            # Convert the stack to an immutable stack and update the stack in the database
+            result: bool = asyncio.run(
                 StackConverter.object_to_model(
                     object=ImmutableStack(**stack.to_dict(exclude=["_logger"]))
                 ).update(
@@ -882,14 +969,28 @@ class StackManager(BaseObjectManager):
                     ),
                 )
             )
+
+            # Check, if the stack was updated successfully
+            if result:
+                # Add the stack to the cache
+                self.update_in_cache(
+                    key=stack.key,
+                    value=stack,
+                )
+
+                # Return the updated stack
+                return stack
+            else:
+                # Return None indicating that the stack does not exist
+                return None
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Return False indicating an exception has occurred
-            return False
+            # Return None indicating an exception has occurred
+            return None
 
 
 class StackModel(ImmutableBaseModel):
@@ -1244,7 +1345,7 @@ class StackModel(ImmutableBaseModel):
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
-            status (Optional[Literal["New", "Learning", "Review", "Completed"]]): The status of the stack.
+            status (Optional[int]): The ID of the status of the stack.
             tags (Optional[List[int]]): The IDs of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
