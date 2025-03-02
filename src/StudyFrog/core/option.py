@@ -88,7 +88,14 @@ class ImmutableOption(ImmutableBaseModel):
         """
 
         # Attempt to create and return a new instance of the MutableOption class with the same attributes as this instance
-        return MutableOption(**self.to_dict(exclude=["_logger"]))
+        return MutableOption(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableOption(MutableBaseObject):
@@ -151,7 +158,14 @@ class MutableOption(MutableBaseObject):
         """
 
         # Attempt to create and return a new instance of the ImmutableOption class with the same attributes as this instance
-        return ImmutableOption(**self.to_dict(exclude=["_logger"]))
+        return ImmutableOption(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class OptionConverter:
@@ -222,7 +236,14 @@ class OptionConverter:
         """
         try:
             # Attempt to create and return a new instance of the OptionModel class from the dictionary representation of the ImmutableOption instance
-            return OptionModel(**object.to_dict(exclude=["_logger"]))
+            return OptionModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -365,7 +386,14 @@ class OptionManager(BaseObjectManager):
                 ImmutableOption,
             ):
                 # If it is, convert it to a mutable option
-                option = MutableOption(**option.to_dict(exclude=["_logger"]))
+                option = MutableOption(
+                    **option.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the option
             option.created_at = Miscellaneous.get_current_datetime()
@@ -392,7 +420,14 @@ class OptionManager(BaseObjectManager):
                 option.id = id
 
                 # Convert the option to an immutable option
-                option = ImmutableOption(**option.to_dict(exclude=["_logger"]))
+                option = ImmutableOption(
+                    **option.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the option to the cache
                 self.add_to_cache(
@@ -439,7 +474,14 @@ class OptionManager(BaseObjectManager):
             # Convert the option to an immutable option and delete the option from the database
             result: bool = asyncio.run(
                 OptionConverter.object_to_model(
-                    object=ImmutableOption(**option.to_dict(exclude=["_logger"]))
+                    object=ImmutableOption(
+                        **option.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -748,7 +790,14 @@ class OptionManager(BaseObjectManager):
             # Convert the option to an immutable option and update the option in the database
             model: Optional[OptionModel] = asyncio.run(
                 OptionConverter.object_to_model(
-                    object=ImmutableOption(**option.to_dict(exclude=["_logger"]))
+                    object=ImmutableOption(
+                        **option.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **option.to_dict(

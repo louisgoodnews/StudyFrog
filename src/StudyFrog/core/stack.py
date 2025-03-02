@@ -131,7 +131,14 @@ class ImmutableStack(ImmutableBaseObject):
         """
 
         # Create a new MutableStack instance from the dictionary representation of the ImmutableStack instance
-        return MutableStack(**self.to_dict(exclude=["_logger"]))
+        return MutableStack(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableStack(MutableBaseObject):
@@ -316,7 +323,14 @@ class MutableStack(MutableBaseObject):
         """
 
         # Create a new ImmutableStack instance from the dictionary representation of the MutableStack instance
-        return ImmutableStack(**self.to_dict(exclude=["_logger"]))
+        return ImmutableStack(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class StackConverter:
@@ -387,7 +401,14 @@ class StackConverter:
         """
         try:
             # Attempt to create and return a new instance of the StackModel class from the dictionary representation of the ImmutableStack instance
-            return StackModel(**object.to_dict(exclude=["_logger"]))
+            return StackModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -563,7 +584,14 @@ class StackManager(BaseObjectManager):
                 ImmutableStack,
             ):
                 # If it is, convert it to a mutable stack
-                stack = MutableStack(**stack.to_dict(exclude=["_logger"]))
+                stack = MutableStack(
+                    **stack.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the stack
             stack.created_at = Miscellaneous.get_current_datetime()
@@ -590,7 +618,14 @@ class StackManager(BaseObjectManager):
                 stack.id = id
 
                 # Convert the stack to an immutable stack
-                stack = ImmutableStack(**stack.to_dict(exclude=["_logger"]))
+                stack = ImmutableStack(
+                    **stack.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the stack to the cache
                 self.add_to_cache(
@@ -637,7 +672,14 @@ class StackManager(BaseObjectManager):
             # Convert the stack to an immutable stack and delete the stack from the database
             result: bool = asyncio.run(
                 StackConverter.object_to_model(
-                    object=ImmutableStack(**stack.to_dict(exclude=["_logger"]))
+                    object=ImmutableStack(
+                        **stack.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -948,7 +990,14 @@ class StackManager(BaseObjectManager):
                 ImmutableStack,
             ):
                 # If it is, convert it to a mutable stack
-                stack = MutableStack(**stack.to_dict(exclude=["_logger"]))
+                stack = MutableStack(
+                    **stack.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Update the updated_at timestamp of the stack
             stack.updated_at = Miscellaneous.get_current_datetime()
@@ -956,7 +1005,14 @@ class StackManager(BaseObjectManager):
             # Convert the stack to an immutable stack and update the stack in the database
             result: bool = asyncio.run(
                 StackConverter.object_to_model(
-                    object=ImmutableStack(**stack.to_dict(exclude=["_logger"]))
+                    object=ImmutableStack(
+                        **stack.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **stack.to_dict(

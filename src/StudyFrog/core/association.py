@@ -219,7 +219,14 @@ class AssociationConverter:
         """
         try:
             # Attempt to create and return a new instance of the AssociationModel class from the dictionary representation of the Association instance
-            return AssociationModel(**object.to_dict(exclude=["_logger"]))
+            return AssociationModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -528,7 +535,14 @@ class AssociationManager(BaseObjectManager):
                 association.id = id
 
                 # Convert the association to an immutable association
-                association = Association(**association.to_dict(exclude=["_logger"]))
+                association = Association(
+                    **association.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the association to the cache
                 self.add_to_cache(
@@ -575,7 +589,14 @@ class AssociationManager(BaseObjectManager):
             # Convert the association to an immutable association and delete the association from the database
             result: bool = asyncio.run(
                 AssociationConverter.object_to_model(
-                    object=Association(**association.to_dict(exclude=["_logger"]))
+                    object=Association(
+                        **association.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -884,7 +905,14 @@ class AssociationManager(BaseObjectManager):
             # Convert the association to an immutable association and update the association in the database
             model: Optional[AssociationModel] = asyncio.run(
                 AssociationConverter.object_to_model(
-                    object=Association(**association.to_dict(exclude=["_logger"]))
+                    object=Association(
+                        **association.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **association.to_dict(

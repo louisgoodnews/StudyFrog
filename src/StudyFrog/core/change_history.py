@@ -156,7 +156,14 @@ class ChangeHistoryConverter:
         """
         try:
             # Attempt to create and return a new instance of the ChangeHistoryModel class from the dictionary representation of the ChangeHistory instance
-            return ChangeHistoryModel(**object.to_dict(exclude=["_logger"]))
+            return ChangeHistoryModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -292,7 +299,12 @@ class ChangeHistoryManager(BaseObjectManager):
             ):
                 # If it is, convert it to a mutable change history
                 change_history = ChangeHistory(
-                    **change_history.to_dict(exclude=["_logger"])
+                    **change_history.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
             # Set the created_at timestamp of the change history
@@ -325,7 +337,12 @@ class ChangeHistoryManager(BaseObjectManager):
 
                 # Convert the change history to an immutable change history
                 change_history = ChangeHistory(
-                    **change_history.to_dict(exclude=["_logger"])
+                    **change_history.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
                 # Add the change history to the cache
@@ -373,7 +390,14 @@ class ChangeHistoryManager(BaseObjectManager):
             # Convert the change history to an immutable change history and delete the change history from the database
             result: bool = asyncio.run(
                 ChangeHistoryConverter.object_to_model(
-                    object=ChangeHistory(**change_history.to_dict(exclude=["_logger"]))
+                    object=ChangeHistory(
+                        **change_history.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -682,7 +706,14 @@ class ChangeHistoryManager(BaseObjectManager):
             # Convert the change history to an immutable change history and update the change history in the database
             model: Optional[ChangeHistoryModel] = asyncio.run(
                 ChangeHistoryConverter.object_to_model(
-                    object=ChangeHistory(**change_history.to_dict(exclude=["_logger"]))
+                    object=ChangeHistory(
+                        **change_history.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **change_history.to_dict(
@@ -1024,7 +1055,14 @@ class ChangeHistoryItemConverter:
         """
         try:
             # Attempt to create and return a new instance of the ChangeHistoryItemModel class from the dictionary representation of the ChangeHistoryItem instance
-            return ChangeHistoryItemModel(**object.to_dict(exclude=["_logger"]))
+            return ChangeHistoryItemModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -1168,7 +1206,12 @@ class ChangeHistoryItemManager(BaseObjectManager):
             ):
                 # If it is, convert it to a mutable change history item
                 change_history_item = ChangeHistoryItem(
-                    **change_history_item.to_dict(exclude=["_logger"])
+                    **change_history_item.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
             # Set the created_at timestamp of the change history item
@@ -1201,7 +1244,12 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
                 # Convert the change history item to an immutable change history item
                 change_history_item = ChangeHistoryItem(
-                    **change_history_item.to_dict(exclude=["_logger"])
+                    **change_history_item.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
                 # Add the change history item to the cache
@@ -1250,7 +1298,12 @@ class ChangeHistoryItemManager(BaseObjectManager):
             result: bool = asyncio.run(
                 ChangeHistoryItemConverter.object_to_model(
                     object=ChangeHistoryItem(
-                        **change_history_item.to_dict(exclude=["_logger"])
+                        **change_history_item.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
                     )
                 ).delete()
             )
@@ -1561,7 +1614,12 @@ class ChangeHistoryItemManager(BaseObjectManager):
             model: Optional[ChangeHistoryItemModel] = asyncio.run(
                 ChangeHistoryItemConverter.object_to_model(
                     object=ChangeHistoryItem(
-                        **change_history_item.to_dict(exclude=["_logger"])
+                        **change_history_item.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
                     )
                 ).update(
                     database=Constants.DATABASE_PATH,
@@ -1580,7 +1638,12 @@ class ChangeHistoryItemManager(BaseObjectManager):
             if model is not None:
                 # Convert the ChangeHistoryItemModel object to an ChangeHistoryItem object
                 change_history_item = ChangeHistoryItem(
-                    **model.to_dict(exclude=["_logger"])
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
                 # Add the change history item to the cache

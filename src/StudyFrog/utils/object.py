@@ -32,15 +32,17 @@ class MutableBaseObject:
         Initializes a new instance of the MutableBaseObject class.
 
         :param kwargs: keyword arguments
+        :type kwargs: Dict[str, Any]
 
         :return: None
+        :rtype: None
         """
 
         # Get an instance of the logger class and store it in the object
         self._logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
         # Update the object's dictionary with the keyword arguments
-        self.__dict__.update(kwargs)
+        self.__dict__.update(**kwargs)
 
     @property
     def logger(self) -> Logger:
@@ -238,7 +240,7 @@ class MutableBaseObject:
         """
 
         # Check if the object contains the given key
-        return key in self.__dict__
+        return f"_{key}" in self.__dict__
 
     def get(
         self,
@@ -288,7 +290,7 @@ class MutableBaseObject:
 
     def to_dict(
         self,
-        exclude: List[str] = [],
+        exclude: List[str] = None,
     ) -> Dict[str, Any]:
         """
         Returns a dictionary representation of the object.
@@ -300,9 +302,14 @@ class MutableBaseObject:
         :rtype: Dict[str, Any]
         """
 
-        # Check if '_logger' is already in the excluded list
+        # Check, if the exclude argument is None
+        if not exclude:
+            # Initialize an empty list
+            exclude = []
+
+        # Check, if the logger attribute should be excluded
         if "_logger" not in exclude:
-            # Add the key "_logger" to the exclude list
+            # Add "_logger" to the exclude list
             exclude.append("_logger")
 
         # Return a dictionary representation of the object
@@ -460,7 +467,7 @@ class ImmutableBaseObject(MutableBaseObject):
     ) -> None:
 
         # Check if the attribute exists
-        if name in self.__dict__:
+        if f"_{name}" in self.__dict__:
             # Set the value of the attribute
             super().set(
                 name=name,

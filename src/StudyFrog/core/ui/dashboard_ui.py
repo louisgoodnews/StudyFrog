@@ -957,7 +957,12 @@ class DashboardUI(tkinter.Frame):
 
                 # Convert stack data to database format
                 data: Dict[str, Any] = Miscellaneous.convert_to_db_format(
-                    data=stack.to_dict(exclude=["_logger"])
+                    data=stack.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
                 # Determine the text to display based on column type

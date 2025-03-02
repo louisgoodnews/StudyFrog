@@ -11,6 +11,8 @@ from tkinter import ttk
 
 from typing import *
 
+from core.stack import ImmutableStack
+
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
@@ -294,7 +296,7 @@ class FlashcardCreateForm(tkinter.Frame):
             sticky=NSEW,
         )
 
-    def get(self) -> Dict[str, Any]:
+    def get(self) -> Optional[Dict[str, Any]]:
         """
         Retrieves the values from the form fields.
 
@@ -306,39 +308,47 @@ class FlashcardCreateForm(tkinter.Frame):
             Exception: If an exception occurs while running the 'get' method.
         """
         try:
-            # Initialize the result dictionary with empty lists and default values
-            result: Dict[str, Any] = {
-                "object_data": {
-                    "created_at": Miscellaneous.get_current_datetime(),
-                    "custom_field_values": [],
-                    "last_viewed_at": Miscellaneous.get_current_datetime(),
-                    "updated_at": Miscellaneous.get_current_datetime(),
-                    "uuid": Miscellaneous.get_uuid(),
-                },
-                "related_objects": {},
-            }
-
-            # Get the back text from the back field
-            result["object_data"]["back_text"] = self.back_field["getter"]()
-
-            # Get the front text from the front field
-            result["object_data"]["front_text"] = self.front_field["getter"]()
-
             # Get the stack from the stack field
-            result["related_objects"]["stack"] = self.unified_manager.get_stack_by(
+            stack: Optional[ImmutableStack] = self.unified_manager.get_stack_by(
                 field="name",
                 value=self.stack_field["getter"](),
             )
 
-            # Copy the difficulty from the stack
-            result["object_data"]["difficulty"] = result["related_objects"]["stack"][
-                "difficulty"
-            ]
+            # Check, if a stack was found
+            if not stack:
+                # Log a warning message indicating that no stack was found
+                self.logger.warning(
+                    message=f"No stack found with name '{self.stack_field['getter']()}'",
+                )
 
-            # Copy the priority from the stack
-            result["object_data"]["priority"] = result["related_objects"]["stack"][
-                "priority"
-            ]
+                # Return early
+                return None
+
+            # Initialize the result dictionary
+            result: Dict[str, Any] = {
+                "object_data": {
+                    "back_text": self.back_field["getter"](),
+                    "back_word_count": len(self.back_field["getter"]().split()),
+                    "created_at": Miscellaneous.get_current_datetime(),
+                    "custom_field_values": [],
+                    "familiarity": 0.0,
+                    "front_text": self.front_field["getter"](),
+                    "front_word_count": len(self.front_field["getter"]().split()),
+                    "icon": None,
+                    "id": None,
+                    "key": None,
+                    "last_viewed_at": Miscellaneous.get_current_datetime(),
+                    "total_word_count": (
+                        len(self.front_field["getter"]().split())
+                        + len(self.back_field["getter"]().split())
+                    ),
+                    "updated_at": Miscellaneous.get_current_datetime(),
+                    "uuid": Miscellaneous.get_uuid(),
+                    "difficulty": stack["difficulty"],
+                    "priority": stack["priority"],
+                },
+                "related_objects": {"stack": stack},
+            }
 
             # Return the result dictionary
             return result

@@ -10,6 +10,7 @@ from typing import *
 from core.answer import AnswerModel
 from core.association import AssociationModel
 from core.change_history import ChangeHistoryModel, ChangeHistoryItemModel
+from core.comment import CommentModel
 from core.custom_field import CustomFieldModel
 from core.default import DefaultModel
 from core.difficulty import DifficultyModel
@@ -37,6 +38,7 @@ def debug() -> None:
         AssociationModel,
         ChangeHistoryItemModel,
         ChangeHistoryModel,
+        CommentModel,
         CustomFieldModel,
         DefaultModel,
         DifficultyModel,

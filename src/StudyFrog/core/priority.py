@@ -100,7 +100,14 @@ class ImmutablePriority(ImmutableBaseObject):
         """
 
         # Return a MutablePriority instance corresponding to the current ImmutablePriority instance
-        return MutablePriority(**self.to_dict(exclude=["_logger"]))
+        return MutablePriority(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutablePriority(MutableBaseObject):
@@ -173,7 +180,14 @@ class MutablePriority(MutableBaseObject):
         """
 
         # Return a MutablePriority instance corresponding to the current ImmutablePriority instance
-        return ImmutablePriority(**self.to_dict(exclude=["_logger"]))
+        return ImmutablePriority(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class PriorityConverter:
@@ -244,7 +258,14 @@ class PriorityConverter:
         """
         try:
             # Attempt to create and return a new instance of the PriorityModel class from the dictionary representation of the ImmutablePriority instance
-            return PriorityModel(**object.to_dict(exclude=["_logger"]))
+            return PriorityModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -390,7 +411,14 @@ class PriorityManager(BaseObjectManager):
                 ImmutablePriority,
             ):
                 # If it is, convert it to a mutable priority
-                priority = MutablePriority(**priority.to_dict(exclude=["_logger"]))
+                priority = MutablePriority(
+                    **priority.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the priority
             priority.created_at = Miscellaneous.get_current_datetime()
@@ -417,7 +445,14 @@ class PriorityManager(BaseObjectManager):
                 priority.id = id
 
                 # Convert the priority to an immutable priority
-                priority = ImmutablePriority(**priority.to_dict(exclude=["_logger"]))
+                priority = ImmutablePriority(
+                    **priority.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the priority to the cache
                 self.add_to_cache(
@@ -464,7 +499,14 @@ class PriorityManager(BaseObjectManager):
             # Convert the priority to an immutable priority and delete the priority from the database
             result: bool = asyncio.run(
                 PriorityConverter.object_to_model(
-                    object=ImmutablePriority(**priority.to_dict(exclude=["_logger"]))
+                    object=ImmutablePriority(
+                        **priority.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -874,7 +916,14 @@ class PriorityManager(BaseObjectManager):
             # Convert the priority to an immutable priority and update the priority in the database
             model: Optional[PriorityModel] = asyncio.run(
                 PriorityConverter.object_to_model(
-                    object=ImmutablePriority(**priority.to_dict(exclude=["_logger"]))
+                    object=ImmutablePriority(
+                        **priority.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **priority.to_dict(

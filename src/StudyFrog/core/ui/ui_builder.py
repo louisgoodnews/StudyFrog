@@ -2739,6 +2739,209 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_readonly_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        value: Optional[str] = None,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a dictionary containing widgets to facilitate a readonly field.
+
+        The widgets contained are:
+            - "root" (tkinter.Frame): The root widget of the readonly field.
+            - "label" (tkinter.Label): The label widget of the readonly field.
+            - "entry" (tkinter.Entry): The entry widget of the readonly field.
+
+        The returned dictionary contains the following functions:
+            - "clearer": A function to clear the content of the entry widget and set it to readonly.
+            - "configurer": A function to configure the widget corresponding to the given key with provided options.
+            - "getter": A function to retrieve the content of the entry widget.
+            - "setter": A function to set the content of the entry widget and make it readonly.
+
+        Args:
+            label (str): The text for the label widget.
+            master (tkinter.Misc): The master widget for placing the container frame.
+            value (Optional[str], optional): The value to set in the entry widget. Defaults to None.
+            **kwargs: Additional keyword arguments to configure the entry widget.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while running the method.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears the content of the entry widget and sets it to readonly.
+
+                Returns:
+                    None
+                """
+
+                # Set the entry widget state to NORMAL to allow modifications
+                result["entry"].configure(state=NORMAL)
+
+                # Delete the content of the entry widget
+                result["entry"].delete(
+                    0,
+                    END,
+                )
+
+                # Set the entry widget state back to readonly
+                result["entry"].configure(state="readonly")
+
+            def configure(
+                key: str,
+                **kwargs,
+            ) -> None:
+                """
+                Configures the widget corresponding to the given key with provided options.
+
+                Args:
+                    key (str): The key identifying the widget to configure.
+                    **kwargs: Additional keyword arguments to configure the widget.
+
+                Returns:
+                    None
+                """
+
+                # Check if the key is in the result dictionary
+                if key not in result:
+                    # Return early if the key is not present
+                    return
+
+                # Configure the widget with the given key using the provided options
+                result[key].configure(**kwargs)
+
+            def get() -> Optional[str]:
+                """
+                Retrieves the content of the entry widget.
+
+                Returns:
+                    Optional[str]: The content of the entry widget or None if the content is empty.
+                """
+                # Get the content of the entry widget
+                content: str = result["entry"].get()
+
+                # Check, if the content is empty
+                if content == "":
+                    # Return None if the content is empty
+                    return None
+
+                # Return the content of the entry widget
+                return content
+
+            def set(value: Optional[str]) -> None:
+                """
+                Sets the content of the entry widget and makes it readonly.
+
+                Parameters:
+                    value (Optional[str]): The value to set in the entry widget.
+
+                Returns:
+                    None
+                """
+
+                # Set the entry widget to NORMAL mode to allow modifications
+                result["entry"].configure(state=NORMAL)
+
+                # Clear the content of the entry widget
+                result["entry"].delete(
+                    0,
+                    END,
+                )
+
+                result["entry"].insert(
+                    0,
+                    value,
+                )
+
+                # Set the entry widget to readonly mode
+                result["entry"].configure(state="readonly")
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 0th column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+            )
+
+            # Place the "Label" label widget within the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Entry" entry widget
+            result["entry"] = cls.get_entry(
+                master=result["root"],
+                state="readonly",
+                **kwargs,
+            )
+
+            # Place the "Entry" entry widget within the "Root" frame widget
+            result["entry"].grid(
+                column=1,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Add the clearer function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the configurer function to the result dictionary
+            result["configurer"] = configure
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Add the setter function to the result dictionary
+            result["setter"] = set
+
+            # Check, if a value was passed
+            if value:
+                # Set the value of the entry widget
+                set(value=value)
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_readonly_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
     def get_scrollbar(
         cls,
         master: tkinter.Misc,

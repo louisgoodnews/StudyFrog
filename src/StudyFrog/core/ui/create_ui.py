@@ -592,69 +592,6 @@ class CreateUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-    def handle_flashcard_creation(
-        self,
-        object_data: Dict[str, Any],
-        related_objects: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        try:
-            # Check if related objects have been provided
-            if not related_objects:
-                # Initialize the related objects dictionary as an empty dictionary
-                related_objects = {}
-
-            # Create a new flashcard
-            flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
-                **object_data
-            )
-
-            # Dispatch a request to create the flashcard
-            create_response: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_FLASHCARD_CREATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    flashcard=flashcard,
-                )
-            )
-
-            # Check if the creation response is None, indicating failure
-            if create_response is None:
-                # Log a warning message indicating that the creation was not successful
-                self.logger.warning(
-                    message=f"Attempt to create flashcard {flashcard} was not successfull: {create_response}."
-                )
-
-                # Return early
-                return
-
-            # Retrieve the created flashcard
-            flashcard = create_response.get_result(key="on_request_flashcard_create")
-
-            if related_objects.get("stack"):
-                # Set the stack to be mutable
-                stack: MutableStack = related_objects["stack"].to_mutable()
-
-                # Add the flashcard key to the stack contents
-                stack.contents.append(flashcard.key)
-
-                # Update the stack in the database
-                self.unified_manager.update_stack(stack=stack)
-
-            # Dispatch the FLASHCARD_CREATED event in the global namespace
-            self.dispatcher.dispatch(
-                event=Events.FLASHCARD_CREATED,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                flashcard=flashcard,
-            )
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'handle_flashcard_creation' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Raise the exception to the caller
-            raise e
-
     def handle_answer_creation(
         self,
         question: ImmutableQuestion,
@@ -779,6 +716,82 @@ class CreateUI(tkinter.Frame):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'handle_answer_creation' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
+
+    def handle_flashcard_creation(
+        self,
+        object_data: Dict[str, Any],
+        related_objects: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        try:
+            # Check if related objects have been provided
+            if not related_objects:
+                # Initialize the related objects dictionary as an empty dictionary
+                related_objects = {}
+
+            # Create a new flashcard
+            flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
+                **object_data
+            )
+
+            # Dispatch a request to create the flashcard
+            create_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_FLASHCARD_CREATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    flashcard=flashcard,
+                )
+            )
+
+            # Check if the creation response is None, indicating failure
+            if create_response is None:
+                # Log a warning message indicating that the creation was not successful
+                self.logger.warning(
+                    message=f"Attempt to create flashcard {flashcard} was not successfull: {create_response}."
+                )
+
+                # Return early
+                return
+
+            # Retrieve the created flashcard
+            flashcard = create_response.get_result(key="on_request_flashcard_create")
+
+            if related_objects.get(
+                "stack",
+                None,
+            ):
+                # Set the stack to be mutable
+                stack: Optional[ImmutableStack] = related_objects.get(
+                    "stack",
+                    None,
+                )
+
+                # Set the stack to be mutable
+                stack = stack.to_mutable()
+
+                # Add the flashcard key to the stack contents
+                stack.contents.append(flashcard.key)
+
+                # Update the stack in the database
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STACK_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    stack=stack,
+                )
+
+            # Dispatch the FLASHCARD_CREATED event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.FLASHCARD_CREATED,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                flashcard=flashcard,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'handle_flashcard_creation' method from '{self.__class__.__name__}': {e}"
             )
 
             # Raise the exception to the caller

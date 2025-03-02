@@ -98,10 +98,17 @@ class ImmutableDefault(ImmutableBaseObject):
         """
 
         # Create a new MutableDefault instance from the dictionary representation of the ImmutableDefault instance
-        return MutableImmutableDefault(**self.to_dict(exclude=["_logger"]))
+        return MutableDefault(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
-class MutableImmutableDefault(MutableBaseObject):
+class MutableDefault(MutableBaseObject):
     """
     A mutable class representing a default.
 
@@ -169,7 +176,14 @@ class MutableImmutableDefault(MutableBaseObject):
         """
 
         # Create a new ImmutableDefault instance from the dictionary representation of the MutableDefault instance
-        return ImmutableDefault(**self.to_dict(exclude=["_logger"]))
+        return ImmutableDefault(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class DefaultConverter:
@@ -240,7 +254,14 @@ class DefaultConverter:
         """
         try:
             # Attempt to create and return a new instance of the DefaultModel class from the dictionary representation of the Default instance
-            return DefaultModel(**object.to_dict(exclude=["_logger"]))
+            return DefaultModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -389,8 +410,13 @@ class DefaultManager(BaseObjectManager):
                 ImmutableDefault,
             ):
                 # If it is, convert it to a mutable default
-                default = MutableImmutableDefault(
-                    **default.to_dict(exclude=["_logger"])
+                default = MutableDefault(
+                    **default.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
             # Set the created_at timestamp of the default
@@ -418,7 +444,14 @@ class DefaultManager(BaseObjectManager):
                 default.id = id
 
                 # Convert the default to an immutable default
-                default = ImmutableDefault(**default.to_dict(exclude=["_logger"]))
+                default = ImmutableDefault(
+                    **default.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the default to the cache
                 self.add_to_cache(
@@ -465,7 +498,14 @@ class DefaultManager(BaseObjectManager):
             # Convert the default to an immutable default and delete the default from the database
             result: bool = asyncio.run(
                 DefaultConverter.object_to_model(
-                    object=ImmutableDefault(**default.to_dict(exclude=["_logger"]))
+                    object=ImmutableDefault(
+                        **default.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -793,7 +833,14 @@ class DefaultManager(BaseObjectManager):
             # Convert the default to an immutable default and update the default in the database
             model: Optional[DefaultModel] = asyncio.run(
                 DefaultConverter.object_to_model(
-                    object=ImmutableDefault(**default.to_dict(exclude=["_logger"]))
+                    object=ImmutableDefault(
+                        **default.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **default.to_dict(

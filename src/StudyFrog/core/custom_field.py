@@ -149,7 +149,14 @@ class CustomFieldConverter:
         """
         try:
             # Attempt to create and return a new instance of the CustomFieldModel class from the dictionary representation of the CustomField instance
-            return CustomFieldModel(**object.to_dict(exclude=["_logger"]))
+            return CustomFieldModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -316,7 +323,14 @@ class CustomFieldManager(BaseObjectManager):
                 custom_field.id = id
 
                 # Convert the custom field to an immutable custom field
-                custom_field = CustomField(**custom_field.to_dict(exclude=["_logger"]))
+                custom_field = CustomField(
+                    **custom_field.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the custom field to the cache
                 self.add_to_cache(
@@ -363,7 +377,14 @@ class CustomFieldManager(BaseObjectManager):
             # Convert the custom field to an immutable custom field and delete the custom field from the database
             result: bool = asyncio.run(
                 CustomFieldConverter.object_to_model(
-                    object=CustomField(**custom_field.to_dict(exclude=["_logger"]))
+                    object=CustomField(
+                        **custom_field.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -672,7 +693,14 @@ class CustomFieldManager(BaseObjectManager):
             # Convert the custom field to an immutable custom field and update the custom field in the database
             model: Optional[CustomFieldModel] = asyncio.run(
                 CustomFieldConverter.object_to_model(
-                    object=CustomField(**custom_field.to_dict(exclude=["_logger"]))
+                    object=CustomField(
+                        **custom_field.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **custom_field.to_dict(

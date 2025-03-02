@@ -96,7 +96,14 @@ class ImmutableAnswer(ImmutableBaseObject):
         """
 
         # Create a new instance of the MutableAnswer class with the same attributes as this instance
-        return MutableAnswer(**self.to_dict(exclude=["_logger"]))
+        return MutableAnswer(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableAnswer(MutableBaseObject):
@@ -163,7 +170,14 @@ class MutableAnswer(MutableBaseObject):
         """
 
         # Create a new instance of the ImmutableAnswer class with the same attributes as this instance
-        return ImmutableAnswer(**self.to_dict(exclude=["_logger"]))
+        return ImmutableAnswer(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class AnswerConverter:
@@ -234,7 +248,14 @@ class AnswerConverter:
         """
         try:
             # Attempt to create and return a new instance of the AnswerModel class from the dictionary representation of the ImmutableAnswer instance
-            return AnswerModel(**object.to_dict(exclude=["_logger"]))
+            return AnswerModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -380,7 +401,14 @@ class AnswerManager(BaseObjectManager):
                 ImmutableAnswer,
             ):
                 # If it is, convert it to a mutable answer
-                answer = MutableAnswer(**answer.to_dict(exclude=["_logger"]))
+                answer = MutableAnswer(
+                    **answer.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the answer
             answer.created_at = Miscellaneous.get_current_datetime()
@@ -410,7 +438,14 @@ class AnswerManager(BaseObjectManager):
                 answer.id = id
 
                 # Convert the answer to an immutable answer
-                answer = ImmutableAnswer(**answer.to_dict(exclude=["_logger"]))
+                answer = ImmutableAnswer(
+                    **answer.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the answer to the cache
                 self.add_to_cache(
@@ -457,7 +492,14 @@ class AnswerManager(BaseObjectManager):
             # Convert the answer to an immutable answer and delete the answer from the database
             result: bool = asyncio.run(
                 AnswerConverter.object_to_model(
-                    object=ImmutableAnswer(**answer.to_dict(exclude=["_logger"]))
+                    object=ImmutableAnswer(
+                        **answer.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -830,7 +872,14 @@ class AnswerManager(BaseObjectManager):
             # Convert the answer to an immutable answer and update the answer in the database
             model: Optional[AnswerModel] = asyncio.run(
                 AnswerConverter.object_to_model(
-                    object=ImmutableAnswer(**answer.to_dict(exclude=["_logger"]))
+                    object=ImmutableAnswer(
+                        **answer.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **answer.to_dict(

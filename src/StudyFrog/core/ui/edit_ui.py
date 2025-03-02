@@ -14,9 +14,10 @@ from core.flashcard import ImmutableFlashcard
 from core.note import ImmutableNote
 from core.question import ImmutableQuestion
 from core.setting import SettingService
-from core.stack import ImmutableStack
+from core.stack import ImmutableStack, StackFactory
 
 from core.ui.ui_builder import UIBuilder
+from core.ui.form.stack_view_form import StackViewForm
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -102,6 +103,9 @@ class EditUI(tkinter.Frame):
 
         # Initialize the fields instance variable dictionary as an empty dictionary
         self.fields: Dict[str, Any] = {}
+
+        # Initialize the form instance variable as None
+        self.form: Optional[tkinter.Misc] = None
 
         # Store the passed navigation item instance in an instance variable
         self.navigation_item: NavigationHistoryItem = navigation_item
@@ -384,64 +388,32 @@ class EditUI(tkinter.Frame):
             weight=1,
         )
 
-        # Configure the master widget's 2nd column to weight 0
+        # Configure the master widget's 0th column to weight 1
         master.grid_columnconfigure(
-            index=1,
-            weight=0,
-        )
-
-        # Configure the master widget's 1st row to weight 1
-        master.grid_rowconfigure(
             index=0,
             weight=1,
         )
 
-        # Create the "Left frame" frame widget
-        left_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["700"],
-            master=master,
-        )
+        if self.answer:
+            pass
+        elif self.flashcard:
+            pass
+        elif self.note:
+            pass
+        elif self.question:
+            pass
+        elif self.stack:
+            self.form = StackViewForm(
+                master=master,
+                stack=self.stack,
+                unified_manager=self.unified_manager,
+            )
 
-        # Configure the "Left frame" frame widget's 1st column to weight 1
-        left_frame.grid_columnconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Configure the "Left frame" frame widget's 1st and 2nd row to weight 1
-        left_frame.grid_rowconfigure(
-            index=(
-                0,
-                1,
-            ),
-            weight=1,
-        )
-
-        # Place the "Left frame" frame widget within the master frame widget
-        left_frame.grid(
+        self.form.grid(
             column=0,
             row=0,
             sticky=NSEW,
         )
-
-        # Create the "Right frame" frame widget
-        right_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["700"],
-            master=master,
-        )
-
-        # Place the "Right frame" frame widget within the master frame widget
-        right_frame.grid(
-            column=1,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create the "Right frame" widgets
-        self.create_right_frame_widgets(master=right_frame)
-
-        # Create the "Left frame" widgets
-        self.create_left_frame_widgets(master=left_frame)
 
     def create_top_frame_widgets(
         self,
@@ -471,53 +443,6 @@ class EditUI(tkinter.Frame):
             index=0,
             weight=1,
         )
-
-        if self.answer:
-            pass
-        elif self.flashcard:
-            pass
-        elif self.note:
-            pass
-        elif self.question:
-            pass
-        elif self.stack:
-            pass
-
-    def create_right_frame_widgets(
-        self,
-        master: tkinter.Misc,
-    ) -> None:
-        """
-        Edits and configures the main widgets of the right frame.
-
-        This method initializes the main widgets of the right frame within the
-        edit menu UI, setting their layout configuration.
-
-        Args:
-            master (tkinter.Misc): The parent widget.
-
-        Returns:
-            None
-        """
-        pass
-
-    def create_left_frame_widgets(
-        self,
-        master: tkinter.Misc,
-    ) -> None:
-        """
-        Edits and configures the main widgets of the left frame.
-
-        This method initializes the main widgets of the left frame within the
-        edit menu UI, setting their layout configuration.
-
-        Args:
-            master (tkinter.Misc): The parent widget.
-
-        Returns:
-            None
-        """
-        pass
 
     def destroy(self) -> None:
         """

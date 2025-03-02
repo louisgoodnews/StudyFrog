@@ -85,7 +85,14 @@ class ImmutableUser(ImmutableBaseObject):
         Returns:
             MutableUser: The mutable user.
         """
-        return MutableUser(**self.to_dict(exclude=["_logger"]))
+        return MutableUser(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableUser(MutableBaseObject):
@@ -145,7 +152,14 @@ class MutableUser(MutableBaseObject):
         Returns:
             ImmutableUser: The immutable user.
         """
-        return ImmutableUser(**self.to_dict(exclude=["_logger"]))
+        return ImmutableUser(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class UserConverter:
@@ -216,7 +230,14 @@ class UserConverter:
         """
         try:
             # Attempt to create and return a new instance of the UserModel class from the dictionary representation of the ImmutableUser instance
-            return UserModel(**object.to_dict(exclude=["_logger"]))
+            return UserModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -359,7 +380,14 @@ class UserManager(BaseObjectManager):
                 ImmutableUser,
             ):
                 # If it is, convert it to a mutable user
-                user = MutableUser(**user.to_dict(exclude=["_logger"]))
+                user = MutableUser(
+                    **user.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the user
             user.created_at = Miscellaneous.get_current_datetime()
@@ -386,7 +414,14 @@ class UserManager(BaseObjectManager):
                 user.id = id
 
                 # Convert the user to an immutable user
-                user = ImmutableUser(**user.to_dict(exclude=["_logger"]))
+                user = ImmutableUser(
+                    **user.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the user to the cache
                 self.add_to_cache(
@@ -433,7 +468,14 @@ class UserManager(BaseObjectManager):
             # Convert the user to an immutable user and delete the user from the database
             result: bool = asyncio.run(
                 UserConverter.object_to_model(
-                    object=ImmutableUser(**user.to_dict(exclude=["_logger"]))
+                    object=ImmutableUser(
+                        **user.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -735,7 +777,14 @@ class UserManager(BaseObjectManager):
             # Convert the user to an immutable user and update the user in the database
             model: Optional[UserModel] = asyncio.run(
                 UserConverter.object_to_model(
-                    object=ImmutableUser(**user.to_dict(exclude=["_logger"]))
+                    object=ImmutableUser(
+                        **user.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **user.to_dict(

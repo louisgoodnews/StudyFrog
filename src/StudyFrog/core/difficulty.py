@@ -100,7 +100,14 @@ class ImmutableDifficulty(ImmutableBaseObject):
         """
 
         # Return a new instance of the MutableDifficulty class
-        return MutableDifficulty(**self.to_dict(exclude=["_logger"]))
+        return MutableDifficulty(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableDifficulty(MutableBaseObject):
@@ -173,7 +180,14 @@ class MutableDifficulty(MutableBaseObject):
         """
 
         # Return a new instance of the ImmutableDifficulty class
-        return ImmutableDifficulty(**self.to_dict(exclude=["_logger"]))
+        return ImmutableDifficulty(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class DifficultyConverter:
@@ -244,7 +258,14 @@ class DifficultyConverter:
         """
         try:
             # Attempt to create and return a new instance of the DifficultyModel class from the dictionary representation of the Difficulty instance
-            return DifficultyModel(**object.to_dict(exclude=["_logger"]))
+            return DifficultyModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -391,7 +412,12 @@ class DifficultyManager(BaseObjectManager):
             ):
                 # If it is, convert it to a mutable difficulty
                 difficulty = MutableDifficulty(
-                    **difficulty.to_dict(exclude=["_logger"])
+                    **difficulty.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
             # Set the created_at timestamp of the difficulty
@@ -422,7 +448,12 @@ class DifficultyManager(BaseObjectManager):
 
                 # Convert the difficulty to an immutable difficulty
                 difficulty = ImmutableDifficulty(
-                    **difficulty.to_dict(exclude=["_logger"])
+                    **difficulty.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
                 )
 
                 # Add the difficulty to the cache
@@ -471,7 +502,12 @@ class DifficultyManager(BaseObjectManager):
             result: bool = asyncio.run(
                 DifficultyConverter.object_to_model(
                     object=ImmutableDifficulty(
-                        **difficulty.to_dict(exclude=["_logger"])
+                        **difficulty.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
                     )
                 ).delete()
             )
@@ -869,7 +905,12 @@ class DifficultyManager(BaseObjectManager):
             model: Optional[DifficultyModel] = asyncio.run(
                 DifficultyConverter.object_to_model(
                     object=ImmutableDifficulty(
-                        **difficulty.to_dict(exclude=["_logger"])
+                        **difficulty.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
                     )
                 ).update(
                     database=Constants.DATABASE_PATH,

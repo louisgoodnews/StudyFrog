@@ -93,7 +93,14 @@ class ImmutableStatus(ImmutableBaseObject):
         """
 
         # Return a new instance of the MutableStatus class with the same attributes as the ImmutableStatus instance
-        return MutableStatus(**self.to_dict(exclude=["_logger"]))
+        return MutableStatus(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableStatus(MutableBaseObject):
@@ -161,7 +168,14 @@ class MutableStatus(MutableBaseObject):
         """
 
         # Return a new instance of the ImmutableStatus class with the same attributes as the ImmutableStatus instance
-        return ImmutableStatus(**self.to_dict(exclude=["_logger"]))
+        return ImmutableStatus(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class StatusConverter:
@@ -232,7 +246,14 @@ class StatusConverter:
         """
         try:
             # Attempt to create and return a new instance of the StatusModel class from the dictionary representation of the ImmutableStatus instance
-            return StatusModel(**object.to_dict(exclude=["_logger"]))
+            return StatusModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -371,7 +392,14 @@ class StatusManager(BaseObjectManager):
                 ImmutableStatus,
             ):
                 # If it is, convert it to a mutable status
-                status = MutableStatus(**status.to_dict(exclude=["_logger"]))
+                status = MutableStatus(
+                    **status.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the status
             status.created_at = Miscellaneous.get_current_datetime()
@@ -398,7 +426,14 @@ class StatusManager(BaseObjectManager):
                 status.id = id
 
                 # Convert the status to an immutable status
-                status = ImmutableStatus(**status.to_dict(exclude=["_logger"]))
+                status = ImmutableStatus(
+                    **status.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the status to the cache
                 self.add_to_cache(
@@ -445,7 +480,14 @@ class StatusManager(BaseObjectManager):
             # Convert the status to an immutable status and delete the status from the database
             result: bool = asyncio.run(
                 StatusConverter.object_to_model(
-                    object=ImmutableStatus(**status.to_dict(exclude=["_logger"]))
+                    object=ImmutableStatus(
+                        **status.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -843,7 +885,14 @@ class StatusManager(BaseObjectManager):
             # Convert the status to an immutable status and update the status in the database
             model: Optional[StatusModel] = asyncio.run(
                 StatusConverter.object_to_model(
-                    object=ImmutableStatus(**status.to_dict(exclude=["_logger"]))
+                    object=ImmutableStatus(
+                        **status.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **status.to_dict(

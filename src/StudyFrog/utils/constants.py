@@ -153,6 +153,7 @@ class Constants:
     ASSOCIATIONS: str = "associations"
     CHANGE_HISTORIES: str = "change_histories"
     CHANGE_HISTORY_ITEMS: str = "change_history_items"
+    COMMENTS: str = "comments"
     CUSTOM_FIELDS: str = "custom_fields"
     DEFAULTS: str = "defaults"
     DIFFICULTIES: str = "difficulties"

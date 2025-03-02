@@ -93,7 +93,14 @@ class ImmutableSetting(ImmutableBaseObject):
         """
 
         # Convert the immutable setting to a mutable setting
-        return Mutable(**self.to_dict(exclude=["_logger"]))
+        return Mutable(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class Mutable(MutableBaseObject):
@@ -160,7 +167,14 @@ class Mutable(MutableBaseObject):
         """
 
         # Convert the mutable setting to an immutable setting
-        return ImmutableSetting(**self.to_dict(exclude=["_logger"]))
+        return ImmutableSetting(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class SettingConverter:
@@ -231,7 +245,14 @@ class SettingConverter:
         """
         try:
             # Attempt to create and return a new instance of the SettingModel class from the dictionary representation of the ImmutableSetting instance
-            return SettingModel(**object.to_dict(exclude=["_logger"]))
+            return SettingModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -396,7 +417,14 @@ class SettingManager(BaseObjectManager):
                 setting.id = id
 
                 # Convert the setting to an immutable setting
-                setting = ImmutableSetting(**setting.to_dict(exclude=["_logger"]))
+                setting = ImmutableSetting(
+                    **setting.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the setting to the cache
                 self.add_to_cache(
@@ -443,7 +471,14 @@ class SettingManager(BaseObjectManager):
             # Convert the setting to an immutable setting and delete the setting from the database
             result: bool = asyncio.run(
                 SettingConverter.object_to_model(
-                    object=ImmutableSetting(**setting.to_dict(exclude=["_logger"]))
+                    object=ImmutableSetting(
+                        **setting.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -752,7 +787,14 @@ class SettingManager(BaseObjectManager):
             # Convert the setting to an immutable setting and update the setting in the database
             model: Optional[SettingModel] = asyncio.run(
                 SettingConverter.object_to_model(
-                    object=ImmutableSetting(**setting.to_dict(exclude=["_logger"]))
+                    object=ImmutableSetting(
+                        **setting.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **setting.to_dict(
@@ -1104,7 +1146,14 @@ class SettingService:
                 return None
 
             # Convert the default object to an immutable setting and return it
-            return SettingFactory.create_setting(**default.to_dict(exclude=["_logger"]))
+            return SettingFactory.create_setting(
+                **default.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

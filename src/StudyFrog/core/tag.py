@@ -86,7 +86,14 @@ class ImmutableTag(ImmutableBaseObject):
         Returns:
             MutableTag: The mutable tag.
         """
-        return MutableTag(**self.to_dict(exclude=["_logger"]))
+        return MutableTag(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableTag(MutableBaseObject):
@@ -149,7 +156,14 @@ class MutableTag(MutableBaseObject):
         """
 
         # Create a new ImmutableTag instance from the dictionary representation of the MutableTag instance
-        return ImmutableTag(**self.to_dict(exclude=["_logger"]))
+        return ImmutableTag(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class TagConverter:
@@ -220,7 +234,14 @@ class TagConverter:
         """
         try:
             # Attempt to create and return a new instance of the TagModel class from the dictionary representation of the ImmutableTag instance
-            return TagModel(**object.to_dict(exclude=["_logger"]))
+            return TagModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -363,7 +384,14 @@ class TagManager(BaseObjectManager):
                 ImmutableTag,
             ):
                 # If it is, convert it to a mutable tag
-                tag = MutableTag(**tag.to_dict(exclude=["_logger"]))
+                tag = MutableTag(
+                    **tag.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the tag
             tag.created_at = Miscellaneous.get_current_datetime()
@@ -390,7 +418,14 @@ class TagManager(BaseObjectManager):
                 tag.id = id
 
                 # Convert the tag to an immutable tag
-                tag = ImmutableTag(**tag.to_dict(exclude=["_logger"]))
+                tag = ImmutableTag(
+                    **tag.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the tag to the cache
                 self.add_to_cache(
@@ -437,7 +472,14 @@ class TagManager(BaseObjectManager):
             # Convert the tag to an immutable tag and delete the tag from the database
             result: bool = asyncio.run(
                 TagConverter.object_to_model(
-                    object=ImmutableTag(**tag.to_dict(exclude=["_logger"]))
+                    object=ImmutableTag(
+                        **tag.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -737,7 +779,14 @@ class TagManager(BaseObjectManager):
             # Convert the tag to an immutable tag and update the tag in the database
             model: Optional[TagModel] = asyncio.run(
                 TagConverter.object_to_model(
-                    object=ImmutableTag(**tag.to_dict(exclude=["_logger"]))
+                    object=ImmutableTag(
+                        **tag.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **tag.to_dict(

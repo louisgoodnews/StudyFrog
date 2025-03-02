@@ -121,7 +121,14 @@ class ImmutableQuestion(ImmutableBaseObject):
         """
 
         # Create a new MutableQuestion instance from the dictionary representation of the ImmutableQuestion instance
-        return MutableQuestion(**self.to_dict(exclude=["_logger"]))
+        return MutableQuestion(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableQuestion(MutableBaseObject):
@@ -292,7 +299,14 @@ class MutableQuestion(MutableBaseObject):
         """
 
         # Create a new ImmutableQuestion instance from the dictionary representation of the MutableQuestion instance
-        return ImmutableQuestion(**self.to_dict(exclude=["_logger"]))
+        return ImmutableQuestion(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class QuestionConverter:
@@ -363,7 +377,14 @@ class QuestionConverter:
         """
         try:
             # Attempt to create and return a new instance of the QuestionModel class from the dictionary representation of the ImmutableQuestion instance
-            return QuestionModel(**object.to_dict(exclude=["_logger"]))
+            return QuestionModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -527,7 +548,14 @@ class QuestionManager(BaseObjectManager):
                 ImmutableQuestion,
             ):
                 # If it is, convert it to a mutable question
-                question = MutableQuestion(**question.to_dict(exclude=["_logger"]))
+                question = MutableQuestion(
+                    **question.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the question
             question.created_at = Miscellaneous.get_current_datetime()
@@ -557,7 +585,14 @@ class QuestionManager(BaseObjectManager):
                 question.id = id
 
                 # Convert the question to an immutable question
-                question = ImmutableQuestion(**question.to_dict(exclude=["_logger"]))
+                question = ImmutableQuestion(
+                    **question.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the question to the cache
                 self.add_to_cache(
@@ -604,7 +639,14 @@ class QuestionManager(BaseObjectManager):
             # Convert the question to an immutable question and delete the question from the database
             result: bool = asyncio.run(
                 QuestionConverter.object_to_model(
-                    object=ImmutableQuestion(**question.to_dict(exclude=["_logger"]))
+                    object=ImmutableQuestion(
+                        **question.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -916,7 +958,14 @@ class QuestionManager(BaseObjectManager):
                 ImmutableQuestion,
             ):
                 # If it is, convert it to a mutable question
-                question = MutableQuestion(**question.to_dict(exclude=["_logger"]))
+                question = MutableQuestion(
+                    **question.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Update the updated_at timestamp of the question
             question.updated_at = Miscellaneous.get_current_datetime()
@@ -924,7 +973,14 @@ class QuestionManager(BaseObjectManager):
             # Convert the question to an immutable question and update the question in the database
             result: bool = asyncio.run(
                 QuestionConverter.object_to_model(
-                    object=ImmutableQuestion(**question.to_dict(exclude=["_logger"]))
+                    object=ImmutableQuestion(
+                        **question.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **question.to_dict(

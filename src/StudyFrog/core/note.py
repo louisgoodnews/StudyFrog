@@ -98,7 +98,14 @@ class ImmutableNote(ImmutableBaseObject):
         """
 
         # Create a new MutableNote instance from the dictionary representation of the ImmutableNote instance
-        return MutableNote(**self.to_dict(exclude=["_logger"]))
+        return MutableNote(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class MutableNote(MutableBaseObject):
@@ -174,7 +181,14 @@ class MutableNote(MutableBaseObject):
         """
 
         # Create a new ImmutableNote instance from the dictionary representation of the MutableNote instance
-        return ImmutableNote(**self.to_dict(exclude=["_logger"]))
+        return ImmutableNote(
+            **self.to_dict(
+                exclude=[
+                    "_logger",
+                    "_values",
+                ]
+            )
+        )
 
 
 class NoteConverter:
@@ -245,7 +259,14 @@ class NoteConverter:
         """
         try:
             # Attempt to create and return a new instance of the NoteModel class from the dictionary representation of the ImmutableNote instance
-            return NoteModel(**object.to_dict(exclude=["_logger"]))
+            return NoteModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                        "_values",
+                    ]
+                )
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -394,7 +415,14 @@ class NoteManager(BaseObjectManager):
                 ImmutableNote,
             ):
                 # If it is, convert it to a mutable note
-                note = MutableNote(**note.to_dict(exclude=["_logger"]))
+                note = MutableNote(
+                    **note.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
             # Set the created_at timestamp of the note
             note.created_at = Miscellaneous.get_current_datetime()
@@ -424,7 +452,14 @@ class NoteManager(BaseObjectManager):
                 note.id = id
 
                 # Convert the note to an immutable note
-                note = ImmutableNote(**note.to_dict(exclude=["_logger"]))
+                note = ImmutableNote(
+                    **note.to_dict(
+                        exclude=[
+                            "_logger",
+                            "_values",
+                        ]
+                    )
+                )
 
                 # Add the note to the cache
                 self.add_to_cache(
@@ -471,7 +506,14 @@ class NoteManager(BaseObjectManager):
             # Convert the note to an immutable note and delete the note from the database
             result: bool = asyncio.run(
                 NoteConverter.object_to_model(
-                    object=ImmutableNote(**note.to_dict(exclude=["_logger"]))
+                    object=ImmutableNote(
+                        **note.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).delete()
             )
 
@@ -780,7 +822,14 @@ class NoteManager(BaseObjectManager):
             # Convert the note to an immutable note and update the note in the database
             model: Optional[NoteModel] = asyncio.run(
                 NoteConverter.object_to_model(
-                    object=ImmutableNote(**note.to_dict(exclude=["_logger"]))
+                    object=ImmutableNote(
+                        **note.to_dict(
+                            exclude=[
+                                "_logger",
+                                "_values",
+                            ]
+                        )
+                    )
                 ).update(
                     database=Constants.DATABASE_PATH,
                     **note.to_dict(
