@@ -12,9 +12,7 @@ from tkinter import ttk
 from typing import *
 
 from core.answer import AnswerFactory, ImmutableAnswer
-from core.difficulty import ImmutableDifficulty
 from core.flashcard import FlashcardFactory, ImmutableFlashcard
-from core.priority import ImmutablePriority
 from core.question import MutableQuestion, QuestionFactory, ImmutableQuestion
 from core.setting import SettingService
 from core.stack import StackFactory, ImmutableStack, MutableStack
@@ -149,9 +147,11 @@ class CreateUI(tkinter.Frame):
         if type is not None:
             # Set the combobox value to the passed type
             self.combobox.set(value=type.capitalize())
+        else:
+            self.preselect_combobox_value()
 
-            # Call the on_combobox_select method
-            self.on_combobox_select()
+        # Call the on_combobox_select method
+        self.on_combobox_select()
 
     def configure_grid(self) -> None:
         """
@@ -1014,6 +1014,7 @@ class CreateUI(tkinter.Frame):
 
         # Create a new form widget based on the selected value
         self.form = forms[self.combobox.get().lower()](
+            dispatcher=self.dispatcher,
             master=self.center_frame,
             unified_manager=self.unified_manager,
         )
@@ -1056,6 +1057,18 @@ class CreateUI(tkinter.Frame):
         # Get the data from the form
         form_data: Dict[str, Any] = self.form.get()
 
+        if not self.form.check_required_fields(
+            object_data=form_data.get(
+                "object_data",
+                None,
+            )
+        ):
+            # Log an info message indicating that not all required fields were filled
+            self.logger.info(message="Seems like not all required fields were filled.")
+
+            # Return early
+            return
+
         # Get the type of form
         type: str = self.combobox.get()
 
@@ -1094,3 +1107,28 @@ class CreateUI(tkinter.Frame):
             ):
                 # Destroy the toplevel widget
                 self.master.destroy()
+
+    def preselect_combobox_value(self) -> None:
+        """
+        Preselects a random value for the combobox widget.
+
+        This method is called after the UI has been created and
+        before the toplevel widget is shown. It preselects a random
+        value from the list of available values for the combobox
+        widget.
+
+        Returns:
+            None
+        """
+
+        # Set the combobox value to a random value
+        self.combobox.set(
+            value=Miscellaneous.select_random(
+                [
+                    # The type of object to be created
+                    "Flashcard",
+                    "Question",
+                    "Stack",
+                ]
+            )
+        )

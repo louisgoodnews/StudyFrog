@@ -34,16 +34,18 @@ class FlashcardCreateForm(tkinter.Frame):
     combobox for selecting a stack to add the flashcard to.
 
     Attributes:
-        master (tkinter.Misc): The parent widget.
-        unified_manager (UnifiedObjectManager): The unified manager instance.
-        logger (Logger): The logger instance for the class.
-        stack_field (Dict[str, Any]): The combobox field for selecting a stack.
         front_field (Dict[str, Any]): The single-line text field for the front text of the flashcard.
         back_field (Dict[str, Any]): The multi-line text field for the back text of the flashcard.
+        dispatcher (Dispatcher): The dispatcher instance for the class.
+        logger (Logger): The logger instance for the class.
+        master (tkinter.Misc): The parent widget.
+        stack_field (Dict[str, Any]): The combobox field for selecting a stack.
+        unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
     def __init__(
         self,
+        dispatcher: Dispatcher,
         master: tkinter.Misc,
         unified_manager: UnifiedObjectManager,
     ) -> None:
@@ -51,6 +53,7 @@ class FlashcardCreateForm(tkinter.Frame):
         Initializes a new instance of the FlashcardCreateForm class.
 
         Args:
+            dispatcher (Dispatcher): The dispatcher instance.
             master (tkinter.Misc): The parent widget.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
@@ -65,6 +68,9 @@ class FlashcardCreateForm(tkinter.Frame):
 
         # Create a logger instance for the class
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+
+        # Store the dispatcher instance in an instance variable
+        self.dispatcher: Dispatcher = dispatcher
 
         # Store the unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager
@@ -84,6 +90,69 @@ class FlashcardCreateForm(tkinter.Frame):
             row=0,
             sticky=NSEW,
         )
+
+    def check_required_fields(
+        self,
+        object_data: Dict[str, Any],
+    ) -> bool:
+        """
+        Checks if all required fields are filled in the object data.
+
+        Args:
+            object_data (Dict[str, Any]): The data to be validated.
+
+        Returns:
+            bool: True if all required fields are filled, False otherwise.
+        """
+
+        # Validate the required fields using the helper method
+        if self.validate_required_fields(object_data=object_data):
+            # Return True if validation is successful
+            return True
+
+        # Show a dialog informing the user to fill all required fields
+        okay: Optional[Dict[str, Any]] = UIBuilder.get_okay(
+            dispatcher=self.dispatcher,
+            message="Please fill in all required fields.",
+            title="Required fields missing.",
+        )
+
+        # Style the okay dialog's "Root" toplevel widget
+        okay["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the okay dialog's "Button" button widget
+        okay["button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the okay dialog's "Message Label" label widget
+        okay["message_label"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Style the okay dialog's "Title Label" label widget
+        okay["title_label"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Return False if validation fails
+        return False
 
     def configure_grid(self) -> None:
         """
@@ -360,3 +429,39 @@ class FlashcardCreateForm(tkinter.Frame):
 
             # Return None indicating an exception has occurred
             return None
+
+    def validate_required_fields(
+        self,
+        object_data: Dict[str, Any],
+    ) -> bool:
+        """
+        Validates the object data to ensure all required fields have been provided.
+
+        Args:
+            object_data (Dict[str, Any]): The object data to validate.
+
+        Returns:
+            bool: True if all required fields have been provided, False otherwise.
+        """
+
+        # Define the required fields
+        required_fields: List[str] = [
+            "front_text",  # The front side of the flashcard
+            "back_text",  # The back side of the flashcard
+            "stack",  # The stack the flashcard belongs to
+            "difficulty",  # The difficulty of the flashcard
+            "priority",  # The priority of the flashcard
+        ]
+
+        # Validate all required fields
+        result: bool = all(
+            object_data.get(
+                field,  # The field to validate
+                None,  # The default value to return if the field is not present
+            )
+            is not None  # The condition to check (i.e., the field should not be None)
+            for field in required_fields  # Iterate over all required fields
+        )
+
+        # Return the result
+        return result

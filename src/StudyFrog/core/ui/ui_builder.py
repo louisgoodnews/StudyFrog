@@ -1561,7 +1561,7 @@ class UIBuilder:
                 # Attempt to obtain the current value of the text widget
                 string: Optional[str] = result["text"].get(
                     "1.0",
-                    END,
+                    "end-1c",
                 )
 
                 # Check, if the content of the text widget is an empty string
@@ -1851,7 +1851,7 @@ class UIBuilder:
         dispatcher: Dispatcher,
         message: str,
         title: str,
-        master: Optional[tkinter.Misc],
+        master: Optional[tkinter.Misc] = None,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
@@ -1990,11 +1990,11 @@ class UIBuilder:
             # Set the "Root" toplevel widget to have focus
             result["root"].focus_set()
 
+            # Lift the "Root" toplevel widget above other windows
+            result["root"].lift()
+
             # Ring the bell
             result["root"].bell()
-
-            # Wait for the "Root" toplevel widget to be closed
-            result["root"].wait_window()
 
             # Return the result
             return result
@@ -2013,7 +2013,7 @@ class UIBuilder:
         dispatcher: Dispatcher,
         message: str,
         title: str,
-        master: Optional[tkinter.Misc],
+        master: Optional[tkinter.Misc] = None,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
@@ -2203,11 +2203,11 @@ class UIBuilder:
             # Set the "Root" toplevel widget to have focus
             result["root"].focus_set()
 
+            # Lift the "Root" toplevel widget above other windows
+            result["root"].lift()
+
             # Ring the bell
             result["root"].bell()
-
-            # Wait for the "Root" toplevel widget to be closed
-            result["root"].wait_window()
 
             # Return the result
             return result
@@ -3171,7 +3171,7 @@ class UIBuilder:
                 # Return the contents of the text widget
                 string: str = result["text"].get(
                     "1.0",
-                    END,
+                    "end-1c",
                 )
 
                 # Check, if the text field's content is an empty string

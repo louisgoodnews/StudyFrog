@@ -388,6 +388,24 @@ class Miscellaneous:
             return None
 
     @classmethod
+    def select_random(
+        cls,
+        iterable: Iterable[Any],
+    ) -> Any:
+        """
+        Selects a random element from an iterable.
+
+        Args:
+            iterable (Iterable[Any]): The iterable to be selected from.
+
+        Returns:
+            Any: The selected element.
+        """
+
+        # Select a random element from the iterable
+        return random.choice(seq=iterable)
+
+    @classmethod
     def shuffle(iterable: Iterable[Any]) -> None:
         """
         Shuffles an iterable.
