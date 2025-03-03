@@ -97,7 +97,6 @@ class ImmutableStatus(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -172,7 +171,6 @@ class MutableStatus(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -250,7 +248,6 @@ class StatusConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -342,7 +339,7 @@ class StatusManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count_statuses(self) -> int:
+    def count_statuss(self) -> int:
         """
         Returns the number of statuss in the database.
 
@@ -350,16 +347,8 @@ class StatusManager(BaseObjectManager):
             int: The number of statuss in the database.
         """
         try:
-            # Count the number of statuss in the database
-            result: Any = asyncio.run(
-                StatusModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.STATUSES};",
-                )
-            )
-
-            # Return the number of statuss in the database
-            return result[0][0] if result else 0
+            # Count and return the number of statuss in the database
+            return asyncio.run(StatusModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -392,20 +381,13 @@ class StatusManager(BaseObjectManager):
                 ImmutableStatus,
             ):
                 # If it is, convert it to a mutable status
-                status = MutableStatus(
-                    **status.to_dict(
-                        exclude=[
-                            "_logger",
-                            "_values",
-                        ]
-                    )
-                )
+                status = status.to_mutable()
 
             # Set the created_at timestamp of the status
             status.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the status
-            status.key = f"STATUS_{self.count_statuses() + 1}"
+            status.key = f"STATUS_{self.count_statuss() + 1}"
 
             # Set the updated_at timestamp of the status
             status.updated_at = Miscellaneous.get_current_datetime()
@@ -426,11 +408,10 @@ class StatusManager(BaseObjectManager):
                 status.id = id
 
                 # Convert the status to an immutable status
-                status = ImmutableStatus(
+                status = StatusFactory.create_status(
                     **status.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -480,16 +461,18 @@ class StatusManager(BaseObjectManager):
             # Convert the status to an immutable status and delete the status from the database
             result: bool = asyncio.run(
                 StatusConverter.object_to_model(
-                    object=ImmutableStatus(
+                    object=StatusFactory.create_status(
                         **status.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
                 ).delete()
             )
+
+            # Remove the status from the cache
+            self.remove_from_cache(key=status.key)
 
             # Return True if the status was deleted successfully
             return result
@@ -514,7 +497,7 @@ class StatusManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_statuses():
+            if self.cache and len(self._cache) == self.count_statuss():
                 # Return the list of immutable statuss from the cache
                 return self.get_cache_values()
 
@@ -525,7 +508,7 @@ class StatusManager(BaseObjectManager):
 
             # Convert the list of StatusModel objects to a list of ImmutableStatus objects
             statuss: List[ImmutableStatus] = [
-                ImmutableStatus(
+                StatusFactory.create_status(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -538,18 +521,11 @@ class StatusManager(BaseObjectManager):
 
             # Iterate over the list of immutable statuss
             for status in statuss:
-                if not self.is_key_in_cache(key=status.key):
-                    # Add the immutable status to the cache
-                    self.add_to_cache(
-                        key=status.key,
-                        value=status,
-                    )
-                else:
-                    # Update the immutable status in the cache
-                    self.update_in_cache(
-                        key=status.key,
-                        value=status,
-                    )
+                # Add the immutable status to the cache
+                self.add_to_cache(
+                    key=status.key,
+                    value=status,
+                )
 
             # Return the list of immutable statuss
             return statuss
@@ -677,7 +653,7 @@ class StatusManager(BaseObjectManager):
             # Return the status if it exists
             if model is not None:
                 # Convert the StatusModel object to an ImmutableStatus object
-                return ImmutableStatus(
+                status: ImmutableStatus = StatusFactory.create_status(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -685,6 +661,15 @@ class StatusManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the status to the cache
+                self.add_to_cache(
+                    key=status.key,
+                    value=status,
+                )
+
+                # Return the status
+                return status
             else:
                 # Return None indicating that the status does not exist
                 return None
@@ -731,7 +716,7 @@ class StatusManager(BaseObjectManager):
             # Return the status if it exists
             if model is not None:
                 # Convert the StatusModel object to an ImmutableStatus object
-                return ImmutableStatus(
+                status: ImmutableStatus = StatusFactory.create_status(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -739,6 +724,15 @@ class StatusManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the status to the cache
+                self.add_to_cache(
+                    key=status.key,
+                    value=status,
+                )
+
+                # Return the status
+                return status
             else:
                 # Return None indicating that the status does not exist
                 return None
@@ -785,7 +779,7 @@ class StatusManager(BaseObjectManager):
             # Return the status if it exists
             if model is not None:
                 # Convert the StatusModel object to an ImmutableStatus object
-                return ImmutableStatus(
+                return StatusFactory.create_status(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -810,19 +804,19 @@ class StatusManager(BaseObjectManager):
         **kwargs,
     ) -> Optional[Union[List[ImmutableStatus]]]:
         """
-        Searches for statuses in the database.
+        Searches for statuss in the database.
 
         Args:
             **kwargs: Any additional keyword arguments to be passed to the search method of the StatusModel class.
 
         Returns:
-            Optional[Union[List[ImmutableStatus]]]: The found statuses if no exception occurs. Otherwise, None.
+            Optional[Union[List[ImmutableStatus]]]: The found statuss if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Search for statuses in the database
+            # Search for statuss in the database
             models: Optional[List[StatusModel]] = asyncio.run(
                 StatusModel.search(
                     database=Constants.DATABASE_PATH,
@@ -830,20 +824,10 @@ class StatusManager(BaseObjectManager):
                 )
             )
 
-            # Check, if no models were found
-            if not models:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"No statuses matching '{kwargs}' were found in the database."
-                )
-
-                # Return early
-                return
-
-            # Return the found statuses if any
+            # Return the found statuss if any
             if models is not None and len(models) > 0:
-                return [
-                    ImmutableStatus(
+                statuss: List[ImmutableStatus] = [
+                    StatusFactory.create_status(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -853,8 +837,19 @@ class StatusManager(BaseObjectManager):
                     )
                     for model in models
                 ]
+
+                # Iterate over the found statuss
+                for status in statuss:
+                    # Add the status to the cache
+                    self.add_to_cache(
+                        key=status.key,
+                        value=status,
+                    )
+
+                # Return the found statuss
+                return statuss
             else:
-                # Return None indicating that no statuses were found
+                # Return None indicating that no statuss were found
                 return None
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -882,14 +877,24 @@ class StatusManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check if the status object is immutable
+            if isinstance(
+                status,
+                ImmutableStatus,
+            ):
+                # If it is, convert it to a mutable status
+                status = status.to_mutable()
+
+            # Update the updated_at timestamp of the status
+            status.updated_at = Miscellaneous.get_current_datetime()
+
             # Convert the status to an immutable status and update the status in the database
-            model: Optional[StatusModel] = asyncio.run(
+            result: bool = asyncio.run(
                 StatusConverter.object_to_model(
-                    object=ImmutableStatus(
+                    object=StatusFactory.create_status(
                         **status.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -906,26 +911,16 @@ class StatusManager(BaseObjectManager):
                 )
             )
 
-            # Return the updated status if it exists
-            if model is not None:
-                # Convert the StatusModel object to an ImmutableStatus object
-                status = ImmutableStatus(
-                    **model.to_dict(
-                        exclude=[
-                            "_logger",
-                            "table",
-                        ]
-                    )
-                )
-
-                # Add the status to the cache
+            # Check, if the status was updated successfully
+            if result:
+                # Update the status in the cache
                 self.update_in_cache(
                     key=status.key,
                     value=status,
                 )
 
                 # Return the updated status
-                return status
+                return status.to_immutable()
             else:
                 # Return None indicating that the status does not exist
                 return None

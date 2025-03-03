@@ -17,6 +17,9 @@ from core.setting import SettingService
 from core.stack import ImmutableStack, StackFactory
 
 from core.ui.ui_builder import UIBuilder
+from core.ui.form.answer_view_form import AnswerViewForm
+from core.ui.form.flashcard_view_form import FlashcardViewForm
+from core.ui.form.question_view_form import QuestionViewForm
 from core.ui.form.stack_view_form import StackViewForm
 
 from utils.constants import Constants
@@ -395,15 +398,31 @@ class EditUI(tkinter.Frame):
         )
 
         if self.answer:
-            pass
+            self.form = AnswerViewForm(
+                answer=self.answer,
+                dispatcher=self.dispatcher,
+                master=master,
+                unified_manager=self.unified_manager,
+            )
         elif self.flashcard:
-            pass
+            self.form = FlashcardViewForm(
+                dispatcher=self.dispatcher,
+                master=master,
+                flashcard=self.flashcard,
+                unified_manager=self.unified_manager,
+            )
         elif self.note:
             pass
         elif self.question:
-            pass
+            self.form = QuestionViewForm(
+                dispatcher=self.dispatcher,
+                master=master,
+                question=self.question,
+                unified_manager=self.unified_manager,
+            )
         elif self.stack:
             self.form = StackViewForm(
+                dispatcher=self.dispatcher,
                 master=master,
                 stack=self.stack,
                 unified_manager=self.unified_manager,

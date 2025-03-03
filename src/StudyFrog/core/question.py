@@ -125,7 +125,6 @@ class ImmutableQuestion(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -303,7 +302,6 @@ class MutableQuestion(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -381,7 +379,6 @@ class QuestionConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -508,10 +505,7 @@ class QuestionManager(BaseObjectManager):
         try:
             # Count the number of questions in the database
             result: Any = asyncio.run(
-                QuestionModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.QUESTIONS};",
-                )
+                QuestionModel.count(database=Constants.DATABASE_PATH)
             )
 
             # Return the number of questions in the database
@@ -548,14 +542,7 @@ class QuestionManager(BaseObjectManager):
                 ImmutableQuestion,
             ):
                 # If it is, convert it to a mutable question
-                question = MutableQuestion(
-                    **question.to_dict(
-                        exclude=[
-                            "_logger",
-                            "_values",
-                        ]
-                    )
-                )
+                question = question.to_mutable()
 
             # Set the created_at timestamp of the question
             question.created_at = Miscellaneous.get_current_datetime()
@@ -585,11 +572,10 @@ class QuestionManager(BaseObjectManager):
                 question.id = id
 
                 # Convert the question to an immutable question
-                question = ImmutableQuestion(
+                question = QuestionFactory.create_question(
                     **question.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -639,16 +625,18 @@ class QuestionManager(BaseObjectManager):
             # Convert the question to an immutable question and delete the question from the database
             result: bool = asyncio.run(
                 QuestionConverter.object_to_model(
-                    object=ImmutableQuestion(
+                    object=QuestionFactory.create_question(
                         **question.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
                 ).delete()
             )
+
+            # Remove the question from the cache
+            self.remove_from_cache(key=question.key)
 
             # Return True if the question was deleted successfully
             return result
@@ -684,7 +672,7 @@ class QuestionManager(BaseObjectManager):
 
             # Convert the list of QuestionModel objects to a list of ImmutableQuestion objects
             questions: List[ImmutableQuestion] = [
-                ImmutableQuestion(
+                QuestionFactory.create_question(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -697,18 +685,11 @@ class QuestionManager(BaseObjectManager):
 
             # Iterate over the list of immutable questions
             for question in questions:
-                if not self.is_key_in_cache(key=question.key):
-                    # Add the immutable question to the cache
-                    self.add_to_cache(
-                        key=question.key,
-                        value=question,
-                    )
-                else:
-                    # Update the immutable question in the cache
-                    self.update_in_cache(
-                        key=question.key,
-                        value=question,
-                    )
+                # Add the immutable question to the cache
+                self.add_to_cache(
+                    key=question.key,
+                    value=question,
+                )
 
             # Return the list of immutable questions
             return questions
@@ -757,7 +738,7 @@ class QuestionManager(BaseObjectManager):
             # Return the question if it exists
             if model is not None:
                 # Convert the QuestionModel object to an ImmutableQuestion object
-                return ImmutableQuestion(
+                question: ImmutableQuestion = QuestionFactory.create_question(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -765,6 +746,15 @@ class QuestionManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the question to the cache
+                self.add_to_cache(
+                    key=question.key,
+                    value=question,
+                )
+
+                # Return the question
+                return question
             else:
                 # Return None indicating that the question does not exist
                 return None
@@ -811,7 +801,7 @@ class QuestionManager(BaseObjectManager):
             # Return the question if it exists
             if model is not None:
                 # Convert the QuestionModel object to an ImmutableQuestion object
-                return ImmutableQuestion(
+                question: ImmutableQuestion = QuestionFactory.create_question(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -819,6 +809,78 @@ class QuestionManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the question to the cache
+                self.add_to_cache(
+                    key=question.key,
+                    value=question,
+                )
+
+                # Return the question
+                return question
+            else:
+                # Return None indicating that the question does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_id' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_question_by_key(
+        self,
+        key: str,
+    ) -> Optional[ImmutableQuestion]:
+        """
+        Returns a question with the given key.
+
+        Args:
+            key (str): The key of the question.
+
+        Returns:
+            Optional[ImmutableQuestion]: The question with the given key if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the question is already in the cache
+            if self.is_key_in_cache(key=key):
+                # Return the question from the cache
+                return self.get_value_from_cache(key=key)
+
+            # Get the question with the given key from the database
+            model: Optional[QuestionModel] = asyncio.run(
+                QuestionModel.get_by(
+                    column="key",
+                    database=Constants.DATABASE_PATH,
+                    value=key,
+                )
+            )
+
+            # Return the question if it exists
+            if model is not None:
+                # Convert the QuestionModel object to an ImmutableQuestion object
+                question: ImmutableQuestion = QuestionFactory.create_question(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+
+                # Add the question to the cache
+                self.add_to_cache(
+                    key=question.key,
+                    value=question,
+                )
+
+                # Return the question
+                return question
             else:
                 # Return None indicating that the question does not exist
                 return None
@@ -865,7 +927,7 @@ class QuestionManager(BaseObjectManager):
             # Return the question if it exists
             if model is not None:
                 # Convert the QuestionModel object to an ImmutableQuestion object
-                return ImmutableQuestion(
+                return QuestionFactory.create_question(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -912,8 +974,8 @@ class QuestionManager(BaseObjectManager):
 
             # Return the found questions if any
             if models is not None and len(models) > 0:
-                return [
-                    ImmutableQuestion(
+                questions: List[ImmutableQuestion] = [
+                    QuestionFactory.create(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -923,6 +985,17 @@ class QuestionManager(BaseObjectManager):
                     )
                     for model in models
                 ]
+
+                # Iterate over the found questions
+                for question in questions:
+                    # Add the question to the cache
+                    self.add_to_cache(
+                        key=question.key,
+                        value=question,
+                    )
+
+                # Return the found questions
+                return questions
             else:
                 # Return None indicating that no questions were found
                 return None
@@ -958,14 +1031,7 @@ class QuestionManager(BaseObjectManager):
                 ImmutableQuestion,
             ):
                 # If it is, convert it to a mutable question
-                question = MutableQuestion(
-                    **question.to_dict(
-                        exclude=[
-                            "_logger",
-                            "_values",
-                        ]
-                    )
-                )
+                question = question.to_mutable()
 
             # Update the updated_at timestamp of the question
             question.updated_at = Miscellaneous.get_current_datetime()
@@ -973,11 +1039,10 @@ class QuestionManager(BaseObjectManager):
             # Convert the question to an immutable question and update the question in the database
             result: bool = asyncio.run(
                 QuestionConverter.object_to_model(
-                    object=ImmutableQuestion(
+                    object=QuestionFactory.create_question(
                         **question.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -996,14 +1061,14 @@ class QuestionManager(BaseObjectManager):
 
             # Check, if the question was updated successfully
             if result:
-                # Add the question to the cache
+                # Update the question in the cache
                 self.update_in_cache(
                     key=question.key,
                     value=question,
                 )
 
                 # Return the updated question
-                return question
+                return question.to_immutable()
             else:
                 # Return None indicating that the question does not exist
                 return None

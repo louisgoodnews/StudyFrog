@@ -313,6 +313,26 @@ class BaseObjectManager:
         # Return True if the value exists, False otherwise
         return value in [item["value"] for item in self._cache]
 
+    def remove_from_cache(
+        self,
+        key: str,
+    ) -> None:
+        """
+        Removes an item from the cache by its key.
+
+        :param key: The key of the item to remove.
+        :type key: str
+
+        :return: None
+        :rtype: None
+        """
+
+        # Remove the item from the cache
+        self._cache.remove(self._cache[key])
+
+        # Log the removal
+        self.logger.info(message=f"Removed key '{key}' from cache.")
+
     def update_in_cache(
         self,
         key: str,

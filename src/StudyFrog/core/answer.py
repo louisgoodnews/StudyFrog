@@ -100,7 +100,6 @@ class ImmutableAnswer(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -174,7 +173,6 @@ class MutableAnswer(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -252,7 +250,6 @@ class AnswerConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -359,16 +356,10 @@ class AnswerManager(BaseObjectManager):
             int: The number of answers in the database.
         """
         try:
-            # Count the number of answers in the database
-            result: Any = asyncio.run(
-                AnswerModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.ANSWERS};",
-                )
+            # Count and return the number of answers in the database
+            return asyncio.run(
+                AnswerModel.count(database=Constants.DATABASE_PATH)
             )
-
-            # Return the number of answers in the database
-            return result[0][0] if result else 0
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -401,14 +392,7 @@ class AnswerManager(BaseObjectManager):
                 ImmutableAnswer,
             ):
                 # If it is, convert it to a mutable answer
-                answer = MutableAnswer(
-                    **answer.to_dict(
-                        exclude=[
-                            "_logger",
-                            "_values",
-                        ]
-                    )
-                )
+                answer = answer.to_mutable()
 
             # Set the created_at timestamp of the answer
             answer.created_at = Miscellaneous.get_current_datetime()
@@ -438,11 +422,10 @@ class AnswerManager(BaseObjectManager):
                 answer.id = id
 
                 # Convert the answer to an immutable answer
-                answer = ImmutableAnswer(
+                answer = AnswerFactory.create_answer(
                     **answer.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -492,16 +475,18 @@ class AnswerManager(BaseObjectManager):
             # Convert the answer to an immutable answer and delete the answer from the database
             result: bool = asyncio.run(
                 AnswerConverter.object_to_model(
-                    object=ImmutableAnswer(
+                    object=AnswerFactory.create_answer(
                         **answer.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
                 ).delete()
             )
+
+            # Remove the answer from the cache
+            self.remove_from_cache(key=answer.key)
 
             # Return True if the answer was deleted successfully
             return result
@@ -537,7 +522,7 @@ class AnswerManager(BaseObjectManager):
 
             # Convert the list of AnswerModel objects to a list of ImmutableAnswer objects
             answers: List[ImmutableAnswer] = [
-                ImmutableAnswer(
+                AnswerFactory.create_answer(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -550,18 +535,11 @@ class AnswerManager(BaseObjectManager):
 
             # Iterate over the list of immutable answers
             for answer in answers:
-                if not self.is_key_in_cache(key=answer.key):
-                    # Add the immutable answer to the cache
-                    self.add_to_cache(
-                        key=answer.key,
-                        value=answer,
-                    )
-                else:
-                    # Update the immutable answer in the cache
-                    self.update_in_cache(
-                        key=answer.key,
-                        value=answer,
-                    )
+                # Add the immutable answer to the cache
+                self.add_to_cache(
+                    key=answer.key,
+                    value=answer,
+                )
 
             # Return the list of immutable answers
             return answers
@@ -610,7 +588,7 @@ class AnswerManager(BaseObjectManager):
             # Return the answer if it exists
             if model is not None:
                 # Convert the AnswerModel object to an ImmutableAnswer object
-                return ImmutableAnswer(
+                answer: ImmutableAnswer = AnswerFactory.create_answer(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -618,6 +596,15 @@ class AnswerManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the answer to the cache
+                self.add_to_cache(
+                    key=answer.key,
+                    value=answer,
+                )
+
+                # Return the answer
+                return answer
             else:
                 # Return None indicating that the answer does not exist
                 return None
@@ -664,7 +651,7 @@ class AnswerManager(BaseObjectManager):
             # Return the answer if it exists
             if model is not None:
                 # Convert the AnswerModel object to an ImmutableAnswer object
-                return ImmutableAnswer(
+                answer: ImmutableAnswer = AnswerFactory.create_answer(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -672,6 +659,15 @@ class AnswerManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the answer to the cache
+                self.add_to_cache(
+                    key=answer.key,
+                    value=answer,
+                )
+
+                # Return the answer
+                return answer
             else:
                 # Return None indicating that the answer does not exist
                 return None
@@ -718,7 +714,7 @@ class AnswerManager(BaseObjectManager):
             # Return the answer if it exists
             if model is not None:
                 # Convert the AnswerModel object to an ImmutableAnswer object
-                return ImmutableAnswer(
+                return AnswerFactory.create_answer(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -746,7 +742,7 @@ class AnswerManager(BaseObjectManager):
             Optional[List[ImmutableAnswer]]: A list of default answers if no exception occurs. Otherwise, None.
 
         Raises:
-            Exception: If no 'difficulty' defaults are found or any other exception occurs.
+            Exception: If no 'status' defaults are found or any other exception occurs.
         """
         try:
             # Import necessary classes
@@ -762,8 +758,8 @@ class AnswerManager(BaseObjectManager):
                     value=f"answer:{answer}",
                 )
                 for answer in [
-                    Constants.TRUE,
                     Constants.FALSE,
+                    Constants.TRUE,
                 ]
             ]
 
@@ -829,8 +825,8 @@ class AnswerManager(BaseObjectManager):
 
             # Return the found answers if any
             if models is not None and len(models) > 0:
-                return [
-                    ImmutableAnswer(
+                answers: List[ImmutableAnswer] = [
+                    AnswerFactory.create(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -840,6 +836,17 @@ class AnswerManager(BaseObjectManager):
                     )
                     for model in models
                 ]
+
+                # Iterate over the found answers
+                for answer in answers:
+                    # Add the answer to the cache
+                    self.add_to_cache(
+                        key=answer.key,
+                        value=answer,
+                    )
+
+                # Return the found answers
+                return answers
             else:
                 # Return None indicating that no answers were found
                 return None
@@ -869,14 +876,24 @@ class AnswerManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check if the answer object is immutable
+            if isinstance(
+                answer,
+                ImmutableAnswer,
+            ):
+                # If it is, convert it to a mutable answer
+                answer = answer.to_mutable()
+
+            # Update the updated_at timestamp of the answer
+            answer.updated_at = Miscellaneous.get_current_datetime()
+
             # Convert the answer to an immutable answer and update the answer in the database
-            model: Optional[AnswerModel] = asyncio.run(
+            result: bool = asyncio.run(
                 AnswerConverter.object_to_model(
-                    object=ImmutableAnswer(
+                    object=AnswerFactory.create_answer(
                         **answer.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -893,26 +910,16 @@ class AnswerManager(BaseObjectManager):
                 )
             )
 
-            # Return the updated answer if it exists
-            if model is not None:
-                # Convert the AnswerModel object to an ImmutableAnswer object
-                answer = ImmutableAnswer(
-                    **model.to_dict(
-                        exclude=[
-                            "_logger",
-                            "table",
-                        ]
-                    )
-                )
-
-                # Add the answer to the cache
+            # Check, if the answer was updated successfully
+            if result:
+                # Update the answer in the cache
                 self.update_in_cache(
                     key=answer.key,
                     value=answer,
                 )
 
                 # Return the updated answer
-                return answer
+                return answer.to_immutable()
             else:
                 # Return None indicating that the answer does not exist
                 return None

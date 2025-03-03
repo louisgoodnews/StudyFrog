@@ -92,7 +92,6 @@ class ImmutableOption(ImmutableBaseModel):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -162,7 +161,6 @@ class MutableOption(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -240,7 +238,6 @@ class OptionConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -390,7 +387,6 @@ class OptionManager(BaseObjectManager):
                     **option.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -424,7 +420,6 @@ class OptionManager(BaseObjectManager):
                     **option.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -478,7 +473,6 @@ class OptionManager(BaseObjectManager):
                         **option.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -794,7 +788,6 @@ class OptionManager(BaseObjectManager):
                         **option.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )

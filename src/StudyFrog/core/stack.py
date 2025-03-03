@@ -135,7 +135,6 @@ class ImmutableStack(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -327,7 +326,6 @@ class MutableStack(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -405,7 +403,6 @@ class StackConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -542,16 +539,8 @@ class StackManager(BaseObjectManager):
             int: The number of stacks in the database.
         """
         try:
-            # Count the number of stacks in the database
-            result: Any = asyncio.run(
-                StackModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.STACKS};",
-                )
-            )
-
-            # Return the number of stacks in the database
-            return result[0][0] if result else 0
+            # Count and return the number of stacks in the database
+            return asyncio.run(StackModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -584,17 +573,13 @@ class StackManager(BaseObjectManager):
                 ImmutableStack,
             ):
                 # If it is, convert it to a mutable stack
-                stack = MutableStack(
-                    **stack.to_dict(
-                        exclude=[
-                            "_logger",
-                            "_values",
-                        ]
-                    )
-                )
+                stack = stack.to_mutable()
 
             # Set the created_at timestamp of the stack
             stack.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the custom_field_values of the stack
+            stack.custom_field_values = [] or stack.custom_field_values
 
             # Set the key of the stack
             stack.key = f"STACK_{self.count_stacks() + 1}"
@@ -618,11 +603,10 @@ class StackManager(BaseObjectManager):
                 stack.id = id
 
                 # Convert the stack to an immutable stack
-                stack = ImmutableStack(
+                stack = StackFactory.create_stack(
                     **stack.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -672,16 +656,18 @@ class StackManager(BaseObjectManager):
             # Convert the stack to an immutable stack and delete the stack from the database
             result: bool = asyncio.run(
                 StackConverter.object_to_model(
-                    object=ImmutableStack(
+                    object=StackFactory.create_stack(
                         **stack.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
                 ).delete()
             )
+
+            # Remove the stack from the cache
+            self.remove_from_cache(key=stack.key)
 
             # Return True if the stack was deleted successfully
             return result
@@ -717,7 +703,7 @@ class StackManager(BaseObjectManager):
 
             # Convert the list of StackModel objects to a list of ImmutableStack objects
             stacks: List[ImmutableStack] = [
-                ImmutableStack(
+                StackFactory.create_stack(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -730,18 +716,11 @@ class StackManager(BaseObjectManager):
 
             # Iterate over the list of immutable stacks
             for stack in stacks:
-                if not self.is_key_in_cache(key=stack.key):
-                    # Add the immutable stack to the cache
-                    self.add_to_cache(
-                        key=stack.key,
-                        value=stack,
-                    )
-                else:
-                    # Update the immutable stack in the cache
-                    self.update_in_cache(
-                        key=stack.key,
-                        value=stack,
-                    )
+                # Add the immutable stack to the cache
+                self.add_to_cache(
+                    key=stack.key,
+                    value=stack,
+                )
 
             # Return the list of immutable stacks
             return stacks
@@ -760,7 +739,7 @@ class StackManager(BaseObjectManager):
         value: Any,
     ) -> Optional[ImmutableStack]:
         """
-        Returns a stack with the given field and value.
+        Retrieves a stack by the given field and value.
 
         Args:
             field (str): The field to search by.
@@ -773,6 +752,11 @@ class StackManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check if the stack is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the stack from the cache
+                return self.get_value_from_cache(key=field)
+
             # Get the stack with the given field and value from the database
             model: Optional[StackModel] = asyncio.run(
                 StackModel.get_by(
@@ -782,20 +766,25 @@ class StackManager(BaseObjectManager):
                 )
             )
 
-            # Convert the StackModel object to an immutable stack
-            stack: Optional[ImmutableStack] = StackConverter.model_to_object(
-                model=model
-            )
-
             # Return the stack if it exists
-            if stack is not None:
+            if model is not None:
+                # Convert the StackModel object to an ImmutableStack object
+                stack: ImmutableStack = StackFactory.create_stack(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+
                 # Add the stack to the cache
                 self.add_to_cache(
                     key=stack.key,
                     value=stack,
                 )
 
-                # Return the immutable stack
+                # Return the stack
                 return stack
             else:
                 # Return None indicating that the stack does not exist
@@ -843,7 +832,7 @@ class StackManager(BaseObjectManager):
             # Return the stack if it exists
             if model is not None:
                 # Convert the StackModel object to an ImmutableStack object
-                return ImmutableStack(
+                stack: ImmutableStack = StackFactory.create_stack(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -851,6 +840,15 @@ class StackManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the stack to the cache
+                self.add_to_cache(
+                    key=stack.key,
+                    value=stack,
+                )
+
+                # Return the stack
+                return stack
             else:
                 # Return None indicating that the stack does not exist
                 return None
@@ -897,7 +895,7 @@ class StackManager(BaseObjectManager):
             # Return the stack if it exists
             if model is not None:
                 # Convert the StackModel object to an ImmutableStack object
-                return ImmutableStack(
+                stack: ImmutableStack = StackFactory.create_stack(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -905,6 +903,15 @@ class StackManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the stack to the cache
+                self.add_to_cache(
+                    key=stack.key,
+                    value=stack,
+                )
+
+                # Return the stack
+                return stack
             else:
                 # Return None indicating that the stack does not exist
                 return None
@@ -944,8 +951,8 @@ class StackManager(BaseObjectManager):
 
             # Return the found stacks if any
             if models is not None and len(models) > 0:
-                return [
-                    ImmutableStack(
+                stacks: List[ImmutableStack] = [
+                    StackFactory.create_stack(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -955,6 +962,17 @@ class StackManager(BaseObjectManager):
                     )
                     for model in models
                 ]
+
+                # Iterate over the found stacks
+                for stack in stacks:
+                    # Add the stack to the cache
+                    self.add_to_cache(
+                        key=stack.key,
+                        value=stack,
+                    )
+
+                # Return the found stacks
+                return stacks
             else:
                 # Return None indicating that no stacks were found
                 return None
@@ -990,14 +1008,7 @@ class StackManager(BaseObjectManager):
                 ImmutableStack,
             ):
                 # If it is, convert it to a mutable stack
-                stack = MutableStack(
-                    **stack.to_dict(
-                        exclude=[
-                            "_logger",
-                            "_values",
-                        ]
-                    )
-                )
+                stack = stack.to_mutable()
 
             # Update the updated_at timestamp of the stack
             stack.updated_at = Miscellaneous.get_current_datetime()
@@ -1005,11 +1016,10 @@ class StackManager(BaseObjectManager):
             # Convert the stack to an immutable stack and update the stack in the database
             result: bool = asyncio.run(
                 StackConverter.object_to_model(
-                    object=ImmutableStack(
+                    object=StackFactory.create_stack(
                         **stack.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -1028,14 +1038,14 @@ class StackManager(BaseObjectManager):
 
             # Check, if the stack was updated successfully
             if result:
-                # Add the stack to the cache
+                # Update the stack in the cache
                 self.update_in_cache(
                     key=stack.key,
                     value=stack,
                 )
 
                 # Return the updated stack
-                return stack
+                return stack.to_immutable()
             else:
                 # Return None indicating that the stack does not exist
                 return None

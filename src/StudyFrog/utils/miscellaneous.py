@@ -4,13 +4,10 @@ Date: 2025-02-06
 """
 
 import asyncio
-
 import json
-
 import random
-
+import re
 import threading
-
 import uuid
 
 from typing import *
@@ -240,6 +237,29 @@ class Miscellaneous:
             str: The string representation of the datetime object.
         """
         return datetime.strftime(format=format)
+
+    @classmethod
+    def find_match(
+        cls,
+        string: str,
+        group: int = 0,
+        pattern: str = r"([A-Za-z]+)",
+    ) -> Optional[str]:
+        """
+        Finds a match for a string against a pattern.
+
+        Args:
+            group (int): The group to return. Defaults to 0 (the whole match).
+            pattern (str): The pattern to match the string against. Defaults to r"([A-Za-z]+)" (all letters).
+            string (str): The string to match.
+
+        Returns:
+            Optional[str]: The string that matched the pattern, or None if no match was found.
+        """
+        return re.match(
+            pattern=pattern,
+            string=string,
+        ).group(group)
 
     @classmethod
     def get_current_datetime(cls) -> datetime:

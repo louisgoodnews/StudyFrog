@@ -11,12 +11,10 @@ from tkinter import ttk
 
 from typing import *
 
+from core.answer import ImmutableAnswer
 from core.difficulty import ImmutableDifficulty
-from core.flashcard import ImmutableFlashcard
-from core.note import ImmutableNote
 from core.priority import ImmutablePriority
-from core.question import ImmutableQuestion
-from core.stack import ImmutableStack, MutableStack
+from core.question import ImmutableQuestion, MutableQuestion
 
 from core.ui.ui_builder import UIBuilder
 
@@ -28,21 +26,21 @@ from utils.miscellaneous import Miscellaneous
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["StackViewForm"]
+__all__: List[str] = ["QuestionViewForm"]
 
 
-class StackViewForm(tkinter.Frame):
+class QuestionViewForm(tkinter.Frame):
     """
-    Represents the stack view form widget of the application.
+    Represents the question view form widget of the application.
 
     This class is responsible for initializing and configuring the layout of the
-    stack view form widget, including setting up the main frames and populating them
+    question view form widget, including setting up the main frames and populating them
     with respective widgets.
 
     Attributes:
         dispatcher (Dispatcher): The dispatcher instance.
         logger (Logger): The logger instance.
-        stack (Union[ImmutableStack, MutableStack]): The stack instance.
+        question (Union[ImmutableQuestion, MutableQuestion]): The question instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -50,16 +48,16 @@ class StackViewForm(tkinter.Frame):
         self,
         dispatcher: Dispatcher,
         master: tkinter.Misc,
-        stack: Union[ImmutableStack, MutableStack],
+        question: Union[ImmutableQuestion, MutableQuestion],
         unified_manager: UnifiedObjectManager,
     ) -> None:
         """
-        Initializes a new instance of the StackViewForm class.
+        Initializes a new instance of the QuestionViewForm class.
 
         Args:
             dispatcher (Dispatcher): The dispatcher instance.
             master (tkinter.Misc): The parent widget.
-            stack (Union[ImmutableStack, MutableStack]): The stack instance.
+            question (Union[ImmutableQuestion, MutableQuestion]): The question instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
         Returns:
@@ -75,8 +73,8 @@ class StackViewForm(tkinter.Frame):
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
 
-        # Store the passed stack instance in an instance variable
-        self.stack: Union[ImmutableStack, MutableStack] = stack
+        # Store the passed question instance in an instance variable
+        self.question: Union[ImmutableQuestion, MutableQuestion] = question
 
         # Initialize the timestamp datetime instance variable as None
         self.timestamp: Optional[datetime] = None
@@ -84,27 +82,27 @@ class StackViewForm(tkinter.Frame):
         # Store the passed unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager
 
-        # Set the background color of the stack view form widget
+        # Set the background color of the question view form widget
         self.configure(background=Constants.BLUE_GREY["700"])
 
         # Subscribe to events relevant for this class
         self.subscribe_to_events()
 
-        # Configure the grid of the stack view form widget
+        # Configure the grid of the question view form widget
         self.configure_grid()
 
-        # Create the widgets of the stack view form
+        # Create the widgets of the question view form
         self.create_widgets()
 
-        # Load the content of the stack by iterating over its contents
-        for key in self.stack["contents"]:
+        # Load the content of the question by iterating over its answers
+        for key in self.question["answers"]:
             self.load_content_by_key(key=key)
 
     def configure_grid(self) -> None:
         """
-        Configures the grid of the stack view form widget.
+        Configures the grid of the question view form widget.
 
-        This method configures the grid of the stack view form widget by setting
+        This method configures the grid of the question view form widget by setting
         the weights of the columns and rows.
 
         Args:
@@ -114,25 +112,25 @@ class StackViewForm(tkinter.Frame):
             None
         """
 
-        # Configure the stack view form widget's 0th column to weight 1.
+        # Configure the question view form widget's 0th column to weight 1.
         self.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the stack view form widget's 0th row to weight 0.
+        # Configure the question view form widget's 0th row to weight 0.
         self.grid_rowconfigure(
             index=0,
             weight=0,
         )
 
-        # Configure the stack view form widget's 1st row to weight 1.
+        # Configure the question view form widget's 1st row to weight 1.
         self.grid_rowconfigure(
             index=1,
             weight=1,
         )
 
-        # Configure the stack view form widget's 2nd row to weight 1.
+        # Configure the question view form widget's 2nd row to weight 1.
         self.grid_rowconfigure(
             index=2,
             weight=1,
@@ -140,9 +138,9 @@ class StackViewForm(tkinter.Frame):
 
     def create_widgets(self):
         """
-        Creates the widgets of the stack view form.
+        Creates the widgets of the question view form.
 
-        This method initializes the main widgets of the stack view form, setting
+        This method initializes the main widgets of the question view form, setting
         their layout configuration.
 
         Args:
@@ -170,7 +168,7 @@ class StackViewForm(tkinter.Frame):
             weight=1,
         )
 
-        # Place the top frame widget within the stack view form
+        # Place the top frame widget within the question view form
         top_frame.grid(
             column=0,
             row=0,
@@ -195,7 +193,7 @@ class StackViewForm(tkinter.Frame):
             weight=1,
         )
 
-        # Place the center frame widget within the stack view form
+        # Place the center frame widget within the question view form
         center_frame.grid(
             column=0,
             row=1,
@@ -220,7 +218,7 @@ class StackViewForm(tkinter.Frame):
             weight=1,
         )
 
-        # Place the bottom frame widget within the stack view form
+        # Place the bottom frame widget within the question view form
         bottom_frame.grid(
             column=0,
             row=2,
@@ -244,7 +242,7 @@ class StackViewForm(tkinter.Frame):
         Creates and configures the main widgets of the top frame.
 
         This method initializes the main widgets of the top frame within the
-        stack view form, setting their layout configuration.
+        question view form, setting their layout configuration.
 
         Args:
             master (tkinter.Misc): The parent widget.
@@ -265,9 +263,9 @@ class StackViewForm(tkinter.Frame):
             weight=1,
         )
 
-        # Create the single line text field for the stack name
-        self.name_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_single_line_text_field(
+        # Create the single line text field for the question name
+        self.question_text_field: Optional[Dict[str, Any]] = (
+            UIBuilder.get_scrolled_text_field(
                 font=(
                     Constants.DEFAULT_FONT_FAMILIY,
                     Constants.DEFAULT_FONT_SIZE,
@@ -278,7 +276,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Style the name field's button widget
-        self.name_field["button"].configure(
+        self.question_text_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -288,34 +286,28 @@ class StackViewForm(tkinter.Frame):
             relief=FLAT,
         )
 
-        # Bind the name field to the on_name_field_changed function
-        self.name_field["entry"].bind(
-            func=lambda event: self.on_name_field_changed(),
+        # Bind the name field to the on_question_text_field_changed function
+        self.question_text_field["scrolled_text_field"]["text"].bind(
+            func=lambda event: self.on_question_text_field_changed(),
             sequence="<KeyRelease>",
         )
 
         # Style the name field's label widget
-        self.name_field["label"].configure(
+        self.question_text_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
         )
 
         # Style the name field's root widget
-        self.name_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Set the name field's value to the stack's name
-        self.name_field["setter"](value=self.stack.name)
-
-        # Configure the name field
-        self.name_field["entry"].configure(
-            font=(
-                Constants.DEFAULT_FONT_FAMILIY,
-                Constants.MEDIUM_FONT_SIZE,
-            ),
+        self.question_text_field["root"].configure(
+            background=Constants.BLUE_GREY["700"]
         )
 
+        # Set the name field's value to the question's question text
+        self.question_text_field["setter"](value=self.question.question_text)
+
         # Configure the name field
-        self.name_field["label"].configure(
+        self.question_text_field["label"].configure(
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
                 Constants.DEFAULT_FONT_SIZE,
@@ -323,13 +315,13 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Place the name field in the top frame
-        self.name_field["root"].grid(
+        self.question_text_field["root"].grid(
             column=0,
             row=0,
             sticky=NSEW,
         )
 
-        # Create a separator widget to divide the stack view form widget
+        # Create a separator widget to divide the question view form widget
         separator: ttk.Separator = UIBuilder.get_separator(
             master=master,
             orient=HORIZONTAL,
@@ -352,7 +344,7 @@ class StackViewForm(tkinter.Frame):
         Creates and configures the main widgets of the center frame.
 
         This method initializes the main widgets of the center frame within the
-        stack view form, setting their layout configuration.
+        question view form, setting their layout configuration.
 
         Args:
             master (tkinter.Misc): The parent widget.
@@ -572,7 +564,7 @@ class StackViewForm(tkinter.Frame):
         self.description_field["root"].configure(background=Constants.BLUE_GREY["700"])
 
         # Configure the description field's label widget
-        self.description_field["setter"](value=self.stack.description)
+        self.description_field["setter"](value=self.question.description)
 
         # Place the description field within the primary attributes frame
         self.description_field["root"].grid(
@@ -681,7 +673,7 @@ class StackViewForm(tkinter.Frame):
             None
         """
 
-        # Create a label widget to display the stack ID
+        # Create a label widget to display the question ID
         self.id_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -689,7 +681,7 @@ class StackViewForm(tkinter.Frame):
             ),
             label="ID: ",
             master=master,
-            value=self.stack.id,
+            value=self.question.id,
         )
 
         # Style the ID field's label widget
@@ -714,7 +706,7 @@ class StackViewForm(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create a label widget to display the stack UUID
+        # Create a label widget to display the question UUID
         self.uuid_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -722,7 +714,7 @@ class StackViewForm(tkinter.Frame):
             ),
             label="UUID: ",
             master=master,
-            value=self.stack.uuid,
+            value=self.question.uuid,
         )
 
         # Style the UUID field's label widget
@@ -747,7 +739,7 @@ class StackViewForm(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create a label widget to display the stack creation date
+        # Create a label widget to display the question creation date
         self.created_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -755,7 +747,7 @@ class StackViewForm(tkinter.Frame):
             ),
             label="Created at: ",
             master=master,
-            value=Miscellaneous.datetime_to_string(datetime=self.stack.created_at),
+            value=Miscellaneous.datetime_to_string(datetime=self.question.created_at),
         )
 
         # Style the created at field's label widget
@@ -780,7 +772,7 @@ class StackViewForm(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create a label widget to display the stack update date
+        # Create a label widget to display the question update date
         self.updated_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -788,7 +780,7 @@ class StackViewForm(tkinter.Frame):
             ),
             label="Updated at: ",
             master=master,
-            value=Miscellaneous.datetime_to_string(datetime=self.stack.updated_at),
+            value=Miscellaneous.datetime_to_string(datetime=self.question.updated_at),
         )
 
         # Style the updated at field's label widget
@@ -876,7 +868,7 @@ class StackViewForm(tkinter.Frame):
                 (
                     difficulty.name
                     for difficulty in difficulties
-                    if difficulty.id == self.stack.difficulty
+                    if difficulty.id == self.question.difficulty
                 ),
                 "Medium",
             )
@@ -940,7 +932,7 @@ class StackViewForm(tkinter.Frame):
                 (
                     priority.name
                     for priority in priorities
-                    if priority.id == self.stack.priority
+                    if priority.id == self.question.priority
                 ),
                 "Medium",
             )
@@ -963,7 +955,7 @@ class StackViewForm(tkinter.Frame):
         Creates and configures the main widgets of the bottom frame.
 
         This method initializes the main widgets of the bottom frame within the
-        stack view form, setting their layout configuration.
+        question view form, setting their layout configuration.
 
         Args:
             master (tkinter.Misc): The parent widget.
@@ -1005,13 +997,7 @@ class StackViewForm(tkinter.Frame):
     def load_content_by_key(
         self,
         key: str,
-        object: Optional[
-            Union[
-                ImmutableFlashcard,
-                ImmutableNote,
-                ImmutableQuestion,
-            ]
-        ] = None,
+        object: Optional[ImmutableAnswer] = None,
     ) -> None:
         """
         Loads content by key.
@@ -1225,80 +1211,80 @@ class StackViewForm(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def on_name_field_changed(self) -> None:
+    def on_question_text_field_changed(self) -> None:
         try:
-            value: Optional[str] = self.name_field["getter"]()
+            value: Optional[str] = self.question_text_field["getter"]()
 
             if not value:
                 # Return early
                 return
 
-            stacks: Optional[List[ImmutableStack]] = self.unified_manager.search_stacks(
-                name=value,
+            questions: Optional[List[ImmutableQuestion]] = (
+                self.unified_manager.search_questions(
+                    question_text=value,
+                )
             )
 
-            if not stacks:
+            if not questions:
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Found no stack(s) in database with name '{value}'."
+                    message=f"Found no questions in database with question text '{value}'."
                 )
 
                 # Return early
                 return
 
-            if len(stacks) == 1:
-                if self.stack.compare_to(
+            if len(questions) == 1:
+                if self.question.compare_to(
                     key=[
                         "id",
                         "key",
                         "name",
                     ],
-                    other=stacks[0],
+                    other=questions[0],
                 ):
                     # Return early
                     return
-
-            if len(stacks) > 1:
+            if len(questions) > 1:
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Found too many stacks ({len(stacks)}) in database with name '{value}'."
+                    message=f"Found too many questions ({len(questions)}) in database with question text '{value}'."
                 )
 
                 # Return early
                 return
-
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'on_name_field_changed' method from '{self.__class__.__name__}': {e}",
+                message=f"Caught an exception while attempting to run 'on_question_text_field_changed' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller
             raise e
 
-    def on_flashcard_created(
+    def on_answer_created(
         self,
-        flashcard: ImmutableFlashcard,
+        answer: ImmutableAnswer,
     ) -> None:
         """
-        Handles the 'on_flashcard_created' event and loads the flashcard into the UI.
+        Handles the 'on_answer_created' event and loads the answer into the UI.
 
         Args:
-            flashcard (ImmutableFlashcard): The flashcard to be loaded into the UI.
+            answer (ImmutableAnswer): The answer to be loaded into the UI.
 
         Raises:
-            Exception: If an exception occurs while loading the flashcard.
+            Exception: If an exception occurs while loading the answer.
         """
         try:
-            # Load the flashcard into the UI
+            # Load the answer into the UI
             self.load_content_by_key(
-                key=flashcard.key,
-                object=flashcard,
+                key=answer.key,
+                object=answer,
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'on_flashcard_created' method from '{self.__class__.__name__}': {e}",
+                message=f"Caught an exception while attempting to run 'on_answer_created' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller
@@ -1306,17 +1292,13 @@ class StackViewForm(tkinter.Frame):
 
     def on_label_left_click(
         self,
-        object: Union[
-            ImmutableFlashcard,
-            ImmutableNote,
-            ImmutableQuestion,
-        ],
+        object: ImmutableAnswer,
     ) -> None:
         """
         Handles the 'on_label_left_click' event and navigates to the next item in the navigation history.
 
         Args:
-            object (ImmutableFlashcard | ImmutableNote | ImmutableQuestion): The object associated with the label that was clicked.
+            object (ImmutableAnswer): The object associated with the label that was clicked.
 
         Raises:
             Exception: If an exception occurs while attempting to navigate to the next item in the navigation history.
@@ -1386,11 +1368,7 @@ class StackViewForm(tkinter.Frame):
     def on_label_right_click(
         self,
         event: tkinter.Event,
-        object: Union[
-            ImmutableFlashcard,
-            ImmutableNote,
-            ImmutableQuestion,
-        ],
+        object: ImmutableAnswer,
     ) -> None:
         """
         Handles the 'on_label_right_click' event and displays a context menu for the label.
@@ -1401,7 +1379,7 @@ class StackViewForm(tkinter.Frame):
 
         Args:
             event (tkinter.Event): The event object.
-            object (ImmutableFlashcard | ImmutableNote | ImmutableQuestion): The object associated with the label.
+            object (ImmutableAnswer): The object associated with the label.
 
         Raises:
             Exception: If an exception occurs while displaying the context menu.
@@ -1459,98 +1437,42 @@ class StackViewForm(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def on_note_created(
-        self,
-        note: ImmutableNote,
-    ) -> None:
-        """
-        Handles the 'on_note_created' event and loads the note into the UI.
-
-        Args:
-            note (ImmutableNote): The note to be loaded into the UI.
-
-        Raises:
-            Exception: If an exception occurs while loading the note.
-        """
-        try:
-            # Load the note into the UI
-            self.load_content_by_key(
-                key=note.key,
-                object=note,
-            )
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'on_note_created' method from '{self.__class__.__name__}': {e}",
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
-    def on_question_created(
+    def on_question_updated(
         self,
         question: ImmutableQuestion,
     ) -> None:
         """
-        Handles the 'on_question_created' event and loads the question into the UI.
+        Updates the current question if the provided question matches certain keys.
+
+        This method compares the provided question with the current question instance
+        using specific keys. If they match, the current question is updated to the
+        provided question.
 
         Args:
-            question (ImmutableQuestion): The question to be loaded into the UI.
-
-        Raises:
-            Exception: If an exception occurs while loading the question.
-        """
-        try:
-            # Load the content by the key of the provided question
-            self.load_content_by_key(
-                key=question.key,
-                object=question,
-            )
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'on_question_created' method from '{self.__class__.__name__}': {e}",
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
-    def on_stack_updated(
-        self,
-        stack: ImmutableStack,
-    ) -> None:
-        """
-        Updates the current stack if the provided stack matches certain keys.
-
-        This method compares the provided stack with the current stack instance
-        using specific keys. If they match, the current stack is updated to the
-        provided stack.
-
-        Args:
-            stack (ImmutableStack): The stack to be compared and potentially updated.
+            question (ImmutableQuestion): The question to be compared and potentially updated.
 
         Raises:
             Exception: If an error occurs during the update process.
         """
         try:
-            # Compare the current stack with the provided stack using specific keys
-            if self.stack.compare_to(
+            # Compare the current question with the provided question using specific keys
+            if self.question.compare_to(
                 key=[
                     "id",
                     "key",
                     "uuid",
                 ],
-                other=stack,
+                other=question,
             ):
-                # Update the current stack to the provided stack if they match
-                self.stack = stack
+                # Update the current question to the provided question if they match
+                self.question = question
 
-                # Log an info message about updating the current stack
-                self.logger.info(message=f"Updated current stack: {self.stack}")
+                # Log an info message about updating the current question
+                self.logger.info(message=f"Updated current question: {self.question}")
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'on_stack_updated' method from '{self.__class__.__name__}': {e}",
+                message=f"Caught an exception while attempting to run 'on_question_updated' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller
@@ -1581,23 +1503,13 @@ class StackViewForm(tkinter.Frame):
 
             # Create a dictionary of events and functions
             subscriptions: Dict[Any, Dict[str, Any]] = {
-                Events.FLASHCARD_CREATED: {
-                    "function": self.on_flashcard_created,
+                Events.ANSWER_CREATED: {
+                    "function": self.on_answer_created,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
-                Events.NOTE_CREATED: {
-                    "function": self.on_note_created,
-                    "namespace": Constants.GLOBAL_NAMESPACE,
-                    "persistent": True,
-                },
-                Events.QUESTION_CREATED: {
-                    "function": self.on_question_created,
-                    "namespace": Constants.GLOBAL_NAMESPACE,
-                    "persistent": True,
-                },
-                Events.STACK_UPDATED: {
-                    "function": self.on_stack_updated,
+                Events.QUESTION_UPDATED: {
+                    "function": self.on_question_updated,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
@@ -1628,7 +1540,7 @@ class StackViewForm(tkinter.Frame):
 
     def unsubscribe_from_events(self) -> None:
         """
-        Unsubscribes from all events subscribed in the stack view form.
+        Unsubscribes from all events subscribed in the question view form.
 
         This method iterates over the UUIDs in the subscriptions dictionary and
         unregisters the event handlers associated with each UUID.
@@ -1653,27 +1565,27 @@ class StackViewForm(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def update_stack(self) -> None:
+    def update_question(self) -> None:
         """
-        Updates the stack and saves it into the database.
+        Updates the question and saves it into the database.
 
-        This method updates the stack object and saves it into the database.
+        This method updates the question object and saves it into the database.
         It also raises an exception if any exception has occurred during the
         update process.
 
         Raises:
-            Exception: If an exception occurs while updating the stack.
+            Exception: If an exception occurs while updating the question.
         """
         try:
-            # Update the stack object
-            self.stack = self.unified_manager.update_stack(stack=self.stack)
+            # Update the question object
+            self.question = self.unified_manager.update_question(question=self.question)
 
             # Set the timestamp datetime instance variable to the current datetime
             self.timestamp = Miscellaneous.get_current_datetime()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'update_stack' method from '{self.__class__.__name__}': {e}",
+                message=f"Caught an exception while attempting to run 'update_question' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller

@@ -90,7 +90,6 @@ class ImmutableTag(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -160,7 +159,6 @@ class MutableTag(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -238,7 +236,6 @@ class TagConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -388,7 +385,6 @@ class TagManager(BaseObjectManager):
                     **tag.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -422,7 +418,6 @@ class TagManager(BaseObjectManager):
                     **tag.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -476,7 +471,6 @@ class TagManager(BaseObjectManager):
                         **tag.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -783,7 +777,6 @@ class TagManager(BaseObjectManager):
                         **tag.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )

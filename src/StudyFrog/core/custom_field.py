@@ -153,7 +153,6 @@ class CustomFieldConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -327,7 +326,6 @@ class CustomFieldManager(BaseObjectManager):
                     **custom_field.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -381,7 +379,6 @@ class CustomFieldManager(BaseObjectManager):
                         **custom_field.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -697,7 +694,6 @@ class CustomFieldManager(BaseObjectManager):
                         **custom_field.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )

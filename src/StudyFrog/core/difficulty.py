@@ -104,7 +104,6 @@ class ImmutableDifficulty(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -184,7 +183,6 @@ class MutableDifficulty(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -262,7 +260,6 @@ class DifficultyConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -415,7 +412,6 @@ class DifficultyManager(BaseObjectManager):
                     **difficulty.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -451,7 +447,6 @@ class DifficultyManager(BaseObjectManager):
                     **difficulty.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -505,7 +500,6 @@ class DifficultyManager(BaseObjectManager):
                         **difficulty.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -908,7 +902,6 @@ class DifficultyManager(BaseObjectManager):
                         **difficulty.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )

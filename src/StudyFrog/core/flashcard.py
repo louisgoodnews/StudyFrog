@@ -110,7 +110,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             familiarity=familiarity,
             front_text=front_text,
             front_word_count=front_word_count,
-            icon=icon,
+            icon="📇",
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
@@ -215,7 +215,7 @@ class MutableFlashcard(MutableBaseObject):
             familiarity=familiarity,
             front_text=front_text,
             front_word_count=front_word_count,
-            icon=icon,
+            icon="📇",
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
@@ -310,7 +310,6 @@ class FlashcardConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -444,16 +443,8 @@ class FlashcardManager(BaseObjectManager):
             int: The number of flashcards in the database.
         """
         try:
-            # Count the number of flashcards in the database
-            result: Any = asyncio.run(
-                FlashcardModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.FLASHCARDS};",
-                )
-            )
-
-            # Return the number of flashcards in the database
-            return result[0][0] if result else 0
+            # Count and return the number of flashcards in the database
+            return asyncio.run(FlashcardModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -486,14 +477,7 @@ class FlashcardManager(BaseObjectManager):
                 ImmutableFlashcard,
             ):
                 # If it is, convert it to a mutable flashcard
-                flashcard = MutableFlashcard(
-                    **flashcard.to_dict(
-                        exclude=[
-                            "_logger",
-                            "_values",
-                        ]
-                    )
-                )
+                flashcard = flashcard.to_mutable()
 
             # Set the created_at timestamp of the flashcard
             flashcard.created_at = Miscellaneous.get_current_datetime()
@@ -523,11 +507,10 @@ class FlashcardManager(BaseObjectManager):
                 flashcard.id = id
 
                 # Convert the flashcard to an immutable flashcard
-                flashcard = ImmutableFlashcard(
+                flashcard = FlashcardFactory.create_flashcard(
                     **flashcard.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -577,16 +560,18 @@ class FlashcardManager(BaseObjectManager):
             # Convert the flashcard to an immutable flashcard and delete the flashcard from the database
             result: bool = asyncio.run(
                 FlashcardConverter.object_to_model(
-                    object=ImmutableFlashcard(
+                    object=FlashcardFactory.create_flashcard(
                         **flashcard.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
                 ).delete()
             )
+
+            # Remove the flashcard from the cache
+            self.remove_from_cache(key=flashcard.key)
 
             # Return True if the flashcard was deleted successfully
             return result
@@ -622,7 +607,7 @@ class FlashcardManager(BaseObjectManager):
 
             # Convert the list of FlashcardModel objects to a list of ImmutableFlashcard objects
             flashcards: List[ImmutableFlashcard] = [
-                ImmutableFlashcard(
+                FlashcardFactory.create_flashcard(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -635,18 +620,11 @@ class FlashcardManager(BaseObjectManager):
 
             # Iterate over the list of immutable flashcards
             for flashcard in flashcards:
-                if not self.is_key_in_cache(key=flashcard.key):
-                    # Add the immutable flashcard to the cache
-                    self.add_to_cache(
-                        key=flashcard.key,
-                        value=flashcard,
-                    )
-                else:
-                    # Update the immutable flashcard in the cache
-                    self.update_in_cache(
-                        key=flashcard.key,
-                        value=flashcard,
-                    )
+                # Add the immutable flashcard to the cache
+                self.add_to_cache(
+                    key=flashcard.key,
+                    value=flashcard,
+                )
 
             # Return the list of immutable flashcards
             return flashcards
@@ -695,7 +673,7 @@ class FlashcardManager(BaseObjectManager):
             # Return the flashcard if it exists
             if model is not None:
                 # Convert the FlashcardModel object to an ImmutableFlashcard object
-                return ImmutableFlashcard(
+                flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -703,6 +681,15 @@ class FlashcardManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the flashcard to the cache
+                self.add_to_cache(
+                    key=flashcard.key,
+                    value=flashcard,
+                )
+
+                # Return the flashcard
+                return flashcard
             else:
                 # Return None indicating that the flashcard does not exist
                 return None
@@ -749,7 +736,7 @@ class FlashcardManager(BaseObjectManager):
             # Return the flashcard if it exists
             if model is not None:
                 # Convert the FlashcardModel object to an ImmutableFlashcard object
-                return ImmutableFlashcard(
+                flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -757,6 +744,15 @@ class FlashcardManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the flashcard to the cache
+                self.add_to_cache(
+                    key=flashcard.key,
+                    value=flashcard,
+                )
+
+                # Return the flashcard
+                return flashcard
             else:
                 # Return None indicating that the flashcard does not exist
                 return None
@@ -764,6 +760,69 @@ class FlashcardManager(BaseObjectManager):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_by_id' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_flashcard_by_key(
+        self,
+        key: str,
+    ) -> Optional[ImmutableFlashcard]:
+        """
+        Returns a flashcard with the given key.
+
+        Args:
+            key (str): The key of the flashcard.
+
+        Returns:
+            Optional[ImmutableFlashcard]: The flashcard with the given key if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the flashcard is already in the cache
+            if self.is_key_in_cache(key=key):
+                # Return the flashcard from the cache
+                return self.get_value_from_cache(key=key)
+
+            # Get the flashcard with the given key from the database
+            model: Optional[FlashcardModel] = asyncio.run(
+                FlashcardModel.get_by(
+                    column="key",
+                    database=Constants.DATABASE_PATH,
+                    value=key,
+                )
+            )
+
+            # Return the flashcard if it exists
+            if model is not None:
+                # Convert the FlashcardModel object to an ImmutableFlashcard object
+                flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+
+                # Add the flashcard to the cache
+                self.add_to_cache(
+                    key=flashcard.key,
+                    value=flashcard,
+                )
+
+                # Return the flashcard
+                return flashcard
+            else:
+                # Return None indicating that the flashcard does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_key' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -803,7 +862,7 @@ class FlashcardManager(BaseObjectManager):
             # Return the flashcard if it exists
             if model is not None:
                 # Convert the FlashcardModel object to an ImmutableFlashcard object
-                return ImmutableFlashcard(
+                flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -811,6 +870,15 @@ class FlashcardManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the flashcard to the cache
+                self.add_to_cache(
+                    key=flashcard.key,
+                    value=flashcard,
+                )
+
+                # Return the flashcard
+                return flashcard
             else:
                 # Return None indicating that the flashcard does not exist
                 return None
@@ -850,8 +918,8 @@ class FlashcardManager(BaseObjectManager):
 
             # Return the found flashcards if any
             if models is not None and len(models) > 0:
-                return [
-                    ImmutableFlashcard(
+                flashcards: List[ImmutableFlashcard] = [
+                    FlashcardFactory.create(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -861,6 +929,17 @@ class FlashcardManager(BaseObjectManager):
                     )
                     for model in models
                 ]
+
+                # Iterate over the found flashcards
+                for flashcard in flashcards:
+                    # Add the flashcard to the cache
+                    self.add_to_cache(
+                        key=flashcard.key,
+                        value=flashcard,
+                    )
+
+                # Return the found flashcards
+                return flashcards
             else:
                 # Return None indicating that no flashcards were found
                 return None
@@ -890,14 +969,24 @@ class FlashcardManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check if the flashcard object is immutable
+            if isinstance(
+                flashcard,
+                ImmutableFlashcard,
+            ):
+                # If it is, convert it to a mutable flashcard
+                flashcard = flashcard.to_mutable()
+
+            # Update the updated_at timestamp of the flashcard
+            flashcard.updated_at = Miscellaneous.get_current_datetime()
+
             # Convert the flashcard to an immutable flashcard and update the flashcard in the database
-            model: Optional[FlashcardModel] = asyncio.run(
+            result: bool = asyncio.run(
                 FlashcardConverter.object_to_model(
-                    object=ImmutableFlashcard(
+                    object=FlashcardFactory.create_flashcard(
                         **flashcard.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -914,26 +1003,16 @@ class FlashcardManager(BaseObjectManager):
                 )
             )
 
-            # Return the updated flashcard if it exists
-            if model is not None:
-                # Convert the FlashcardModel object to an ImmutableFlashcard object
-                flashcard = ImmutableFlashcard(
-                    **model.to_dict(
-                        exclude=[
-                            "_logger",
-                            "table",
-                        ]
-                    )
-                )
-
-                # Add the flashcard to the cache
+            # Check, if the flashcard was updated successfully
+            if result:
+                # Update the flashcard in the cache
                 self.update_in_cache(
                     key=flashcard.key,
                     value=flashcard,
                 )
 
                 # Return the updated flashcard
-                return flashcard
+                return flashcard.to_immutable()
             else:
                 # Return None indicating that the flashcard does not exist
                 return None

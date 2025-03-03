@@ -160,7 +160,6 @@ class ChangeHistoryConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -302,7 +301,6 @@ class ChangeHistoryManager(BaseObjectManager):
                     **change_history.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -340,7 +338,6 @@ class ChangeHistoryManager(BaseObjectManager):
                     **change_history.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -394,7 +391,6 @@ class ChangeHistoryManager(BaseObjectManager):
                         **change_history.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -710,7 +706,6 @@ class ChangeHistoryManager(BaseObjectManager):
                         **change_history.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -1059,7 +1054,6 @@ class ChangeHistoryItemConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -1209,7 +1203,6 @@ class ChangeHistoryItemManager(BaseObjectManager):
                     **change_history_item.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -1247,7 +1240,6 @@ class ChangeHistoryItemManager(BaseObjectManager):
                     **change_history_item.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -1301,7 +1293,6 @@ class ChangeHistoryItemManager(BaseObjectManager):
                         **change_history_item.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -1617,7 +1608,6 @@ class ChangeHistoryItemManager(BaseObjectManager):
                         **change_history_item.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -1641,7 +1631,6 @@ class ChangeHistoryItemManager(BaseObjectManager):
                     **model.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )

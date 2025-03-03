@@ -89,7 +89,6 @@ class ImmutableUser(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -156,7 +155,6 @@ class MutableUser(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -234,7 +232,6 @@ class UserConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -384,7 +381,6 @@ class UserManager(BaseObjectManager):
                     **user.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -418,7 +414,6 @@ class UserManager(BaseObjectManager):
                     **user.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -472,7 +467,6 @@ class UserManager(BaseObjectManager):
                         **user.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -781,7 +775,6 @@ class UserManager(BaseObjectManager):
                         **user.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )

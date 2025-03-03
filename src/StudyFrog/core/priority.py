@@ -104,7 +104,6 @@ class ImmutablePriority(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -184,7 +183,6 @@ class MutablePriority(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -262,7 +260,6 @@ class PriorityConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -415,7 +412,6 @@ class PriorityManager(BaseObjectManager):
                     **priority.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -449,7 +445,6 @@ class PriorityManager(BaseObjectManager):
                     **priority.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -503,7 +498,6 @@ class PriorityManager(BaseObjectManager):
                         **priority.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -920,7 +914,6 @@ class PriorityManager(BaseObjectManager):
                         **priority.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )

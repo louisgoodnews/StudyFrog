@@ -960,7 +960,6 @@ class DashboardUI(tkinter.Frame):
                     data=stack.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )

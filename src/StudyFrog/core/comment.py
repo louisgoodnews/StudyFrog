@@ -99,6 +99,28 @@ class ImmutableComment(ImmutableBaseObject):
             version=version,
         )
 
+    def to_mutable(self) -> Optional["MutableComment"]:
+        """
+        Converts the immutable comment to a mutable comment.
+
+        Returns:
+            Optional[MutableComment]: The mutable comment, or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while converting the comment.
+        """
+        try:
+            # Attempt to create a MutableComment instance from the current ImmutableComment instance
+            return MutableComment(**self.to_dict(exclude=["_logger"]))
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from {self.__class__.__name__}: {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
 
 class MutableComment(MutableBaseObject):
     """
@@ -266,7 +288,6 @@ class CommentConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -284,7 +305,7 @@ class CommentFactory:
     logger: Logger = Logger.get_logger(name="CommentFactory")
 
     @classmethod
-    def creeate_comment(
+    def create_comment(
         cls,
         parent: str,
         comment_text: str,
@@ -338,7 +359,7 @@ class CommentFactory:
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
-                message=f"Caught an exception while attempting to run 'creeate_comment' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'create_comment' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -377,10 +398,7 @@ class CommentManager(BaseObjectManager):
         try:
             # Count the number of comments in the database
             result: Any = asyncio.run(
-                CommentModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.COMMENTS};",
-                )
+                CommentModel.count(database=Constants.DATABASE_PATH)
             )
 
             # Return the number of comments in the database
@@ -417,14 +435,7 @@ class CommentManager(BaseObjectManager):
                 ImmutableComment,
             ):
                 # If it is, convert it to a mutable comment
-                comment = MutableComment(
-                    **comment.to_dict(
-                        exclude=[
-                            "_logger",
-                            "_values",
-                        ]
-                    )
-                )
+                comment = comment.to_mutable()
 
             # Set the created_at timestamp of the comment
             comment.created_at = Miscellaneous.get_current_datetime()
@@ -454,11 +465,10 @@ class CommentManager(BaseObjectManager):
                 comment.id = id
 
                 # Convert the comment to an immutable comment
-                comment = ImmutableComment(
+                comment = CommentFactory.create_comment(
                     **comment.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -508,16 +518,18 @@ class CommentManager(BaseObjectManager):
             # Convert the comment to an immutable comment and delete the comment from the database
             result: bool = asyncio.run(
                 CommentConverter.object_to_model(
-                    object=ImmutableComment(
+                    object=CommentFactory.create_comment(
                         **comment.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
                 ).delete()
             )
+
+            # Remove the comment from the cache
+            self.remove_from_cache(key=comment.key)
 
             # Return True if the comment was deleted successfully
             return result
@@ -553,7 +565,7 @@ class CommentManager(BaseObjectManager):
 
             # Convert the list of CommentModel objects to a list of ImmutableComment objects
             comments: List[ImmutableComment] = [
-                ImmutableComment(
+                CommentFactory.create_comment(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -566,18 +578,11 @@ class CommentManager(BaseObjectManager):
 
             # Iterate over the list of immutable comments
             for comment in comments:
-                if not self.is_key_in_cache(key=comment.key):
-                    # Add the immutable comment to the cache
-                    self.add_to_cache(
-                        key=comment.key,
-                        value=comment,
-                    )
-                else:
-                    # Update the immutable comment in the cache
-                    self.update_in_cache(
-                        key=comment.key,
-                        value=comment,
-                    )
+                # Add the immutable comment to the cache
+                self.add_to_cache(
+                    key=comment.key,
+                    value=comment,
+                )
 
             # Return the list of immutable comments
             return comments
@@ -626,7 +631,7 @@ class CommentManager(BaseObjectManager):
             # Return the comment if it exists
             if model is not None:
                 # Convert the CommentModel object to an ImmutableComment object
-                return ImmutableComment(
+                comment: ImmutableComment = CommentFactory.create_comment(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -634,6 +639,15 @@ class CommentManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the comment to the cache
+                self.add_to_cache(
+                    key=comment.key,
+                    value=comment,
+                )
+
+                # Return the comment
+                return comment
             else:
                 # Return None indicating that the comment does not exist
                 return None
@@ -680,7 +694,7 @@ class CommentManager(BaseObjectManager):
             # Return the comment if it exists
             if model is not None:
                 # Convert the CommentModel object to an ImmutableComment object
-                return ImmutableComment(
+                comment: ImmutableComment = CommentFactory.create_comment(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -688,6 +702,15 @@ class CommentManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the comment to the cache
+                self.add_to_cache(
+                    key=comment.key,
+                    value=comment,
+                )
+
+                # Return the comment
+                return comment
             else:
                 # Return None indicating that the comment does not exist
                 return None
@@ -734,7 +757,7 @@ class CommentManager(BaseObjectManager):
             # Return the comment if it exists
             if model is not None:
                 # Convert the CommentModel object to an ImmutableComment object
-                return ImmutableComment(
+                return CommentFactory.create_comment(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -781,8 +804,8 @@ class CommentManager(BaseObjectManager):
 
             # Return the found comments if any
             if models is not None and len(models) > 0:
-                return [
-                    ImmutableComment(
+                comments: List[ImmutableComment] = [
+                    CommentFactory.create(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -792,6 +815,17 @@ class CommentManager(BaseObjectManager):
                     )
                     for model in models
                 ]
+
+                # Iterate over the found comments
+                for comment in comments:
+                    # Add the comment to the cache
+                    self.add_to_cache(
+                        key=comment.key,
+                        value=comment,
+                    )
+
+                # Return the found comments
+                return comments
             else:
                 # Return None indicating that no comments were found
                 return None
@@ -821,14 +855,24 @@ class CommentManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check if the comment object is immutable
+            if isinstance(
+                comment,
+                ImmutableComment,
+            ):
+                # If it is, convert it to a mutable comment
+                comment = comment.to_mutable()
+
+            # Update the updated_at timestamp of the comment
+            comment.updated_at = Miscellaneous.get_current_datetime()
+
             # Convert the comment to an immutable comment and update the comment in the database
-            model: Optional[CommentModel] = asyncio.run(
+            result: bool = asyncio.run(
                 CommentConverter.object_to_model(
-                    object=ImmutableComment(
+                    object=CommentFactory.create_comment(
                         **comment.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -845,26 +889,16 @@ class CommentManager(BaseObjectManager):
                 )
             )
 
-            # Return the updated comment if it exists
-            if model is not None:
-                # Convert the CommentModel object to an ImmutableComment object
-                comment = ImmutableComment(
-                    **model.to_dict(
-                        exclude=[
-                            "_logger",
-                            "table",
-                        ]
-                    )
-                )
-
-                # Add the comment to the cache
+            # Check, if the comment was updated successfully
+            if result:
+                # Update the comment in the cache
                 self.update_in_cache(
                     key=comment.key,
                     value=comment,
                 )
 
                 # Return the updated comment
-                return comment
+                return comment.to_immutable()
             else:
                 # Return None indicating that the comment does not exist
                 return None

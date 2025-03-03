@@ -49,6 +49,38 @@ class ImmutableBaseModel(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(**kwargs)
 
+    @classmethod
+    async def count(
+        cls,
+        database: str,
+    ) -> Optional[int]:
+        """
+        Counts the number of entries in the database table.
+
+        Args:
+            database (str): The path to the database.
+
+        Returns:
+            Optional[int]: The number of entries in the database table, or None if the table does not exist.
+        """
+        try:
+            # Count the number of entries in the database table
+            result: Optional[Any] = await DatabaseService.execute(
+                database=database,
+                sql=f"SELECT COUNT(*) FROM {cls.table};",
+            )
+
+            # Return the number of entries in the database table
+            return result[0][0] if result else 0
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'count' method from '{cls.__name__}' class: {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
+
     async def create(
         self,
         database: str,

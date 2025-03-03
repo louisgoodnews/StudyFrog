@@ -102,7 +102,6 @@ class ImmutableDefault(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -180,7 +179,6 @@ class MutableDefault(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -258,7 +256,6 @@ class DefaultConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -414,7 +411,6 @@ class DefaultManager(BaseObjectManager):
                     **default.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -448,7 +444,6 @@ class DefaultManager(BaseObjectManager):
                     **default.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -502,7 +497,6 @@ class DefaultManager(BaseObjectManager):
                         **default.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -837,7 +831,6 @@ class DefaultManager(BaseObjectManager):
                         **default.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )

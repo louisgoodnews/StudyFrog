@@ -611,8 +611,12 @@ class CreateUI(tkinter.Frame):
             Exception: If an error occurs during answer creation.
         """
         try:
-            # Convert the immutable question object into a mutable object
-            question = question.to_mutable()
+            if isinstance(
+                question,
+                ImmutableQuestion,
+            ):
+                # Convert the immutable question object into a mutable object
+                question = question.to_mutable()
 
             # Handle answer creation depending on the question type
             if question["question_type"] == "MULTIPLE_CHOICE":
@@ -775,9 +779,16 @@ class CreateUI(tkinter.Frame):
                 # Add the flashcard key to the stack contents
                 stack.contents.append(flashcard.key)
 
-                # Update the stack in the database
+                # Dispatch the REQUEST_STACK_UPDATE event in the global namespace
                 self.dispatcher.dispatch(
                     event=Events.REQUEST_STACK_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    stack=stack,
+                )
+
+                # Dispatch the STACK_UPDATED event in the global namespace
+                self.dispatcher.dispatch(
+                    event=Events.STACK_UPDATED,
                     namespace=Constants.GLOBAL_NAMESPACE,
                     stack=stack,
                 )

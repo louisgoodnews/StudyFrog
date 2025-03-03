@@ -97,7 +97,6 @@ class ImmutableSetting(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -171,7 +170,6 @@ class Mutable(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -249,7 +247,6 @@ class SettingConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -421,7 +418,6 @@ class SettingManager(BaseObjectManager):
                     **setting.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -475,7 +471,6 @@ class SettingManager(BaseObjectManager):
                         **setting.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -791,7 +786,6 @@ class SettingManager(BaseObjectManager):
                         **setting.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -1150,7 +1144,6 @@ class SettingService:
                 **default.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )

@@ -1570,7 +1570,7 @@ class UIBuilder:
                     return None
 
                 # Return the content of the text widget
-                return string
+                return string.strip()
 
             def set(value: str) -> None:
                 """
@@ -3160,7 +3160,7 @@ class UIBuilder:
                     END,
                 )
 
-            def get() -> str:
+            def get() -> Optional[str]:
                 """
                 Gets the contents of the scrolled text widget.
 
@@ -3169,10 +3169,18 @@ class UIBuilder:
                 """
 
                 # Return the contents of the text widget
-                return result["text"].get(
+                string: str = result["text"].get(
                     "1.0",
                     END,
                 )
+
+                # Check, if the text field's content is an empty string
+                if string == "":
+                    # Return None
+                    return None
+
+                # Return the string
+                return string.strip()
 
             def set(value: str) -> None:
                 """

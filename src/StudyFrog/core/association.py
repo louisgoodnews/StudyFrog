@@ -223,7 +223,6 @@ class AssociationConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -539,7 +538,6 @@ class AssociationManager(BaseObjectManager):
                     **association.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -593,7 +591,6 @@ class AssociationManager(BaseObjectManager):
                         **association.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -909,7 +906,6 @@ class AssociationManager(BaseObjectManager):
                         **association.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )

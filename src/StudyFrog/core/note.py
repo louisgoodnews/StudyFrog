@@ -102,7 +102,6 @@ class ImmutableNote(ImmutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -185,7 +184,6 @@ class MutableNote(MutableBaseObject):
             **self.to_dict(
                 exclude=[
                     "_logger",
-                    "_values",
                 ]
             )
         )
@@ -263,7 +261,6 @@ class NoteConverter:
                 **object.to_dict(
                     exclude=[
                         "_logger",
-                        "_values",
                     ]
                 )
             )
@@ -419,7 +416,6 @@ class NoteManager(BaseObjectManager):
                     **note.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -456,7 +452,6 @@ class NoteManager(BaseObjectManager):
                     **note.to_dict(
                         exclude=[
                             "_logger",
-                            "_values",
                         ]
                     )
                 )
@@ -510,7 +505,6 @@ class NoteManager(BaseObjectManager):
                         **note.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
@@ -826,7 +820,6 @@ class NoteManager(BaseObjectManager):
                         **note.to_dict(
                             exclude=[
                                 "_logger",
-                                "_values",
                             ]
                         )
                     )
