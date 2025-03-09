@@ -938,7 +938,10 @@ class DashboardUI(tkinter.Frame):
             )
 
             # Iterate over stack attributes to configure the frame and create labels
-            for index, column in enumerate(
+            for (
+                index,
+                column,
+            ) in enumerate(
                 iterable=[
                     "icon",
                     "name",

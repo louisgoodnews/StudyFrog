@@ -572,7 +572,7 @@ class StackViewForm(tkinter.Frame):
         self.description_field["root"].configure(background=Constants.BLUE_GREY["700"])
 
         # Configure the description field's label widget
-        self.description_field["setter"](value=self.stack.description)
+        self.description_field["setter"](value=self.stack.description or "")
 
         # Place the description field within the primary attributes frame
         self.description_field["root"].grid(

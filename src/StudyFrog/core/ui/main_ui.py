@@ -18,7 +18,7 @@ from core.ui.topbar import TopBar
 
 from core.ui.ui_builder import UIBuilder
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.navigation import NavigationHistoryService
@@ -363,12 +363,6 @@ class MainUI(tkinter.Tk):
                 # Set the master to the MainUI center frame
                 master = self.center_frame
 
-            # Dispatch the NAVIGATE_VALIDATE_SUCCESS event in the global namespace
-            self.dispatcher.dispatch(
-                event=Events.NAVIGATE_VALIDATE_SUCCESS,
-                namespace=Constants.GLOBAL_NAMESPACE,
-            )
-
             # Attempt to get the UI class
             ui_class: Optional[Type[tkinter.Misc]] = UIRegistry.get(name=target)
 
@@ -377,7 +371,7 @@ class MainUI(tkinter.Tk):
                 raise ValueError(f"Invalid target: {target}. Must be a valid UI name.")
 
             # Dispatch the REQUEST_BACKWARD_NAVIGATION or REQUEST_FORWARD_NAVIGATION event in the global namespace
-            response: Any = self.dispatcher.dispatch(
+            response: DispatcherNotification = self.dispatcher.dispatch(
                 event=(
                     Events.REQUEST_BACKWARD_NAVIGATION
                     if direction == "backward"

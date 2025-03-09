@@ -340,14 +340,7 @@ class TopBar(tkinter.Frame):
         # Configure the "Button" button widget
         search_bar["button"].configure(
             background=Constants.INDIGO["500"],
-            command=lambda: self.dispatcher.dispatch(
-                direction="forward",
-                event=Events.REQUEST_VALIDATE_NAVIGATION,
-                master=UIBuilder.get_toplevel(),
-                namespace=Constants.GLOBAL_NAMESPACE,
-                source="topbar",
-                target="search_ui",
-            ),
+            command=self.on_searchbar_button_clicked,
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
                 Constants.DEFAULT_FONT_SIZE,
@@ -458,3 +451,52 @@ class TopBar(tkinter.Frame):
                 func=lambda e, btn=button: btn.config(foreground=Constants.WHITE),
                 sequence="<Leave>",
             )
+
+    def on_searchbar_button_clicked(self) -> None:
+        """
+        Handles the event when the search button is clicked in the topbar.
+
+        This function is called when the search button is clicked in the topbar.
+        It dispatches a navigation request to the global namespace with the target
+        "search_ui" and the source "topbar".
+
+        Raises:
+            Exception: If an exception occurs while attempting to dispatch the
+                navigation request.
+        """
+        try:
+            # Get the root widget
+            root: tkinter.Toplevel = UIBuilder.get_toplevel()
+
+            # Configure the root toplevel widget's 0th column to weight 1
+            root.grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the root toplevel widget's 0th row to weight 1
+            root.grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Set the toplevel widget's geometry to 1920x1080
+            root.wm_geometry(newGeometry="1920x1080")
+
+            # Dispatch the navigation request
+            self.dispatcher.dispatch(
+                direction="forward",
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
+                master=root,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                source="topbar",
+                target="search_ui",
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_searchbar_button_clicked' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e

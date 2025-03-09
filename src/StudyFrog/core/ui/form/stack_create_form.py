@@ -589,7 +589,7 @@ class StackCreateForm(tkinter.Frame):
         result["object_data"]["name"] = self.name["getter"]()
 
         # Get the value of the stack description from the multi-line text field
-        result["object_data"]["description"] = self.description["getter"]()
+        result["object_data"]["description"] = self.description["getter"]() or ""
 
         # Get the value of the due by date from the date entry widget
         result["object_data"]["due_by"] = self.due_by["getter"]()

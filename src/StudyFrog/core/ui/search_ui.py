@@ -3,13 +3,20 @@ Author: lodego
 Date: 2025-02-11
 """
 
+from sched import Event
 import tkinter
 
+from tkinter import ttk
 from tkinter.constants import *
 
 from typing import *
 
+from core.answer import ImmutableAnswer
+from core.flashcard import ImmutableFlashcard
+from core.note import ImmutableNote
+from core.question import ImmutableQuestion
 from core.setting import SettingService
+from core.stack import ImmutableStack
 
 from core.ui.ui_builder import UIBuilder
 
@@ -93,6 +100,9 @@ class SearchUI(tkinter.Frame):
         # Store the passed unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager
 
+        # Configure the search UI
+        self.configure(background=Constants.BLUE_GREY["700"])
+
         # Configure the grid
         self.configure_grid()
 
@@ -105,6 +115,33 @@ class SearchUI(tkinter.Frame):
             row=0,
             sticky=NSEW,
         )
+
+        # Load objects from the database
+        self.load_objects_from_database()
+
+    def clear(self) -> None:
+        """
+        Clears the content of the search widget.
+
+        This method clears the content of the search widget by destroying all
+        its children widgets.
+
+        Returns:
+            None
+        """
+
+        # Get a list of all children widgets in the content frame
+        children: Optional[List[tkinter.Misc]] = self.content_frame.winfo_children()
+
+        # Check if the content frame has any children
+        if not children:
+            # Return early if the content frame has no children
+            return
+
+        # Iterate over the children of the content frame
+        for child in children:
+            # Destroy each child widget
+            child.destroy()
 
     def configure_grid(self) -> None:
         """
@@ -157,17 +194,20 @@ class SearchUI(tkinter.Frame):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        top_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
-        # Configure the "Top Frame" frame widget's 1st column to weight 1
+        # Configure the "Top Frame" frame widget's 0th column to weight 1
         top_frame.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the "TOp Frame" frame widget's 1st row to weight 1
+        # Configure the "TOp Frame" frame widget's 0th row to weight 1
         top_frame.grid_rowconfigure(
-            index=1,
+            index=0,
             weight=1,
         )
 
@@ -179,15 +219,18 @@ class SearchUI(tkinter.Frame):
         )
 
         # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        center_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
-        # Configure the "Center Frame" frame widget's 1st column to weight 1
+        # Configure the "Center Frame" frame widget's 0th column to weight 1
         center_frame.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the "Center Frame" frame widget's 1st row to weight 1
+        # Configure the "Center Frame" frame widget's 0th row to weight 1
         center_frame.grid_rowconfigure(
             index=0,
             weight=1,
@@ -201,15 +244,18 @@ class SearchUI(tkinter.Frame):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
-        # Configure the "Bottom Frame" frame widget's 1st column to weight 1
+        # Configure the "Bottom Frame" frame widget's 0th column to weight 1
         bottom_frame.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the "Bottom Frame" frame widget's 1st row to weight 1
+        # Configure the "Bottom Frame" frame widget's 0th row to weight 1
         bottom_frame.grid_rowconfigure(
             index=0,
             weight=1,
@@ -247,7 +293,74 @@ class SearchUI(tkinter.Frame):
         Returns:
             None
         """
-        pass
+
+        # Configure the master frame's 0th column to weight 0
+        master.grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Configure the master frame's 1st column to weight 1
+        master.grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Configure the master frame's 2nd column to weight 0
+        master.grid_columnconfigure(
+            index=2,
+            weight=0,
+        )
+
+        # Configure the master frame's 0th row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Create the "Previous" button widget
+        previous_button: tkinter.Button = UIBuilder.get_button(
+            background=Constants.BLUE_GREY["700"],
+            command=self.on_previous_button_click,
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            master=master,
+            relief=FLAT,
+            text="Previous",
+        )
+
+        # Place the "Previous" button widget within the top frame
+        previous_button.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+        # Create the "Next" button widget
+        next_button: tkinter.Button = UIBuilder.get_button(
+            background=Constants.BLUE_GREY["700"],
+            command=self.on_next_button_click,
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            master=master,
+            relief=FLAT,
+            text="Next",
+        )
+
+        # Place the "Next" button widget within the top frame
+        next_button.grid(
+            column=2,
+            padx=5,
+            pady=5,
+            row=0,
+        )
 
     def create_center_frame_widgets(
         self,
@@ -265,7 +378,147 @@ class SearchUI(tkinter.Frame):
         Returns:
             None
         """
-        pass
+
+        # Configure the master frame's 0th column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master frame's 0th row to weight 0
+        master.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Configure the master frame's 1st row to weight 1
+        master.grid_rowconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Get the scrolled frame dictionary
+        scrolled_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+            master=master
+        )
+
+        # Create the label frame
+        label_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=master,
+        )
+
+        # Configure the label frame's 0th row to weight 1
+        label_frame.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Place the label frame within the master frame
+        label_frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+        for (
+            index,
+            string,
+        ) in enumerate(
+            iterable=[
+                "icon",
+                "name",
+                "priority",
+                "difficulty",
+                "last viewed at",
+                "status",
+                "due by",
+            ]
+        ):
+            # Configure the label frame's column at the current index to weight 1
+            label_frame.grid_columnconfigure(
+                index=index,
+                weight=1,
+            )
+
+            # Create the label widget
+            label: tkinter.Label = UIBuilder.get_label(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                master=label_frame,
+                text=string.capitalize(),
+            )
+
+            # Place the label widget within the label frame
+            label.grid(
+                column=index,
+                row=0,
+                sticky=NSEW,
+            )
+
+        # Style the scrolled frame's canvas widget
+        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame's frame widget
+        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame's root widget
+        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the scrolled frame's root widget within the master frame
+        scrolled_frame["root"].grid(
+            column=0,
+            row=1,
+            sticky=NSEW,
+        )
+
+        # Initialize the content frame instance variable
+        self.content_frame: tkinter.Frame = scrolled_frame["frame"]
+
+    def create_content_item(
+        self,
+        object: Union[
+            ImmutableAnswer,
+            ImmutableFlashcard,
+            ImmutableNote,
+            ImmutableQuestion,
+            ImmutableStack,
+        ],
+        **kwargs,
+    ) -> None:
+        """
+        Creates and configures the main widgets of the content item.
+
+        This method initializes the main widgets of the content item within the
+        search UI, setting their layout configuration.
+
+        Args:
+            object (Union[
+                ImmutableAnswer,
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+                ImmutableStack,
+            ]): The object to create the content item for.
+            **kwargs: Keyword arguments.
+
+        Returns:
+            None
+        """
+        try:
+            pass
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_content_item' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
 
     def create_top_frame_widgets(
         self,
@@ -283,4 +536,218 @@ class SearchUI(tkinter.Frame):
         Returns:
             None
         """
+
+        # Configure the master frame's 0th column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master frame's 0th row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master frame's 1st row to weight 0
+        master.grid_rowconfigure(
+            index=1,
+            weight=0,
+        )
+
+        # Get the searchbar dictionary
+        self.searchbar: Optional[Dict[str, Any]] = UIBuilder.get_searchbar(
+            command=self.searchbar_command,
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.MEDIUM_FONT_SIZE,
+            ),
+            master=master,
+        )
+
+        # Style the searchbar dictionary's "Button" button widget
+        self.searchbar["button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the searchbar dictionary's "Root" frame widget
+        self.searchbar["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the searchbar dictionary's "Root" frame widget within the master frame
+        self.searchbar["root"].grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Get the separator widget
+        separator: ttk.Separator = UIBuilder.get_separator(
+            master=master,
+            orient=HORIZONTAL,
+        )
+
+        # Place the separator widget within the master frame
+        separator.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
+
+    def load_contents(self) -> None:
+        # Check, if the loaded_objects list already exists
+        if not hasattr(
+            self,
+            "loaded_objects",
+        ):
+            # Load all objects from the database
+            self.load_objects_from_database()
+
+        # TODO: Load the contents of the search results
         pass
+
+    def load_objects_from_database(self) -> None:
+        """
+        Loads all objects from the database and stores them as an instance variable.
+
+        This method is used to load all objects from the database and store them in memory.
+        It is used to populate the search results.
+
+        Returns:
+            None
+        """
+        try:
+            # Initialize a list to store loaded objects as an instance variable
+            self.loaded_objects: List[
+                Optional[
+                    Union[
+                        ImmutableAnswer,
+                        ImmutableFlashcard,
+                        ImmutableNote,
+                        ImmutableQuestion,
+                        ImmutableStack,
+                    ]
+                ]
+            ] = []
+
+            # Get all answers from the database
+            self.loaded_objects.extend(self.unified_manager.get_all_answers())
+
+            # Get all flashcards from the database
+            self.loaded_objects.extend(self.unified_manager.get_all_flashcards())
+
+            # Get all notes from the database
+            self.loaded_objects.extend(self.unified_manager.get_all_notes())
+
+            # Get all questions from the database
+            self.loaded_objects.extend(self.unified_manager.get_all_questions())
+
+            # Get all stacks from the database
+            self.loaded_objects.extend(self.unified_manager.get_all_stacks())
+
+            # Sort the loaded objects by their 'created_at' attribute
+            # This is done to ensure the search results are shown in the order of when they were created
+            self.loaded_objects.sort(
+                key=lambda obj: obj["created_at"],
+                reverse=True,
+            )
+
+            self.logger.debug(
+                message=f"Loaded {len(self.loaded_objects)} {"objects" if len(self.loaded_objects) != 1 else "object"} from the database."
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'load_objects_from_database' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_label_click(
+        self,
+        object: Union[
+            ImmutableAnswer,
+            ImmutableFlashcard,
+            ImmutableNote,
+            ImmutableQuestion,
+            ImmutableStack,
+        ],
+    ) -> None:
+        """
+        Handles the 'on_label_click' event and dispatches a navigation request.
+
+        Args:
+            object (Union[ImmutableAnswer, ImmutableFlashcard, ImmutableNote,
+                          ImmutableQuestion, ImmutableStack]): The object associated
+                          with the label that was clicked.
+
+        Raises:
+            Exception: If an exception occurs while dispatching the navigation request.
+        """
+        try:
+            # Initialize the kwargs dictionary with navigation details
+            kwargs: Dict[str, Any] = {
+                "direction": "forward",
+                "event": Events.REQUEST_VALIDATE_NAVIGATION,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "source": "search_ui",
+                "target": "edit_ui",
+            }
+
+            # Get the toplevel widget
+            toplevel: tkinter.Toplevel = UIBuilder.get_toplevel()
+
+            # Set the geometry of the toplevel widget
+            toplevel.wm_geometry(newGeometry="1080x720")
+
+            # Add the toplevel widget to kwargs
+            kwargs["master"] = toplevel
+
+            # Find the match from the object's key and add it to kwargs
+            kwargs[
+                Miscellaneous.find_match(
+                    group=1,
+                    string=object.key,
+                    pattern=r"^([A-Za-z]+)\.",
+                ).lower()
+            ] = object
+
+            # Dispatch the navigation request
+            self.dispatcher.dispatch(**kwargs)
+        except Exception as e:
+            # Log an error message indicating an exception occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_label_click' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_next_button_click(self) -> None:
+        self.clear()
+
+    def on_previous_button_click(self) -> None:
+        self.clear()
+
+    def searchbar_command(
+        self,
+        string: str,
+    ) -> None:
+        try:
+            pass
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'searchbar_command' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
