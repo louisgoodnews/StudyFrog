@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from typing import *
 
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
 
 
 __all__: List[str] = ["BaseObjectManager"]
@@ -185,7 +186,7 @@ class BaseObjectManager:
             self._timestamp = datetime.now()
 
             # Log updating the timestamp
-            self.logger.info(message="Updated the timestamp to now.")
+            self.logger.info(message=f"Updated the timestamp to {Miscellaneous.datetime_to_string(datetime=self._timestamp)}.")
 
     def get_cache_keys(self) -> List[str]:
         """

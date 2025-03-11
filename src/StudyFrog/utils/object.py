@@ -225,7 +225,7 @@ class MutableBaseObject:
         # Check if the values associated with the given keys are equal
         return all(self[key] == other[key] for key in key)
 
-    def contains(
+    def contains_key(
         self,
         key: str,
     ) -> bool:
@@ -241,6 +241,23 @@ class MutableBaseObject:
 
         # Check if the object contains the given key
         return f"_{key}" in self.__dict__
+
+    def contains_value(
+        self,
+        value: Any,
+    ) -> bool:
+        """
+        Checks if the object contains the given value.
+
+        :param value: The value to check.
+        :type value: Any
+
+        :return: True if the object contains the given value, False otherwise.
+        :rtype: bool
+        """
+
+        # Check if the object contains the given value
+        return value in self.__dict__.values()
 
     def get(
         self,
@@ -290,13 +307,13 @@ class MutableBaseObject:
 
     def to_dict(
         self,
-        exclude: List[str] = None,
+        exclude: Iterable[str] = None,
     ) -> Dict[str, Any]:
         """
         Returns a dictionary representation of the object.
 
         :param exclude: A list of attribute names to exclude from the dictionary.
-        :type exclude: List[str]
+        :type exclude: Iterable[str]
 
         :return: A dictionary representation of the object.
         :rtype: Dict[str, Any]
