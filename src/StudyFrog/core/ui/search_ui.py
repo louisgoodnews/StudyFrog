@@ -94,6 +94,9 @@ class SearchUI(tkinter.Frame):
         # Store the passed navigation service instance in an instance variable
         self.navigation_service: NavigationHistoryService = navigation_service
 
+        # Store the current page number in an instance variable
+        self.page: int = 0
+
         # Store the passed setting service instance in an instance variable
         self.setting_service: SettingService = setting_service
 
@@ -814,10 +817,66 @@ class SearchUI(tkinter.Frame):
             raise e
 
     def on_next_button_click(self) -> None:
+        """
+        Handles the click event of the "Next" button.
+
+        This method is used to navigate to the next page of search results.
+        It first clears the content frame, then increments the current page,
+        and finally loads the objects for the current page.
+
+        Returns:
+            None
+        """
+
+        # Check if the current page is the last page
+        if self.page + 1 >= len(self.loaded_objects):
+            # Log a warning message
+            self.logger.warning(
+                message=f"Cannot navigate to next page as the current page ({self.page}) is the last page."
+            )
+
+            # Return early
+            return
+
+        # Clear the content frame
         self.clear()
 
+        # Increment the current page
+        self.page += 1
+
+        # Load the objects for the current page
+        self.load_contents()
+
     def on_previous_button_click(self) -> None:
+        """
+        Handles the click event of the "Previous" button.
+
+        This method is used to navigate to the previous page of search results.
+        It first clears the content frame, then decrements the current page,
+        and finally loads the objects for the current page.
+
+        Returns:
+            None
+        """
+
+        # Check if the current page is the first page
+        if self.page - 1 <= 0:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Cannot navigate to previous page as the current page ({self.page}) is the first page."
+            )
+
+            # Return early
+            return
+
+        # Clear the content frame
         self.clear()
+
+        # Decrement the current page
+        self.page -= 1
+
+        # Load the objects for the current page
+        self.load_contents()
 
     def searchbar_command(
         self,
