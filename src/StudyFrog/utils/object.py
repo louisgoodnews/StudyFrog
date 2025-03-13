@@ -214,10 +214,10 @@ class MutableBaseObject:
         :rtype: bool
         """
 
-        # Check if the passed key argument is a string
-        if isinstance(
+        # Check if the passed key argument is not a list
+        if not isinstance(
             key,
-            str,
+            list,
         ):
             # Convert the key to a list if it is a string
             key = [key]
@@ -258,6 +258,31 @@ class MutableBaseObject:
 
         # Check if the object contains the given value
         return value in self.__dict__.values()
+
+    def delete(
+        self,
+        name: str,
+    ) -> None:
+        """
+        Deletes the attribute with the given name.
+
+        :param name: The name of the attribute to delete.
+        :type name: str
+
+        :return: None
+        :rtype: None
+        """
+
+        # Check if the attribute exists
+        if name not in self.__dict__:
+            # Log a warning message if the attribute does not exist
+            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+
+            # Return early since the attribute is not present
+            return
+
+        # Delete the attribute
+        del self.__dict__[name]
 
     def get(
         self,
@@ -343,7 +368,7 @@ class ImmutableBaseObject(MutableBaseObject):
 
     This class serves as a base class for all immutable base objects.
 
-    It inherits the MutableBaseObject class and extends it immutability.
+    It inherits the MutableBaseObject class and extends it with immutability.
 
     Attributes:
         logger (Logger): The Logger instance associated with the object.
@@ -476,12 +501,51 @@ class ImmutableBaseObject(MutableBaseObject):
         raise AttributeError(
             f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
         )
+    
+    def delete(
+        self,
+        name: str,
+    ) -> None:
+        """
+        Deletes the attribute with the given name.
+
+        :param name: The name of the attribute to delete.
+        :type name: str
+
+        :return: None
+        :rtype: None
+        """
+
+        # Check if the attribute exists
+        if name not in self.__dict__:
+            # Log a warning message if the attribute does not exist
+            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+
+            # Return early since the attribute is not present
+            return
+
+        # Raise an attribute error as the attribute is immutable
+        raise AttributeError(
+            f"Cannot delete attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
+        )
 
     def set(
         self,
         name: str,
         value: Any,
     ) -> None:
+        """
+        Sets the value of the attribute with the given name.
+
+        :param name: The name of the attribute to set.
+        :type name: str
+
+        :param value: The value to set the attribute to.
+        :type value: Any
+
+        :return: None
+        :rtype: None
+        """
 
         # Check if the attribute exists
         if f"_{name}" in self.__dict__:
