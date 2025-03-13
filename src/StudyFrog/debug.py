@@ -4,7 +4,6 @@ Date: 2025-02-05
 """
 
 import asyncio
-import tkinter
 
 from tkinter.constants import *
 from typing import *
@@ -26,8 +25,6 @@ from core.stack import StackModel
 from core.status import StatusModel
 from core.tag import TagModel
 from core.user import UserModel
-
-from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
 from utils.logger import Logger
@@ -92,36 +89,6 @@ def debug() -> None:
         return True
 
     clear_database(logger=logger)
-
-    root: tkinter.Tk = UIBuilder.get_tk()
-
-    root.grid_columnconfigure(
-        index=0,
-        weight=1,
-    )
-
-    root.grid_rowconfigure(
-        index=0,
-        weight=1,
-    )
-
-    single_select: Dict[str, Any] = UIBuilder.get_single_select_field(
-        label="Single Select: ",
-        master=root,
-        values=[
-            "Option 1",
-            "Option 2",
-            "Option 3",
-        ]
-    )
-
-    single_select["root"].grid(
-        column=0,
-        row=0,
-        sticky=NSEW,
-    )
-
-    root.mainloop()
 
 
 if __name__ == "__main__":
