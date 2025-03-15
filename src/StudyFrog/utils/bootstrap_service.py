@@ -592,6 +592,14 @@ class BootstrapService:
                     "function": self.unified_object_service.on_request_get_all_users,
                 },
                 {
+                    "event": Events.REQUEST_GET_BY_KEY,
+                    "function": self.unified_object_service.on_request_get_by_key,
+                },
+                {
+                    "event": Events.REQUEST_GET_BY_KEYS,
+                    "function": self.unified_object_service.on_request_get_by_keys,
+                },
+                {
                     "event": Events.REQUEST_NOTE_CREATE,
                     "function": self.unified_object_service.on_request_note_create,
                 },

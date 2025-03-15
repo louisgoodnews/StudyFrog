@@ -3,6 +3,7 @@ Author: lodego
 Date: 2025-02-09
 """
 
+from math import e
 from typing import *
 
 from core.answer import ImmutableAnswer
@@ -23,6 +24,7 @@ from core.tag import ImmutableTag
 from core.user import ImmutableUser
 
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
 
 __all__: List[str] = [
     "UnifiedObjectManager",
@@ -112,6 +114,144 @@ class UnifiedObjectManager:
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{name}'"
         )
+
+    def get_by_key(
+        self,
+        key: str,
+    ) -> Optional[
+        Union[
+            Association,
+            CustomField,
+            ImmutableStack,
+            ImmutableFlashcard,
+            ImmutableQuestion,
+            ImmutableAnswer,
+            ImmutableOption,
+            ImmutableTag,
+            ImmutableStatus,
+            ImmutablePriority,
+            ImmutableDifficulty,
+            ImmutableSetting,
+            ImmutableNote,
+            ImmutableUser,
+            ImmutableDefault,
+        ]
+    ]:
+        """
+        Retrieves an object by its key.
+
+        Args:
+            key (str): The key of the object to be retrieved.
+
+        Returns:
+            Optional[Union[Association, CustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]: The retrieved object if the key exists, otherwise None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to run the 'get_by_key' method.
+        """
+        try:
+            # Attempt to find a match in the given key
+            match: Optional[str] = Miscellaneous.find_match(
+                string=key,
+                group=1,
+                pattern=r"^([A-Za-z]+)\\",
+            )
+
+            if not match:
+                # Log an error message indicating that the key format is invalid
+                self.logger.error(message=f"Invalid key format: '{key}'")
+
+                # Return early since the key is invalid
+                return
+
+            # Run the 'get_by_key' method of the corresponding manager
+            return self.run(
+                manager=f"{match}_manager",
+                method="get_by_key",
+                key=key,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_key' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def get_by_keys(
+        self,
+        keys: List[str],
+    ) -> Optional[
+        List[
+            Union[
+                Association,
+                CustomField,
+                ImmutableStack,
+                ImmutableFlashcard,
+                ImmutableQuestion,
+                ImmutableAnswer,
+                ImmutableOption,
+                ImmutableTag,
+                ImmutableStatus,
+                ImmutablePriority,
+                ImmutableDifficulty,
+                ImmutableSetting,
+                ImmutableNote,
+                ImmutableUser,
+                ImmutableDefault,
+            ]
+        ]
+    ]:
+        """
+        Retrieves a list of objects by their keys.
+
+        Args:
+            keys (List[str]): A list of keys for the objects to be retrieved.
+
+        Returns:
+            Optional[List[Union[Association, CustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]]: The list of retrieved objects if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to run the 'get_by_keys' method.
+        """
+        try:
+            # Initialize an empty list to store the retrieved objects
+            result: List[
+                Union[
+                    Association,
+                    CustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                ]
+            ] = []
+
+            # Iterate over the list of keys
+            for key in keys:
+                # Get the object by key and append it to the result list
+                result.append(self.get_by_key(key=key))
+
+            # Return the list of retrieved objects
+            return result
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_keys' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
 
     def register_manager(
         self,
@@ -1055,6 +1195,80 @@ class UnifiedObjectService:
 
         # Get all users from the database and return them
         return self.unified_manager.get_all_users()
+
+    def on_request_get_by_key(
+        self,
+        key: str,
+    ) -> Optional[
+        Union[
+            Association,
+            CustomField,
+            ImmutableStack,
+            ImmutableFlashcard,
+            ImmutableQuestion,
+            ImmutableAnswer,
+            ImmutableOption,
+            ImmutableTag,
+            ImmutableStatus,
+            ImmutablePriority,
+            ImmutableDifficulty,
+            ImmutableSetting,
+            ImmutableNote,
+            ImmutableUser,
+            ImmutableDefault,
+        ]
+    ]:
+        """
+        Retrieves an object by its key.
+
+        Args:
+            key (str): The key of the object to be retrieved.
+
+        Returns:
+            Optional[Union[Association, CustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]: The retrieved object if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to run the 'get_by_key' method.
+        """
+        return self.unified_manager.get_by_key(key=key)
+
+    def on_request_get_by_keys(
+        self,
+        keys: List[str],
+    ) -> Optional[
+        List[
+            Union[
+                Association,
+                CustomField,
+                ImmutableStack,
+                ImmutableFlashcard,
+                ImmutableQuestion,
+                ImmutableAnswer,
+                ImmutableOption,
+                ImmutableTag,
+                ImmutableStatus,
+                ImmutablePriority,
+                ImmutableDifficulty,
+                ImmutableSetting,
+                ImmutableNote,
+                ImmutableUser,
+                ImmutableDefault,
+            ]
+        ]
+    ]:
+        """
+        Retrieves objects by their keys.
+
+        Args:
+            keys (List[str]): The keys of the objects to be retrieved.
+
+        Returns:
+            Optional[List[Union[Association, CustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]]: The retrieved objects if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to run the 'get_by_keys' method.
+        """
+        return self.unified_manager.get_by_keys(keys=keys)
 
     def on_request_note_create(
         self,

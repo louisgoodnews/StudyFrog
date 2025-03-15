@@ -565,6 +565,16 @@ class Events:
         name="global:request:get:all:users"
     )
 
+    # An event that indicates that the user wants to get an object by its key
+    REQUEST_GET_BY_KEY: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:by:key"
+    )
+
+    # An event that indicates that the user wants to get objects by their keys
+    REQUEST_GET_BY_KEYS: DispatcherEvent = DispatcherEventFactory.create_event(
+        name="global:request:get:by:keys"
+    )
+
     # An event that indicates that the user wants to create a new note
     REQUEST_NOTE_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:note:create"
