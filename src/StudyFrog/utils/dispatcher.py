@@ -765,7 +765,7 @@ class Dispatcher:
         namespace: str,
         *args,
         **kwargs,
-    ) -> Optional[Any]:
+    ) -> Optional[DispatcherNotification]:
         """
         Dispatches an event to all registered subscriptions.
 
@@ -776,7 +776,7 @@ class Dispatcher:
             **kwargs: Additional keyword arguments to be passed to the event handler.
 
         Returns:
-            Any: The return value of the first function that handles the event.
+            Optional[DispatcherNotification]: The return value of the first function that handles the event.
         """
         try:
             # Check if the event exists in the subscriptions dictionary

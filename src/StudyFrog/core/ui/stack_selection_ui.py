@@ -9,13 +9,16 @@ from tkinter.constants import *
 
 from typing import *
 
+from core.difficulty import ImmutableDifficulty
+from core.priority import ImmutablePriority
 from core.setting import SettingService
+from core.stack import ImmutableStack
 
 from core.ui.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
@@ -84,7 +87,13 @@ class StackSelectionUI(BaseUI):
 
     @override
     def collect_subscriptions(self) -> Dict[Any, Dict[str, Any]]:
-        return {}
+        return {
+            Events.STACK_CREATED: {
+                "function": self.on_stack_creaed,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+        }
 
     @override
     def configure_grid(self) -> None:
@@ -253,6 +262,84 @@ class StackSelectionUI(BaseUI):
                 index=0,
                 weight=1,
             )
+
+            # Get the dispatcher response
+            difficulties_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_GET_ALL_DIFFICULTIES,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            )
+
+            if not difficulties_response:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get difficulties in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Get the result from the dispatcher notification
+            difficulties: List[ImmutableDifficulty] = difficulties_response.get_result(
+                key="on_request_get_all_difficulties"
+            )
+
+            self.logger.debug(
+                message=f"Got {len(difficulties)} difficulties in '{self.__class__.__name__}'"
+            )
+
+            # Get the dispatcher response
+            priorities_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_GET_ALL_PRIORITIES,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            )
+
+            if not priorities_response:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get priorities in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Get the result from the dispatcher notification
+            priorities: List[ImmutablePriority] = priorities_response.get_result(
+                key="on_request_get_all_priorities"
+            )
+
+            self.logger.debug(
+                message=f"Got {len(priorities)} priorities in '{self.__class__.__name__}'"
+            )
+
+            # Get the dispatcher response
+            stacks_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_GET_ALL_STACKS,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            )
+
+            if not stacks_response:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get stacks in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Get the result from the dispatcher notification
+            stacks: List[ImmutableStack] = stacks_response.get_result(
+                key="on_request_get_all_stacks"
+            )
+
+            self.logger.debug(
+                message=f"Got {len(stacks)} stacks in '{self.__class__.__name__}'"
+            )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -282,6 +369,29 @@ class StackSelectionUI(BaseUI):
             # Log an error message indicating that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'create_top_frame_widgets' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_stack_creaed(
+        self,
+        stack: ImmutableStack,
+    ) -> None:
+        try:
+            # TODO:
+            #   - Update the UI to display the new stack
+            #   - Add the new stack to the list of available stacks
+            #   - Add the new stack to list of selected stacks
+            #   - Open a Toplevel to the SearchUI to select stack contents
+            #   - Add the selected stack contents to the new stack
+            #   - Save the new stack
+            #   - Close the Toplevel
+            pass
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_stack_creaed' method from '{self.__class__.__name__}': {e}"
             )
 
             # Re-raise the exception to the caller
