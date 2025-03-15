@@ -36,11 +36,15 @@ from core.ui.create_ui import CreateUI
 from core.ui.dashboard_ui import DashboardUI
 from core.ui.edit_ui import EditUI
 from core.ui.help_ui import HelpUI
+from core.ui.learning_dashboard_ui import LearningDashboardUI
+from core.ui.learning_session_ui import LearningSessionUI
+from core.ui.learning_session_result_ui import LearningSessionResultUI
 from core.ui.menu_ui import MenuUI
 from core.ui.notification_ui import NotificationUI
 from core.ui.report_ui import ReportUI
 from core.ui.search_ui import SearchUI
 from core.ui.setting_ui import SettingUI
+from core.ui.stack_selection_ui import StackSelectionUI
 from core.ui.ui_registry import UIRegistry
 from core.ui.user_ui import UserUI
 
@@ -808,11 +812,15 @@ class BootstrapService:
                 "dashboard_ui": DashboardUI,
                 "edit_ui": EditUI,
                 "help_ui": HelpUI,
+                "learning_dashboard_ui": LearningDashboardUI,
+                "learning_session_ui": LearningSessionUI,
+                "learning_session_result_ui": LearningSessionResultUI,
                 "menu_ui": MenuUI,
                 "notification_ui": NotificationUI,
                 "report_ui": ReportUI,
                 "search_ui": SearchUI,
                 "setting_ui": SettingUI,
+                "stack_selection_ui": StackSelectionUI,
                 "user_ui": UserUI,
             }
 

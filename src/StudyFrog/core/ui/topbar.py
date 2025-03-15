@@ -127,7 +127,7 @@ class TopBar(tkinter.Frame):
         menu_button: tkinter.Button = UIBuilder.get_button(
             background=Constants.INDIGO["500"],
             command=lambda: self.dispatcher.dispatch(
-                event=Events.REQUEST_FORWARD_NAVIGATION,
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
                 master=UIBuilder.get_toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
                 source="topbar",
@@ -185,27 +185,27 @@ class TopBar(tkinter.Frame):
 
         navigations: Dict[str, Dict[str, Any]] = {
             "📚 Learning": {
-                "event": Events.REQUEST_FORWARD_NAVIGATION,
+                "event": Events.REQUEST_VALIDATE_NAVIGATION,
                 "target": "learning_dashboard_ui",
             },
             "📝 Notes": {
-                "event": Events.REQUEST_FORWARD_NAVIGATION,
+                "event": Events.REQUEST_VALIDATE_NAVIGATION,
                 "target": "notes_view_ui",
             },
             "📖 Flashcards": {
-                "event": Events.REQUEST_FORWARD_NAVIGATION,
+                "event": Events.REQUEST_VALIDATE_NAVIGATION,
                 "target": "flashcards_view_ui",
             },
             "❓ Questions": {
-                "event": Events.REQUEST_FORWARD_NAVIGATION,
+                "event": Events.REQUEST_VALIDATE_NAVIGATION,
                 "target": "questions_view_ui",
             },
             "📋 Stacks": {
-                "event": Events.REQUEST_FORWARD_NAVIGATION,
+                "event": Events.REQUEST_VALIDATE_NAVIGATION,
                 "target": "stacks_view_ui",
             },
             "📊 Statistics": {
-                "event": Events.REQUEST_FORWARD_NAVIGATION,
+                "event": Events.REQUEST_VALIDATE_NAVIGATION,
                 "target": "statistics_view_ui",
             },
         }
@@ -230,6 +230,7 @@ class TopBar(tkinter.Frame):
                 command=lambda event=value["event"], target=value[
                     "target"
                 ]: self.dispatcher.dispatch(
+                    direction="forward",
                     event=event,
                     namespace=Constants.GLOBAL_NAMESPACE,
                     source="topbar",

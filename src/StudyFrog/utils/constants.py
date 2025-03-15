@@ -14,6 +14,9 @@ from os import path
 from typing import *
 
 
+__all__: List[str] = ["Constants"]
+
+
 class Constants:
     """
     Contains various constants used throughout the program.
@@ -523,6 +526,9 @@ class Constants:
         "A700": "#FFD600",
     }
 
+    BACKWARD_DIRECTION: str = "backward"
+    FORWARD_DIRECTION: str = "forward"
+
     GLOBAL_NAMESPACE: str = "GLOBAL"
 
     HIGHEST: str = "highest"
@@ -531,7 +537,6 @@ class Constants:
     LOWEST: str = "lowest"
 
     MEDIUM: str = "medium"
-
     HARD: str = "hard"
     EASY: str = "easy"
 
@@ -549,7 +554,6 @@ class Constants:
     MAIN_UI_NAMESPACE: str = "MAIN_UI"
     REPORT_UI_NAMESPACE: str = "REPORT_UI"
     SEARCH_UI_NAMESPACE: str = "SEARCH_UI"
-    SETTING_UI_NAMESPACE: str = "SETTING_UI"
     SETTING_UI_NAMESPACE: str = "SETTING_UI"
 
     NOW: datetime = datetime.now()
