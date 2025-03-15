@@ -131,10 +131,7 @@ class MainUI(tkinter.Tk):
         )
 
         # Create the "Center Frame" frame widget
-        self._center_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["700"],
-            master=self,
-        )
+        self._center_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
         self._center_frame.grid_rowconfigure(

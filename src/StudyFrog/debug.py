@@ -5,6 +5,7 @@ Date: 2025-02-05
 
 import asyncio
 
+from tkinter.constants import *
 from typing import *
 
 from core.answer import AnswerModel
@@ -33,48 +34,61 @@ from utils.model import ImmutableBaseModel
 def debug() -> None:
     logger: Logger = Logger.get_logger(name="debug")
 
-    model_classes: Set[Type[ImmutableBaseModel]] = {
-        AnswerModel,
-        AssociationModel,
-        ChangeHistoryItemModel,
-        ChangeHistoryModel,
-        CommentModel,
-        CustomFieldModel,
-        DefaultModel,
-        DifficultyModel,
-        FlashcardModel,
-        NoteModel,
-        OptionModel,
-        PriorityModel,
-        QuestionModel,
-        SettingModel,
-        StackModel,
-        StatusModel,
-        TagModel,
-        UserModel,
-    }
+    logger.debug(message="Debugging...")
 
-    # Iterate an drop and create the tables
-    for model_class in model_classes:
-        try:
-            # Drop the table
-            asyncio.run(model_class.drop_table(database=Constants.DATABASE_PATH))
+    def clear_database(logger: Logger) -> bool:
+        model_classes: Set[Type[ImmutableBaseModel]] = {
+            AnswerModel,
+            AssociationModel,
+            ChangeHistoryItemModel,
+            ChangeHistoryModel,
+            CommentModel,
+            CustomFieldModel,
+            DefaultModel,
+            DifficultyModel,
+            FlashcardModel,
+            NoteModel,
+            OptionModel,
+            PriorityModel,
+            QuestionModel,
+            SettingModel,
+            StackModel,
+            StatusModel,
+            TagModel,
+            UserModel,
+        }
 
-            # Log an info message
-            logger.info(f"Dropped table '{model_class.__name__}'.")
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            logger.error(f"Failed to drop table '{model_class.__name__}': {str(e)}")
+        # Iterate an drop and create the tables
+        for model_class in model_classes:
+            try:
+                # Drop the table
+                asyncio.run(model_class.drop_table(database=Constants.DATABASE_PATH))
 
-        try:
-            # Create the table
-            asyncio.run(model_class.create_table(database=Constants.DATABASE_PATH))
+                # Log an info message
+                logger.info(f"Dropped table '{model_class.__name__}'.")
+            except Exception as e:
+                # Log an error message indicating an exception has occurred
+                logger.error(f"Failed to drop table '{model_class.__name__}': {str(e)}")
 
-            # Log an info message
-            logger.info(f"Created table '{model_class.__name__}'.")
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            logger.error(f"Failed to create table '{model_class.__name__}': {str(e)}")
+                return False
+
+            try:
+                # Create the table
+                asyncio.run(model_class.create_table(database=Constants.DATABASE_PATH))
+
+                # Log an info message
+                logger.info(f"Created table '{model_class.__name__}'.")
+            except Exception as e:
+                # Log an error message indicating an exception has occurred
+                logger.error(
+                    f"Failed to create table '{model_class.__name__}': {str(e)}"
+                )
+
+                return False
+
+        return True
+
+    clear_database(logger=logger)
 
 
 if __name__ == "__main__":

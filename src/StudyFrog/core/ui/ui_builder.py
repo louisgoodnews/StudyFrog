@@ -3922,6 +3922,8 @@ class UIBuilder:
                     result["value_remove_button"] = cls.get_button(
                         command=on_value_remove_button_click,
                         master=result["value_frame"],
+                        text="X",
+                        width=3,
                         **kwargs,
                     )
 
@@ -4013,8 +4015,8 @@ class UIBuilder:
                 # Add the values to the "Listbox" listbox widget
                 [
                     result["listbox"].insert(
-                        index=index,
-                        value=value,
+                        index,
+                        value,
                     )
                     for (
                         index,
@@ -4087,6 +4089,7 @@ class UIBuilder:
             # Place the "Container" frame widget within the "Root" frame widget
             result["container"].grid(
                 column=1,
+                padx=5, pady=5,
                 row=0,
                 sticky=NSEW,
             )
@@ -4100,8 +4103,8 @@ class UIBuilder:
 
             # Place the "Button" button widget within the "Root" frame widget
             result["button"].grid(
-                column=0,
-                row=1,
+                column=2,
+                row=0,
                 sticky=NSEW,
             )
 

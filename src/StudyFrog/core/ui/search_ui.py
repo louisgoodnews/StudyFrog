@@ -94,6 +94,9 @@ class SearchUI(tkinter.Frame):
         # Store the passed navigation service instance in an instance variable
         self.navigation_service: NavigationHistoryService = navigation_service
 
+        # Store the current page number in an instance variable
+        self.page: int = 0
+
         # Store the passed setting service instance in an instance variable
         self.setting_service: SettingService = setting_service
 
@@ -117,7 +120,7 @@ class SearchUI(tkinter.Frame):
         )
 
         # Load objects from the database
-        self.load_objects_from_database()
+        self.load_contents()
 
     def clear(self) -> None:
         """
@@ -481,6 +484,7 @@ class SearchUI(tkinter.Frame):
 
     def create_content_item(
         self,
+        columns: List[str],
         object: Union[
             ImmutableAnswer,
             ImmutableFlashcard,
@@ -488,7 +492,6 @@ class SearchUI(tkinter.Frame):
             ImmutableQuestion,
             ImmutableStack,
         ],
-        **kwargs,
     ) -> None:
         """
         Creates and configures the main widgets of the content item.
@@ -497,6 +500,7 @@ class SearchUI(tkinter.Frame):
         search UI, setting their layout configuration.
 
         Args:
+            columns (List[str]): The columns to display.
             object (Union[
                 ImmutableAnswer,
                 ImmutableFlashcard,
@@ -504,13 +508,64 @@ class SearchUI(tkinter.Frame):
                 ImmutableQuestion,
                 ImmutableStack,
             ]): The object to create the content item for.
-            **kwargs: Keyword arguments.
 
         Returns:
             None
         """
+
         try:
-            pass
+            # Create a tkinter.Frame widget
+            frame: tkinter.Frame = UIBuilder.get_frame(
+                background=Constants.BLUE_GREY["700"],
+                master=self.content_frame,
+            )
+
+            # Configure the frame's 0th row to weight 1
+            frame.grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Place the frame within the content frame
+            frame.grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=len(self.content_frame.winfo_children()),
+                sticky=NSEW,
+            )
+
+            # Iterate over each column
+            for (
+                index,
+                column,
+            ) in enumerate(iterable=columns):
+                # Create a tkinter.Label widget
+                label: tkinter.Label = UIBuilder.get_label(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    master=frame,
+                    text=object.get(name=column),
+                )
+
+                # Bind the label widget to the on_label_click method
+                label.bind(
+                    func=lambda event: self.on_label_click(object=object),
+                    sequence="<ButtonRelease-1>",
+                )
+
+                # Place the label widget within the frame
+                label.grid(
+                    column=index,
+                    padx=5,
+                    pady=5,
+                    row=0,
+                    sticky=NSEW,
+                )
         except Exception as e:
             # Log an error message indicating an exception occured
             self.logger.error(
@@ -610,8 +665,19 @@ class SearchUI(tkinter.Frame):
             # Load all objects from the database
             self.load_objects_from_database()
 
-        # TODO: Load the contents of the search results
-        pass
+        for loaded_object in self.loaded_objects["0"]:
+            self.create_content_item(
+                columns=[
+                    "icon",
+                    "name",
+                    "priority",
+                    "difficulty",
+                    "last_viewed_at",
+                    "status",
+                    "due_by",
+                ],
+                object=loaded_object,
+            )
 
     def load_objects_from_database(self) -> None:
         """
@@ -624,8 +690,24 @@ class SearchUI(tkinter.Frame):
             None
         """
         try:
-            # Initialize a list to store loaded objects as an instance variable
-            self.loaded_objects: List[
+            # Initialize a dictionary to store loaded objects by page number
+            self.loaded_objects: Dict[
+                str,
+                List[
+                    Optional[
+                        Union[
+                            ImmutableAnswer,
+                            ImmutableFlashcard,
+                            ImmutableNote,
+                            ImmutableQuestion,
+                            ImmutableStack,
+                        ]
+                    ]
+                ],
+            ] = {}
+
+            # Get all answers, flashcards, notes, questions, and stacks from the database
+            objects: List[
                 Optional[
                     Union[
                         ImmutableAnswer,
@@ -635,33 +717,36 @@ class SearchUI(tkinter.Frame):
                         ImmutableStack,
                     ]
                 ]
-            ] = []
+            ] = (
+                self.unified_manager.get_all_answers()
+                + self.unified_manager.get_all_flashcards()
+                + self.unified_manager.get_all_notes()
+                + self.unified_manager.get_all_questions()
+                + self.unified_manager.get_all_stacks()
+            )
 
-            # Get all answers from the database
-            self.loaded_objects.extend(self.unified_manager.get_all_answers())
-
-            # Get all flashcards from the database
-            self.loaded_objects.extend(self.unified_manager.get_all_flashcards())
-
-            # Get all notes from the database
-            self.loaded_objects.extend(self.unified_manager.get_all_notes())
-
-            # Get all questions from the database
-            self.loaded_objects.extend(self.unified_manager.get_all_questions())
-
-            # Get all stacks from the database
-            self.loaded_objects.extend(self.unified_manager.get_all_stacks())
-
-            # Sort the loaded objects by their 'created_at' attribute
-            # This is done to ensure the search results are shown in the order of when they were created
-            self.loaded_objects.sort(
+            # Sort the objects by their 'created_at' attribute in descending order
+            # This ensures the search results are shown in the order of their creation date
+            objects.sort(
                 key=lambda obj: obj["created_at"],
                 reverse=True,
             )
 
-            self.logger.debug(
-                message=f"Loaded {len(self.loaded_objects)} {"objects" if len(self.loaded_objects) != 1 else "object"} from the database."
-            )
+            # Initialize page number for pagination
+            page: int = 0
+
+            # Iterate over the objects and paginate them
+            for (
+                index,
+                loaded_object,
+            ) in enumerate(iterable=objects):
+                if index % 30 == 0:
+                    page = int(index // 30)
+                    # Initialize a new page in the dictionary
+                    self.loaded_objects[str(page)] = []
+
+                # Add the object to the current page
+                self.loaded_objects[str(page)].append(loaded_object)
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -732,10 +817,66 @@ class SearchUI(tkinter.Frame):
             raise e
 
     def on_next_button_click(self) -> None:
+        """
+        Handles the click event of the "Next" button.
+
+        This method is used to navigate to the next page of search results.
+        It first clears the content frame, then increments the current page,
+        and finally loads the objects for the current page.
+
+        Returns:
+            None
+        """
+
+        # Check if the current page is the last page
+        if self.page + 1 >= len(self.loaded_objects):
+            # Log a warning message
+            self.logger.warning(
+                message=f"Cannot navigate to next page as the current page ({self.page}) is the last page."
+            )
+
+            # Return early
+            return
+
+        # Clear the content frame
         self.clear()
 
+        # Increment the current page
+        self.page += 1
+
+        # Load the objects for the current page
+        self.load_contents()
+
     def on_previous_button_click(self) -> None:
+        """
+        Handles the click event of the "Previous" button.
+
+        This method is used to navigate to the previous page of search results.
+        It first clears the content frame, then decrements the current page,
+        and finally loads the objects for the current page.
+
+        Returns:
+            None
+        """
+
+        # Check if the current page is the first page
+        if self.page - 1 <= 0:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Cannot navigate to previous page as the current page ({self.page}) is the first page."
+            )
+
+            # Return early
+            return
+
+        # Clear the content frame
         self.clear()
+
+        # Decrement the current page
+        self.page -= 1
+
+        # Load the objects for the current page
+        self.load_contents()
 
     def searchbar_command(
         self,
