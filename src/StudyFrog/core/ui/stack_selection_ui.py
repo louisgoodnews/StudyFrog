@@ -5,6 +5,7 @@ Date: 2025-03-15
 
 import tkinter
 
+from tkinter import ttk
 from tkinter.constants import *
 
 from typing import *
@@ -89,7 +90,7 @@ class StackSelectionUI(BaseUI):
     def collect_subscriptions(self) -> Dict[Any, Dict[str, Any]]:
         return {
             Events.STACK_CREATED: {
-                "function": self.on_stack_creaed,
+                "function": self.on_stack_created,
                 "namespace": Constants.GLOBAL_NAMESPACE,
                 "persistent": True,
             },
@@ -225,6 +226,21 @@ class StackSelectionUI(BaseUI):
         self,
         master: tkinter.Frame,
     ) -> None:
+        """
+        Creates and configures the widgets of the bottom frame.
+
+        This method initializes the Cancel and Start buttons within the bottom frame
+        and places them in the grid layout.
+
+        Args:
+            master (tkinter.Frame): The parent frame widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to create or configure the widgets.
+        """
         try:
             # Configure the weight of the 0th column to 1.
             master.grid_columnconfigure(
@@ -232,10 +248,82 @@ class StackSelectionUI(BaseUI):
                 weight=1,
             )
 
+            # Configure the weight of the 0th column to 1.
+            master.grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
             # Configure the weight of the 0th row to 1.
             master.grid_rowconfigure(
                 index=0,
                 weight=1,
+            )
+
+            # Create the Cancel button widget
+            cancel_button: Optional[tkinter.Button] = UIBuilder.get_button(
+                background=Constants.BLUE_GREY["700"],
+                command=self.on_cancel_button_click,
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                master=master,
+                relief=FLAT,
+                text="Cancel",
+            )
+
+            # Check if the Cancel button was created successfully
+            if not cancel_button:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create Cancel button in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Place the Cancel button widget in the main window
+            cancel_button.grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=W,
+            )
+
+            # Create the Start button widget
+            start_button: Optional[tkinter.Button] = UIBuilder.get_button(
+                background=Constants.BLUE_GREY["700"],
+                command=self.on_start_button_click,
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                master=master,
+                relief=FLAT,
+                text="Start",
+            )
+
+            # Check if the Start button was created successfully
+            if not start_button:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create Start button in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Place the Start button widget in the main window
+            start_button.grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=E,
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
@@ -263,56 +351,22 @@ class StackSelectionUI(BaseUI):
                 weight=1,
             )
 
-            # Get the dispatcher response
-            difficulties_response: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_GET_ALL_DIFFICULTIES,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
+            # Configure the weight of the 1st row to 0.
+            master.grid_rowconfigure(
+                index=1,
+                weight=0,
             )
 
-            if not difficulties_response:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to get difficulties in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
-
-            # Get the result from the dispatcher notification
-            difficulties: List[ImmutableDifficulty] = difficulties_response.get_result(
-                key="on_request_get_all_difficulties"
+            # Configure the weight of the 2nd row to 0.
+            master.grid_rowconfigure(
+                index=2,
+                weight=0,
             )
 
-            self.logger.debug(
-                message=f"Got {len(difficulties)} difficulties in '{self.__class__.__name__}'"
-            )
-
-            # Get the dispatcher response
-            priorities_response: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_GET_ALL_PRIORITIES,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
-            )
-
-            if not priorities_response:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to get priorities in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
-
-            # Get the result from the dispatcher notification
-            priorities: List[ImmutablePriority] = priorities_response.get_result(
-                key="on_request_get_all_priorities"
-            )
-
-            self.logger.debug(
-                message=f"Got {len(priorities)} priorities in '{self.__class__.__name__}'"
+            # Configure the weight of the 3rd row to 0.
+            master.grid_rowconfigure(
+                index=3,
+                weight=0,
             )
 
             # Get the dispatcher response
@@ -339,6 +393,176 @@ class StackSelectionUI(BaseUI):
 
             self.logger.debug(
                 message=f"Got {len(stacks)} stacks in '{self.__class__.__name__}'"
+            )
+
+            # Create the separator widget
+            separator: Optional[ttk.Separator] = UIBuilder.get_separator(
+                master=master,
+                orient=HORIZONTAL,
+            )
+
+            if not separator:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create separator in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Place the separator widget in the main window
+            separator.grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=1,
+                sticky=EW,
+            )
+
+            # Get the dispatcher response
+            difficulties_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_GET_ALL_DIFFICULTIES,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            )
+
+            if not difficulties_response:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get difficulties in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Get the result from the dispatcher notification
+            difficulties: List[ImmutableDifficulty] = difficulties_response.get_result(
+                key="on_request_get_all_difficulties"
+            )
+
+            # Create the difficulty select widgets within the passed master frame
+            difficulty_select: Optional[Dict[str, Any]] = (
+                UIBuilder.get_multi_select_field(
+                    label="Difficulties: ",
+                    master=master,
+                    values=[difficulty["name"] for difficulty in difficulties],
+                )
+            )
+
+            if not difficulty_select:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create difficulty select in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Style the difficulty select widget's button
+            difficulty_select["select_button"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
+
+            # Style the difficulty select widget's label
+            difficulty_select["label"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+            )
+
+            # Style the difficulty select widget's root frame
+            difficulty_select["root"].configure(background=Constants.BLUE_GREY["700"])
+
+            # Place the difficulty select widget in the main window
+            difficulty_select["root"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=2,
+                sticky=NSEW,
+            )
+
+            # Get the dispatcher response
+            priorities_response: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_GET_ALL_PRIORITIES,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            )
+
+            if not priorities_response:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get priorities in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Get the result from the dispatcher notification
+            priorities: List[ImmutablePriority] = priorities_response.get_result(
+                key="on_request_get_all_priorities"
+            )
+
+            # Create the priority select widgets within the passed master frame
+            priority_select: Optional[Dict[str, Any]] = (
+                UIBuilder.get_multi_select_field(
+                    label="Priorities: ",
+                    master=master,
+                    values=[priority["name"] for priority in priorities],
+                )
+            )
+
+            if not priority_select:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create priority select in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Style the priority select widget's button
+            priority_select["select_button"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
+
+            # Style the priority select widget's label
+            priority_select["label"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+            )
+
+            # Style the priority select widget's root frame
+            priority_select["root"].configure(background=Constants.BLUE_GREY["700"])
+
+            # Place the priority select widget in the main window
+            priority_select["root"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=3,
+                sticky=NSEW,
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
@@ -374,7 +598,19 @@ class StackSelectionUI(BaseUI):
             # Re-raise the exception to the caller
             raise e
 
-    def on_stack_creaed(
+    def on_cancel_button_click(self) -> None:
+        try:
+            pass
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_cancel_button_click' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_stack_created(
         self,
         stack: ImmutableStack,
     ) -> None:
@@ -391,7 +627,38 @@ class StackSelectionUI(BaseUI):
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'on_stack_creaed' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'on_stack_created' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_start_button_click(self) -> None:
+        """
+        Handles the event when the 'Start' button is clicked.
+
+        This function dispatches a navigation request to the global namespace
+        with the target 'learning_session_ui' and the source 'stack_selection_ui'.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the dispatching of the event.
+        """
+        try:
+            # Dispatch the REQUEST_VALIDATE_NAVIGATION event
+            self.dispatcher.dispatch(
+                direction=Constants.FORWARD_DIRECTION,
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                source="stack_selection_ui",
+                target="learning_session_ui",
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_start_button_click' method from '{self.__class__.__name__}': {e}"
             )
 
             # Re-raise the exception to the caller

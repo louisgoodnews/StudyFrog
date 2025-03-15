@@ -1780,6 +1780,7 @@ class UIBuilder:
 
             # Create the "Select button" button widget
             result["select_button"] = cls.get_button(
+                command=on_select_button_click,
                 master=result["root"],
                 text="Select",
             )
