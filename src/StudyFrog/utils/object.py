@@ -78,6 +78,21 @@ class MutableBaseObject:
         # Delete the attribute
         del self.__dict__[name]
 
+    def __eq__(
+        self,
+        other: "MutableBaseObject",
+    ) -> bool:
+        """
+        Checks if the object is equal to the given object.
+
+        :param other: The object to compare to.
+        :type other: MutableBaseObject
+
+        :return: True if the object is equal to the given object, False otherwise.
+        :rtype: bool
+        """
+        return self.__dict__ == other.__dict__
+
     def __getattr__(
         self,
         name: str,
@@ -501,7 +516,7 @@ class ImmutableBaseObject(MutableBaseObject):
         raise AttributeError(
             f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
         )
-    
+
     def delete(
         self,
         name: str,

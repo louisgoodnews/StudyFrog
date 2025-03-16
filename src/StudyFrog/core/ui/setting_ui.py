@@ -11,6 +11,7 @@ from typing import *
 
 from core.setting import SettingService
 
+from core.ui.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
@@ -24,7 +25,7 @@ from utils.unified import UnifiedObjectManager
 __all__: List[str] = ["SettingUI"]
 
 
-class SettingUI(tkinter.Frame):
+class SettingUI(BaseUI):
     """
     A class representing the setting user interface (UI) of the application.
 
@@ -63,41 +64,32 @@ class SettingUI(tkinter.Frame):
 
         # Call the parent class constructor
         super().__init__(
+            dispatcher=dispatcher,
             master=master,
             name="setting_ui",
+            navigation_item=navigation_item,
+            navigation_service=navigation_service,
+            setting_service=setting_service,
+            unified_manager=unified_manager,
         )
 
-        # Initialize the logger instance
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+    @override
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects and returns a list of subscriptions.
 
-        # Store the passed dispatcher instance in an instance variable
-        self.dispatcher: Dispatcher = dispatcher
+        This method should be implemented by subclasses to provide
+        a list containing event subscriptions. Each subscription
+        is associated with specific events and their corresponding
+        handlers.
 
-        # Store the passed navigation item instance in an instance variable
-        self.navigation_item: NavigationHistoryItem = navigation_item
+        Returns:
+            List[Dict[str, Any]]: A list representing the subscriptions for events.
+        """
 
-        # Store the passed navigation service instance in an instance variable
-        self.navigation_service: NavigationHistoryService = navigation_service
+        return []
 
-        # Store the passed setting service instance in an instance variable
-        self.setting_service: SettingService = setting_service
-
-        # Store the passed unified manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
-
-        # Configure the grid
-        self.configure_grid()
-
-        # Create the widgets
-        self.create_widgets()
-
-        # Grid the setting widget in it's master
-        self.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
-        )
-
+    @override
     def configure_grid(self) -> None:
         """
         Configures the grid of the setting widget.
@@ -133,6 +125,7 @@ class SettingUI(tkinter.Frame):
             weight=1,
         )
 
+    @override
     def create_widgets(self) -> None:
         """
         Creates and configures the main frames of the setting UI.

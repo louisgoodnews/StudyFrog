@@ -11,6 +11,7 @@ from typing import *
 
 from core.setting import SettingService
 
+from core.ui.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
@@ -24,7 +25,7 @@ from utils.unified import UnifiedObjectManager
 __all__: List[str] = ["ReportUI"]
 
 
-class ReportUI(tkinter.Frame):
+class ReportUI(BaseUI):
     """
     A class representing the report menu user interface (UI) of the application.
 
@@ -68,41 +69,30 @@ class ReportUI(tkinter.Frame):
 
         # Call the parent class constructor
         super().__init__(
+            dispatcher=dispatcher,
             master=master,
             name="report_ui",
+            navigation_item=navigation_item,
+            navigation_service=navigation_service,
+            setting_service=setting_service,
+            unified_manager=unified_manager,
         )
 
-        # Initialize the logger instance
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+    @override
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects the subscriptions for the report menu UI.
 
-        # Store the passed dispatcher instance in an instance variable
-        self.dispatcher: Dispatcher = dispatcher
+        This method collects the subscriptions for the report menu UI by setting up
+        the necessary event subscriptions.
 
-        # Store the passed navigation item instance in an instance variable
-        self.navigation_item: NavigationHistoryItem = navigation_item
+        Returns:
+            List[Dict[str, Any]]: The collected subscriptions.
+        """
 
-        # Store the passed navigation service instance in an instance variable
-        self.navigation_service: NavigationHistoryService = navigation_service
+        return []
 
-        # Store the passed setting service instance in an instance variable
-        self.setting_service: SettingService = setting_service
-
-        # Store the passed unified manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
-
-        # Configure the grid
-        self.configure_grid()
-
-        # Create the widgets
-        self.create_widgets()
-
-        # Grid the report menu widget in its master
-        self.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
-        )
-
+    @override
     def configure_grid(self) -> None:
         """
         Configures the grid of the report menu widget.
@@ -138,6 +128,7 @@ class ReportUI(tkinter.Frame):
             weight=1,
         )
 
+    @override
     def create_widgets(self) -> None:
         """
         Creates and configures the main frames of the report menu UI.
@@ -154,7 +145,10 @@ class ReportUI(tkinter.Frame):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        top_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the "Top Frame" frame widget's 1st column to weight 1
         top_frame.grid_columnconfigure(
@@ -176,7 +170,10 @@ class ReportUI(tkinter.Frame):
         )
 
         # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        center_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
         center_frame.grid_columnconfigure(
@@ -198,7 +195,10 @@ class ReportUI(tkinter.Frame):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the "Bottom Frame" frame widget's 1st column to weight 1
         bottom_frame.grid_columnconfigure(

@@ -12,6 +12,8 @@ from typing import *
 from core.setting import SettingService
 from core.stack import ImmutableStack
 
+from core.ui.base_ui import BaseUI
+
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
@@ -26,7 +28,7 @@ from utils.unified import UnifiedObjectManager
 __all__: List[str] = ["DashboardUI"]
 
 
-class DashboardUI(tkinter.Frame):
+class DashboardUI(BaseUI):
     """
     A class representing the dashboard user interface (UI) of the application.
 
@@ -67,45 +69,13 @@ class DashboardUI(tkinter.Frame):
 
         # Call the parent class constructor
         super().__init__(
+            dispatcher=dispatcher,
             master=master,
             name="dashboard_ui",
-        )
-
-        # Initialize the logger instance
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
-
-        # Store the passed dispatcher instance in an instance variable
-        self.dispatcher: Dispatcher = dispatcher
-
-        # Store the passed navigation item instance in an instance variable
-        self.navigation_item: NavigationHistoryItem = navigation_item
-
-        # Store the passed navigation service instance in an instance variable
-        self.navigation_service: NavigationHistoryService = navigation_service
-
-        # Store the passed setting service instance in an instance variable
-        self.setting_service: SettingService = setting_service
-
-        # Store the passed unified manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
-
-        # Configure the DasboardUI's background to be grey
-        self.configure(background=Constants.BLUE_GREY["700"])
-
-        # Subscribe to events relevant for this class
-        self.subscribe_to_events()
-
-        # Configure the grid
-        self.configure_grid()
-
-        # Create the widgets
-        self.create_widgets()
-
-        # Grid the dashboard widget in it's master
-        self.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
+            navigation_item=navigation_item,
+            navigation_service=navigation_service,
+            setting_service=setting_service,
+            unified_manager=unified_manager,
         )
 
         # Lookup the new stacks
@@ -117,6 +87,29 @@ class DashboardUI(tkinter.Frame):
         # Lookup the completed stacks
         self.lookup_completed_stacks()
 
+    @override
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects and returns a list of subscriptions.
+
+        This method should be implemented by subclasses to provide
+        a list containing event subscriptions. Each subscription
+        is associated with specific events and their corresponding
+        handlers.
+
+        Returns:
+            List[Dict[str, Any]]: A list representing the subscriptions for events.
+        """
+        return [
+            {
+                "event": Events.STACK_CREATED,
+                "function": self.on_stack_created,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+        ]
+
+    @override
     def configure_grid(self) -> None:
         """
         Configures the grid of the dashboard widget.
@@ -152,6 +145,7 @@ class DashboardUI(tkinter.Frame):
             weight=1,
         )
 
+    @override
     def create_widgets(self) -> None:
         """
         Creates and configures the main frames of the dashboard UI.
@@ -1161,35 +1155,6 @@ class DashboardUI(tkinter.Frame):
             sticky=EW,
         )
 
-    def destroy(self) -> None:
-        """
-        Cleans up resources and unsubscribes from events.
-
-        This method attempts to unsubscribe from all events
-        and calls the parent class's destroy method to clean
-        up resources. Logs any exceptions that occur.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an error occurs during the destroy process.
-        """
-        try:
-            # Attempt to unsubscribe from all events
-            self.unsubscribe_from_events()
-
-            # Call the parent class's destroy method
-            super().destroy()
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'destroy' method from '{self.__class__.__name__}': {e}",
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
     def lookup_completed_stacks(self) -> None:
         """
         Looks up the stacks and displays them.
@@ -1420,88 +1385,6 @@ class DashboardUI(tkinter.Frame):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'on_stack_created' method from '{self.__class__.__name__}': {e}",
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
-    def subscribe_to_events(self) -> None:
-        """
-        Subscribes to all events in the subscriptions dictionary.
-
-        This method iterates over the events and functions in the subscriptions
-        dictionary and registers them with the dispatcher. It also stores the
-        UUIDs of the subscriptions in the subscriptions list.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an error occurs while subscribing to events.
-        """
-        try:
-            # Check if a "subscriptions" list exists as instance variable
-            if not hasattr(
-                self,
-                "subscriptions",
-            ):
-                # Initialize the subscriptions list as an empty list
-                self.subscriptions: List[str] = []
-
-            # Create a dictionary of events and functions
-            subscriptions: Dict[Any, Dict[str, Any]] = {
-                Events.STACK_CREATED: {
-                    "function": self.on_stack_created,
-                    "namespace": Constants.GLOBAL_NAMESPACE,
-                    "persistent": True,
-                },
-            }
-
-            # Iterate over the events and functions in the subscriptions dictionary
-            for (
-                event,
-                subscription,
-            ) in subscriptions.items():
-                # Store the UUID of the subscription in the subscriptions list
-                self.subscriptions.append(
-                    self.dispatcher.register(
-                        event=event,
-                        function=subscription["function"],
-                        namespace=subscription["namespace"],
-                        persistent=subscription["persistent"],
-                    )
-                )
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'subscribe_to_events' method from '{self.__class__.__name__}': {e}",
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
-    def unsubscribe_from_events(self) -> None:
-        """
-        Unsubscribes from all events subscribed in the dashboard UI.
-
-        This method iterates over the UUIDs in the subscriptions dictionary and
-        unregisters the event handlers associated with each UUID.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an error occurs while unsubscribing from events.
-        """
-        try:
-            # Iterate over the UUIDs in the subscriptions dictionary
-            for uuid in self.subscriptions:
-                # Unregister the handler for the given UUID
-                self.dispatcher.unregister(uuid=uuid)
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'unsubscribe_from_events' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller

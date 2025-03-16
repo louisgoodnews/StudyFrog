@@ -11,6 +11,7 @@ from typing import *
 
 from core.setting import SettingService
 
+from core.ui.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
@@ -24,7 +25,7 @@ from utils.unified import UnifiedObjectManager
 __all__: List[str] = ["UserUI"]
 
 
-class UserUI(tkinter.Frame):
+class UserUI(BaseUI):
     """
     A class representing the user menu user interface (UI) of the application.
 
@@ -68,41 +69,32 @@ class UserUI(tkinter.Frame):
 
         # Call the parent class constructor
         super().__init__(
+            dispatcher=dispatcher,
             master=master,
             name="user_ui",
+            navigation_item=navigation_item,
+            navigation_service=navigation_service,
+            setting_service=setting_service,
+            unified_manager=unified_manager,
         )
 
-        # Initialize the logger instance
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+    @override
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects and returns a list of subscriptions.
 
-        # Store the passed dispatcher instance in an instance variable
-        self.dispatcher: Dispatcher = dispatcher
+        This method should be implemented by subclasses to provide
+        a list containing event subscriptions. Each subscription
+        is associated with specific events and their corresponding
+        handlers.
 
-        # Store the passed navigation item instance in an instance variable
-        self.navigation_item: NavigationHistoryItem = navigation_item
+        Returns:
+            List[Dict[str, Any]]: A list representing the subscriptions for events.
+        """
 
-        # Store the passed navigation service instance in an instance variable
-        self.navigation_service: NavigationHistoryService = navigation_service
+        return []
 
-        # Store the passed setting service instance in an instance variable
-        self.setting_service: SettingService = setting_service
-
-        # Store the passed unified manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
-
-        # Configure the grid
-        self.configure_grid()
-
-        # User the widgets
-        self.user_widgets()
-
-        # Grid the user menu widget in its master
-        self.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
-        )
-
+    @override
     def configure_grid(self) -> None:
         """
         Configures the grid of the user menu widget.
@@ -138,7 +130,8 @@ class UserUI(tkinter.Frame):
             weight=1,
         )
 
-    def user_widgets(self) -> None:
+    @override
+    def create_widgets(self) -> None:
         """
         Users and configures the main frames of the user menu UI.
 
@@ -153,8 +146,11 @@ class UserUI(tkinter.Frame):
             None
         """
 
-        # User the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        # Create the "Top Frame" frame widget
+        top_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the "Top Frame" frame widget's 1st column to weight 1
         top_frame.grid_columnconfigure(
@@ -175,8 +171,11 @@ class UserUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # User the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        # Create the "Center Frame" frame widget
+        center_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
         center_frame.grid_columnconfigure(
@@ -197,8 +196,11 @@ class UserUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # User the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        # Create the "Bottom Frame" frame widget
+        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the "Bottom Frame" frame widget's 1st column to weight 1
         bottom_frame.grid_columnconfigure(
@@ -219,21 +221,21 @@ class UserUI(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # User the "Bottom Frame" frame widgets
-        self.user_bottom_frame_widgets(master=bottom_frame)
+        # Create the "Bottom Frame" frame widgets
+        self.create_bottom_frame_widgets(master=bottom_frame)
 
-        # User the "Center Frame" frame widgets
-        self.user_center_frame_widgets(master=center_frame)
+        # Create the "Center Frame" frame widgets
+        self.create_center_frame_widgets(master=center_frame)
 
-        # User the "Top Frame" frame widgets
-        self.user_top_frame_widgets(master=top_frame)
+        # Create the "Top Frame" frame widgets
+        self.create_top_frame_widgets(master=top_frame)
 
-    def user_bottom_frame_widgets(
+    def create_bottom_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
         """
-        Users and configures the main widgets of the bottom frame.
+        Creates and configures the main widgets of the bottom frame.
 
         This method initializes the main widgets of the bottom frame within the
         user menu UI, setting their layout configuration.
@@ -246,12 +248,12 @@ class UserUI(tkinter.Frame):
         """
         pass
 
-    def user_center_frame_widgets(
+    def create_center_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
         """
-        Users and configures the main widgets of the center frame.
+        Creates and configures the main widgets of the center frame.
 
         This method initializes the main widgets of the center frame within the
         user menu UI, setting their layout configuration.
@@ -264,12 +266,12 @@ class UserUI(tkinter.Frame):
         """
         pass
 
-    def user_top_frame_widgets(
+    def create_top_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
         """
-        Users and configures the main widgets of the top frame.
+        Creates and configures the main widgets of the top frame.
 
         This method initializes the main widgets of the top frame within the
         user menu UI, setting their layout configuration.

@@ -79,12 +79,25 @@ class LearningDashboardUI(BaseUI):
             unified_manager=unified_manager,
         )
 
-        # Subscribe to events to handle necessary UI interactions
-        self.subscribe_to_events()
-
     @override
-    def collect_subscriptions(self) -> Dict[Any, Dict[str, Any]]:
-        return {}
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects and returns a list of subscriptions.
+
+        This method should be implemented by subclasses to provide
+        a list containing event subscriptions. Each subscription
+        is associated with specific events and their corresponding
+        handlers.
+
+        Returns:
+            List[Dict[str, Any]]: A list representing the subscriptions for events.
+
+        Raises:
+            NotImplementedError: If the method is not implemented
+            by a subclass.
+        """
+
+        return []
 
     @override
     def configure_grid(self) -> None:

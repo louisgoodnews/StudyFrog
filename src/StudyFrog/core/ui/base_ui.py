@@ -11,13 +11,9 @@ from typing import *
 
 from core.setting import SettingService
 
-from core.ui.ui_builder import UIBuilder
-
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
-from utils.events import Events
 from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
@@ -56,6 +52,10 @@ class BaseUI(tkinter.Frame):
         """
         Initializes a new instance of the BaseUI class.
 
+        This constructor initializes a new instance of the BaseUI class,
+        which is used as the base class for all UI components in the application.
+        It configures the grid layout, creates widgets, and subscribes to events.
+
         Args:
             dispatcher (Dispatcher): The dispatcher instance.
             master (tkinter.Misc): The parent widget.
@@ -68,6 +68,18 @@ class BaseUI(tkinter.Frame):
         Returns:
             None
         """
+
+        # Configure master widget's 0th column to weight 1.
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure master widget's 0th row to weight 1.
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
 
         # Call the parent class constructor
         super().__init__(
@@ -93,34 +105,36 @@ class BaseUI(tkinter.Frame):
         # Store the passed unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager
 
-        # Configure the frame
+        # Configure the background color of the BaseUI instance
         self.configure(background=Constants.BLUE_GREY["700"])
 
-        # Configure the grid
+        # Configure the grid layout
         self.configure_grid()
 
         # Create widgets
         self.create_widgets()
 
-        # Grid the frame
+        # Subscribe to events
+        self.subscribe_to_events()
+
+        # Grid the BaseUI instance
         self.grid(
             column=0,
             row=0,
             sticky=NSEW,
         )
 
-    def collect_subscriptions(self) -> Dict[Any, Dict[str, Any]]:
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
-        Collects and returns a dictionary of subscriptions.
+        Collects and returns a list of subscriptions.
 
         This method should be implemented by subclasses to provide
-        a dictionary containing event subscriptions. Each subscription
+        a list containing event subscriptions. Each subscription
         is associated with specific events and their corresponding
         handlers.
 
         Returns:
-            Dict[Any, Dict[str, Any]]: A dictionary representing
-            the subscriptions for events.
+            List[Dict[str, Any]]: A list representing the subscriptions for events.
 
         Raises:
             NotImplementedError: If the method is not implemented
@@ -218,17 +232,14 @@ class BaseUI(tkinter.Frame):
                 self.subscriptions: List[str] = []
 
             # Create a dictionary of events and functions
-            subscriptions: Dict[Any, Dict[str, Any]] = self.collect_subscriptions()
+            subscriptions: List[Dict[str, Any]] = self.collect_subscriptions()
 
             # Iterate over the events and functions in the subscriptions dictionary
-            for (
-                event,
-                subscription,
-            ) in subscriptions.items():
+            for subscription in subscriptions:
                 # Store the UUID of the subscription in the subscriptions list
                 self.subscriptions.append(
                     self.dispatcher.register(
-                        event=event,
+                        event=subscription["event"],
                         function=subscription["function"],
                         namespace=subscription["namespace"],
                         persistent=subscription["persistent"],

@@ -18,6 +18,7 @@ from core.setting import SettingService
 from core.stack import StackFactory, ImmutableStack, MutableStack
 from core.status import ImmutableStatus
 
+from core.ui.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 from core.ui.form.flashcard_create_form import FlashcardCreateForm
 from core.ui.form.question_create_form import QuestionCreateForm
@@ -35,7 +36,7 @@ from utils.unified import UnifiedObjectManager
 __all__: List[str] = ["CreateUI"]
 
 
-class CreateUI(tkinter.Frame):
+class CreateUI(BaseUI):
     """
     A class representing the create menu user interface (UI) of the application.
 
@@ -78,50 +79,21 @@ class CreateUI(tkinter.Frame):
             None
         """
 
-        # Call the parent class constructor
-        super().__init__(
-            master=master,
-            name="create_ui",
-        )
-
-        # Initialize the logger instance
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
-
-        # Store the passed dispatcher instance in an instance variable
-        self.dispatcher: Dispatcher = dispatcher
-
         # Create a boolean variable in an instance variable
         self.create_another: tkinter.BooleanVar = tkinter.BooleanVar(value=True)
 
         # Initialize the form instance variable as None
         self.form: Optional[tkinter.Misc] = None
 
-        # Store the passed navigation item instance in an instance variable
-        self.navigation_item: NavigationHistoryItem = navigation_item
-
-        # Store the passed navigation service instance in an instance variable
-        self.navigation_service: NavigationHistoryService = navigation_service
-
-        # Store the passed setting service instance in an instance variable
-        self.setting_service: SettingService = setting_service
-
-        # Store the passed unified manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
-
-        # Set the background og the CreateUI to grey
-        self.configure(background=Constants.BLUE_GREY["700"])
-
-        # Configure the grid
-        self.configure_grid()
-
-        # Create the widgets
-        self.create_widgets()
-
-        # Grid the create menu widget in its master
-        self.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
+        # Call the parent class constructor
+        super().__init__(
+            dispatcher=dispatcher,
+            master=master,
+            name="create_ui",
+            navigation_item=navigation_item,
+            navigation_service=navigation_service,
+            setting_service=setting_service,
+            unified_manager=unified_manager,
         )
 
         if isinstance(
@@ -153,6 +125,23 @@ class CreateUI(tkinter.Frame):
         # Call the on_combobox_select method
         self.on_combobox_select()
 
+    @override
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects and returns a list of subscriptions.
+
+        This method should be implemented by subclasses to provide
+        a list containing event subscriptions. Each subscription
+        is associated with specific events and their corresponding
+        handlers.
+
+        Returns:
+            List[Dict[str, Any]]: A list representing the subscriptions for events.
+        """
+
+        return []
+
+    @override
     def configure_grid(self) -> None:
         """
         Configures the grid of the create menu widget.
@@ -185,6 +174,7 @@ class CreateUI(tkinter.Frame):
             weight=1,
         )
 
+    @override
     def create_widgets(self) -> None:
         """
         Creates and configures the main frames of the create menu UI.
