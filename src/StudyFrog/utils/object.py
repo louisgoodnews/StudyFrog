@@ -563,7 +563,7 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if f"_{name}" in self.__dict__:
+        if name in self.__dict__:
             # Set the value of the attribute
             super().set(
                 name=name,
