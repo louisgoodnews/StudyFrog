@@ -379,6 +379,38 @@ class StackSelectionUI(BaseUI):
                 weight=0,
             )
 
+            # Create the scrolled frame widgets
+            scrolled_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+                master=master,
+            )
+
+            if not scrolled_frame:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create scrolled frame in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Style the scrolled frame widget's canvas
+            scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+            # Style the scrolled frame widget's frame
+            scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+            # Style the scrolled frame widget's root frame
+            scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+            # Place the scrolled frame widget's root frame in the main window
+            scrolled_frame["root"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
             # Get the dispatcher response
             stacks_response: Optional[DispatcherNotification] = (
                 self.dispatcher.dispatch(
@@ -401,9 +433,13 @@ class StackSelectionUI(BaseUI):
                 key="on_request_get_all_stacks"
             )
 
-            self.logger.debug(
-                message=f"Got {len(stacks)} stacks in '{self.__class__.__name__}'"
-            )
+            # Iterate over the stacks
+            for stack in stacks:
+                # Create the stack item widgets
+                self.create_stack_item_widgets(
+                    master=scrolled_frame["frame"],
+                    stack=stack,
+                )
 
             # Create the separator widget
             separator: Optional[ttk.Separator] = UIBuilder.get_separator(
@@ -578,6 +614,147 @@ class StackSelectionUI(BaseUI):
             # Log an error message indicating that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'create_center_frame_widgets' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def create_stack_item_widgets(
+        self,
+        master: tkinter.Misc,
+        stack: ImmutableStack,
+    ) -> None:
+        """
+        Creates and configures widgets for a single stack item.
+
+        This method initializes a frame for the stack item and populates it with
+        labels displaying various stack attributes, such as priority, difficulty,
+        and status, each represented by an emoji.
+
+        Args:
+            master (tkinter.Misc): The parent widget.
+            stack (ImmutableStack): The immutable stack data.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during widget creation or data lookup.
+        """
+        try:
+            # Create a tkinter.Frame widget for the stack item
+            frame: tkinter.Frame = UIBuilder.get_frame(
+                background=Constants.GREY["default"],
+                master=master,
+            )
+
+            # Dispatch events to lookup stack attribute details
+            difficulty_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                id=stack["difficulty"],
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+            priority_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_PRIORITY_LOOKUP,
+                id=stack["priority"],
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+            status_notification: DispatcherNotification = self.dispatcher.dispatch(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                id=stack["status"],
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Iterate over stack attributes to configure the frame and create labels
+            for (
+                index,
+                column,
+            ) in enumerate(
+                iterable=[
+                    "icon",
+                    "name",
+                    "priority",
+                    "difficulty",
+                    "last_viewed_at",
+                    "status",
+                    "due_by",
+                ]
+            ):
+                # Configure the frame widget's column to weight 1
+                frame.grid_columnconfigure(
+                    index=index,
+                    weight=1,
+                )
+
+                # Convert stack data to database format
+                data: Dict[str, Any] = Miscellaneous.convert_to_db_format(
+                    data=stack.to_dict(
+                        exclude=[
+                            "_logger",
+                        ]
+                    )
+                )
+
+                # Determine the text to display based on column type
+                if column == "priority":
+                    text = priority_notification.get_result(
+                        key="on_request_priority_lookup"
+                    )[0]["emoji"]
+                elif column == "difficulty":
+                    text = difficulty_notification.get_result(
+                        key="on_request_difficulty_lookup"
+                    )[0]["emoji"]
+                elif column == "status":
+                    text = status_notification.get_result(
+                        key="on_request_status_lookup"
+                    )[0]["emoji"]
+                else:
+                    text = data[column]
+
+                # Create a tkinter.Label widget for each stack attribute
+                label: tkinter.Label = UIBuilder.get_label(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    master=frame,
+                    text=text,
+                )
+
+                # Place the label widget in the stack item frame
+                label.grid(
+                    column=index,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Bind the label widget to a command that dispatches an event when clicked
+                label.bind(
+                    func=lambda event, stack=stack: self.dispatcher.dispatch(
+                        direction="forward",
+                        event=Events.REQUEST_VALIDATE_NAVIGATION,
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                        source="dashboard_ui",
+                        stack=stack,
+                        target="edit_ui",
+                    ),
+                    sequence="<ButtonRelease-1>",
+                )
+
+            # Place the stack item frame within the new stacks frame
+            frame.grid(
+                column=0,
+                padx=5,
+                pady=10,
+                row=len(self.new_stacks_frame.winfo_children()),
+                sticky=NSEW,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to create stack item widgets: {e}"
             )
 
             # Re-raise the exception to the caller
