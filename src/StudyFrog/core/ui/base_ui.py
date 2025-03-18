@@ -44,10 +44,10 @@ class BaseUI(tkinter.Frame):
         dispatcher: Dispatcher,
         master: tkinter.Misc,
         name: str,
-        navigation_item: NavigationHistoryItem,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
         unified_manager: UnifiedObjectManager,
+        navigation_item: Optional[NavigationHistoryItem] = None,
     ) -> None:
         """
         Initializes a new instance of the BaseUI class.
@@ -94,7 +94,7 @@ class BaseUI(tkinter.Frame):
         self.dispatcher: Dispatcher = dispatcher
 
         # Store the passed navigation item instance in an instance variable
-        self.navigation_item: NavigationHistoryItem = navigation_item
+        self.navigation_item: Optional[NavigationHistoryItem] = navigation_item
 
         # Store the passed navigation service instance in an instance variable
         self.navigation_service: NavigationHistoryService = navigation_service
