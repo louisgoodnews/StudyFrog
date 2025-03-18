@@ -576,3 +576,68 @@ class Constants:
     @classmethod
     def get_base_id(cls) -> int:
         return copy.deepcopy(cls.BASE_ID)
+
+    @classmethod
+    def get_colors(
+        cls,
+        as_dict: bool = False,
+    ) -> Union[Dict[str, str], List[str]]:
+        """
+        Returns the colors as a dictionary or a list.
+
+        Args:
+            as_dict (bool): If True, returns the colors as a dictionary with color names as keys and color codes as values. Defaults to False.
+
+        Returns:
+            Union[Dict[str, str], List[str]]: The colors as a dictionary or a list.
+        """
+        if as_dict:
+            # Initialize an empty dictionary
+            result: Dict[str, str] = {}
+
+            # Add blue colors
+            result.update(cls.BLUE)
+
+            # Add red colors
+            result.update(cls.RED)
+
+            # Add green colors
+            result.update(cls.GREEN)
+
+            # Add yellow colors
+            result.update(cls.YELLOW)
+
+            # Add orange colors
+            result.update(cls.ORANGE)
+
+            # Add pink colors
+            result.update(cls.PINK)
+
+            # Add purple colors
+            result.update(cls.PURPLE)
+
+            # Add teal colors
+            result.update(cls.TEAL)
+
+            # Add white colors
+            result.update(cls.WHITE)
+
+            # Add black colors
+            result.update(cls.BLACK)
+
+            # Return the colors as a dictionary
+            return result
+        else:
+            # Return the colors as a list
+            return list(
+                cls.BLUE.values()
+                + cls.RED.values()
+                + cls.GREEN.values()
+                + cls.YELLOW.values()
+                + cls.ORANGE.values()
+                + cls.PINK.values()
+                + cls.PURPLE.values()
+                + cls.TEAL.values()
+                + cls.WHITE.values()
+                + cls.BLACK.values()
+            )

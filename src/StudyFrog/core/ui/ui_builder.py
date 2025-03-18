@@ -1701,26 +1701,210 @@ class UIBuilder:
             # Initialize the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            # Initialize the "Listbox" key as None
+            # Initialize the listbox widget as None
             result["listbox"] = None
 
-            # Initialize the "Toplevel" key as None
-            result["toplevel"] = None
-
-            # Initialize the "Selection" key as an empty list
+            # Initialize the selection key as an empty list
             result["selection"] = []
 
+            # Initialize the toplevel widget as None
+            result["toplevel"] = None
+
+            # Add the values to the result dictionary
+            result["values"] = values
+
             def clear() -> None:
-                pass
+                """
+                Clears the selected value from the single select field.
+
+                Returns:
+                    None
+                """
+
+                # Set the value associated with the "selection" key to None
+                result["selection"] = []
+
+                # Iterate over the children of the "Container" frame widget
+                for child in result["container"].winfo_children():
+                    # Destroy each child widget
+                    child.destroy()
 
             def get() -> Optional[List[str]]:
-                pass
+                """
+                Gets the selected value(s) from the single select field.
+
+                Returns:
+                    Optional[List[str]]: The selected value(s) or None if no value is selected.
+                """
+
+                # Check, if a value is associated with the "selection" key
+                if not result.get(
+                    "selection",
+                    None,
+                ):
+                    # Return early
+                    return None
+
+                # Return the value associated with the "selection" key
+                return result["selection"]
 
             def on_listbox_select(event: Optional[tkinter.Event] = None) -> None:
-                pass
+                """
+                Called when an item is selected from the listbox widget.
+
+                Gets the selected value from the listbox widget and sets it to the "selection" key of the result dictionary.
+
+                If no selection is made, sets the value associated with the "selection" key to None.
+
+                Args:
+                    event (Optional[tkinter.Event]): The event object.
+
+                Returns:
+                    None
+                """
+
+                # Get the selection indices of the listbox widget
+                selection_indices: Optional[Tuple[int]] = tuple(
+                    result["listbox"].curselection()
+                )
+
+                # Check, if selection indices are available
+                if not selection_indices or len(selection_indices) == 0:
+                    # Return early
+                    return
+                else:
+                    # Appendselected value(s) to the  the value associated with the "selection" key with the selected value(s)
+                    result["selection"].append(result["listbox"].get(*selection_indices))
+
+                # Iterate over the children of the "Container" frame widget
+                for child in result["container"].winfo_children():
+                    # Destroy each child widget
+                    child.destroy()
+
+                # Iterate over the selection
+                for (
+                    index,
+                    value,
+                ) in enumerate(iterable=result["selection"]):
+                    # Configure the "Container" frame widget's index column to weight 1
+                    result["container"].grid_columnconfigure(
+                        index=index,
+                        weight=1,
+                    )
+
+                    # Create the "Value frame" frame widget
+                    result[f"value_frame_{index}"] = cls.get_frame(
+                        master=result["container"]
+                    )
+
+                    # Configure the "Value frame" frame widget's 1st column to weight 1
+                    result[f"value_frame_{index}"].grid_columnconfigure(
+                        index=0,
+                        weight=1,
+                    )
+
+                    # Configure the "Value frame" frame widget's 2nd column to weight 0
+                    result[f"value_frame_{index}"].grid_columnconfigure(
+                        index=1,
+                        weight=0,
+                    )
+
+                    # Place the "Value frame" frame widget within the "Container" frame widget
+                    result[f"value_frame_{index}"].grid(
+                        column=index,
+                        padx=5,
+                        pady=5,
+                        row=0,
+                        sticky=NSEW,
+                    )
+
+                    # Create the "Value label" label widget
+                    result[f"value_label_{index}"] = cls.get_label(
+                        master=result[f"value_frame_{index}"],
+                        text=value,
+                        **kwargs,
+                    )
+
+                    # Place the "Value label" label widget within the "Value frame" frame widget
+                    result[f"value_label_{index}"].grid(
+                        column=0,
+                        padx=5,
+                        pady=5,
+                        row=0,
+                        sticky=NSEW,
+                    )
+
+                    # Create the "Value remove button" button widget
+                    result[f"value_{index}_remove_button"] = cls.get_button(
+                        command=lambda: on_value_remove_button_click(index=index),
+                        master=result[f"value_frame_{index}"],
+                        text="X",
+                        width=3,
+                        **kwargs,
+                    )
+
+                    # Place the "Value remove button" button widget within the "Value frame" frame widget
+                    result[f"value_{index}_remove_button"].grid(
+                        column=1,
+                        padx=5,
+                        pady=5,
+                        row=0,
+                    )
+
+            def on_toplevel_destroy() -> None:
+                """
+                Called when the "Toplevel" toplevel widget is destroyed.
+
+                Destroys the toplevel widget and the listbox widget associated with the result dictionary.
+
+                Returns:
+                    None
+                """
+
+                # Check, if a value is associated with the "toplevel" key
+                if result.get(
+                    "toplevel",
+                    None,
+                ):
+                    # Destroy the toplevel widget
+                    result["toplevel"].destroy()
+
+                    # Set the value associated with the "toplevel" key to None
+                    result["toplevel"] = None
+
+                    # Set the value associated with the "listbox" key to None
+                    result["listbox"] = None
+
+            def on_value_remove_button_click(index: int) -> None:
+                """
+                Called when the "Value remove button" button widget is clicked.
+
+                Destroys the value frame widget associated with the given index and removes the value at the given index from the selection list.
+
+                Args:
+                    index (int): The index of the value to be removed.
+
+                Returns:
+                    None
+                """
+
+                # Destroy the value frame widget associated with the given index
+                result[f"value_frame_{index}"].destroy()
+
+                # Remove the value at the given index from the selection list
+                result["selection"].pop(index)
 
             def on_select_button_click() -> None:
-                # Check, if the "Toplevel" key is associated with a value
+                """
+                Called when the "Select" button is clicked.
+
+                Creates and displays a toplevel widget with a listbox widget containing the values to be selected from.
+
+                Returns:
+                    None
+                """
+
+                # Check, if a value is associated with the "toplevel" key
                 if not result.get(
                     "toplevel",
                     None,
@@ -1728,11 +1912,148 @@ class UIBuilder:
                     # Create the "Toplevel" toplevel widget
                     result["toplevel"] = cls.get_toplevel()
 
-            def set(value: List[str]) -> None:
-                pass
+                    # Configure the "Toplevel" toplevel widget's 1st column to weight 1
+                    result["toplevel"].grid_columnconfigure(
+                        index=0,
+                        weight=1,
+                    )
 
-            def update_selection_display() -> None:
-                pass
+                    # Configure the "Toplevel" toplevel widget's 1st row to weight 1
+                    result["toplevel"].grid_rowconfigure(
+                        index=0,
+                        weight=1,
+                    )
+
+                    # Add the WM_DELETE_WINDOW protocol to the toplevel widget
+                    result["toplevel"].protocol(
+                        name="WM_DELETE_WINDOW",
+                        func=on_toplevel_destroy,
+                    )
+
+                # Configure the "Toplevel" toplevel widget's 1st column to weight 1
+                result["toplevel"].grid_columnconfigure(
+                    index=0,
+                    weight=1,
+                )
+
+                # Configure the "Toplevel" toplevel widget's 2nd column to weight 0
+                result["toplevel"].grid_columnconfigure(
+                    index=1,
+                    weight=0,
+                )
+
+                # Create the "Listbox" listbox widget
+                result["listbox"] = cls.get_listbox(
+                    activestyle="underline",
+                    master=result["toplevel"],
+                    selectmode="extended",
+                    **kwargs,
+                )
+
+                # Place the "listbox" listbox widget in the "Toplevel" toplevel widget
+                result["listbox"].grid(
+                    column=0,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Add the values to the "Listbox" listbox widget
+                [
+                    result["listbox"].insert(
+                        index,
+                        value,
+                    )
+                    for (
+                        index,
+                        value,
+                    ) in enumerate(iterable=result["values"])
+                ]
+
+                # Bind the "<<ListboxSelect>>" event to the "on_listbox_select" function
+                result["listbox"].bind(
+                    func=on_listbox_select,
+                    sequence="<<ListboxSelect>>",
+                )
+
+            def set(value: str) -> None:
+                """
+                Sets the selected value in the single select field.
+
+                Args:
+                    value (str): The value to be set.
+
+                Returns:
+                    None
+                """
+
+                if value not in result["values"]:
+                    # Add the value to the "values" list
+                    result["values"].append(value)
+
+                # Set the value associated with the "selection" key
+                result["selection"] = [value]
+
+                # Iterate over the children of the "Container" frame widget
+                for child in result["container"].winfo_children():
+                    # Destroy each child widget
+                    child.destroy()
+
+                # Create the "Value frame" frame widget
+                result["value_frame"] = cls.get_frame(master=result["container"])
+
+                # Configure the "Value frame" frame widget's 1st column to weight 1
+                result["value_frame"].grid_columnconfigure(
+                    index=0,
+                    weight=1,
+                )
+
+                # Configure the "Value frame" frame widget's 2nd column to weight 0
+                result["value_frame"].grid_columnconfigure(
+                    index=1,
+                    weight=0,
+                )
+
+                # Place the "Value frame" frame widget within the "Container" frame widget
+                result["value_frame"].grid(
+                    column=0,
+                    padx=5,
+                    pady=5,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Create the "Value label" label widget
+                result["value_label"] = cls.get_label(
+                    master=result["value_frame"],
+                    text=result["selection"][0],
+                    **kwargs,
+                )
+
+                # Place the "Value label" label widget within the "Value frame" frame widget
+                result["value_label"].grid(
+                    column=0,
+                    padx=5,
+                    pady=5,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Create the "Value remove button" button widget
+                result["value_remove_button"] = cls.get_button(
+                    command=on_value_remove_button_click,
+                    master=result["value_frame"],
+                    text="X",
+                    width=3,
+                    **kwargs,
+                )
+
+                # Place the "Value remove button" button widget within the "Value frame" frame widget
+                result["value_remove_button"].grid(
+                    column=1,
+                    padx=5,
+                    pady=5,
+                    row=0,
+                )
 
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(master=master)
@@ -3827,6 +4148,22 @@ class UIBuilder:
             # Add the values to the result dictionary
             result["values"] = values
 
+            def clear() -> None:
+                """
+                Clears the selected value from the single select field.
+
+                Returns:
+                    None
+                """
+
+                # Set the value associated with the "selection" key to None
+                result["selection"] = None
+
+                # Iterate over the children of the "Container" frame widget
+                for child in result["container"].winfo_children():
+                    # Destroy each child widget
+                    child.destroy()
+
             def get() -> Optional[str]:
                 """
                 Gets the selected value from the single select field.
@@ -3986,6 +4323,18 @@ class UIBuilder:
                     # Create the "Toplevel" toplevel widget
                     result["toplevel"] = cls.get_toplevel()
 
+                    # Configure the "Toplevel" toplevel widget's 1st column to weight 1
+                    result["toplevel"].grid_columnconfigure(
+                        index=0,
+                        weight=1,
+                    )
+
+                    # Configure the "Toplevel" toplevel widget's 1st row to weight 1
+                    result["toplevel"].grid_rowconfigure(
+                        index=0,
+                        weight=1,
+                    )
+
                 # Configure the "Toplevel" toplevel widget's 1st column to weight 1
                 result["toplevel"].grid_columnconfigure(
                     index=0,
@@ -4029,6 +4378,86 @@ class UIBuilder:
                 result["listbox"].bind(
                     func=on_listbox_select,
                     sequence="<<ListboxSelect>>",
+                )
+
+            def set(value: str) -> None:
+                """
+                Sets the selected value in the single select field.
+
+                Args:
+                    value (str): The value to be set.
+
+                Returns:
+                    None
+                """
+
+                if value not in result["values"]:
+                    # Add the value to the "values" list
+                    result["values"].append(value)
+
+                # Set the value associated with the "selection" key
+                result["selection"] = value
+
+                # Iterate over the children of the "Container" frame widget
+                for child in result["container"].winfo_children():
+                    # Destroy each child widget
+                    child.destroy()
+
+                # Create the "Value frame" frame widget
+                result["value_frame"] = cls.get_frame(master=result["container"])
+
+                # Configure the "Value frame" frame widget's 1st column to weight 1
+                result["value_frame"].grid_columnconfigure(
+                    index=0,
+                    weight=1,
+                )
+
+                # Configure the "Value frame" frame widget's 2nd column to weight 0
+                result["value_frame"].grid_columnconfigure(
+                    index=1,
+                    weight=0,
+                )
+
+                # Place the "Value frame" frame widget within the "Container" frame widget
+                result["value_frame"].grid(
+                    column=0,
+                    padx=5,
+                    pady=5,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Create the "Value label" label widget
+                result["value_label"] = cls.get_label(
+                    master=result["value_frame"],
+                    text=result["selection"],
+                    **kwargs,
+                )
+
+                # Place the "Value label" label widget within the "Value frame" frame widget
+                result["value_label"].grid(
+                    column=0,
+                    padx=5,
+                    pady=5,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+                # Create the "Value remove button" button widget
+                result["value_remove_button"] = cls.get_button(
+                    command=on_value_remove_button_click,
+                    master=result["value_frame"],
+                    text="X",
+                    width=3,
+                    **kwargs,
+                )
+
+                # Place the "Value remove button" button widget within the "Value frame" frame widget
+                result["value_remove_button"].grid(
+                    column=1,
+                    padx=5,
+                    pady=5,
+                    row=0,
                 )
 
             # Create the "Root" frame widget
@@ -4090,7 +4519,8 @@ class UIBuilder:
             # Place the "Container" frame widget within the "Root" frame widget
             result["container"].grid(
                 column=1,
-                padx=5, pady=5,
+                padx=5,
+                pady=5,
                 row=0,
                 sticky=NSEW,
             )
@@ -4109,8 +4539,14 @@ class UIBuilder:
                 sticky=NSEW,
             )
 
+            # Add the clear function to the result dictionary
+            result["clearer"] = clear
+
             # Add the getter function to the result dictionary
             result["getter"] = get
+
+            # Add the set function to the result dictionary
+            result["setter"] = set
 
             # Return the result dictionary
             return result
