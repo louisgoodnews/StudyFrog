@@ -59,7 +59,16 @@ class MainUI(BaseUI):
         """
 
         # Get the root window
-        root: tkinter.Tk = UIBuilder.get_tk()
+        root: Optional[tkinter.Tk] = UIBuilder.get_tk()
+
+        if not root:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Failed to get root window in '{self.__class__.__name__}'. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the root window's 1st column to weight 1
         root.grid_columnconfigure(
@@ -195,11 +204,20 @@ class MainUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             height=25,
             master=self,
         )
+
+        if not top_frame:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Failed to create top frame in '{self.__class__.__name__}'. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Top Frame" frame widget's 1st column to weight 1
         top_frame.grid_columnconfigure(
@@ -221,10 +239,19 @@ class MainUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        self.center_frame: tkinter.Frame = UIBuilder.get_frame(
+        self.center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
+
+        if not self.center_frame:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Failed to create center frame in '{self.__class__.__name__}'. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
         self.center_frame.grid_rowconfigure(
@@ -246,11 +273,20 @@ class MainUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+        bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             height=25,
             master=self,
         )
+
+        if not bottom_frame:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Failed to create bottom frame in '{self.__class__.__name__}'. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Bottom Frame" frame widget's 1st column to weight 1
         bottom_frame.grid_columnconfigure(

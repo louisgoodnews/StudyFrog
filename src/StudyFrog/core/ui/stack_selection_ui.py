@@ -159,23 +159,31 @@ class StackSelectionUI(BaseUI):
         """
         try:
             # Create the top frame widget
-            top_frame: tkinter.Frame = UIBuilder.get_frame(
+            top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
             )
 
-            # Create the center frame widget
-            center_frame: tkinter.Frame = UIBuilder.get_frame(
-                background=Constants.BLUE_GREY["700"],
-                master=self,
+            if not top_frame:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create top frame in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Configure the weight of the 0th column to weight 1.
+            top_frame.grid_columnconfigure(
+                index=0,
+                weight=1,
             )
 
-            # Create the bottom frame widget
-            bottom_frame: tkinter.Frame = UIBuilder.get_frame(
-                background=Constants.BLUE_GREY["700"],
-                height=25,
-                master=self,
+            # Configure the weight of the 0th row to weight 1.
+            top_frame.grid_rowconfigure(
+                index=0,
+                weight=1,
             )
 
             # Place the top frame widget in the main window
@@ -185,11 +193,66 @@ class StackSelectionUI(BaseUI):
                 sticky=NSEW,
             )
 
+            # Create the center frame widget
+            center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+                background=Constants.BLUE_GREY["700"],
+                master=self,
+            )
+
+            if not center_frame:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create center frame in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+            
+            # Configure the weight of the 0th column to weight 1.
+            center_frame.grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the weight of the 0th row to weight 1.
+            center_frame.grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
             # Place the center frame widget in the main window
             center_frame.grid(
                 column=0,
                 row=1,
                 sticky=NSEW,
+            )
+
+            # Create the bottom frame widget
+            bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+                background=Constants.BLUE_GREY["700"],
+                height=25,
+                master=self,
+            )
+
+            if not bottom_frame:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create bottom frame in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Configure the weight of the 0th column to weight 1.
+            bottom_frame.grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the weight of the 0th row to weight 1.
+            bottom_frame.grid_rowconfigure(
+                index=0,
+                weight=1,
             )
 
             # Place the bottom frame widget in the main window
@@ -198,22 +261,6 @@ class StackSelectionUI(BaseUI):
                 row=2,
                 sticky=NSEW,
             )
-
-            # Check if all frames were created successfully
-            if not all(
-                [
-                    top_frame,
-                    center_frame,
-                    bottom_frame,
-                ]
-            ):
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create frames in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
 
             # Create and configure the top frame widgets
             self.create_top_frame_widgets(master=top_frame)
