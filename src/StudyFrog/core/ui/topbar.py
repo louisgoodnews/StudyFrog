@@ -127,6 +127,7 @@ class TopBar(tkinter.Frame):
         menu_button: tkinter.Button = UIBuilder.get_button(
             background=Constants.INDIGO["500"],
             command=lambda: self.dispatcher.dispatch(
+                direction="forward",
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
                 master=UIBuilder.get_toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,

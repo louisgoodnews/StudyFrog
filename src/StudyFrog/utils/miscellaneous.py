@@ -272,16 +272,6 @@ class Miscellaneous:
         return datetime.now()
 
     @classmethod
-    def get_uuid(cls) -> str:
-        """
-        Returns a new UUID.
-
-        Returns:
-            str: A new UUID.
-        """
-        return str(uuid.uuid4())
-
-    @classmethod
     def get_date_decrement(
         cls,
         decrement: int,
@@ -312,6 +302,16 @@ class Miscellaneous:
             datetime: The incremented datetime.
         """
         return datetime.now() + timedelta(days=increment)
+
+    @classmethod
+    def get_uuid(cls) -> str:
+        """
+        Returns a new UUID.
+
+        Returns:
+            str: A new UUID.
+        """
+        return str(uuid.uuid4())
 
     @classmethod
     def run_asynchronously(
