@@ -209,7 +209,7 @@ class MutableBaseObject:
         """
 
         # Return a string representation of the object
-        return self.__repr__()
+        return ", ".join([f'{value}' for value in self.to_dict(exclude=["_logger"]).values()])
 
     def compare_to(
         self,
