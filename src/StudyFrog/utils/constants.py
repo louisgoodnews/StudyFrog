@@ -125,53 +125,53 @@ class Constants:
     * YESTERDAY: The current date minus one day.
     """
 
-    APPLICATION_NAME: str = "🐸 StudyFrog"
-    APPLICATION_VERSION: float = 0.1
+    APPLICATION_NAME: Final[str] = "🐸 StudyFrog"
+    APPLICATION_VERSION: Final[float] = 0.1
 
-    BASE_ID: int = 10000
+    BASE_ID: Final[int] = 10000
 
-    CWD: str = os.getcwd()
+    CWD: Final[str] = os.getcwd()
 
-    DATA_PATH: str = path.join(
+    DATA_PATH: Final[str] = path.join(
         CWD,
         "data",
     )
 
-    DATABASE_PATH: str = path.join(
+    DATABASE_PATH: Final[str] = path.join(
         DATA_PATH,
         "database.db",
     )
 
-    EXPORT_PATH: str = path.join(
+    EXPORT_PATH: Final[str] = path.join(
         DATA_PATH,
         "exports",
     )
 
-    IMPORT_PATH: str = path.join(
+    IMPORT_PATH: Final[str] = path.join(
         DATA_PATH,
         "imports",
     )
 
-    ANSWERS: str = "answers"
-    ASSOCIATIONS: str = "associations"
-    CHANGE_HISTORIES: str = "change_histories"
-    CHANGE_HISTORY_ITEMS: str = "change_history_items"
-    COMMENTS: str = "comments"
-    CUSTOM_FIELDS: str = "custom_fields"
-    DEFAULTS: str = "defaults"
-    DIFFICULTIES: str = "difficulties"
-    FLASHCARDS: str = "flashcards"
-    NOTES: str = "notes"
-    OPTIONS: str = "options"
-    PRIORITIES: str = "priorities"
-    QUESTIONS: str = "questions"
-    SETTINGS: str = "settings"
-    STACKS: str = "stacks"
-    STATUSES: str = "statuses"
-    TAGS: str = "tags"
-    USERS: str = "users"
+    ANSWERS: Final[str] = "answers"
+    ASSOCIATIONS: Final[str] = "associations"
+    CHANGE_HISTORIES: Final[str] = "change_histories"
+    CHANGE_HISTORY_ITEMS: Final[str] = "change_history_items"
+    COMMENTS: Final[str] = "comments"
+    CUSTOM_FIELDS: Final[str] = "custom_fields"
+    DEFAULTS: Final[str] = "defaults"
+    DIFFICULTIES: Final[str] = "difficulties"
+    FLASHCARDS: Final[str] = "flashcards"
+    NOTES: Final[str] = "notes"
+    OPTIONS: Final[str] = "options"
+    PRIORITIES: Final[str] = "priorities"
+    QUESTIONS: Final[str] = "questions"
+    SETTINGS: Final[str] = "settings"
+    STACKS: Final[str] = "stacks"
+    STATUSES: Final[str] = "statuses"
+    TAGS: Final[str] = "tags"
+    USERS: Final[str] = "users"
 
-    DEFAULT_FONT_FAMILIY: str = "Helvetica"
+    DEFAULT_FONT_FAMILIY: Final[str] = "Helvetica"
     DEFAULT_FONT_SIZE: int = 16
 
     VERY_LARGE_FONT_SIZE: int = 48
@@ -179,20 +179,20 @@ class Constants:
     MEDIUM_FONT_SIZE: int = 16
     SMALL_FONT_SIZE: int = 12
 
-    BOLD: str = "bold"
-    ITALIC: str = "italic"
-    NORMAL: str = "normal"
-    OVERSTRIKE: str = "overstrike"
-    UNDERLINE: str = "underline"
+    BOLD: Final[str] = "bold"
+    ITALIC: Final[str] = "italic"
+    NORMAL: Final[str] = "normal"
+    OVERSTRIKE: Final[str] = "overstrike"
+    UNDERLINE: Final[str] = "underline"
 
-    DEFAULT_GEOMETRY: str = "1920x1080"
+    DEFAULT_GEOMETRY: Final[str] = "1920x1080"
 
-    DEFAULT_DATE_FORMAT: str = r"^\d{4}-\d{2}-\d{2}$"
-    DEFAULT_TIME_FORMAT: str = r"^\d{2}:\d{2}:\d{2}$"
+    DEFAULT_DATE_FORMAT: Final[str] = r"^\d{4}-\d{2}-\d{2}$"
+    DEFAULT_TIME_FORMAT: Final[str] = r"^\d{2}:\d{2}:\d{2}$"
 
-    DEFAULT_DATETIME_FORMAT: str = f"{DEFAULT_DATE_FORMAT} {DEFAULT_TIME_FORMAT}"
+    DEFAULT_DATETIME_FORMAT: Final[str] = f"{DEFAULT_DATE_FORMAT} {DEFAULT_TIME_FORMAT}"
 
-    AMBER: Dict[str, Any] = {
+    AMBER: Final[Dict[str, Any]] = {
         "default": "#FFC107",
         "50": "#FFF8E1",
         "100": "#FFECB3",
@@ -210,9 +210,9 @@ class Constants:
         "A700": "#FFAB00",
     }
 
-    BLACK: str = "#000000"
+    BLACK: Final[str] = "#000000"
 
-    BLUE: Dict[str, Any] = {
+    BLUE: Final[Dict[str, Any]] = {
         "default": "#2196F3",
         "50": "#E3F2FD",
         "100": "#BBDEFB",
@@ -230,7 +230,7 @@ class Constants:
         "A700": "#2962FF",
     }
 
-    BLUE_GREY: Dict[str, Any] = {
+    BLUE_GREY: Final[Dict[str, Any]] = {
         "default": "#607D8B",
         "50": "#ECEFF1",
         "100": "#CFD8DC",
@@ -244,7 +244,7 @@ class Constants:
         "900": "#263238",
     }
 
-    BROWN: Dict[str, Any] = {
+    BROWN: Final[Dict[str, Any]] = {
         "default": "#795548",
         "50": "#EFEBE9",
         "100": "#D7CCC8",
@@ -276,7 +276,7 @@ class Constants:
         "A700": "#00B8D4",
     }
 
-    DEPP_ORANGE: Dict[str, Any] = {
+    DEPP_ORANGE: Final[Dict[str, Any]] = {
         "default": "#FF5722",
         "50": "#FBE9E7",
         "100": "#FFCCBC",
@@ -294,7 +294,7 @@ class Constants:
         "A700": "#DD2C00",
     }
 
-    DEEP_PURPLE: Dict[str, Any] = {
+    DEEP_PURPLE: Final[Dict[str, Any]] = {
         "default": "#673AB7",
         "50": "#EDE7F6",
         "100": "#D1C4E9",
@@ -312,7 +312,7 @@ class Constants:
         "A700": "#6200EA",
     }
 
-    GREEN: Dict[str, Any] = {
+    GREEN: Final[Dict[str, Any]] = {
         "default": "#4CAF50",
         "50": "#E8F5E9",
         "100": "#C8E6C9",
@@ -330,7 +330,7 @@ class Constants:
         "A700": "#00C853",
     }
 
-    GREY: Dict[str, Any] = {
+    GREY: Final[Dict[str, Any]] = {
         "default": "#9E9E9E",
         "50": "#FAFAFA",
         "100": "#F5F5F5",
@@ -344,7 +344,7 @@ class Constants:
         "900": "#212121",
     }
 
-    INDIGO: Dict[str, Any] = {
+    INDIGO: Final[Dict[str, Any]] = {
         "default": "#3F51B5",
         "50": "#E8EAF6",
         "100": "#C5CAE9",
@@ -380,7 +380,7 @@ class Constants:
         "A700": "#0091EA",
     }
 
-    LIGHT_GREEN: Dict[str, Any] = {
+    LIGHT_GREEN: Final[Dict[str, Any]] = {
         "default": "#CDDC39",
         "50": "#F1F8E9",
         "100": "#DCEDC8",
@@ -398,7 +398,7 @@ class Constants:
         "A700": "#64DD17",
     }
 
-    LIME: Dict[str, Any] = {
+    LIME: Final[Dict[str, Any]] = {
         "default": "#CDDC39",
         "50": "#F9FBE7",
         "100": "#F0F4C3",
@@ -416,7 +416,7 @@ class Constants:
         "A700": "#AEEA00",
     }
 
-    ORANGE: Dict[str, Any] = {
+    ORANGE: Final[Dict[str, Any]] = {
         "default": "#FF9800",
         "50": "#FFF3E0",
         "100": "#FFE0B2",
@@ -434,7 +434,7 @@ class Constants:
         "A700": "#FF6D00",
     }
 
-    PINK: Dict[str, Any] = {
+    PINK: Final[Dict[str, Any]] = {
         "default": "#E91E63",
         "50": "#FCE4EC",
         "100": "#F8BBD0",
@@ -452,7 +452,7 @@ class Constants:
         "A700": "#C51162",
     }
 
-    PURPLE: Dict[str, Any] = {
+    PURPLE: Final[Dict[str, Any]] = {
         "default": "#9C27B0",
         "50": "#F3E5F5",
         "100": "#E1BEE7",
@@ -470,7 +470,7 @@ class Constants:
         "A700": "#AA00FF",
     }
 
-    RED: Dict[str, Any] = {
+    RED: Final[Dict[str, Any]] = {
         "default": "#F44336",
         "50": "#FFEBEE",
         "100": "#FFCDD2",
@@ -506,9 +506,9 @@ class Constants:
         "A700": "#00BFA5",
     }
 
-    WHITE: str = "#ffffff"
+    WHITE: Final[str] = "#ffffff"
 
-    YELLOW: Dict[str, Any] = {
+    YELLOW: Final[Dict[str, Any]] = {
         "default": "#FFEB3B",
         "50": "#FFFDE7",
         "100": "#FFF9C4",
@@ -526,52 +526,52 @@ class Constants:
         "A700": "#FFD600",
     }
 
-    BACKWARD_DIRECTION: str = "backward"
-    FORWARD_DIRECTION: str = "forward"
+    BACKWARD_DIRECTION: Final[str] = "backward"
+    FORWARD_DIRECTION: Final[str] = "forward"
 
-    GLOBAL_NAMESPACE: str = "GLOBAL"
+    GLOBAL_NAMESPACE: Final[str] = "GLOBAL"
 
-    HIGHEST: str = "highest"
-    HIGH: str = "high"
-    LOW: str = "low"
-    LOWEST: str = "lowest"
+    HIGHEST: Final[str] = "highest"
+    HIGH: Final[str] = "high"
+    LOW: Final[str] = "low"
+    LOWEST: Final[str] = "lowest"
 
-    MEDIUM: str = "medium"
-    HARD: str = "hard"
-    EASY: str = "easy"
+    MEDIUM: Final[str] = "medium"
+    HARD: Final[str] = "hard"
+    EASY: Final[str] = "easy"
 
-    NEW: str = "new"
-    LEARNING: str = "learning"
-    REVIEW: str = "review"
-    COMPLETED: str = "completed"
+    NEW: Final[str] = "new"
+    LEARNING: Final[str] = "learning"
+    REVIEW: Final[str] = "review"
+    COMPLETED: Final[str] = "completed"
 
-    TRUE: str = "true"
-    FALSE: str = "false"
+    TRUE: Final[str] = "true"
+    FALSE: Final[str] = "false"
 
-    CREATE_UI_NAMESPACE: str = "CREATE_UI"
-    DASHBOARD_UI_NAMESPACE: str = "DASHBOARD_UI"
-    EDIT_UI_NAMESPACE: str = "EDIT_UI"
-    MAIN_UI_NAMESPACE: str = "MAIN_UI"
-    REPORT_UI_NAMESPACE: str = "REPORT_UI"
-    SEARCH_UI_NAMESPACE: str = "SEARCH_UI"
-    SETTING_UI_NAMESPACE: str = "SETTING_UI"
+    CREATE_UI_NAMESPACE: Final[str] = "CREATE_UI"
+    DASHBOARD_UI_NAMESPACE: Final[str] = "DASHBOARD_UI"
+    EDIT_UI_NAMESPACE: Final[str] = "EDIT_UI"
+    MAIN_UI_NAMESPACE: Final[str] = "MAIN_UI"
+    REPORT_UI_NAMESPACE: Final[str] = "REPORT_UI"
+    SEARCH_UI_NAMESPACE: Final[str] = "SEARCH_UI"
+    SETTING_UI_NAMESPACE: Final[str] = "SETTING_UI"
 
-    NOW: datetime = datetime.now()
+    NOW: Final[datetime] =  datetime.now()
 
-    TODAY: datetime = datetime.today()
-    TOMORROW: datetime = datetime.today() + timedelta(days=1)
-    YESTERDAY: datetime = datetime.today() - timedelta(days=1)
+    TODAY: Final[datetime] =  datetime.today()
+    TOMORROW: Final[datetime] =  datetime.today() + timedelta(days=1)
+    YESTERDAY: Final[datetime] =  datetime.today() - timedelta(days=1)
 
-    START_OF_WEEK: datetime = datetime.today() - timedelta(
+    START_OF_WEEK: Final[datetime] =  datetime.today() - timedelta(
         days=datetime.today().weekday()
     )
-    END_OF_WEEK: datetime = START_OF_WEEK + timedelta(days=6)
+    END_OF_WEEK: Final[datetime] =  START_OF_WEEK + timedelta(days=6)
 
-    START_OF_MONTH: datetime = datetime.today().replace(day=1)
-    END_OF_MONTH: datetime = START_OF_MONTH + timedelta(days=31)
+    START_OF_MONTH: Final[datetime] =  datetime.today().replace(day=1)
+    END_OF_MONTH: Final[datetime] =  START_OF_MONTH + timedelta(days=31)
 
-    START_OF_YEAR: datetime = datetime.today().replace(month=1, day=1)
-    END_OF_YEAR: datetime = START_OF_YEAR + timedelta(days=365)
+    START_OF_YEAR: Final[datetime] =  datetime.today().replace(month=1, day=1)
+    END_OF_YEAR: Final[datetime] =  START_OF_YEAR + timedelta(days=365)
 
     @classmethod
     def get_base_id(cls) -> int:
