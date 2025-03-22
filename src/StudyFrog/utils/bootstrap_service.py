@@ -35,16 +35,21 @@ from core.ui.calendar_ui import CalendarUI
 from core.ui.create_ui import CreateUI
 from core.ui.dashboard_ui import DashboardUI
 from core.ui.edit_ui import EditUI
+from core.ui.flashcards_view_ui import FlashcardsViewUI
 from core.ui.help_ui import HelpUI
 from core.ui.learning_dashboard_ui import LearningDashboardUI
 from core.ui.learning_session_ui import LearningSessionUI
 from core.ui.learning_session_result_ui import LearningSessionResultUI
 from core.ui.menu_ui import MenuUI
+from core.ui.notes_view_ui import NotesViewUI
 from core.ui.notification_ui import NotificationUI
+from core.ui.questions_view_ui import QuestionsViewUI
 from core.ui.report_ui import ReportUI
 from core.ui.search_ui import SearchUI
 from core.ui.setting_ui import SettingUI
 from core.ui.stack_selection_ui import StackSelectionUI
+from core.ui.stacks_view_ui import StacksViewUI
+from core.ui.statistics_view_ui import StatisticsViewUI
 from core.ui.ui_registry import UIRegistry
 from core.ui.user_ui import UserUI
 
@@ -819,16 +824,21 @@ class BootstrapService:
                 "create_ui": CreateUI,
                 "dashboard_ui": DashboardUI,
                 "edit_ui": EditUI,
+                "flashcards_view_ui": FlashcardsViewUI,
                 "help_ui": HelpUI,
                 "learning_dashboard_ui": LearningDashboardUI,
                 "learning_session_ui": LearningSessionUI,
                 "learning_session_result_ui": LearningSessionResultUI,
                 "menu_ui": MenuUI,
+                "notes_view_ui": NotesViewUI,
                 "notification_ui": NotificationUI,
+                "questions_view_ui": QuestionsViewUI,
                 "report_ui": ReportUI,
                 "search_ui": SearchUI,
                 "setting_ui": SettingUI,
                 "stack_selection_ui": StackSelectionUI,
+                "stacks_view_ui": StacksViewUI,
+                "statistics_view_ui": StatisticsViewUI,
                 "user_ui": UserUI,
             }
 

@@ -9,6 +9,10 @@ from datetime import datetime
 
 from typing import *
 
+from core.difficulty import ImmutableDifficulty, MutableDifficulty
+from core.priority import ImmutablePriority, MutablePriority
+
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -23,6 +27,7 @@ __all__: List[str] = [
     "MutableFlashcard",
     "FlashcardConverter",
     "FlashcardFactory",
+    "FlashcardBuilder",
     "FlashcardManager",
     "FlashcardModel",
 ]
@@ -226,6 +231,46 @@ class MutableFlashcard(MutableBaseObject):
             uuid=uuid,
         )
 
+    def set_difficulty(
+        self,
+        difficulty: Union[
+            ImmutableDifficulty,
+            MutableDifficulty,
+        ],
+    ) -> None:
+        """
+        Sets the difficulty of the flashcard.
+
+        Args:
+            difficulty (Union[ImmutableDifficulty, MutableDifficulty]): The difficulty of the flashcard.
+
+        Returns:
+            None
+        """
+
+        # Set the difficulty of the flashcard
+        self.difficulty = difficulty.id
+
+    def set_priority(
+        self,
+        priority: Union[
+            ImmutablePriority,
+            MutablePriority,
+        ],
+    ) -> None:
+        """
+        Sets the priority of the flashcard.
+
+        Args:
+            priority (Union[ImmutablePriority, MutablePriority]): The priority of the flashcard.
+
+        Returns:
+            None
+        """
+
+        # Set the priority of the flashcard
+        self.priority = priority.id
+
     def to_immutable(self) -> ImmutableFlashcard:
         """
         Returns an immutable copy of the MutableFlashcard instance.
@@ -411,6 +456,254 @@ class FlashcardFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class FlashcardBuilder(BaseObjectBuilder):
+    """
+    A builder class for creating instances of ImmutableFlashcard class.
+
+    Attributes:
+        configuration (Dict[str, Any]): The dictionary containing the configuration of the object to be built.
+        logger (Logger): The logger instance associated with the object.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the FlashcardBuilder class.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableFlashcard,
+            MutableFlashcard,
+        ]
+    ]:
+        """
+        Builds an instance of the ImmutableFlashcard or MutableFlashcard class using the configuration dictionary.
+
+        This method is responsible for creating an instance of the ImmutableFlashcard or MutableFlashcard class based on the configuration dictionary
+        passed to the constructor. If an exception occurs while creating the instance, this method will log an error message
+        and return None.
+
+        Args:
+            as_mutable (bool): A flag indicating whether the flashcard should be mutable.
+
+        Returns:
+            Optional[Union[ImmutableFlashcard, MutableFlashcard]]: An instance of the ImmutableFlashcard or MutableFlashcard class if no exception occurs. Otherwise, None.
+        """
+
+        try:
+            # Attempt to create an instance of the ImmutableFlashcard class using the configuration dictionary
+            flashcard: Optional[ImmutableFlashcard] = FlashcardFactory.create_flashcard(
+                **self.configuration
+            )
+
+            if not flashcard:
+                # Log an error message indicating an exception has occurred
+                self.logger.error(
+                    message=f"Failed to build an instance of the ImmutableFlashcard or MutableFlashcard class from '{self.__class__.__name__}'"
+                )
+
+                # Raise an exception
+                raise Exception(
+                    f"Failed to build an instance of the ImmutableFlashcard or MutableFlashcard class from '{self.__class__.__name__}'"
+                )
+
+            # Check if the flashcard should be mutable
+            if as_mutable:
+                # Return a mutable copy of the flashcard
+                return flashcard.to_mutable()
+
+            # Return the instance of the ImmutableFlashcard class
+            return flashcard
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def back_text(
+        self,
+        value: str,
+    ) -> Self:
+        # Set the back_text value in the configuration dictionary
+        self.configuration["back_text"] = value
+
+        # Return the builder instance
+        return self
+
+    def back_word_count(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the back_word_count value in the configuration dictionary
+        self.configuration["back_word_count"] = value
+
+        # Return the builder instance
+        return self
+
+    def created_at(
+        self,
+        value: Optional[datetime] = None,
+    ) -> Self:
+        # Set the created_at value in the configuration dictionary
+        self.configuration["created_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def custom_field_values(
+        self,
+        value: Optional[List[Dict[str, Any]]] = None,
+    ) -> Self:
+        # Set the custom_field_values value in the configuration dictionary
+        self.configuration["custom_field_values"] = value
+
+        # Return the builder instance
+        return self
+
+    def difficulty(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the difficulty value in the configuration dictionary
+        self.configuration["difficulty"] = value
+
+        # Return the builder instance
+        return self
+
+    def familiarity(
+        self,
+        value: Optional[float] = None,
+    ) -> Self:
+        # Set the familiarity value in the configuration dictionary
+        self.configuration["familiarity"] = value
+
+        # Return the builder instance
+        return self
+
+    def front_text(
+        self,
+        value: str,
+    ) -> Self:
+        # Set the front_text value in the configuration dictionary
+        self.configuration["front_text"] = value
+
+        # Return the builder instance
+        return self
+
+    def front_word_count(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the front_word_count value in the configuration dictionary
+        self.configuration["front_word_count"] = value
+
+        # Return the builder instance
+        return self
+
+    def icon(
+        self,
+        value: Optional[str] = None,
+    ) -> Self:
+        # Set the icon value in the configuration dictionary
+        self.configuration["icon"] = value
+
+        # Return the builder instance
+        return self
+
+    def id(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the id value in the configuration dictionary
+        self.configuration["id"] = value
+
+        # Return the builder instance
+        return self
+
+    def key(
+        self,
+        value: Optional[str] = None,
+    ) -> Self:
+        # Set the key value in the configuration dictionary
+        self.configuration["key"] = value
+
+        # Return the builder instance
+        return self
+
+    def last_viewed_at(
+        self,
+        value: Optional[datetime] = None,
+    ) -> Self:
+        # Set the last_viewed_at value in the configuration dictionary
+        self.configuration["last_viewed_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def priority(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the priority value in the configuration dictionary
+        self.configuration["priority"] = value
+
+        # Return the builder instance
+        return self
+
+    def status(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the status value in the configuration dictionary
+        self.configuration["status"] = value
+
+        # Return the builder instance
+        return self
+
+    def total_word_count(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the total_word_count value in the configuration dictionary
+        self.configuration["total_word_count"] = value
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: Optional[datetime] = None,
+    ) -> Self:
+        # Set the updated_at value in the configuration dictionary
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def uuid(
+        self,
+        value: Optional[str] = None,
+    ) -> Self:
+        # Set the uuid value in the configuration dictionary
+        self.configuration["uuid"] = value
+
+        # Return the builder instance
+        return self
 
 
 class FlashcardManager(BaseObjectManager):

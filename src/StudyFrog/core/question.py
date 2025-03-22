@@ -9,6 +9,10 @@ from datetime import datetime
 
 from typing import *
 
+from core.difficulty import ImmutableDifficulty, MutableDifficulty
+from core.priority import ImmutablePriority, MutablePriority
+
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -289,6 +293,46 @@ class MutableQuestion(MutableBaseObject):
         # Remove the correct answer key from the list of correct answers
         self["correct_answers"].remove(answer["key"])
 
+    def set_difficulty(
+        self,
+        difficulty: Union[
+            ImmutableDifficulty,
+            MutableDifficulty,
+        ],
+    ) -> None:
+        """
+        Sets the difficulty of the question.
+
+        Args:
+            difficulty (Union[ImmutableDifficulty, MutableDifficulty]): The difficulty of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the difficulty of the question
+        self.difficulty = difficulty.id
+
+    def set_priority(
+        self,
+        priority: Union[
+            ImmutablePriority,
+            MutablePriority,
+        ],
+    ) -> None:
+        """
+        Sets the priority of the question.
+
+        Args:
+            priority (Union[ImmutablePriority, MutablePriority]): The priority of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the priority of the question
+        self.priority = priority.id
+
     def to_immutable(self) -> ImmutableQuestion:
         """
         Converts the mutable question to an immutable question.
@@ -471,6 +515,223 @@ class QuestionFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class QuestionBuilder(BaseObjectBuilder):
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the QuestionBuilder class.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableQuestion,
+            MutableQuestion,
+        ]
+    ]:
+        """
+        Builds an instance of the ImmutableQuestion or MutableQuestion class
+        using the configuration dictionary.
+
+        Args:
+            as_mutable (bool): A flag indicating whether the question should be mutable.
+
+        Returns:
+            Optional[Union[ImmutableQuestion, MutableQuestion]]: An instance of the
+            ImmutableQuestion or MutableQuestion class if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Attempt to create an ImmutableQuestion using the configuration dictionary
+            question: Optional[ImmutableQuestion] = QuestionFactory.create_question(
+                **self.configuration
+            )
+
+            if not question:
+                # Log an error message indicating an exception has occurred
+                self.logger.error(
+                    message=f"Failed to build an instance of the ImmutableQuestion or MutableQuestion class from '{self.__class__.__name__}'"
+                )
+
+                # Raise an exception
+                raise Exception(
+                    f"Failed to build an instance of the ImmutableQuestion or MutableQuestion class from '{self.__class__.__name__}'"
+                )
+
+            # Check if the question should be mutable
+            if as_mutable:
+                # Convert the ImmutableQuestion to a MutableQuestion
+                return question.to_mutable()
+
+            # Return the instance of the ImmutableQuestion
+            return question
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def answers(
+        self,
+        value: List[str],
+    ) -> Self:
+        # Set the answers value in the configuration dictionary
+        self.configuration["answers"] = value
+
+        # Return the builder instance
+        return self
+
+    def correct_answers(
+        self,
+        value: List[str],
+    ) -> Self:
+        # Set the correct_answers value in the configuration dictionary
+        self.configuration["correct_answers"] = value
+
+        # Return the builder instance
+        return self
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        # Set the created_at value in the configuration dictionary
+        self.configuration["created_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def custom_field_values(
+        self,
+        value: Optional[List[Dict[str, Any]]] = None,
+    ) -> Self:
+        # Set the custom_field_values value in the configuration dictionary
+        self.configuration["custom_field_values"] = value
+
+        # Return the builder instance
+        return self
+
+    def difficulty(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the difficulty value in the configuration dictionary
+        self.configuration["difficulty"] = value
+
+        # Return the builder instance
+        return self
+
+    def icon(
+        self,
+        value: Optional[str] = None,
+    ) -> Self:
+        # Set the icon value in the configuration dictionary
+        self.configuration["icon"] = value
+
+        # Return the builder instance
+        return self
+
+    def id(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the id value in the configuration dictionary
+        self.configuration["id"] = value
+
+        # Return the builder instance
+        return self
+
+    def key(
+        self,
+        value: Optional[str] = None,
+    ) -> Self:
+        # Set the key value in the configuration dictionary
+        self.configuration["key"] = value
+
+        # Return the builder instance
+        return self
+
+    def last_viewed_at(
+        self,
+        value: Optional[datetime] = None,
+    ) -> Self:
+        # Set the last_viewed_at value in the configuration dictionary
+        self.configuration["last_viewed_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def priority(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the priority value in the configuration dictionary
+        self.configuration["priority"] = value
+
+        # Return the builder instance
+        return self
+
+    def question_text(
+        self,
+        value: str,
+    ) -> Self:
+        # Set the question_text value in the configuration dictionary
+        self.configuration["question_text"] = value
+
+        # Return the builder instance
+        return self
+
+    def question_type(
+        self,
+        value: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
+    ) -> Self:
+        # Set the question_type value in the configuration dictionary
+        self.configuration["question_type"] = value
+
+        # Return the builder instance
+        return self
+
+    def status(
+        self,
+        value: Optional[int] = None,
+    ) -> Self:
+        # Set the status value in the configuration dictionary
+        self.configuration["status"] = value
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: Optional[datetime] = None,
+    ) -> Self:
+        # Set the updated_at value in the configuration dictionary
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def uuid(
+        self,
+        value: Optional[str] = None,
+    ) -> Self:
+        # Set the uuid value in the configuration dictionary
+        self.configuration["uuid"] = value
+
+        # Return the builder instance
+        return self
 
 
 class QuestionManager(BaseObjectManager):

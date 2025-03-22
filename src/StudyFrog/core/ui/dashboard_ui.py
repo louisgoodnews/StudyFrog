@@ -1194,7 +1194,7 @@ class DashboardUI(BaseUI):
             if not stacks:
                 # Log a warning message indicating that no stacks were found
                 self.logger.warning(
-                    message="No stacks found while looking up stacks.",
+                    message="No stacks found while looking up completed stacks.",
                 )
 
                 # Return early
@@ -1255,7 +1255,7 @@ class DashboardUI(BaseUI):
             if not stacks:
                 # Log a warning message indicating that no stacks were found
                 self.logger.warning(
-                    message="No stacks found while looking up stacks.",
+                    message="No stacks found while looking up new stacks.",
                 )
 
                 # Return early
@@ -1309,7 +1309,7 @@ class DashboardUI(BaseUI):
             if not stacks:
                 # Log a warning message indicating that no stacks were found
                 self.logger.warning(
-                    message="No stacks found while looking up stacks.",
+                    message="No stacks found while looking up recently viewed stacks.",
                 )
 
                 # Return early

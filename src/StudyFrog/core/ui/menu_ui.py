@@ -16,8 +16,7 @@ from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
-from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
+from utils.events import Events
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
@@ -145,11 +144,21 @@ class MenuUI(BaseUI):
             None
         """
 
-        # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        # Attempt to create the "Top Frame" frame widget
+        top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
+
+        # Check, if the creation of the top frame was successfull
+        if not top_frame:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'top' frame in main window. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Top Frame" frame widget's 1st column to weight 1
         top_frame.grid_columnconfigure(
@@ -170,11 +179,21 @@ class MenuUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(
+        # Attempt to create the "Center Frame" frame widget
+        center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
+
+        # Check, if the creation of the center frame was successfull
+        if not center_frame:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'center' frame in main window. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
         center_frame.grid_columnconfigure(
@@ -195,11 +214,21 @@ class MenuUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+        # Attempt to create the "Bottom Frame" frame widget
+        bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
+
+        # Check, if the creation of the bottom frame was successfull
+        if not bottom_frame:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'bottom' frame in main window. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Bottom Frame" frame widget's 1st column to weight 1
         bottom_frame.grid_columnconfigure(
@@ -245,7 +274,62 @@ class MenuUI(BaseUI):
         Returns:
             None
         """
-        pass
+
+        # Configure the bottom frame widget's 1st column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the bottom frame widget's 1st row to weight 0
+        master.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Configure the bottom frame widget's 2nd row to weight 1
+        master.grid_rowconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Configure the bottom frame widget's 3rd row to weight 0
+        master.grid_rowconfigure(
+            index=2,
+            weight=0,
+        )
+
+        # Attempt to create the close button
+        close_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            background=Constants.BLUE_GREY["700"],
+            command=self.on_close_button_clicked,
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            master=master,
+            relief=FLAT,
+            text="Close",
+        )
+
+        # Check, if the creation of the close button was successfull
+        if not close_button:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'close' button in bottom frame widgets. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Place the close button in the bottom frame
+        close_button.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
+        )
 
     def create_center_frame_widgets(
         self,
@@ -263,7 +347,127 @@ class MenuUI(BaseUI):
         Returns:
             None
         """
-        pass
+
+        # Configure the center frame widget's 1st column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the center frame widget's 1st row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Attempt to create the scrolled frame widgets
+        scrolled_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+            master=master
+        )
+
+        # Check, if the creation of the scrolled frame widgets was successfull
+        if not scrolled_frame:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'scrolled frame' in center frame widgets. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Style the scrolled frame widget's canvas widget
+        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame widget's frame widget
+        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame widget's root widget
+        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the scrolled frame widget in the center frame
+        scrolled_frame["root"].grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Configure the scrolled frame widget's frame widget's 1st column to weight 0
+        scrolled_frame["frame"].grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Configure the scrolled frame widget's frame widget's 2nd column to weight 1
+        scrolled_frame["frame"].grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+
+        home_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            background=Constants.BLUE_GREY["700"],
+            command=self.on_home_button_clicked,
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            master=scrolled_frame["frame"],
+            relief=FLAT,
+            text="🏠",
+        )
+
+        # Check, if the creation of the home button was successfull
+        if not home_button:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'home' button in center frame widgets. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Place the home button in the center frame
+        home_button.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+        home_label: Optional[tkinter.Label] = UIBuilder.get_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            master=scrolled_frame["frame"],
+            text="Home",
+        )
+
+        # Check, if the creation of the home label was successfull
+        if not home_label:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'home' label in center frame widgets. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Bind the home label to the left mouse button click event
+        home_label.bind(
+            func=lambda event: self.on_home_button_clicked(),
+            sequence="<ButtonRelease-1>",
+        )
+
+        # Place the home label in the center frame
+        home_label.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+        )
 
     def create_top_frame_widgets(
         self,
@@ -281,4 +485,165 @@ class MenuUI(BaseUI):
         Returns:
             None
         """
-        pass
+
+        # Configure the top frame widget's 1st column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the top frame widget's 2nd column to weight 1
+        master.grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Configure the top frame widget's 1st row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Attempt to create the StudyFrog label
+        study_frog_label: Optional[tkinter.Label] = UIBuilder.get_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.LARGE_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            master=master,
+            text="StudyFrog",
+        )
+
+        # Check, if the creation of the StudyFrog label was successfull
+        if not study_frog_label:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'StudyFrog' label in top frame widgets. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Place the StudyFrog label in the top frame
+        study_frog_label.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Attempt to create the shutdown button
+        shutdown_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            background=Constants.BLUE_GREY["700"],
+            command=self.on_shutdown_button_clicked,
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            master=master,
+            relief=FLAT,
+            text="X",
+        )
+
+        # Check, if the creation of the shutdown button was successfull
+        if not shutdown_button:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to create 'shutdown' button in top frame widgets. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Place the shutdown button in the top frame
+        shutdown_button.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+    def on_close_button_clicked(self) -> None:
+        """
+        Handles the event when the 'close' button is clicked.
+
+        This method destroys the master widget, which will close the window.
+
+        Returns:
+            None
+        """
+        if not isinstance(
+            self.master,
+            tkinter.Toplevel,
+        ):
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                "Failed to destroy master widget in 'on_close_button_clicked' method. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Destroy the master widget
+        self.master.destroy()
+
+    def on_home_button_clicked(self) -> None:
+        """
+        Handles the event when the 'home' button is clicked.
+
+        This method dispatches the REQUEST_VALIDATE_NAVIGATION event in the global namespace,
+        which will cause the application to navigate to the dashboard UI.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to dispatch the event.
+        """
+        try:
+            # Attempt to dispatch the REQUEST_VALIDATE_NAVIGATION event in the global namespace
+            self.dispatcher.dispatch(
+                direction=Constants.FORWARD_DIRECTION,
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                source="menu_ui",
+                target="dashboard_ui",
+            )
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_home_button_clicked' method from {self.__class__.__name__}: {e}"
+            )
+
+            # Re-raise the exception the caller
+            raise e
+
+    def on_shutdown_button_clicked(self) -> None:
+        """
+        Handles the event when the 'shutdown' button is clicked.
+
+        This method dispatches the REQUEST_APPLICATION_STOP event in the global namespace,
+        which will cause the application to stop.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to dispatch the event.
+        """
+        try:
+            # Attempt to dispatch the REQUEST_APPLICATION_STOP event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_APPLICATION_STOP,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_shutdown_button_clicked' method from {self.__class__.__name__}: {e}"
+            )
+
+            # Re-raise the exception the caller
+            raise e

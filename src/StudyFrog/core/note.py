@@ -9,6 +9,10 @@ from datetime import datetime
 
 from typing import *
 
+from core.difficulty import ImmutableDifficulty, MutableDifficulty
+from core.priority import ImmutablePriority, MutablePriority
+
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -23,6 +27,7 @@ __all__: List[str] = [
     "MutableNote",
     "NoteConverter",
     "NoteFactory",
+    "Notebuilder",
     "NoteManager",
     "NoteModel",
 ]
@@ -170,6 +175,116 @@ class MutableNote(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    def add_child(
+        self,
+        child: Union[
+            ImmutableNote,
+            "MutableNote",
+        ],
+    ) -> None:
+        """
+        Adds a child Note to the Note.
+
+        Args:
+            child (Union[ImmutableNote, MutableNote]): The child Note to be added.
+
+        Returns:
+            None
+        """
+
+        # Add the child to the list of children
+        self.children.append(child.id)
+
+    def remove_child(
+        self,
+        child: Union[
+            ImmutableNote,
+            "MutableNote",
+        ],
+    ) -> None:
+        """
+        Removes a child Note from the Note.
+
+        Args:
+            child (Union[ImmutableNote, MutableNote]): The child Note to be removed.
+
+        Returns:
+            None
+        """
+
+        # Check if the child is already in the list of children
+        if child.id not in self.children:
+            # Log a warning message
+            self.logger.warning(
+                f"Child with ID {child.id} not found in list of children for {self.__class__.__name__} with ID {self.id}"
+            )
+
+            # Return if the child is not in the list of children
+            return
+
+        # Remove the child from the list of children
+        self.children.remove(child.id)
+
+    def set_ancestor(
+        self,
+        ancestor: Union[
+            ImmutableNote,
+            "MutableNote",
+        ],
+    ) -> None:
+        """
+        Sets the ancestor of the Note.
+
+        Args:
+            ancestor (Union[ImmutableNote, MutableNote]): The ancestor of the Note.
+
+        Returns:
+            None
+        """
+
+        # Set the ancestor of the Note
+        self.ancestor = ancestor.id
+
+    def set_difficulty(
+        self,
+        difficulty: Union[
+            ImmutableDifficulty,
+            MutableDifficulty,
+        ],
+    ) -> None:
+        """
+        Sets the difficulty of the Note.
+
+        Args:
+            difficulty (Union[ImmutableDifficulty, MutableDifficulty]): The difficulty of the Note.
+
+        Returns:
+            None
+        """
+
+        # Set the difficulty of the Note
+        self.difficulty = difficulty.id
+
+    def set_priority(
+        self,
+        priority: Union[
+            ImmutablePriority,
+            MutablePriority,
+        ],
+    ) -> None:
+        """
+        Sets the priority of the Note.
+
+        Args:
+            priority (Union[ImmutablePriority, MutablePriority]): The priority of the Note.
+
+        Returns:
+            None
+        """
+
+        # Set the priority of the Note
+        self.priority = priority.id
 
     def to_immutable(self) -> ImmutableNote:
         """
@@ -338,6 +453,173 @@ class NoteFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class NoteBuilder(BaseObjectBuilder):
+    """
+    A builder class used to create instances of ImmutableNote class.
+
+    Attributes:
+        configuration (Dict[str, Any]): The dictionary containing the configuration of the object to be built.
+        logger (Logger): The logger instance associated with the object.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the NoteBuilder class.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableNote,
+            MutableNote,
+        ]
+    ]:
+        """
+        Builds an instance of the ImmutableNote or MutableNote class using the configuration dictionary.
+
+        This method is responsible for creating an instance of the ImmutableNote or MutableNote class based on the configuration dictionary
+        passed to the constructor. If an exception occurs while creating the instance, this method will log an error message
+        and return None.
+
+        Args:
+            as_mutable (bool): A flag indicating whether the note should be mutable.
+
+        Returns:
+            Optional[Union[ImmutableNote, MutableNote]]: An instance of the ImmutableNote or MutableNote class if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Attempt to create an instance of the ImmutableNote class using the configuration dictionary
+            note: Optional[ImmutableNote] = NoteFactory.create_note(
+                **self.configuration
+            )
+
+            if not note:
+                # Log an error message indicating an exception has occurred
+                self.logger.error(
+                    message=f"Failed to build an instance of the ImmutableNote or MutableNote class from '{self.__class__.__name__}'"
+                )
+
+                # Raise an exception
+                raise Exception(
+                    f"Failed to build an instance of the ImmutableNote or MutableNote class from '{self.__class__.__name__}'"
+                )
+
+            # Check if the instance should be mutable
+            if as_mutable:
+                # Convert the instance to a MutableNote
+                return note.to_mutable()
+
+            # Return the instance
+            return note
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def body_text(
+        self,
+        value: str,
+    ) -> Self:
+        # Set the body_text value in the configuration dictionary
+        self.configuration["body_text"] = value
+
+        # Return the builder instance
+        return self
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        # Set the created_at value in the configuration dictionary
+        self.configuration["created_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def custom_field_values(
+        self,
+        value: List[Dict[str, Any]],
+    ) -> Self:
+        # Set the custom_field_values value in the configuration dictionary
+        self.configuration["custom_field_values"] = value
+
+        # Return the builder instance
+        return self
+
+    def icon(
+        self,
+        value: str,
+    ) -> Self:
+        # Set the icon value in the configuration dictionary
+        self.configuration["icon"] = value
+
+        # Return the builder instance
+        return self
+
+    def id(
+        self,
+        value: int,
+    ) -> Self:
+        # Set the id value in the configuration dictionary
+        self.configuration["id"] = value
+
+        # Return the builder instance
+        return self
+
+    def key(
+        self,
+        value: str,
+    ) -> Self:
+        # Set the key value in the configuration dictionary
+        self.configuration["key"] = value
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        # Set the updated_at value in the configuration dictionary
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def uuid(
+        self,
+        value: str,
+    ) -> Self:
+        # Set the uuid value in the configuration dictionary
+        self.configuration["uuid"] = value
+
+        # Return the builder instance
+        return self
+
+    def title_text(
+        self,
+        value: str,
+    ) -> Self:
+        # Set the title_text value in the configuration dictionary
+        self.configuration["title_text"] = value
+
+        # Return the builder instance
+        return self
 
 
 class NoteManager(BaseObjectManager):

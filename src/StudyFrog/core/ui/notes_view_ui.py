@@ -1,6 +1,6 @@
 """
 Author: lodego
-Date: 2025-02-11
+Date: 2025-03-22
 """
 
 import tkinter
@@ -20,15 +20,15 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["NotificationUI"]
+__all__: List[str] = ["NotesViewUI"]
 
 
-class NotificationUI(BaseUI):
+class NotesViewUI(BaseUI):
     """
-    A class representing the notification menu user interface (UI) of the application.
+    A class representing the notes view user interface (UI) of the application.
 
     This class is responsible for initializing and configuring the layout of the
-    notification menu UI, including setting up the main frames and populating them with
+    notes view UI, including setting up the main frames and populating them with
     respective widgets. It extends the tkinter.Frame class and utilizes various
     utility classes for managing navigation, logging, and other functionalities.
 
@@ -51,7 +51,7 @@ class NotificationUI(BaseUI):
         unified_manager: UnifiedObjectManager,
     ) -> None:
         """
-        Initializes a new instance of the NotificationUI class.
+        Initializes a new instance of the NotesViewUI class.
 
         Args:
             dispatcher (Dispatcher): The dispatcher instance.
@@ -69,7 +69,7 @@ class NotificationUI(BaseUI):
         super().__init__(
             dispatcher=dispatcher,
             master=master,
-            name="notification_ui",
+            name="notes_view_ui",
             navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
@@ -95,23 +95,23 @@ class NotificationUI(BaseUI):
     @override
     def configure_grid(self) -> None:
         """
-        Configures the grid of the notification menu widget.
+        Configures the grid of the notes view widget.
 
-        This method configures the grid of the notification menu widget by setting the
+        This method configures the grid of the notes view widget by setting the
         weights of the columns and rows.
 
         Returns:
             None
         """
 
-        # Configure the notification menu widget's 1st column to weight 1.
+        # Configure the notes view widget's 1st column to weight 1.
         # This means that the 1st column will stretch when the window is resized.
         self.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the notification menu widget's 1st and 3rd row to weight 0.
+        # Configure the notes view widget's 1st and 3rd row to weight 0.
         # This means that the 1st and 3rd row will not stretch when the window is resized.
         self.grid_rowconfigure(
             index=(
@@ -121,7 +121,7 @@ class NotificationUI(BaseUI):
             weight=0,
         )
 
-        # Configure the notification menu widget's 2nd row to weight 1.
+        # Configure the notes view widget's 2nd row to weight 1.
         # This means that the 2nd row will stretch when the window is resized.
         self.grid_rowconfigure(
             index=1,
@@ -131,10 +131,10 @@ class NotificationUI(BaseUI):
     @override
     def create_widgets(self) -> None:
         """
-        Creates and configures the main frames of the notification menu UI.
+        Creates and configures the main frames of the notes view UI.
 
         This method initializes the top, center, and bottom frames within the
-        notification menu UI, setting their layout configuration and invoking methods
+        notes view UI, setting their layout configuration and invoking methods
         to populate each frame with its respective widgets.
 
         Args:
