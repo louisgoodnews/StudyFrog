@@ -1429,7 +1429,7 @@ class FlashcardModel(ImmutableBaseModel):
         autoincrement=False,
         default=None,
         description="",
-        foreign_key=f"{Constants.PRIORITIES}(id)",
+        foreign_key=f"{Constants.DIFFICULTIES}(id)",
         index=False,
         name="difficulty",
         nullable=False,

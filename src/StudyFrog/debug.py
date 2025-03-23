@@ -63,9 +63,6 @@ def debug() -> None:
             try:
                 # Drop the table
                 asyncio.run(model_class.drop_table(database=Constants.DATABASE_PATH))
-
-                # Log an info message
-                logger.info(f"Dropped table '{model_class.__name__}'.")
             except Exception as e:
                 # Log an error message indicating an exception has occurred
                 logger.error(f"Failed to drop table '{model_class.__name__}': {str(e)}")
@@ -75,9 +72,6 @@ def debug() -> None:
             try:
                 # Create the table
                 asyncio.run(model_class.create_table(database=Constants.DATABASE_PATH))
-
-                # Log an info message
-                logger.info(f"Created table '{model_class.__name__}'.")
             except Exception as e:
                 # Log an error message indicating an exception has occurred
                 logger.error(

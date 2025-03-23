@@ -136,7 +136,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
     async def create_table(
         cls,
         database: str,
-    ) -> None:
+    ) -> bool:
         """
         Creates the table based on the defined fields.
 
@@ -144,7 +144,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             database (str): Path to the SQLite database file.
 
         Returns:
-            None
+            bool: True if the table was created successfully, False otherwise.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -161,14 +161,22 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 parameters=(),
                 sql=sql,
             )
+
+            # Log an info message
+            cls.logger.info(
+                message=f"Created table '{cls.table}' in the database."
+            )
+
+            # Return True indicating the operation was successful
+            return True
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'create_table' method from '{cls.__name__}' class: {e}"
             )
 
-            # Return None indicating an exception occurred
-            return None
+            # Return False indicating an exception occurred
+            return False
 
     async def delete(
         self,
@@ -227,11 +235,19 @@ class ImmutableBaseModel(ImmutableBaseObject):
             sql: str = f"DROP TABLE IF EXISTS {cls.table}"
 
             # Execute the SQL query
-            return await DatabaseService.execute(
+            await DatabaseService.execute(
                 database=database,
                 parameters=(),
                 sql=sql,
             )
+
+            # Log an info message
+            cls.logger.info(
+                message=f"Dropped table '{cls.table}' from the database."
+            )
+
+            # Return True indicating the operation was successful
+            return True
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
