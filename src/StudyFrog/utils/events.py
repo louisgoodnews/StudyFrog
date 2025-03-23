@@ -6,6 +6,7 @@ Date: 2025-02-06
 from typing import *
 
 from utils.dispatcher import DispatcherEvent, DispatcherEventFactory
+from utils.logger import Logger
 
 
 __all__: Final[List[str]] = ["Events"]
@@ -17,6 +18,8 @@ class Events:
 
     These events are dispatched using the Dispatcher class.
     """
+
+    logger: Logger = Logger.get_logger(name="Events")
 
     # An event that indicates that an answer has been created in the backend
     ANSWER_CREATED: DispatcherEvent = DispatcherEventFactory.create_event(
@@ -944,10 +947,16 @@ class Events:
         Returns:
             Optional[DispatcherEvent]: The event with the given name if found; None otherwise.
         """
-        return next(
+        event: Optional[DispatcherEvent] = next(
             (event for event in cls.get_all_events() if event.name == name),
             None,
         )
+
+        if not event:
+            # Log a warning message
+            cls.logger.warning(f"Event with name '{name}' not found.")
+
+        return event
 
     @classmethod
     def get_event_names(cls) -> List[str]:

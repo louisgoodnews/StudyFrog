@@ -22,6 +22,7 @@ from core.status import StatusManager
 from core.tag import TagManager
 from core.user import UserManager
 
+from utils.dispatcher import Dispatcher
 from utils.logger import Logger
 from utils.unified import UnifiedObjectManager
 
@@ -35,6 +36,25 @@ class ComponentAccessor:
 
     Attributes:
         logger (Logger): The logger instance associated with the ComponentAccessor class.
+        answer_manager (AnswerManager): The answer manager instance.
+        association_manager (AssociationManager): The association manager instance.
+        change_history_manager (ChangeHistoryManager): The change history manager instance.
+        change_history_item_manager (ChangeHistoryItemManager): The change history item manager instance.
+        comment_manager (CommentManager): The comment manager instance.
+        custom_field_manager (CustomFieldManager): The custom field manager instance.
+        default_manager (DefaultManager): The default manager instance.
+        difficulty_manager (DifficultyManager): The difficulty manager instance.
+        flashcard_manager (FlashcardManager): The flashcard manager instance.
+        note_manager (NoteManager): The note manager instance.
+        priority_manager (PriorityManager): The priority manager instance.
+        question_manager (QuestionManager): The question manager instance.
+        setting_manager (SettingManager): The setting manager instance.
+        stack_manager (StackManager): The stack manager instance.
+        status_manager (StatusManager): The status manager instance.
+        tag_manager (TagManager): The tag manager instance.
+        unified_manager (UnifiedObjectManager): The unified manager instance.
+        user_manager (UserManager): The user manager instance.
+        dispatcher (Dispatcher): The dispatcher instance.
 
     Methods:
         get_answer_manager(): Returns the answer manager instance.
@@ -46,6 +66,7 @@ class ComponentAccessor:
         get_custom_field_manager(): Returns the custom field manager instance.
         get_default_manager(): Returns the default manager instance.
         get_difficulty_manager(): Returns the difficulty manager instance.
+        get_dispatcher(): Returns the dispatcher instance.
         get_flashcard_manager(): Returns the flashcard manager instance.
         get_logger(name: str): Returns a logger instance for the specified name.
         get_note_manager(): Returns the note manager instance.
@@ -60,6 +81,26 @@ class ComponentAccessor:
     """
 
     logger: Logger = Logger.get_logger(name="ComponentAccessor")
+
+    answer_manager: AnswerManager = AnswerManager()
+    association_manager: AssociationManager = AssociationManager()
+    change_history_manager: ChangeHistoryManager = ChangeHistoryManager()
+    change_history_item_manager: ChangeHistoryItemManager = ChangeHistoryItemManager()
+    comment_manager: CommentManager = CommentManager()
+    custom_field_manager: CustomFieldManager = CustomFieldManager()
+    default_manager: DefaultManager = DefaultManager()
+    difficulty_manager: DifficultyManager = DifficultyManager()
+    dispatcher: Dispatcher = Dispatcher()
+    flashcard_manager: FlashcardManager = FlashcardManager()
+    note_manager: NoteManager = NoteManager()
+    priority_manager: PriorityManager = PriorityManager()
+    question_manager: QuestionManager = QuestionManager()
+    setting_manager: SettingManager = SettingManager()
+    stack_manager: StackManager = StackManager()
+    status_manager: StatusManager = StatusManager()
+    tag_manager: TagManager = TagManager()
+    unified_manager: UnifiedObjectManager = UnifiedObjectManager()
+    user_manager: UserManager = UserManager()
 
     @classmethod
     def get_answer_manager(cls) -> AnswerManager:
@@ -174,6 +215,16 @@ class ComponentAccessor:
             DifficultyManager: The difficulty manager instance.
         """
         return DifficultyManager()
+
+    @classmethod
+    def get_dispatcher(cls) -> Dispatcher:
+        """
+        Returns the Dispatcher instance.
+
+        Returns:
+            Dispatcher: The Dispatcher instance.
+        """
+        return Dispatcher()
 
     @classmethod
     def get_flashcard_manager(cls) -> FlashcardManager:
