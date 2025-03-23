@@ -23,7 +23,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["LearningDashboardUI"]
+__all__: Final[List[str]] = ["LearningDashboardUI"]
 
 
 class LearningDashboardUI(BaseUI):

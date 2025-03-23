@@ -7,11 +7,10 @@ import tkinter
 
 from typing import *
 
-from utils.constants import Constants
 from utils.logger import Logger
 
 
-__all__: List[str] = ["UIRegistry"]
+__all__: Final[List[str]] = ["UIRegistry"]
 
 
 class UIRegistry:
@@ -23,7 +22,7 @@ class UIRegistry:
         logger (Logger): The logger instance associated with the object.
     """
 
-    registry: Dict[str, Type[tkinter.Misc]] = {}
+    registry: Final[Dict[str, Type[tkinter.Misc]]] = {}
 
     logger: Logger = Logger.get_logger(name="UIRegistry")
 
@@ -82,21 +81,6 @@ class UIRegistry:
                     message=f"Overwriting widget '{name}' with class '{type(widget).__name__}'."
                 )
 
-            # Check if the provided widget is a subclass of tkinter.Misc.
-            if not issubclass(
-                widget,
-                tkinter.Misc,
-            ):
-                # Log an error message indicating that the provided widget is not a valid tkinter UI class.
-                cls.logger.error(
-                    message=f"Cannot register '{name}': Provided widget is not a valid tkinter UI class."
-                )
-
-                # Raise a type error indicating that the provided widget is not a valid tkinter UI class.
-                raise TypeError(
-                    f"Provided widget '{name}' is not a subclass of tkinter.Misc."
-                )
-
             # Register the widget class under the given name
             cls.registry[name] = widget
 
@@ -131,18 +115,20 @@ class UIRegistry:
             Exception: If an exception occurs while attempting to unregister the widget.
         """
         try:
-            # Check if the widget class is registered
-            if name in cls.registry:
-                # Remove the widget class from the registry
-                del cls.registry[name]
-
-                # Log an info message indicating that the widget has been unregistered
-                cls.logger.info(message=f"Unregistered UI class '{name}'.")
-            else:
+            if name not in cls.registry:
                 # Log a warning message indicating that no such widget is registered
                 cls.logger.warning(
                     message=f"Cannot unregister '{name}': No such UI class registered."
                 )
+
+                # Return early since no such widget is registered
+                return
+
+            # Remove the widget class from the registry
+            del cls.registry[name]
+
+            # Log an info message indicating that the widget has been unregistered
+            cls.logger.info(message=f"Unregistered UI class '{name}'.")
         except Exception as e:
             # Log an error message indicating that no such widget is registered
             cls.logger.error(

@@ -6,6 +6,9 @@ from typing import *
 from concurrent.futures import ProcessPoolExecutor
 
 
+__all__: Final[List[str]] = ["TextComparer"]
+
+
 class TextComparer:
     """
     A class for comparing the similarity between two texts using spaCy models.

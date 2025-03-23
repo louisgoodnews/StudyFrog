@@ -8,7 +8,7 @@ from typing import *
 from utils.object import ImmutableBaseObject
 
 
-__all__: List[str] = ["BaseObjectBuilder"]
+__all__: Final[List[str]] = ["BaseObjectBuilder"]
 
 
 class BaseObjectBuilder(ImmutableBaseObject):

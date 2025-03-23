@@ -21,7 +21,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["MenuUI"]
+__all__: Final[List[str]] = ["MenuUI"]
 
 
 class MenuUI(BaseUI):

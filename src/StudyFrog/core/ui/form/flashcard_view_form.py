@@ -27,7 +27,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["FlashcardViewForm"]
+__all__: Final[List[str]] = ["FlashcardViewForm"]
 
 
 class FlashcardViewForm(tkinter.Frame):
@@ -1083,23 +1083,21 @@ class FlashcardViewForm(tkinter.Frame):
                 self.subscriptions: List[str] = []
 
             # Create a dictionary of events and functions
-            subscriptions: Dict[Any, Dict[str, Any]] = {
-                Events.FLASHCARD_UPDATED: {
+            subscriptions: List["dict[str, Any]"] = [
+                {
+                    "event": Events.FLASHCARD_UPDATED,
                     "function": self.on_flashcard_updated,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
-            }
+            ]
 
             # Iterate over the events and functions in the subscriptions dictionary
-            for (
-                event,
-                subscription,
-            ) in subscriptions.items():
+            for subscription in subscriptions:
                 # Store the UUID of the subscription in the subscriptions list
                 self.subscriptions.append(
                     self.dispatcher.register(
-                        event=event,
+                        event=subscription["event"],
                         function=subscription["function"],
                         namespace=subscription["namespace"],
                         persistent=subscription["persistent"],

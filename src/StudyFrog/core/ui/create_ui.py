@@ -33,7 +33,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["CreateUI"]
+__all__: Final[List[str]] = ["CreateUI"]
 
 
 class CreateUI(BaseUI):

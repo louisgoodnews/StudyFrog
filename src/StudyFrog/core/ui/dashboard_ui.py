@@ -25,7 +25,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["DashboardUI"]
+__all__: Final[List[str]] = ["DashboardUI"]
 
 
 class DashboardUI(BaseUI):

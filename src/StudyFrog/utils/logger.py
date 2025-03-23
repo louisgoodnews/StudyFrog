@@ -12,7 +12,7 @@ from typing import *
 from utils.level import *
 
 
-__all__: List[str] = ["Logger"]
+__all__: Final[List[str]] = ["Logger"]
 
 
 class Logger:

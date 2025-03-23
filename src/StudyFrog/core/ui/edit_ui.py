@@ -32,7 +32,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["EditUI"]
+__all__: Final[List[str]] = ["EditUI"]
 
 
 class EditUI(BaseUI):
@@ -87,17 +87,6 @@ class EditUI(BaseUI):
             None
         """
 
-        # Call the parent class constructor
-        super().__init__(
-            dispatcher=dispatcher,
-            master=master,
-            name="create_ui",
-            navigation_item=navigation_item,
-            navigation_service=navigation_service,
-            setting_service=setting_service,
-            unified_manager=unified_manager,
-        )
-
         # Store the passed answer instance in an instance variable
         self.answer: Optional[ImmutableAnswer] = answer
 
@@ -118,6 +107,17 @@ class EditUI(BaseUI):
 
         # Store the passed stack instance in an instance variable
         self.stack: Optional[ImmutableStack] = stack
+
+        # Call the parent class constructor
+        super().__init__(
+            dispatcher=dispatcher,
+            master=master,
+            name="edit_ui",
+            navigation_item=navigation_item,
+            navigation_service=navigation_service,
+            setting_service=setting_service,
+            unified_manager=unified_manager,
+        )
 
     @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:

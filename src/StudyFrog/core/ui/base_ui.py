@@ -18,7 +18,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["BaseUI"]
+__all__: Final[List[str]] = ["BaseUI"]
 
 
 class BaseUI(tkinter.Frame):

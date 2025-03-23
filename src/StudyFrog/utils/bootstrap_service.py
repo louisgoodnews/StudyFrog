@@ -62,7 +62,7 @@ from utils.navigation import NavigationHistoryService
 from utils.unified import UnifiedObjectManager, UnifiedObjectService
 
 
-__all__: List[str] = ["BootstrapService"]
+__all__: Final[List[str]] = ["BootstrapService"]
 
 
 class BootstrapService:

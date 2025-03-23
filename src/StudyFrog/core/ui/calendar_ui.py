@@ -22,7 +22,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["CalendarUI"]
+__all__: Final[List[str]] = ["CalendarUI"]
 
 
 class CalendarUI(BaseUI):

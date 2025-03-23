@@ -8,7 +8,7 @@ from typing import *
 from utils.dispatcher import DispatcherEvent, DispatcherEventFactory
 
 
-__all__: List[str] = ["Events"]
+__all__: Final[List[str]] = ["Events"]
 
 
 class Events:

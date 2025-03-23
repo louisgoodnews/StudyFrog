@@ -28,7 +28,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["StackViewForm"]
+__all__: Final[List[str]] = ["StackViewForm"]
 
 
 class StackViewForm(tkinter.Frame):
@@ -1580,38 +1580,39 @@ class StackViewForm(tkinter.Frame):
                 self.subscriptions: List[str] = []
 
             # Create a dictionary of events and functions
-            subscriptions: Dict[Any, Dict[str, Any]] = {
-                Events.FLASHCARD_CREATED: {
+            subscriptions: List[Dict[str, Any]] = [
+                {
+                    "event": Events.FLASHCARD_CREATED,
                     "function": self.on_flashcard_created,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
-                Events.NOTE_CREATED: {
+                {
+                    "event": Events.NOTE_CREATED,
                     "function": self.on_note_created,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
-                Events.QUESTION_CREATED: {
+                {
+                    "event": Events.QUESTION_CREATED,
                     "function": self.on_question_created,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
-                Events.STACK_UPDATED: {
+                {
+                    "event": Events.STACK_UPDATED,
                     "function": self.on_stack_updated,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
-            }
+            ]
 
             # Iterate over the events and functions in the subscriptions dictionary
-            for (
-                event,
-                subscription,
-            ) in subscriptions.items():
+            for subscription in subscriptions:
                 # Store the UUID of the subscription in the subscriptions list
                 self.subscriptions.append(
                     self.dispatcher.register(
-                        event=event,
+                        event=subscription["event"],
                         function=subscription["function"],
                         namespace=subscription["namespace"],
                         persistent=subscription["persistent"],

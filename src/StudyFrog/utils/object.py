@@ -8,7 +8,7 @@ from typing import *
 from utils.logger import Logger
 
 
-__all__: List[str] = [
+__all__: Final[List[str]] = [
     "MutableBaseObject",
     "ImmutableBaseObject",
 ]

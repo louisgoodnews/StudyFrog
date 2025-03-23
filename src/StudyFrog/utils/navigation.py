@@ -20,7 +20,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.object import ImmutableBaseObject
 
 
-__all__: List[str] = [
+__all__: Final[List[str]] = [
     "NavigationHistoryItem",
     "NavigationHistoryItemFactory",
     "NavigationHistoryService",

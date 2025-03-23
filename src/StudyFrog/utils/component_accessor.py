@@ -26,7 +26,7 @@ from utils.logger import Logger
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["ComponentAccessor"]
+__all__: Final[List[str]] = ["ComponentAccessor"]
 
 
 class ComponentAccessor:

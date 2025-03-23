@@ -20,7 +20,7 @@ from utils.model import ImmutableBaseModel
 from utils.object import MutableBaseObject, ImmutableBaseObject
 
 
-__all__: List[str] = [
+__all__: Final[List[str]] = [
     "ImmutableDefault",
     "MutableDefault",
     "DefaultConverter",

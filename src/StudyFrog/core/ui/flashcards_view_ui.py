@@ -20,7 +20,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["FlashcardsViewUI"]
+__all__: Final[List[str]] = ["FlashcardsViewUI"]
 
 
 class FlashcardsViewUI(BaseUI):

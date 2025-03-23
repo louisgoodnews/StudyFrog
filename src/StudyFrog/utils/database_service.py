@@ -10,7 +10,7 @@ from typing import *
 from utils.logger import Logger
 
 
-__all__: List[str] = ["DatabaseService"]
+__all__: Final[List[str]] = ["DatabaseService"]
 
 
 class DatabaseService:

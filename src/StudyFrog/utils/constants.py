@@ -14,7 +14,7 @@ from os import path
 from typing import *
 
 
-__all__: List[str] = ["Constants"]
+__all__: Final[List[str]] = ["Constants"]
 
 
 class Constants:

@@ -27,7 +27,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["StackSelectionUI"]
+__all__: Final[List[str]] = ["StackSelectionUI"]
 
 
 class StackSelectionUI(BaseUI):
@@ -795,7 +795,7 @@ class StackSelectionUI(BaseUI):
                 column=0,
                 padx=5,
                 pady=10,
-                row=len(self.new_stacks_frame.winfo_children()),
+                row=len(master.winfo_children()),
                 sticky=NSEW,
             )
         except Exception as e:

@@ -21,7 +21,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["StackCreateForm"]
+__all__: Final[List[str]] = ["StackCreateForm"]
 
 
 class StackCreateForm(tkinter.Frame):

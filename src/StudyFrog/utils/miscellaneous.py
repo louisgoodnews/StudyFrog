@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from utils.logger import Logger
 
 
-__all__: List[str] = ["Miscellaneous"]
+__all__: Final[List[str]] = ["Miscellaneous"]
 
 
 class Miscellaneous:

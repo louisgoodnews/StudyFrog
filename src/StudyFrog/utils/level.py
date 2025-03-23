@@ -8,7 +8,7 @@ from typing import *
 from enum import Enum
 
 
-__all__: List[str] = ["Level"]
+__all__: Final[List[str]] = ["Level"]
 
 
 class Level(Enum):
@@ -40,7 +40,7 @@ Date: 2024-01-24
 from enum import Enum
 
 
-__all__: List[str] = ["Level"]
+__all__: Final[List[str]] = ["Level"]
 
 
 class Level(Enum):

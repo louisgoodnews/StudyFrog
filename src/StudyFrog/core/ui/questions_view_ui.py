@@ -20,7 +20,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["QuestionsViewUI"]
+__all__: Final[List[str]] = ["QuestionsViewUI"]
 
 
 class QuestionsViewUI(BaseUI):

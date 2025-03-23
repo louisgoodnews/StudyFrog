@@ -26,7 +26,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["QuestionViewForm"]
+__all__: Final[List[str]] = ["QuestionViewForm"]
 
 
 class QuestionViewForm(tkinter.Frame):
@@ -1502,28 +1502,27 @@ class QuestionViewForm(tkinter.Frame):
                 self.subscriptions: List[str] = []
 
             # Create a dictionary of events and functions
-            subscriptions: Dict[Any, Dict[str, Any]] = {
-                Events.ANSWER_CREATED: {
+            subscriptions: List["dict[str, Any]"] = [
+                {
+                    "event": Events.ANSWER_CREATED,
                     "function": self.on_answer_created,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
-                Events.QUESTION_UPDATED: {
+                {
+                    "event": Events.QUESTION_UPDATED,
                     "function": self.on_question_updated,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 },
-            }
+            ]
 
             # Iterate over the events and functions in the subscriptions dictionary
-            for (
-                event,
-                subscription,
-            ) in subscriptions.items():
+            for subscription in subscriptions:
                 # Store the UUID of the subscription in the subscriptions list
                 self.subscriptions.append(
                     self.dispatcher.register(
-                        event=event,
+                        event=subscription["event"],
                         function=subscription["function"],
                         namespace=subscription["namespace"],
                         persistent=subscription["persistent"],

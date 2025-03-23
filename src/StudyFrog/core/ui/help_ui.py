@@ -22,7 +22,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["HelpUI"]
+__all__: Final[List[str]] = ["HelpUI"]
 
 
 class HelpUI(BaseUI):

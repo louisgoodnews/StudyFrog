@@ -21,7 +21,7 @@ from utils.navigation import NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["TopBar"]
+__all__: Final[List[str]] = ["TopBar"]
 
 
 class TopBar(tkinter.Frame):

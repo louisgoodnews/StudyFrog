@@ -20,7 +20,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["StacksViewUI"]
+__all__: Final[List[str]] = ["StacksViewUI"]
 
 
 class StacksViewUI(BaseUI):

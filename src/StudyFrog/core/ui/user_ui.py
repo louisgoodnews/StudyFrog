@@ -22,7 +22,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["UserUI"]
+__all__: Final[List[str]] = ["UserUI"]
 
 
 class UserUI(BaseUI):

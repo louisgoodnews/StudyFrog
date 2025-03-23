@@ -16,7 +16,7 @@ from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 
 
-__all__: List[str] = ["Application"]
+__all__: Final[List[str]] = ["Application"]
 
 
 class Application:

@@ -28,7 +28,7 @@ from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["SearchUI"]
+__all__: Final[List[str]] = ["SearchUI"]
 
 
 class SearchUI(BaseUI):

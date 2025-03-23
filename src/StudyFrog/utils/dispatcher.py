@@ -14,7 +14,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.object import ImmutableBaseObject
 
 
-__all__: List[str] = [
+__all__: Final[List[str]] = [
     "Dispatcher",
     "DispatcherEvent",
     "DispatcherEventFactory",
@@ -483,7 +483,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         )
 
         # Initialize the subscriptions dictionary as an empty dictionary
-        self.subscriptions: Dict[str, Any] = {}
+        self.subscriptions: Final[Dict[str, Any]] = {}
 
     def add_subscription(
         self,
@@ -757,7 +757,7 @@ class Dispatcher:
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the subscriptions dictionary as an empty dictionary
-        self.subscriptions: Dict[str, DispatcherEventSubscription] = {}
+        self.subscriptions: Final[Dict[str, DispatcherEventSubscription]] = {}
 
     def dispatch(
         self,

@@ -21,7 +21,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["QuestionCreateForm"]
+__all__: Final[List[str]] = ["QuestionCreateForm"]
 
 
 class QuestionCreateForm(tkinter.Frame):

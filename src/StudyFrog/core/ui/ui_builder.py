@@ -20,7 +20,7 @@ from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 
 
-__all__: List[str] = ["UIBuilder"]
+__all__: Final[List[str]] = ["UIBuilder"]
 
 
 class UIBuilder:

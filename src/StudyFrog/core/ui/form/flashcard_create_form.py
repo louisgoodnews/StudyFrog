@@ -23,7 +23,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["FlashcardCreateForm"]
+__all__: Final[List[str]] = ["FlashcardCreateForm"]
 
 
 class FlashcardCreateForm(tkinter.Frame):

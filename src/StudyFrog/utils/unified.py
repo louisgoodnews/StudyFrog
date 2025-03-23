@@ -26,7 +26,7 @@ from core.user import ImmutableUser
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 
-__all__: List[str] = [
+__all__: Final[List[str]] = [
     "UnifiedObjectManager",
     "UnifiedObjectService",
 ]

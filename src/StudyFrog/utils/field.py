@@ -8,7 +8,7 @@ from typing import *
 from utils.object import ImmutableBaseObject
 
 
-__all__: List[str] = ["Field"]
+__all__: Final[List[str]] = ["Field"]
 
 
 class Field(ImmutableBaseObject):

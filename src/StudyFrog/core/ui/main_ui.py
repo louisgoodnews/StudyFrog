@@ -23,7 +23,7 @@ from utils.navigation import NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
 
-__all__: List[str] = ["MainUI"]
+__all__: Final[List[str]] = ["MainUI"]
 
 
 class MainUI(BaseUI):
