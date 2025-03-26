@@ -14,7 +14,6 @@ from utils.constants import Constants
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
-from utils.notification_service import NotificationService
 
 
 __all__: Final[List[str]] = ["Application"]
@@ -63,7 +62,7 @@ class Application:
         self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Bootstrap the application services
-        self.bootstrap_service: BootstrapService = BootstrapService()
+        self.bootstrap_service: Final[BootstrapService] = BootstrapService()
 
         # Initialize the dispatcher, navigation service, notification service, setting service, unified manager, and unified object service
         (
@@ -76,7 +75,7 @@ class Application:
         ) = self.bootstrap_service.run_startup_tasks()
 
         # Initialize the main UI
-        self.main_ui: MainUI = MainUI(
+        self.main_ui: Final[MainUI] = MainUI(
             dispatcher=self.dispatcher,
             navigation_service=self.navigation_service,
             setting_service=self.setting_service,
@@ -84,15 +83,7 @@ class Application:
         )
 
         # Get the start time
-        self.start_time: datetime = Miscellaneous.get_current_datetime()
-
-        # Register the stop application function with the dispatcher
-        self.dispatcher.register(
-            event=Events.REQUEST_APPLICATION_STOP,
-            function=self.stop_application,
-            namespace=Constants.GLOBAL_NAMESPACE,
-            persistent=False,
-        )
+        self.start_time: Final[datetime] = Miscellaneous.get_current_datetime()
 
     def start_application(self) -> None:
         try:
@@ -114,6 +105,9 @@ class Application:
             # Log a info message indicating the application has started
             self.logger.info(message=f"Started {Constants.APPLICATION_NAME}")
 
+            # Subscribe to events
+            self.subscribe_to_events()
+
             # Show the main UI
             self.main_ui.mainloop()
         except Exception as e:
@@ -124,6 +118,37 @@ class Application:
 
             # Exit the application with a non-zero exit code indicating an exception occurred
             exit(1)
+    
+    def subscribe_to_events(self) -> None:
+        """
+        Registers the stop application function with the dispatcher.
+
+        This method subscribes the stop_application method to the REQUEST_APPLICATION_STOP
+        event in the global namespace. It ensures that the stop_application method is called
+        whenever the corresponding event is triggered.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during the registration process.
+        """
+        try:
+            # Register the stop_application function with the dispatcher
+            self.dispatcher.register(
+                event=Events.REQUEST_APPLICATION_STOP,
+                function=self.stop_application,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                persistent=False,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'subscribe_to_events' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
 
     def stop_application(self) -> None:
         """
@@ -142,7 +167,7 @@ class Application:
             self.bootstrap_service.run_shutdown_tasks()
 
             # Get the end time
-            end_time: datetime = Miscellaneous.get_current_datetime()
+            end_time: Final[datetime] = Miscellaneous.get_current_datetime()
 
             # Dispatch the "APPLICATION_STOPPED" event in the global namespace
             self.dispatcher.dispatch(
@@ -151,7 +176,7 @@ class Application:
             )
 
             # Get the duration of the application
-            duration: timedelta = end_time - self.start_time
+            duration: Final[timedelta] = end_time - self.start_time
 
             # Log an info message indicating the application has been stopped
             self.logger.info(
