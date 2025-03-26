@@ -78,7 +78,6 @@ class ReportUI(BaseUI):
             unified_manager=unified_manager,
         )
 
-    @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
         Collects the subscriptions for the report menu UI.
@@ -90,7 +89,9 @@ class ReportUI(BaseUI):
             List[Dict[str, Any]]: The collected subscriptions.
         """
 
-        return []
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        return subscriptions
 
     @override
     def configure_grid(self) -> None:

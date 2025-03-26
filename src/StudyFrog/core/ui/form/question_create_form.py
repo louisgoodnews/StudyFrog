@@ -321,7 +321,7 @@ class QuestionCreateForm(tkinter.Frame):
         )
 
         # Style the scrolled frame "Core attributes" button widget
-        notebook["core attributes_button"].configure(
+        notebook["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -340,7 +340,7 @@ class QuestionCreateForm(tkinter.Frame):
         )
 
         # Style the scrolled frame "Secondary attributes" button widget
-        notebook["secondary attributes_button"].configure(
+        notebook["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,

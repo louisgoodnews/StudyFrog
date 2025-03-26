@@ -125,7 +125,6 @@ class CreateUI(BaseUI):
         # Call the on_combobox_select method
         self.on_combobox_select()
 
-    @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
         Collects and returns a list of subscriptions.
@@ -139,7 +138,9 @@ class CreateUI(BaseUI):
             List[Dict[str, Any]]: A list representing the subscriptions for events.
         """
 
-        return []
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        return subscriptions
 
     @override
     def configure_grid(self) -> None:
@@ -630,7 +631,9 @@ class CreateUI(BaseUI):
                     )
 
                     # Retrieve the created answer
-                    answer = create_response.get_result(key="on_request_answer_create")
+                    answer = create_response.get_result_by_key(
+                        key="on_request_answer_create"
+                    )
 
                     # Add the answer to the question
                     question.add_to_answers(answer=answer)
@@ -655,7 +658,9 @@ class CreateUI(BaseUI):
                 )
 
                 # Retrieve the created answer
-                answer = create_response.get_result(key="on_request_answer_create")
+                answer = create_response.get_result_by_key(
+                    key="on_request_answer_create"
+                )
 
                 # Add the answer to the question
                 question.add_to_answers(answer=answer)
@@ -674,7 +679,7 @@ class CreateUI(BaseUI):
                 )
 
                 # Get the true answer from the response
-                true_answer: ImmutableAnswer = true_answer_response.get_result(
+                true_answer: ImmutableAnswer = true_answer_response.get_result_by_key(
                     key="on_request_answer_lookup"
                 )[0]
 
@@ -688,7 +693,7 @@ class CreateUI(BaseUI):
                 )
 
                 # Get the false answer from the response
-                false_answer: ImmutableAnswer = false_answer_response.get_result(
+                false_answer: ImmutableAnswer = false_answer_response.get_result_by_key(
                     key="on_request_answer_lookup"
                 )[0]
 
@@ -751,7 +756,9 @@ class CreateUI(BaseUI):
                 return
 
             # Retrieve the created flashcard
-            flashcard = create_response.get_result(key="on_request_flashcard_create")
+            flashcard = create_response.get_result_by_key(
+                key="on_request_flashcard_create"
+            )
 
             if related_objects.get(
                 "stack",
@@ -842,7 +849,7 @@ class CreateUI(BaseUI):
                 return
 
             # Retrieve the created question
-            question: ImmutableQuestion = create_response.get_result(
+            question: ImmutableQuestion = create_response.get_result_by_key(
                 key="on_request_question_create"
             )
 
@@ -946,7 +953,7 @@ class CreateUI(BaseUI):
                 return
 
             # Retrieve the created stack
-            stack = create_response.get_result(key="on_request_stack_create")
+            stack = create_response.get_result_by_key(key="on_request_stack_create")
 
             # Check, if the "ancestor_stack" key exists in the related objects
             if related_objects.get(
@@ -1070,7 +1077,7 @@ class CreateUI(BaseUI):
         )
 
         # Retrieve the status from the response
-        status: Optional[ImmutableStatus] = status_response.get_result(
+        status: Optional[ImmutableStatus] = status_response.get_result_by_key(
             key="on_request_status_lookup",
         )[0]
 

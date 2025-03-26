@@ -286,7 +286,7 @@ class StackCreateForm(tkinter.Frame):
         )
 
         # Style the scrolled frame "Core attributes" button widget
-        notebook["core attributes_button"].configure(
+        notebook["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -305,7 +305,7 @@ class StackCreateForm(tkinter.Frame):
         )
 
         # Style the scrolled frame "Secondary attributes" button widget
-        notebook["secondary attributes_button"].configure(
+        notebook["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -332,6 +332,12 @@ class StackCreateForm(tkinter.Frame):
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
             relief=FLAT,
+        )
+
+        # Bind the combobox widget to the on_ancestor_stack_select method
+        self.ancestor_stack_field["combobox"].bind(
+            func=self.on_ancestor_stack_select,
+            sequence="<<ComboboxSelected>>",
         )
 
         # Style the stack field "Label" label widget
@@ -634,6 +640,56 @@ class StackCreateForm(tkinter.Frame):
 
         # Return the result dictionary
         return result
+
+    def on_ancestor_stack_select(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
+        """
+        Handles the selection event of the ancestor stack field.
+
+        Args:
+            event (tkinter.Event): The event object. Defaults to None
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs
+        """
+        try:
+            # Get the value from the ancestor stack field
+            value: Optional[str] = self.ancestor_stack_field["getter"]()
+
+            if not value:
+                # Log a warning message
+                self.logger.warning(message="Got no value from 'Ancestor stack' field.")
+
+                # Return early
+                return
+
+            stack: Optional[ImmutableStack] = self.unified_manager.get_stack_by(
+                field="name",
+                value=value,
+            )
+
+            if not stack:
+                # Log a warning message
+                self.logger.warning(message="Got no stack from 'Ancestor stack' field.")
+
+                # Return early
+                return
+
+            # Set the due by date
+            self.due_by["setter"](value=stack["due_by"])
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_ancestor_stack_select' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
 
     def validate_required_fields(
         self,

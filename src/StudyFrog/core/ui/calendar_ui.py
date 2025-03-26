@@ -78,7 +78,6 @@ class CalendarUI(BaseUI):
             unified_manager=unified_manager,
         )
 
-    @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
         Collects and returns a list of subscriptions.
@@ -92,7 +91,9 @@ class CalendarUI(BaseUI):
             List[Dict[str, Any]]: A list representing the subscriptions for events.
         """
 
-        return []
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        return subscriptions
 
     @override
     def configure_grid(self) -> None:

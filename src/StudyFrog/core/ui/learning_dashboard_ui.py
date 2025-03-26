@@ -79,7 +79,6 @@ class LearningDashboardUI(BaseUI):
             unified_manager=unified_manager,
         )
 
-    @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
         Collects and returns a list of subscriptions.
@@ -97,7 +96,9 @@ class LearningDashboardUI(BaseUI):
             by a subclass.
         """
 
-        return []
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        return subscriptions
 
     @override
     def configure_grid(self) -> None:
@@ -327,7 +328,9 @@ class LearningDashboardUI(BaseUI):
                 )
 
                 # Style the button widget corresponding to the label
-                tabbed_view[f"{label.lower()}_button"].configure(
+                tabbed_view[
+                    f"{Miscellaneous.any_to_snake(string=label)}_button"
+                ].configure(
                     background=Constants.BLUE_GREY["700"],
                     font=(
                         Constants.DEFAULT_FONT_FAMILIY,

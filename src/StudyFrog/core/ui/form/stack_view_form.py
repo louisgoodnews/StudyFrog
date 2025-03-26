@@ -525,7 +525,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Style the primary attributes button
-        tabbed_view["primary attributes_button"].configure(
+        tabbed_view["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,
@@ -609,7 +609,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Style the secondary attributes button
-        tabbed_view["secondary attributes_button"].configure(
+        tabbed_view["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILIY,

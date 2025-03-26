@@ -119,7 +119,6 @@ class EditUI(BaseUI):
             unified_manager=unified_manager,
         )
 
-    @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
         Collects and returns a list of subscriptions.
@@ -133,38 +132,44 @@ class EditUI(BaseUI):
             List[Dict[str, Any]]: A list representing the subscriptions for events.
         """
 
-        return [
-            {
-                "event": Events.ANSWER_UPDATED,
-                "function": self.on_answer_updated,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-            {
-                "event": Events.FLASHCARD_UPDATED,
-                "function": self.on_flashcard_updated,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-            {
-                "event": Events.NOTE_UPDATED,
-                "function": self.on_note_updated,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-            {
-                "event": Events.QUESTION_UPDATED,
-                "function": self.on_question_updated,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-            {
-                "event": Events.STACK_UPDATED,
-                "function": self.on_stack_updated,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-        ]
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        subscriptions.extend(
+            [
+                {
+                    "event": Events.ANSWER_UPDATED,
+                    "function": self.on_answer_updated,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+                {
+                    "event": Events.FLASHCARD_UPDATED,
+                    "function": self.on_flashcard_updated,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+                {
+                    "event": Events.NOTE_UPDATED,
+                    "function": self.on_note_updated,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+                {
+                    "event": Events.QUESTION_UPDATED,
+                    "function": self.on_question_updated,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+                {
+                    "event": Events.STACK_UPDATED,
+                    "function": self.on_stack_updated,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+            ]
+        )
+
+        return subscriptions
 
     @override
     def configure_grid(self) -> None:

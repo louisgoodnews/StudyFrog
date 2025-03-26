@@ -234,8 +234,38 @@ class FlashcardCreateForm(tkinter.Frame):
             sticky=EW,
         )
 
+        # Attempt to create the tabbed view widgets
+        tabbed_view: Optional[Dict[str, Any]] = UIBuilder.get_tabbed_view(master=self)
+
+        if not tabbed_view:
+            # Log a warning message to indicate that something went wrong
+            self.logger.warning(
+                f"Failed to get tabbed view widgets in {self.__class__.__name__}. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Style the tabbed view widget's "Center Frame" frame widget
+        tabbed_view["center_frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the tabbed view widget's "Root" frame widget
+        tabbed_view["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the tabbed view widget's "Top Frame" frame widget
+        tabbed_view["top_frame"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the tabbed view widgets within the passed master widget
+        tabbed_view["root"].grid(
+            column=0,
+            row=2,
+            sticky=NSEW,
+        )
+
         # Create the scrolled frame widgets
-        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=self)
+        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
+            master=tabbed_view["center_frame"]
+        )
 
         # Style the scrolled frame "Canvas" widget
         scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
@@ -246,13 +276,21 @@ class FlashcardCreateForm(tkinter.Frame):
         # Style the scrolled frame "Root" frame widget
         scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
 
-        # Place the "Root frame" frame widget within the passed master widget
-        scrolled_frame["root"].grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=2,
-            sticky=NSEW,
+        # Add the scrolled frame widget to the tabbed view
+        tabbed_view["adder"](
+            label="Core attributes",
+            widget=scrolled_frame["root"],
+        )
+
+        # Style the "Core attributes" button
+        tabbed_view["core_attributes_button"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
         )
 
         # Create a combobox widget to select a stack
@@ -446,22 +484,15 @@ class FlashcardCreateForm(tkinter.Frame):
 
         # Define the required fields
         required_fields: List[str] = [
-            "front_text",  # The front side of the flashcard
             "back_text",  # The back side of the flashcard
-            "stack",  # The stack the flashcard belongs to
             "difficulty",  # The difficulty of the flashcard
+            "front_text",  # The front side of the flashcard
             "priority",  # The priority of the flashcard
+            "stack",  # The stack the flashcard belongs to
         ]
 
         # Validate all required fields
-        result: bool = all(
-            object_data.get(
-                field,  # The field to validate
-                None,  # The default value to return if the field is not present
-            )
-            is not None  # The condition to check (i.e., the field should not be None)
-            for field in required_fields  # Iterate over all required fields
-        )
+        result: bool = all([object_data.get(field) for field in required_fields])
 
         # Return the result
         return result

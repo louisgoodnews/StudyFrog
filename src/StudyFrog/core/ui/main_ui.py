@@ -104,7 +104,6 @@ class MainUI(BaseUI):
             unified_manager=unified_manager,
         )
 
-    @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
         Collects and returns a list of subscriptions.
@@ -118,20 +117,29 @@ class MainUI(BaseUI):
             List[Dict[str, Any]]: A list representing the subscriptions for events.
         """
 
-        return [
-            {
-                "event": Events.APPLICATION_STOPPED,
-                "function": self.on_application_stopped,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-            {
-                "event": Events.REQUEST_VALIDATE_NAVIGATION,
-                "function": self.on_request_validate_navigation,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-        ]
+        # Get the list of subscriptions
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        # Extend the list of subscriptions
+        subscriptions.extend(
+            [
+                {
+                    "event": Events.APPLICATION_STOPPED,
+                    "function": self.on_application_stopped,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+                {
+                    "event": Events.REQUEST_VALIDATE_NAVIGATION,
+                    "function": self.on_request_validate_navigation,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+            ]
+        )
+
+        # Return the list of subscriptions
+        return subscriptions
 
     @override
     def configure_grid(self) -> None:
@@ -397,7 +405,6 @@ class MainUI(BaseUI):
         Returns:
             Optional[Any]: None if an exception occurs, otherwise any value returned by the UI class.
         """
-
         try:
             # Check if the direction is valid
             if direction not in [
@@ -407,6 +414,20 @@ class MainUI(BaseUI):
                 # Raise an exception indicating an invalid direction
                 raise ValueError(
                     f"Invalid direction: {direction}. Must be either 'backward' or 'forward'."
+                )
+
+            # Attempt to validate the navigation request
+            validation: bool = self.validate_navigation()
+
+            if not validation:
+                # Log an error message
+                self.logger.error(
+                    message=f"Something has gone wrong while attempting to validate navigation request"
+                )
+
+                # Raise an exception to the caller
+                raise ValueError(
+                    f"Failed to validate navigation for navigation request: direction ({direction}), source ({source}) and taraget ({target})."
                 )
 
             # Check, if a master is given
@@ -450,12 +471,6 @@ class MainUI(BaseUI):
                 **kwargs,
             )
 
-            # Dispatch the NAVIGATE_VALIDATE_SUCCESS event in the global namespace indicating a success
-            self.dispatcher.dispatch(
-                event=Events.NAVIGATE_VALIDATE_SUCCESS,
-                namespace=Constants.GLOBAL_NAMESPACE,
-            )
-
             # Dispatch the "NAVIGATION_COMPLETED" event in the global namespace indicating a success
             self.dispatcher.dispatch(
                 event=Events.NAVIGATION_COMPLETED,
@@ -467,11 +482,55 @@ class MainUI(BaseUI):
                 message=f"Caught an exception while attempting to run 'on_request_validate_navigation' method from '{self.__class__.__name__}': {e}"
             )
 
+            # Return None indicating an exception has ocurred
+            return None
+
+    def validate_navigation(self) -> bool:
+        try:
+            # Attempt to dispatch the REQUEST_UI_VALIDATE_NAVIGATION event in the global namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_UI_VALIDATE_NAVIGATION,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            if not notification:
+                # Log a warning message indicating that something has gone wrong
+                self.logger.warning(message=f"")
+
+                # Raise an exception
+                raise ValueError(
+                    "Failed to get DispatcherNotification from REQUEST_UI_VALIDATE_NAVIGATION event."
+                )
+
+            # Set true, if all event subscribers confirm and thus validate, otherwise False
+            result: bool = all(notification.get_all_results())
+
+            if result:
+                # Dispatch the NAVIGATE_VALIDATE_SUCCESS event in the global namespace indicating a success
+                self.dispatcher.dispatch(
+                    event=Events.NAVIGATE_VALIDATE_SUCCESS,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            else:
+                # Dispatch the NAVIGATE_VALIDATE_FAILURE event in the global namespace indicating a failure
+                self.dispatcher.dispatch(
+                    event=Events.NAVIGATE_VALIDATE_FAILURE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+
+            # Return the result
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has ocurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'validate_navigation' method from '{self.__class__.__name__}': {e}"
+            )
+
             # Dispatch the NAVIGATE_VALIDATE_FAILURE event in the global namespace indicating a failure
             self.dispatcher.dispatch(
                 event=Events.NAVIGATE_VALIDATE_FAILURE,
                 namespace=Constants.GLOBAL_NAMESPACE,
             )
 
-            # Return None indicating an exception has ocurred
-            return None
+            # Return False to indicate that validation failed
+            return False
