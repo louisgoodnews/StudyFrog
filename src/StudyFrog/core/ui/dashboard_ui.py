@@ -106,7 +106,7 @@ class DashboardUI(BaseUI):
             [
                 {
                     "event": Events.STACK_CREATED,
-                    "funtion": self.on_stack_created,
+                    "function": self.on_stack_created,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 }

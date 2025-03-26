@@ -241,22 +241,10 @@ class BaseUI(tkinter.Frame):
                 # Store the UUID of the subscription in the subscriptions list
                 self.subscriptions.append(
                     self.dispatcher.register(
-                        event=subscription.get(
-                            "event",
-                            Events.GENERIC_EVENT,
-                        ),
-                        function=subscription.get(
-                            "function",
-                            None,
-                        ),
-                        namespace=subscription.get(
-                            "namespace",
-                            Constants.GLOBAL_NAMESPACE,
-                        ),
-                        persistent=subscription.get(
-                            "persistent",
-                            False,
-                        ),
+                        event=subscription["event"],
+                        function=subscription["function"],
+                        namespace=subscription["namespace"],
+                        persistent=subscription["persistent"],
                     )
                 )
         except Exception as e:

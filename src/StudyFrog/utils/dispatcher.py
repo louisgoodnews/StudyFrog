@@ -863,7 +863,7 @@ class Dispatcher:
                 self.subscriptions[event.name] = {}
 
             # Attempt to create a new subscription
-            subscription: DispatcherEventSubscription = (
+            subscription: Optional[DispatcherEventSubscription] = (
                 DispatcherEventSubscriptionFactory.create_subscription(
                     event=event,
                 )

@@ -4807,7 +4807,7 @@ class UIBuilder:
                     if "_button" in key
                 ]:
                     # Check, if the key and the string are identical
-                    if string.lower() not in key:
+                    if f"{Miscellaneous.any_to_snake(string=string)}_button" != key:
                         # Enable the widget if it is not the one that was clicked
                         value.configure(state=NORMAL)
                     else:
