@@ -39,7 +39,7 @@ class MutableBaseObject:
         """
 
         # Get an instance of the logger class and store it in the object
-        self._logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self._logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Update the object's dictionary with the keyword arguments
         self.__dict__.update(**kwargs)

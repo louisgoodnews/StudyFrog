@@ -362,7 +362,7 @@ class QuestionConverter:
         logger (Logger): The logger instance associated with the QuestionConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="QuestionConverter")
+    logger: Final[Logger] = Logger.get_logger(name="QuestionConverter")
 
     @classmethod
     def model_to_object(
@@ -444,7 +444,7 @@ class QuestionFactory:
         logger (Logger): The logger instance associated with the QuestionFactory class.
     """
 
-    logger: Logger = Logger.get_logger(name="QuestionFactory")
+    logger: Final[Logger] = Logger.get_logger(name="QuestionFactory")
 
     @classmethod
     def create_question(

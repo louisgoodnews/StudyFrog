@@ -55,7 +55,7 @@ class NoteLearningView(tkinter.Frame):
         )
 
         # Create a logger instance
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher

@@ -14,6 +14,7 @@ from utils.constants import Constants
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
+from utils.notification_service import NotificationService
 
 
 __all__: Final[List[str]] = ["Application"]
@@ -59,15 +60,16 @@ class Application:
         """
 
         # Initialize a logger
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Bootstrap the application services
         self.bootstrap_service: BootstrapService = BootstrapService()
 
-        # Initialize the dispatcher, navigation service, setting service, unified manager, and unified object service
+        # Initialize the dispatcher, navigation service, notification service, setting service, unified manager, and unified object service
         (
             self.dispatcher,
             self.navigation_service,
+            self.notification_service,
             self.setting_service,
             self.unified_manager,
             self.unified_object_service,

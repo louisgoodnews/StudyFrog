@@ -294,7 +294,7 @@ class FlashcardConverter:
         logger (Logger): The logger instance associated with the FlashcardConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="FlashcardConverter")
+    logger: Final[Logger] = Logger.get_logger(name="FlashcardConverter")
 
     @classmethod
     def model_to_object(
@@ -376,7 +376,7 @@ class FlashcardFactory:
         logger (Logger): The logger instance associated with the object.
     """
 
-    logger: Logger = Logger.get_logger(name="FlashcardFactory")
+    logger: Final[Logger] = Logger.get_logger(name="FlashcardFactory")
 
     @classmethod
     def create_flashcard(

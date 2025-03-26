@@ -171,7 +171,7 @@ class UserConverter:
         logger (Logger): The logger instance associated with the UserConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="UserConverter")
+    logger: Final[Logger] = Logger.get_logger(name="UserConverter")
 
     @classmethod
     def model_to_object(
@@ -253,7 +253,7 @@ class UserFactory:
         logger (Logger): The logger instance associated with the UserFactory class.
     """
 
-    logger: Logger = Logger.get_logger(name="UserFactory")
+    logger: Final[Logger] = Logger.get_logger(name="UserFactory")
 
     @classmethod
     def create_user(

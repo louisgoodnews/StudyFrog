@@ -342,7 +342,7 @@ class StackConverter:
         logger (Logger): The logger instance associated with the StackConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="StackConverter")
+    logger: Final[Logger] = Logger.get_logger(name="StackConverter")
 
     @classmethod
     def model_to_object(
@@ -424,7 +424,7 @@ class StackFactory:
         logger (Logger): The logger instance associated with the StackFactory class.
     """
 
-    logger: Logger = Logger.get_logger(name="StackFactory")
+    logger: Final[Logger] = Logger.get_logger(name="StackFactory")
 
     @classmethod
     def create_stack(

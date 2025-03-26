@@ -96,7 +96,7 @@ class DispatcherEventFactory:
 
     index: int = Constants.get_base_id()
 
-    logger: Logger = Logger.get_logger(name="DispatcherEventFactory")
+    logger: Final[Logger] = Logger.get_logger(name="DispatcherEventFactory")
 
     @classmethod
     def create_event(
@@ -300,7 +300,7 @@ class DispatcherNotificationFactory:
 
     index: int = Constants.get_base_id()
 
-    logger: Logger = Logger.get_logger(name="DispatcherNotificationFactory")
+    logger: Final[Logger] = Logger.get_logger(name="DispatcherNotificationFactory")
 
     @classmethod
     def create_notification(
@@ -722,7 +722,7 @@ class DispatcherEventSubscriptionFactory:
 
     index: int = Constants.get_base_id()
 
-    logger: Logger = Logger.get_logger(name="DispatcherEventSubscriptionFactory")
+    logger: Final[Logger] = Logger.get_logger(name="DispatcherEventSubscriptionFactory")
 
     @classmethod
     def create_subscription(
@@ -804,7 +804,7 @@ class Dispatcher:
             None
         """
         # Initialize an instance of the Logger class
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the subscriptions dictionary as an empty dictionary
         self.subscriptions: Final[Dict[str, DispatcherEventSubscription]] = {}

@@ -31,7 +31,7 @@ class UIBuilder:
         logger (Logger): The logger instance used by the class.
     """
 
-    logger: Logger = Logger.get_logger(name="UIBuilder")
+    logger: Final[Logger] = Logger.get_logger(name="UIBuilder")
 
     @classmethod
     def get_bool_variable(

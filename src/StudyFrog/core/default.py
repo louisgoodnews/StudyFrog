@@ -195,7 +195,7 @@ class DefaultConverter:
         logger (Logger): The logger instance associated with the DefaultConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="DefaultConverter")
+    logger: Final[Logger] = Logger.get_logger(name="DefaultConverter")
 
     @classmethod
     def model_to_object(
@@ -277,7 +277,7 @@ class DefaultFactory:
         logger (Logger): The logger instance associated with the object.
     """
 
-    logger: Logger = Logger.get_logger(name="DefaultFactory")
+    logger: Final[Logger] = Logger.get_logger(name="DefaultFactory")
 
     @classmethod
     def create_default(

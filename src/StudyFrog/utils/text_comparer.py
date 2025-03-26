@@ -74,7 +74,7 @@ class TextComparer:
         Returns:
             None
         """
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
         self.fast_model_name = fast_model
         self.deep_model_name = deep_model
         self.preprocess = preprocess

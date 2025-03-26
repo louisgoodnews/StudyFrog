@@ -199,7 +199,7 @@ class DifficultyConverter:
         logger (Logger): The logger instance associated with the DifficultyConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="DifficultyConverter")
+    logger: Final[Logger] = Logger.get_logger(name="DifficultyConverter")
 
     @classmethod
     def model_to_object(
@@ -281,7 +281,7 @@ class DifficultyFactory:
         logger (Logger): The logger instance associated with the DifficultyFactory class.
     """
 
-    logger: Logger = Logger.get_logger(name="DifficultyFactory")
+    logger: Final[Logger] = Logger.get_logger(name="DifficultyFactory")
 
     @classmethod
     def create_difficulty(

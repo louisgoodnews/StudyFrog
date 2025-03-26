@@ -70,7 +70,7 @@ class StackViewForm(tkinter.Frame):
         super().__init__(master=master)
 
         # Create an instance variable for the logger
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher

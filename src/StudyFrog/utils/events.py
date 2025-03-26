@@ -19,7 +19,7 @@ class Events:
     These events are dispatched using the Dispatcher class.
     """
 
-    logger: Logger = Logger.get_logger(name="Events")
+    logger: Final[Logger] = Logger.get_logger(name="Events")
 
     # An event that indicates that an answer has been created in the backend
     ANSWER_CREATED: DispatcherEvent = DispatcherEventFactory.create_event(

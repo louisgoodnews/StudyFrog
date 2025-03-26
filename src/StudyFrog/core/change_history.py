@@ -99,7 +99,7 @@ class ChangeHistoryConverter:
         logger (Logger): The logger instance associated with the ChangeHistoryConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="ChangeHistoryConverter")
+    logger: Final[Logger] = Logger.get_logger(name="ChangeHistoryConverter")
 
     @classmethod
     def model_to_object(
@@ -174,7 +174,7 @@ class ChangeHistoryConverter:
 
 
 class ChangeHistoryFactory:
-    logger: Logger = Logger.get_logger(name="ChangeHistoryFactory")
+    logger: Final[Logger] = Logger.get_logger(name="ChangeHistoryFactory")
 
     @classmethod
     def create_change_history(
@@ -993,7 +993,7 @@ class ChangeHistoryItemConverter:
         logger (Logger): The logger instance associated with the ChangeHistoryItemConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="ChangeHistoryItemConverter")
+    logger: Final[Logger] = Logger.get_logger(name="ChangeHistoryItemConverter")
 
     @classmethod
     def model_to_object(
@@ -1075,7 +1075,7 @@ class ChangeHistoryItemFactory:
         logger (Logger): The logger instance associated with the object.
     """
 
-    logger: Logger = Logger.get_logger(name="ChangeHistoryItemFactory")
+    logger: Final[Logger] = Logger.get_logger(name="ChangeHistoryItemFactory")
 
     @classmethod
     def create_change_history_item(

@@ -61,7 +61,7 @@ class QuestionCreateForm(tkinter.Frame):
         )
 
         # Create a logger instance for the class
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize an empty list for the answer fields
         self.answer_fields: List[tkinter.Misc] = []

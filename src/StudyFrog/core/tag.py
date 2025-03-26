@@ -175,7 +175,7 @@ class TagConverter:
         logger (Logger): The logger instance associated with the TagConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="TagConverter")
+    logger: Final[Logger] = Logger.get_logger(name="TagConverter")
 
     @classmethod
     def model_to_object(
@@ -257,7 +257,7 @@ class TagFactory:
         logger (Logger): The logger instance associated with the TagFactory class.
     """
 
-    logger: Logger = Logger.get_logger(name="TagFactory")
+    logger: Final[Logger] = Logger.get_logger(name="TagFactory")
 
     @classmethod
     def create_tag(

@@ -59,6 +59,7 @@ from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
 from utils.navigation import NavigationHistoryService
+from utils.notification_service import NotificationService
 from utils.unified import UnifiedObjectManager, UnifiedObjectService
 
 
@@ -112,24 +113,29 @@ class BootstrapService:
         """
 
         # Initialize a logger instance
-        self.logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the dispatcher instance
-        self.dispatcher: Dispatcher = Dispatcher()
+        self.dispatcher: Final[Dispatcher] = Dispatcher()
 
         # Initialize the navigation service instance
-        self.navigation_history_service: NavigationHistoryService = (
+        self.navigation_history_service: Final[NavigationHistoryService] = (
             NavigationHistoryService(dispatcher=self.dispatcher)
         )
 
         # Initialize the setting service instance
-        self.setting_service: SettingService = SettingService()
+        self.setting_service: Final[SettingService] = SettingService()
 
         # Initialize the list of subscriptions
-        self.subscriptions: List[str] = []
+        self.subscriptions: Final[List[str]] = []
+
+        # Initialize the notification service instance
+        self.notification_service: Final[NotificationService] = (
+            NotificationService(dispatcher=self.dispatcher)
+        )
 
         # Initialize the unified object manager instance
-        self.unified_object_manager: UnifiedObjectManager = UnifiedObjectManager()
+        self.unified_object_manager: Final[UnifiedObjectManager] = UnifiedObjectManager()
 
         # Initialize the unified object service instance
         self.unified_object_service: UnifiedObjectService = UnifiedObjectService(
@@ -945,6 +951,7 @@ class BootstrapService:
     ) -> Tuple[
         Optional[Dispatcher],
         Optional[NavigationHistoryService],
+        Optional[NotificationService],
         Optional[SettingService],
         Optional[UnifiedObjectManager],
         Optional[UnifiedObjectService],
@@ -953,10 +960,11 @@ class BootstrapService:
         Executes startup tasks for the application.
 
         This method registers UI menus and returns initialized instances of
-        dispatcher, navigation service, and setting service.
+        dispatcher, navigation service, notification service, setting service,
+        unified object manager, and unified object service.
 
         Returns:
-            Tuple[Optional[Dispatcher], Optional[NavigationHistoryService], Optional[SettingService], Optional[UnifiedObjectManager], Optional[UnifiedObjectService]]:
+            Tuple[Optional[Dispatcher], Optional[NavigationHistoryService], Optional[NotificationService], Optional[SettingService], Optional[UnifiedObjectManager], Optional[UnifiedObjectService]]:
             A tuple containing the dispatcher, navigation service, setting service,
             unified object manager, and unified object service instances, or None
             values if an exception occurs.
@@ -995,10 +1003,11 @@ class BootstrapService:
             # Log an info message about completing startup tasks
             self.logger.info(message="Startup tasks completed.")
 
-            # Return the dispatcher, navigation service, setting service, and unified object manager instances
+            # Return the dispatcher, navigation service, notification service, setting service, and unified object manager instances
             return (
                 self.dispatcher,
                 self.navigation_history_service,
+                self.notification_service,
                 self.setting_service,
                 self.unified_object_manager,
                 self.unified_object_service,

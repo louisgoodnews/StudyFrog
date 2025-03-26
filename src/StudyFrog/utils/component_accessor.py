@@ -80,7 +80,7 @@ class ComponentAccessor:
         get_user_manager(): Returns the user manager instance.
     """
 
-    logger: Logger = Logger.get_logger(name="ComponentAccessor")
+    logger: Final[Logger] = Logger.get_logger(name="ComponentAccessor")
 
     answer_manager: AnswerManager = AnswerManager()
     association_manager: AssociationManager = AssociationManager()
