@@ -4756,7 +4756,9 @@ class UIBuilder:
                     )
 
                     # Disable the button
-                    result[f"{Miscellaneous.any_to_snake(string=label)}_button"].configure(state=DISABLED)
+                    result[
+                        f"{Miscellaneous.any_to_snake(string=label)}_button"
+                    ].configure(state=DISABLED)
                 else:
                     # Hide the widget
                     widget.grid_forget()
@@ -4822,7 +4824,10 @@ class UIBuilder:
                 )
 
             # Create the "Root" frame widget
-            result["root"] = cls.get_frame(master=master)
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs,
+            )
 
             # Configure the "Root" frame widget's 1st column to weight 1
             result["root"].grid_columnconfigure(

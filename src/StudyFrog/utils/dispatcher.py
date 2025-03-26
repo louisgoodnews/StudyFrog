@@ -148,7 +148,7 @@ class DispatcherNotification(ImmutableBaseObject):
         event (DispatcherEvent): The event associated with the notification.
         id (int): The unique identifier of the notification.
         namespace (str): The namespace under which the notification was created.
-        result (Any): The result of the notification.
+        result (Dict[str, Any]): The result of the notification.
         start (datetime): The timestamp when the notification started.
     """
 
@@ -159,7 +159,7 @@ class DispatcherNotification(ImmutableBaseObject):
         event: DispatcherEvent,
         id: int,
         namespace: str,
-        result: Any,
+        result: Dict[str, Any],
         start: datetime,
     ) -> None:
         """
@@ -171,7 +171,7 @@ class DispatcherNotification(ImmutableBaseObject):
             event (DispatcherEvent): The event associated with the notification.
             id (int): The unique identifier of the notification.
             namespace (str): The namespace under which the notification was created.
-            result (Any): The result of the notification.
+            result (Dict[str, Any]): The result of the notification.
             start (datetime): The timestamp when the notification started.
 
         Returns:
@@ -258,6 +258,30 @@ class DispatcherNotification(ImmutableBaseObject):
 
         # Return the result
         return self["result"][key]
+
+    def has(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Returns True if the notification contains the given key, False otherwise.
+
+        Args:
+            key (str): The key to check.
+
+        Returns:
+            bool: True if the notification contains the given key, False otherwise.
+        """
+        return key in self["result"].keys()
+
+    def is_empty(self) -> bool:
+        """
+        Returns True if the notification is empty, False otherwise.
+
+        Returns:
+            bool: True if the notification is empty, False otherwise.
+        """
+        return len(self["result"].keys()) == 0
 
 
 class DispatcherNotificationFactory:
@@ -508,10 +532,8 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         super().__init__(
             event=event,
             id=id,
+            subscriptions={},
         )
-
-        # Initialize the subscriptions dictionary as an empty dictionary
-        self.subscriptions: Final[Dict[str, Any]] = {}
 
     def add_subscription(
         self,
