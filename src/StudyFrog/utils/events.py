@@ -156,6 +156,11 @@ class Events:
         name="backend:flashcard:deleted"
     )
 
+    # An event that indicates that a flashcard has been flipped in the flashcard learning view
+    FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED: DispatcherEventFactory.create_event(
+        name="flashcardlearningview:flashcard:flipped"
+    )
+
     # An event that indicates that a flashcard has been loaed in the backend
     FLASHCARD_LOADED: DispatcherEvent = DispatcherEventFactory.create_event(
         name="backend:flashcard:loaded"
@@ -464,6 +469,20 @@ class Events:
         name="global:request:flashcard:delete"
     )
 
+    # An event that indicates that the user wants to flip the flashcard in the flashcard learning view
+    REQUEST_FLASHCARD_LEARNING_VIEW_FLIP_FLASHCARD: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="learningsessionui:request:flashcard_learning_view:flip_flashcard"
+        )
+    )
+
+    # An event that indicates that the user wants to load a flashcard in the flashcard learning view
+    REQUEST_FLASHCARD_LEARNING_VIEW_LOAD_FLASHCARD: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="learningsessionui:request:flashcard_learning_view:load_flashcard"
+        )
+    )
+
     # An event that indicates that the user wants to load a flashcard
     REQUEST_FLASHCARD_LOAD: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:flashcard:load"
@@ -586,6 +605,27 @@ class Events:
     # An event that indicates that the user wants to delete a note
     REQUEST_NOTE_DELETE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:note:delete"
+    )
+
+    # An event that indicates that the user wants to hide the note in the note learning view
+    REQUEST_NOTE_LEARNING_VIEW_HIDE_NOTE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="learningsessionui:request:note_learning_view:hide_note"
+        )
+    )
+
+    # An event that indicates that the user wants to load a note in the note learning view
+    REQUEST_NOTE_LEARNING_VIEW_LOAD_NOTE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="learningsessionui:request:note_learning_view:load_note"
+        )
+    )
+
+    # An event that indicates that the user wants to show the note in the note learning view
+    REQUEST_NOTE_LEARNING_VIEW_SHOW_NOTE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="learningsessionui:request:note_learning_view:show_note"
+        )
     )
 
     # An event that indicates that the user wants to load a note
@@ -796,6 +836,11 @@ class Events:
     # An event that indicates that the user wants to stop a timer
     REQUEST_TIMER_STOP: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:timer:stop"
+    )
+
+    # An event that indicates that the navigator requests the ui to validate navigation
+    REQUEST_UI_VALIDATE_NAVIGATION: DispatcherEvent = (
+        DispatcherEventFactory.create_event(name="ui:request:validate:navigation")
     )
 
     # An event that indicates that the user wants to create a new user

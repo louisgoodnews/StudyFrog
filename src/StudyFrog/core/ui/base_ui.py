@@ -13,6 +13,7 @@ from core.setting import SettingService
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
+from utils.events import Events
 from utils.logger import Logger
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
@@ -102,6 +103,9 @@ class BaseUI(tkinter.Frame):
         # Store the passed setting service instance in an instance variable
         self.setting_service: SettingService = setting_service
 
+        # Initialize the list of subscription UUIDs as an empty list
+        self.subscriptions: List[str] = []
+
         # Store the passed unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager
 
@@ -128,21 +132,24 @@ class BaseUI(tkinter.Frame):
         """
         Collects and returns a list of subscriptions.
 
-        This method should be implemented by subclasses to provide
-        a list containing event subscriptions. Each subscription
-        is associated with specific events and their corresponding
-        handlers.
+        This method creates a list of dictionaries containing event subscription configurations.
 
         Returns:
             List[Dict[str, Any]]: A list representing the subscriptions for events.
-
-        Raises:
-            NotImplementedError: If the method is not implemented
-            by a subclass.
         """
-        raise NotImplementedError(
-            f"{self.__class__.__name__} must implement 'collect_subscriptions' method."
-        )
+
+        # Initialize the list of subscriptions
+        subscriptions: List[Dict[str, Any]] = [
+            {
+                "event": Events.REQUEST_UI_VALIDATE_NAVIGATION,
+                "function": self.on_request_ui_validate_navigation,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            }
+        ]
+
+        # Return the list to the caller
+        return subscriptions
 
     def configure_grid(self) -> None:
         """
@@ -208,6 +215,9 @@ class BaseUI(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
+    def on_request_ui_validate_navigation(self) -> bool:
+        return True
+
     def subscribe_to_events(self) -> None:
         """
         Subscribes to all events in the subscriptions dictionary.
@@ -223,14 +233,6 @@ class BaseUI(tkinter.Frame):
             Exception: If an error occurs while subscribing to events.
         """
         try:
-            # Check if a "subscriptions" list exists as instance variable
-            if not hasattr(
-                self,
-                "subscriptions",
-            ):
-                # Initialize the subscriptions list as an empty list
-                self.subscriptions: List[str] = []
-
             # Create a dictionary of events and functions
             subscriptions: List[Dict[str, Any]] = self.collect_subscriptions()
 
@@ -239,10 +241,22 @@ class BaseUI(tkinter.Frame):
                 # Store the UUID of the subscription in the subscriptions list
                 self.subscriptions.append(
                     self.dispatcher.register(
-                        event=subscription["event"],
-                        function=subscription["function"],
-                        namespace=subscription["namespace"],
-                        persistent=subscription["persistent"],
+                        event=subscription.get(
+                            "event",
+                            Events.GENERIC_EVENT,
+                        ),
+                        function=subscription.get(
+                            "function",
+                            None,
+                        ),
+                        namespace=subscription.get(
+                            "namespace",
+                            Constants.GLOBAL_NAMESPACE,
+                        ),
+                        persistent=subscription.get(
+                            "persistent",
+                            False,
+                        ),
                     )
                 )
         except Exception as e:

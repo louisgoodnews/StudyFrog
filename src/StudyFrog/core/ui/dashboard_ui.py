@@ -87,7 +87,6 @@ class DashboardUI(BaseUI):
         # Lookup the completed stacks
         self.lookup_completed_stacks()
 
-    @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
         Collects and returns a list of subscriptions.
@@ -100,14 +99,21 @@ class DashboardUI(BaseUI):
         Returns:
             List[Dict[str, Any]]: A list representing the subscriptions for events.
         """
-        return [
-            {
-                "event": Events.STACK_CREATED,
-                "function": self.on_stack_created,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-        ]
+
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        subscriptions.extend(
+            [
+                {
+                    "event": Events.STACK_CREATED,
+                    "funtion": self.on_stack_created,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                }
+            ]
+        )
+
+        return subscriptions
 
     @override
     def configure_grid(self) -> None:
@@ -475,87 +481,96 @@ class DashboardUI(BaseUI):
         Returns:
             None
         """
+        try:
+            # Create the "New Stacks" frame widget
+            new_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
+                background=Constants.BLUE_GREY["700"],
+                master=master["center_frame"],
+            )
 
-        # Create the "New Stacks" frame widget
-        new_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["700"],
-            master=master["center_frame"],
-        )
+            # Add the "New Stacks" frame widget to the notebook
+            master["adder"](
+                label="My New Stacks",
+                widget=new_stacks_frame,
+            )
 
-        # Add the "New Stacks" frame widget to the notebook
-        master["adder"](
-            label="My New Stacks",
-            sticky=NSEW,
-            widget=new_stacks_frame,
-        )
+            # Configure the "My New Stacks" button
+            master["my_new_stacks_button"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
 
-        # Configure the "My New Stacks" button
-        master["my new stacks_button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILIY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
+            # Create the "Recently Viewed" frame widget
+            recently_viewed_frame: tkinter.Frame = UIBuilder.get_frame(
+                background=Constants.BLUE_GREY["700"],
+                master=master["center_frame"],
+            )
 
-        # Create the "Recently Viewed" frame widget
-        recently_viewed_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["700"],
-            master=master["center_frame"],
-        )
+            # Add the "Recently Viewed" frame widget to the notebook
+            master["adder"](
+                label="Recently Viewed",
+                sticky=NSEW,
+                widget=recently_viewed_frame,
+            )
 
-        # Add the "Recently Viewed" frame widget to the notebook
-        master["adder"](
-            label="Recently Viewed",
-            sticky=NSEW,
-            widget=recently_viewed_frame,
-        )
+            # Configure the "Recently Viewed" button
+            master["recently_viewed_button"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
 
-        # Configure the "Recently Viewed" button
-        master["recently viewed_button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILIY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
+            # Create the "Completed Stacks" frame widget
+            completed_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
+                background=Constants.BLUE_GREY["700"],
+                master=master["center_frame"],
+            )
 
-        # Create the "Completed Stacks" frame widget
-        completed_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["700"],
-            master=master["center_frame"],
-        )
+            # Add the "Completed Stacks" frame widget to the notebook
+            master["adder"](
+                label="Completed Stacks",
+                sticky=NSEW,
+                widget=completed_stacks_frame,
+            )
 
-        # Add the "Completed Stacks" frame widget to the notebook
-        master["adder"](
-            label="Completed Stacks",
-            sticky=NSEW,
-            widget=completed_stacks_frame,
-        )
+            # Configure the "Completed Stacks" button
+            master["completed_stacks_button"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
 
-        # Configure the "Completed Stacks" button
-        master["completed stacks_button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILIY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
+            # Create the "New Stacks" frame widgets
+            self.create_new_stacks_frame_widgets(master=new_stacks_frame)
 
-        # Create the "New Stacks" frame widgets
-        self.create_new_stacks_frame_widgets(master=new_stacks_frame)
+            # Create the "Recently Viewed" frame widgets
+            self.create_recently_viewed_stacks_frame_widgets(
+                master=recently_viewed_frame
+            )
 
-        # Create the "Recently Viewed" frame widgets
-        self.create_recently_viewed_stacks_frame_widgets(master=recently_viewed_frame)
+            # Create the "Completed Stacks" frame widgets
+            self.create_completed_stacks_frame_widgets(master=completed_stacks_frame)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_notebook_widgets' method from '{self.__class__.__name__}' class: {e}"
+            )
 
-        # Create the "Completed Stacks" frame widgets
-        self.create_completed_stacks_frame_widgets(master=completed_stacks_frame)
+            # Re-raise the exception to the caller
+            raise e
 
     def create_new_stacks_frame_widgets(
         self,
@@ -963,15 +978,15 @@ class DashboardUI(BaseUI):
 
                 # Determine the text to display based on column type
                 if column == "priority":
-                    text = priority_notification.get_result(
+                    text = priority_notification.get_result_by_key(
                         key="on_request_priority_lookup"
                     )[0]["emoji"]
                 elif column == "difficulty":
-                    text = difficulty_notification.get_result(
+                    text = difficulty_notification.get_result_by_key(
                         key="on_request_difficulty_lookup"
                     )[0]["emoji"]
                 elif column == "status":
-                    text = status_notification.get_result(
+                    text = status_notification.get_result_by_key(
                         key="on_request_status_lookup"
                     )[0]["emoji"]
                 else:
@@ -1180,14 +1195,14 @@ class DashboardUI(BaseUI):
             stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
                 event=Events.REQUEST_STACK_LOOKUP,
                 namespace=Constants.GLOBAL_NAMESPACE,
-                status=status_notification.get_result(key="on_request_status_lookup")[
-                    0
-                ]["id"],
+                status=status_notification.get_result_by_key(
+                    key="on_request_status_lookup"
+                )[0]["id"],
             )
 
             # Lookup the stacks from the DispatcherNotification
-            stacks: Optional[List[ImmutableStack]] = stacks_notification.get_result(
-                key="on_request_stack_lookup"
+            stacks: Optional[List[ImmutableStack]] = (
+                stacks_notification.get_result_by_key(key="on_request_stack_lookup")
             )
 
             # Check, if the stacks list is None
@@ -1241,14 +1256,14 @@ class DashboardUI(BaseUI):
             stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
                 event=Events.REQUEST_STACK_LOOKUP,
                 namespace=Constants.GLOBAL_NAMESPACE,
-                status=status_notification.get_result(key="on_request_status_lookup")[
-                    0
-                ]["id"],
+                status=status_notification.get_result_by_key(
+                    key="on_request_status_lookup"
+                )[0]["id"],
             )
 
             # Lookup the stacks from the DispatcherNotification
-            stacks: Optional[List[ImmutableStack]] = stacks_notification.get_result(
-                key="on_request_stack_lookup"
+            stacks: Optional[List[ImmutableStack]] = (
+                stacks_notification.get_result_by_key(key="on_request_stack_lookup")
             )
 
             # Check, if the stacks list is None
@@ -1301,8 +1316,8 @@ class DashboardUI(BaseUI):
             )
 
             # Lookup the stacks from the DispatcherNotification
-            stacks: Optional[List[ImmutableStack]] = stacks_notification.get_result(
-                key="on_request_get_all_stacks"
+            stacks: Optional[List[ImmutableStack]] = (
+                stacks_notification.get_result_by_key(key="on_request_get_all_stacks")
             )
 
             # Check, if the stacks list is None

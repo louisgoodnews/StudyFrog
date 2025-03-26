@@ -21,7 +21,6 @@ from core.ui.ui_builder import UIBuilder
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
-from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
@@ -83,7 +82,9 @@ class StackSelectionUI(BaseUI):
             unified_manager=unified_manager,
         )
 
-    @override
+        # Initialize the selected_stacks attribute
+        self.selected_stacks: List[ImmutableStack] = []
+
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
         Collects and returns a list of subscriptions.
@@ -97,14 +98,20 @@ class StackSelectionUI(BaseUI):
             List[Dict[str, Any]]: A list representing the subscriptions for events.
         """
 
-        return [
-            {
-                "event": Events.STACK_CREATED,
-                "function": self.on_stack_created,
-                "namespace": Constants.GLOBAL_NAMESPACE,
-                "persistent": True,
-            },
-        ]
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        subscriptions.extend(
+            [
+                {
+                    "event": Events.STACK_CREATED,
+                    "function": self.on_stack_created,
+                    "namespace": Constants.GLOBAL_NAMESPACE,
+                    "persistent": True,
+                },
+            ]
+        )
+
+        return subscriptions
 
     @override
     def configure_grid(self) -> None:
@@ -207,7 +214,7 @@ class StackSelectionUI(BaseUI):
 
                 # Return early
                 return
-            
+
             # Configure the weight of the 0th column to weight 1.
             center_frame.grid_columnconfigure(
                 index=0,
@@ -476,7 +483,7 @@ class StackSelectionUI(BaseUI):
                 return
 
             # Get the result from the dispatcher notification
-            stacks: List[ImmutableStack] = stacks_response.get_result(
+            stacks: List[ImmutableStack] = stacks_response.get_result_by_key(
                 key="on_request_get_all_stacks"
             )
 
@@ -530,12 +537,14 @@ class StackSelectionUI(BaseUI):
                 return
 
             # Get the result from the dispatcher notification
-            difficulties: List[ImmutableDifficulty] = difficulties_response.get_result(
-                key="on_request_get_all_difficulties"
+            difficulties: List[ImmutableDifficulty] = (
+                difficulties_response.get_result_by_key(
+                    key="on_request_get_all_difficulties"
+                )
             )
 
             # Create the difficulty select widgets within the passed master frame
-            difficulty_select: Optional[Dict[str, Any]] = (
+            self.difficulty_select: Optional[Dict[str, Any]] = (
                 UIBuilder.get_multi_select_field(
                     label="Difficulties: ",
                     master=master,
@@ -543,7 +552,7 @@ class StackSelectionUI(BaseUI):
                 )
             )
 
-            if not difficulty_select:
+            if not self.difficulty_select:
                 # Log a warning message
                 self.logger.warning(
                     message=f"Failed to create difficulty select in '{self.__class__.__name__}'. This is likely a bug."
@@ -553,7 +562,7 @@ class StackSelectionUI(BaseUI):
                 return
 
             # Style the difficulty select widget's button
-            difficulty_select["select_button"].configure(
+            self.difficulty_select["select_button"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILIY,
@@ -564,7 +573,7 @@ class StackSelectionUI(BaseUI):
             )
 
             # Style the difficulty select widget's label
-            difficulty_select["label"].configure(
+            self.difficulty_select["label"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILIY,
@@ -574,10 +583,12 @@ class StackSelectionUI(BaseUI):
             )
 
             # Style the difficulty select widget's root frame
-            difficulty_select["root"].configure(background=Constants.BLUE_GREY["700"])
+            self.difficulty_select["root"].configure(
+                background=Constants.BLUE_GREY["700"]
+            )
 
             # Place the difficulty select widget in the main window
-            difficulty_select["root"].grid(
+            self.difficulty_select["root"].grid(
                 column=0,
                 padx=5,
                 pady=5,
@@ -603,12 +614,12 @@ class StackSelectionUI(BaseUI):
                 return
 
             # Get the result from the dispatcher notification
-            priorities: List[ImmutablePriority] = priorities_response.get_result(
+            priorities: List[ImmutablePriority] = priorities_response.get_result_by_key(
                 key="on_request_get_all_priorities"
             )
 
             # Create the priority select widgets within the passed master frame
-            priority_select: Optional[Dict[str, Any]] = (
+            self.priority_select: Optional[Dict[str, Any]] = (
                 UIBuilder.get_multi_select_field(
                     label="Priorities: ",
                     master=master,
@@ -616,7 +627,7 @@ class StackSelectionUI(BaseUI):
                 )
             )
 
-            if not priority_select:
+            if not self.priority_select:
                 # Log a warning message
                 self.logger.warning(
                     message=f"Failed to create priority select in '{self.__class__.__name__}'. This is likely a bug."
@@ -626,7 +637,7 @@ class StackSelectionUI(BaseUI):
                 return
 
             # Style the priority select widget's button
-            priority_select["select_button"].configure(
+            self.priority_select["select_button"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILIY,
@@ -637,7 +648,7 @@ class StackSelectionUI(BaseUI):
             )
 
             # Style the priority select widget's label
-            priority_select["label"].configure(
+            self.priority_select["label"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILIY,
@@ -647,10 +658,12 @@ class StackSelectionUI(BaseUI):
             )
 
             # Style the priority select widget's root frame
-            priority_select["root"].configure(background=Constants.BLUE_GREY["700"])
+            self.priority_select["root"].configure(
+                background=Constants.BLUE_GREY["700"]
+            )
 
             # Place the priority select widget in the main window
-            priority_select["root"].grid(
+            self.priority_select["root"].grid(
                 column=0,
                 padx=5,
                 pady=5,
@@ -690,27 +703,107 @@ class StackSelectionUI(BaseUI):
         """
         try:
             # Create a tkinter.Frame widget for the stack item
-            frame: tkinter.Frame = UIBuilder.get_frame(
+            frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
                 background=Constants.GREY["default"],
                 master=master,
             )
 
+            if not frame:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create stack item frame in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Create a tkinter.Checkbutton widget for the stack item
+            checkbutton: Optional[tkinter.Checkbutton] = UIBuilder.get_checkbutton(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                master=frame,
+                relief=FLAT,
+                text="",
+                variable=UIBuilder.get_bool_variable(),
+            )
+
+            if not checkbutton:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create stack item checkbutton in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            checkbutton.bind(
+                func=lambda event: self.on_stack_item_checkbutton_click(stack=stack),
+                sequence="<ButtonRelease-1>",
+            )
+
+            # Place the checkbutton in the frame
+            checkbutton.grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+            )
+
             # Dispatch events to lookup stack attribute details
-            difficulty_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_DIFFICULTY_LOOKUP,
-                id=stack["difficulty"],
-                namespace=Constants.GLOBAL_NAMESPACE,
+            difficulty_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                    id=stack["difficulty"],
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
-            priority_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_PRIORITY_LOOKUP,
-                id=stack["priority"],
-                namespace=Constants.GLOBAL_NAMESPACE,
+
+            if not difficulty_notification:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to lookup difficulty in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            priority_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_PRIORITY_LOOKUP,
+                    id=stack["priority"],
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
-            status_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_STATUS_LOOKUP,
-                id=stack["status"],
-                namespace=Constants.GLOBAL_NAMESPACE,
+
+            if not priority_notification:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to lookup priority in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            status_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STATUS_LOOKUP,
+                    id=stack["status"],
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
+
+            if not status_notification:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to lookup status in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
 
             # Iterate over stack attributes to configure the frame and create labels
             for (
@@ -725,7 +818,8 @@ class StackSelectionUI(BaseUI):
                     "last_viewed_at",
                     "status",
                     "due_by",
-                ]
+                ],
+                start=1,
             ):
                 # Configure the frame widget's column to weight 1
                 frame.grid_columnconfigure(
@@ -744,22 +838,22 @@ class StackSelectionUI(BaseUI):
 
                 # Determine the text to display based on column type
                 if column == "priority":
-                    text = priority_notification.get_result(
+                    text = priority_notification.get_result_by_key(
                         key="on_request_priority_lookup"
                     )[0]["emoji"]
                 elif column == "difficulty":
-                    text = difficulty_notification.get_result(
+                    text = difficulty_notification.get_result_by_key(
                         key="on_request_difficulty_lookup"
                     )[0]["emoji"]
                 elif column == "status":
-                    text = status_notification.get_result(
+                    text = status_notification.get_result_by_key(
                         key="on_request_status_lookup"
                     )[0]["emoji"]
                 else:
                     text = data[column]
 
                 # Create a tkinter.Label widget for each stack attribute
-                label: tkinter.Label = UIBuilder.get_label(
+                label: Optional[tkinter.Label] = UIBuilder.get_label(
                     background=Constants.BLUE_GREY["700"],
                     font=(
                         Constants.DEFAULT_FONT_FAMILIY,
@@ -770,6 +864,15 @@ class StackSelectionUI(BaseUI):
                     text=text,
                 )
 
+                if not label:
+                    # Log a warning message
+                    self.logger.warning(
+                        message=f"Failed to create stack item label in '{self.__class__.__name__}'. This is likely a bug."
+                    )
+
+                    # Return early
+                    return
+
                 # Place the label widget in the stack item frame
                 label.grid(
                     column=index,
@@ -779,12 +882,12 @@ class StackSelectionUI(BaseUI):
 
                 # Bind the label widget to a command that dispatches an event when clicked
                 label.bind(
-                    func=lambda event, stack=stack: self.dispatcher.dispatch(
+                    func=lambda event, obj=stack: self.dispatcher.dispatch(
                         direction="forward",
                         event=Events.REQUEST_VALIDATE_NAVIGATION,
                         namespace=Constants.GLOBAL_NAMESPACE,
                         source="dashboard_ui",
-                        stack=stack,
+                        stack=obj,
                         target="edit_ui",
                     ),
                     sequence="<ButtonRelease-1>",
@@ -844,6 +947,46 @@ class StackSelectionUI(BaseUI):
             # Re-raise the exception to the caller
             raise e
 
+    def on_stack_item_checkbutton_click(
+        self,
+        stack: ImmutableStack,
+    ) -> None:
+        """
+        Handles the click event of a stack item checkbutton and adds or removes the stack from the list of selected stacks.
+
+        Args:
+            stack (ImmutableStack): The stack that was clicked
+
+        Returns:
+            None
+        """
+        try:
+            # Check if the stack is currently selected
+            if stack not in self.selected_stacks:
+                # Add the stack to the list of selected stacks
+                self.selected_stacks.append(stack)
+
+                # Log an info message:
+                self.logger.info(
+                    message=f"Stack '{stack.name}' with ID ({stack.id}) added to selected stacks in '{self.__class__.__name__}'."
+                )
+            else:
+                # Remove the stack from the list of selected stacks
+                self.selected_stacks.remove(stack)
+
+                # Log an info message:
+                self.logger.info(
+                    message=f"Stack '{stack.name}' with ID ({stack.id}) removed from selected stacks in '{self.__class__.__name__}'."
+                )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_stack_item_checkbutton_click' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
     def on_stack_created(
         self,
         stack: ImmutableStack,
@@ -881,14 +1024,85 @@ class StackSelectionUI(BaseUI):
             Exception: If an exception occurs during the dispatching of the event.
         """
         try:
+            # Initialize the kwargs dictionary
+            kwargs: Dict[str, Any] = {
+                "direction": Constants.FORWARD_DIRECTION,
+                "event": Events.REQUEST_VALIDATE_NAVIGATION,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "source": "stack_selection_ui",
+                "stacks": self.selected_stacks,
+                "target": "learning_session_ui",
+            }
+
+            # Get the priority selection
+            priority_selection: Optional[List[str]] = self.priority_select["getter"]()
+
+            if not priority_selection:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get priority selection in '{self.__class__.__name__}'. This is likely due to no value being selected."
+                )
+            else:
+                # Dispatch a request to look up the priority by name
+                priority_notification: Optional[DispatcherNotification] = (
+                    self.dispatcher.dispatch(
+                        event=Events.REQUEST_PRIORITY_LOOKUP,
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                        name=priority_selection[0],
+                    )
+                )
+
+                if not priority_notification:
+                    # Log a warning message
+                    self.logger.warning(
+                        message=f"Priority with name '{priority_selection}' not found in '{self.__class__.__name__}'."
+                    )
+                else:
+                    # Store the priority in the kwargs dictionary
+                    kwargs["priorities"] = (
+                        priority_notification.get_one_and_only_result()
+                    )
+
+            # Get the difficulty selection
+            difficulty_selection: Optional[List[str]] = self.difficulty_select[
+                "getter"
+            ]()
+
+            if not difficulty_selection:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get difficulty selection in '{self.__class__.__name__}'. This is likely due to no value being selected."
+                )
+            else:
+                # Dispatch a request to look up the difficulty by name
+                difficulty_notification: Optional[DispatcherNotification] = (
+                    self.dispatcher.dispatch(
+                        event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                        namespace=Constants.GLOBAL_NAMESPACE,
+                        name=difficulty_selection[0],
+                    )
+                )
+
+                if not difficulty_notification:
+                    # Log a warning message
+                    self.logger.warning(
+                        message=f"Difficulty with name '{difficulty_selection}' not found in '{self.__class__.__name__}'."
+                    )
+                else:
+                    # Store the difficulty in the kwargs dictionary
+                    kwargs["difficulties"] = (
+                        difficulty_notification.get_one_and_only_result()
+                    )
+
             # Dispatch the REQUEST_VALIDATE_NAVIGATION event
-            self.dispatcher.dispatch(
-                direction=Constants.FORWARD_DIRECTION,
-                event=Events.REQUEST_VALIDATE_NAVIGATION,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                source="stack_selection_ui",
-                target="learning_session_ui",
-            )
+            self.dispatcher.dispatch(**kwargs)
+
+            if isinstance(
+                self.master,
+                tkinter.Toplevel,
+            ):
+                # Destroy the current window
+                self.master.destroy()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(

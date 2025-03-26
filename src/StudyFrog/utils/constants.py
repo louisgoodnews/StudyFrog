@@ -551,27 +551,28 @@ class Constants:
     CREATE_UI_NAMESPACE: Final[str] = "CREATE_UI"
     DASHBOARD_UI_NAMESPACE: Final[str] = "DASHBOARD_UI"
     EDIT_UI_NAMESPACE: Final[str] = "EDIT_UI"
+    LEARNING_SESSION_NAMESPACE: Final[str] = "LEARNING_SESSION"
     MAIN_UI_NAMESPACE: Final[str] = "MAIN_UI"
     REPORT_UI_NAMESPACE: Final[str] = "REPORT_UI"
     SEARCH_UI_NAMESPACE: Final[str] = "SEARCH_UI"
     SETTING_UI_NAMESPACE: Final[str] = "SETTING_UI"
 
-    NOW: Final[datetime] =  datetime.now()
+    NOW: Final[datetime] = datetime.now()
 
-    TODAY: Final[datetime] =  datetime.today()
-    TOMORROW: Final[datetime] =  datetime.today() + timedelta(days=1)
-    YESTERDAY: Final[datetime] =  datetime.today() - timedelta(days=1)
+    TODAY: Final[datetime] = datetime.today()
+    TOMORROW: Final[datetime] = datetime.today() + timedelta(days=1)
+    YESTERDAY: Final[datetime] = datetime.today() - timedelta(days=1)
 
-    START_OF_WEEK: Final[datetime] =  datetime.today() - timedelta(
+    START_OF_WEEK: Final[datetime] = datetime.today() - timedelta(
         days=datetime.today().weekday()
     )
-    END_OF_WEEK: Final[datetime] =  START_OF_WEEK + timedelta(days=6)
+    END_OF_WEEK: Final[datetime] = START_OF_WEEK + timedelta(days=6)
 
-    START_OF_MONTH: Final[datetime] =  datetime.today().replace(day=1)
-    END_OF_MONTH: Final[datetime] =  START_OF_MONTH + timedelta(days=31)
+    START_OF_MONTH: Final[datetime] = datetime.today().replace(day=1)
+    END_OF_MONTH: Final[datetime] = START_OF_MONTH + timedelta(days=31)
 
-    START_OF_YEAR: Final[datetime] =  datetime.today().replace(month=1, day=1)
-    END_OF_YEAR: Final[datetime] =  START_OF_YEAR + timedelta(days=365)
+    START_OF_YEAR: Final[datetime] = datetime.today().replace(month=1, day=1)
+    END_OF_YEAR: Final[datetime] = START_OF_YEAR + timedelta(days=365)
 
     @classmethod
     def get_base_id(cls) -> int:

@@ -923,8 +923,14 @@ class BootstrapService:
             None
         """
         try:
+            # Log an info message about running shutdown tasks
+            self.logger.info(message="Running shutdown tasks....")
+
             # Unregister all event handlers from the dispatcher
             self.unregister_handlers()
+
+            # Log an info message about completing shutdown tasks
+            self.logger.info(message="Shutdown tasks completed.")
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -959,6 +965,9 @@ class BootstrapService:
             Exception: If an exception occurs while running the startup tasks.
         """
         try:
+            # Log an info message about running startup tasks
+            self.logger.info(message="Running startup tasks....")
+
             # Create the database tables
             self.create_tables()
 
@@ -982,6 +991,9 @@ class BootstrapService:
 
             # Create the default statuses
             self.create_default_statuses()
+
+            # Log an info message about completing startup tasks
+            self.logger.info(message="Startup tasks completed.")
 
             # Return the dispatcher, navigation service, setting service, and unified object manager instances
             return (

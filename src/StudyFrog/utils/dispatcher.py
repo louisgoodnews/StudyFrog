@@ -200,7 +200,35 @@ class DispatcherNotification(ImmutableBaseObject):
         # Get the result of the notification
         return self["result"].values()
 
-    def get_result(
+    def get_one_and_only_result(self) -> Optional[Any]:
+        """
+        Returns the one and only result of the notification.
+
+        If the result contains more than one or no value(s), a ValueError is
+        raised.
+
+        Returns:
+            Optional[Any]: The one and only result of the notification if it
+                contains exactly one value. Otherwise, None.
+        """
+        try:
+            # Check if the result contains more than one or no value(s)
+            if len(self["result"]) == 1:
+                # Return the one and only result
+                return self["result"][next(iter(self["result"]))]
+            else:
+                # Raise a ValueError if the result contains more than one or no value(s)
+                raise ValueError("Result contains more than one or no value(s).")
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_one_and_only_result' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_result_by_key(
         self,
         key: str,
     ) -> Optional[Any]:

@@ -64,7 +64,7 @@ class Miscellaneous:
         Returns:
             str: The snake_case version of the input string.
         """
-        return string.lower().replace(" ", "_")
+        return string.strip().lower().replace(" ", "_")
 
     @classmethod
     def camel_to_pascal(

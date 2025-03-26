@@ -209,7 +209,9 @@ class MutableBaseObject:
         """
 
         # Return a string representation of the object
-        return ", ".join([f'{value}' for value in self.to_dict(exclude=["_logger"]).values()])
+        return ", ".join(
+            [f"{value}" for value in self.to_dict(exclude=["_logger"]).values()]
+        )
 
     def compare_to(
         self,
@@ -444,8 +446,8 @@ class ImmutableBaseObject(MutableBaseObject):
             super()
             .__repr__()
             .replace(
-                f"({self.__class__.__name__})",
-                f"({self.__class__.__name__}[Immutable])",
+                f"{self.__class__.__name__}",
+                f"{self.__class__.__name__}(Immutable)",
             )
         )
 

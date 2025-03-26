@@ -1774,7 +1774,9 @@ class UIBuilder:
                     return
                 else:
                     # Appendselected value(s) to the  the value associated with the "selection" key with the selected value(s)
-                    result["selection"].append(result["listbox"].get(*selection_indices))
+                    result["selection"].append(
+                        result["listbox"].get(*selection_indices)
+                    )
 
                 # Iterate over the children of the "Container" frame widget
                 for child in result["container"].winfo_children():
@@ -4728,15 +4730,17 @@ class UIBuilder:
                 # Get the number of children in the "children" dictionary
                 num_children: int = len(result["children"])
 
-                # Create the "{label.lower()}_button" button widget
-                result[f"{label.lower()}_button"] = cls.get_button(
-                    command=lambda string=label: on_button_click(string=string),
-                    master=result["top_frame"],
-                    text=label,
+                # Create the "{Miscellaneous.any_to_snake(string=label)}_button" button widget
+                result[f"{Miscellaneous.any_to_snake(string=label)}_button"] = (
+                    cls.get_button(
+                        command=lambda string=label: on_button_click(string=string),
+                        master=result["top_frame"],
+                        text=label,
+                    )
                 )
 
                 # Place the button widget within the "Top frame" frame widget
-                result[f"{label.lower()}_button"].grid(
+                result[f"{Miscellaneous.any_to_snake(string=label)}_button"].grid(
                     column=num_children - 1,
                     row=0,
                     sticky=sticky,
@@ -4752,7 +4756,7 @@ class UIBuilder:
                     )
 
                     # Disable the button
-                    result[f"{label.lower()}_button"].configure(state=DISABLED)
+                    result[f"{Miscellaneous.any_to_snake(string=label)}_button"].configure(state=DISABLED)
                 else:
                     # Hide the widget
                     widget.grid_forget()
