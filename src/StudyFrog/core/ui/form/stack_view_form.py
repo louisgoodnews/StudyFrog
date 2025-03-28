@@ -500,31 +500,31 @@ class StackViewForm(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Create the primary attributes frame
-        primary_attributes_frame: tkinter.Frame = UIBuilder.get_frame(
+        # Create the core attributes frame
+        core_attributes_frame: tkinter.Frame = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=tabbed_view["center_frame"],
         )
 
-        # Configure the primary attributes frame's 0th column to weight 1
-        primary_attributes_frame.grid_columnconfigure(
+        # Configure the core attributes frame's 0th column to weight 1
+        core_attributes_frame.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the primary attributes frame's 0th row to weight 1
-        primary_attributes_frame.grid_rowconfigure(
+        # Configure the core attributes frame's 0th row to weight 1
+        core_attributes_frame.grid_rowconfigure(
             index=0,
             weight=1,
         )
 
-        # Add the primary attributes frame to the tabbed view
+        # Add the core attributes frame to the tabbed view
         tabbed_view["adder"](
-            label="Primary Attributes",
-            widget=primary_attributes_frame,
+            label="Core Attributes",
+            widget=core_attributes_frame,
         )
 
-        # Style the primary attributes button
+        # Style the core attributes button
         tabbed_view["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
@@ -543,7 +543,7 @@ class StackViewForm(tkinter.Frame):
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Description: ",
-                master=primary_attributes_frame,
+                master=core_attributes_frame,
             )
         )
 
@@ -574,7 +574,7 @@ class StackViewForm(tkinter.Frame):
         # Configure the description field's label widget
         self.description_field["setter"](value=self.stack.description or "")
 
-        # Place the description field within the primary attributes frame
+        # Place the description field within the core attributes frame
         self.description_field["root"].grid(
             column=0,
             row=0,
