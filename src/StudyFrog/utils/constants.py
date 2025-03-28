@@ -172,12 +172,12 @@ class Constants:
     USERS: Final[str] = "users"
 
     DEFAULT_FONT_FAMILIY: Final[str] = "Helvetica"
-    DEFAULT_FONT_SIZE: int = 16
+    DEFAULT_FONT_SIZE: Final[int] =16
 
-    VERY_LARGE_FONT_SIZE: int = 48
-    LARGE_FONT_SIZE: int = 24
-    MEDIUM_FONT_SIZE: int = 16
-    SMALL_FONT_SIZE: int = 12
+    VERY_LARGE_FONT_SIZE: Final[int] =48
+    LARGE_FONT_SIZE: Final[int] =24
+    MEDIUM_FONT_SIZE: Final[int] =16
+    SMALL_FONT_SIZE: Final[int] =12
 
     BOLD: Final[str] = "bold"
     ITALIC: Final[str] = "italic"
@@ -258,7 +258,7 @@ class Constants:
         "900": "#3E2723",
     }
 
-    CYAN = {
+    CYAN: Final[Dict[str, Any]] = {
         "default": "#00BCD4",
         "50": "#E0F7FA",
         "100": "#B2EBF2",
@@ -576,6 +576,15 @@ class Constants:
 
     @classmethod
     def get_base_id(cls) -> int:
+        """
+        Returns the base ID.
+
+        The base ID is used to generate unique IDs for objects in the application.
+
+        Returns:
+            int: The base ID.
+        """
+        # Copy the base ID to prevent external modification
         return copy.deepcopy(cls.BASE_ID)
 
     @classmethod
