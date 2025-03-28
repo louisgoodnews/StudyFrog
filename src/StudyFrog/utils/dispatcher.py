@@ -619,29 +619,37 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             # Set the start time of the notification
             result.start(value=Miscellaneous.get_current_datetime())
 
-            # Iterate over the subscriptions in the namespace
-            for (
-                uuid,
-                subscription,
-            ) in self.subscriptions[namespace].items():
-                # Check if the subscription is persistent
-                if not subscription["persistent"]:
-                    # Add the subscription to the subscriptions dictionary
-                    non_persistents.append(uuid)
+            # Get the subscriptions in the namespace
+            subscriptions: Dict[str, Any] = self.subscriptions.get(namespace, {})
 
-                # Log a message indicating the function is beeing called
-                self.logger.info(
-                    message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
-                )
+            # Check if there are any subscriptions in the namespace
+            if len(subscriptions) == 0:
+                # Set the result of the notification
+                result.configuration["result"] = {}
+            else:
+                # Iterate over the subscriptions in the namespace
+                for (
+                    uuid,
+                    subscription,
+                ) in subscriptions.items():
+                    # Check if the subscription is persistent
+                    if not subscription["persistent"]:
+                        # Add the subscription to the subscriptions dictionary
+                        non_persistents.append(uuid)
 
-                # Call the function associated with the subscription
-                result.result(
-                    key=subscription["function"].__name__,
-                    value=subscription["function"](
-                        *args,
-                        **kwargs,
-                    ),
-                )
+                    # Log a message indicating the function is beeing called
+                    self.logger.info(
+                        message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
+                    )
+
+                    # Call the function associated with the subscription
+                    result.result(
+                        key=subscription["function"].__name__,
+                        value=subscription["function"](
+                            *args,
+                            **kwargs,
+                        ),
+                    )
 
             # Iterate over the non-persistent subscriptions
             for uuid in non_persistents:
