@@ -981,7 +981,7 @@ class PriorityModel(ImmutableBaseModel):
         value (float): The value of the priority.
     """
 
-    table: str = Constants.PRIORITIES
+    table: Final[str] = Constants.PRIORITIES
 
     id: Field = Field(
         autoincrement=True,

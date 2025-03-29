@@ -256,10 +256,24 @@ class Miscellaneous:
         Returns:
             Optional[str]: The string that matched the pattern, or None if no match was found.
         """
-        return re.match(
+
+        # Find a match for the string against the pattern
+        match: Optional[re.Match] = re.match(
             pattern=pattern,
             string=string,
-        ).group(group)
+        )
+
+        if not match:
+            # Log an error message indicating that no match was found
+            cls.logger.error(
+                message=f"Failed to find match for string '{string}' with pattern '{pattern}'."
+            )
+
+            # Return None indicating no match was found
+            return None
+
+        # Return the matched group
+        return match.group(group)
 
     @classmethod
     def get_current_datetime(cls) -> datetime:

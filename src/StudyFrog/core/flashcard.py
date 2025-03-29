@@ -126,6 +126,35 @@ class ImmutableFlashcard(ImmutableBaseObject):
             uuid=uuid,
         )
 
+    def get_custom_field_value(
+        self,
+        customfield_id: str,
+    ) -> Optional[Any]:
+        """
+        Retrieves the value of a custom field by its ID.
+
+        Args:
+            customfield_id (str): The ID of the custom field to retrieve.
+
+        Returns:
+            Optional[Any]: The value of the custom field if found, otherwise None.
+        """
+        try:
+            # Iterate over the custom field values and return the value for the matching customfield_id
+            return next(
+                item["value"]
+                for item in self.custom_field_values
+                if item["customfield_id"] == customfield_id
+            )
+        except StopIteration as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_custom_field_value' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def to_mutable(self) -> "MutableFlashcard":
         """
         Returns a mutable copy of the ImmutableFlashcard instance.
@@ -230,6 +259,65 @@ class MutableFlashcard(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    def get_custom_field_value(
+        self,
+        customfield_id: str,
+    ) -> Optional[Any]:
+        """
+        Retrieves the value of a custom field by its ID.
+
+        Args:
+            customfield_id (str): The ID of the custom field to retrieve.
+
+        Returns:
+            Optional[Any]: The value of the custom field if found, otherwise None.
+        """
+        try:
+            # Iterate over the custom field values and return the value for the matching customfield_id
+            return next(
+                item["value"]
+                for item in self.custom_field_values
+                if item["customfield_id"] == customfield_id
+            )
+        except StopIteration as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_custom_field_value' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def set_custom_field_value(
+        self,
+        customfield_id: str,
+        value: Any,
+    ) -> None:
+        """
+        Sets the value of a custom field by its ID.
+
+        Args:
+            customfield_id (str): The ID of the custom field to set.
+            value (Any): The value to set for the custom field.
+
+        Returns:
+            None
+        """
+        try:
+            # Iterate over the custom field values and update the value for the matching customfield_id
+            for item in self.custom_field_values:
+                if item["customfield_id"] == customfield_id:
+                    item["value"] = value
+                    return
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'set_custom_field_value' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return indicating an error has occurred
+            return
 
     def set_difficulty(
         self,
@@ -428,7 +516,7 @@ class FlashcardFactory:
             Exception: If an exception occurs while creating the flashcard.
         """
         try:
-            # Attempt to create an d return an ImmutableFlashcard object
+            # Attempt to create and return an ImmutableFlashcard object
             return ImmutableFlashcard(
                 back_text=back_text,
                 back_word_count=back_word_count,
@@ -1324,26 +1412,26 @@ class FlashcardModel(ImmutableBaseModel):
     Represents the structure of a flashcard model.
 
     Attributes:
-        back_text (Optional[str]): The back side of the flashcard.
-        back_word_count (Optional[int]): The word count of the back side of the flashcard.
-        created_at (Optional[datetime]): The timestamp when the flashcard was created.
-        custom_field_values (Optional[str]): The custom field values of the flashcard.
-        difficulty (Optional[int]): The difficulty of the flashcard.
-        familiarity (Optional[float]): The familiarity of the flashcard.
-        front_text (Optional[str]): The front side of the flashcard.
-        front_word_count (Optional[int]): The word count of the front side of the flashcard.
-        icon (Optional[str]): The icon of the flashcard. Defaults to "📇".
-        id (Optional[int]): The ID of the flashcard.
-        key (Optional[str]): The key of the flashcard.
-        last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
-        priority (Optional[int]): The priority of the flashcard.
-        status (Optional[int]): The status of the flashcard.
-        total_word_count (Optional[int]): The word count of the back side of the flashcard.
-        updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
-        uuid (Optional[str]): The UUID of the flashcard.
+        back_text (Field): The back side of the flashcard.
+        back_word_count (Field): The word count of the back side of the flashcard.
+        created_at (Field): The timestamp when the flashcard was created.
+        custom_field_values (Field): The custom field values of the flashcard.
+        difficulty (Field): The difficulty of the flashcard.
+        familiarity (Field): The familiarity of the flashcard.
+        front_text (Field): The front side of the flashcard.
+        front_word_count (Field): The word count of the front side of the flashcard.
+        icon (Field): The icon of the flashcard. Defaults to "📇".
+        id (Field): The ID of the flashcard.
+        key (Field): The key of the flashcard.
+        last_viewed_at (Field): The timestamp when the flashcard was last viewed.
+        priority (Field): The priority of the flashcard.
+        status (Field): The status of the flashcard.
+        total_word_count (Field): The word count of the back side of the flashcard.
+        updated_at (Field): The timestamp when the flashcard was last updated.
+        uuid (Field): The UUID of the flashcard.
     """
 
-    table: str = Constants.FLASHCARDS
+    table: Final[str] = Constants.FLASHCARDS
 
     id: Field = Field(
         autoincrement=True,

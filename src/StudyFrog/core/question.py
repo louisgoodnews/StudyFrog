@@ -1365,7 +1365,7 @@ class QuestionModel(ImmutableBaseModel):
         uuid (Field): The UUID of the question.
     """
 
-    table: str = Constants.QUESTIONS
+    table: Final[str] = Constants.QUESTIONS
 
     id: Field = Field(
         autoincrement=True,

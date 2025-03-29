@@ -1054,12 +1054,8 @@ class CreateUI(BaseUI):
         # Get the data from the form
         form_data: Dict[str, Any] = self.form.get()
 
-        if not self.form.check_required_fields(
-            object_data=form_data.get(
-                "object_data",
-                {},
-            )
-        ):
+        # Check if all required fields are filled
+        if not self.form.check_required_fields(object_data=form_data):
             # Log an info message indicating that not all required fields were filled
             self.logger.info(message="Seems like not all required fields were filled.")
 

@@ -105,16 +105,20 @@ class FlashcardCreateForm(tkinter.Frame):
             bool: True if all required fields are filled, False otherwise.
         """
 
+        validation: Tuple[bool, List[str]] = self.validate_required_fields(
+            object_data=object_data
+        )
+
         # Validate the required fields using the helper method
-        if self.validate_required_fields(object_data=object_data):
+        if validation[0]:
             # Return True if validation is successful
             return True
 
         # Show a dialog informing the user to fill all required fields
         okay: Optional[Dict[str, Any]] = UIBuilder.get_okay(
             dispatcher=self.dispatcher,
-            message="Please fill in all required fields.",
-            title="Required fields missing.",
+            message=f"Please fill in all required fields: {', '.join(validation[1])}",
+            title="Required fields are missing.",
         )
 
         # Style the okay dialog's "Root" toplevel widget
@@ -471,7 +475,7 @@ class FlashcardCreateForm(tkinter.Frame):
     def validate_required_fields(
         self,
         object_data: Dict[str, Any],
-    ) -> bool:
+    ) -> Tuple[bool, List[str]]:
         """
         Validates the object data to ensure all required fields have been provided.
 
@@ -480,6 +484,7 @@ class FlashcardCreateForm(tkinter.Frame):
 
         Returns:
             bool: True if all required fields have been provided, False otherwise.
+            List[str]: A list of missing fields if the validation fails.
         """
 
         # Define the required fields
@@ -488,14 +493,27 @@ class FlashcardCreateForm(tkinter.Frame):
             "difficulty",  # The difficulty of the flashcard
             "front_text",  # The front side of the flashcard
             "priority",  # The priority of the flashcard
-            "stack",  # The stack the flashcard belongs to
         ]
 
-        # Validate all required fields
-        result: bool = all([object_data.get(field, None) is not None for field in required_fields])
+        missing_fields: List[str] = []
 
-        # Log the result
-        self.logger.debug(message=f"object data: {object_data}; result: {result}")
+        check: List[bool] = []
+
+        # Iterate over all required fields
+        for required_field in required_fields:
+            # Check if the required field is in the object data
+            if required_field in object_data.get("object_data", {}):
+                # If the field is present, append True to the check list
+                check.append(True)
+            # Check if the required field is in the related objects
+            elif required_field in object_data.get("related_objects", {}):
+                # If the field is present, append True to the check list
+                check.append(True)
+            else:
+                # If the field is not present, append the field to the missing fields
+                # list and append False to the check list
+                missing_fields.append(required_field)
+                check.append(False)
 
         # Return the result
-        return result
+        return all(check), missing_fields

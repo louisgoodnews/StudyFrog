@@ -758,7 +758,7 @@ class CustomFieldModel(ImmutableBaseModel):
         uuid (str): The UUID of the custom field.
     """
 
-    table: str = Constants.CUSTOM_FIELDS
+    table: Final[str] = Constants.CUSTOM_FIELDS
 
     id: Field = Field(
         autoincrement=True,

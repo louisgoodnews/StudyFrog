@@ -839,7 +839,7 @@ class UserModel(ImmutableBaseModel):
         uuid (Field): The UUID of the user.
     """
 
-    table: str = Constants.USERS
+    table: Final[str] = Constants.USERS
 
     id: Field = Field(
         autoincrement=True,

@@ -357,9 +357,7 @@ class AnswerManager(BaseObjectManager):
         """
         try:
             # Count and return the number of answers in the database
-            return asyncio.run(
-                AnswerModel.count(database=Constants.DATABASE_PATH)
-            )
+            return asyncio.run(AnswerModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -948,7 +946,7 @@ class AnswerModel(ImmutableBaseModel):
         uuid (Optional[str]): The UUID of the answer.
     """
 
-    table: str = Constants.ANSWERS
+    table: Final[str] = Constants.ANSWERS
 
     id: Field = Field(
         autoincrement=True,

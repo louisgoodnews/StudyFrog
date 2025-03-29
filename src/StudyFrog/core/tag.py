@@ -841,7 +841,7 @@ class TagModel(ImmutableBaseModel):
         value (Field): The value of the tag.
     """
 
-    table: str = Constants.TAGS
+    table: Final[str] = Constants.TAGS
 
     id: Field = Field(
         autoincrement=True,

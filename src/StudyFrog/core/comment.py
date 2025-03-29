@@ -931,7 +931,7 @@ class CommentModel(ImmutableBaseModel):
         uuid (Optional[str]): The UUID of the comment.
     """
 
-    table: str = Constants.COMMENTS
+    table: Final[str] = Constants.COMMENTS
 
     id: Field = Field(
         autoincrement=True,

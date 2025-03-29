@@ -950,7 +950,7 @@ class StatusModel(ImmutableBaseModel):
         uuid (str): The UUID of the status.
     """
 
-    table: str = Constants.STATUSES
+    table: Final[str] = Constants.STATUSES
 
     id: Field = Field(
         autoincrement=True,

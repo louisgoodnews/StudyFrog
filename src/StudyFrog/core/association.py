@@ -46,6 +46,8 @@ class Association(ImmutableBaseObject):
         icon (Optional[str]): The icon of the association..
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
+        learning_session (Optional[int]): The ID of the learning session that is being associated with.
+        learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
         note (Optional[int]): The ID of the note that is being associated with.
         option (Optional[int]): The ID of the option that is being associated with.
         priority (Optional[int]): The ID of the priority that is being associated with.
@@ -79,6 +81,8 @@ class Association(ImmutableBaseObject):
         icon: Optional[str] = "🔗",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        learning_session: Optional[int] = None,
+        learning_session_item: Optional[int] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -107,6 +111,8 @@ class Association(ImmutableBaseObject):
             icon (Optional[str]): The icon of the association. Defaults to "🔗".
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
+            learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -137,6 +143,8 @@ class Association(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            learning_session=learning_session,
+            learning_session_item=learning_session_item,
             note=note,
             option=option,
             priority=priority,
@@ -267,6 +275,8 @@ class AssociationFactory:
         icon: Optional[str] = "🔗",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        learning_session: Optional[int] = None,
+        learning_session_item: Optional[int] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -295,6 +305,8 @@ class AssociationFactory:
             icon (Optional[str]): The icon of the association. Defaults to "🔗".
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
+            learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -328,6 +340,8 @@ class AssociationFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                learning_session=learning_session,
+                learning_session_item=learning_session_item,
                 note=note,
                 option=option,
                 priority=priority,
@@ -388,6 +402,8 @@ class AssociationManager(BaseObjectManager):
         default: Optional[int] = None,
         difficulty: Optional[int] = None,
         flashcard: Optional[int] = None,
+        learning_session: Optional[int] = None,
+        learning_session_item: Optional[int] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -410,6 +426,8 @@ class AssociationManager(BaseObjectManager):
             default (Optional[int]): The ID of the default that is being associated with.
             difficulty (Optional[int]): The ID of the difficulty that is being associated with.
             flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+            learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -438,6 +456,8 @@ class AssociationManager(BaseObjectManager):
                 default=default,
                 difficulty=difficulty,
                 flashcard=flashcard,
+                learning_session=learning_session,
+                learning_session_item=learning_session_item,
                 note=note,
                 option=option,
                 priority=priority,
@@ -972,6 +992,8 @@ class AssociationModel(ImmutableBaseModel):
         icon (Optional[str]): The icon of the association. Defaults to "🔗".
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
+        learning_session (Optional[int]): The ID of the learning session that is being associated with.
+        learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
         note (Optional[int]): The ID of the note that is being associated with.
         option (Optional[int]): The ID of the option that is being associated with.
         priority (Optional[int]): The ID of the priority that is being associated with.
@@ -985,7 +1007,7 @@ class AssociationModel(ImmutableBaseModel):
         uuid (Optional[str]): The UUID of the association.
     """
 
-    table: str = Constants.ASSOCIATIONS
+    table: Final[str] = Constants.ASSOCIATIONS
 
     id: Field = Field(
         autoincrement=True,
@@ -1177,6 +1199,38 @@ class AssociationModel(ImmutableBaseModel):
         size=255,
         type="VARCHAR",
         unique=True,
+    )
+
+    learning_session: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.LEARNING_SESSIONS}(id)",
+        index=False,
+        name="learning_session",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    learning_session_item: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.LEARNING_SESSION_ITEMS}(id)",
+        index=False,
+        name="learning_session_item",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
     )
 
     note: Field = Field(
@@ -1377,6 +1431,8 @@ class AssociationModel(ImmutableBaseModel):
         icon: Optional[str] = "🔗",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        learning_session: Optional[int] = None,
+        learning_session_item: Optional[int] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -1405,6 +1461,8 @@ class AssociationModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the association. Defaults to "🔗".
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
+            learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -1434,6 +1492,8 @@ class AssociationModel(ImmutableBaseModel):
             icon="🔗",
             id=id,
             key=key,
+            learning_session=learning_session,
+            learning_session_item=learning_session_item,
             note=note,
             option=option,
             priority=priority,

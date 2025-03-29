@@ -20,6 +20,7 @@ from core.ui.ui_builder import UIBuilder
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
+from utils.learning_session_runner import LearningSessionRunner
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
@@ -93,6 +94,14 @@ class LearningSessionUI(BaseUI):
 
         # Store the passed priority list as an instance variable
         self.priorities: Optional[List[ImmutablePriority]] = priorities
+
+        # Initialize the learning session runner as an instance variable
+        self.runner: LearningSessionRunner = LearningSessionRunner(
+            difficulties=difficulties,
+            dispatcher=dispatcher,
+            priorities=priorities,
+            stacks=stacks,
+        )
 
         # Store the passed stacks ImmutableStack list as an instance variable
         self.stacks: List[ImmutableStack] = stacks

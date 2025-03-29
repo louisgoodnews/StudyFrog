@@ -597,6 +597,74 @@ class Events:
         name="global:request:get:by:keys"
     )
 
+    # An event that indicates that the user wants to create a new learning session
+    REQUEST_LEARNING_SESSION_CREATE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session:create"
+        )
+    )
+
+    # An event that indicates that the user wants to delete a learning session
+    REQUEST_LEARNING_SESSION_DELETE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session:delete"
+        )
+    )
+
+    # An event that indicates that the user wants to load a learning session
+    REQUEST_LEARNING_SESSION_LOAD: DispatcherEvent = (
+        DispatcherEventFactory.create_event(name="global:request:learning_session:load")
+    )
+
+    # An event that indicates that the user wants to lookup a learning session
+    REQUEST_LEARNING_SESSION_LOOKUP: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session:lookup"
+        )
+    )
+
+    # An event that indicates that the user wants to update a learning session
+    REQUEST_LEARNING_SESSION_UPDATE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session:update"
+        )
+    )
+
+    # An event that indicates that the user wants to create a new learning session item
+    REQUEST_LEARNING_SESSION_ITEM_CREATE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_item:create"
+        )
+    )
+
+    # An event that indicates that the user wants to delete a learning session item
+    REQUEST_LEARNING_SESSION_ITEM_DELETE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_item:delete"
+        )
+    )
+
+    # An event that indicates that the user wants to load a learning session item
+    REQUEST_LEARNING_SESSION_ITEM_LOAD: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_item:load"
+        )
+    )
+
+    # An event that indicates that the user wants to lookup a learning session item
+    REQUEST_LEARNING_SESSION_ITEM_LOOKUP: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_item:lookup"
+        )
+    )
+
+    # An event that indicates that the user wants to update a learning session item
+    REQUEST_LEARNING_SESSION_ITEM_UPDATE: DispatcherEvent = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_item:update"
+        )
+    )
+
     # An event that indicates that the user wants to create a new note
     REQUEST_NOTE_CREATE: DispatcherEvent = DispatcherEventFactory.create_event(
         name="global:request:note:create"
@@ -1123,6 +1191,38 @@ class Events:
             cls.REQUEST_FLASHCARD_LOAD,
             cls.REQUEST_FLASHCARD_LOOKUP,
             cls.REQUEST_FLASHCARD_UPDATE,
+        ]
+
+    @classmethod
+    def get_learning_session_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all learning session events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all learning session events in the Events class.
+        """
+        return [
+            cls.REQUEST_LEARNING_SESSION_CREATE,
+            cls.REQUEST_LEARNING_SESSION_DELETE,
+            cls.REQUEST_LEARNING_SESSION_LOAD,
+            cls.REQUEST_LEARNING_SESSION_LOOKUP,
+            cls.REQUEST_LEARNING_SESSION_UPDATE,
+        ]
+
+    @classmethod
+    def get_learning_session_item_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all learning session item events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all learning session item events in the Events class.
+        """
+        return [
+            cls.REQUEST_LEARNING_SESSION_ITEM_CREATE,
+            cls.REQUEST_LEARNING_SESSION_ITEM_DELETE,
+            cls.REQUEST_LEARNING_SESSION_ITEM_LOAD,
+            cls.REQUEST_LEARNING_SESSION_ITEM_LOOKUP,
+            cls.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
         ]
 
     @classmethod

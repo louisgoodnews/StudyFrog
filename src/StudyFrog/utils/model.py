@@ -163,9 +163,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             )
 
             # Log an info message
-            cls.logger.info(
-                message=f"Created table '{cls.table}' in the database."
-            )
+            cls.logger.info(message=f"Created table '{cls.table}' in the database.")
 
             # Return True indicating the operation was successful
             return True
@@ -242,9 +240,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             )
 
             # Log an info message
-            cls.logger.info(
-                message=f"Dropped table '{cls.table}' from the database."
-            )
+            cls.logger.info(message=f"Dropped table '{cls.table}' from the database.")
 
             # Return True indicating the operation was successful
             return True

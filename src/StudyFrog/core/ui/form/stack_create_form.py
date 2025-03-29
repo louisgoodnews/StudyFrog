@@ -715,7 +715,7 @@ class StackCreateForm(tkinter.Frame):
 
         # Validate all required fields
         result: bool = all(
-            object_data.get(
+            object_data["object_data"].get(
                 field,  # The field to validate
                 None,  # The default value to return if the field is not present
             )

@@ -771,7 +771,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
         uuid (Field): The UUID of the change_history.
     """
 
-    table: str = Constants.CHANGE_HISTORIES
+    table: Final[str] = Constants.CHANGE_HISTORIES
 
     id: Field = Field(
         autoincrement=True,
@@ -1674,7 +1674,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         uuid (Optional[str]): The UUID of the item.
     """
 
-    table: str = Constants.CHANGE_HISTORY_ITEMS
+    table: Final[str] = Constants.CHANGE_HISTORY_ITEMS
 
     id: Field = Field(
         autoincrement=True,

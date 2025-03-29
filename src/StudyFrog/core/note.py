@@ -1167,7 +1167,7 @@ class NoteModel(ImmutableBaseModel):
         uuid (Optional[str]): The UUID of the Note.
     """
 
-    table: str = Constants.NOTES
+    table: Final[str] = Constants.NOTES
 
     id: Field = Field(
         autoincrement=True,

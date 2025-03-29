@@ -2320,6 +2320,9 @@ class UIBuilder:
             # Ring the bell
             result["root"].bell()
 
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
             # Return the result
             return result
         except Exception as e:

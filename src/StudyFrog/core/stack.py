@@ -1082,7 +1082,7 @@ class StackModel(ImmutableBaseModel):
         uuid (Optional[str]): The UUID of the stack.
     """
 
-    table: str = Constants.STACKS
+    table: Final[str] = Constants.STACKS
 
     id: Field = Field(
         autoincrement=True,

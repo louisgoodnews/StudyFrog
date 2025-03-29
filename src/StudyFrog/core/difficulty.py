@@ -969,7 +969,7 @@ class DifficultyModel(ImmutableBaseModel):
         uuid (str): The UUID of the difficulty.
     """
 
-    table: str = Constants.DIFFICULTIES
+    table: Final[str] = Constants.DIFFICULTIES
 
     id: Field = Field(
         autoincrement=True,

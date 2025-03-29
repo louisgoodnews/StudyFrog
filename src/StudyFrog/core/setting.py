@@ -850,7 +850,7 @@ class SettingModel(ImmutableBaseModel):
         value (Optional[str]): The value of the setting.
     """
 
-    table: str = Constants.SETTINGS
+    table: Final[str] = Constants.SETTINGS
 
     id: Field = Field(
         autoincrement=True,

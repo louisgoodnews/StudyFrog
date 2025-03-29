@@ -759,7 +759,7 @@ class DispatcherEventSubscriptionFactory:
             return None
 
 
-class Dispatcher:
+class Dispatcher(ImmutableBaseObject):
     """
     A class used to manage event subscriptions and dispatch events to registered handlers.
 
@@ -787,16 +787,21 @@ class Dispatcher:
         """
         Creates and returns a new instance of the Dispatcher class.
 
-        If the instance does not exist, creates a new one by calling the parent class constructor and initializes it by calling the `init` method of the class.
+        If the instance does not exist, it creates a new one by calling the parent
+        class constructor and initializes it by calling the `init` method of the class.
 
-        If the instance already exists, returns the existing instance.
+        If the instance already exists, it returns the existing instance.
 
         Returns:
             Dispatcher: The created or existing instance of Dispatcher class.
         """
+        # Check if the shared instance already exists
         if cls._shared_instance is None:
-            cls._shared_instance = super().__new__(cls)
+            # Create a new instance of the Dispatcher class
+            cls._shared_instance = super(Dispatcher, cls).__new__(cls)
+            # Initialize the new instance
             cls._shared_instance.init()
+        # Return the shared instance
         return cls._shared_instance
 
     def init(self) -> None:
@@ -811,8 +816,6 @@ class Dispatcher:
         Returns:
             None
         """
-        # Initialize an instance of the Logger class
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the subscriptions dictionary as an empty dictionary
         self.subscriptions: Final[Dict[str, DispatcherEventSubscription]] = {}
@@ -951,6 +954,20 @@ class Dispatcher:
         namespace: Optional[str] = None,
         uuid: Optional[str] = None,
     ) -> Optional[bool]:
+        """
+        Unregisters event handlers from the subscriptions dictionary.
+
+        This method can be used to bulk remove subscriptions by event, namespace,
+        or UUID.
+
+        Args:
+            event (Optional[DispatcherEvent]): The event whose subscriptions are to be removed.
+            namespace (Optional[str]): The namespace whose subscriptions are to be removed.
+            uuid (Optional[str]): The UUID of the subscription to be removed.
+
+        Returns:
+            Optional[bool]: True if the subscriptions were removed, False if the event was not found, or None if an exception occurred.
+        """
         try:
             if all([not event, not namespace, not uuid]):
                 raise ValueError(
@@ -958,7 +975,18 @@ class Dispatcher:
                 )
 
             if event:
-                if event.name not in self.subscriptions.keys():
+                # Remove the event from the subscriptions dictionary
+                if event.name in self.subscriptions.keys():
+                    self.subscriptions.pop(event.name)
+
+                    # Log an info message indicating the subscriptions were removed
+                    self.logger.info(
+                        message=f"Subscriptions with event '{event.name}' successfully bulk removed from subscriptions."
+                    )
+
+                    # Return True indicating the subscriptions were removed
+                    return True
+                else:
                     # Log a warning message indicating the event was not found
                     self.logger.warning(
                         message=f"Event '{event.name}' not found in subscriptions."
@@ -967,27 +995,33 @@ class Dispatcher:
                     # Return False indicating the event was not found
                     return False
 
-                # Remove the event from the subscriptions dictionary
-                self.subscriptions.pop(event.name)
-
-                # Return True indicating the event was removed
-                return True
-
             if namespace:
+                # Remove the namespace from the subscriptions dictionary
                 for subscription in self.subscriptions.values():
                     if namespace in subscription.subscriptions.keys():
                         subscription.subscriptions.pop(namespace)
 
-                # Return True indicating the namespace was removed
+                # Log an info message indicating the subscriptions were removed
+                self.logger.info(
+                    message=f"Subscriptions with namespace '{namespace}' successfully bulk removed from subscriptions."
+                )
+
+                # Return True indicating the subscriptions were removed
                 return True
 
             if uuid:
+                # Remove the subscription from the subscriptions dictionary
                 for subscription in self.subscriptions.values():
                     for namespace in subscription.subscriptions.keys():
                         if uuid in subscription.subscriptions[namespace]:
                             subscription.subscriptions[namespace].pop(uuid)
 
-                            # Return True indicating the UUID was removed
+                            # Log an info message indicating the subscription was removed
+                            self.logger.info(
+                                message=f"Subscription with UUID '{uuid}' successfully removed from '{namespace}' namespace subscriptions."
+                            )
+
+                            # Return True indicating the subscription was removed
                             return True
 
             # Return False indicating that the event was not found

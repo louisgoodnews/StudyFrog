@@ -5,6 +5,11 @@ Date: 2025-02-09
 
 from typing import *
 
+from core.learning.learning_session import (
+    ImmutableLearningSession,
+    ImmutableLearningSessionItem,
+)
+
 from core.answer import ImmutableAnswer
 from core.association import Association
 from core.change_history import ChangeHistory, ChangeHistoryItem
@@ -24,6 +29,7 @@ from core.user import ImmutableUser
 
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
+from utils.object import ImmutableBaseObject
 
 
 __all__: Final[List[str]] = [
@@ -32,7 +38,7 @@ __all__: Final[List[str]] = [
 ]
 
 
-class UnifiedObjectManager:
+class UnifiedObjectManager(ImmutableBaseObject):
     """
     A singleton manager class for registering and managing multiple manager instances.
 
@@ -62,7 +68,7 @@ class UnifiedObjectManager:
         # Check if a shared instance already exists
         if cls._shared_instance is None:
             # Create a new instance
-            cls._shared_instance = super().__new__(cls)
+            cls._shared_instance = super(UnifiedObjectManager, cls).__new__(cls)
 
             # Initialize the instance
             cls._shared_instance.init()
@@ -77,9 +83,6 @@ class UnifiedObjectManager:
         Returns:
             None
         """
-
-        # Create a logger instance for the UnifiedObjectManager class
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize an empty dictionary for storing registered managers
         self.managers: Final[Dict[str, Any]] = {}
@@ -154,7 +157,7 @@ class UnifiedObjectManager:
             match: Optional[str] = Miscellaneous.find_match(
                 string=key,
                 group=1,
-                pattern=r"^([A-Za-z]+)\\",
+                pattern=r"([A-Za-z]+)",
             )
 
             if not match:
@@ -166,8 +169,8 @@ class UnifiedObjectManager:
 
             # Run the 'get_by_key' method of the corresponding manager
             return self.run(
-                manager=f"{match}_manager",
-                method="get_by_key",
+                manager=f"{match.lower()}_manager",
+                method=f"get_{match.lower()}_by_key",
                 key=key,
             )
         except Exception as e:
@@ -345,7 +348,7 @@ class UnifiedObjectManager:
             raise e
 
 
-class UnifiedObjectService:
+class UnifiedObjectService(ImmutableBaseObject):
     """
     A singleton service class for managing unified objects.
 
@@ -380,7 +383,7 @@ class UnifiedObjectService:
         # Check if a shared instance already exists
         if cls._shared_instance is None:
             # Create a new instance
-            cls._shared_instance = super().__new__(cls)
+            cls._shared_instance = super(UnifiedObjectService, cls).__new__(cls)
 
             # Initialize the instance
             cls._shared_instance.init(unified_manager=unified_manager)
@@ -401,9 +404,6 @@ class UnifiedObjectService:
         Returns:
             None
         """
-
-        # Get an instance of the Logger class and store it in an instance variable
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Store the passed unified_manager instance in an instance variable
         self.unified_manager: Final[UnifiedObjectManager] = unified_manager
@@ -1273,6 +1273,188 @@ class UnifiedObjectService:
             Exception: If an exception occurs while attempting to run the 'get_by_keys' method.
         """
         return self.unified_manager.get_by_keys(keys=keys)
+
+    def on_request_learning_session_create(
+        self,
+        learning_session: ImmutableLearningSession,
+    ) -> Optional[ImmutableLearningSession]:
+        """
+        Handles the 'request_learning_session_create' event and creates a new learning session in the database.
+
+        Args:
+            learning_session (ImmutableLearningSession): The learning session to be created.
+
+        Returns:
+            Optional[ImmutableLearningSession]: The created immutable learning session if no exception occurs. Otherwise, None.
+        """
+
+        # Create a new learning session in the database and return the created immutable learning session
+        return self.unified_manager.create_learning_session(
+            learning_session=learning_session
+        )
+
+    def on_request_learning_session_delete(
+        self,
+        learning_session: ImmutableLearningSession,
+    ) -> Optional[ImmutableLearningSession]:
+        """
+        Handles the 'request_learning_session_delete' event and deletes a learning session from the database.
+
+        Args:
+            learning_session (ImmutableLearningSession): The learning session to be deleted.
+
+        Returns:
+            Optional[ImmutableLearningSession]: The deleted immutable learning session if no exception occurs. Otherwise, None.
+        """
+
+        # Delete the learning session from the database and return the deleted immutable learning session
+        return self.unified_manager.delete_learning_session(
+            learning_session=learning_session
+        )
+
+    def on_request_learning_session_load(
+        self,
+        **kwargs,
+    ) -> Optional[ImmutableLearningSession]:
+        """
+        Handles the 'request_learning_session_load' event and loads a learning session from the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the learning session.
+
+        Returns:
+            Optional[ImmutableLearningSession]: The loaded immutable learning session if no exception occurs. Otherwise, None.
+        """
+
+        # Load the learning session from the database and return the loaded immutable learning session
+        return self.unified_manager.get_learning_session_by(**kwargs)
+
+    def on_request_learning_session_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[ImmutableLearningSession]:
+        """
+        Handles the 'request_learning_session_lookup' event and looks up a learning session in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the learning session.
+
+        Returns:
+            Optional[ImmutableLearningSession]: The looked up immutable learning session if no exception occurs. Otherwise, None.
+        """
+
+        # Look up the learning session in the database and return the looked up immutable learning session
+        return self.unified_manager.search_learning_sessions(**kwargs)
+
+    def on_request_learning_session_update(
+        self,
+        learning_session: ImmutableLearningSession,
+    ) -> Optional[ImmutableLearningSession]:
+        """
+        Handles the 'request_learning_session_update' event and updates a learning session in the database.
+
+        Args:
+            learning_session (ImmutableLearningSession): The learning session to be updated.
+
+        Returns:
+            Optional[ImmutableLearningSession]: The updated immutable learning session if no exception occurs. Otherwise, None.
+        """
+
+        # Update the learning session in the database and return the updated immutable learning session
+        return self.unified_manager.update_learning_session(
+            learning_session=learning_session
+        )
+
+    def on_request_learning_session_item_create(
+        self,
+        learning_session_item: ImmutableLearningSessionItem,
+    ) -> Optional[ImmutableLearningSessionItem]:
+        """
+        Handles the 'request_learning_session_item_create' event and creates a new learning session item in the database.
+
+        Args:
+            learning_session_item (ImmutableLearningSessionItem): The learning session item to be created.
+
+        Returns:
+            Optional[ImmutableLearningSessionItem]: The created immutable learning session item if no exception occurs. Otherwise, None.
+        """
+
+        # Create a new learning session item in the database and return the created immutable learning session item
+        return self.unified_manager.create_learning_session_item(
+            learning_session_item=learning_session_item
+        )
+
+    def on_request_learning_session_item_delete(
+        self,
+        learning_session_item: ImmutableLearningSessionItem,
+    ) -> bool:
+        """
+        Handles the 'request_learning_session_item_delete' event and deletes a learning session item from the database.
+
+        Args:
+            learning_session_item (ImmutableLearningSessionItem): The learning session item to be deleted.
+
+        Returns:
+            bool: True if the learning session item was deleted successfully. False otherwise.
+        """
+
+        # Delete the learning session item from the database and return the result of the deletion
+        return self.unified_manager.delete_learning_session_item(
+            learning_session_item=learning_session_item
+        )
+
+    def on_request_learning_session_item_load(
+        self,
+        **kwargs,
+    ) -> Optional[ImmutableLearningSessionItem]:
+        """
+        Handles the 'request_learning_session_item_load' event and loads a learning session item from the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the learning session item.
+
+        Returns:
+            Optional[ImmutableLearningSessionItem]: The loaded immutable learning session item if no exception occurs. Otherwise, None.
+        """
+
+        # Load the learning session item from the database and return the loaded immutable learning session item
+        return self.unified_manager.get_learning_session_item_by(**kwargs)
+
+    def on_request_learning_session_item_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[ImmutableLearningSessionItem]:
+        """
+        Handles the 'request_learning_session_item_lookup' event and looks up a learning session item in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the learning session item.
+
+        Returns:
+            Optional[ImmutableLearningSessionItem]: The looked up immutable learning session item if no exception occurs. Otherwise, None.
+        """
+
+        # Look up the learning session item in the database and return the looked up immutable learning session item
+        return self.unified_manager.search_learning_session_items(**kwargs)
+
+    def on_request_learning_session_item_update(
+        self,
+        learning_session_item: ImmutableLearningSessionItem,
+    ) -> Optional[ImmutableLearningSessionItem]:
+        """
+        Handles the 'request_learning_session_item_update' event and updates a learning session item in the database.
+
+        Args:
+            learning_session_item (ImmutableLearningSessionItem): The learning session item to be updated.
+
+        Returns:
+            Optional[ImmutableLearningSessionItem]: The updated immutable learning session item if no exception occurs. Otherwise, None.
+        """
+
+        # Update the learning session item in the database and return the updated immutable learning session item
+        return self.unified_manager.update_learning_session_item(
+            learning_session_item=learning_session_item
+        )
 
     def on_request_note_create(
         self,

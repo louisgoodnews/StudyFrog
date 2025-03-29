@@ -4,10 +4,17 @@ Date: 2025-02-09
 """
 
 import asyncio
-
 import tkinter
 
+from datetime import datetime
 from typing import *
+
+from core.learning.learning_session import (
+    LearningSessionManager,
+    LearningSessionModel,
+    LearningSessionItemManager,
+    LearningSessionItemModel,
+)
 
 from core.answer import AnswerManager, AnswerModel
 from core.association import AssociationManager, AssociationModel
@@ -58,15 +65,17 @@ from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryService
 from utils.notification_service import NotificationService
+from utils.object import ImmutableBaseObject
 from utils.unified import UnifiedObjectManager, UnifiedObjectService
 
 
 __all__: Final[List[str]] = ["BootstrapService"]
 
 
-class BootstrapService:
+class BootstrapService(ImmutableBaseObject):
     """
     A singleton class responsible for bootstrapping and initializing core services.
 
@@ -97,7 +106,7 @@ class BootstrapService:
             BootstrapService: The created or existing instance of BootstrapService class.
         """
         if cls._shared_instance is None:
-            cls._shared_instance = super().__new__(cls)
+            cls._shared_instance = super(BootstrapService, cls).__new__(cls)
             cls._shared_instance.init()
         return cls._shared_instance
 
@@ -106,14 +115,11 @@ class BootstrapService:
         Initializes the shared instance of the BootstrapService.
 
         This method is called when the shared instance is created, and it initializes
-        the logger, dispatcher, navigation service, setting service, unified object manager, and unified object service.
+        the dispatcher, navigation service, setting service, unified object manager, and unified object service.
 
         Returns:
             None
         """
-
-        # Initialize a logger instance
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the dispatcher instance
         self.dispatcher: Final[Dispatcher] = Dispatcher()
@@ -130,15 +136,17 @@ class BootstrapService:
         self.subscriptions: Final[List[str]] = []
 
         # Initialize the notification service instance
-        self.notification_service: Final[NotificationService] = (
-            NotificationService(dispatcher=self.dispatcher)
+        self.notification_service: Final[NotificationService] = NotificationService(
+            dispatcher=self.dispatcher
         )
 
         # Initialize the unified object manager instance
-        self.unified_object_manager: Final[UnifiedObjectManager] = UnifiedObjectManager()
+        self.unified_object_manager: Final[UnifiedObjectManager] = (
+            UnifiedObjectManager()
+        )
 
         # Initialize the unified object service instance
-        self.unified_object_service: UnifiedObjectService = UnifiedObjectService(
+        self.unified_object_service: Final[UnifiedObjectService] = UnifiedObjectService(
             unified_manager=self.unified_object_manager
         )
 
@@ -358,6 +366,8 @@ class BootstrapService:
                 DefaultModel,
                 DifficultyModel,
                 FlashcardModel,
+                LearningSessionModel,
+                LearningSessionItemModel,
                 NoteModel,
                 OptionModel,
                 PriorityModel,
@@ -609,6 +619,46 @@ class BootstrapService:
                 {
                     "event": Events.REQUEST_GET_BY_KEYS,
                     "function": self.unified_object_service.on_request_get_by_keys,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_CREATE,
+                    "function": self.unified_object_service.on_request_learning_session_create,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_DELETE,
+                    "function": self.unified_object_service.on_request_learning_session_delete,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_LOAD,
+                    "function": self.unified_object_service.on_request_learning_session_load,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_LOOKUP,
+                    "function": self.unified_object_service.on_request_learning_session_lookup,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_UPDATE,
+                    "function": self.unified_object_service.on_request_learning_session_update,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ITEM_CREATE,
+                    "function": self.unified_object_service.on_request_learning_session_item_create,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ITEM_DELETE,
+                    "function": self.unified_object_service.on_request_learning_session_item_delete,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ITEM_LOAD,
+                    "function": self.unified_object_service.on_request_learning_session_item_load,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ITEM_LOOKUP,
+                    "function": self.unified_object_service.on_request_learning_session_item_lookup,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
+                    "function": self.unified_object_service.on_request_learning_session_item_update,
                 },
                 {
                     "event": Events.REQUEST_NOTE_CREATE,
@@ -888,6 +938,8 @@ class BootstrapService:
                 "default_manager": DefaultManager,
                 "difficulty_manager": DifficultyManager,
                 "flashcard_manager": FlashcardManager,
+                "learning_session_manager": LearningSessionManager,
+                "learning_session_item_manager": LearningSessionItemManager,
                 "note_manager": NoteManager,
                 "option_manager": OptionManager,
                 "priority_manager": PriorityManager,
@@ -929,14 +981,25 @@ class BootstrapService:
             None
         """
         try:
+            # Get the current datetime
+            start: datetime = Miscellaneous.get_current_datetime()
+
             # Log an info message about running shutdown tasks
             self.logger.info(message="Running shutdown tasks....")
 
             # Unregister all event handlers from the dispatcher
             self.unregister_handlers()
 
+            # Get the current datetime
+            end: datetime = Miscellaneous.get_current_datetime()
+
+            # Calculate the duration
+            duration: float = (end - start).total_seconds()
+
             # Log an info message about completing shutdown tasks
-            self.logger.info(message="Shutdown tasks completed.")
+            self.logger.info(
+                message=f"Shutdown tasks completed in {duration:.2f} seconds."
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -973,6 +1036,9 @@ class BootstrapService:
             Exception: If an exception occurs while running the startup tasks.
         """
         try:
+            # Get the current datetime
+            start: datetime = Miscellaneous.get_current_datetime()
+
             # Log an info message about running startup tasks
             self.logger.info(message="Running startup tasks....")
 
@@ -1000,8 +1066,16 @@ class BootstrapService:
             # Create the default statuses
             self.create_default_statuses()
 
+            # Get the current datetime
+            end: datetime = Miscellaneous.get_current_datetime()
+
+            # Calculate the duration
+            duration: float = (end - start).total_seconds()
+
             # Log an info message about completing startup tasks
-            self.logger.info(message="Startup tasks completed.")
+            self.logger.info(
+                message=f"Startup tasks completed in {duration:.2f} seconds."
+            )
 
             # Return the dispatcher, navigation service, notification service, setting service, and unified object manager instances
             return (

@@ -851,7 +851,7 @@ class OptionModel(ImmutableBaseModel):
         value (Optional[str]): The value of the option.
     """
 
-    table: str = Constants.OPTIONS
+    table: Final[str] = Constants.OPTIONS
 
     id: Field = Field(
         autoincrement=True,

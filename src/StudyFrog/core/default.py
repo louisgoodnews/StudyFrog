@@ -896,7 +896,7 @@ class DefaultModel(ImmutableBaseModel):
         value (Optional[str]): The value of the default.
     """
 
-    table: str = Constants.DEFAULTS
+    table: Final[str] = Constants.DEFAULTS
 
     id: Field = Field(
         autoincrement=True,

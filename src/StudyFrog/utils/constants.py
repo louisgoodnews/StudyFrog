@@ -161,6 +161,8 @@ class Constants:
     DEFAULTS: Final[str] = "defaults"
     DIFFICULTIES: Final[str] = "difficulties"
     FLASHCARDS: Final[str] = "flashcards"
+    LEARNING_SESSIONS: Final[str] = "learning_sessions"
+    LEARNING_SESSION_ITEMS: Final[str] = "learning_session_items"
     NOTES: Final[str] = "notes"
     OPTIONS: Final[str] = "options"
     PRIORITIES: Final[str] = "priorities"
