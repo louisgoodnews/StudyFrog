@@ -494,5 +494,8 @@ class FlashcardCreateForm(tkinter.Frame):
         # Validate all required fields
         result: bool = all([object_data.get(field) for field in required_fields])
 
+        # Log the result
+        self.logger.debug(message=f"object data: {object_data}; result: {result}")
+
         # Return the result
         return result
