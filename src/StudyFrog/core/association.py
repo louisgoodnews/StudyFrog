@@ -162,7 +162,7 @@ class AssociationConverter:
         logger (Logger): The logger instance associated with the AssociationConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="AssociationConverter")
+    logger: Final[Logger] = Logger.get_logger(name="AssociationConverter")
 
     @classmethod
     def model_to_object(
@@ -244,7 +244,7 @@ class AssociationFactory:
         logger (Logger): The logger instance associated with the object.
     """
 
-    logger: Logger = Logger.get_logger(name="AssociationFactory")
+    logger: Final[Logger] = Logger.get_logger(name="AssociationFactory")
 
     @classmethod
     def create_association(

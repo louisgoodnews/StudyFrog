@@ -31,7 +31,7 @@ class UIBuilder:
         logger (Logger): The logger instance used by the class.
     """
 
-    logger: Logger = Logger.get_logger(name="UIBuilder")
+    logger: Final[Logger] = Logger.get_logger(name="UIBuilder")
 
     @classmethod
     def get_bool_variable(
@@ -4756,7 +4756,9 @@ class UIBuilder:
                     )
 
                     # Disable the button
-                    result[f"{Miscellaneous.any_to_snake(string=label)}_button"].configure(state=DISABLED)
+                    result[
+                        f"{Miscellaneous.any_to_snake(string=label)}_button"
+                    ].configure(state=DISABLED)
                 else:
                     # Hide the widget
                     widget.grid_forget()
@@ -4807,7 +4809,7 @@ class UIBuilder:
                     if "_button" in key
                 ]:
                     # Check, if the key and the string are identical
-                    if string.lower() not in key:
+                    if f"{Miscellaneous.any_to_snake(string=string)}_button" != key:
                         # Enable the widget if it is not the one that was clicked
                         value.configure(state=NORMAL)
                     else:
@@ -4822,7 +4824,10 @@ class UIBuilder:
                 )
 
             # Create the "Root" frame widget
-            result["root"] = cls.get_frame(master=master)
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs,
+            )
 
             # Configure the "Root" frame widget's 1st column to weight 1
             result["root"].grid_columnconfigure(

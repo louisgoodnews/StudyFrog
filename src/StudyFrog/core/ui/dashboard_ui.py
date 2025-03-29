@@ -106,7 +106,7 @@ class DashboardUI(BaseUI):
             [
                 {
                     "event": Events.STACK_CREATED,
-                    "funtion": self.on_stack_created,
+                    "function": self.on_stack_created,
                     "namespace": Constants.GLOBAL_NAMESPACE,
                     "persistent": True,
                 }
@@ -1364,6 +1364,22 @@ class DashboardUI(BaseUI):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'on_label_clicked' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_label_hover(
+        self,
+        stack: ImmutableStack,
+    ) -> None:
+        try:
+            # Log a debug message indicating that the label was hovered
+            self.logger.debug(message=f"Hovered on label for stack: {stack}.")
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_label_hover' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller

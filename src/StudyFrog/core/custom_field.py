@@ -92,7 +92,7 @@ class CustomFieldConverter:
         logger (Logger): The logger instance associated with the CustomFieldConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="CustomFieldConverter")
+    logger: Final[Logger] = Logger.get_logger(name="CustomFieldConverter")
 
     @classmethod
     def model_to_object(
@@ -174,7 +174,7 @@ class CustomFieldFactory:
         logger (Logger): The logger instance associated with the CustomFieldFactory class.
     """
 
-    logger: Logger = Logger.get_logger(name="CustomFieldFactory")
+    logger: Final[Logger] = Logger.get_logger(name="CustomFieldFactory")
 
     @classmethod
     def create_custom_field(

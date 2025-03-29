@@ -199,7 +199,7 @@ class PriorityConverter:
         logger (Logger): The logger instance associated with the PriorityConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="PriorityConverter")
+    logger: Final[Logger] = Logger.get_logger(name="PriorityConverter")
 
     @classmethod
     def model_to_object(
@@ -281,7 +281,7 @@ class PriorityFactory:
         logger (Logger): The logger instance associated with the PriorityFactory class.
     """
 
-    logger: Logger = Logger.get_logger(name="PriorityFactory")
+    logger: Final[Logger] = Logger.get_logger(name="PriorityFactory")
 
     @classmethod
     def create_priority(

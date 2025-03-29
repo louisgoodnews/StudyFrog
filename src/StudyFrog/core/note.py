@@ -315,7 +315,7 @@ class NoteConverter:
         logger (Logger): The logger instance associated with the NoteConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="NoteConverter")
+    logger: Final[Logger] = Logger.get_logger(name="NoteConverter")
 
     @classmethod
     def model_to_object(
@@ -397,7 +397,7 @@ class NoteFactory:
         logger (Logger): The logger instance associated with the object.
     """
 
-    logger: Logger = Logger.get_logger(name="NoteFactory")
+    logger: Final[Logger] = Logger.get_logger(name="NoteFactory")
 
     @classmethod
     def create_Note(

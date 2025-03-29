@@ -155,7 +155,7 @@ class NotificationUI(BaseUI):
         if not top_frame:
             # Log an error message to indicate that something went wrong
             logger.error(
-                "Failed to create 'top' frame in main window. This is likely a bug."
+                f"Failed to create 'top' frame in {self.__class__.__name__}. This is likely a bug."
             )
 
             # Return early
@@ -190,7 +190,7 @@ class NotificationUI(BaseUI):
         if not center_frame:
             # Log an error message to indicate that something went wrong
             logger.error(
-                "Failed to create 'center' frame in main window. This is likely a bug."
+                f"Failed to create 'center' frame in {self.__class__.__name__}. This is likely a bug."
             )
 
             # Return early
@@ -225,7 +225,7 @@ class NotificationUI(BaseUI):
         if not bottom_frame:
             # Log an error message to indicate that something went wrong
             logger.error(
-                "Failed to create 'bottom' frame in main window. This is likely a bug."
+                f"Failed to create 'bottom' frame in {self.__class__.__name__}. This is likely a bug."
             )
 
             # Return early

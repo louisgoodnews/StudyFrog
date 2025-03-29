@@ -187,7 +187,7 @@ class StatusConverter:
         logger (Logger): The logger instance associated with the StatusConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="StatusConverter")
+    logger: Final[Logger] = Logger.get_logger(name="StatusConverter")
 
     @classmethod
     def model_to_object(
@@ -262,7 +262,7 @@ class StatusConverter:
 
 
 class StatusFactory:
-    logger: Logger = Logger.get_logger(name="StatusFactory")
+    logger: Final[Logger] = Logger.get_logger(name="StatusFactory")
 
     @classmethod
     def create_status(

@@ -486,6 +486,17 @@ class MainUI(BaseUI):
             return None
 
     def validate_navigation(self) -> bool:
+        """
+        Validates the navigation for the UI component.
+
+        This method should be implemented by subclasses to validate
+        the navigation for the UI component. It is responsible for
+        ensuring that the navigation is valid and appropriate for
+        the UI component.
+
+        Returns:
+            bool: True if the navigation is valid, False otherwise.
+        """
         try:
             # Attempt to dispatch the REQUEST_UI_VALIDATE_NAVIGATION event in the global namespace
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
@@ -495,7 +506,9 @@ class MainUI(BaseUI):
 
             if not notification:
                 # Log a warning message indicating that something has gone wrong
-                self.logger.warning(message=f"")
+                self.logger.warning(
+                    message=f"Failed to get DispatcherNotification from REQUEST_UI_VALIDATE_NAVIGATION event."
+                )
 
                 # Raise an exception
                 raise ValueError(

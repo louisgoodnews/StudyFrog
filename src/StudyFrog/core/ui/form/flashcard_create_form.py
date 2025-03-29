@@ -67,7 +67,7 @@ class FlashcardCreateForm(tkinter.Frame):
         )
 
         # Create a logger instance for the class
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Store the dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
@@ -438,6 +438,7 @@ class FlashcardCreateForm(tkinter.Frame):
                     "back_word_count": len(self.back_field["getter"]().split()),
                     "created_at": Miscellaneous.get_current_datetime(),
                     "custom_field_values": [],
+                    "difficulty": stack["difficulty"],
                     "familiarity": 0.0,
                     "front_text": self.front_field["getter"](),
                     "front_word_count": len(self.front_field["getter"]().split()),
@@ -445,14 +446,13 @@ class FlashcardCreateForm(tkinter.Frame):
                     "id": None,
                     "key": None,
                     "last_viewed_at": Miscellaneous.get_current_datetime(),
+                    "priority": stack["priority"],
                     "total_word_count": (
                         len(self.front_field["getter"]().split())
                         + len(self.back_field["getter"]().split())
                     ),
                     "updated_at": Miscellaneous.get_current_datetime(),
                     "uuid": Miscellaneous.get_uuid(),
-                    "difficulty": stack["difficulty"],
-                    "priority": stack["priority"],
                 },
                 "related_objects": {"stack": stack},
             }
@@ -492,7 +492,7 @@ class FlashcardCreateForm(tkinter.Frame):
         ]
 
         # Validate all required fields
-        result: bool = all([object_data.get(field) for field in required_fields])
+        result: bool = all([object_data.get(field, None) is not None for field in required_fields])
 
         # Log the result
         self.logger.debug(message=f"object data: {object_data}; result: {result}")

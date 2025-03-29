@@ -402,6 +402,21 @@ class StackSelectionUI(BaseUI):
         self,
         master: tkinter.Frame,
     ) -> None:
+        """
+        Creates and configures widgets in the center frame of the stack selection UI.
+
+        This method initializes the label, scrolled frame, separator, difficulty select, and priority select widgets
+        within the center frame and places them in the grid layout.
+
+        Args:
+            master (tkinter.Frame): The parent frame widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during widget creation or data lookup.
+        """
         try:
             # Configure the weight of the 0th column to 1.
             master.grid_columnconfigure(
@@ -409,9 +424,15 @@ class StackSelectionUI(BaseUI):
                 weight=1,
             )
 
-            # Configure the weight of the 0th row to 1.
+            # Configure the weight of the 0th row to 0.
             master.grid_rowconfigure(
                 index=0,
+                weight=0,
+            )
+
+            # Configure the weight of the 1st row to 1.
+            master.grid_rowconfigure(
+                index=1,
                 weight=1,
             )
 
@@ -431,6 +452,44 @@ class StackSelectionUI(BaseUI):
             master.grid_rowconfigure(
                 index=3,
                 weight=0,
+            )
+
+            # Configure the weight of the 4th row to 0.
+            master.grid_rowconfigure(
+                index=4,
+                weight=0,
+            )
+
+            # Create the label widget
+            label: Optional[tkinter.Label] = UIBuilder.get_label(
+                anchor=W,
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                master=master,
+                text="Select one or more stacks: ",
+            )
+
+            # Check if the label was created successfully
+            if not label:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create label in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Place the label widget in the main window
+            label.grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
             )
 
             # Create the scrolled frame widgets
@@ -461,7 +520,7 @@ class StackSelectionUI(BaseUI):
                 column=0,
                 padx=5,
                 pady=5,
-                row=0,
+                row=1,
                 sticky=NSEW,
             )
 
@@ -515,7 +574,7 @@ class StackSelectionUI(BaseUI):
                 column=0,
                 padx=5,
                 pady=5,
-                row=1,
+                row=2,
                 sticky=EW,
             )
 
@@ -592,7 +651,7 @@ class StackSelectionUI(BaseUI):
                 column=0,
                 padx=5,
                 pady=5,
-                row=2,
+                row=3,
                 sticky=NSEW,
             )
 
@@ -667,7 +726,7 @@ class StackSelectionUI(BaseUI):
                 column=0,
                 padx=5,
                 pady=5,
-                row=3,
+                row=4,
                 sticky=NSEW,
             )
         except Exception as e:

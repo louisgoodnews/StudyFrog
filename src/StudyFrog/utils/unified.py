@@ -3,7 +3,6 @@ Author: lodego
 Date: 2025-02-09
 """
 
-from math import e
 from typing import *
 
 from core.answer import ImmutableAnswer
@@ -25,6 +24,7 @@ from core.user import ImmutableUser
 
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
+
 
 __all__: Final[List[str]] = [
     "UnifiedObjectManager",
@@ -79,10 +79,10 @@ class UnifiedObjectManager:
         """
 
         # Create a logger instance for the UnifiedObjectManager class
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize an empty dictionary for storing registered managers
-        self.managers: Dict[str, Any] = {}
+        self.managers: Final[Dict[str, Any]] = {}
 
     def __getattr__(
         self,
@@ -184,22 +184,24 @@ class UnifiedObjectManager:
         keys: List[str],
     ) -> Optional[
         List[
-            Union[
-                Association,
-                CustomField,
-                ImmutableStack,
-                ImmutableFlashcard,
-                ImmutableQuestion,
-                ImmutableAnswer,
-                ImmutableOption,
-                ImmutableTag,
-                ImmutableStatus,
-                ImmutablePriority,
-                ImmutableDifficulty,
-                ImmutableSetting,
-                ImmutableNote,
-                ImmutableUser,
-                ImmutableDefault,
+            Optional[
+                Union[
+                    Association,
+                    CustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                ]
             ]
         ]
     ]:
@@ -218,22 +220,24 @@ class UnifiedObjectManager:
         try:
             # Initialize an empty list to store the retrieved objects
             result: List[
-                Union[
-                    Association,
-                    CustomField,
-                    ImmutableStack,
-                    ImmutableFlashcard,
-                    ImmutableQuestion,
-                    ImmutableAnswer,
-                    ImmutableOption,
-                    ImmutableTag,
-                    ImmutableStatus,
-                    ImmutablePriority,
-                    ImmutableDifficulty,
-                    ImmutableSetting,
-                    ImmutableNote,
-                    ImmutableUser,
-                    ImmutableDefault,
+                Optional[
+                    Union[
+                        Association,
+                        CustomField,
+                        ImmutableStack,
+                        ImmutableFlashcard,
+                        ImmutableQuestion,
+                        ImmutableAnswer,
+                        ImmutableOption,
+                        ImmutableTag,
+                        ImmutableStatus,
+                        ImmutablePriority,
+                        ImmutableDifficulty,
+                        ImmutableSetting,
+                        ImmutableNote,
+                        ImmutableUser,
+                        ImmutableDefault,
+                    ]
                 ]
             ] = []
 
@@ -399,10 +403,10 @@ class UnifiedObjectService:
         """
 
         # Get an instance of the Logger class and store it in an instance variable
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Store the passed unified_manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
+        self.unified_manager: Final[UnifiedObjectManager] = unified_manager
 
     def on_request_answer_create(
         self,

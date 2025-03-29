@@ -227,7 +227,7 @@ class CommentConverter:
         logger (Logger): The logger instance associated with the CommentConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="CommentConverter")
+    logger: Final[Logger] = Logger.get_logger(name="CommentConverter")
 
     @classmethod
     def model_to_object(
@@ -302,7 +302,7 @@ class CommentConverter:
 
 
 class CommentFactory:
-    logger: Logger = Logger.get_logger(name="CommentFactory")
+    logger: Final[Logger] = Logger.get_logger(name="CommentFactory")
 
     @classmethod
     def create_comment(

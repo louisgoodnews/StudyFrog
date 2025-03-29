@@ -96,7 +96,7 @@ class DispatcherEventFactory:
 
     index: int = Constants.get_base_id()
 
-    logger: Logger = Logger.get_logger(name="DispatcherEventFactory")
+    logger: Final[Logger] = Logger.get_logger(name="DispatcherEventFactory")
 
     @classmethod
     def create_event(
@@ -148,7 +148,7 @@ class DispatcherNotification(ImmutableBaseObject):
         event (DispatcherEvent): The event associated with the notification.
         id (int): The unique identifier of the notification.
         namespace (str): The namespace under which the notification was created.
-        result (Any): The result of the notification.
+        result (Dict[str, Any]): The result of the notification.
         start (datetime): The timestamp when the notification started.
     """
 
@@ -159,7 +159,7 @@ class DispatcherNotification(ImmutableBaseObject):
         event: DispatcherEvent,
         id: int,
         namespace: str,
-        result: Any,
+        result: Dict[str, Any],
         start: datetime,
     ) -> None:
         """
@@ -171,7 +171,7 @@ class DispatcherNotification(ImmutableBaseObject):
             event (DispatcherEvent): The event associated with the notification.
             id (int): The unique identifier of the notification.
             namespace (str): The namespace under which the notification was created.
-            result (Any): The result of the notification.
+            result (Dict[str, Any]): The result of the notification.
             start (datetime): The timestamp when the notification started.
 
         Returns:
@@ -259,6 +259,30 @@ class DispatcherNotification(ImmutableBaseObject):
         # Return the result
         return self["result"][key]
 
+    def has(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Returns True if the notification contains the given key, False otherwise.
+
+        Args:
+            key (str): The key to check.
+
+        Returns:
+            bool: True if the notification contains the given key, False otherwise.
+        """
+        return key in self["result"].keys()
+
+    def is_empty(self) -> bool:
+        """
+        Returns True if the notification is empty, False otherwise.
+
+        Returns:
+            bool: True if the notification is empty, False otherwise.
+        """
+        return len(self["result"].keys()) == 0
+
 
 class DispatcherNotificationFactory:
     """
@@ -276,7 +300,7 @@ class DispatcherNotificationFactory:
 
     index: int = Constants.get_base_id()
 
-    logger: Logger = Logger.get_logger(name="DispatcherNotificationFactory")
+    logger: Final[Logger] = Logger.get_logger(name="DispatcherNotificationFactory")
 
     @classmethod
     def create_notification(
@@ -508,10 +532,8 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         super().__init__(
             event=event,
             id=id,
+            subscriptions={},
         )
-
-        # Initialize the subscriptions dictionary as an empty dictionary
-        self.subscriptions: Final[Dict[str, Any]] = {}
 
     def add_subscription(
         self,
@@ -597,29 +619,37 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             # Set the start time of the notification
             result.start(value=Miscellaneous.get_current_datetime())
 
-            # Iterate over the subscriptions in the namespace
-            for (
-                uuid,
-                subscription,
-            ) in self.subscriptions[namespace].items():
-                # Check if the subscription is persistent
-                if not subscription["persistent"]:
-                    # Add the subscription to the subscriptions dictionary
-                    non_persistents.append(uuid)
+            # Get the subscriptions in the namespace
+            subscriptions: Dict[str, Any] = self.subscriptions.get(namespace, {})
 
-                # Log a message indicating the function is beeing called
-                self.logger.info(
-                    message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
-                )
+            # Check if there are any subscriptions in the namespace
+            if len(subscriptions) == 0:
+                # Set the result of the notification
+                result.configuration["result"] = {}
+            else:
+                # Iterate over the subscriptions in the namespace
+                for (
+                    uuid,
+                    subscription,
+                ) in subscriptions.items():
+                    # Check if the subscription is persistent
+                    if not subscription["persistent"]:
+                        # Add the subscription to the subscriptions dictionary
+                        non_persistents.append(uuid)
 
-                # Call the function associated with the subscription
-                result.result(
-                    key=subscription["function"].__name__,
-                    value=subscription["function"](
-                        *args,
-                        **kwargs,
-                    ),
-                )
+                    # Log a message indicating the function is beeing called
+                    self.logger.info(
+                        message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
+                    )
+
+                    # Call the function associated with the subscription
+                    result.result(
+                        key=subscription["function"].__name__,
+                        value=subscription["function"](
+                            *args,
+                            **kwargs,
+                        ),
+                    )
 
             # Iterate over the non-persistent subscriptions
             for uuid in non_persistents:
@@ -700,7 +730,7 @@ class DispatcherEventSubscriptionFactory:
 
     index: int = Constants.get_base_id()
 
-    logger: Logger = Logger.get_logger(name="DispatcherEventSubscriptionFactory")
+    logger: Final[Logger] = Logger.get_logger(name="DispatcherEventSubscriptionFactory")
 
     @classmethod
     def create_subscription(
@@ -782,7 +812,7 @@ class Dispatcher:
             None
         """
         # Initialize an instance of the Logger class
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the subscriptions dictionary as an empty dictionary
         self.subscriptions: Final[Dict[str, DispatcherEventSubscription]] = {}
@@ -863,7 +893,7 @@ class Dispatcher:
                 self.subscriptions[event.name] = {}
 
             # Attempt to create a new subscription
-            subscription: DispatcherEventSubscription = (
+            subscription: Optional[DispatcherEventSubscription] = (
                 DispatcherEventSubscriptionFactory.create_subscription(
                     event=event,
                 )

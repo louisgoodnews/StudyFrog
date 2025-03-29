@@ -30,7 +30,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
         logger (Logger): The logger instance associated with the object.
     """
 
-    logger: Logger = Logger.get_logger(name="ImmutableBaseModel")
+    logger: Final[Logger] = Logger.get_logger(name="ImmutableBaseModel")
 
     def __init__(
         self,

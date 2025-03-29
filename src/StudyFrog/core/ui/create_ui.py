@@ -1057,7 +1057,7 @@ class CreateUI(BaseUI):
         if not self.form.check_required_fields(
             object_data=form_data.get(
                 "object_data",
-                None,
+                {},
             )
         ):
             # Log an info message indicating that not all required fields were filled

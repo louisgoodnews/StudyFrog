@@ -76,7 +76,7 @@ class NavigationHistoryItemFactory:
     """
 
     index: int = Constants.get_base_id()
-    logger: Logger = Logger.get_logger(name="NavigationHistoryItemFactory")
+    logger: Final[Logger] = Logger.get_logger(name="NavigationHistoryItemFactory")
 
     @classmethod
     def create_navigation_item(
@@ -150,7 +150,7 @@ class NavigationHistoryService:
             None
         """
         # Initialize a logger
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher

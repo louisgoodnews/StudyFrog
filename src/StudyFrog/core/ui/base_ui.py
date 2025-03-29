@@ -89,25 +89,25 @@ class BaseUI(tkinter.Frame):
         )
 
         # Initialize the logger instance
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Store the passed dispatcher instance in an instance variable
-        self.dispatcher: Dispatcher = dispatcher
+        self.dispatcher: Final[Dispatcher] = dispatcher
 
         # Store the passed navigation item instance in an instance variable
         self.navigation_item: Optional[NavigationHistoryItem] = navigation_item
 
         # Store the passed navigation service instance in an instance variable
-        self.navigation_service: NavigationHistoryService = navigation_service
+        self.navigation_service: Final[NavigationHistoryService] = navigation_service
 
         # Store the passed setting service instance in an instance variable
-        self.setting_service: SettingService = setting_service
+        self.setting_service: Final[SettingService] = setting_service
 
         # Initialize the list of subscription UUIDs as an empty list
-        self.subscriptions: List[str] = []
+        self.subscriptions: Final[List[str]] = []
 
         # Store the passed unified manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
+        self.unified_manager: Final[UnifiedObjectManager] = unified_manager
 
         # Configure the background color of the BaseUI instance
         self.configure(background=Constants.BLUE_GREY["700"])
@@ -216,6 +216,17 @@ class BaseUI(tkinter.Frame):
             raise e
 
     def on_request_ui_validate_navigation(self) -> bool:
+        """
+        Validates the navigation for the UI component.
+
+        This method should be implemented by subclasses to validate
+        the navigation for the UI component. It is responsible for
+        ensuring that the navigation is valid and appropriate for
+        the UI component.
+
+        Returns:
+            bool: True if the navigation is valid, False otherwise.
+        """
         return True
 
     def subscribe_to_events(self) -> None:
@@ -241,22 +252,10 @@ class BaseUI(tkinter.Frame):
                 # Store the UUID of the subscription in the subscriptions list
                 self.subscriptions.append(
                     self.dispatcher.register(
-                        event=subscription.get(
-                            "event",
-                            Events.GENERIC_EVENT,
-                        ),
-                        function=subscription.get(
-                            "function",
-                            None,
-                        ),
-                        namespace=subscription.get(
-                            "namespace",
-                            Constants.GLOBAL_NAMESPACE,
-                        ),
-                        persistent=subscription.get(
-                            "persistent",
-                            False,
-                        ),
+                        event=subscription["event"],
+                        function=subscription["function"],
+                        namespace=subscription["namespace"],
+                        persistent=subscription["persistent"],
                     )
                 )
         except Exception as e:

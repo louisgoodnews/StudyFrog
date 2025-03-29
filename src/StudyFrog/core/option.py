@@ -177,7 +177,7 @@ class OptionConverter:
         logger (Logger): The logger instance associated with the OptionConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="OptionConverter")
+    logger: Final[Logger] = Logger.get_logger(name="OptionConverter")
 
     @classmethod
     def model_to_object(
@@ -259,7 +259,7 @@ class OptionFactory:
         logger (Logger): The logger instance associated with the OptionFactory class.
     """
 
-    logger: Logger = Logger.get_logger(name="OptionFactory")
+    logger: Final[Logger] = Logger.get_logger(name="OptionFactory")
 
     @classmethod
     def create_option(

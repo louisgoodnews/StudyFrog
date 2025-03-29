@@ -148,10 +148,20 @@ class HelpUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
+
+        # Check, if the creation of the top frame was successfull
+        if not top_frame:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                f"Failed to create 'top' frame in {self.__class__.__name__}. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Top Frame" frame widget's 1st column to weight 1
         top_frame.grid_columnconfigure(
@@ -173,10 +183,20 @@ class HelpUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(
+        center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
+
+        # Check, if the creation of the center frame was successfull
+        if not center_frame:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                f"Failed to create 'center' frame in {self.__class__.__name__}. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
         center_frame.grid_columnconfigure(
@@ -198,10 +218,20 @@ class HelpUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+        bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
+
+        # Check, if the creation of the bottom frame was successfull
+        if not bottom_frame:
+            # Log an error message to indicate that something went wrong
+            logger.error(
+                f"Failed to create 'bottom' frame in {self.__class__.__name__}. This is likely a bug."
+            )
+
+            # Return early
+            return
 
         # Configure the "Bottom Frame" frame widget's 1st column to weight 1
         bottom_frame.grid_columnconfigure(

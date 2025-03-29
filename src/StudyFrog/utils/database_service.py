@@ -21,7 +21,7 @@ class DatabaseService:
         logger (Logger): The logger instance associated with the object.
     """
 
-    logger: Logger = Logger.get_logger(name="DatabaseService")
+    logger: Final[Logger] = Logger.get_logger(name="DatabaseService")
 
     @classmethod
     async def create(

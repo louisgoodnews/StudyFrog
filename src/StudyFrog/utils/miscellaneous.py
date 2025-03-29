@@ -32,7 +32,7 @@ class Miscellaneous:
         logger (Logger): The logger instance associated with the Miscellaneous class.
     """
 
-    logger: Logger = Logger.get_logger(name="Miscellaneous")
+    logger: Final[Logger] = Logger.get_logger(name="Miscellaneous")
 
     @classmethod
     def any_to_camel(

@@ -186,7 +186,7 @@ class SettingConverter:
         logger (Logger): The logger instance associated with the SettingConverter class.
     """
 
-    logger: Logger = Logger.get_logger(name="SettingConverter")
+    logger: Final[Logger] = Logger.get_logger(name="SettingConverter")
 
     @classmethod
     def model_to_object(
@@ -268,7 +268,7 @@ class SettingFactory:
         logger (Logger): The logger instance associated with the object.
     """
 
-    logger: Logger = Logger.get_logger(name="SettingFactory")
+    logger: Final[Logger] = Logger.get_logger(name="SettingFactory")
 
     @classmethod
     def create_setting(
@@ -1064,7 +1064,7 @@ class SettingService:
         """
 
         # Initialize the logger
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the default manager
         self.default_manager: DefaultManager = DefaultManager()
