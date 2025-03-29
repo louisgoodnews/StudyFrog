@@ -45,6 +45,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
 
     Attributes:
         children (Optional[List[str]]): A list of child learning sessions.
+        contents (Optional[List[str]]): A list of contents.
         created_at (Optional[datetime]): The timestamp when the learning session was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         duration (Optional[float]): The duration of the learning session.
@@ -63,6 +64,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
     def __init__(
         self,
         children: Optional[List[str]] = None,
+        contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
@@ -81,7 +83,8 @@ class ImmutableLearningSession(ImmutableBaseObject):
         Initializes a new instance of the ImmutableLearningSession class.
 
         Args:
-            children (Optional[List[str]]): A list of child learning sessions.
+            children (Optional[List[str]]): A list of child learning session keys.
+            contents (Optional[List[str]]): A list of content keys.
             created_at (Optional[datetime]): The timestamp when the learning session was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             duration (Optional[float]): The duration of the learning session.
@@ -103,6 +106,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             children=children,
+            contents=contents,
             created_at=created_at,
             custom_field_values=custom_field_values,
             duration=duration,
@@ -176,7 +180,8 @@ class MutableLearningSession(MutableBaseObject):
     This class is responsible for encapsulating the properties of a mutable learning session.
 
     Attributes:
-        children (Optional[List[str]]): A list of child learning sessions.
+        children (Optional[List[str]]): A list of child learning session keys.
+        contents (Optional[List[str]]): A list of content keys.
         created_at (Optional[datetime]): The timestamp when the learning session was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         duration (Optional[float]): The duration of the learning session.
@@ -195,6 +200,7 @@ class MutableLearningSession(MutableBaseObject):
     def __init__(
         self,
         children: Optional[List[str]] = None,
+        contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
@@ -213,7 +219,8 @@ class MutableLearningSession(MutableBaseObject):
         Initializes a new instance of the MutableLearningSession class.
 
         Args:
-            children (Optional[List[str]]): A list of child learning sessions.
+            children (Optional[List[str]]): A list of child learning session keys.
+            contents (Optional[List[str]]): A list of content keys.
             created_at (Optional[datetime]): The timestamp when the learning session was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             duration (Optional[float]): The duration of the learning session.
@@ -235,6 +242,7 @@ class MutableLearningSession(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             children=children,
+            contents=contents,
             created_at=created_at,
             custom_field_values=custom_field_values,
             duration=duration,
@@ -486,6 +494,7 @@ class LearningSessionFactory:
     def create_learning_session(
         cls,
         children: Optional[List[str]] = None,
+        contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         duration: Optional[float] = None,
         end: Optional[datetime] = None,
@@ -504,6 +513,7 @@ class LearningSessionFactory:
 
         Args:
             children (Optional[List[str]], optional): The children of the learning session. Defaults to None.
+            contents (Optional[List[str]], optional): The contents of the learning session. Defaults to None.
             created_at (Optional[datetime], optional): The timestamp when the learning session was created. Defaults to None.
             duration (Optional[float], optional): The duration of the learning session. Defaults to None.
             end (Optional[datetime], optional): The end time of the learning session. Defaults to None.
@@ -527,6 +537,7 @@ class LearningSessionFactory:
             # Attempt to create and return an ImmutableLearningSession object
             return ImmutableLearningSession(
                 children=children,
+                contents=contents,
                 created_at=created_at,
                 duration=duration,
                 end=end,
@@ -640,6 +651,32 @@ class LearningSessionBuilder(BaseObjectBuilder):
                 list,
             )
             else self.configuration["children"].append(value)
+        )
+        return self
+    
+    def contents(self, value: Union[List[str], str],) -> Self:
+        """
+        Sets the contents attribute of the builder.
+
+        Args:
+            value (Union[List[str], str]): The value to set for the contents attribute.
+
+        Returns:
+            Self: The builder instance with the contents attribute set.
+        """
+        # Check if the "contents" key is already present in the configuration
+        if "contents" not in self.configuration:
+            # Initialize the "contents" key with an empty list
+            self.configuration["contents"] = []
+
+        # Add the value to the contents list
+        self.configuration["contents"].extend(
+            value
+            if isinstance(
+                value,
+                list,
+            )
+            else self.configuration["contents"].append(value)
         )
         return self
 
@@ -1516,6 +1553,7 @@ class LearningSessionModel(ImmutableBaseModel):
 
     Attributes:
         children (Field): A list of child learning sessions.
+        contents (Field): A list of contents of the learning session.
         created_at (Field): The timestamp when the learning session was created.
         custom_field_values (Field): A list of custom field values.
         duration (Field): The duration of the learning session.
@@ -1557,6 +1595,22 @@ class LearningSessionModel(ImmutableBaseModel):
         index=False,
         name="children",
         nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
+    contents: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="contents",
+        nullable=False,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1776,6 +1830,7 @@ class LearningSessionModel(ImmutableBaseModel):
     def __init__(
         self,
         children: Optional[List[str]] = None,
+        contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
@@ -1795,6 +1850,7 @@ class LearningSessionModel(ImmutableBaseModel):
 
         Args:
             children (Optional[List[str]]): A list of child learning sessions.
+            contents (Optional[List[str]]): A list of contents of the learning session.
             created_at (Optional[datetime]): The timestamp when the learning session was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             duration (Optional[float]): The duration of the learning session.
@@ -1813,6 +1869,7 @@ class LearningSessionModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             children=children,
+            contents=contents,
             created_at=created_at,
             custom_field_values=custom_field_values,
             duration=duration,

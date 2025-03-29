@@ -477,12 +477,17 @@ class MainUI(BaseUI):
                 namespace=Constants.GLOBAL_NAMESPACE,
             )
         except Exception as e:
-            # Log an error message indicating an exception has ocurred
+            # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'on_request_validate_navigation' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Return None indicating an exception has ocurred
+            # Log an error message indicating that the navigation validation failed
+            self.logger.error(
+                message=f"Failed to validate navigation for navigation request: direction ({direction}), source ({source}) and target ({target})."
+            )
+
+            # Return None indicating an exception has occurred
             return None
 
     def validate_navigation(self) -> bool:

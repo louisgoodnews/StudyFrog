@@ -16,14 +16,14 @@ from core.stack import ImmutableStack, MutableStack
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
+from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
-from utils.object import ImmutableBaseObject
 
 
 __all__: Final[List[str]] = ["LearningSessionRunner"]
 
 
-class LearningSessionRunner(ImmutableBaseObject):
+class LearningSessionRunner:
     """
     A singleton class responsible for managing a learning session.
 
@@ -101,6 +101,9 @@ class LearningSessionRunner(ImmutableBaseObject):
         Returns:
             None
         """
+
+        # Initialize the logger
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize an empty list to store the session's contents
         self.contents: Final[List[str]] = []
@@ -195,7 +198,7 @@ class LearningSessionRunner(ImmutableBaseObject):
                 ]
 
             # Add the filtered contents to the list
-            self.contents.extend(contents)
+            self.contents.extend([content.key for content in contents])
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(

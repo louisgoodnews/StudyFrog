@@ -39,10 +39,22 @@ class MutableBaseObject:
         """
 
         # Get an instance of the logger class and store it in the object
-        self._logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
+        object.__setattr__(
+            self,
+            "_logger",
+            Logger.get_logger(self.__class__.__name__),
+        )
 
         # Update the object's dictionary with the keyword arguments
-        self.__dict__.update(**kwargs)
+        for (
+            key,
+            value,
+        ) in kwargs.items():
+            object.__setattr__(
+                self,
+                key,
+                value,
+            )
 
     @property
     def logger(self) -> Logger:
@@ -91,6 +103,8 @@ class MutableBaseObject:
         :return: True if the object is equal to the given object, False otherwise.
         :rtype: bool
         """
+
+        # Check if the objects are equal
         return self.__dict__ == other.__dict__
 
     def __getattr__(

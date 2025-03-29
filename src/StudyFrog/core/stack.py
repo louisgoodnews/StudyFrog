@@ -520,16 +520,40 @@ class StackManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["StackManager"] = None
+
+    def __new__(cls) -> "StackManager":
         """
-        Initializes a new instance of the StackManager class.
+        Creates and returns a new instance of the StackManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            StackManager: The created or existing instance of StackManager class.
+        """
+        # Check if the shared instance does not exist
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(StackManager, cls).__new__(cls)
+            # Initialize the instance with the dispatcher and stacks
+            cls._shared_instance.init()
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
+        """
+        Initializes the stack manager.
+
+        This method is responsible for initializing the stack manager by
+        setting up the logger instance.
 
         Returns:
             None
         """
-
-        # Call the parent class constructor
-        super().__init__()
+        pass
 
     def count_stacks(self) -> int:
         """
