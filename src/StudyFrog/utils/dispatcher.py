@@ -215,7 +215,15 @@ class DispatcherNotification(ImmutableBaseObject):
             # Check if the result contains more than one or no value(s)
             if len(self["result"]) == 1:
                 # Return the one and only result
-                return self["result"][next(iter(self["result"]))]
+                result: Optional[Any] = self["result"][next(iter(self["result"]))]
+
+                # Check if the result is a list with one element
+                if isinstance(result, list) and len(result) == 1:
+                    # Return the first element of the list
+                    return result[0]
+
+                # Return the result
+                return result
             else:
                 # Raise a ValueError if the result contains more than one or no value(s)
                 raise ValueError("Result contains more than one or no value(s).")

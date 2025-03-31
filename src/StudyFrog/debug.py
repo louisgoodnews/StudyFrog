@@ -32,6 +32,7 @@ from core.tag import TagModel
 from core.user import UserModel
 
 from utils.constants import Constants
+from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.model import ImmutableBaseModel

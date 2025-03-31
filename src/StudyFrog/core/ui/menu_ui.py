@@ -306,7 +306,7 @@ class MenuUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_close_button_clicked,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -409,7 +409,7 @@ class MenuUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_home_button_clicked,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -439,7 +439,7 @@ class MenuUI(BaseUI):
         home_label: Optional[tkinter.Label] = UIBuilder.get_label(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -510,7 +510,7 @@ class MenuUI(BaseUI):
         study_frog_label: Optional[tkinter.Label] = UIBuilder.get_label(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.LARGE_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -540,7 +540,7 @@ class MenuUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_shutdown_button_clicked,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,

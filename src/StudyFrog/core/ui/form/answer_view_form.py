@@ -262,7 +262,7 @@ class AnswerViewForm(tkinter.Frame):
         self.answer_text_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_scrolled_text_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 height=5,
@@ -275,7 +275,7 @@ class AnswerViewForm(tkinter.Frame):
         self.answer_text_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -303,7 +303,7 @@ class AnswerViewForm(tkinter.Frame):
         # Configure the name field
         self.answer_text_field["label"].configure(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
         )
@@ -515,7 +515,7 @@ class AnswerViewForm(tkinter.Frame):
         # Create a label widget to display the stack ID
         self.id_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="ID: ",
@@ -527,7 +527,7 @@ class AnswerViewForm(tkinter.Frame):
         self.id_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -548,7 +548,7 @@ class AnswerViewForm(tkinter.Frame):
         # Create a label widget to display the stack UUID
         self.uuid_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="UUID: ",
@@ -560,7 +560,7 @@ class AnswerViewForm(tkinter.Frame):
         self.uuid_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -581,7 +581,7 @@ class AnswerViewForm(tkinter.Frame):
         # Create a label widget to display the stack creation date
         self.created_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="Created at: ",
@@ -593,7 +593,7 @@ class AnswerViewForm(tkinter.Frame):
         self.created_at_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -614,7 +614,7 @@ class AnswerViewForm(tkinter.Frame):
         # Create a label widget to display the stack update date
         self.updated_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="Updated at: ",
@@ -626,7 +626,7 @@ class AnswerViewForm(tkinter.Frame):
         self.updated_at_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -667,7 +667,7 @@ class AnswerViewForm(tkinter.Frame):
         self.difficulty_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_combobox_select_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Difficulty*: ",
@@ -681,7 +681,7 @@ class AnswerViewForm(tkinter.Frame):
         self.difficulty_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -692,7 +692,7 @@ class AnswerViewForm(tkinter.Frame):
         self.difficulty_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -731,7 +731,7 @@ class AnswerViewForm(tkinter.Frame):
         self.priority_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_combobox_select_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Priority*: ",
@@ -745,7 +745,7 @@ class AnswerViewForm(tkinter.Frame):
         self.priority_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -756,7 +756,7 @@ class AnswerViewForm(tkinter.Frame):
         self.priority_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -1019,9 +1019,7 @@ class AnswerViewForm(tkinter.Frame):
         """
         try:
             # Update the answer object
-            self.answer = self.unified_manager.update_answer(
-                answer=self.answer
-            )
+            self.answer = self.unified_manager.update_answer(answer=self.answer)
 
             # Set the timestamp datetime instance variable to the current datetime
             self.timestamp = Miscellaneous.get_current_datetime()

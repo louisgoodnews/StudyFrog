@@ -45,6 +45,7 @@ class FlashcardLearningView(tkinter.Frame):
         dispatcher: Dispatcher,
         flashcard: ImmutableFlashcard,
         master: tkinter.Misc,
+        namespace: str,
         setting_service: SettingService,
     ) -> None:
         """
@@ -54,6 +55,7 @@ class FlashcardLearningView(tkinter.Frame):
             dispatcher (Dispatcher): The dispatcher instance.
             flashcard (ImmutableFlashcard): The flashcard instance.
             master (tkinter.Misc): The parent widget.
+            namespace (str): The namespace.
             setting_service (SettingService): The setting service instance.
         """
 
@@ -74,11 +76,17 @@ class FlashcardLearningView(tkinter.Frame):
         # Create a logger instance
         self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
+        # Initialize a list to store bindings
+        self.bindings: Final[List[str]] = []
+
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
 
         # Store the passed flashcard instance in an instance variable
         self.flashcard: ImmutableFlashcard = flashcard
+
+        # Store the passed namespace in an instance variable
+        self.namespace: str = namespace
 
         # Store the passed setting service instance in an instance variable
         self.setting_service: SettingService = setting_service
@@ -108,11 +116,11 @@ class FlashcardLearningView(tkinter.Frame):
         # This method is responsible for creating the widgets that are used to display the flashcard
         self.create_widgets()
 
+        # Subscribe to events
+        self.subscribe_to_events()
+
         # Bind the space key to the flip method
-        self.bind_all(
-            func=lambda event: self.flip(),
-            sequence="<space>",
-        )
+        self.bind_keys()
 
         # Place the flashcard learning form widget in the parent widget
         # This method is responsible for placing the frame in the parent widget
@@ -120,6 +128,24 @@ class FlashcardLearningView(tkinter.Frame):
             column=0,
             row=0,
             sticky=NSEW,
+        )
+
+    def bind_keys(self) -> None:
+        """
+        Binds the space key to the flip method.
+
+        This method binds the space key to the flip method, which is used to flip the flashcard.
+
+        Returns:
+            None
+        """
+
+        # Bind the space key to the flip method
+        self.bindings.append(
+            self.bind_all(
+                func=lambda event: self.flip(),
+                sequence="<space>",
+            )
         )
 
     def clear(self) -> None:
@@ -163,14 +189,14 @@ class FlashcardLearningView(tkinter.Frame):
         subscriptions: List[Dict[str, Any]] = [
             {
                 "event": Events.REQUEST_FLASHCARD_LEARNING_VIEW_FLIP_FLASHCARD,
-                "function": self.on_flashcard_learning_view_flip_flashcard,
-                "namespace": Constants.LEARNING_SESSION_NAMESPACE,
+                "function": self.on_request_flashcard_learning_view_flip_flashcard,
+                "namespace": self.namespace,
                 "persistent": True,
             },
             {
                 "event": Events.REQUEST_FLASHCARD_LEARNING_VIEW_LOAD_FLASHCARD,
-                "function": self.on_flashcard_learning_view_load_flashcard,
-                "namespace": Constants.LEARNING_SESSION_NAMESPACE,
+                "function": self.on_request_flashcard_learning_view_load_flashcard,
+                "namespace": self.namespace,
                 "persistent": True,
             },
         ]
@@ -196,8 +222,8 @@ class FlashcardLearningView(tkinter.Frame):
             weight=1,
         )
 
-        # Configure the flashcard learning view widget's 1st row to weight 1.
-        # This means that the 1st row will stretch when the window is resized.
+        # Configure the flashcard learning view widget's 0th row to weight 1.
+        # This means that the 0th row will stretch when the window is resized.
         self.grid_rowconfigure(
             index=0,
             weight=1,
@@ -216,7 +242,7 @@ class FlashcardLearningView(tkinter.Frame):
         """
         try:
             # Create the front frame widget
-            self.front_frame: Optional[tkinter.Frame] = UIBuilder.create_frame(
+            self.front_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
@@ -230,6 +256,20 @@ class FlashcardLearningView(tkinter.Frame):
                 # Return early if creation failed
                 return
 
+            # Configure the front frame widget's 0th column to weight 1.
+            # This means that the 0th column will stretch when the window is resized.
+            self.front_frame.grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the front frame widget's 0th row to weight 1.
+            # This means that the 0th row will stretch when the window is resized.
+            self.front_frame.grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
             # Place the front frame in the grid
             self.front_frame.grid(
                 column=0,
@@ -238,15 +278,17 @@ class FlashcardLearningView(tkinter.Frame):
             )
 
             # Create the front text label widget
-            self.front_text_label: Optional[tkinter.Label] = UIBuilder.create_label(
+            self.front_text_label: Optional[tkinter.Label] = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
+                disabledforeground=Constants.WHITE,
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
-                    Constants.DEFAULT_FONT_SIZE,
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
+                justify=CENTER,
                 master=self.front_frame,
-                text=self.flashcard.front,
+                text=self.flashcard.front_text,
             )
 
             # Check if the front text label was created successfully
@@ -272,7 +314,7 @@ class FlashcardLearningView(tkinter.Frame):
             )
 
             # Create the back frame widget
-            self.back_frame: Optional[tkinter.Frame] = UIBuilder.create_frame(
+            self.back_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
@@ -286,24 +328,50 @@ class FlashcardLearningView(tkinter.Frame):
                 # Return early if creation failed
                 return
 
-            # Create the back text widget
-            self.back_text_text: Optional[tkinter.Text] = UIBuilder.get_text(
+            # Configure the back frame widget's 0th column to weight 1.
+            # This means that the 0th column will stretch when the window is resized.
+            self.back_frame.grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the back frame widget's 0th row to weight 1.
+            # This means that the 0th row will stretch when the window is resized.
+            self.back_frame.grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Place the back frame in the grid
+            self.back_frame.grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
+
+            scrolled_text: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_text(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
-                    Constants.DEFAULT_FONT_SIZE,
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
                 master=self.back_frame,
                 relief=FLAT,
-                state=DISABLED,
+                wrap=WORD,
             )
 
-            # Insert the back text into the text widget
-            self.back_text_text.insert(
-                chars=self.flashcard.back_text,
-                index="1.0",
-            )
+            # Check if the scrolled text was created successfully
+            if not scrolled_text:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create scrolled text in '{self.__class__.__name__}'. This is likely a bug."
+                )
+                # Return early if creation failed
+                return
+
+            # Create the back text widget
+            self.back_text_text: Optional[tkinter.Text] = scrolled_text["text"]
 
             # Check if the back text widget was created successfully
             if not self.back_text_text:
@@ -314,17 +382,40 @@ class FlashcardLearningView(tkinter.Frame):
                 # Return early if creation failed
                 return
 
+            # Bind the back text widget to the flip method
+            self.back_text_text.bind(
+                func=lambda event: self.flip(),
+                sequence="<ButtonRelease-1>",
+            )
+
+            # Insert the back text into the text widget
+            self.back_text_text.insert(
+                chars=self.flashcard.back_text,
+                index="1.0",
+            )
+
+            # Disable the back text widget
+            self.back_text_text.configure(state=DISABLED)
+
             # Place the back text widget in the grid
-            self.back_text_text.grid(
+            scrolled_text["root"].grid(
                 column=0,
                 row=0,
                 sticky=NSEW,
             )
+
+            if self.side == "back":
+                # Hide the front frame
+                self.front_frame.grid_forget()
+            else:
+                # Hide the back frame
+                self.back_frame.grid_forget()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'create_widgets' method from '{self.__class__.__name__}': {e}"
             )
+
             # Re-raise the exception to the caller
             raise e
 
@@ -343,6 +434,9 @@ class FlashcardLearningView(tkinter.Frame):
             Exception: If an error occurs during the destroy process.
         """
         try:
+            # Unbind the space key from the flip method
+            self.unbind_keys()
+
             # Attempt to unsubscribe from all events
             self.unsubscribe_from_events()
 
@@ -406,11 +500,11 @@ class FlashcardLearningView(tkinter.Frame):
             )
 
         if dispatch:
-            # Dispatch the FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED event
+            # Dispatch the NOTIFY_FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED event
             self.dispatcher.dispatch(
-                event=Events.FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED,
+                event=Events.NOTIFY_FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED,
                 flashcard=self.flashcard,
-                namespace=Constants.LEARNING_SESSION_NAMESPACE,
+                namespace=self.namespace,
             )
 
     def forget_widgets(self) -> None:
@@ -530,6 +624,23 @@ class FlashcardLearningView(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
+    def unbind_keys(self) -> None:
+        """
+        Unbinds the space key from the flip method.
+
+        This method unbinds the space key from the flip method, which is used to flip the flashcard.
+
+        Returns:
+            None
+        """
+
+        # Unbind the space key from the flip method
+        for binding in self.bindings:
+            self.unbind_all(binding)
+
+        # Clear the list of bindings
+        self.bindings.clear()
+
     def unsubscribe_from_events(self) -> None:
         """
         Unsubscribes from all events subscribed in the edit UI.
@@ -570,6 +681,12 @@ class FlashcardLearningView(tkinter.Frame):
             None
         """
 
+        # Update the widgets in the flashcard learning view form
+        self.update_idletasks()
+
+        # Disable the back text widget
+        self.back_text_text.configure(state=NORMAL)
+
         # Clear the back text widget
         self.back_text_text.delete(
             index1="1.0",
@@ -578,11 +695,14 @@ class FlashcardLearningView(tkinter.Frame):
 
         # Insert the current flashcard's back text into the back text widget
         self.back_text_text.insert(
+            chars=self.flashcard.back_text,
             index="1.0",
-            string=self.flashcard.back,
         )
+
+        # Disable the back text widget
+        self.back_text_text.configure(state=DISABLED)
 
         # Update the front text label with the current flashcard's front text
         self.front_text_label.configure(
-            text=self.flashcard.front,
+            text=self.flashcard.front_text,
         )

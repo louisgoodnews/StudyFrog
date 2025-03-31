@@ -135,7 +135,7 @@ class TopBar(tkinter.Frame):
                 target="menu_ui",
             ),
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
                 Constants.BOLD,
             ),
@@ -168,7 +168,7 @@ class TopBar(tkinter.Frame):
         logo_label: tkinter.Label = UIBuilder.get_label(
             background=Constants.INDIGO["500"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
                 Constants.BOLD,
             ),
@@ -238,7 +238,7 @@ class TopBar(tkinter.Frame):
                     target=target,
                 ),
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -282,7 +282,7 @@ class TopBar(tkinter.Frame):
                 target="create_ui",
             ),
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -344,7 +344,7 @@ class TopBar(tkinter.Frame):
             background=Constants.INDIGO["500"],
             command=self.on_searchbar_button_clicked,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -353,7 +353,7 @@ class TopBar(tkinter.Frame):
 
         # Configure the "Entry" entry widget
         search_bar["entry"].configure(
-            font=(Constants.DEFAULT_FONT_FAMILIY, Constants.DEFAULT_FONT_SIZE),
+            font=(Constants.DEFAULT_FONT_FAMILY, Constants.DEFAULT_FONT_SIZE),
         )
 
         # Grid the "Search Bar" search bar widget in the "Right Frame" frame widget
@@ -424,7 +424,7 @@ class TopBar(tkinter.Frame):
                     target=target,
                 ),
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,

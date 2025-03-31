@@ -110,7 +110,7 @@ class MutableBaseObject:
     def __getattr__(
         self,
         name: str,
-    ) -> Any:
+    ) -> Optional[Any]:
         """
         Returns the value of the attribute with the given name.
 
@@ -118,7 +118,7 @@ class MutableBaseObject:
         :type name: str
 
         :return: The value of the attribute with the given name.
-        :rtype: Any
+        :rtype: Optional[Any]
         """
 
         # Check if the attribute exists
@@ -135,7 +135,7 @@ class MutableBaseObject:
     def __getitem__(
         self,
         name: str,
-    ) -> Any:
+    ) -> Optional[Any]:
         """
         Returns the value of the attribute with the given name.
 
@@ -143,7 +143,7 @@ class MutableBaseObject:
         :type name: str
 
         :return: The value of the attribute with the given name.
-        :rtype: Any
+        :rtype: Optional[Any]
         """
 
         # Check if the attribute exists
@@ -168,7 +168,7 @@ class MutableBaseObject:
         """
 
         # Return a string representation of the object
-        return f"<{self.__class__.__name__}({", ".join([f'{key}={value}' for key, value, in self.to_dict().items()])})>"
+        return f"<{self.__class__.__name__}({", ".join([f'{key}={value}' for (key, value,) in self.to_dict().items()])})>"
 
     def __setattr__(
         self,
@@ -224,7 +224,13 @@ class MutableBaseObject:
 
         # Return a string representation of the object
         return ", ".join(
-            [f"{value}" for value in self.to_dict(exclude=["_logger"]).values()]
+            [
+                f"{key}={value}"
+                for (
+                    key,
+                    value,
+                ) in self.to_dict(exclude=["_logger"]).items()
+            ]
         )
 
     def compare_to(
@@ -318,7 +324,7 @@ class MutableBaseObject:
     def get(
         self,
         name: str,
-    ) -> Any:
+    ) -> Optional[Any]:
         """
         Returns the value of the attribute with the given name.
 
@@ -326,7 +332,7 @@ class MutableBaseObject:
         :type name: str
 
         :return: The value of the attribute with the given name.
-        :rtype: Any
+        :rtype: Optional[Any]
         """
 
         # Check if the attribute exists

@@ -364,7 +364,7 @@ class CreateUI(BaseUI):
         create_another: tkinter.Checkbutton = UIBuilder.get_checkbutton(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -384,7 +384,7 @@ class CreateUI(BaseUI):
         label: tkinter.Label = UIBuilder.get_label(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -440,7 +440,7 @@ class CreateUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_cancel_button_click,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -463,7 +463,7 @@ class CreateUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_create_button_click,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -536,7 +536,7 @@ class CreateUI(BaseUI):
         label: tkinter.Label = UIBuilder.get_label(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -556,7 +556,7 @@ class CreateUI(BaseUI):
         # Create the combobox widget
         self.combobox: ttk.Combobox = UIBuilder.get_combobox(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             master=top_frame,

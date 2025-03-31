@@ -264,7 +264,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.front_text_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_scrolled_text_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 height=5,
@@ -277,7 +277,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.front_text_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -305,7 +305,7 @@ class FlashcardViewForm(tkinter.Frame):
         # Configure the name field
         self.front_text_field["label"].configure(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
         )
@@ -516,7 +516,7 @@ class FlashcardViewForm(tkinter.Frame):
         tabbed_view["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -527,7 +527,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.back_text_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_multi_line_text_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Back Text*: ",
@@ -539,7 +539,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.back_text_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -550,7 +550,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.back_text_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -600,7 +600,7 @@ class FlashcardViewForm(tkinter.Frame):
         tabbed_view["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -648,7 +648,7 @@ class FlashcardViewForm(tkinter.Frame):
         # Create a label widget to display the stack ID
         self.id_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="ID: ",
@@ -660,7 +660,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.id_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -681,7 +681,7 @@ class FlashcardViewForm(tkinter.Frame):
         # Create a label widget to display the stack UUID
         self.uuid_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="UUID: ",
@@ -693,7 +693,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.uuid_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -714,7 +714,7 @@ class FlashcardViewForm(tkinter.Frame):
         # Create a label widget to display the stack creation date
         self.created_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="Created at: ",
@@ -726,7 +726,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.created_at_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -747,7 +747,7 @@ class FlashcardViewForm(tkinter.Frame):
         # Create a label widget to display the stack update date
         self.updated_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="Updated at: ",
@@ -759,7 +759,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.updated_at_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -800,7 +800,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.difficulty_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_combobox_select_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Difficulty*: ",
@@ -814,7 +814,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.difficulty_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -825,7 +825,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.difficulty_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -864,7 +864,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.priority_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_combobox_select_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Priority*: ",
@@ -878,7 +878,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.priority_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -889,7 +889,7 @@ class FlashcardViewForm(tkinter.Frame):
         self.priority_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,

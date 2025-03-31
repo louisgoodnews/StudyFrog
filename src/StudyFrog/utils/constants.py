@@ -4,13 +4,11 @@ Date: 2025-02-06
 """
 
 import copy
-
 import os
 
 from datetime import datetime, timedelta
-
 from os import path
-
+from tkinter import ttk
 from typing import *
 
 
@@ -50,7 +48,7 @@ class Constants:
     * TAGS: The name of the table for tags.
     * USERS: The name of the table for users.
 
-    * DEFAULT_FONT_FAMILIY: The default font family.
+    * DEFAULT_FONT_FAMILY: The default font family.
     * DEFAULT_FONT_SIZE: The default font size.
 
     * VERY_LARGE_FONT_SIZE: The very large font size.
@@ -173,13 +171,13 @@ class Constants:
     TAGS: Final[str] = "tags"
     USERS: Final[str] = "users"
 
-    DEFAULT_FONT_FAMILIY: Final[str] = "Helvetica"
-    DEFAULT_FONT_SIZE: Final[int] =16
+    DEFAULT_FONT_FAMILY: Final[str] = "Helvetica"
+    DEFAULT_FONT_SIZE: Final[int] = 16
 
-    VERY_LARGE_FONT_SIZE: Final[int] =48
-    LARGE_FONT_SIZE: Final[int] =24
-    MEDIUM_FONT_SIZE: Final[int] =16
-    SMALL_FONT_SIZE: Final[int] =12
+    VERY_LARGE_FONT_SIZE: Final[int] = 48
+    LARGE_FONT_SIZE: Final[int] = 24
+    MEDIUM_FONT_SIZE: Final[int] = 16
+    SMALL_FONT_SIZE: Final[int] = 12
 
     BOLD: Final[str] = "bold"
     ITALIC: Final[str] = "italic"
@@ -558,23 +556,51 @@ class Constants:
     REPORT_UI_NAMESPACE: Final[str] = "REPORT_UI"
     SEARCH_UI_NAMESPACE: Final[str] = "SEARCH_UI"
     SETTING_UI_NAMESPACE: Final[str] = "SETTING_UI"
+    STACK_SELECTION_NAMESPACE: Final[str] = "STACK_SELECTION"
 
+    # The current date and time
     NOW: Final[datetime] = datetime.now()
 
+    # The current date
     TODAY: Final[datetime] = datetime.today()
+
+    # The next day
     TOMORROW: Final[datetime] = datetime.today() + timedelta(days=1)
+
+    # The previous day
     YESTERDAY: Final[datetime] = datetime.today() - timedelta(days=1)
 
+    # The start of the week
     START_OF_WEEK: Final[datetime] = datetime.today() - timedelta(
         days=datetime.today().weekday()
     )
+
+    # The end of the week
     END_OF_WEEK: Final[datetime] = START_OF_WEEK + timedelta(days=6)
 
+    # The start of the month
     START_OF_MONTH: Final[datetime] = datetime.today().replace(day=1)
+
+    # The end of the month
     END_OF_MONTH: Final[datetime] = START_OF_MONTH + timedelta(days=31)
 
+    # The start of the year
     START_OF_YEAR: Final[datetime] = datetime.today().replace(month=1, day=1)
+
+    # The end of the year
     END_OF_YEAR: Final[datetime] = START_OF_YEAR + timedelta(days=365)
+
+    # The learning modes
+    LEARNING_MODES: Final[List[str]] = [
+        "Default",
+        "Recall",
+        "Recall (at random)",
+        "Speed-Test",
+        "Spaced Repetition",
+    ]
+
+    # The style of the application
+    STYLE: Final[ttk.Style] = ttk.Style()
 
     @classmethod
     def get_base_id(cls) -> int:

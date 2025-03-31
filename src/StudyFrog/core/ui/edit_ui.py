@@ -350,7 +350,7 @@ class EditUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_cancel_button_click,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -373,7 +373,7 @@ class EditUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_save_button_click,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,

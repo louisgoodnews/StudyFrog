@@ -333,7 +333,7 @@ class LearningDashboardUI(BaseUI):
                 ].configure(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -408,7 +408,7 @@ class LearningDashboardUI(BaseUI):
                 background=Constants.BLUE_GREY["700"],
                 command=self.on_select_stacks_button_click,
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -648,7 +648,7 @@ class LearningDashboardUI(BaseUI):
             label: Optional[tkinter.Label] = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,

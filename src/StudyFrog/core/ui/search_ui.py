@@ -319,7 +319,7 @@ class SearchUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_previous_button_click,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -341,7 +341,7 @@ class SearchUI(BaseUI):
             background=Constants.BLUE_GREY["700"],
             command=self.on_next_button_click,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -441,7 +441,7 @@ class SearchUI(BaseUI):
             label: tkinter.Label = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -537,7 +537,7 @@ class SearchUI(BaseUI):
                 label: tkinter.Label = UIBuilder.get_label(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -607,7 +607,7 @@ class SearchUI(BaseUI):
         self.searchbar: Optional[Dict[str, Any]] = UIBuilder.get_searchbar(
             command=self.searchbar_command,
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             master=master,
@@ -617,7 +617,7 @@ class SearchUI(BaseUI):
         self.searchbar["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,

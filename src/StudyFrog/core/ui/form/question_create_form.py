@@ -148,7 +148,7 @@ class QuestionCreateForm(tkinter.Frame):
         okay["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -159,7 +159,7 @@ class QuestionCreateForm(tkinter.Frame):
         okay["message_label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -169,7 +169,7 @@ class QuestionCreateForm(tkinter.Frame):
         okay["title_label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -227,7 +227,7 @@ class QuestionCreateForm(tkinter.Frame):
         instruction_label: tkinter.Label = UIBuilder.get_label(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -324,7 +324,7 @@ class QuestionCreateForm(tkinter.Frame):
         notebook["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -343,7 +343,7 @@ class QuestionCreateForm(tkinter.Frame):
         notebook["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -353,7 +353,7 @@ class QuestionCreateForm(tkinter.Frame):
         # Create a combobox widget to select a stack
         self.stack_field = UIBuilder.get_combobox_select_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Stack*: ",
@@ -391,7 +391,7 @@ class QuestionCreateForm(tkinter.Frame):
         # Create a multi-line text field for the question text of the question
         self.question_text_field: Dict[str, Any] = UIBuilder.get_scrolled_text_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             height=15,
@@ -430,7 +430,7 @@ class QuestionCreateForm(tkinter.Frame):
         # Create a combobox widget to select a question type
         self.question_type_field = UIBuilder.get_combobox_select_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Question Type*: ",
@@ -579,7 +579,7 @@ class QuestionCreateForm(tkinter.Frame):
             # Create a new multiple choice answer field
             answer_field: Dict[str, Any] = UIBuilder.get_multiple_choice_answer_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 master=self.answers_frame,
@@ -589,7 +589,7 @@ class QuestionCreateForm(tkinter.Frame):
             answer_field["checkbutton"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -598,7 +598,7 @@ class QuestionCreateForm(tkinter.Frame):
             # Configure the answer field's entry widget
             answer_field["entry"].configure(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
             )
@@ -710,7 +710,7 @@ class QuestionCreateForm(tkinter.Frame):
                     background=Constants.BLUE_GREY["700"],
                     command=self.on_add_answer_button_click,
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.MEDIUM_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -742,7 +742,7 @@ class QuestionCreateForm(tkinter.Frame):
                 # Create the open answer field widgets
                 open_answer_field: Dict[str, Any] = UIBuilder.get_open_answer_field(
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     master=self.answers_frame,
@@ -752,7 +752,7 @@ class QuestionCreateForm(tkinter.Frame):
                 open_answer_field["button"].configure(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -768,7 +768,7 @@ class QuestionCreateForm(tkinter.Frame):
                 open_answer_field["label"].configure(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -817,7 +817,7 @@ class QuestionCreateForm(tkinter.Frame):
                 true_false_answer_field["false_radiobutton"].configure(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -827,7 +827,7 @@ class QuestionCreateForm(tkinter.Frame):
                 true_false_answer_field["label"].configure(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -842,7 +842,7 @@ class QuestionCreateForm(tkinter.Frame):
                 true_false_answer_field["true_radiobutton"].configure(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,

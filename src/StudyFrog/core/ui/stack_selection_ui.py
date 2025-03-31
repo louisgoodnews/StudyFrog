@@ -329,7 +329,7 @@ class StackSelectionUI(BaseUI):
                 background=Constants.BLUE_GREY["700"],
                 command=self.on_cancel_button_click,
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -362,7 +362,7 @@ class StackSelectionUI(BaseUI):
                 background=Constants.BLUE_GREY["700"],
                 command=self.on_start_button_click,
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -424,48 +424,19 @@ class StackSelectionUI(BaseUI):
                 weight=1,
             )
 
-            # Configure the weight of the 0th row to 0.
-            master.grid_rowconfigure(
-                index=0,
-                weight=0,
-            )
-
-            # Configure the weight of the 1st row to 1.
-            master.grid_rowconfigure(
-                index=1,
-                weight=1,
-            )
-
-            # Configure the weight of the 1st row to 0.
-            master.grid_rowconfigure(
-                index=1,
-                weight=0,
-            )
-
-            # Configure the weight of the 2nd row to 0.
-            master.grid_rowconfigure(
-                index=2,
-                weight=0,
-            )
-
-            # Configure the weight of the 3rd row to 0.
-            master.grid_rowconfigure(
-                index=3,
-                weight=0,
-            )
-
-            # Configure the weight of the 4th row to 0.
-            master.grid_rowconfigure(
-                index=4,
-                weight=0,
-            )
+            for index in range(12):
+                # Configure the weight of the current row index to 1.
+                master.grid_rowconfigure(
+                    index=index,
+                    weight=1,
+                )
 
             # Create the label widget
             label: Optional[tkinter.Label] = UIBuilder.get_label(
                 anchor=W,
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -624,7 +595,7 @@ class StackSelectionUI(BaseUI):
             self.difficulty_select["select_button"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -635,7 +606,7 @@ class StackSelectionUI(BaseUI):
             self.difficulty_select["label"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -699,7 +670,7 @@ class StackSelectionUI(BaseUI):
             self.priority_select["select_button"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -710,7 +681,7 @@ class StackSelectionUI(BaseUI):
             self.priority_select["label"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -727,6 +698,174 @@ class StackSelectionUI(BaseUI):
                 padx=5,
                 pady=5,
                 row=4,
+                sticky=NSEW,
+            )
+
+            # Create the mode select widget
+            self.mode_select: Optional[Dict[str, Any]] = (
+                UIBuilder.get_combobox_select_field(
+                    label="Mode: ",
+                    master=master,
+                )
+            )
+
+            if not self.mode_select:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create mode select in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Style the mode select widget's button
+            self.mode_select["button"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
+
+            # Style the mode select widget's combobox
+            self.mode_select["combobox"].configure(
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                state="readonly",
+                values=Constants.LEARNING_MODES,
+            )
+
+            # Set the initial value of the mode select widget
+            self.mode_select["setter"](value=Constants.LEARNING_MODES[0])
+
+            # Style the mode select widget's label
+            self.mode_select["label"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
+
+            # Style the mode select widget's root frame
+            self.mode_select["root"].configure(background=Constants.BLUE_GREY["700"])
+
+            # Place the mode select widget in the main window
+            self.mode_select["root"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=5,
+                sticky=NSEW,
+            )
+
+            # Create the randomisation check widget
+            self.randomisation_check: Optional[Dict[str, Any]] = (
+                UIBuilder.get_checkbutton_field(
+                    label="Enable randomisation?: ",
+                    master=master,
+                    namespace=Constants.STACK_SELECTION_NAMESPACE,
+                )
+            )
+
+            if not self.randomisation_check:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create randomisation check in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Style the randomisation check widget's checkbutton
+            self.randomisation_check["checkbutton"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
+
+            # Style the randomisation check widget's label
+            self.randomisation_check["label"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+            )
+
+            # Style the randomisation check widget's root frame
+            self.randomisation_check["root"].configure(
+                background=Constants.BLUE_GREY["700"]
+            )
+
+            # Place the randomisation check widget in the main window
+            self.randomisation_check["root"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=6,
+                sticky=NSEW,
+            )
+
+            # Create the countup check widget
+            self.countup_check: Optional[Dict[str, Any]] = (
+                UIBuilder.get_checkbutton_field(
+                    label="Enable countup timer?: ",
+                    master=master,
+                    namespace=Constants.STACK_SELECTION_NAMESPACE,
+                )
+            )
+
+            if not self.countup_check:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create countup check in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Style the countup check widget's checkbutton
+            self.countup_check["checkbutton"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
+
+            # Style the countup check widget's label
+            self.countup_check["label"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+            )
+
+            # Style the countup check widget's root frame
+            self.countup_check["root"].configure(background=Constants.BLUE_GREY["700"])
+
+            # Place the countup check widget in the main window
+            self.countup_check["root"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=7,
                 sticky=NSEW,
             )
         except Exception as e:
@@ -780,7 +919,7 @@ class StackSelectionUI(BaseUI):
             checkbutton: Optional[tkinter.Checkbutton] = UIBuilder.get_checkbutton(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -915,7 +1054,7 @@ class StackSelectionUI(BaseUI):
                 label: Optional[tkinter.Label] = UIBuilder.get_label(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -995,8 +1134,45 @@ class StackSelectionUI(BaseUI):
             raise e
 
     def on_cancel_button_click(self) -> None:
+        """
+        Handles the click event of the "Cancel" button.
+
+        If the user clicks "Cancel", the method will create an okay/cancel dialog
+        to confirm the cancellation. If the user clicks "Okay" in the dialog,
+        the method will log an info message and destroy the current window.
+
+        Returns:
+            None
+        """
         try:
-            pass
+            # Create an okay/cancel dialog to confirm the cancellation
+            okay_cancel: Optional[Dict[str, Any]] = UIBuilder.get_okay_cancel(
+                dispatcher=self.dispatcher,
+                message="Are you sure you want to cancel?",
+                title="Confirm cancel",
+            )
+
+            if not okay_cancel:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create okay/cancel dialog in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            if okay_cancel["getter"]() == "okay":
+                # Log an info message:
+                self.logger.info(
+                    message=f"Stack selection cancelled in '{self.__class__.__name__}'."
+                )
+
+                if isinstance(
+                    self.master,
+                    tkinter.Toplevel,
+                ):
+                    # Destroy the current window
+                    self.master.destroy()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -1087,7 +1263,12 @@ class StackSelectionUI(BaseUI):
             kwargs: Dict[str, Any] = {
                 "direction": Constants.FORWARD_DIRECTION,
                 "event": Events.REQUEST_VALIDATE_NAVIGATION,
+                "mode": self.mode_select["getter"](),
                 "namespace": Constants.GLOBAL_NAMESPACE,
+                "settings": {
+                    "enable_randomisation": self.randomisation_check["getter"](),
+                    "enable_countup": self.countup_check["getter"](),
+                },
                 "source": "stack_selection_ui",
                 "stacks": self.selected_stacks,
                 "target": "learning_session_ui",
@@ -1107,7 +1288,7 @@ class StackSelectionUI(BaseUI):
                     self.dispatcher.dispatch(
                         event=Events.REQUEST_PRIORITY_LOOKUP,
                         namespace=Constants.GLOBAL_NAMESPACE,
-                        name=priority_selection[0],
+                        name=priority_selection,
                     )
                 )
 
@@ -1117,9 +1298,14 @@ class StackSelectionUI(BaseUI):
                         message=f"Priority with name '{priority_selection}' not found in '{self.__class__.__name__}'."
                     )
                 else:
+                    # Get the priority from the notification
+                    priority: Union[ImmutablePriority, List[ImmutablePriority]] = (
+                        priority_notification.get_one_and_only_result()
+                    )
+
                     # Store the priority in the kwargs dictionary
                     kwargs["priorities"] = (
-                        priority_notification.get_one_and_only_result()
+                        priority if isinstance(priority, list) else [priority]
                     )
 
             # Get the difficulty selection
@@ -1138,7 +1324,7 @@ class StackSelectionUI(BaseUI):
                     self.dispatcher.dispatch(
                         event=Events.REQUEST_DIFFICULTY_LOOKUP,
                         namespace=Constants.GLOBAL_NAMESPACE,
-                        name=difficulty_selection[0],
+                        name=difficulty_selection,
                     )
                 )
 
@@ -1148,10 +1334,25 @@ class StackSelectionUI(BaseUI):
                         message=f"Difficulty with name '{difficulty_selection}' not found in '{self.__class__.__name__}'."
                     )
                 else:
+                    # Get the difficulty from the notification
+                    difficulty: Union[
+                        ImmutableDifficulty, List[ImmutableDifficulty]
+                    ] = difficulty_notification.get_one_and_only_result()
+
                     # Store the difficulty in the kwargs dictionary
                     kwargs["difficulties"] = (
-                        difficulty_notification.get_one_and_only_result()
+                        difficulty if isinstance(difficulty, list) else [difficulty]
                     )
+
+            # Check if "difficulties" key is missing (to prevent it from being None)
+            if "difficulties" not in kwargs:
+                # Set the difficulties to an empty list
+                kwargs["difficulties"] = []
+
+            # Check if "priorities" key is missing (to prevent it from being None)
+            if "priorities" not in kwargs:
+                # Set the priorities to an empty list
+                kwargs["priorities"] = []
 
             # Dispatch the REQUEST_VALIDATE_NAVIGATION event
             self.dispatcher.dispatch(**kwargs)

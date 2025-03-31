@@ -4,13 +4,11 @@ Date: 2025-02-08
 """
 
 import re
-
 import tkinter
 
+from datetime import timedelta
 from typing import *
-
 from tkinter import ttk
-
 from tkinter.constants import *
 
 from utils.constants import Constants
@@ -25,13 +23,18 @@ __all__: Final[List[str]] = ["UIBuilder"]
 
 class UIBuilder:
     """
-    A utility class for building user interface components.
+    A utility class for building (tkinter, ttk) user interface components.
 
     Attributes:
         logger (Logger): The logger instance used by the class.
+        dispatcher (Dispatcher): The dispatcher instance used by the class.
     """
 
+    # The logger instance used by the class
     logger: Final[Logger] = Logger.get_logger(name="UIBuilder")
+
+    # The dispatcher instance used by the class
+    dispatcher: Final[Dispatcher] = Dispatcher()
 
     @classmethod
     def get_bool_variable(
@@ -165,6 +168,473 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_checkbutton' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_checkbutton_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[bool], None]] = None,
+        value: bool = False,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of tkinter.Checkbutton that is used as a field.
+
+        This method creates a dictionary that holds all functions and widgets that facilitate the checkbox field.
+        Contained keys are:
+            - "clearer": A function that clears the checkbox field.
+            - "getter": A function that retrieves the value of the checkbox field.
+            - "setter": A function that sets the value of the checkbox field.
+            - "variable": A tkinter.BooleanVar instance that holds the value of the checkbox field.
+            - "root": A tkinter.Frame instance that holds the checkbox field.
+            - "label": A tkinter.Label instance that holds the label for the checkbox field.
+            - "checkbutton": A tkinter.Checkbutton instance that is used as a field.
+
+        Args:
+            label (str): The label for the checkbutton.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the checkbutton. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[bool], None]]): A callback function that is called when the value of the checkbox field changes. Defaults to None.
+            value (bool): The initial value of the checkbox field. Defaults to False.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created tkinter.Checkbutton instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Checkbutton.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear(dispatch: bool = True) -> None:
+                """
+                Clears the checkbutton field by setting its value to False.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the checkbutton field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the CHECKBOX_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.CHECKBOX_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=False,
+                        )
+
+                    # Set the value of the checkbutton field to False
+                    result["variable"].set(value=False)
+
+                    # Update the text of the checkbutton
+                    result["checkbutton"].configure(text=str(result["variable"].get()))
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+            def get(dispatch: bool = True) -> bool:
+                """
+                Retrieves the value of the checkbutton field as a boolean.
+
+                Args:
+                    None
+
+                Returns:
+                    bool: The value of the checkbutton field as a boolean.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the checkbutton field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the CHECKBOX_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.CHECKBOX_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the checkbutton field as a boolean
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return False
+                    return False
+
+            def on_check_box_changed(dispatch: bool = True) -> None:
+                """
+                Handles the CHECKBOX_FIELD_CHANGED event.
+
+                This function is called when the value of the checkbutton field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the CHECKBOX_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the CHECKBOX_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.CHECKBOX_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Update the text of the checkbutton
+                    result["checkbutton"].configure(text=str(result["variable"].get()))
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_check_box_changed' method from '{cls.__name__}': {e}"
+                    )
+
+            def set(
+                dispatch: bool = True,
+                value: bool = False,
+            ) -> None:
+                """
+                Sets the value of the checkbutton field.
+
+                Args:
+                    dispatch (bool, optional): Whether to dispatch the CHECKBOX_FIELD_SET event. Defaults to True.
+                    value (bool, optional): The value to set for the checkbutton field. Defaults to False.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the checkbutton field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the CHECKBOX_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.CHECKBOX_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    # Set the value of the checkbutton field
+                    result["variable"].set(value=value)
+
+                    # Update the text of the checkbutton
+                    result["checkbutton"].configure(text=str(result["variable"].get()))
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+            # Create the "Variable" boolean variable
+            result["variable"] = cls.get_bool_variable(value=value)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs,
+            )
+
+            # Configure the "Root" frame widget's 0th column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+                **kwargs,
+            )
+
+            # Add the "Label" label widget to the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Checkbutton" checkbutton widget
+            result["checkbutton"] = cls.get_checkbutton(
+                command=on_check_box_changed,
+                master=result["root"],
+                text="False",
+                variable=result["variable"],
+                **kwargs,
+            )
+
+            # Add the "Checkbutton" checkbutton widget to the "Root" frame widget
+            result["checkbutton"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_checkbutton_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_checkbutton_field_group(
+        cls,
+        labels: List[str],
+        master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[bool], None]] = None,
+        selection_mode: Literal["multiple", "single"] = "single",
+        value: bool = False,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a group of checkbutton fields.
+
+        This method creates a frame widget and adds a checkbutton field to it for each label in the given list of labels.
+        The checkbutton fields are configured to call the given on_change_callback when their value is changed.
+        The method also adds a getter and setter function to the result dictionary, which can be used to get and set the value of the checkbutton fields.
+
+        Args:
+            labels (List[str]): A list of labels for the checkbutton fields.
+            master (tkinter.Misc): The master widget.
+            namespace (str, optional): The namespace to use for the checkbutton fields. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[bool], None]], optional): A callback function to call when the value of a checkbutton field is changed. Defaults to None.
+            selection_mode (Literal["multiple", "single"], optional): The selection mode for the checkbutton fields. Defaults to "single".
+            value (bool, optional): The initial value of the checkbutton fields. Defaults to False.
+            **kwargs: Any additional keyword arguments to be passed to the tkinter.Checkbutton constructor.
+
+        Returns:
+            Optional[Dict[str, Any]]: A dictionary containing the created checkbutton fields, the getter and setter functions, and the clearer function.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Checkbutton.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear() -> None:
+                """
+                Clears all the checkbutton fields.
+
+                This method calls the "clearer" function on each checkbutton field in the "fields" dictionary.
+
+                Returns:
+                    None
+                """
+
+                # Iterate over the values in the "fields" dictionary
+                for field in result["fields"].values():
+                    # Call the "clearer" function on the current field
+                    field["clearer"]()
+
+            def enforce_selection_mode(
+                label: str,
+                value: bool,
+            ) -> None:
+                """
+                Enforces the selection mode on the checkbutton fields.
+
+                This method is called when the value of a checkbutton field is changed.
+                It enforces the selection mode by calling the setter function on all
+                other checkbutton fields with the opposite value of the one given.
+
+                Args:
+                    label (str): The label of the checkbutton field that was changed.
+                    value (bool): The new value of the checkbutton field.
+                """
+
+                # Check, if the selection mode is "multiple"
+                if selection_mode == "multiple":
+                    # If the selection mode is "multiple", there is nothing to do
+                    return
+
+                # Iterate over the values in the "fields" dictionary
+                for (
+                    key,
+                    field,
+                ) in result["fields"].items():
+                    # Check, if the current field is the one that was changed
+                    if key == label:
+                        # Skip the current field
+                        continue
+
+                    # Call the "setter" function on the current field
+                    field["setter"](
+                        dispatch=False,
+                        value= not value,
+                    )
+
+            def get(label: str) -> bool:
+                """
+                Gets the value of the checkbutton field with the given label.
+
+                This method calls the "getter" function on the checkbutton field in the "fields" dictionary with the given label
+                and returns its value.
+
+                Args:
+                    label (str): The label of the checkbutton field to get.
+
+                Returns:
+                    bool: The value of the checkbutton field with the given label.
+                """
+
+                # Check if the label is present in the "fields" dictionary
+                if label not in result["fields"].keys():
+                    # Return early
+                    return False
+
+                # Call the "getter" function on the current field
+                return result["fields"][label]["getter"]()
+
+            def set(
+                label: str,
+                value: bool = False,
+            ) -> None:
+                """
+                Sets the value of the checkbutton field with the given label.
+
+                This method calls the "setter" function on the checkbutton field in the "fields" dictionary with the given label
+                and sets it to the given value.
+
+                Args:
+                    label (str): The label of the checkbutton field to set.
+                    value (bool, optional): The value to set the checkbutton field to. Defaults to False.
+
+                Returns:
+                    None
+                """
+
+                # Check if the label is present in the "fields" dictionary
+                if label not in result["fields"].keys():
+                    # Return early
+                    return
+
+                # Call the "setter" function on the current field
+                result["fields"][label]["setter"](value=value)
+
+            # Initialize the "fields" dictionary as an empty dictionary
+            result["fields"] = {}
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 0th column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            for (
+                index,
+                label,
+            ) in enumerate(iterable=labels):
+                # Configure the "Root" frame widget's row at the current index to weight 0
+                result["root"].grid_rowconfigure(
+                    index=index,
+                    weight=0,
+                )
+
+                # Create the check widget
+                checkbutton_field: Optional[Dict[str, Any]] = cls.get_checkbutton_field(
+                    label=label,
+                    master=result["root"],
+                    namespace=namespace,
+                    on_change_callback=enforce_selection_mode,
+                    value=value,
+                    **kwargs,
+                )
+
+                if not checkbutton_field:
+                    # Log a warning message
+                    cls.logger.warning(
+                        message=f"Failed to create check widget in '{cls.__name__}'. This is likely a bug."
+                    )
+
+                    # Return early
+                    return None
+
+                # Add the check widget to the result dictionary
+                result["fields"][label] = checkbutton_field
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_checkbutton_field_group' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
@@ -450,6 +920,307 @@ class UIBuilder:
             # Log an error message indicating an exception occured
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_combobox_select_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_countdown(
+        cls,
+        dispatcher: Dispatcher,
+        master: tkinter.Misc,
+        namespace: str,
+        time_limit: int = 60,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a countdown widget with associated labels and dispatcher notifications.
+
+        The returned dictionary contains the following keys:
+            - "root": The container frame for the widgets
+            - "information_label": The information label widget
+            - "countdown_label": The countdown label widget
+
+        Args:
+            dispatcher (Dispatcher): The dispatcher instance used for event notifications.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for dispatching events.
+            time_limit (int, optional): The time limit for the countdown in minutes. Defaults to 60.
+            **kwargs: Additional keyword arguments. These will be passed to the tkinter.Label constructors.
+
+        Returns:
+            Optional[Dict[str, Any]]: A dictionary containing the countdown widget elements, or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the countdown widget.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def notify_countdown_start() -> None:
+                # Check, if the notify_start variable is True
+                if result["notify_start"]:
+                    # Dispatch the NOTIFY_UI_COUNTDOWN_STARTED event
+                    dispatcher.dispatch(
+                        event=Events.NOTIFY_UI_COUNTDOWN_STARTED,
+                        namespace=namespace,
+                    )
+
+                # Set the notify_start variable to False
+                result["notify_start"] = False
+
+            def notify_countdown_ended() -> None:
+                # Check, if the notify_end variable is True
+                if result["notify_end"]:
+                    # Dispatch the NOTIFY_UI_COUNTDOWN_ENDED event
+                    dispatcher.dispatch(
+                        event=Events.NOTIFY_UI_COUNTDOWN_ENDED,
+                        namespace=namespace,
+                    )
+
+                # Set the notify_end variable to False
+                result["notify_end"] = False
+
+            def update_countdown_label() -> None:
+                # Decrement the seconds variable
+                result["seconds"] -= 1
+
+                # Check, if the seconds variable is less than 0
+                if result["seconds"] < 0:
+                    # Dispatch the NOTIFY_UI_COUNTDOWN_ENDED event
+                    notify_countdown_ended()
+
+                    # Return early
+                    return
+
+                # Update the countdown label
+                result["countdown_label"].configure(
+                    text=str(timedelta(seconds=result["seconds"])),
+                )
+
+                # Schedule the update_countdown_label function to be called after 1000 milliseconds
+                after(
+                    func=update_countdown_label,
+                    ms=1000,
+                )
+
+            # Initialize the seconds variable
+            result["seconds"] = 60 * time_limit
+
+            # Initialize the flag to notify the end of the countdown
+            result["notify_end"] = True
+
+            # Initialize the flag to notify the start of the countdown
+            result["notify_start"] = True
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 0th column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Information Label" label widget
+            result["information_label"] = cls.get_label(
+                master=result["root"],
+                text="Time left: ",
+                **kwargs,
+            )
+
+            # Grid the "Information Label" label widget in the "Root" frame widget
+            result["information_label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Countdown Label" label widget
+            result["countdown_label"] = cls.get_label(
+                master=result["root"],
+                text="",
+                **kwargs,
+            )
+
+            # Grid the "Countdown Label" label widget in the "Root" frame widget
+            result["countdown_label"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Update the countdown label
+            update_countdown_label()
+
+            # Dispatch the NOTIFY_UI_COUNTDOWN_STARTED event
+            notify_countdown_start()
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_countdown' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_countup(
+        cls,
+        dispatcher: Dispatcher,
+        master: tkinter.Misc,
+        namespace: str,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a countup widget with associated labels and dispatcher notifications.
+
+        The returned dictionary contains the following keys:
+            - "root": The container frame for the widgets
+            - "information_label": The information label widget
+            - "countup_label": The countup label widget
+
+        Args:
+            dispatcher (Dispatcher): The dispatcher instance used for event notifications.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for dispatching events.
+            **kwargs: Additional keyword arguments. These will be passed to the tkinter.Label constructors.
+
+        Returns:
+            Optional[Dict[str, Any]]: A dictionary containing the countup widget elements, or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create the countup widget.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def notify_countup_start() -> None:
+                # Check, if the notify_start variable is True
+                if result["notify_start"]:
+                    # Dispatch the NOTIFY_UI_COUNTUP_STARTED event
+                    dispatcher.dispatch(
+                        event=Events.NOTIFY_UI_COUNTUP_STARTED,
+                        namespace=namespace,
+                    )
+
+                # Set the notify_start variable to False
+                result["notify_start"] = False
+
+            def update_countup_label() -> None:
+                """
+                Updates the label displaying the elapsed time of the countup.
+
+                This function is scheduled to be called every 1000 milliseconds using the after method of the label widget.
+                """
+
+                # Update the text of the label
+                result["countup_label"].config(
+                    text=str(timedelta(seconds=result["seconds"])),
+                )
+
+                # Increment the seconds variable
+                result["seconds"] += 1
+
+                # Schedule the next call to update_countup_label
+                result["countup_label"].after(
+                    ms=1000,
+                    func=update_countup_label,
+                )
+
+            # Initialize the flag to notify the start of the countup
+            result["notify_start"] = True
+
+            # Initialize the seconds variable
+            result["seconds"] = 0
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(master=master)
+
+            # Configure the "Root" frame widget's 0th column to weight 1
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 1
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=1,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Information Label" label widget
+            result["information_label"] = cls.get_label(
+                master=result["root"],
+                text="Time elapsed: ",
+                **kwargs,
+            )
+
+            # Grid the "Information Label" label widget in the "Root" frame widget
+            result["information_label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Countdown Label" label widget
+            result["countdown_label"] = cls.get_label(
+                master=result["root"],
+                text="",
+                **kwargs,
+            )
+
+            # Grid the "Countdown Label" label widget in the "Root" frame widget
+            result["countdown_label"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Update the countup label
+            update_countup_label()
+
+            # Dispatch the NOTIFY_UI_COUNTUP_STARTED event
+            notify_countup_start()
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_countup' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
@@ -2323,6 +3094,9 @@ class UIBuilder:
             # Add the getter function to the result dictionary
             result["getter"] = get
 
+            # Wait for the window to be closed
+            result["root"].wait_window()
+
             # Return the result
             return result
         except Exception as e:
@@ -2363,7 +3137,7 @@ class UIBuilder:
             # Initialize the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            def on_button_click(string: str) -> None:
+            def on_button_click(string: Literal["okay", "cancel"]) -> None:
                 """
                 Called when any of the "Okay" or "Cancel" buttons is clicked.
 
@@ -2380,7 +3154,7 @@ class UIBuilder:
                 # Obtain an event based on the passed string
                 event: DispatcherEvent = (
                     Events.CANCEL_BUTTON_CLICKED
-                    if string == "Cancel"
+                    if string.lower() == "cancel"
                     else Events.OKAY_BUTTON_CLICKED
                 )
 
@@ -2535,6 +3309,12 @@ class UIBuilder:
 
             # Ring the bell
             result["root"].bell()
+
+            # Add the getter function to the result dictionary
+            result["getter"] = get
+
+            # Wait for the window to be closed
+            result["root"].wait_window()
 
             # Return the result
             return result

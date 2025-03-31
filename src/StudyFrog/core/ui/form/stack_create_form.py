@@ -147,7 +147,7 @@ class StackCreateForm(tkinter.Frame):
         okay["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -158,7 +158,7 @@ class StackCreateForm(tkinter.Frame):
         okay["message_label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -168,7 +168,7 @@ class StackCreateForm(tkinter.Frame):
         okay["title_label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -192,7 +192,7 @@ class StackCreateForm(tkinter.Frame):
         instruction_label: tkinter.Label = UIBuilder.get_label(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -289,7 +289,7 @@ class StackCreateForm(tkinter.Frame):
         notebook["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -308,7 +308,7 @@ class StackCreateForm(tkinter.Frame):
         notebook["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -318,7 +318,7 @@ class StackCreateForm(tkinter.Frame):
         # Create a combobox widget to select a stack
         self.ancestor_stack_field = UIBuilder.get_combobox_select_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Ancestor Stack: ",
@@ -364,7 +364,7 @@ class StackCreateForm(tkinter.Frame):
         # Create a single-line text field for the stack name.
         self.name: Dict[str, Any] = UIBuilder.get_single_line_text_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Name* : ",
@@ -402,7 +402,7 @@ class StackCreateForm(tkinter.Frame):
         # Create a stack field for the difficulty
         self.difficulty_field: Dict[str, Any] = UIBuilder.get_combobox_select_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Difficulty* : ",
@@ -447,7 +447,7 @@ class StackCreateForm(tkinter.Frame):
         # Create a stack field for the priority
         self.priority_field: Dict[str, Any] = UIBuilder.get_combobox_select_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Priority* : ",
@@ -490,7 +490,7 @@ class StackCreateForm(tkinter.Frame):
         # Create a multi-line text field for the stack description.
         self.description: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Description: ",
@@ -522,7 +522,7 @@ class StackCreateForm(tkinter.Frame):
         # Create a date entry widget for the due by date
         self.due_by: Dict[str, Any] = UIBuilder.get_date_entry(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Due by*: ",

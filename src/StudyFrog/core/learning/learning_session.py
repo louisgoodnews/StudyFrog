@@ -496,6 +496,7 @@ class LearningSessionFactory:
         children: Optional[List[str]] = None,
         contents: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
         end: Optional[datetime] = None,
         filters: Optional[List[Dict[str, Any]]] = None,
@@ -515,6 +516,7 @@ class LearningSessionFactory:
             children (Optional[List[str]], optional): The children of the learning session. Defaults to None.
             contents (Optional[List[str]], optional): The contents of the learning session. Defaults to None.
             created_at (Optional[datetime], optional): The timestamp when the learning session was created. Defaults to None.
+            custom_field_values (Optional[List[Dict[str, Any]]], optional): The custom field values of the learning session. Defaults to None.
             duration (Optional[float], optional): The duration of the learning session. Defaults to None.
             end (Optional[datetime], optional): The end time of the learning session. Defaults to None.
             filters (Optional[List[Dict[str, Any]]], optional): The filters applied to the learning session. Defaults to None.
@@ -539,6 +541,7 @@ class LearningSessionFactory:
                 children=children,
                 contents=contents,
                 created_at=created_at,
+                custom_field_values=custom_field_values,
                 duration=duration,
                 end=end,
                 filters=filters,

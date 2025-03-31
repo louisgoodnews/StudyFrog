@@ -128,7 +128,7 @@ class FlashcardCreateForm(tkinter.Frame):
         okay["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -139,7 +139,7 @@ class FlashcardCreateForm(tkinter.Frame):
         okay["message_label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -149,7 +149,7 @@ class FlashcardCreateForm(tkinter.Frame):
         okay["title_label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -206,7 +206,7 @@ class FlashcardCreateForm(tkinter.Frame):
         instruction_label: tkinter.Label = UIBuilder.get_label(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -290,7 +290,7 @@ class FlashcardCreateForm(tkinter.Frame):
         tabbed_view["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -300,7 +300,7 @@ class FlashcardCreateForm(tkinter.Frame):
         # Create a combobox widget to select a stack
         self.stack_field = UIBuilder.get_combobox_select_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Stack*: ",
@@ -338,7 +338,7 @@ class FlashcardCreateForm(tkinter.Frame):
         # Create a multi-line text field for the front text of the flashcard
         self.front_field: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Front Text*: ",
@@ -374,7 +374,7 @@ class FlashcardCreateForm(tkinter.Frame):
         # Create a multi-line text field for the back text of the flashcard
         self.back_field: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             label="Back Text*: ",

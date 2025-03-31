@@ -269,7 +269,7 @@ class StackViewForm(tkinter.Frame):
         self.name_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_single_line_text_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 label="Name*: ",
@@ -281,7 +281,7 @@ class StackViewForm(tkinter.Frame):
         self.name_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -309,7 +309,7 @@ class StackViewForm(tkinter.Frame):
         # Configure the name field
         self.name_field["entry"].configure(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
         )
@@ -317,7 +317,7 @@ class StackViewForm(tkinter.Frame):
         # Configure the name field
         self.name_field["label"].configure(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
         )
@@ -528,7 +528,7 @@ class StackViewForm(tkinter.Frame):
         tabbed_view["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -539,7 +539,7 @@ class StackViewForm(tkinter.Frame):
         self.description_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_multi_line_text_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Description: ",
@@ -551,7 +551,7 @@ class StackViewForm(tkinter.Frame):
         self.description_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -562,7 +562,7 @@ class StackViewForm(tkinter.Frame):
         self.description_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -612,7 +612,7 @@ class StackViewForm(tkinter.Frame):
         tabbed_view["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -684,7 +684,7 @@ class StackViewForm(tkinter.Frame):
         # Create a label widget to display the stack ID
         self.id_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="ID: ",
@@ -696,7 +696,7 @@ class StackViewForm(tkinter.Frame):
         self.id_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -717,7 +717,7 @@ class StackViewForm(tkinter.Frame):
         # Create a label widget to display the stack UUID
         self.uuid_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="UUID: ",
@@ -729,7 +729,7 @@ class StackViewForm(tkinter.Frame):
         self.uuid_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -750,7 +750,7 @@ class StackViewForm(tkinter.Frame):
         # Create a label widget to display the stack creation date
         self.created_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="Created at: ",
@@ -762,7 +762,7 @@ class StackViewForm(tkinter.Frame):
         self.created_at_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -783,7 +783,7 @@ class StackViewForm(tkinter.Frame):
         # Create a label widget to display the stack update date
         self.updated_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="Updated at: ",
@@ -795,7 +795,7 @@ class StackViewForm(tkinter.Frame):
         self.updated_at_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -836,7 +836,7 @@ class StackViewForm(tkinter.Frame):
         self.difficulty_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_combobox_select_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Difficulty*: ",
@@ -850,7 +850,7 @@ class StackViewForm(tkinter.Frame):
         self.difficulty_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -861,7 +861,7 @@ class StackViewForm(tkinter.Frame):
         self.difficulty_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -900,7 +900,7 @@ class StackViewForm(tkinter.Frame):
         self.priority_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_combobox_select_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Priority*: ",
@@ -914,7 +914,7 @@ class StackViewForm(tkinter.Frame):
         self.priority_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -925,7 +925,7 @@ class StackViewForm(tkinter.Frame):
         self.priority_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -1093,7 +1093,7 @@ class StackViewForm(tkinter.Frame):
             icon_label: tkinter.Label = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -1128,7 +1128,7 @@ class StackViewForm(tkinter.Frame):
             key_label: tkinter.Label = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -1184,7 +1184,7 @@ class StackViewForm(tkinter.Frame):
                 anchor=W,
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,

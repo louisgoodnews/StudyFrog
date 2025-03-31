@@ -101,13 +101,6 @@ class UnifiedObjectManager(ImmutableBaseObject):
         Returns:
             The method from the registered manager or raises AttributeError.
         """
-        if name in self.__dict__:
-            return self.__dict__[name]
-
-        if name.startswith("__"):
-            raise AttributeError(
-                f"'{self.__class__.__name__}' has no attribute '{name}'"
-            )
 
         # Iterate over the registered managers
         for manager in self.managers.values():
@@ -334,7 +327,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
         manager_instance: Optional[Any] = self.managers.get(manager, None)
 
         # Check if the manager instance is None
-        if manager_instance is None:
+        if not manager_instance:
             raise AttributeError(
                 f"Manager '{manager}' not found in UnifiedObjectManager."
             )

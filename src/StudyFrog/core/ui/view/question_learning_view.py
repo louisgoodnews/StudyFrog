@@ -1,6 +1,6 @@
 """
 Author: lodego
-Date: 2025-03-24
+Date: 2025-03-30
 """
 
 import tkinter
@@ -8,7 +8,7 @@ import tkinter
 from tkinter.constants import *
 from typing import *
 
-from core.note import ImmutableNote
+from core.question import ImmutableQuestion
 from core.setting import SettingService
 
 from core.ui.ui_builder import UIBuilder
@@ -19,26 +19,27 @@ from utils.events import Events
 from utils.logger import Logger
 
 
-__all__: Final[List[str]] = ["NoteLearningView"]
+__all__: Final[List[str]] = ["QuestionLearningView"]
 
 
-class NoteLearningView(tkinter.Frame):
+class QuestionLearningView(tkinter.Frame):
     def __init__(
         self,
         dispatcher: Dispatcher,
         master: tkinter.Misc,
         namespace: str,
+        question: ImmutableQuestion,
         setting_service: SettingService,
-        note: ImmutableNote,
     ) -> None:
         """
-        Initializes a new instance of the NoteLearningView class.
+        Initializes a new instance of the QuestionLearningView class.
 
         Args:
             dispatcher (Dispatcher): The dispatcher instance.
             master (tkinter.Misc): The parent widget.
+            namespace (str): The namespace.
             setting_service (SettingService): The setting service instance.
-            note (ImmutableNote): The note instance.
+            question (ImmutableQuestion): The question instance.
         """
 
         # Configure the grid of the master widget's 0th column to weight 1.
@@ -64,8 +65,8 @@ class NoteLearningView(tkinter.Frame):
         # Store the passed namespace in an instance variable
         self.namespace: str = namespace
 
-        # Store the passed note instance in an instance variable
-        self.note: ImmutableNote = note
+        # Store the passed question instance in an instance variable
+        self.question: ImmutableQuestion = question
 
         # Store the passed setting service instance in an instance variable
         self.setting_service: SettingService = setting_service
@@ -77,20 +78,20 @@ class NoteLearningView(tkinter.Frame):
         # Call the parent class constructor
         super().__init__(
             master=master,
-            name="note_learning_view",
+            name="question_learning_view",
         )
 
         # Style the frame
         self.configure(background=Constants.BLUE_GREY["700"])
 
-        # Configure the grid of the note learning form widget
+        # Configure the grid of the question learning form widget
         # This method is responsible for configuring the grid layout of the frame
         self.configure_grid()
 
-        # Create the widgets of the note learning form
+        # Create the widgets of the question learning form
         self.create_widgets()
 
-        # Place the note learning form widget in the parent widget
+        # Place the question learning form widget in the parent widget
         # This method is responsible for placing the frame in the parent widget
         self.grid(
             column=0,
@@ -100,9 +101,9 @@ class NoteLearningView(tkinter.Frame):
 
     def clear(self) -> None:
         """
-        Clears the content of the note learning view widget.
+        Clears the content of the question learning view widget.
 
-        This method clears the content of the note learning view widget by destroying
+        This method clears the content of the question learning view widget by destroying
         all its children widgets.
 
         Returns:
@@ -143,9 +144,9 @@ class NoteLearningView(tkinter.Frame):
 
     def configure_grid(self) -> None:
         """
-        Configures the grid of the note learning view widget.
+        Configures the grid of the question learning view widget.
 
-        This method configures the grid of the note learning view widget by setting
+        This method configures the grid of the question learning view widget by setting
         the weights of the columns and rows.
 
         The 0th column is configured to weight 1, which means that the column will
@@ -164,25 +165,25 @@ class NoteLearningView(tkinter.Frame):
             None
         """
 
-        # Configure the note learning view widget's 0th column to weight 1
+        # Configure the question learning view widget's 0th column to weight 1
         self.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the note learning view widget's 0th row to weight 0
+        # Configure the question learning view widget's 0th row to weight 0
         self.grid_rowconfigure(
             index=0,
             weight=0,
         )
 
-        # Configure the note learning view widget's 1st row to weight 1
+        # Configure the question learning view widget's 1st row to weight 1
         self.grid_rowconfigure(
             index=1,
             weight=1,
         )
 
-        # Configure the note learning view widget's 2nd row to weight 0
+        # Configure the question learning view widget's 2nd row to weight 0
         self.grid_rowconfigure(
             index=2,
             weight=0,
@@ -286,10 +287,10 @@ class NoteLearningView(tkinter.Frame):
 
     def create_widgets(self) -> None:
         """
-        Creates and configures the main widgets of the note learning view widget.
+        Creates and configures the main widgets of the question learning view widget.
 
         This method initializes the top, center, and bottom frames within the
-        note learning view widget, setting their layout configuration.
+        question learning view widget, setting their layout configuration.
         """
 
         # Create the top frame widget
@@ -321,7 +322,7 @@ class NoteLearningView(tkinter.Frame):
             weight=1,
         )
 
-        # Place the top frame widget within the note learning view widget
+        # Place the top frame widget within the question learning view widget
         top_frame.grid(
             column=0,
             row=0,
@@ -357,7 +358,7 @@ class NoteLearningView(tkinter.Frame):
             weight=1,
         )
 
-        # Place the center frame widget within the note learning view widget
+        # Place the center frame widget within the question learning view widget
         center_frame.grid(
             column=0,
             row=1,
@@ -393,7 +394,7 @@ class NoteLearningView(tkinter.Frame):
             weight=1,
         )
 
-        # Place the bottom frame widget within the note learning view widget
+        # Place the bottom frame widget within the question learning view widget
         bottom_frame.grid(
             column=0,
             row=2,

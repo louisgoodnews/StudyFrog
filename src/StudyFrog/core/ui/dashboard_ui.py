@@ -346,7 +346,7 @@ class DashboardUI(BaseUI):
                 type="stack",
             ),
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -376,7 +376,7 @@ class DashboardUI(BaseUI):
                 type="recent:staple",
             ),
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -498,7 +498,7 @@ class DashboardUI(BaseUI):
             master["my_new_stacks_button"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -522,7 +522,7 @@ class DashboardUI(BaseUI):
             master["recently_viewed_button"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -546,7 +546,7 @@ class DashboardUI(BaseUI):
             master["completed_stacks_button"].configure(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -634,7 +634,7 @@ class DashboardUI(BaseUI):
             label: tkinter.Label = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -743,7 +743,7 @@ class DashboardUI(BaseUI):
             label: tkinter.Label = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -853,7 +853,7 @@ class DashboardUI(BaseUI):
             label: tkinter.Label = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -996,7 +996,7 @@ class DashboardUI(BaseUI):
                 label: tkinter.Label = UIBuilder.get_label(
                     background=Constants.BLUE_GREY["700"],
                     font=(
-                        Constants.DEFAULT_FONT_FAMILIY,
+                        Constants.DEFAULT_FONT_FAMILY,
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
@@ -1105,7 +1105,7 @@ class DashboardUI(BaseUI):
         clock: Dict[str, Any] = UIBuilder.get_clock(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.LARGE_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -1153,7 +1153,7 @@ class DashboardUI(BaseUI):
         continue_label: tkinter.Label = UIBuilder.get_label(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.LARGE_FONT_SIZE,
             ),
             foreground=Constants.WHITE,

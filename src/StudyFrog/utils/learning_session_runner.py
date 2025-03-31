@@ -3,7 +3,13 @@ Author: lodego
 Date: 2025-03-29
 """
 
+from tkinter import N
 from typing import *
+
+from core.learning.learning_session import (
+    ImmutableLearningSession,
+    LearningSessionBuilder,
+)
 
 from core.answer import ImmutableAnswer, MutableAnswer
 from core.difficulty import ImmutableDifficulty
@@ -12,6 +18,7 @@ from core.note import ImmutableNote, MutableNote
 from core.priority import ImmutablePriority
 from core.question import ImmutableQuestion, MutableQuestion
 from core.stack import ImmutableStack, MutableStack
+from core.status import ImmutableStatus
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
@@ -44,6 +51,7 @@ class LearningSessionRunner:
         cls,
         difficulties: List[Union[ImmutableDifficulty]],
         dispatcher: Dispatcher,
+        namespace: str,
         priorities: List[Union[ImmutablePriority]],
         stacks: List[Union[ImmutableStack, MutableStack]],
     ) -> "LearningSessionRunner":
@@ -58,6 +66,7 @@ class LearningSessionRunner:
         Args:
             difficulties (List[Union[ImmutableDifficulty, MutableDifficulty]]): The difficulties to be used by the runner.
             dispatcher (Dispatcher): The dispatcher instance to be used by the runner.
+            namespace (str): The namespace to be used by the runner.
             priorities (List[Union[ImmutablePriority, MutablePriority]]): The priorities to be used by the runner.
             stacks (List[Union[ImmutableStack, MutableStack]]): The stacks to be used by the runner.
 
@@ -73,6 +82,7 @@ class LearningSessionRunner:
             cls._shared_instance.init(
                 difficulties=difficulties,
                 dispatcher=dispatcher,
+                namespace=namespace,
                 priorities=priorities,
                 stacks=stacks,
             )
@@ -83,6 +93,7 @@ class LearningSessionRunner:
         self,
         difficulties: List[Union[ImmutableDifficulty]],
         dispatcher: Dispatcher,
+        namespace: str,
         priorities: List[Union[ImmutablePriority]],
         stacks: List[Union[ImmutableStack, MutableStack]],
     ) -> None:
@@ -95,6 +106,7 @@ class LearningSessionRunner:
         Args:
             difficulties (List[Union[ImmutableDifficulty]]): The difficulties to be used by the runner.
             dispatcher (Dispatcher): The dispatcher instance.
+            namespace (str): The namespace to be used by the runner.
             priorities (List[Union[ImmutablePriority]]): The priorities to be used by the runner.
             stacks (List[Union[ImmutableStack, MutableStack]]): The stacks to be used by the runner.
 
@@ -108,6 +120,9 @@ class LearningSessionRunner:
         # Initialize an empty list to store the session's contents
         self.contents: Final[List[str]] = []
 
+        # Initialize the current content index
+        self.content_index: int = -1
+
         # Store the passed difficulty list in an immutable instance variable
         self.difficulties: Final[List[Union[ImmutableDifficulty]]] = difficulties
 
@@ -117,17 +132,35 @@ class LearningSessionRunner:
         # Initialize an empty list to store the session's items
         self.items: Final[List[str]] = []
 
+        # Initialize the current item index
+        self.item_index: int = -1
+
+        # Store the passed namespace in an immutable instance variable
+        self.namespace: Final[str] = namespace
+
         # Store the passed priority list in an immutable instance variable
         self.priorities: Final[List[Union[ImmutablePriority]]] = priorities
 
         # Store the passed stack list in an immutable instance variable
         self.stacks: Final[List[Union[ImmutableStack, MutableStack]]] = stacks
 
+        # Initialize an empty list to store the subscription UUIDs
+        self.subscriptions: Final[List[str]] = []
+
         # Subscribe to events
         self.subscribe_to_events()
 
         # Apply filters
         self.apply_filters()
+
+        # Create a learning session
+        self.create_learning_session()
+
+        # Dispatch a notification to indicate that the learning session runner has been loaded
+        self.dispatcher.dispatch(
+            event=Events.NOTIFY_LEARNING_SESSION_RUNNER_LOADED,
+            namespace=self.namespace,
+        )
 
     def apply_filters(self) -> None:
         """
@@ -157,7 +190,7 @@ class LearningSessionRunner:
                 keys=keys,
             )
 
-            if notification is None:
+            if not notification:
                 # Log a warning message indicating that something went wrong
                 self.logger.warning(
                     message=f"Failed to get contents for stacks: {', '.join(stack.__repr__ for stack in self.stacks)}"
@@ -180,8 +213,8 @@ class LearningSessionRunner:
                 # Return early
                 return
 
-            if self.difficulties:
-                # Filter the contents based on the difficulties
+            # Filter the contents based on the difficulties
+            if len(self.difficulties) > 0:
                 contents = [
                     content
                     for content in contents
@@ -189,8 +222,8 @@ class LearningSessionRunner:
                     in [difficulty.id for difficulty in self.difficulties]
                 ]
 
-            if self.priorities:
-                # Filter the contents based on the priorities
+            # Filter the contents based on the priorities
+            if len(self.priorities) > 0:
                 contents = [
                     content
                     for content in contents
@@ -222,10 +255,372 @@ class LearningSessionRunner:
         """
 
         # Initialize an empty list to store subscriptions
-        subscriptions: List[Dict[str, Any]] = []
+        subscriptions: List[Dict[str, Any]] = [
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_RUNNER_LOAD_NEXT_ITEM,
+                "function": self.on_request_learning_session_runner_load_next_item,
+                "namespace": self.namespace,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_RUNNER_LOAD_PREVIOUS_ITEM,
+                "function": self.on_request_learning_session_runner_load_previous_item,
+                "namespace": self.namespace,
+                "persistent": True,
+            },
+            {
+                "event": Events.NOTIFY_FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED,
+                "function": self.on_notify_flashcard_learning_view_flashcard_flipped,
+                "namespace": self.namespace,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_RUNNER_GET_INDEX_AND_LIMIT,
+                "function": self.on_request_learning_session_runner_get_index_and_limit,
+                "namespace": self.namespace,
+                "persistent": True,
+            },
+            {
+                "event": Events.NOTIFY_LEARNING_SESSION_DIFFICULTY_BUTTON_CLICKED,
+                "function": self.on_notify_learning_session_difficulty_button_clicked,
+                "namespace": self.namespace,
+                "persistent": True,
+            },
+        ]
 
         # Return the collected subscriptions
         return subscriptions
+
+    def create_learning_session(self) -> None:
+        """
+        Creates a learning session.
+
+        This method creates a learning session with the contents and filters
+        specified in the class instance. It first creates a builder instance
+        and then sets the contents and filters using the builder's methods.
+        Finally, it attempts to build the learning session and stores the
+        built learning session in the class instance.
+
+        Returns:
+            None: This method does not return any value.
+        """
+
+        # Dispatch a request to lookup the status of the learning session
+        status_notification: Optional[DispatcherNotification] = (
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                name="new",
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+        )
+
+        # Check if the notification is None
+        if not status_notification:
+            # Log a warning message indicating that something went wrong
+            self.logger.warning(message="Failed to create learning session")
+
+            # Return early
+            return
+
+        # Get the status of the learning session
+        status: Optional[ImmutableStatus] = (
+            status_notification.get_one_and_only_result()
+        )
+
+        # Check if the status is None
+        if not status:
+            # Log a warning message indicating that something went wrong
+            self.logger.warning(message="Failed to create learning session")
+
+            # Return early
+            return
+
+        # Create a builder instance
+        builder: LearningSessionBuilder = LearningSessionBuilder()
+
+        # Set the children of the learning session
+        # The children are set to an empty list
+        builder.children(value=[])
+
+        # Set the contents of the learning session
+        # The contents are set to the contents of the stacks
+        builder.contents(value=self.contents)
+
+        # Set the filters of the learning session
+        # The filters are set to the difficulties and priorities
+        builder.filters(
+            value={
+                # Set the difficulty filter
+                "difficulty": [difficulty.id for difficulty in self.difficulties],
+                # Set the priority filter
+                "priority": [priority.id for priority in self.priorities],
+            }
+        )
+
+        # Set the stacks of the learning session
+        # The stacks are set to the stacks of the learning session
+        builder.stacks(value=[stack.id for stack in self.stacks])
+
+        # Set the start of the learning session
+        # The start is set to the current datetime
+        builder.start(value=Miscellaneous.get_current_datetime())
+
+        # Set the status of the learning session
+        # The status is set to the status of the learning session
+        builder.status(value=status.get(name="id"))
+
+        # Dispatch the request to create the learning session
+        create_notification: Optional[DispatcherNotification] = (
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_LEARNING_SESSION_CREATE,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                learning_session=builder.build(),
+            )
+        )
+
+        # Check if the notification is None
+        if not create_notification:
+            # Log a warning message indicating that something went wrong
+            self.logger.warning(message="Failed to create learning session")
+
+            # Return early
+            return
+
+        # The learning session is retrieved from the notification
+        self.learning_session: ImmutableLearningSession = (
+            create_notification.get_one_and_only_result()
+        )
+
+    def is_running(self) -> bool:
+        """
+        Determines if the learning session is currently running.
+
+        This method dispatches a request to check the status of the learning session
+        and verifies if it is 'completed'. If the status lookup fails or the status
+        is not 'completed', it logs a warning and returns False.
+
+        Returns:
+            bool: True if the learning session is running, False otherwise.
+        """
+        try:
+            # Dispatch a request to lookup the 'completed' status
+            status_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STATUS_LOOKUP,
+                    name="completed",
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            )
+
+            # Check if the notification is None
+            if not status_notification:
+                # Log a warning message about the failed lookup
+                self.logger.warning(
+                    message=f"Failed to lookup 'completed' status in {self.__class__.__name__}"
+                )
+                return False
+
+            # Retrieve the status of the learning session
+            status: Optional[ImmutableStatus] = (
+                status_notification.get_one_and_only_result()
+            )
+
+            # Verify if the status is None
+            if not status:
+                # Log a warning message about the failed lookup
+                self.logger.warning(
+                    message=f"Failed to lookup 'completed' status in {self.__class__.__name__}"
+                )
+                return False
+
+            # Check if the learning session's status matches 'completed' status
+            return self.learning_session.status == status.id
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'is_running' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Return False indicating an exception occurred
+            return False
+
+    def on_notify_flashcard_learning_view_flashcard_flipped(
+        self,
+        flashcard: ImmutableFlashcard,
+    ) -> None:
+        try:
+            self.logger.debug(
+                message=f"{self.__class__.__name__} received notification that the flashcard with key '{flashcard.key}' has been flipped"
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_notify_learning_session_difficulty_button_clicked(
+        self,
+        difficulty: Literal["easy", "medium", "hard"],
+    ) -> None:
+        try:
+            self.logger.debug(
+                message=f"{self.__class__.__name__} received notification that the difficulty button with key '{difficulty}' has been clicked"
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_notify_learning_session_difficulty_button_clicked' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_request_learning_session_runner_get_index_and_limit(self) -> Tuple[int, int]:
+        """
+        Handles the 'request_learning_session_runner_get_index_and_limit' event and gets the current index and limit of the learning session runner.
+
+        This event is dispatched by the learning session UI when it needs to render the learning session runner.
+
+        Returns:
+            Tuple[int, int]: The index and limit of the learning session runner.
+        """
+        return (
+            # Return the current index
+            self.content_index,
+            # Return the length of the contents
+            len(self.contents),
+        )
+
+    def on_request_learning_session_runner_load_next_item(
+        self,
+    ) -> Optional[
+        Union[
+            ImmutableFlashcard,
+            ImmutableNote,
+            Tuple[ImmutableQuestion, List[ImmutableAnswer]],
+        ]
+    ]:
+        """
+        Handles the 'request_learning_session_runner_load_next_item' event and loads the next item in the learning session's item list.
+
+        This event is dispatched by the learning session UI when the user navigates to the next item in the learning session.
+
+        Returns:
+            Optional[Union[ImmutableFlashcard, ImmutableNote, Tuple[ImmutableQuestion, List[ImmutableAnswer]]]]: The loaded item if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Increment the content index
+            self.content_index += 1
+
+            # Check if the content index is out of bounds
+            if self.content_index >= len(self.contents):
+                # Log a warning message about the out of bounds index
+                self.logger.warning(
+                    message=f"Content index {self.content_index} is out of bounds in {self.__class__.__name__}. This is likely a bug."
+                )
+
+                # Reset the content index to the last valid index
+                self.content_index = len(self.contents) - 1
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Dispatch a request to lookup the item by key
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_BY_KEY,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                key=self.contents[self.content_index],
+            )
+
+            # Check if the notification is None
+            if not notification:
+                # Log a warning message about the failed lookup
+                self.logger.warning(
+                    message=f"Failed to lookup item with key '{self.contents[self.content_index]}' in database in {self.__class__.__name__}. This is likely a bug."
+                )
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Return the item
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_request_learning_session_runner_load_next_item' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
+
+    def on_request_learning_session_runner_load_previous_item(self) -> Optional[
+        Union[
+            ImmutableFlashcard,
+            ImmutableNote,
+            Tuple[ImmutableQuestion, List[ImmutableAnswer]],
+        ]
+    ]:
+        """
+        Handles the 'request_learning_session_runner_load_previous_item' event and loads the previous item in the learning session.
+
+        This event is dispatched by the learning session UI when the user navigates to the previous item in the learning session.
+
+        Returns:
+            Optional[Union[ImmutableFlashcard, ImmutableNote, Tuple[ImmutableQuestion, List[ImmutableAnswer]]]]: The item that was loaded if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Decrement the content index
+            self.content_index -= 1
+
+            # Check if the content index is out of bounds
+            if self.content_index < 0:
+                # Log a warning message about the out of bounds index
+                self.logger.warning(
+                    message=f"Content index {self.content_index} is out of bounds in {self.__class__.__name__}. This is likely a bug."
+                )
+
+                # Reset the content index to 0
+                self.content_index = 0
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Dispatch a request to lookup the item by key
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_BY_KEY,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                key=self.contents[self.content_index],
+            )
+
+            # Check if the notification is None
+            if not notification:
+                # Log a warning message about the failed lookup
+                self.logger.warning(
+                    message=f"Failed to lookup item with key '{self.contents[self.content_index]}' in database in {self.__class__.__name__}. This is likely a bug."
+                )
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Return the item
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_request_learning_session_runner_load_previous_item' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
 
     def subscribe_to_events(self) -> None:
         """

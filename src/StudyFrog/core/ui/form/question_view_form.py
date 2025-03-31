@@ -267,7 +267,7 @@ class QuestionViewForm(tkinter.Frame):
         self.question_text_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_scrolled_text_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 label="Name*: ",
@@ -279,7 +279,7 @@ class QuestionViewForm(tkinter.Frame):
         self.question_text_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -309,7 +309,7 @@ class QuestionViewForm(tkinter.Frame):
         # Configure the name field
         self.question_text_field["label"].configure(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
         )
@@ -520,7 +520,7 @@ class QuestionViewForm(tkinter.Frame):
         tabbed_view["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -531,7 +531,7 @@ class QuestionViewForm(tkinter.Frame):
         self.description_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_multi_line_text_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Description: ",
@@ -543,7 +543,7 @@ class QuestionViewForm(tkinter.Frame):
         self.description_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -554,7 +554,7 @@ class QuestionViewForm(tkinter.Frame):
         self.description_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -604,7 +604,7 @@ class QuestionViewForm(tkinter.Frame):
         tabbed_view["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -676,7 +676,7 @@ class QuestionViewForm(tkinter.Frame):
         # Create a label widget to display the question ID
         self.id_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="ID: ",
@@ -688,7 +688,7 @@ class QuestionViewForm(tkinter.Frame):
         self.id_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -709,7 +709,7 @@ class QuestionViewForm(tkinter.Frame):
         # Create a label widget to display the question UUID
         self.uuid_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="UUID: ",
@@ -721,7 +721,7 @@ class QuestionViewForm(tkinter.Frame):
         self.uuid_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -742,7 +742,7 @@ class QuestionViewForm(tkinter.Frame):
         # Create a label widget to display the question creation date
         self.created_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="Created at: ",
@@ -754,7 +754,7 @@ class QuestionViewForm(tkinter.Frame):
         self.created_at_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -775,7 +775,7 @@ class QuestionViewForm(tkinter.Frame):
         # Create a label widget to display the question update date
         self.updated_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             label="Updated at: ",
@@ -787,7 +787,7 @@ class QuestionViewForm(tkinter.Frame):
         self.updated_at_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -828,7 +828,7 @@ class QuestionViewForm(tkinter.Frame):
         self.difficulty_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_combobox_select_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Difficulty*: ",
@@ -842,7 +842,7 @@ class QuestionViewForm(tkinter.Frame):
         self.difficulty_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -853,7 +853,7 @@ class QuestionViewForm(tkinter.Frame):
         self.difficulty_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -892,7 +892,7 @@ class QuestionViewForm(tkinter.Frame):
         self.priority_field: Optional[Dict[str, Any]] = (
             UIBuilder.get_combobox_select_field(
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
                 ),
                 label="Priority*: ",
@@ -906,7 +906,7 @@ class QuestionViewForm(tkinter.Frame):
         self.priority_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -917,7 +917,7 @@ class QuestionViewForm(tkinter.Frame):
         self.priority_field["label"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
-                Constants.DEFAULT_FONT_FAMILIY,
+                Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
@@ -1079,7 +1079,7 @@ class QuestionViewForm(tkinter.Frame):
             icon_label: tkinter.Label = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -1114,7 +1114,7 @@ class QuestionViewForm(tkinter.Frame):
             key_label: tkinter.Label = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
@@ -1170,7 +1170,7 @@ class QuestionViewForm(tkinter.Frame):
                 anchor=W,
                 background=Constants.BLUE_GREY["700"],
                 font=(
-                    Constants.DEFAULT_FONT_FAMILIY,
+                    Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
