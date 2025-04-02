@@ -50,7 +50,7 @@ class ImmutableStack(ImmutableBaseObject):
         name (str): The name of the stack.
         priority (int): The priority of the stack.
         status (int): The status of the stack.
-        tags (List[int]): The IDs of the tags associated with the stack.
+        tags (List[str]): The keys of the tags associated with the stack.
         updated_at (datetime): The timestamp when the stack was last updated.
         uuid (str): The UUID of the stack.
     """
@@ -72,7 +72,7 @@ class ImmutableStack(ImmutableBaseObject):
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
-        tags: Optional[List[int]] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -95,7 +95,7 @@ class ImmutableStack(ImmutableBaseObject):
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
             priority (Optional[int]): The ID of the priority associated with the stack.
             status (Optional[int]): The ID of the status associated with the stack.
-            tags (Optional[List[int]]): The IDs of the tags associated with the stack.
+            tags (Optional[List[str]]): The keys of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
         """
@@ -122,6 +122,61 @@ class ImmutableStack(ImmutableBaseObject):
             uuid=uuid,
         )
 
+    def get_content_grouped_by(
+        self,
+        type_key: Literal[
+            "flashcard",
+            "note",
+            "question",
+        ],
+    ) -> List[str]:
+        """
+        Returns a list of the contents of the stack grouped by the given key.
+
+        Args:
+            type_key (Literal["flashcard", "note", "question"]): The key to group the contents by.
+
+        Returns:
+            List[str]: A list of the contents of the stack grouped by the given key.
+        """
+
+        # Check if the stack has content
+        if not self.has_contents():
+            # Return an empty list if the stack has no content
+            return []
+
+        # Return the list of the contents of the stack grouped by the given key
+        return [
+            key
+            for key in self.get(
+                default=[],
+                name="contents",
+            )
+            if key.lower().startswith(type_key)
+        ]
+
+    def has_ancestor(self) -> bool:
+        """
+        Returns True if the stack has an ancestor, False otherwise.
+
+        Returns:
+            bool: True if the stack has an ancestor, False otherwise.
+        """
+
+        # Check if the stack has an ancestor
+        return self.ancestor is not None
+
+    def has_contents(self) -> bool:
+        """
+        Returns True if the stack has contents, False otherwise.
+
+        Returns:
+            bool: True if the stack has contents, False otherwise.
+        """
+
+        # Check if the stack has contents
+        return self.contents is not None and len(self.contents) > 0
+
     def has_descendants(self) -> bool:
         """
         Returns True if the stack has descendants, False otherwise.
@@ -133,6 +188,72 @@ class ImmutableStack(ImmutableBaseObject):
         # Check if the stack has descendants
         return self.descendants is not None and len(self.descendants) > 0
 
+    def is_ancestor_of(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Returns True if the stack is an ancestor of the given key, False otherwise.
+
+        Args:
+            key (str): The key of the stack.
+
+        Returns:
+            bool: True if the stack is an ancestor of the given key, False otherwise.
+        """
+
+        # Check if the stack has descendants
+        if not self.has_descendants():
+            # Return False if the stack has no descendants
+            return False
+
+        # Check if the stack is an ancestor of the given key
+        return key in self.descendants
+
+    def is_content_of(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Returns True if the given key is a content of the stack, False otherwise.
+
+        Args:
+            key (str): The key of the content.
+
+        Returns:
+            bool: True if the given key is a content of the stack, False otherwise.
+        """
+
+        # Check if the stack has content
+        if not self.has_contents():
+            # Return False if the stack has no content
+            return False
+
+        # Check if the stack is a content of the given key
+        return key in self.contents
+
+    def is_descendant_of(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Returns True if the stack is a descendant of the given key, False otherwise.
+
+        Args:
+            key (str): The key of the stack.
+
+        Returns:
+            bool: True if the stack is a descendant of the given key, False otherwise.
+        """
+
+        # Check if the stack has an ancestor
+        if not self.has_ancestor():
+            # Return False if the stack has no ancestor
+            return False
+
+        # Check if the stack is a descendant of the given key
+        return key == self.ancestor
+
     def to_mutable(self) -> "MutableStack":
         """
         Returns a mutable copy of the ImmuutableStack instance.
@@ -140,15 +261,23 @@ class ImmutableStack(ImmutableBaseObject):
         Returns:
             MutableStack: A mutable copy of the ImmuutableStack instance.
         """
-
-        # Create a new MutableStack instance from the dictionary representation of the ImmutableStack instance
-        return MutableStack(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new MutableStack instance from the dictionary representation of the ImmutableStack instance
+            return MutableStack(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
 
 
 class MutableStack(MutableBaseObject):
@@ -195,7 +324,7 @@ class MutableStack(MutableBaseObject):
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
-        tags: Optional[List[int]] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -218,7 +347,7 @@ class MutableStack(MutableBaseObject):
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
             status (Optional[int]): The status of the stack.
-            tags (Optional[List[int]]): The IDs of the tags associated with the stack.
+            tags (Optional[List[str]]): The keys of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
 
@@ -250,13 +379,13 @@ class MutableStack(MutableBaseObject):
 
     def add_to_contents(
         self,
-        obj: Any,
+        content: Any,
     ) -> None:
         """
         Adds a given object to the contents of the stack.
 
         Args:
-            obj (Any): The object to add to the contents of the stack.
+            content (Any): The object to add to the contents of the stack.
         """
 
         # If the stack currently has no contents, create an empty list
@@ -265,17 +394,17 @@ class MutableStack(MutableBaseObject):
             self["contents"] = []
 
         # Append the key of the given object to the stack's contents
-        self["contents"].append(obj.key)
+        self["contents"].append(content.key)
 
     def add_to_descendants(
         self,
-        obj: Any,
+        descendant: Any,
     ) -> None:
         """
         Adds a given object to the descendants of the stack.
 
         Args:
-            obj (Any): The object to add to the descendants of the stack.
+            descendant (Any): The object to add to the descendants of the stack.
         """
 
         # If the stack currently has no descendants, create an empty list
@@ -284,7 +413,62 @@ class MutableStack(MutableBaseObject):
             self["descendants"] = []
 
         # Append the key of the given object to the stack's descendants
-        self["descendants"].append(obj.key)
+        self["descendants"].append(descendant.key)
+
+    def get_content_grouped_by(
+        self,
+        type_key: Literal[
+            "flashcard",
+            "note",
+            "question",
+        ],
+    ) -> List[str]:
+        """
+        Returns a list of the contents of the stack grouped by the given key.
+
+        Args:
+            type_key (Literal["flashcard", "note", "question"]): The key to group the contents by.
+
+        Returns:
+            List[str]: A list of the contents of the stack grouped by the given key.
+        """
+
+        # Check if the stack has content
+        if not self.has_contents():
+            # Return an empty list if the stack has no content
+            return []
+
+        # Return the list of the contents of the stack grouped by the given key
+        return [
+            key
+            for key in self.get(
+                default=[],
+                name="contents",
+            )
+            if key.lower().startswith(type_key)
+        ]
+
+    def has_ancestor(self) -> bool:
+        """
+        Returns True if the stack has an ancestor, False otherwise.
+
+        Returns:
+            bool: True if the stack has an ancestor, False otherwise.
+        """
+
+        # Check if the stack has an ancestor
+        return self.ancestor is not None
+
+    def has_contents(self) -> bool:
+        """
+        Returns True if the stack has contents, False otherwise.
+
+        Returns:
+            bool: True if the stack has contents, False otherwise.
+        """
+
+        # Check if the stack has contents
+        return self.contents is not None and len(self.contents) > 0
 
     def has_descendants(self) -> bool:
         """
@@ -297,15 +481,81 @@ class MutableStack(MutableBaseObject):
         # Check if the stack has descendants
         return self.descendants is not None and len(self.descendants) > 0
 
+    def is_ancestor_of(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Returns True if the stack is an ancestor of the given key, False otherwise.
+
+        Args:
+            key (str): The key of the stack.
+
+        Returns:
+            bool: True if the stack is an ancestor of the given key, False otherwise.
+        """
+
+        # Check if the stack has descendants
+        if not self.has_descendants():
+            # Return False if the stack has no descendants
+            return False
+
+        # Check if the stack is an ancestor of the given key
+        return key in self.descendants
+
+    def is_content_of(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Returns True if the given key is a content of the stack, False otherwise.
+
+        Args:
+            key (str): The key of the content.
+
+        Returns:
+            bool: True if the given key is a content of the stack, False otherwise.
+        """
+
+        # Check if the stack has content
+        if not self.has_contents():
+            # Return False if the stack has no content
+            return False
+
+        # Check if the stack is a content of the given key
+        return key in self.contents
+
+    def is_descendant_of(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Returns True if the stack is a descendant of the given key, False otherwise.
+
+        Args:
+            key (str): The key of the stack.
+
+        Returns:
+            bool: True if the stack is a descendant of the given key, False otherwise.
+        """
+
+        # Check if the stack has an ancestor
+        if not self.has_ancestor():
+            # Return False if the stack has no ancestor
+            return False
+
+        # Check if the stack is a descendant of the given key
+        return key == self.ancestor
+
     def remove_from_contents(
         self,
-        obj: Any,
+        content: Any,
     ) -> None:
         """
         Removes a given object from the contents of the stack.
 
         Args:
-            obj (Any): The object to remove from the contents of the stack.
+            content (Any): The object to remove from the contents of the stack.
         """
 
         # If the stack currently has no contents, return
@@ -314,7 +564,7 @@ class MutableStack(MutableBaseObject):
             return
 
         # Remove the key of the given object from the stack's contents
-        self["contents"].remove(obj.key)
+        self["contents"].remove(content.key)
 
     def remove_from_descendants(
         self,
@@ -342,15 +592,23 @@ class MutableStack(MutableBaseObject):
         Returns:
             ImmutableStack: A immutable copy of the MutableStack instance.
         """
-
-        # Create a new ImmutableStack instance from the dictionary representation of the MutableStack instance
-        return ImmutableStack(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new ImmutableStack instance from the dictionary representation of the MutableStack instance
+            return ImmutableStack(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
 
 
 class StackConverter:
@@ -466,7 +724,7 @@ class StackFactory:
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
-        tags: Optional[List[int]] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableStack]:
@@ -489,7 +747,7 @@ class StackFactory:
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
             status (Optional[int]): The status of the stack.
-            tags (Optional[List[int]]): The IDs of the tags associated with the stack.
+            tags (Optional[List[str]]): The keys of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
 
@@ -630,6 +888,9 @@ class StackManager(BaseObjectManager):
             # Set the key of the stack
             stack.key = f"STACK_{self.count_stacks() + 1}"
 
+            # Set the tags of the stack
+            stack.tags = [] or stack.tags
+
             # Set the updated_at timestamp of the stack
             stack.updated_at = Miscellaneous.get_current_datetime()
 
@@ -725,6 +986,51 @@ class StackManager(BaseObjectManager):
 
             # Return False indicating an exception has occurred
             return False
+
+    def get_from_stacks(
+        self,
+        condition: Callable[[ImmutableStack], bool],
+        limit: Optional[int] = None,
+    ) -> Optional[List[ImmutableStack]]:
+        """
+        Returns a list of stacks from the cache that match the given condition.
+
+        Args:
+            condition (Callable[[ImmutableStack], bool]): A function that takes an ImmutableStack instance and returns a boolean value.
+            limit (Optional[int]): The maximum number of stacks to return.
+
+        Returns:
+            Optional[ImmutableStack]: The stack that matches the given condition if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Initialize an empty list to store matching stacks
+            result: List[ImmutableStack] = []
+
+            # Get all stacks from the cache
+            stacks: List[ImmutableStack] = self.get_all_stacks()
+
+            # Iterate over the list of immutable stacks in the cache
+            for stack in stacks:
+                # Check if the stack matches the given condition
+                if condition(stack):
+                    # Add the stack that matches the given condition to the result list
+                    result.append(stack)
+
+            # Check if the limit is specified and if the result list exceeds the limit
+            if limit is not None and len(result) > limit:
+                # Return the first 'limit' number of stacks
+                return result[:limit]
+
+            # Return the list of matching stacks
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_from_stacks' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
 
     def get_all_stacks(self) -> Optional[List[ImmutableStack]]:
         """
@@ -1435,7 +1741,7 @@ class StackModel(ImmutableBaseModel):
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[Literal["New", "Learning", "Review", "Completed"]] = None,
-        tags: Optional[List[int]] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1458,7 +1764,7 @@ class StackModel(ImmutableBaseModel):
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
             status (Optional[int]): The ID of the status of the stack.
-            tags (Optional[List[int]]): The IDs of the tags associated with the stack.
+            tags (Optional[List[str]]): The keys of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
 

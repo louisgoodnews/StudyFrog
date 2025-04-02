@@ -50,6 +50,8 @@ class ImmutableQuestion(ImmutableBaseObject):
         status (int): The status of the question.
         question_text (str): The text of the question.
         question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
+        status (int): The status of the question.
+        tags (Optional[List[str]]): The tags associated with the question.
         updated_at (datetime): The timestamp when the question was last updated.
         uuid (str): The UUID of the question.
     """
@@ -69,6 +71,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -89,7 +92,7 @@ class ImmutableQuestion(ImmutableBaseObject):
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
             priority (Optional[int]): The priority of the question.
             status (Optional[int]): The status of the question.
-            status (Optional[int]): The status of the question.
+            tags (Optional[List[str]]): The tags associated with the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -112,6 +115,7 @@ class ImmutableQuestion(ImmutableBaseObject):
             question_text=question_text,
             question_type=question_type,
             status=status,
+            tags=tags,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -123,15 +127,21 @@ class ImmutableQuestion(ImmutableBaseObject):
         Returns:
             MutableQuestion: The mutable version of the immutable question.
         """
-
-        # Create a new MutableQuestion instance from the dictionary representation of the ImmutableQuestion instance
-        return MutableQuestion(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new MutableQuestion instance from the dictionary representation of the ImmutableQuestion instance
+            return MutableQuestion(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}")
+            
+            # Return None indicating an exception has occurred
+            return None
 
 
 class MutableQuestion(MutableBaseObject):
@@ -152,6 +162,8 @@ class MutableQuestion(MutableBaseObject):
         status (int): The status of the question.
         question_text (str): The text of the question.
         question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
+        status (int): The status of the question.
+        tags (Optional[List[str]]): The tags associated with the question.
         updated_at (datetime): The timestamp when the question was last updated.
         uuid (str): The UUID of the question.
     """
@@ -171,6 +183,7 @@ class MutableQuestion(MutableBaseObject):
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -191,6 +204,7 @@ class MutableQuestion(MutableBaseObject):
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
             priority (Optional[int]): The priority of the question.
             status (Optional[int]): The status of the question.
+            tags (Optional[List[str]]): The tags associated with the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -213,6 +227,7 @@ class MutableQuestion(MutableBaseObject):
             question_text=question_text,
             question_type=question_type,
             status=status,
+            tags=tags,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -462,6 +477,7 @@ class QuestionFactory:
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> MutableQuestion:
@@ -482,6 +498,7 @@ class QuestionFactory:
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
             priority (Optional[int]): The priority of the question.
             status (Optional[int]): The status of the question.
+            tags (Optional[List[str]]): The tags associated with the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -504,6 +521,7 @@ class QuestionFactory:
                 question_text=question_text,
                 question_type=question_type,
                 status=status,
+                tags=tags,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -713,6 +731,16 @@ class QuestionBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+    def tags(
+        self,
+        value: Optional[List[str]] = None,
+    ) -> Self:
+        # Set the tags value in the configuration dictionary
+        self.configuration["tags"] = value
+
+        # Return the builder instance
+        return self
+
     def updated_at(
         self,
         value: Optional[datetime] = None,
@@ -813,6 +841,9 @@ class QuestionManager(BaseObjectManager):
 
             # Set the key of the question
             question.key = f"QUESTION_{self.count_questions() + 1}"
+
+            # Set the tags of the question
+            question.tags = [] or question.tags
 
             # Set the updated_at timestamp of the question
             question.updated_at = Miscellaneous.get_current_datetime()
@@ -1360,7 +1391,7 @@ class QuestionModel(ImmutableBaseModel):
         question_text (Field): The text of the question.
         question_type (Field): The type of the question.
         status (Field): The status of the question.
-        table (str): The table name of the question model.
+        tags (Field): The tags associated with the question.
         updated_at (Field): The timestamp when the question was last updated.
         uuid (Field): The UUID of the question.
     """
@@ -1575,6 +1606,22 @@ class QuestionModel(ImmutableBaseModel):
         unique=False,
     )
 
+    tags: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="tags",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     updated_at: Field = Field(
         autoincrement=False,
         default=None,
@@ -1624,6 +1671,7 @@ class QuestionModel(ImmutableBaseModel):
             Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]
         ] = None,
         status: Optional[int] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1644,6 +1692,7 @@ class QuestionModel(ImmutableBaseModel):
             question_text (Optional[str]): The text of the question.
             question_type (Optional[Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]]): The type of the question.
             status (Optional[int]): The ID of the status of the question.
+            tags (Optional[List[str]]): The tags associated with the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -1667,6 +1716,7 @@ class QuestionModel(ImmutableBaseModel):
             question_type=question_type,
             status=status,
             table=Constants.QUESTIONS,
+            tags=tags,
             updated_at=updated_at,
             uuid=uuid,
         )

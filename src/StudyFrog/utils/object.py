@@ -324,9 +324,13 @@ class MutableBaseObject:
     def get(
         self,
         name: str,
+        default: Optional[Any] = None,
     ) -> Optional[Any]:
         """
         Returns the value of the attribute with the given name.
+
+        :param default: The default value to return if the attribute does not exist.
+        :type default: Optional[Any]
 
         :param name: The name of the attribute to get.
         :type name: str
@@ -340,11 +344,14 @@ class MutableBaseObject:
             # Log a warning message if the attribute does not exist
             self.logger.warning(message=f"Attribute '{name}' does not exist.")
 
-            # Return early since the attribute is not present
-            return
+            # Return the default value if the attribute is not present
+            return default
 
         # Return the value of the attribute
-        return self.__dict__[name]
+        return self.__dict__.get(
+            name,
+            default,
+        )
 
     def set(
         self,

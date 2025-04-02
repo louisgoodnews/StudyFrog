@@ -46,6 +46,7 @@ class ImmutableNote(ImmutableBaseObject):
         icon (str): The icon of the Note.
         id (int): The ID of the Note.
         key (str): The key of the Note.
+        tags (Optional[List[str]]): The key of the tags associated with the Note.
         title_text (str): The title of the Note.
         updated_at (datetime): The timestamp when the Note was last updated.
         uuid (str): The UUID of the Note.
@@ -60,6 +61,7 @@ class ImmutableNote(ImmutableBaseObject):
         icon: Optional[str] = "📝",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -68,12 +70,13 @@ class ImmutableNote(ImmutableBaseObject):
 
         Args:
             body_text (str): The body of the Note.
-            title_text (str): The title of the Note.
             created_at (datetime): The timestamp when the Note was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             icon (str): The icon of the Note. Defaults to "📝".
             id (int): The ID of the Note.
             key (str): The key of the Note.
+            tags (Optional[List[str]]): The key of the tags associated with the Note.
+            title_text (str): The title of the Note.
             updated_at (datetime): The timestamp when the Note was last updated.
             uuid (str): The UUID of the Note.
 
@@ -89,6 +92,7 @@ class ImmutableNote(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            tags=tags,
             title_text=title_text,
             updated_at=updated_at,
             uuid=uuid,
@@ -101,15 +105,21 @@ class ImmutableNote(ImmutableBaseObject):
         Returns:
             MutableNote: A mutable copy of the ImmutableNote instance.
         """
-
-        # Create a new MutableNote instance from the dictionary representation of the ImmutableNote instance
-        return MutableNote(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new MutableNote instance from the dictionary representation of the ImmutableNote instance
+            return MutableNote(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}")
+            
+            # Return None indicating that an exception has occurred
+            return None
 
 
 class MutableNote(MutableBaseObject):
@@ -125,6 +135,7 @@ class MutableNote(MutableBaseObject):
         icon (str): The icon of the Note.
         id (int): The ID of the Note.
         key (str): The key of the Note.
+        tags (Optional[List[str]]): The key of the tags associated with the Note.
         title_text (str): The title of the Note.
         updated_at (datetime): The timestamp when the Note was last updated.
         uuid (str): The UUID of the Note.
@@ -140,6 +151,7 @@ class MutableNote(MutableBaseObject):
         icon: Optional[str] = "📝",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -148,13 +160,14 @@ class MutableNote(MutableBaseObject):
 
         Args:
             body_text (str): The body of the Note.
-            title_text (str): The title of the Note.
             ancestor (int): The ID of the ancestor Note.
             children (List[int]): The IDs of the children Notes.
             created_at (datetime): The timestamp when the Note was created.
             icon (str): The icon of the Note. Defaults to "📝".
             id (int): The ID of the Note.
             key (str): The key of the Note.
+            tags (Optional[List[str]]): The key of the tags associated with the Note.
+            title_text (str): The title of the Note.
             updated_at (datetime): The timestamp when the Note was last updated.
             uuid (str): The UUID of the Note.
 
@@ -165,13 +178,14 @@ class MutableNote(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             body_text=body_text,
-            title_text=title_text,
             ancestor=ancestor,
             children=children,
             created_at=created_at,
             icon=icon,
             id=id,
             key=key,
+            tags=tags,
+            title_text=title_text,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -293,15 +307,21 @@ class MutableNote(MutableBaseObject):
         Returns:
             ImmutableNote: An immutable copy of the MutableNote instance.
         """
-
-        # Create a new ImmutableNote instance from the dictionary representation of the MutableNote instance
-        return ImmutableNote(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new ImmutableNote instance from the dictionary representation of the MutableNote instance
+            return ImmutableNote(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}")
+            
+            # Return None indicating that an exception has occurred
+            return None
 
 
 class NoteConverter:
@@ -409,6 +429,7 @@ class NoteFactory:
         icon: Optional[str] = "📝",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableNote]:
@@ -423,6 +444,7 @@ class NoteFactory:
             icon (Optional[str]): The icon of the Note. Defaults to "📝".
             id (Optional[int]): The ID of the Note.
             key (Optional[str]): The key of the Note.
+            tags (Optional[List[str]]): The key of the tags associated with the Note.
             updated_at (Optional[datetime]): The timestamp when the Note was last updated.
             uuid (Optional[str]): The UUID of the Note.
 
@@ -441,6 +463,7 @@ class NoteFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                tags=tags,
                 title_text=title_text,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -591,6 +614,16 @@ class NoteBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+    def tags(
+        self,
+        value: List[str],
+    ) -> Self:
+        # Set the tags value in the configuration dictionary
+        self.configuration["tags"] = value
+
+        # Return the builder instance
+        return self
+
     def updated_at(
         self,
         value: datetime,
@@ -710,6 +743,9 @@ class NoteManager(BaseObjectManager):
 
             # Set the key of the note
             note.key = f"NOTE_{self.count_notes() + 1}"
+
+            # Set the tags of the note
+            note.tags = [] or note.tags
 
             # Set the updated_at timestamp of the note
             note.updated_at = Miscellaneous.get_current_datetime()
@@ -859,6 +895,51 @@ class NoteManager(BaseObjectManager):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_from_notes(
+        self,
+        condition: Callable[[ImmutableNote], bool],
+        limit: Optional[int] = None,
+    ) -> Optional[List[ImmutableNote]]:
+        """
+        Returns a list of notes from the cache that match the given condition.
+
+        Args:
+            condition (Callable[[ImmutableNote], bool]): A function that takes an ImmutableNote instance and returns a boolean value.
+            limit (Optional[int]): The maximum number of notes to return.
+
+        Returns:
+            Optional[List[ImmutableNote]]: The list of notes that match the given condition if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Initialize an empty list to store matching notes
+            result: List[ImmutableNote] = []
+
+            # Get all notes from the cache
+            notes: List[ImmutableNote] = self.get_all_notes()
+
+            # Iterate over the list of immutable notes in the cache
+            for note in notes:
+                # Check if the note matches the given condition
+                if condition(note):
+                    # Add the note that matches the given condition to the result list
+                    result.append(note)
+
+            # Check if the limit is specified and if the result list exceeds the limit
+            if limit is not None and len(result) > limit:
+                # Return the first 'limit' number of notes
+                return result[:limit]
+
+            # Return the list of matching notes
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_from_notes' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1162,6 +1243,7 @@ class NoteModel(ImmutableBaseModel):
         icon (Optional[str]): The icon of the Note. Defaults to "📝".
         id (Optional[int]): The ID of the Note.
         key (Optional[str]): The key of the Note.
+        tags (Optional[List[str]]): The tags associated with the Note.
         title_text (Optional[str]): The title of the Note.
         updated_at (Optional[datetime]): The timestamp when the Note was last updated.
         uuid (Optional[str]): The UUID of the Note.
@@ -1265,6 +1347,22 @@ class NoteModel(ImmutableBaseModel):
         unique=True,
     )
 
+    tags: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="tags",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     title_text: Field = Field(
         autoincrement=False,
         default=None,
@@ -1321,6 +1419,7 @@ class NoteModel(ImmutableBaseModel):
         icon: Optional[str] = "📝",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         title_text: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1335,6 +1434,7 @@ class NoteModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the Note. Defaults to "📝".
             id (Optional[int]): The ID of the Note.
             key (Optional[str]): The key of the Note.
+            tags (Optional[List[str]]): The tags associated with the Note.
             title_text (Optional[str]): The title of the Note.
             updated_at (Optional[datetime]): The timestamp when the Note was last updated.
             uuid (Optional[str]): The UUID of the Note.
@@ -1352,6 +1452,7 @@ class NoteModel(ImmutableBaseModel):
             id=id,
             key=key,
             table=Constants.NOTES,
+            tags=tags,
             title_text=title_text,
             updated_at=updated_at,
             uuid=uuid,

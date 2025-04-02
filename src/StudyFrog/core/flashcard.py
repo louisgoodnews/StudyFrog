@@ -54,6 +54,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
         priority (int): The ID of the priority the flashcard is associated with.
         status (int): The ID of the status the flashcard is associated with.
+        tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
         total_word_count (int): The word count of the flashcard.
         updated_at (datetime): The timestamp when the flashcard was last updated.
         uuid (str): The UUID of the flashcard.
@@ -75,6 +76,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        tags: Optional[List[str]] = None,
         total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -97,6 +99,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
             status (Optional[int]): The ID of the status the flashcard is associated with.
+            tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
             total_word_count (Optional[int]): The word count of the flashcard.
             updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
             uuid (Optional[str]): The UUID of the flashcard.
@@ -121,6 +124,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             last_viewed_at=last_viewed_at,
             priority=priority,
             status=status,
+            tags=tags,
             total_word_count=total_word_count,
             updated_at=updated_at,
             uuid=uuid,
@@ -162,9 +166,23 @@ class ImmutableFlashcard(ImmutableBaseObject):
         Returns:
             MutableFlashcard: A mutable copy of the ImmutableFlashcard instance.
         """
+        try:
+            # Create a new MutableFlashcard instance from the dictionary representation of the ImmutableFlashcard instance
+            return MutableFlashcard(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
+            )
 
-        # Create a new MutableFlashcard instance from the dictionary representation of the ImmutableFlashcard instance
-        return MutableFlashcard(**self.to_dict(exclude=["_logger"]))
+            # Return None indicating an exception has occurred
+            return None
 
 
 class MutableFlashcard(MutableBaseObject):
@@ -188,6 +206,7 @@ class MutableFlashcard(MutableBaseObject):
         last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
         priority (int): The ID of the priority the flashcard is associated with.
         status (int): The ID of the status the flashcard is associated with.
+        tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
         total_word_count (int): The word count of the back side of the flashcard.
         updated_at (datetime): The timestamp when the flashcard was last updated.
         uuid (str): The UUID of the flashcard.
@@ -209,6 +228,7 @@ class MutableFlashcard(MutableBaseObject):
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        tags: Optional[List[str]] = None,
         total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -231,6 +251,7 @@ class MutableFlashcard(MutableBaseObject):
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
             status (Optional[int]): The ID of the status the flashcard is associated with.
+            tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
             total_word_count (Optional[int]): The word count of the flashcard.
             updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
             uuid (Optional[str]): The UUID of the flashcard.
@@ -255,6 +276,7 @@ class MutableFlashcard(MutableBaseObject):
             last_viewed_at=last_viewed_at,
             priority=priority,
             status=status,
+            tags=tags,
             total_word_count=total_word_count,
             updated_at=updated_at,
             uuid=uuid,
@@ -366,9 +388,23 @@ class MutableFlashcard(MutableBaseObject):
         Returns:
             ImmutableFlashcard: An immutable copy of the MutableFlashcard instance.
         """
+        try:
+            # Create a new ImmutableFlashcard instance from the dictionary representation of the MutableFlashcard instance
+            return ImmutableFlashcard(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
+            )
 
-        # Create a new ImmutableFlashcard instance from the dictionary representation of the MutableFlashcard instance
-        return ImmutableFlashcard(**self.to_dict(exclude=["_logger"]))
+            # Return None indicating an exception has occurred
+            return None
 
 
 class FlashcardConverter:
@@ -483,6 +519,7 @@ class FlashcardFactory:
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        tags: Optional[List[str]] = None,
         total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -505,6 +542,7 @@ class FlashcardFactory:
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
             status (Optional[int]): The ID of the status the flashcard is associated with.
+            tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
             total_word_count (Optional[int]): The word count of the flashcard.
             updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
             uuid (Optional[str]): The UUID of the flashcard.
@@ -532,6 +570,7 @@ class FlashcardFactory:
                 last_viewed_at=last_viewed_at,
                 priority=priority,
                 status=status,
+                tags=tags,
                 total_word_count=total_word_count,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -763,6 +802,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+    def tags(
+        self,
+        value: Optional[List[str]] = None,
+    ) -> Self:
+        # Set the tags value in the configuration dictionary
+        self.configuration["tags"] = value
+
+        # Return the builder instance
+        return self
+
     def total_word_count(
         self,
         value: Optional[int] = None,
@@ -868,6 +917,9 @@ class FlashcardManager(BaseObjectManager):
 
             # Set the key of the flashcard
             flashcard.key = f"FLASHCARD_{self.count_flashcards() + 1}"
+
+            # Set the tags of the flashcard
+            flashcard.tags = [] or flashcard.tags
 
             # Set the updated_at timestamp of the flashcard
             flashcard.updated_at = Miscellaneous.get_current_datetime()
@@ -1272,6 +1324,51 @@ class FlashcardManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def get_from_flashcards(
+        self,
+        condition: Callable[[ImmutableFlashcard], bool],
+        limit: Optional[int] = None,
+    ) -> Optional[List[ImmutableFlashcard]]:
+        """
+        Returns a list of flashcards from the cache that match the given condition.
+
+        Args:
+            condition (Callable[[ImmutableFlashcard], bool]): A function that takes an ImmutableFlashcard instance and returns a boolean value.
+            limit (Optional[int]): The maximum number of flashcards to return.
+
+        Returns:
+            Optional[List[ImmutableFlashcard]]: The list of flashcards that match the given condition if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Initialize an empty list to store matching flashcards
+            result: List[ImmutableFlashcard] = []
+
+            # Get all flashcards from the cache
+            flashcards: List[ImmutableFlashcard] = self.get_all_flashcards()
+
+            # Iterate over the list of immutable flashcards in the cache
+            for flashcard in flashcards:
+                # Check if the flashcard matches the given condition
+                if condition(flashcard):
+                    # Add the flashcard that matches the given condition to the result list
+                    result.append(flashcard)
+
+            # Check if the limit is specified and if the result list exceeds the limit
+            if limit is not None and len(result) > limit:
+                # Return the first 'limit' number of flashcards
+                return result[:limit]
+
+            # Return the list of matching flashcards
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_from_flashcards' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def search_flashcards(
         self,
         **kwargs,
@@ -1426,6 +1523,7 @@ class FlashcardModel(ImmutableBaseModel):
         last_viewed_at (Field): The timestamp when the flashcard was last viewed.
         priority (Field): The priority of the flashcard.
         status (Field): The status of the flashcard.
+        tags (Field): The tags of the flashcard.
         total_word_count (Field): The word count of the back side of the flashcard.
         updated_at (Field): The timestamp when the flashcard was last updated.
         uuid (Field): The UUID of the flashcard.
@@ -1657,6 +1755,22 @@ class FlashcardModel(ImmutableBaseModel):
         unique=False,
     )
 
+    tags: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="tags",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     total_word_count: Field = Field(
         autoincrement=False,
         default=None,
@@ -1721,6 +1835,7 @@ class FlashcardModel(ImmutableBaseModel):
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        tags: Optional[List[str]] = None,
         total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1743,6 +1858,7 @@ class FlashcardModel(ImmutableBaseModel):
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
             priority (Optional[int]): The priority of the flashcard.
             status (Optional[int]): The status of the flashcard.
+            tags (Optional[List[str]]): The tags of the flashcard.
             total_word_count (Optional[int]): The total word count of the flashcard.
             updated_at (Optional[datetime]): The timestamp when the flashcard was last updated.
             uuid (Optional[str]): The UUID of the flashcard.
@@ -1767,6 +1883,7 @@ class FlashcardModel(ImmutableBaseModel):
             last_viewed_at=last_viewed_at,
             priority=priority,
             status=status,
+            tags=tags,
             total_word_count=total_word_count,
             table=Constants.FLASHCARDS,
             updated_at=updated_at,

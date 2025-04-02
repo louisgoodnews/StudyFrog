@@ -364,7 +364,7 @@ class UIBuilder:
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(
                 master=master,
-                **kwargs,
+                **kwargs.get("frame", {}),
             )
 
             # Configure the "Root" frame widget's 0th column to weight 0
@@ -389,7 +389,7 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
-                **kwargs,
+                **kwargs.get("label", {}),
             )
 
             # Add the "Label" label widget to the "Root" frame widget
@@ -407,7 +407,7 @@ class UIBuilder:
                 master=result["root"],
                 text="False",
                 variable=result["variable"],
-                **kwargs,
+                **kwargs.get("checkbutton", {}),
             )
 
             # Add the "Checkbutton" checkbutton widget to the "Root" frame widget
@@ -609,7 +609,7 @@ class UIBuilder:
                     namespace=namespace,
                     on_change_callback=enforce_selection_mode,
                     value=value,
-                    **kwargs,
+                    **kwargs.get(f"{label}_field", {}),
                 )
 
                 if not checkbutton_field:
@@ -2673,7 +2673,7 @@ class UIBuilder:
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(
                 master=master,
-                **kwargs,
+                **kwargs.get("root", {}),
             )
 
             # Configure the "Root" frame widget's 0th column to weight 0
@@ -2716,7 +2716,7 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
-                **kwargs,
+                **kwargs.get("label", {}),
             )
 
             # Add the "Label" label widget to the "Root" frame widget
@@ -2731,7 +2731,7 @@ class UIBuilder:
             # Create the "Text" text widget
             result["text"] = cls.get_text(
                 master=result["root"],
-                **kwargs,
+                **kwargs.get("text", {}),
             )
 
             # Bind the "Text" text widget to the "on_text_changed" function
@@ -2781,7 +2781,7 @@ class UIBuilder:
                 command=on_button_clicked,
                 master=result["root"],
                 text="X",
-                **kwargs,
+                **kwargs.get("button", {}),
             )
 
             # Add the "Entry" text widget to the "Root" frame widget
@@ -4193,7 +4193,7 @@ class UIBuilder:
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(
                 master=master,
-                **kwargs,
+                **kwargs.get("root", {}),
             )
 
             # Configure the "Root" frame widget's 0th column to weight 0
@@ -4218,7 +4218,7 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
-                **kwargs,
+                **kwargs.get("label", {}),
             )
 
             # Add the "Label" label widget to the "Root" frame widget
@@ -4236,7 +4236,7 @@ class UIBuilder:
                 master=result["root"],
                 text="False",
                 variable=result["variable"],
-                **kwargs,
+                **kwargs.get("radiobutton", {}),
             )
 
             # Add the "Checkbutton" radiobutton widget to the "Root" frame widget
@@ -4438,7 +4438,7 @@ class UIBuilder:
                     namespace=namespace,
                     on_change_callback=enforce_selection_mode,
                     value=value,
-                    **kwargs,
+                    **kwargs.get(f"{label}_field", {}),
                 )
 
                 if not radiobutton_field:
@@ -4711,7 +4711,336 @@ class UIBuilder:
             return None
 
     @classmethod
-    def get_scale_field(
+    def get_float_scale_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        from_: float = 0,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str], None]] = None,
+        resolution: float = 1,
+        to: float = 100,
+        value: float = 0,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of tkinter.Scale that is used as a field.
+
+        This method creates a dictionary that holds all functions and widgets that facilitate the scale field.
+        Contained keys are:
+            - "clearer": A function that clears the scale field.
+            - "getter": A function that retrieves the value of the scale field.
+            - "setter": A function that sets the value of the scale field.
+            - "variable": A tkinter.BooleanVar instance that holds the value of the scale field.
+            - "root": A tkinter.Frame instance that holds the scale field.
+            - "label": A tkinter.Label instance that holds the label for the scale field.
+            - "scale": A tkinter.Scale instance that is used as a field.
+
+        Args:
+            from_ (float): The minimum of the scale.
+            label (str): The label for the scale.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the scale. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the scale field changes. Defaults to None.
+            resolution (float): The step size of the scale.
+            to (float): The maximum of the scale.
+            value (float): The float value of the scale field.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created tkinter.Scale instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Scale.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear(dispatch: int = True) -> None:
+                """
+                Clears the scale field by setting its value to an empty float.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the scale field.
+                """
+                try:
+                    # Set the value of the scale field to an empty float
+                    result["variable"].set(value="")
+
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def get(dispatch: int = True) -> Optional[float]:
+                """
+                Retrieves the value of the scale field as a float.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[float]: The value of the scale field as a float. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the scale field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the scale field as a float
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_button_clicked() -> None:
+                """
+                Handles the button click.
+
+                This function calls the clear function.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the scale field.
+                """
+                try:
+                    # Clear the scale field
+                    clear(dispatch=True)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_button_clicked' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def on_scale_changed(dispatch: int = True) -> None:
+                """
+                Handles the SCALE_FIELD_CHANGED event.
+
+                This function is called when the value of the scale field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the SCALE_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_scale_changed' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def set(
+                value: float,
+                dispatch: int = True,
+            ) -> None:
+                """
+                Sets the value of the scale field.
+
+                Args:
+                    dispatch (int, optional): Whether to dispatch the SCALE_FIELD_SET event. Defaults to True.
+                    value (float, optional): The value to set for the scale field.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the scale field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    if value not in result["values"]:
+                        # Add the value to the values list
+                        result["values"].append(value)
+
+                    # Set the value of the scale field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            # Create the "Variable" float variable
+            result["variable"] = cls.get_double_variable(value=value)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs.get("root", {}),
+            )
+
+            # Configure the "Root" frame widget's 0th column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+                **kwargs.get("label", {}),
+            )
+
+            # Add the "Label" label widget to the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Scale" scale widget
+            result["scale"] = cls.get_scale(
+                command=on_scale_changed,
+                from_=from_,
+                master=result["root"],
+                resolution=resolution,
+                to=to,
+                value=value,
+                variable=result["variable"],
+                **kwargs.get("scale", {}),
+            )
+
+            # Add the "Scale" scale widget to the "Root" frame widget
+            result["scale"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                command=on_button_clicked,
+                master=result["root"],
+                text="X",
+                **kwargs.get("button", {}),
+            )
+
+            # Add the "Button" scale widget to the "Root" frame widget
+            result["button"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=0,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_float_scale_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+
+            return None
+
+    @classmethod
+    def get_int_scale_field(
         cls,
         label: str,
         master: tkinter.Misc,
@@ -4737,11 +5066,14 @@ class UIBuilder:
             - "scale": A tkinter.Scale instance that is used as a field.
 
         Args:
+            from_ (int): The minimum value of the scale.
             label (str): The label for the scale.
             master (tkinter.Misc): The master widget.
             namespace (str): The namespace for the scale. Defaults to Constants.GLOBAL_NAMESPACE.
             on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the scale field changes. Defaults to None.
-            values (List[str]): The list of string values of the scale field.
+            resolution (int): The resolution of the scale. Defaults to 1.
+            to (int): The maximum value of the scale. Defaults to 100.
+            value (int): The initial value of the scale. Defaults to 0.
             **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
 
         Returns:
@@ -4888,15 +5220,15 @@ class UIBuilder:
                     raise e
 
             def set(
+                value: int,
                 dispatch: int = True,
-                value: int = False,
             ) -> None:
                 """
                 Sets the value of the scale field.
 
                 Args:
                     dispatch (int, optional): Whether to dispatch the SCALE_FIELD_SET event. Defaults to True.
-                    value (int, optional): The value to set for the scale field. Defaults to False.
+                    value (int): The value to set for the scale field.
 
                 Returns:
                     None
@@ -4983,6 +5315,7 @@ class UIBuilder:
                 command=on_scale_changed,
                 from_=from_,
                 master=result["root"],
+                resolution=resolution,
                 to=to,
                 value=value,
                 variable=result["variable"],
@@ -5028,7 +5361,7 @@ class UIBuilder:
         except Exception as e:
             # Log an error message indicating an exception occured
             cls.logger.error(
-                message=f"Caught an exception while attempting to run 'get_scale_field' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_int_scale_field' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
@@ -5901,7 +6234,7 @@ class UIBuilder:
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(
                 master=master,
-                **kwargs,
+                **kwargs.get("root", {}),
             )
 
             # Configure the "Root" frame widget's 0th column to weight 0
@@ -5932,7 +6265,7 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
-                **kwargs,
+                **kwargs.get("label", {}),
             )
 
             # Add the "Label" label widget to the "Root" frame widget
@@ -5948,7 +6281,7 @@ class UIBuilder:
             result["entry"] = cls.get_entry(
                 master=result["root"],
                 variable=result["variable"],
-                **kwargs,
+                **kwargs.get("entry", {}),
             )
 
             # Bind the "Entry" entry widget to the "on_entry_changed" function
@@ -5971,7 +6304,7 @@ class UIBuilder:
                 command=on_button_clicked,
                 master=result["root"],
                 text="X",
-                **kwargs,
+                **kwargs.get("button", {}),
             )
 
             # Add the "Entry" entry widget to the "Root" frame widget

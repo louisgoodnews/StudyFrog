@@ -43,6 +43,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         icon (str): The icon of the answer.
         id (int): The ID of the answer.
         key (str): The key of the answer.
+        tags (List[str]): The keys of the tags associated with the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
         uuid (str): The UUID of the answer.
     """
@@ -55,6 +56,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -68,6 +70,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
+            tags (List[str]): The keys of the tags associated with the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
 
@@ -83,6 +86,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            tags=tags,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -94,15 +98,23 @@ class ImmutableAnswer(ImmutableBaseObject):
         Returns:
             MutableAnswer: A new instance of the MutableAnswer class with the same attributes as this instance.
         """
-
-        # Create a new instance of the MutableAnswer class with the same attributes as this instance
-        return MutableAnswer(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new instance of the MutableAnswer class with the same attributes as this instance
+            return MutableAnswer(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class MutableAnswer(MutableBaseObject):
@@ -116,6 +128,7 @@ class MutableAnswer(MutableBaseObject):
         icon (str): The icon of the answer.
         id (int): The ID of the answer.
         key (str): The key of the answer.
+        tags (List[str]): The keys of the tags associated with the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
         uuid (str): The UUID of the answer.
     """
@@ -128,6 +141,7 @@ class MutableAnswer(MutableBaseObject):
         icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -141,6 +155,7 @@ class MutableAnswer(MutableBaseObject):
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
+            tags (List[str]): The keys of the tags associated with the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
 
@@ -156,6 +171,7 @@ class MutableAnswer(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            tags=tags,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -167,15 +183,23 @@ class MutableAnswer(MutableBaseObject):
         Returns:
             ImmutableAnswer: A new instance of the ImmutableAnswer class with the same attributes as this instance.
         """
-
-        # Create a new instance of the ImmutableAnswer class with the same attributes as this instance
-        return ImmutableAnswer(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new instance of the ImmutableAnswer class with the same attributes as this instance
+            return ImmutableAnswer(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class AnswerConverter:
@@ -282,6 +306,7 @@ class AnswerFactory:
         icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableAnswer]:
@@ -295,6 +320,7 @@ class AnswerFactory:
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
+            tags (List[str]): The keys of the tags associated with the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
 
@@ -313,6 +339,7 @@ class AnswerFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                tags=tags,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -400,6 +427,9 @@ class AnswerManager(BaseObjectManager):
 
             # Set the key of the answer
             answer.key = f"ANSWER_{self.count_answers() + 1}"
+
+            # Set the tags of the answer
+            answer.tags = [] or answer.tags
 
             # Set the updated_at timestamp of the answer
             answer.updated_at = Miscellaneous.get_current_datetime()
@@ -796,6 +826,51 @@ class AnswerManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def get_from_answers(
+        self,
+        condition: Callable[[ImmutableAnswer], bool],
+        limit: Optional[int] = None,
+    ) -> Optional[List[ImmutableAnswer]]:
+        """
+        Returns a list of answers from the cache that match the given condition.
+
+        Args:
+            condition (Callable[[ImmutableAnswer], bool]): A function that takes an ImmutableAnswer instance and returns a boolean value.
+            limit (Optional[int]): The maximum number of answers to return.
+
+        Returns:
+            Optional[List[ImmutableAnswer]]: The list of answers that match the given condition if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Initialize an empty list to store matching answers
+            result: List[ImmutableAnswer] = []
+
+            # Get all answers from the cache
+            answers: List[ImmutableAnswer] = self.get_all_answers()
+
+            # Iterate over the list of immutable answers in the cache
+            for answer in answers:
+                # Check if the answer matches the given condition
+                if condition(answer):
+                    # Add the answer that matches the given condition to the result list
+                    result.append(answer)
+
+            # Check if the limit is specified and if the result list exceeds the limit
+            if limit is not None and len(result) > limit:
+                # Return the first 'limit' number of answers
+                return result[:limit]
+
+            # Return the list of matching answers
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_from_answers' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def search_answers(
         self,
         **kwargs,
@@ -942,6 +1017,7 @@ class AnswerModel(ImmutableBaseModel):
         id (Optional[int]): The ID of the answer.
         key (Optional[str]): The key of the answer.
         table (str): The table name of the answer model.
+        tags (List[str]): The keys of the tags associated with the answer.
         updated_at (Optional[datetime]): The timestamp when the answer was last updated.
         uuid (Optional[str]): The UUID of the answer.
     """
@@ -1044,6 +1120,22 @@ class AnswerModel(ImmutableBaseModel):
         unique=True,
     )
 
+    tags: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="tags",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     updated_at: Field = Field(
         autoincrement=False,
         default=None,
@@ -1084,6 +1176,7 @@ class AnswerModel(ImmutableBaseModel):
         icon: Optional[str] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1097,6 +1190,7 @@ class AnswerModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the answer.
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
+            tags (Optional[List[str]]): The keys of the tags associated with the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
 
@@ -1112,6 +1206,7 @@ class AnswerModel(ImmutableBaseModel):
             id=id,
             key=key,
             table=Constants.ANSWERS,
+            tags=tags,
             updated_at=updated_at,
             uuid=uuid,
         )
