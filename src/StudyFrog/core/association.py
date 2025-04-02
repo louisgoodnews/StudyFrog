@@ -5,12 +5,10 @@ Date: 2025-02-06
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
-
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -21,7 +19,8 @@ from utils.object import MutableBaseObject, ImmutableBaseObject
 
 
 __all__: Final[List[str]] = [
-    "Association",
+    "AImmutablessociation",
+    "ImmutableAssociation",
     "AssociationConverter",
     "AssociationFactory",
     "AssociationManager",
@@ -29,7 +28,7 @@ __all__: Final[List[str]] = [
 ]
 
 
-class Association(ImmutableBaseObject):
+class ImmutableAssociation(ImmutableBaseObject):
     """
     An immutable class representing an association between two entities.
 
@@ -158,6 +157,194 @@ class Association(ImmutableBaseObject):
             uuid=uuid,
         )
 
+    def to_mutable(self) -> Optional["MutableAssociation"]:
+        """
+        Converts the ImmutableAssociation instance to a MutableAssociation instance.
+
+        Returns:
+            Optional[MutableAssociation]: The converted MutableAssociation instance, or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to convert the ImmutableAssociation instance.
+        """
+        try:
+            # Create a MutableAssociation instance from the current ImmutableAssociation instance
+            return MutableAssociation(
+                **self.to_dict(
+                    exclude=[
+                        # Exclude the logger from the dictionary representation
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+
+class MutableAssociation(MutableBaseObject):
+    """
+    A mutable class representing an association between two entities.
+
+    Attributes:
+        association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
+        answer (Optional[int]): The ID of the answer that is being associated with.
+        change_history (Optional[int]): The ID of the change history that is being associated with.
+        change_history_item (Optional[int]): The ID of the change history item that is being associated with.
+        created_at (Optional[datetime]): The timestamp when the association was created.
+        custom_field (Optional[int]): The ID of the custom field that is being associated with.
+        default (Optional[int]): The ID of the default that is being associated with.
+        difficulty (Optional[int]): The ID of the difficulty that is being associated with.
+        flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+        icon (Optional[str]): The icon of the association..
+        id (Optional[int]): The ID of the association.
+        key (Optional[str]): The key of the association.
+        learning_session (Optional[int]): The ID of the learning session that is being associated with.
+        learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+        note (Optional[int]): The ID of the note that is being associated with.
+        option (Optional[int]): The ID of the option that is being associated with.
+        priority (Optional[int]): The ID of the priority that is being associated with.
+        question (Optional[int]): The ID of the question that is being associated with.
+        setting (Optional[int]): The ID of the setting that is being associated with.
+        stack (Optional[int]): The ID of the stack that is being associated with.
+        status (Optional[int]): The ID of the status that is being associated with.
+        tag (Optional[int]): The ID of the tag that is being associated with.
+        updated_at (Optional[datetime]): The timestamp when the association was last updated.
+        user (Optional[int]): The ID of the user that is being associated with.
+        uuid (Optional[str]): The UUID of the association.
+    """
+
+    def __init__(
+        self,
+        association_type: Literal[
+            "ancestor",
+            "dependant",
+            "depends_on",
+            "descendant",
+            "tagged_with",
+        ],
+        answer: Optional[int] = None,
+        change_history: Optional[int] = None,
+        change_history_item: Optional[int] = None,
+        created_at: Optional[datetime] = None,
+        custom_field: Optional[int] = None,
+        default: Optional[int] = None,
+        difficulty: Optional[int] = None,
+        flashcard: Optional[int] = None,
+        icon: Optional[str] = "🔗",
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        learning_session: Optional[int] = None,
+        learning_session_item: Optional[int] = None,
+        note: Optional[int] = None,
+        option: Optional[int] = None,
+        priority: Optional[int] = None,
+        question: Optional[int] = None,
+        setting: Optional[int] = None,
+        stack: Optional[int] = None,
+        status: Optional[int] = None,
+        tag: Optional[int] = None,
+        updated_at: Optional[datetime] = None,
+        user: Optional[int] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance of the MutableAssociation class.
+
+        Args:
+            association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
+            answer (Optional[int]): The ID of the answer that is being associated with.
+            change_history (Optional[int]): The ID of the change history that is being associated with.
+            change_history_item (Optional[int]): The ID of the change history item that is being associated with.
+            created_at (Optional[datetime]): The timestamp when the association was created.
+            custom_field (Optional[int]): The ID of the custom field that is being associated with.
+            default (Optional[int]): The ID of the default that is being associated with.
+            difficulty (Optional[int]): The ID of the difficulty that is being associated with.
+            flashcard (Optional[int]): The ID of the flashcard that is being associated with.
+            icon (Optional[str]): The icon of the association. Defaults to "🔗".
+            id (Optional[int]): The ID of the association.
+            key (Optional[str]): The key of the association.
+            learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+            note (Optional[int]): The ID of the note that is being associated with.
+            option (Optional[int]): The ID of the option that is being associated with.
+            priority (Optional[int]): The ID of the priority that is being associated with.
+            question (Optional[int]): The ID of the question that is being associated with.
+            setting (Optional[int]): The ID of the setting that is being associated with.
+            stack (Optional[int]): The ID of the stack that is being associated with.
+            status (Optional[int]): The ID of the status that is being associated with.
+            tag (Optional[int]): The ID of the tag that is being associated with.
+            updated_at (Optional[datetime]): The timestamp when the association was last updated.
+            user (Optional[int]): The ID of the user that is being associated with.
+            uuid (Optional[str]): The UUID of the association.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__(
+            answer=answer,
+            association_type=association_type,
+            change_history=change_history,
+            change_history_item=change_history_item,
+            created_at=created_at,
+            custom_field=custom_field,
+            default=default,
+            difficulty=difficulty,
+            flashcard=flashcard,
+            icon=icon,
+            id=id,
+            key=key,
+            learning_session=learning_session,
+            learning_session_item=learning_session_item,
+            note=note,
+            option=option,
+            priority=priority,
+            question=question,
+            setting=setting,
+            stack=stack,
+            status=status,
+            tag=tag,
+            updated_at=updated_at,
+            user=user,
+            uuid=uuid,
+        )
+
+    def to_immutable(self) -> Optional["ImmutableAssociation"]:
+        """
+        Converts the MutableAssociation instance to an ImmutableAssociation instance.
+
+        Returns:
+            Optional[ImmutableAssociation]: The converted ImmutableAssociation instance, or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to convert the MutableAssociation instance.
+        """
+        try:
+            # Create a ImmutableAssociation instance from the current MutableAssociation instance
+            return ImmutableAssociation(
+                **self.to_dict(
+                    exclude=[
+                        # Exclude the logger from the dictionary representation
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
 
 class AssociationConverter:
     """
@@ -176,22 +363,22 @@ class AssociationConverter:
     def model_to_object(
         cls,
         model: "AssociationModel",
-    ) -> Optional[Association]:
+    ) -> Optional[ImmutableAssociation]:
         """
-        Converts a given AssociationModel instance to an Association instance.
+        Converts a given AssociationModel instance to an ImmutableAssociation instance.
 
         Args:
             model (AssociationModel): The AssociationModel instance to be converted.
 
         Returns:
-            Association: The converted Association instance if no exception occurs. Otherwise, None.
+            ImmutableAssociation: The converted ImmutableAssociation instance if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to convert the AssociationModel instance.
         """
         try:
-            # Attempt to create and return a new instance of the Association class from the dictionary representation of the AssociationModel instance
-            return Association(
+            # Attempt to create and return a new instance of the ImmutableAssociation class from the dictionary representation of the AssociationModel instance
+            return ImmutableAssociation(
                 **model.to_dict(
                     exclude=[
                         "_logger",
@@ -211,22 +398,22 @@ class AssociationConverter:
     @classmethod
     def object_to_model(
         cls,
-        object: Association,
+        object: ImmutableAssociation,
     ) -> Optional["AssociationModel"]:
         """
-        Converts a given Association instance to a AssociationModel instance.
+        Converts a given ImmutableAssociation instance to a AssociationModel instance.
 
         Args:
-            object (Association): The Association instance to be converted.
+            object (ImmutableAssociation): The ImmutableAssociation instance to be converted.
 
         Returns:
             AssociationModel: The converted AssociationModel instance if no exception occurs. Otherwise, None.
 
         Raises:
-            Exception: If an exception occurs while attempting to convert the Association instance.
+            Exception: If an exception occurs while attempting to convert the ImmutableAssociation instance.
         """
         try:
-            # Attempt to create and return a new instance of the AssociationModel class from the dictionary representation of the Association instance
+            # Attempt to create and return a new instance of the AssociationModel class from the dictionary representation of the ImmutableAssociation instance
             return AssociationModel(
                 **object.to_dict(
                     exclude=[
@@ -288,9 +475,9 @@ class AssociationFactory:
         updated_at: Optional[datetime] = None,
         user: Optional[int] = None,
         uuid: Optional[str] = None,
-    ) -> Optional[Association]:
+    ) -> Optional[ImmutableAssociation]:
         """
-        Creates and returns a new instance of Association class.
+        Creates and returns a new instance of ImmutableAssociation class.
 
         Args:
             association_type (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]): The type of the association.
@@ -320,14 +507,14 @@ class AssociationFactory:
             uuid (Optional[str]): The UUID of the association.
 
         Returns:
-            Optional[Association]: The created association object if no exception occurs. Otherwise, None.
+            Optional[ImmutableAssociation]: The created association object if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while creating the association.
         """
         try:
-            # Attempt to create an d return an Association object
-            return Association(
+            # Attempt to create an d return an ImmutableAssociation object
+            return ImmutableAssociation(
                 answer=answer,
                 association_type=association_type,
                 change_history=change_history,
@@ -364,6 +551,301 @@ class AssociationFactory:
             return None
 
 
+class AssociationBuilder(BaseObjectBuilder):
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the AssociationBuilder class.
+
+        This class is a builder for the Association class. It is used to create instances of the Association class from a configuration dictionary.
+
+        Args:
+            None: No arguments are required.
+
+        Returns:
+            None: No value is returned.
+        """
+        super().__init__()
+
+    @override
+    def build(self) -> ImmutableAssociation:
+        """
+        Builds and returns an instance of ImmutableAssociation class using the configuration dictionary.
+
+        This method attempts to create an instance of the ImmutableAssociation class using the configuration dictionary passed to the constructor.
+        If an exception occurs while creating the instance, this method will log an error message and return None.
+
+        Returns:
+            ImmutableAssociation: The created association object if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to run 'build' method from '{self.__name__}'
+        """
+        try:
+            # Attempt to create an association object using the configuration dictionary
+            association: Optional[ImmutableAssociation] = (
+                AssociationFactory.create_association(**self.configuration)
+            )
+
+            # Check if the association was successfully created
+            if not association:
+                # Log a warning message indicating that something has gone wrong
+                self.logger.warning(
+                    message=f"Failed to create association from configuration: {self.configuration}"
+                )
+
+                # Return None indicating that the association could not be created
+                return None
+
+            # Return the created association object
+            return association
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__name__}': {e}"
+            )
+            return None
+
+    def answer(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the answer for the association.
+
+        Args:
+            value (int): The ID of the answer to be set.
+
+        Returns:
+            Self: The builder object with the answer set.
+        """
+        self.configuration["answer"] = value
+        return self
+
+    def change_history(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the change history for the association.
+
+        Args:
+            value (int): The ID of the change history to be set.
+
+        Returns:
+            Self: The builder object with the change history set.
+        """
+        self.configuration["change_history"] = value
+        return self
+
+    def change_history_item(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the change history item for the association.
+
+        Args:
+            value (int): The ID of the change history item to be set.
+
+        Returns:
+            Self: The builder object with the change history item set.
+        """
+        self.configuration["change_history_item"] = value
+        return self
+
+    def comment(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the comment for the association.
+
+        Args:
+            value (int): The ID of the comment to be set.
+
+        Returns:
+            Self: The builder object with the comment set.
+        """
+        self.configuration["comment"] = value
+        return self
+
+    def custom_field(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the custom field for the association.
+
+        Args:
+            value (int): The ID of the custom field to be set.
+
+        Returns:
+            Self: The builder object with the custom field set.
+        """
+        self.configuration["custom_field"] = value
+        return self
+
+    def default(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the default value for the association.
+
+        Args:
+            value (int): The ID of the default value to be set.
+
+        Returns:
+            Self: The builder object with the default value set.
+        """
+        self.configuration["default"] = value
+        return self
+
+    def difficulty(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the difficulty for the association.
+
+        Args:
+            value (int): The ID of the difficulty to be set.
+
+        Returns:
+            Self: The builder object with the difficulty set.
+        """
+        self.configuration["difficulty"] = value
+        return self
+
+    def flashcard(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the flashcard for the association.
+
+        Args:
+            value (int): The ID of the flashcard to be set.
+
+        Returns:
+            Self: The builder object with the flashcard set.
+        """
+        self.configuration["flashcard"] = value
+        return self
+
+    def note(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the note for the association.
+
+        Args:
+            value (int): The ID of the note to be set.
+
+        Returns:
+            Self: The builder object with the note set.
+        """
+        self.configuration["note"] = value
+        return self
+
+    def priority(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the priority for the association.
+
+        Args:
+            value (int): The ID of the priority to be set.
+
+        Returns:
+            Self: The builder object with the priority set.
+        """
+        self.configuration["priority"] = value
+        return self
+
+    def question(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the question for the association.
+
+        Args:
+            value (int): The ID of the question to be set.
+
+        Returns:
+            Self: The builder object with the question set.
+        """
+        self.configuration["question"] = value
+        return self
+
+    def setting(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the setting for the association.
+
+        Args:
+            value (int): The ID of the setting to be set.
+
+        Returns:
+            Self: The builder object with the setting set.
+        """
+        self.configuration["setting"] = value
+        return self
+
+    def stack(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the stack for the association.
+
+        Args:
+            value (int): The ID of the stack to be set.
+
+        Returns:
+            Self: The builder object with the stack set.
+        """
+        self.configuration["stack"] = value
+        return self
+
+    def tag(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the tag for the association.
+
+        Args:
+            value (int): The ID of the tag to be set.
+
+        Returns:
+            Self: The builder object with the tag set.
+        """
+        self.configuration["tag"] = value
+        return self
+
+    def user(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the user for the association.
+
+        Args:
+            value (int): The ID of the user to be set.
+
+        Returns:
+            Self: The builder object with the user set.
+        """
+        self.configuration["user"] = value
+        return self
+
+
 class AssociationManager(BaseObjectManager):
     """
     A manager class for managing associations in the application.
@@ -375,9 +857,34 @@ class AssociationManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["AssociationManager"] = None
+
+    def __new__(cls) -> "AssociationManager":
         """
-        Initializes a new instance of the AssociationManager class.
+        Creates and returns a new instance of the AssociationManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            AssociationManager: The created or existing instance of AssociationManager class.
+        """
+
+        # Check if the shared instance does not exist
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(AssociationManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
+        """
+        Initializes a new instance of the FlashcardManager class.
 
         Returns:
             None
@@ -446,7 +953,7 @@ class AssociationManager(BaseObjectManager):
         """
         try:
             # Create an Association object
-            association: Association = AssociationFactory.create_association(
+            association: ImmutableAssociation = AssociationFactory.create_association(
                 answer=answer,
                 association_type=association_type,
                 change_history=change_history,
@@ -512,21 +1019,29 @@ class AssociationManager(BaseObjectManager):
 
     def create_association(
         self,
-        association: Association,
-    ) -> Optional[Association]:
+        association: Union[ImmutableAssociation, MutableAssociation],
+    ) -> Optional[ImmutableAssociation]:
         """
         Creates a new association in the database.
 
         Args:
-            association (Association): The association to be created.
+            association (Union[ImmutableAssociation, MutableAssociation]): The association to be created.
 
         Returns:
-            Optional[Association]: The newly created immutable association if no exception occurs. Otherwise, None.
+            Optional[ImmutableAssociation]: The newly created immutable association if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while creating the association.
         """
         try:
+            # Check if the association object is immutable
+            if isinstance(
+                association,
+                ImmutableAssociation,
+            ):
+                # If it is, convert it to a mutable association
+                association = association.to_mutable()
+
             # Set the created_at timestamp of the association
             association.created_at = Miscellaneous.get_current_datetime()
 
@@ -554,7 +1069,7 @@ class AssociationManager(BaseObjectManager):
                 association.id = id
 
                 # Convert the association to an immutable association
-                association = Association(
+                association = ImmutableAssociation(
                     **association.to_dict(
                         exclude=[
                             "_logger",
@@ -589,13 +1104,13 @@ class AssociationManager(BaseObjectManager):
 
     def delete_association(
         self,
-        association: Association,
+        association: Union[ImmutableAssociation, MutableAssociation],
     ) -> bool:
         """
         Deletes a association from the database.
 
         Args:
-            association (Association): The association to be deleted.
+            association (Union[ImmutableAssociation, MutableAssociation]): The association to be deleted.
 
         Returns:
             bool: True if the association was deleted successfully. False otherwise.
@@ -628,12 +1143,12 @@ class AssociationManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_associations(self) -> Optional[List[Association]]:
+    def get_all_associations(self) -> Optional[List[ImmutableAssociation]]:
         """
         Returns a list of all associations in the database.
 
         Returns:
-            Optional[List[Association]]: A list of all associations in the database if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableAssociation]]: A list of all associations in the database if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -649,9 +1164,9 @@ class AssociationManager(BaseObjectManager):
                 AssociationModel.get_all(database=Constants.DATABASE_PATH)
             )
 
-            # Convert the list of AssociationModel objects to a list of Association objects
-            associations: List[Association] = [
-                Association(
+            # Convert the list of AssociationModel objects to a list of ImmutableAssociation objects
+            associations: List[ImmutableAssociation] = [
+                ImmutableAssociation(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -692,7 +1207,7 @@ class AssociationManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
-    ) -> Optional[Association]:
+    ) -> Optional[ImmutableAssociation]:
         """
         Retrieves a association by the given field and value.
 
@@ -701,7 +1216,7 @@ class AssociationManager(BaseObjectManager):
             value (Any): The value to search for.
 
         Returns:
-            Optional[Association]: The association with the given field and value if no exception occurs. Otherwise, None.
+            Optional[ImmutableAssociation]: The association with the given field and value if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -723,8 +1238,8 @@ class AssociationManager(BaseObjectManager):
 
             # Return the association if it exists
             if model is not None:
-                # Convert the AssociationModel object to an Association object
-                return Association(
+                # Convert the AssociationModel object to an ImmutableAssociation object
+                return ImmutableAssociation(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -747,7 +1262,7 @@ class AssociationManager(BaseObjectManager):
     def get_association_by_id(
         self,
         id: int,
-    ) -> Optional[Association]:
+    ) -> Optional[ImmutableAssociation]:
         """
         Returns a association with the given ID.
 
@@ -755,7 +1270,7 @@ class AssociationManager(BaseObjectManager):
             id (int): The ID of the association.
 
         Returns:
-            Optional[Association]: The association with the given ID if no exception occurs. Otherwise, None.
+            Optional[ImmutableAssociation]: The association with the given ID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -777,8 +1292,8 @@ class AssociationManager(BaseObjectManager):
 
             # Return the association if it exists
             if model is not None:
-                # Convert the AssociationModel object to an Association object
-                return Association(
+                # Convert the AssociationModel object to an ImmutableAssociation object
+                return ImmutableAssociation(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -801,7 +1316,7 @@ class AssociationManager(BaseObjectManager):
     def get_association_by_uuid(
         self,
         uuid: str,
-    ) -> Optional[Association]:
+    ) -> Optional[ImmutableAssociation]:
         """
         Returns a association with the given UUID.
 
@@ -809,7 +1324,7 @@ class AssociationManager(BaseObjectManager):
             uuid (str): The UUID of the association.
 
         Returns:
-            Optional[Association]: The association with the given UUID if no exception occurs. Otherwise, None.
+            Optional[ImmutableAssociation]: The association with the given UUID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -831,8 +1346,8 @@ class AssociationManager(BaseObjectManager):
 
             # Return the association if it exists
             if model is not None:
-                # Convert the AssociationModel object to an Association object
-                return Association(
+                # Convert the AssociationModel object to an ImmutableAssociation object
+                return ImmutableAssociation(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -855,7 +1370,7 @@ class AssociationManager(BaseObjectManager):
     def search_associations(
         self,
         **kwargs,
-    ) -> Optional[Union[List[Association]]]:
+    ) -> Optional[Union[List[ImmutableAssociation]]]:
         """
         Searches for associations in the database.
 
@@ -863,7 +1378,7 @@ class AssociationManager(BaseObjectManager):
             **kwargs: Any additional keyword arguments to be passed to the search method of the AssociationModel class.
 
         Returns:
-            Optional[Union[List[Association]]]: The found associations if no exception occurs. Otherwise, None.
+            Optional[Union[List[ImmutableAssociation]]]: The found associations if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -880,7 +1395,7 @@ class AssociationManager(BaseObjectManager):
             # Return the found associations if any
             if models is not None and len(models) > 0:
                 return [
-                    Association(
+                    ImmutableAssociation(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -904,16 +1419,16 @@ class AssociationManager(BaseObjectManager):
 
     def update_association(
         self,
-        association: Association,
-    ) -> Optional[Association]:
+        association: ImmutableAssociation,
+    ) -> Optional[ImmutableAssociation]:
         """
         Updates a association with the given ID.
 
         Args:
-            association (Association): The association to update.
+            association (ImmutableAssociation): The association to update.
 
         Returns:
-            Optional[Association]: The updated association if no exception occurs. Otherwise, None.
+            Optional[ImmutableAssociation]: The updated association if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -922,7 +1437,7 @@ class AssociationManager(BaseObjectManager):
             # Convert the association to an immutable association and update the association in the database
             model: Optional[AssociationModel] = asyncio.run(
                 AssociationConverter.object_to_model(
-                    object=Association(
+                    object=ImmutableAssociation(
                         **association.to_dict(
                             exclude=[
                                 "_logger",
@@ -944,8 +1459,8 @@ class AssociationManager(BaseObjectManager):
 
             # Return the updated association if it exists
             if model is not None:
-                # Convert the AssociationModel object to an Association object
-                association = Association(
+                # Convert the AssociationModel object to an ImmutableAssociation object
+                association = ImmutableAssociation(
                     **model.to_dict(
                         exclude=[
                             "_logger",

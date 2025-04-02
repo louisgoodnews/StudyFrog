@@ -5,10 +5,7 @@ Date: 2025-02-09
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
-
 from typing import *
 
 from utils.constants import Constants
@@ -346,7 +343,29 @@ class DefaultManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["DefaultManager"] = None
+
+    def __new__(cls) -> "DefaultManager":
+        """
+        Creates and returns a new instance of the DefaultManager class.
+
+        This method is responsible for creating a new instance of the DefaultManager class and initializing it.
+        If the instance already exists, it returns the existing instance.
+
+        Returns:
+            DefaultManager: A new instance of the DefaultManager class.
+        """
+
+        # Check if the shared instance already exists
+        if cls._shared_instance is None:
+            # If it does not exist, create a new instance
+            cls._shared_instance = super(DefaultManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
         """
         Initializes a new instance of the DefaultManager class.
 

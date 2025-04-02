@@ -666,7 +666,29 @@ class NoteManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["NoteManager"] = None
+
+    def __new__(cls) -> "NoteManager":
+        """
+        Creates and returns a new instance of the NoteManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            NoteManager: The created or existing instance of NoteManager class.
+        """
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(NoteManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
         """
         Initializes a new instance of the NoteManager class.
 

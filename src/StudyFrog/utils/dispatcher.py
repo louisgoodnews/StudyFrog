@@ -4,7 +4,6 @@ Date: 2025-02-06
 """
 
 from datetime import datetime
-
 from typing import *
 
 from utils.builder import BaseObjectBuilder
@@ -59,6 +58,7 @@ class DispatcherEvent(ImmutableBaseObject):
             uuid=uuid,
         )
 
+    @override
     def compare_to(
         self,
         other: "DispatcherEvent",
@@ -72,12 +72,15 @@ class DispatcherEvent(ImmutableBaseObject):
         Returns:
             bool: True if both events have the same id, name, and uuid; False otherwise.
         """
-        return all(
-            [
-                self.id == other.id,
-                self.name == other.name,
-                self.uuid == other.uuid,
-            ]
+
+        # Call the parent class compare_to method
+        return super().compare_to(
+            key=[
+                "id",
+                "name",
+                "uuid",
+            ],
+            other=other,
         )
 
 

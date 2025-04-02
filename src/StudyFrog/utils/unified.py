@@ -11,9 +11,9 @@ from core.learning.learning_session import (
 )
 
 from core.answer import ImmutableAnswer
-from core.association import Association
-from core.change_history import ChangeHistory, ChangeHistoryItem
-from core.custom_field import CustomField
+from core.association import ImmutableAssociation
+from core.change_history import ImmutableChangeHistory, ImmutableChangeHistoryItem
+from core.custom_field import ImmutableCustomField
 from core.default import ImmutableDefault
 from core.difficulty import ImmutableDifficulty
 from core.flashcard import ImmutableFlashcard
@@ -119,13 +119,101 @@ class UnifiedObjectManager(ImmutableBaseObject):
             f"'{self.__class__.__name__}' object has no attribute '{name}'"
         )
 
+    def get_all(self) -> Optional[
+        List[
+            Union[
+                ImmutableAssociation,
+                ImmutableCustomField,
+                ImmutableStack,
+                ImmutableFlashcard,
+                ImmutableQuestion,
+                ImmutableAnswer,
+                ImmutableOption,
+                ImmutableTag,
+                ImmutableStatus,
+                ImmutablePriority,
+                ImmutableDifficulty,
+                ImmutableSetting,
+                ImmutableNote,
+                ImmutableUser,
+                ImmutableDefault,
+            ]
+        ]
+    ]:
+        """
+        Retrieves all registered managers.
+
+        This method iterates over all registered managers, calls the get_all method of each manager,
+        and combines their results into a single list.
+
+        Returns:
+            Optional[List[Union[
+                ImmutableAssociation,
+                ImmutableCustomField,
+                ImmutableStack,
+                ImmutableFlashcard,
+                ImmutableQuestion,
+                ImmutableAnswer,
+                ImmutableOption,
+                ImmutableTag,
+                ImmutableStatus,
+                ImmutablePriority,
+                ImmutableDifficulty,
+                ImmutableSetting,
+                ImmutableNote,
+                ImmutableUser,
+                ImmutableDefault,
+            ]]]]: The list of all registered managers if no exception occurs. Otherwise, None.
+        """
+        try:
+            result: List[
+                Union[
+                    ImmutableAssociation,
+                    ImmutableCustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                ]
+            ] = [
+                manager.__getattr__(
+                    name=f"get_all{Miscellaneous.pluralize(string=name.replace('_manager', ''))}"
+                )
+                for (
+                    name,
+                    manager,
+                ) in self.managers.items()
+            ]
+
+            # Combine the results of each manager into a single list
+            result = [item for sublist in result for item in sublist]
+
+            return result
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def get_by_key(
         self,
         key: str,
     ) -> Optional[
         Union[
-            Association,
-            CustomField,
+            ImmutableAssociation,
+            ImmutableCustomField,
             ImmutableStack,
             ImmutableFlashcard,
             ImmutableQuestion,
@@ -148,7 +236,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
             key (str): The key of the object to be retrieved.
 
         Returns:
-            Optional[Union[Association, CustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]: The retrieved object if the key exists, otherwise None.
+            Optional[Union[ImmutableAssociation, ImmutableCustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]: The retrieved object if the key exists, otherwise None.
 
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_key' method.
@@ -190,8 +278,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
         List[
             Optional[
                 Union[
-                    Association,
-                    CustomField,
+                    ImmutableAssociation,
+                    ImmutableCustomField,
                     ImmutableStack,
                     ImmutableFlashcard,
                     ImmutableQuestion,
@@ -216,7 +304,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
             keys (List[str]): A list of keys for the objects to be retrieved.
 
         Returns:
-            Optional[List[Union[Association, CustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]]: The list of retrieved objects if no exception occurs. Otherwise, None.
+            Optional[List[Union[ImmutableAssociation, ImmutableCustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]]: The list of retrieved objects if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_keys' method.
@@ -226,8 +314,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
             result: List[
                 Optional[
                     Union[
-                        Association,
-                        CustomField,
+                        ImmutableAssociation,
+                        ImmutableCustomField,
                         ImmutableStack,
                         ImmutableFlashcard,
                         ImmutableQuestion,
@@ -502,16 +590,16 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_association_create(
         self,
-        association: Association,
-    ) -> Optional[Association]:
+        association: ImmutableAssociation,
+    ) -> Optional[ImmutableAssociation]:
         """
         Handles the 'request_association_create' event and creates a new association in the database.
 
         Args:
-            association (Association): The association to be created.
+            association (ImmutableAssociation): The association to be created.
 
         Returns:
-            Optional[Association]: The created association object if no exception occurs. Otherwise, None.
+            Optional[ImmutableAssociation]: The created association object if no exception occurs. Otherwise, None.
         """
 
         # Create and return the association
@@ -519,13 +607,13 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_association_delete(
         self,
-        association: Association,
+        association: ImmutableAssociation,
     ) -> bool:
         """
         Handles the 'request_association_delete' event and deletes an association from the database.
 
         Args:
-            association (Association): The association to be deleted.
+            association (ImmutableAssociation): The association to be deleted.
 
         Returns:
             bool: True if the association was deleted successfully. False otherwise.
@@ -537,7 +625,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_association_load(
         self,
         **kwargs,
-    ) -> Optional[List[Association]]:
+    ) -> Optional[List[ImmutableAssociation]]:
         """
         Handles the 'request_association_load' event and loads associations from the database.
 
@@ -545,7 +633,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             **kwargs: Keyword arguments to be used for querying associations.
 
         Returns:
-            Optional[List[Association]]: A list of loaded associations if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableAssociation]]: A list of loaded associations if no exception occurs. Otherwise, None.
         """
 
         # Retrieve associations using the provided keyword arguments
@@ -554,7 +642,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_association_lookup(
         self,
         **kwargs,
-    ) -> Optional[List[Association]]:
+    ) -> Optional[List[ImmutableAssociation]]:
         """
         Handles the 'request_association_lookup' event and looks up associations in the database.
 
@@ -562,7 +650,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             **kwargs: The keyword arguments to be used for querying the associations.
 
         Returns:
-            Optional[List[Association]]: The loaded associations if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableAssociation]]: The loaded associations if no exception occurs. Otherwise, None.
         """
 
         # Search for associations using the provided keyword arguments and return them
@@ -570,16 +658,16 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_association_update(
         self,
-        association: Association,
-    ) -> Optional[Association]:
+        association: ImmutableAssociation,
+    ) -> Optional[ImmutableAssociation]:
         """
         Handles the 'request_association_update' event and updates an association in the database.
 
         Args:
-            association (Association): The association to be updated.
+            association (ImmutableAssociation): The association to be updated.
 
         Returns:
-            Optional[Association]: The updated association object if no exception occurs. Otherwise, None.
+            Optional[ImmutableAssociation]: The updated association object if no exception occurs. Otherwise, None.
         """
 
         # Update and return the association
@@ -587,16 +675,16 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_change_history_create(
         self,
-        change_history: ChangeHistory,
-    ) -> Optional[ChangeHistory]:
+        change_history: ImmutableChangeHistory,
+    ) -> Optional[ImmutableChangeHistory]:
         """
         Handles the 'request_change_history_create' event and creates a new change history in the database.
 
         Args:
-            change_history (ChangeHistory): The change history to be created.
+            change_history (ImmutableChangeHistory): The change history to be created.
 
         Returns:
-            Optional[ChangeHistory]: The created change history object if no exception occurs. Otherwise, None.
+            Optional[ImmutableChangeHistory]: The created change history object if no exception occurs. Otherwise, None.
         """
 
         # Create and return the change history
@@ -604,13 +692,13 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_change_history_delete(
         self,
-        change_history: ChangeHistory,
+        change_history: ImmutableChangeHistory,
     ) -> bool:
         """
         Handles the 'request_change_history_delete' event and deletes a change history from the database.
 
         Args:
-            change_history (ChangeHistory): The change history to be deleted.
+            change_history (ImmutableChangeHistory): The change history to be deleted.
 
         Returns:
             bool: True if the change history was deleted successfully. False otherwise.
@@ -622,7 +710,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_change_history_load(
         self,
         **kwargs,
-    ) -> Optional[List[ChangeHistory]]:
+    ) -> Optional[List[ImmutableChangeHistory]]:
         """
         Handles the 'request_change_history_load' event and loads change histories from the database.
 
@@ -630,7 +718,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             **kwargs: Keyword arguments to be used for querying change histories.
 
         Returns:
-            Optional[List[ChangeHistory]]: A list of loaded change histories if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableChangeHistory]]: A list of loaded change histories if no exception occurs. Otherwise, None.
         """
 
         # Retrieve change histories using the provided keyword arguments
@@ -639,7 +727,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_change_history_lookup(
         self,
         **kwargs,
-    ) -> Optional[List[ChangeHistory]]:
+    ) -> Optional[List[ImmutableChangeHistory]]:
         """
         Handles the 'request_change_history_lookup' event and looks up change histories in the database.
 
@@ -647,7 +735,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             **kwargs: The keyword arguments to be used for querying the change histories.
 
         Returns:
-            Optional[List[ChangeHistory]]: The loaded change histories if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableChangeHistory]]: The loaded change histories if no exception occurs. Otherwise, None.
         """
 
         # Search for change histories using the provided keyword arguments and return them
@@ -655,16 +743,16 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_change_history_update(
         self,
-        change_history: ChangeHistory,
-    ) -> Optional[ChangeHistory]:
+        change_history: ImmutableChangeHistory,
+    ) -> Optional[ImmutableChangeHistory]:
         """
         Handles the 'request_change_history_update' event and updates a change history in the database.
 
         Args:
-            change_history (ChangeHistory): The change history to be updated.
+            change_history (ImmutableChangeHistory): The change history to be updated.
 
         Returns:
-            Optional[ChangeHistory]: The updated change history object if no exception occurs. Otherwise, None.
+            Optional[ImmutableChangeHistory]: The updated change history object if no exception occurs. Otherwise, None.
         """
 
         # Update and return the change history
@@ -672,16 +760,16 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_change_history_item_create(
         self,
-        change_history_item: ChangeHistoryItem,
-    ) -> Optional[ChangeHistoryItem]:
+        change_history_item: ImmutableChangeHistoryItem,
+    ) -> Optional[ImmutableChangeHistoryItem]:
         """
         Handles the 'request_change_history_item_create' event and creates a new change history item in the database.
 
         Args:
-            change_history_item (ChangeHistoryItem): The change history item to be created.
+            change_history_item (ImmutableChangeHistoryItem): The change history item to be created.
 
         Returns:
-            Optional[ChangeHistoryItem]: The created change history item object if no exception occurs. Otherwise, None.
+            Optional[ImmutableChangeHistoryItem]: The created change history item object if no exception occurs. Otherwise, None.
         """
 
         # Create and return the change history item
@@ -691,13 +779,13 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_change_history_item_delete(
         self,
-        change_history_item: ChangeHistoryItem,
+        change_history_item: ImmutableChangeHistoryItem,
     ) -> bool:
         """
         Handles the 'request_change_history_item_delete' event and deletes a change history item from the database.
 
         Args:
-            change_history_item (ChangeHistoryItem): The change history item to be deleted.
+            change_history_item (ImmutableChangeHistoryItem): The change history item to be deleted.
 
         Returns:
             bool: True if the change history item was deleted successfully. False otherwise.
@@ -711,7 +799,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_change_history_item_load(
         self,
         **kwargs,
-    ) -> Optional[List[ChangeHistoryItem]]:
+    ) -> Optional[List[ImmutableChangeHistoryItem]]:
         """
         Handles the 'request_change_history_item_load' event and retrieves a list of change history items from the database.
 
@@ -719,7 +807,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             **kwargs: The keyword arguments to be used for retrieving the change history items.
 
         Returns:
-            Optional[List[ChangeHistoryItem]]: A list of loaded change history items if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableChangeHistoryItem]]: A list of loaded change history items if no exception occurs. Otherwise, None.
         """
 
         # Retrieve change history items using the provided keyword arguments
@@ -728,7 +816,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_change_history_item_lookup(
         self,
         **kwargs,
-    ) -> Optional[List[ChangeHistoryItem]]:
+    ) -> Optional[List[ImmutableChangeHistoryItem]]:
         """
         Handles the 'request_change_history_item_lookup' event and looks up change history items in the database.
 
@@ -736,7 +824,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             **kwargs: The keyword arguments to be used for querying the change history items.
 
         Returns:
-            Optional[List[ChangeHistoryItem]]: The loaded change history items if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableChangeHistoryItem]]: The loaded change history items if no exception occurs. Otherwise, None.
         """
 
         # Search for change history items using the provided keyword arguments and return them
@@ -744,16 +832,16 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_change_history_item_update(
         self,
-        change_history_item: ChangeHistoryItem,
-    ) -> Optional[ChangeHistoryItem]:
+        change_history_item: ImmutableChangeHistoryItem,
+    ) -> Optional[ImmutableChangeHistoryItem]:
         """
         Handles the 'request_change_history_item_update' event and updates a change history item in the database.
 
         Args:
-            change_history_item (ChangeHistoryItem): The change history item to be updated.
+            change_history_item (ImmutableChangeHistoryItem): The change history item to be updated.
 
         Returns:
-            Optional[ChangeHistoryItem]: The updated change history item object if no exception occurs. Otherwise, None.
+            Optional[ImmutableChangeHistoryItem]: The updated change history item object if no exception occurs. Otherwise, None.
         """
 
         # Update and return the change history item
@@ -763,16 +851,16 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_custom_field_create(
         self,
-        custom_field: CustomField,
-    ) -> Optional[CustomField]:
+        custom_field: ImmutableCustomField,
+    ) -> Optional[ImmutableCustomField]:
         """
         Handles the 'request_custom_field_create' event and creates a new custom field in the database.
 
         Args:
-            custom_field (CustomField): The custom field to be created.
+            custom_field (ImmutableCustomField): The custom field to be created.
 
         Returns:
-            Optional[CustomField]: The newly created custom field if no exception occurs. Otherwise, None.
+            Optional[ImmutableCustomField]: The newly created custom field if no exception occurs. Otherwise, None.
         """
 
         # Create and return the custom field
@@ -780,13 +868,13 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_custom_field_delete(
         self,
-        custom_field: CustomField,
+        custom_field: ImmutableCustomField,
     ) -> bool:
         """
         Handles the 'request_custom_field_delete' event and deletes a custom field from the database.
 
         Args:
-            custom_field (CustomField): The custom field to be deleted.
+            custom_field (ImmutableCustomField): The custom field to be deleted.
 
         Returns:
             bool: True if the custom field was deleted successfully. False otherwise.
@@ -798,7 +886,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_custom_field_load(
         self,
         **kwargs,
-    ) -> Optional[List[CustomField]]:
+    ) -> Optional[List[ImmutableCustomField]]:
         """
         Handles the 'request_custom_field_load' event and retrieves a list of custom fields from the database.
 
@@ -806,7 +894,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             **kwargs: The keyword arguments to be used for retrieving the custom fields.
 
         Returns:
-            Optional[List[CustomField]]: A list of loaded custom fields if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableCustomField]]: A list of loaded custom fields if no exception occurs. Otherwise, None.
         """
 
         # Retrieve custom fields using the provided keyword arguments
@@ -815,7 +903,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_custom_field_lookup(
         self,
         **kwargs,
-    ) -> Optional[List[CustomField]]:
+    ) -> Optional[List[ImmutableCustomField]]:
         """
         Handles the 'request_custom_field_lookup' event and looks up custom fields in the database.
 
@@ -823,7 +911,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             **kwargs: The keyword arguments to be used for querying the custom fields.
 
         Returns:
-            Optional[List[CustomField]]: The loaded custom fields if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableCustomField]]: The loaded custom fields if no exception occurs. Otherwise, None.
         """
 
         # Search for custom fields using the provided keyword arguments and return them
@@ -831,16 +919,16 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_custom_field_update(
         self,
-        custom_field: CustomField,
-    ) -> Optional[CustomField]:
+        custom_field: ImmutableCustomField,
+    ) -> Optional[ImmutableCustomField]:
         """
         Handles the 'request_custom_field_update' event and updates a custom field in the database.
 
         Args:
-            custom_field (CustomField): The custom field to be updated.
+            custom_field (ImmutableCustomField): The custom field to be updated.
 
         Returns:
-            Optional[CustomField]: The updated custom field object if no exception occurs. Otherwise, None.
+            Optional[ImmutableCustomField]: The updated custom field object if no exception occurs. Otherwise, None.
         """
 
         # Update and return the custom field
@@ -1027,12 +1115,12 @@ class UnifiedObjectService(ImmutableBaseObject):
         # Get all answers from the database and return them
         return self.unified_manager.get_all_answers()
 
-    def on_request_get_all_associations(self) -> Optional[List[Association]]:
+    def on_request_get_all_associations(self) -> Optional[List[ImmutableAssociation]]:
         """
         Handles the 'request_get_all_associations' event and gets all associations from the database.
 
         Returns:
-            Optional[List[Association]]: A list of all associations if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableAssociation]]: A list of all associations if no exception occurs. Otherwise, None.
         """
 
         # Get all associations from the database and return them
@@ -1040,12 +1128,12 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_get_all_change_histories(
         self,
-    ) -> Optional[List[ChangeHistory]]:
+    ) -> Optional[List[ImmutableChangeHistory]]:
         """
         Handles the 'request_all_change_histories' event and gets all change histories from the database.
 
         Returns:
-            Optional[List[ImmutableChangeHistory]]: A list of all change histories if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableImmutableChangeHistory]]: A list of all change histories if no exception occurs. Otherwise, None.
         """
 
         # Get all change histories from the database and return them
@@ -1053,23 +1141,23 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_get_all_change_history_items(
         self,
-    ) -> Optional[List[ChangeHistoryItem]]:
+    ) -> Optional[List[ImmutableChangeHistoryItem]]:
         """
         Handles the 'request_all_change_history_items' event and gets all change history items from the database.
 
         Returns:
-            Optional[List[ImmutableChangeHistoryItem]]: A list of all change history items if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableImmutableChangeHistoryItem]]: A list of all change history items if no exception occurs. Otherwise, None.
         """
 
         # Get all change history items from the database and return them
         return self.unified_manager.get_all_change_history_items()
 
-    def on_request_get_all_custom_fields(self) -> Optional[List[CustomField]]:
+    def on_request_get_all_custom_fields(self) -> Optional[List[ImmutableCustomField]]:
         """
         Handles the 'request_get_all_custom_fields' event and gets all custom fields from the database.
 
         Returns:
-            Optional[List[ImmutableCustomField]]: A list of all custom fields if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableImmutableCustomField]]: A list of all custom fields if no exception occurs. Otherwise, None.
         """
 
         # Get all custom fields from the database and return them
@@ -1212,8 +1300,8 @@ class UnifiedObjectService(ImmutableBaseObject):
         key: str,
     ) -> Optional[
         Union[
-            Association,
-            CustomField,
+            ImmutableAssociation,
+            ImmutableCustomField,
             ImmutableStack,
             ImmutableFlashcard,
             ImmutableQuestion,
@@ -1236,7 +1324,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             key (str): The key of the object to be retrieved.
 
         Returns:
-            Optional[Union[Association, CustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]: The retrieved object if no exception occurs. Otherwise, None.
+            Optional[Union[ImmutableAssociation, ImmutableCustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]: The retrieved object if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_key' method.
@@ -1249,8 +1337,8 @@ class UnifiedObjectService(ImmutableBaseObject):
     ) -> Optional[
         List[
             Union[
-                Association,
-                CustomField,
+                ImmutableAssociation,
+                ImmutableCustomField,
                 ImmutableStack,
                 ImmutableFlashcard,
                 ImmutableQuestion,
@@ -1274,7 +1362,7 @@ class UnifiedObjectService(ImmutableBaseObject):
             keys (List[str]): The keys of the objects to be retrieved.
 
         Returns:
-            Optional[List[Union[Association, CustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]]: The retrieved objects if no exception occurs. Otherwise, None.
+            Optional[List[Union[ImmutableAssociation, ImmutableCustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]]: The retrieved objects if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_keys' method.

@@ -86,13 +86,19 @@ class ImmutableTag(ImmutableBaseObject):
         Returns:
             MutableTag: The mutable tag.
         """
-        return MutableTag(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            return MutableTag(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            self._logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
+            )
+            return None
 
 
 class MutableTag(MutableBaseObject):
@@ -153,15 +159,20 @@ class MutableTag(MutableBaseObject):
         Returns:
             ImmutableTag: A immutable copy of the MutableTag instance.
         """
-
-        # Create a new ImmutableTag instance from the dictionary representation of the MutableTag instance
-        return ImmutableTag(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new ImmutableTag instance from the dictionary representation of the MutableTag instance
+            return ImmutableTag(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            self._logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
+            )
+            return None
 
 
 class TagConverter:
@@ -543,6 +554,51 @@ class TagManager(BaseObjectManager):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_from_tags(
+        self,
+        condition: Callable[[ImmutableTag], bool],
+        limit: Optional[int] = None,
+    ) -> Optional[List[ImmutableTag]]:
+        """
+        Returns a list of tags from the cache that match the given condition.
+
+        Args:
+            condition (Callable[[ImmutableTag], bool]): A function that takes an ImmutableTag instance and returns a boolean value.
+            limit (Optional[int]): The maximum number of tags to return.
+
+        Returns:
+            Optional[List[ImmutableTag]]: The list of tags that match the given condition if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Initialize an empty list to store matching tags
+            result: List[ImmutableTag] = []
+
+            # Get all tags from the cache
+            tags: List[ImmutableTag] = self.get_all_tags()
+
+            # Iterate over the list of immutable tags in the cache
+            for tag in tags:
+                # Check if the tag matches the given condition
+                if condition(tag):
+                    # Add the tag that matches the given condition to the result list
+                    result.append(tag)
+
+            # Check if the limit is specified and if the result list exceeds the limit
+            if limit is not None and len(result) > limit:
+                # Return the first 'limit' number of tags
+                return result[:limit]
+
+            # Return the list of matching tags
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_from_tags' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred

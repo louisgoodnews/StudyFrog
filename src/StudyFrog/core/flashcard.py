@@ -50,6 +50,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         front_word_count (int): The word count of the front side of the flashcard.
         icon (str): The icon of the flashcard.
         id (int): The ID of the flashcard.
+        interval (Optional[int]): The repetition interval of the flashcard in days.
         key (str): The key of the flashcard.
         last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
         priority (int): The ID of the priority the flashcard is associated with.
@@ -72,6 +73,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         front_word_count: Optional[int] = None,
         icon: Optional[str] = "📇",
         id: Optional[int] = None,
+        interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
@@ -95,6 +97,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             front_word_count (Optional[int]): The word count of the front side of the flashcard.
             icon (Optional[str]): The icon of the flashcard. Defaults to "📇".
             id (Optional[int]): The ID of the flashcard.
+            interval (Optional[int]): The repetition interval of the flashcard in days.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
@@ -202,6 +205,7 @@ class MutableFlashcard(MutableBaseObject):
         front_word_count (int): The word count of the front side of the flashcard.
         icon (str): The icon of the flashcard.
         id (int): The ID of the flashcard.
+        interval (Optional[int]): The repetition interval of the flashcard in days.
         key (str): The key of the flashcard.
         last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
         priority (int): The ID of the priority the flashcard is associated with.
@@ -224,6 +228,7 @@ class MutableFlashcard(MutableBaseObject):
         front_word_count: Optional[int] = None,
         icon: Optional[str] = "📇",
         id: Optional[int] = None,
+        interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
@@ -247,6 +252,7 @@ class MutableFlashcard(MutableBaseObject):
             front_word_count (Optional[int]): The word count of the front side of the flashcard.
             icon (Optional[str]): The icon of the flashcard. Defaults to "📇".
             id (Optional[int]): The ID of the flashcard.
+            interval (Optional[int]): The repetition interval of the flashcard in days.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
@@ -272,6 +278,7 @@ class MutableFlashcard(MutableBaseObject):
             front_word_count=front_word_count,
             icon="📇",
             id=id,
+            interval=interval,
             key=key,
             last_viewed_at=last_viewed_at,
             priority=priority,
@@ -515,6 +522,7 @@ class FlashcardFactory:
         front_word_count: Optional[int] = None,
         icon: Optional[str] = "📇",
         id: Optional[int] = None,
+        interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
@@ -538,6 +546,7 @@ class FlashcardFactory:
             front_word_count (Optional[int]): The word count of the front side of the flashcard.
             icon (Optional[str]): The icon of the flashcard. Defaults to "📇".
             id (Optional[int]): The ID of the flashcard.
+            interval (Optional[int]): The repetition interval of the flashcard in days.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
@@ -566,6 +575,7 @@ class FlashcardFactory:
                 front_word_count=front_word_count,
                 id=id,
                 icon=icon,
+                interval=interval,
                 key=key,
                 last_viewed_at=last_viewed_at,
                 priority=priority,
@@ -742,22 +752,12 @@ class FlashcardBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
-    def icon(
-        self,
-        value: Optional[str] = None,
-    ) -> Self:
-        # Set the icon value in the configuration dictionary
-        self.configuration["icon"] = value
-
-        # Return the builder instance
-        return self
-
-    def id(
+    def interval(
         self,
         value: Optional[int] = None,
     ) -> Self:
-        # Set the id value in the configuration dictionary
-        self.configuration["id"] = value
+        # Set the interval value in the configuration dictionary
+        self.configuration["interval"] = value
 
         # Return the builder instance
         return self
@@ -854,7 +854,32 @@ class FlashcardManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["FlashcardManager"] = None
+
+    def __new__(cls) -> "FlashcardManager":
+        """
+        Creates and returns a new instance of the FlashcardManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            FlashcardManager: The created or existing instance of FlashcardManager class.
+        """
+        
+        # Check if the shared instance does not exist
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(FlashcardManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+        
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
         """
         Initializes a new instance of the FlashcardManager class.
 
@@ -1519,6 +1544,7 @@ class FlashcardModel(ImmutableBaseModel):
         front_word_count (Field): The word count of the front side of the flashcard.
         icon (Field): The icon of the flashcard. Defaults to "📇".
         id (Field): The ID of the flashcard.
+        interval (Field): The repetition interval of the flashcard in days.
         key (Field): The key of the flashcard.
         last_viewed_at (Field): The timestamp when the flashcard was last viewed.
         priority (Field): The priority of the flashcard.
@@ -1691,6 +1717,22 @@ class FlashcardModel(ImmutableBaseModel):
         unique=False,
     )
 
+    interval: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="interval",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     key: Field = Field(
         autoincrement=False,
         default=None,
@@ -1831,6 +1873,7 @@ class FlashcardModel(ImmutableBaseModel):
         front_word_count: Optional[int] = None,
         icon: Optional[str] = "📇",
         id: Optional[int] = None,
+        interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         priority: Optional[int] = None,
@@ -1854,6 +1897,7 @@ class FlashcardModel(ImmutableBaseModel):
             front_word_count (Optional[int]): The word count of the front side of the flashcard.
             icon (Optional[str]): The icon of the flashcard. Defaults to "📇".
             id (Optional[int]): The ID of the flashcard.
+            interval (Optional[int]): The repetition interval of the flashcard in days.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
             priority (Optional[int]): The priority of the flashcard.
@@ -1879,6 +1923,7 @@ class FlashcardModel(ImmutableBaseModel):
             front_word_count=front_word_count,
             icon="📇",
             id=id,
+            interval=interval,
             key=key,
             last_viewed_at=last_viewed_at,
             priority=priority,

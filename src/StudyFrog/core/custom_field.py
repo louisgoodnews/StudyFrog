@@ -6,7 +6,6 @@ Date: 2025-02-09
 import asyncio
 
 from datetime import datetime
-
 from typing import *
 
 from utils.constants import Constants
@@ -19,14 +18,15 @@ from utils.object import MutableBaseObject, ImmutableBaseObject
 
 
 __all__: Final[List[str]] = [
-    "CustomField",
+    "ImmutableCustomField",
+    "MutableCustomField",
     "CustomFieldConverter",
     "CustomFieldFactory",
     "CustomFieldModel",
 ]
 
 
-class CustomField(ImmutableBaseObject):
+class ImmutableCustomField(ImmutableBaseObject):
     """
     An immutable class representing a custom field.
 
@@ -80,6 +80,117 @@ class CustomField(ImmutableBaseObject):
             uuid=uuid,
         )
 
+    def to_mutable(self) -> Optional["MutableCustomField"]:
+        """
+        Returns a mutable version of the immutable object.
+
+        Returns:
+            MutableCustomField: A mutable version of the immutable object.
+
+        Raises:
+            Exception: If an exception occurs while attempting to convert the ImmutableCustomField instance.
+        """
+        try:
+            # Attempt to create and return a new instance of the MutableCustomField class from the dictionary representation of the ImmutableCustomField instance
+            return MutableCustomField(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+
+class MutableCustomField(MutableBaseObject):
+    """
+    A mutable class representing a custom field.
+
+    Attributes:
+        name (str): The name of the custom field.
+        type (str): The type of the custom field.
+        created_at (Optional[datetime]): The timestamp when the custom field was created.
+        id (Optional[int]): The ID of the custom field.
+        key (Optional[str]): The key of the custom field.
+        updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
+        uuid (Optional[str]): The UUID of the custom field.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        type: str,
+        created_at: Optional[datetime] = None,
+        icon: Optional[str] = "🎛️",
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance of the MutableCustomField class.
+
+        Args:
+            name (str): The name of the custom field.
+            type (str): The type of the custom field.
+            created_at (Optional[datetime]): The timestamp when the custom field was created.
+            icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
+            id (Optional[int]): The ID of the custom field.
+            key (Optional[str]): The key of the custom field.
+            updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
+            uuid (Optional[str]): The UUID of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__(
+            created_at=created_at,
+            icon=icon,
+            id=id,
+            key=key,
+            name=name,
+            type=type,
+            updated_at=updated_at,
+            uuid=uuid,
+        )
+
+    def to_immutable(self) -> Optional[ImmutableCustomField]:
+        """
+        Returns an immutable version of the mutable object.
+
+        Returns:
+            ImmutableCustomField: An immutable version of the mutable object.
+
+        Raises:
+            Exception: If an exception occurs while attempting to convert the MutableCustomField instance.
+        """
+        try:
+            # Attempt to create and return a new instance of the ImmutableCustomField class from the dictionary representation of the MutableCustomField instance
+            return ImmutableCustomField(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
 
 class CustomFieldConverter:
     """
@@ -98,7 +209,7 @@ class CustomFieldConverter:
     def model_to_object(
         cls,
         model: "CustomFieldModel",
-    ) -> Optional[CustomField]:
+    ) -> Optional[ImmutableCustomField]:
         """
         Converts a given CustomFieldModel instance to an CustomField instance.
 
@@ -113,7 +224,7 @@ class CustomFieldConverter:
         """
         try:
             # Attempt to create and return a new instance of the CustomField class from the dictionary representation of the CustomFieldModel instance
-            return CustomField(
+            return ImmutableCustomField(
                 **model.to_dict(
                     exclude=[
                         "_logger",
@@ -133,7 +244,7 @@ class CustomFieldConverter:
     @classmethod
     def object_to_model(
         cls,
-        object: CustomField,
+        object: Union[ImmutableCustomField, MutableCustomField],
     ) -> Optional["CustomFieldModel"]:
         """
         Converts a given CustomField instance to a CustomFieldModel instance.
@@ -187,7 +298,7 @@ class CustomFieldFactory:
         key: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
-    ) -> Optional[CustomField]:
+    ) -> Optional[ImmutableCustomField]:
         """
         Creates and returns a new instance of the CustomField class.
 
@@ -202,14 +313,14 @@ class CustomFieldFactory:
             uuid (str): The UUID of the custom field.
 
         Returns:
-            Optional[CustomField]: The newly created CustomField instance or None if an exception occurs.
+            Optional[ImmutableCustomField]: The newly created CustomField instance or None if an exception occurs.
 
         Raises:
             Exception: If an exception occurs while attempting to create the CustomField instance.
         """
         try:
             # Attempt to create and return a new instance of the CustomField class
-            return CustomField(
+            return ImmutableCustomField(
                 created_at=created_at,
                 icon=icon,
                 id=id,
@@ -240,7 +351,32 @@ class CustomFieldManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["CustomFieldManager"] = None
+
+    def __new__(cls) -> "CustomFieldManager":
+        """
+        Creates and returns a new instance of the CustomFieldManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            CustomFieldManager: The created or existing instance of CustomFieldManager class.
+        """
+
+        # Check if the shared instance does not exist
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(CustomFieldManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
         """
         Initializes a new instance of the CustomFieldManager class.
 
@@ -280,21 +416,29 @@ class CustomFieldManager(BaseObjectManager):
 
     def create_custom_field(
         self,
-        custom_field: CustomField,
-    ) -> Optional[CustomField]:
+        custom_field: Union[ImmutableCustomField, MutableCustomField],
+    ) -> Optional[ImmutableCustomField]:
         """
         Creates a new custom field in the database.
 
         Args:
-            custom field (CustomField): The custom field to be created.
+            custom field (Union[ImmutableCustomField, MutableCustomField]): The custom field to be created.
 
         Returns:
-            Optional[CustomField]: The newly created immutable custom field if no exception occurs. Otherwise, None.
+            Optional[ImmutableCustomField]: The newly created immutable custom field if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while creating the custom field.
         """
         try:
+            # Check if the custom field object is immutable
+            if isinstance(
+                custom_field,
+                ImmutableCustomField,
+            ):
+                # If it is, convert it to a mutable custom field
+                custom_field = custom_field.to_mutable()
+
             # Set the created_at timestamp of the custom field
             custom_field.created_at = Miscellaneous.get_current_datetime()
 
@@ -322,7 +466,7 @@ class CustomFieldManager(BaseObjectManager):
                 custom_field.id = id
 
                 # Convert the custom field to an immutable custom field
-                custom_field = CustomField(
+                custom_field = ImmutableCustomField(
                     **custom_field.to_dict(
                         exclude=[
                             "_logger",
@@ -357,13 +501,13 @@ class CustomFieldManager(BaseObjectManager):
 
     def delete_custom_field(
         self,
-        custom_field: CustomField,
+        custom_field: Union[ImmutableCustomField, MutableCustomField],
     ) -> bool:
         """
         Deletes a custom field from the database.
 
         Args:
-            custom field (CustomField): The custom field to be deleted.
+            custom field (Union[ImmutableCustomField, MutableCustomField]): The custom field to be deleted.
 
         Returns:
             bool: True if the custom field was deleted successfully. False otherwise.
@@ -396,12 +540,12 @@ class CustomFieldManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_custom_fields(self) -> Optional[List[CustomField]]:
+    def get_all_custom_fields(self) -> Optional[List[ImmutableCustomField]]:
         """
         Returns a list of all custom fields in the database.
 
         Returns:
-            Optional[List[CustomField]]: A list of all custom fields in the database if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableCustomField]]: A list of all custom fields in the database if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -418,8 +562,8 @@ class CustomFieldManager(BaseObjectManager):
             )
 
             # Convert the list of CustomFieldModel objects to a list of CustomField objects
-            custom_fields: List[CustomField] = [
-                CustomField(
+            custom_fields: List[ImmutableCustomField] = [
+                ImmutableCustomField(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -460,7 +604,7 @@ class CustomFieldManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
-    ) -> Optional[CustomField]:
+    ) -> Optional[ImmutableCustomField]:
         """
         Retrieves a custom field by the given field and value.
 
@@ -469,7 +613,7 @@ class CustomFieldManager(BaseObjectManager):
             value (Any): The value to search for.
 
         Returns:
-            Optional[CustomField]: The custom field with the given field and value if no exception occurs. Otherwise, None.
+            Optional[ImmutableCustomField]: The custom field with the given field and value if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -492,7 +636,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return the custom field if it exists
             if model is not None:
                 # Convert the CustomFieldModel object to an CustomField object
-                return CustomField(
+                return ImmutableCustomField(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -515,7 +659,7 @@ class CustomFieldManager(BaseObjectManager):
     def get_custom_field_by_id(
         self,
         id: int,
-    ) -> Optional[CustomField]:
+    ) -> Optional[ImmutableCustomField]:
         """
         Returns a custom field with the given ID.
 
@@ -523,7 +667,7 @@ class CustomFieldManager(BaseObjectManager):
             id (int): The ID of the custom_field.
 
         Returns:
-            Optional[CustomField]: The custom field with the given ID if no exception occurs. Otherwise, None.
+            Optional[ImmutableCustomField]: The custom field with the given ID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -546,7 +690,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return the custom field if it exists
             if model is not None:
                 # Convert the CustomFieldModel object to an CustomField object
-                return CustomField(
+                return ImmutableCustomField(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -569,7 +713,7 @@ class CustomFieldManager(BaseObjectManager):
     def get_custom_field_by_uuid(
         self,
         uuid: str,
-    ) -> Optional[CustomField]:
+    ) -> Optional[ImmutableCustomField]:
         """
         Returns a custom field with the given UUID.
 
@@ -577,7 +721,7 @@ class CustomFieldManager(BaseObjectManager):
             uuid (str): The UUID of the custom_field.
 
         Returns:
-            Optional[CustomField]: The custom field with the given UUID if no exception occurs. Otherwise, None.
+            Optional[ImmutableCustomField]: The custom field with the given UUID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -600,7 +744,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return the custom field if it exists
             if model is not None:
                 # Convert the CustomFieldModel object to an CustomField object
-                return CustomField(
+                return ImmutableCustomField(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -623,7 +767,7 @@ class CustomFieldManager(BaseObjectManager):
     def search_custom_fields(
         self,
         **kwargs,
-    ) -> Optional[Union[List[CustomField]]]:
+    ) -> Optional[Union[List[ImmutableCustomField]]]:
         """
         Searches for custom fields in the database.
 
@@ -631,7 +775,7 @@ class CustomFieldManager(BaseObjectManager):
             **kwargs: Any additional keyword arguments to be passed to the search method of the CustomFieldModel class.
 
         Returns:
-            Optional[Union[List[CustomField]]]: The found custom fields if no exception occurs. Otherwise, None.
+            Optional[Union[List[ImmutableCustomField]]]: The found custom fields if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -648,7 +792,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return the found custom fields if any
             if models is not None and len(models) > 0:
                 return [
-                    CustomField(
+                    ImmutableCustomField(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -672,16 +816,16 @@ class CustomFieldManager(BaseObjectManager):
 
     def update_custom_field(
         self,
-        custom_field: CustomField,
-    ) -> Optional[CustomField]:
+        custom_field: Union[ImmutableCustomField, MutableCustomField],
+    ) -> Optional[ImmutableCustomField]:
         """
         Updates a custom field with the given ID.
 
         Args:
-            custom field (CustomField): The custom field to update.
+            custom field (Union[ImmutableCustomField, MutableCustomField]): The custom field to update.
 
         Returns:
-            Optional[CustomField]: The updated custom field if no exception occurs. Otherwise, None.
+            Optional[ImmutableCustomField]: The updated custom field if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -713,7 +857,7 @@ class CustomFieldManager(BaseObjectManager):
             # Return the updated custom field if it exists
             if model is not None:
                 # Convert the CustomFieldModel object to an CustomField object
-                custom_field = CustomField(
+                custom_field = ImmutableCustomField(
                     **model.to_dict(
                         exclude=[
                             "_logger",

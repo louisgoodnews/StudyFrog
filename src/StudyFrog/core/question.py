@@ -773,7 +773,29 @@ class QuestionManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["QuestionManager"] = None
+
+    def __new__(cls) -> "QuestionManager":
+        """
+        Creates and returns a new instance of the QuestionManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            QuestionManager: The created or existing instance of QuestionManager class.
+        """
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(QuestionManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
         """
         Initializes a new instance of the QuestionManager class.
 

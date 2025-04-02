@@ -6,7 +6,6 @@ Date 2025-02-09
 import asyncio
 
 from datetime import datetime
-
 from typing import *
 
 from core.default import ImmutableDefault, DefaultManager
@@ -334,7 +333,29 @@ class SettingManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["SettingManager"] = None
+
+    def __new__(cls) -> "SettingManager":
+        """
+        Creates and returns a new instance of the SettingManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            SettingManager: The created or existing instance of SettingManager class.
+        """
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(SettingManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
         """
         Initializes a new instance of the SettingManager class.
 

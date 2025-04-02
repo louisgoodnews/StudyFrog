@@ -6,7 +6,6 @@ Date: 2025-02-15
 import asyncio
 
 from datetime import datetime
-
 from typing import *
 
 from utils.constants import Constants
@@ -328,7 +327,29 @@ class StatusManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["StatusManager"] = None
+
+    def __new__(cls) -> "StatusManager":
+        """
+        Creates and returns a new instance of the StatusManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            StatusManager: The created or existing instance of StatusManager class.
+        """
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(StatusManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
         """
         Initializes a new instance of the StatusManager class.
 

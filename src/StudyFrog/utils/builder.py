@@ -47,6 +47,8 @@ class BaseObjectBuilder(ImmutableBaseObject):
         Returns:
             Any: An instance of the subclass.
         """
+
+        # Raise a NotImplementedError if the method is not implemented
         raise NotImplementedError(
             f"Subclass '{self.__class__.__name__}' must implement the 'build' method."
         )
@@ -54,7 +56,7 @@ class BaseObjectBuilder(ImmutableBaseObject):
     def kwargs(
         self,
         **kwargs,
-    ) -> None:
+    ) -> Self:
         """
         Updates the configuration dictionary with the given keyword arguments.
 
@@ -62,8 +64,11 @@ class BaseObjectBuilder(ImmutableBaseObject):
             kwargs (Dict[str, Any]): The keyword arguments to be updated.
 
         Returns:
-            None
+            Self: The builder instance with updated configuration.
         """
 
         # Update the configuration dictionary with the given keyword arguments
         self.configuration.update(kwargs)
+
+        # Return the builder instance
+        return self

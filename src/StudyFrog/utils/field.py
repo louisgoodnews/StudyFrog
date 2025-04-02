@@ -118,6 +118,26 @@ class Field(ImmutableBaseObject):
             unique_together=unique_together,
         )
 
+    @classmethod
+    def get_id_field(cls) -> "Field":
+        """
+        Returns a Field instance for the ID field.
+
+        Args:
+            None
+
+        Returns:
+            Field: The ID field.
+        """
+
+        # Return the ID field
+        return Field(
+            name="id",
+            type="INTEGER",
+            primary_key=True,
+            autoincrement=True,
+        )
+
     def to_sql_string(self) -> str:
         """
         Converts the field object to a SQL-compatible column definition.

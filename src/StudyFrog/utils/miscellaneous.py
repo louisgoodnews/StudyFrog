@@ -328,6 +328,24 @@ class Miscellaneous:
         return str(uuid.uuid4())
 
     @classmethod
+    def pluralize(cls, string: str,) -> str:
+        """
+        Returns the plural form of a word.
+
+        Args:
+            string (str): The word to pluralize.
+
+        Returns:
+            str: The plural form of the word.
+        """
+        if string.endswith("s"):
+            return string
+        elif string.endswith("y"):
+            return string[:-1] + "ies"
+        else:
+            return string + "s"
+
+    @classmethod
     def run_asynchronously(
         cls,
         func: Callable[..., Any],

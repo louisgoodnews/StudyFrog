@@ -5,10 +5,7 @@ Date: 2025-02-05
 
 import asyncio
 
-import uuid
-
 from datetime import datetime
-
 from typing import *
 
 from utils.constants import Constants
@@ -347,7 +344,29 @@ class PriorityManager(BaseObjectManager):
         logger (Logger): The logger instance associated with the object.
     """
 
-    def __init__(self) -> None:
+    _shared_instance: Optional["PriorityManager"] = None
+
+    def __new__(cls) -> "PriorityManager":
+        """
+        Creates and returns a new instance of the PriorityManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            PriorityManager: The created or existing instance of PriorityManager class.
+        """
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(PriorityManager, cls).__new__(cls)
+            # Initialize the instance
+            cls._shared_instance.init()
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
         """
         Initializes a new instance of the PriorityManager class.
 
