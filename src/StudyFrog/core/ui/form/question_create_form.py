@@ -351,7 +351,7 @@ class QuestionCreateForm(tkinter.Frame):
         )
 
         # Create a combobox widget to select a stack
-        self.stack_field = UIBuilder.get_combobox_select_field(
+        self.stack_field = UIBuilder.get_combobox_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
@@ -428,7 +428,7 @@ class QuestionCreateForm(tkinter.Frame):
         )
 
         # Create a combobox widget to select a question type
-        self.question_type_field = UIBuilder.get_combobox_select_field(
+        self.question_type_field = UIBuilder.get_combobox_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,

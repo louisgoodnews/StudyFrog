@@ -316,7 +316,7 @@ class StackCreateForm(tkinter.Frame):
         )
 
         # Create a combobox widget to select a stack
-        self.ancestor_stack_field = UIBuilder.get_combobox_select_field(
+        self.ancestor_stack_field = UIBuilder.get_combobox_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
@@ -400,7 +400,7 @@ class StackCreateForm(tkinter.Frame):
         )
 
         # Create a stack field for the difficulty
-        self.difficulty_field: Dict[str, Any] = UIBuilder.get_combobox_select_field(
+        self.difficulty_field: Dict[str, Any] = UIBuilder.get_combobox_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
@@ -445,7 +445,7 @@ class StackCreateForm(tkinter.Frame):
         )
 
         # Create a stack field for the priority
-        self.priority_field: Dict[str, Any] = UIBuilder.get_combobox_select_field(
+        self.priority_field: Dict[str, Any] = UIBuilder.get_combobox_field(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,

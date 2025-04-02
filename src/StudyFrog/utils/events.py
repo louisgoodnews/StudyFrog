@@ -126,23 +126,28 @@ class Events:
     )
 
     # An event that indicates that a checkbox field has changed
-    CHECKBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
+    CHECKBUTTON_FIELD_CHANGED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:checkbox:field:changed")
     )
 
     # An event that indicates that a checkbox field has been cleared
-    CHECKBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
+    CHECKBUTTON_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:checkbox:field:cleared")
     )
 
     # An event that indicates that a checkbox field's value has been retrieved
-    CHECKBOX_FIELD_GET: Final[DispatcherEvent] = (
+    CHECKBUTTON_FIELD_GET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:checkbox:field:get")
     )
 
     # An event that indicates that a checkbox field has been set
-    CHECKBOX_FIELD_SET: Final[DispatcherEvent] = (
+    CHECKBUTTON_FIELD_SET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:checkbox:field:set")
+    )
+
+    # An event that indicates that a combobox field has changed
+    COMBOBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:combobox:field:changed")
     )
 
     # An event that indicates that a combobox field has been cleared
@@ -1149,6 +1154,21 @@ class Events:
         DispatcherEventFactory.create_event(name="global:request:validate:navigation")
     )
 
+    # An event that indicates that a scale field has been cleared
+    SCALE_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:scale:field:cleared")
+    )
+
+    # An event that indicates that a scale field has been retrieved
+    SCALE_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:scale:field:get")
+    )
+
+    # An event that indicates that a scale field has been set
+    SCALE_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:scale:field:set")
+    )
+
     # An event that indicates that the settings button has been clicked
     SETTINGS_BUTTON_CLICKED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:settings:button:clicked")
@@ -1404,18 +1424,18 @@ class Events:
         ]
     
     @classmethod
-    def get_checkbox_field_events(cls) -> List[DispatcherEvent]:
+    def get_checkbutton_field_events(cls) -> List[DispatcherEvent]:
         """
-        Returns a list of all checkbox field events in the Events class.
+        Returns a list of all checkbutton field events in the Events class.
 
         Returns:
-            List[DispatcherEvent]: A list of all checkbox field events in the Events class.
+            List[DispatcherEvent]: A list of all checkbutton field events in the Events class.
         """
         return [
-            cls.CHECKBOX_FIELD_CHANGED,
-            cls.CHECKBOX_FIELD_CLEARED,
-            cls.CHECKBOX_FIELD_GET,
-            cls.CHECKBOX_FIELD_SET,
+            cls.CHECKBUTTON_FIELD_CHANGED,
+            cls.CHECKBUTTON_FIELD_CLEARED,
+            cls.CHECKBUTTON_FIELD_GET,
+            cls.CHECKBUTTON_FIELD_SET,
         ]
 
     @classmethod
@@ -1671,6 +1691,20 @@ class Events:
             cls.READONLY_FIELD_CLEARED,
             cls.READONLY_FIELD_GET,
             cls.READONLY_FIELD_SET,
+        ]
+
+    @classmethod
+    def get_scale_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all scale field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all scale field events in the Events class.
+        """
+        return [
+            cls.SCALE_FIELD_CLEARED,
+            cls.SCALE_FIELD_GET,
+            cls.SCALE_FIELD_SET,
         ]
 
     @classmethod

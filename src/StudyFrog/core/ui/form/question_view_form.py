@@ -826,7 +826,7 @@ class QuestionViewForm(tkinter.Frame):
 
         # Create a combobox select field for the difficulty
         self.difficulty_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_combobox_select_field(
+            UIBuilder.get_combobox_field(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
@@ -890,7 +890,7 @@ class QuestionViewForm(tkinter.Frame):
 
         # Create a combobox select field for the priority
         self.priority_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_combobox_select_field(
+            UIBuilder.get_combobox_field(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,

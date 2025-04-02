@@ -599,9 +599,6 @@ class Constants:
         "Spaced Repetition",
     ]
 
-    # The style of the application
-    STYLE: Final[ttk.Style] = ttk.Style()
-
     @classmethod
     def get_base_id(cls) -> int:
         """

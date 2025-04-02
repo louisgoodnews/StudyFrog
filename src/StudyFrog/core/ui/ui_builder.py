@@ -229,9 +229,9 @@ class UIBuilder:
                 """
                 try:
                     if dispatch:
-                        # Dispatch the CHECKBOX_FIELD_CLEARED event
+                        # Dispatch the CHECKBUTTON_FIELD_CLEARED event
                         cls.dispatcher.dispatch(
-                            event=Events.CHECKBOX_FIELD_CLEARED,
+                            event=Events.CHECKBUTTON_FIELD_CLEARED,
                             label=label,
                             namespace=namespace,
                             value=False,
@@ -263,9 +263,9 @@ class UIBuilder:
                 """
                 try:
                     if dispatch:
-                        # Dispatch the CHECKBOX_FIELD_GET event
+                        # Dispatch the CHECKBUTTON_FIELD_GET event
                         cls.dispatcher.dispatch(
-                            event=Events.CHECKBOX_FIELD_GET,
+                            event=Events.CHECKBUTTON_FIELD_GET,
                             label=label,
                             namespace=namespace,
                             value=result["variable"].get(),
@@ -284,7 +284,7 @@ class UIBuilder:
 
             def on_check_box_changed(dispatch: bool = True) -> None:
                 """
-                Handles the CHECKBOX_FIELD_CHANGED event.
+                Handles the CHECKBUTTON_FIELD_CHANGED event.
 
                 This function is called when the value of the checkbutton field changes.
 
@@ -295,13 +295,13 @@ class UIBuilder:
                     None
 
                 Raises:
-                    Exception: If an exception occurs while attempting to dispatch the CHECKBOX_FIELD_CHANGED event.
+                    Exception: If an exception occurs while attempting to dispatch the CHECKBUTTON_FIELD_CHANGED event.
                 """
                 try:
                     if dispatch:
-                        # Dispatch the CHECKBOX_FIELD_CHANGED event
+                        # Dispatch the CHECKBUTTON_FIELD_CHANGED event
                         cls.dispatcher.dispatch(
-                            event=Events.CHECKBOX_FIELD_CHANGED,
+                            event=Events.CHECKBUTTON_FIELD_CHANGED,
                             label=label,
                             namespace=namespace,
                             value=result["variable"].get(),
@@ -328,7 +328,7 @@ class UIBuilder:
                 Sets the value of the checkbutton field.
 
                 Args:
-                    dispatch (bool, optional): Whether to dispatch the CHECKBOX_FIELD_SET event. Defaults to True.
+                    dispatch (bool, optional): Whether to dispatch the CHECKBUTTON_FIELD_SET event. Defaults to True.
                     value (bool, optional): The value to set for the checkbutton field. Defaults to False.
 
                 Returns:
@@ -339,9 +339,9 @@ class UIBuilder:
                 """
                 try:
                     if dispatch:
-                        # Dispatch the CHECKBOX_FIELD_SET event
+                        # Dispatch the CHECKBUTTON_FIELD_SET event
                         cls.dispatcher.dispatch(
-                            event=Events.CHECKBOX_FIELD_SET,
+                            event=Events.CHECKBUTTON_FIELD_SET,
                             label=label,
                             namespace=namespace,
                             value=value,
@@ -525,8 +525,12 @@ class UIBuilder:
                     # Call the "setter" function on the current field
                     field["setter"](
                         dispatch=False,
-                        value= not value,
+                        value=not value,
                     )
+
+                if on_change_callback:
+                    # Call the on_change_callback
+                    on_change_callback(value)
 
             def get(label: str) -> bool:
                 """
@@ -766,99 +770,252 @@ class UIBuilder:
             return None
 
     @classmethod
-    def get_combobox_select_field(
+    def get_combobox_field(
         cls,
         label: str,
         master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str], None]] = None,
+        values: List[str] = [],
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
-        Creates and returns a combobox widget with associated label and button.
+        Creates and returns a new instance of tkinter.Combobox that is used as a field.
 
-        The returned dictionary contains the following keys:
-            - "root": The container frame for the widgets
-            - "label": The label widget
-            - "combobox": The combobox widget
-            - "button": The button widget
+        This method creates a dictionary that holds all functions and widgets that facilitate the combobox field.
+        Contained keys are:
+            - "clearer": A function that clears the combobox field.
+            - "getter": A function that retrieves the value of the combobox field.
+            - "setter": A function that sets the value of the combobox field.
+            - "variable": A tkinter.BooleanVar instance that holds the value of the combobox field.
+            - "root": A tkinter.Frame instance that holds the combobox field.
+            - "label": A tkinter.Label instance that holds the label for the combobox field.
+            - "combobox": A tkinter.Combobox instance that is used as a field.
 
         Args:
-            label (str): The text for the label widget.
-            master (tkinter.Misc): The master widget for placing the container frame.
-            **kwargs: Additional keyword arguments for the combobox widget.
+            label (str): The label for the combobox.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the combobox. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the combobox field changes. Defaults to None.
+            values (List[str]): The list of string values of the combobox field.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
 
         Returns:
-            Optional[Dict[str, Any]]: The created combobox widget dictionary.
+            Optional[Dict[str, Any]]: The created tkinter.Combobox instance or None if an exception occurs.
 
         Raises:
-            Exception: If an exception occurs while attempting to create the combobox widget.
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Combobox.
         """
         try:
             # Initialize the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            def clear() -> None:
+            def clear(dispatch: bool = True) -> None:
                 """
-                Clears the content of the combobox widget.
-
-                Returns:
-                    None
-                """
-
-                # Set the content of the combobox widget to an empty string
-                result["combobox"].set("")
-
-            def get() -> Optional[str]:
-                """
-                Retrieves the content of the combobox widget.
-
-                Returns:
-                    Optional[str]: The content of the combobox widget.
-                """
-
-                # Attempt to obtain the current value of the combobox widget
-                string: Optional[str] = result["combobox"].get()
-
-                # Check, if the content of the combobox widget is an empty string
-                if string == "" or string is None:
-                    # Return early
-                    return None
-
-                # Return the content of the combobox widget
-                return string
-
-            def set(value: str) -> None:
-                """
-                Sets the content of the combobox widget.
+                Clears the combobox field by setting its value to an empty string.
 
                 Args:
-                    value (str): The value to set the combobox widget to.
+                    None
 
                 Returns:
                     None
-                """
 
-                # Set the content of the combobox widget to the given value
-                result["combobox"].set(value)
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the combobox field.
+                """
+                try:
+                    # Set the value of the combobox field to an empty string
+                    result["variable"].set(value="")
+
+                    if dispatch:
+                        # Dispatch the COMBOBOX_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.COMBOBOX_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def get(dispatch: bool = True) -> Optional[str]:
+                """
+                Retrieves the value of the combobox field as a string.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[str]: The value of the combobox field as a string. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the combobox field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the COMBOBOX_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.COMBOBOX_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the combobox field as a string
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_button_clicked() -> None:
+                """
+                Handles the button click.
+
+                This function calls the clear function.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the combobox field.
+                """
+                try:
+                    # Clear the combobox field
+                    clear(dispatch=True)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_button_clicked' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def on_combobox_changed(dispatch: bool = True) -> None:
+                """
+                Handles the COMBOBOX_FIELD_CHANGED event.
+
+                This function is called when the value of the combobox field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the COMBOBOX_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the COMBOBOX_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.COMBOBOX_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_combobox_changed' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def set(
+                dispatch: bool = True,
+                value: bool = False,
+            ) -> None:
+                """
+                Sets the value of the combobox field.
+
+                Args:
+                    dispatch (bool, optional): Whether to dispatch the COMBOBOX_FIELD_SET event. Defaults to True.
+                    value (bool, optional): The value to set for the combobox field. Defaults to False.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the combobox field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the COMBOBOX_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.COMBOBOX_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    if value not in result["values"]:
+                        # Add the value to the values list
+                        result["values"].append(value)
+
+                    # Set the value of the combobox field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            # Store the values in the result dictionary
+            result["values"] = values
+
+            # Create the "Variable" string variable
+            result["variable"] = cls.get_str_variable(value="")
 
             # Create the "Root" frame widget
-            result["root"] = cls.get_frame(master=master)
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs.get("root", {}),
+            )
 
-            # Configure the "Root" frame widget's 1st and 3rd column to weight 0
+            # Configure the "Root" frame widget's 0th column to weight 0
             result["root"].grid_columnconfigure(
-                index=(
-                    0,
-                    2,
-                ),
+                index=0,
                 weight=0,
             )
 
-            # Configure the "Root" frame widget's 2nd column to weight 1
+            # Configure the "Root" frame widget's 1st column to weight 1
             result["root"].grid_columnconfigure(
                 index=1,
                 weight=1,
             )
 
-            # Configure the "Root" frame widget's 1st row to weight 1
+            # Configure the "Root" frame widget's 2nd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
             result["root"].grid_rowconfigure(
                 index=0,
                 weight=1,
@@ -868,11 +1025,14 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
+                **kwargs.get("label", {}),
             )
 
-            # Grid the "Label" label widget in the "Root" frame widget
+            # Add the "Label" label widget to the "Root" frame widget
             result["label"].grid(
                 column=0,
+                padx=5,
+                pady=5,
                 row=0,
                 sticky=NSEW,
             )
@@ -880,24 +1040,35 @@ class UIBuilder:
             # Create the "Combobox" combobox widget
             result["combobox"] = cls.get_combobox(
                 master=result["root"],
-                **kwargs,
+                text="False",
+                values=result["values"],
+                **kwargs.get("combobox", {}),
             )
 
-            # Grid the "Combobox" combobox widget in the "Root" frame widget
+            # Add the "Combobox" combobox widget to the "Root" frame widget
             result["combobox"].grid(
                 column=1,
+                padx=5,
+                pady=5,
                 row=0,
                 sticky=NSEW,
             )
 
-            # Create the "Button" button widget
-            result["button"] = cls.get_button(
-                command=clear,
-                master=result["root"],
-                text="Clear",
+            # Bind the "Combobox" combobox widget to the "on_combobox_changed" function
+            result["combobox"].bind(
+                func=lambda event: on_combobox_changed(),
+                sequence="<<ComboboxSelected>>",
             )
 
-            # Grid the "Button" button widget in the "Root" frame widget
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                command=on_button_clicked,
+                master=result["root"],
+                text="X",
+                **kwargs.get("button", {}),
+            )
+
+            # Add the "Button" combobox widget to the "Root" frame widget
             result["button"].grid(
                 column=2,
                 padx=5,
@@ -905,13 +1076,13 @@ class UIBuilder:
                 row=0,
             )
 
-            # Add the clearer function to the result dictionary
+            # Add the "clearer" function to the result dictionary
             result["clearer"] = clear
 
-            # Add the getter function to the result dictionary
+            # Add the "getter" function to the result dictionary
             result["getter"] = get
 
-            # Add the setter function to the result dictionary
+            # Add the "setter" function to the result dictionary
             result["setter"] = set
 
             # Return the result dictionary
@@ -919,10 +1090,11 @@ class UIBuilder:
         except Exception as e:
             # Log an error message indicating an exception occured
             cls.logger.error(
-                message=f"Caught an exception while attempting to run 'get_combobox_select_field' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_combobox_field' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
+
             return None
 
     @classmethod
@@ -2281,133 +2453,277 @@ class UIBuilder:
         cls,
         label: str,
         master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str], None]] = None,
+        value: str = "",
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
-        Creates and returns various widgets required to create a multi-line text field.
+        Creates and returns a new instance of tkinter.Text that is used as a field.
 
-        The created widgets are stored in a dictionary and returned to the caller.
+        This method creates a dictionary that holds all functions and widgets that facilitate the multi line text field.
+        Contained keys are:
+            - "clearer": A function that clears the multi line text field.
+            - "getter": A function that retrieves the value of the multi line text field.
+            - "setter": A function that sets the value of the multi line textfield.
+            - "variable": A tkinter.stringVar instance that holds the value of the multi line textfield.
+            - "root": A tkinter.Frame instance that holds the multi line textfield.
+            - "label": A tkinter.Label instance that holds the label for the multi line textfield.
+            - "text": A tkinter.Entry instance that is used as a field.
+            - "scrollbar": A tkinter.Scrollbar instance that is used to scroll the multi line textfield.
+            - "button": A tkinter.Button that clears the multi line text field.
 
-        The dictionary contains the following keys:
-            - "root": The master widget (Call your geometry manager (.place, .grid, .pack, etc.) on this widget)
-            - "label": The label widget
-            - "text": The text widget
-            - "button": The button widget
-            - "clear": A function to clear all content from the text widget
-            - "get": A function to get the content of the text widget
-            - "set": A function to set the content of the text widget
+        Args:
+            label (str): The label for the multi line text field.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the multi line text field. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the multi line text field changes. Defaults to None.
+            value (bool): The initial value of the multi line text field. Defaults to an empty string.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
 
         Returns:
-            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+            Optional[Dict[str, Any]]: The created tkinter.Entry instance or None if an exception occurs.
 
         Raises:
-            Exception: If an exception occurs while attempting to create the widgets
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Entry.
         """
         try:
             # Initialize the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            def clear() -> None:
+            def clear(dispatch: bool = True) -> None:
                 """
-                Clears the content of the text widget.
-
-                Returns:
-                    None
-                """
-
-                # Delete all content from the text widget
-                result["text"].delete(
-                    "1.0",
-                    END,
-                )
-
-            def get() -> Optional[str]:
-                """
-                Retrieves the content of the text widget.
-
-                Returns:
-                    Optional[str]: The content of the text widget.
-                """
-
-                # Attempt to obtain the current value of the text widget
-                string: Optional[str] = result["text"].get(
-                    "1.0",
-                    "end-1c",
-                )
-
-                # Check, if the content of the text widget is an empty string
-                if string == "":
-                    # Return early
-                    return None
-
-                # Return the content of the text widget
-                return string.strip()
-
-            def set(value: str) -> None:
-                """
-                Sets the content of the text widget to the given value.
+                Clears the multi line text field by setting its value to an empty string.
 
                 Args:
-                    value (str): The value to set the content of the text widget to.
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the multi line text field.
+                """
+                try:
+                    # Set the value of the multi line text field field to an empty string
+                    result["text"].delete(
+                        index1="1.0",
+                        index2=END,
+                    )
+
+                    if dispatch:
+                        # Dispatch the MULTI_LINE_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.MULTI_LINE_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["text"].get(
+                                index1="1.0",
+                                index2=END,
+                            ),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+            def get(dispatch: bool = True) -> Optional[str]:
+                """
+                Retrieves the value of the multi line text field as a string.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[str]: The value of the multi line text field as a string. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the multi line text field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the MULTI_LINE_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.MULTI_LINE_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["text"].get(
+                                index1="1.0",
+                                index2=END,
+                            ),
+                        )
+
+                    # Return the value of the multi line text field as a string
+                    return result["text"].get(
+                        index1="1.0",
+                        index2=END,
+                    )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_button_clicked() -> None:
+                """
+                Handles the button click.
+
+                This function calls the clear function.
+
+                Args:
+                    None
 
                 Returns:
                     None
                 """
+                # Clear the multi line text field
+                clear(dispatch=True)
 
-                # Delete all content from the text widget
-                result["text"].delete(
-                    "1.0",
-                    END,
-                )
+            def on_text_changed(dispatch: bool = True) -> None:
+                """
+                Handles the MULTI_LINE_FIELD_CHANGED event.
 
-                # Insert the given value into the text widget
-                result["text"].insert(
-                    "1.0",
-                    value,
-                )
+                This function is called when the value of the multi line text field changes.
 
-            # Create the "Root Frame" frame widget
-            result["root"] = cls.get_frame(master=master)
+                Args:
+                    None
 
-            # Configure the "Root Frame" frame widget's 1st and 3rd column to weight 0
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the MULTI_LINE_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the MULTI_LINE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.MULTI_LINE_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["text"].get(
+                                index1="1.0",
+                                index2=END,
+                            ),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(
+                            result["text"].get(
+                                index1="1.0",
+                                index2=END,
+                            )
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_text_changed' method from '{cls.__name__}': {e}"
+                    )
+
+            def set(
+                dispatch: bool = True,
+                value: str = "",
+            ) -> None:
+                """
+                Sets the value of the multi line text field.
+
+                Args:
+                    dispatch (bool, optional): Whether to dispatch the MULTI_LINE_FIELD_SET event. Defaults to True.
+                    value (str, optional): The value to set for the multi line text field. Defaults to an empty string.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the multi line text field.
+                """
+                try:
+                    # Clear the text widget
+                    result["text"].delete(
+                        index1="1.0",
+                        index2=END,
+                    )
+
+                    # Insert the passed string value into the text widget
+                    result["text"].insert(
+                        chars=value,
+                        index="1.0",
+                    )
+
+                    if dispatch:
+                        # Dispatch the MULTI_LINE_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.MULTI_LINE_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs,
+            )
+
+            # Configure the "Root" frame widget's 0th column to weight 0
             result["root"].grid_columnconfigure(
-                index=(
-                    0,
-                    2,
-                ),
+                index=0,
                 weight=0,
             )
 
-            # Configure the "Root Frame" frame widget's 2nd column to weight 1
+            # Configure the "Root" frame widget's 1st column to weight 1
             result["root"].grid_columnconfigure(
                 index=1,
                 weight=1,
             )
 
-            # Configure the "Root Frame" frame widget's 1st and 3rd column to weight 0
-            result["root"].grid_rowconfigure(
-                index=(
-                    0,
-                    2,
-                ),
+            # Configure the "Root" frame widget's 2nd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
                 weight=0,
             )
 
-            # Configure the "Root Frame" frame widget's 1st row to weight 1
+            # Configure the "Root" frame widget's 0th row to weight 0
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st row to weight 1
             result["root"].grid_rowconfigure(
                 index=1,
                 weight=1,
+            )
+
+            # Configure the "Root" frame widget's 2nd row to weight 0
+            result["root"].grid_rowconfigure(
+                index=2,
+                weight=0,
             )
 
             # Create the "Label" label widget
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
+                **kwargs,
             )
 
-            # Configure the "Label" label widget's grid properties
+            # Add the "Label" label widget to the "Root" frame widget
             result["label"].grid(
                 column=0,
+                padx=5,
+                pady=5,
                 row=0,
                 sticky=NSEW,
             )
@@ -2418,21 +2734,57 @@ class UIBuilder:
                 **kwargs,
             )
 
-            # Configure the "Text" text widget's grid properties
+            # Bind the "Text" text widget to the "on_text_changed" function
+            result["text"].bind(
+                func=lambda event: on_text_changed(),
+                sequence="<KeyRelease>",
+            )
+
+            # Add the "Entry" text widget to the "Root" frame widget
             result["text"].grid(
                 column=1,
+                padx=5,
+                pady=5,
                 row=1,
                 sticky=NSEW,
             )
 
-            # Create the "Clear" button widget
-            result["button"] = cls.get_button(
-                command=clear,
+            # Check if the value is present
+            if value:
+                # Set the value of the text widget
+                result["text"].insert(
+                    chars=value,
+                    index="1.0",
+                )
+
+            # Create the "Scrollbar" scrollbar widget
+            result["scrollbar"] = cls.get_scrollbar(
+                command=result["text"].yview,
                 master=result["root"],
-                text="Clear",
+                orient=VERTICAL,
             )
 
-            # Grid the button widget
+            # Add the "scrollbar" scrollbar widget to the "Root" frame widget
+            result["scrollbar"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=1,
+                sticky=NS,
+            )
+
+            # Configure the "Text" text widget's scrollbar
+            result["text"].config(yscrollcommand=result["scrollbar"].set)
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_multi_line_text(
+                command=on_button_clicked,
+                master=result["root"],
+                text="X",
+                **kwargs,
+            )
+
+            # Add the "Entry" text widget to the "Root" frame widget
             result["button"].grid(
                 column=2,
                 padx=5,
@@ -3653,32 +4005,298 @@ class UIBuilder:
     @classmethod
     def get_radiobutton_field(
         cls,
-        labels: Iterable[str],
+        label: str,
         master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[bool], None]] = None,
+        value: bool = False,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
-        Creates and returns a new instance of a radiobutton field.
+        Creates and returns a new instance of tkinter.Checkbutton that is used as a field.
 
-        The created radiobutton field contains a frame widget as its root widget,
-        and a checkbutton widget for each label passed as argument.
-
-        The value of each checkbutton is stored in a tkinter.BooleanVar instance,
-        which is stored in a dictionary under the key "variable_{index}".
-
-        The checkbutton widgets are stored in a dictionary under the key "checkbuttons".
-        The keys of the dictionary are the keys of the "checkbuttons" dictionary,
-        and the values are the checkbutton widgets.
-
-        The method returns a dictionary containing the created radiobutton field widgets and functions.
+        This method creates a dictionary that holds all functions and widgets that facilitate the checkbox field.
+        Contained keys are:
+            - "clearer": A function that clears the checkbox field.
+            - "getter": A function that retrieves the value of the checkbox field.
+            - "setter": A function that sets the value of the checkbox field.
+            - "variable": A tkinter.BooleanVar instance that holds the value of the checkbox field.
+            - "root": A tkinter.Frame instance that holds the checkbox field.
+            - "label": A tkinter.Label instance that holds the label for the checkbox field.
+            - "radiobutton": A tkinter.Checkbutton instance that is used as a field.
 
         Args:
-            labels (Iterable[str]): The labels of the checkbuttons.
+            label (str): The label for the radiobutton.
             master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the radiobutton. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[bool], None]]): A callback function that is called when the value of the checkbox field changes. Defaults to None.
+            value (bool): The initial value of the checkbox field. Defaults to False.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created tkinter.Checkbutton instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Checkbutton.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear(dispatch: bool = True) -> None:
+                """
+                Clears the radiobutton field by setting its value to False.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the radiobutton field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the RADIOBUTTON_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.RADIOBUTTON_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=False,
+                        )
+
+                    # Set the value of the radiobutton field to False
+                    result["variable"].set(value=False)
+
+                    # Update the text of the radiobutton
+                    result["radiobutton"].configure(text=str(result["variable"].get()))
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+            def get(dispatch: bool = True) -> bool:
+                """
+                Retrieves the value of the radiobutton field as a boolean.
+
+                Args:
+                    None
+
+                Returns:
+                    bool: The value of the radiobutton field as a boolean.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the radiobutton field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the RADIOBUTTON_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.RADIOBUTTON_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the radiobutton field as a boolean
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return False
+                    return False
+
+            def on_check_box_changed(dispatch: bool = True) -> None:
+                """
+                Handles the RADIOBUTTON_FIELD_CHANGED event.
+
+                This function is called when the value of the radiobutton field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the RADIOBUTTON_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the RADIOBUTTON_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.RADIOBUTTON_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Update the text of the radiobutton
+                    result["radiobutton"].configure(text=str(result["variable"].get()))
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_check_box_changed' method from '{cls.__name__}': {e}"
+                    )
+
+            def set(
+                dispatch: bool = True,
+                value: bool = False,
+            ) -> None:
+                """
+                Sets the value of the radiobutton field.
+
+                Args:
+                    dispatch (bool, optional): Whether to dispatch the RADIOBUTTON_FIELD_SET event. Defaults to True.
+                    value (bool, optional): The value to set for the radiobutton field. Defaults to False.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the radiobutton field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the RADIOBUTTON_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.RADIOBUTTON_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    # Set the value of the radiobutton field
+                    result["variable"].set(value=value)
+
+                    # Update the text of the radiobutton
+                    result["radiobutton"].configure(text=str(result["variable"].get()))
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+            # Create the "Variable" boolean variable
+            result["variable"] = cls.get_bool_variable(value=value)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs,
+            )
+
+            # Configure the "Root" frame widget's 0th column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+                **kwargs,
+            )
+
+            # Add the "Label" label widget to the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Checkbutton" radiobutton widget
+            result["radiobutton"] = cls.get_radiobutton(
+                command=on_check_box_changed,
+                master=result["root"],
+                text="False",
+                variable=result["variable"],
+                **kwargs,
+            )
+
+            # Add the "Checkbutton" radiobutton widget to the "Root" frame widget
+            result["radiobutton"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_radiobutton_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_radiobutton_field_group(
+        cls,
+        labels: List[str],
+        master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[bool], None]] = None,
+        selection_mode: Literal["multiple", "single"] = "single",
+        value: bool = False,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a group of radiobutton fields.
+
+        This method creates a frame widget and adds a radiobutton field to it for each label in the given list of labels.
+        The radiobutton fields are configured to call the given on_change_callback when their value is changed.
+        The method also adds a getter and setter function to the result dictionary, which can be used to get and set the value of the radiobutton fields.
+
+        Args:
+            labels (List[str]): A list of labels for the radiobutton fields.
+            master (tkinter.Misc): The master widget.
+            namespace (str, optional): The namespace to use for the radiobutton fields. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[bool], None]], optional): A callback function to call when the value of a radiobutton field is changed. Defaults to None.
+            selection_mode (Literal["multiple", "single"], optional): The selection mode for the radiobutton fields. Defaults to "single".
+            value (bool, optional): The initial value of the radiobutton fields. Defaults to False.
             **kwargs: Any additional keyword arguments to be passed to the tkinter.Checkbutton constructor.
 
         Returns:
-            Optional[Dict[str, Any]]: The created radiobutton field widgets and functions.
+            Optional[Dict[str, Any]]: A dictionary containing the created radiobutton fields, the getter and setter functions, and the clearer function.
 
         Raises:
             Exception: If an exception occurs while attempting to create a new instance of tkinter.Checkbutton.
@@ -3689,149 +4307,159 @@ class UIBuilder:
 
             def clear() -> None:
                 """
-                Deselects all radiobuttons.
+                Clears all the radiobutton fields.
+
+                This method calls the "clearer" function on each radiobutton field in the "fields" dictionary.
 
                 Returns:
                     None
                 """
 
-                # Iterate over all radiobuttons in the "Radiobuttons" dictionary
-                for value in result["radiobuttons"].values():
-                    # Deselect the radiobutton
-                    value.deselect()
+                # Iterate over the values in the "fields" dictionary
+                for field in result["fields"].values():
+                    # Call the "clearer" function on the current field
+                    field["clearer"]()
 
-            def get() -> Optional[Dict[str, Any]]:
-                """
-                Retrieves the values of the radiobuttons and returns them in a dictionary.
-
-                The keys of the dictionary are the keys of the "radiobuttons" dictionary,
-                and the values are the values of the radiobuttons.
-
-                Returns:
-                    Optional[Dict[str, Any]]: The dictionary containing the values of the radiobuttons.
-                """
-
-                # Initialize the dictionary as an empty dictionary
-                dictionary: Dict[str, Any] = {}
-
-                # Iterate over the radiobuttons in the "Radiobuttons" dictionary
-                for (
-                    key,
-                    value,
-                ) in result["radiobuttons"].items():
-                    # Get the value of the radiobutton
-                    dictionary[key] = value.get()
-
-                # Return the dictionary
-                return dictionary
-
-            def on_radiobutton_click(string: str) -> None:
-                """
-                Handles the click event of a radiobutton.
-
-                Deselects all radiobuttons except the one that was clicked.
-
-                Args:
-                    string (str): The key of the radiobutton that was clicked.
-
-                Returns:
-                    None
-                """
-
-                # Iterate over all radiobuttons in the "Radiobuttons" dictionary
-                for (
-                    key,
-                    value,
-                ) in result["radiobuttons"].items():
-                    # Check if the key is not the one that was clicked
-                    if key != string:
-                        # Deselect the radiobutton
-                        value.deselect()
-
-            def set(
-                key: str,
+            def enforce_selection_mode(
+                label: str,
                 value: bool,
             ) -> None:
                 """
-                Sets the value of the radiobutton with the given key to the given value.
+                Enforces the selection mode on the radiobutton fields.
+
+                This method is called when the value of a radiobutton field is changed.
+                It enforces the selection mode by calling the setter function on all
+                other radiobutton fields with the opposite value of the one given.
 
                 Args:
-                    key (str): The key of the radiobutton to be set.
-                    value (bool): The value to which the radiobutton should be set.
+                    label (str): The label of the radiobutton field that was changed.
+                    value (bool): The new value of the radiobutton field.
+                """
+
+                # Check, if the selection mode is "multiple"
+                if selection_mode == "multiple":
+                    # If the selection mode is "multiple", there is nothing to do
+                    return
+
+                # Iterate over the values in the "fields" dictionary
+                for (
+                    key,
+                    field,
+                ) in result["fields"].items():
+                    # Check, if the current field is the one that was changed
+                    if key == label:
+                        # Skip the current field
+                        continue
+
+                    # Call the "setter" function on the current field
+                    field["setter"](
+                        dispatch=False,
+                        value=not value,
+                    )
+
+                if on_change_callback:
+                    # Call the on_change_callback
+                    on_change_callback(value)
+
+            def get(label: str) -> bool:
+                """
+                Gets the value of the radiobutton field with the given label.
+
+                This method calls the "getter" function on the radiobutton field in the "fields" dictionary with the given label
+                and returns its value.
+
+                Args:
+                    label (str): The label of the radiobutton field to get.
+
+                Returns:
+                    bool: The value of the radiobutton field with the given label.
+                """
+
+                # Check if the label is present in the "fields" dictionary
+                if label not in result["fields"].keys():
+                    # Return early
+                    return False
+
+                # Call the "getter" function on the current field
+                return result["fields"][label]["getter"]()
+
+            def set(
+                label: str,
+                value: bool = False,
+            ) -> None:
+                """
+                Sets the value of the radiobutton field with the given label.
+
+                This method calls the "setter" function on the radiobutton field in the "fields" dictionary with the given label
+                and sets it to the given value.
+
+                Args:
+                    label (str): The label of the radiobutton field to set.
+                    value (bool, optional): The value to set the radiobutton field to. Defaults to False.
 
                 Returns:
                     None
                 """
 
-                # Check if the key is present in the "Radiobuttons" dictionary
-                if key in result["radiobuttons"].keys():
-                    # Set the value of the radiobutton with the given key to the given value
-                    result["radiobuttons"][key].set(value=value)
+                # Check if the label is present in the "fields" dictionary
+                if label not in result["fields"].keys():
+                    # Return early
+                    return
+
+                # Call the "setter" function on the current field
+                result["fields"][label]["setter"](value=value)
+
+            # Initialize the "fields" dictionary as an empty dictionary
+            result["fields"] = {}
 
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(master=master)
 
-            # Configure the "Root" frame widget's 1st column to weight 1
+            # Configure the "Root" frame widget's 0th column to weight 1
             result["root"].grid_columnconfigure(
                 index=0,
                 weight=1,
             )
 
-            # Initialize the "Radiobuttons" dictionary as an empty dictionary
-            result["radiobuttons"] = {}
-
-            # Iterate over the passed labels
             for (
                 index,
                 label,
             ) in enumerate(iterable=labels):
-                # Create a "Variable_{index}" tkinter.BooleanVar
-                result[f"variable_{index}"] = cls.get_bool_variable(
+                # Configure the "Root" frame widget's row at the current index to weight 0
+                result["root"].grid_rowconfigure(
+                    index=index,
+                    weight=0,
+                )
+
+                # Create the check widget
+                radiobutton_field: Optional[Dict[str, Any]] = cls.get_radiobutton_field(
+                    label=label,
                     master=result["root"],
-                    value=False,
-                )
-
-                # Create a "Frame_{index}" frame widget
-                result[f"frame_{index}"] = cls.get_frame(master=result["root"])
-
-                # Configure the "Frame_{index}" frame widget's 1st column to weight 1
-                result[f"frame_{index}"].grid_columnconfigure(
-                    index=0,
-                    weight=1,
-                )
-
-                # Create a "Radiobutton_{index}" radiobutton widget
-                result[f"radiobutton_{index}"] = cls.get_radiobutton(
-                    command=lambda string=f"radiobutton_{index}": on_radiobutton_click(
-                        string=string
-                    ),
-                    master=result[f"frame_{index}"],
-                    text=label,
-                    variable=result[f"variable_{index}"],
+                    namespace=namespace,
+                    on_change_callback=enforce_selection_mode,
+                    value=value,
                     **kwargs,
                 )
 
-                # Place the "Radiobutton_{index}" radiobutton widget in the "Frame_{index}" frame widget
-                result[f"radiobutton_{index}"].grid(
-                    column=0,
-                    padx=5,
-                    pady=5,
-                    row=index,
-                    sticky=NSEW,
-                )
+                if not radiobutton_field:
+                    # Log a warning message
+                    cls.logger.warning(
+                        message=f"Failed to create check widget in '{cls.__name__}'. This is likely a bug."
+                    )
 
-                # Append the "Radiobutton_{index}" radiobutton widget to the "Checkbuttons" dictionary
-                result["radiouttons"][f"radiobutton_{index}"] = result[
-                    f"radiobutton_{index}"
-                ]
+                    # Return early
+                    return None
 
-            # Add the clearer function to the result dictionary
+                # Add the check widget to the result dictionary
+                result["fields"][label] = radiobutton_field
+
+            # Add the "clearer" function to the result dictionary
             result["clearer"] = clear
 
-            # Add the getter function to the result dictionary
+            # Add the "getter" function to the result dictionary
             result["getter"] = get
 
-            # Add the setter function to the result dictionary
+            # Add the "setter" function to the result dictionary
             result["setter"] = set
 
             # Return the result dictionary
@@ -3839,7 +4467,7 @@ class UIBuilder:
         except Exception as e:
             # Log an error message indicating an exception occured
             cls.logger.error(
-                message=f"Caught an exception while attempting to run 'get_radiobutton_field' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_radiobutton_field_group' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
@@ -4046,6 +4674,365 @@ class UIBuilder:
             )
 
             # Return None indicating an exception occured
+            return None
+
+    @classmethod
+    def get_scale(
+        cls,
+        master: tkinter.Misc,
+        **kwargs,
+    ) -> Optional[tkinter.Scale]:
+        """
+        Creates and returns a new instance of tkinter.Scale.
+
+        Args:
+            master (tkinter.Misc): The master widget.
+            **kwargs: Additional keyword arguments to be passed to the tkinter.Scale constructor.
+
+        Returns:
+            Optional[tkinter.Scale]: The created tkinter.Scale instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Scale.
+        """
+        try:
+            # Attempt to create and return a new instance of tkinter.Scale
+            return tkinter.Scale(
+                master=master,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_scale' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occurred
+            return None
+
+    @classmethod
+    def get_scale_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        from_: int = 0,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str], None]] = None,
+        resolution: int = 1,
+        to: int = 100,
+        value: int = 0,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of tkinter.Scale that is used as a field.
+
+        This method creates a dictionary that holds all functions and widgets that facilitate the scale field.
+        Contained keys are:
+            - "clearer": A function that clears the scale field.
+            - "getter": A function that retrieves the value of the scale field.
+            - "setter": A function that sets the value of the scale field.
+            - "variable": A tkinter.BooleanVar instance that holds the value of the scale field.
+            - "root": A tkinter.Frame instance that holds the scale field.
+            - "label": A tkinter.Label instance that holds the label for the scale field.
+            - "scale": A tkinter.Scale instance that is used as a field.
+
+        Args:
+            label (str): The label for the scale.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the scale. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the scale field changes. Defaults to None.
+            values (List[str]): The list of string values of the scale field.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created tkinter.Scale instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Scale.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear(dispatch: int = True) -> None:
+                """
+                Clears the scale field by setting its value to an empty string.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the scale field.
+                """
+                try:
+                    # Set the value of the scale field to an empty string
+                    result["variable"].set(value="")
+
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def get(dispatch: int = True) -> Optional[str]:
+                """
+                Retrieves the value of the scale field as a string.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[str]: The value of the scale field as a string. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the scale field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the scale field as a string
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_button_clicked() -> None:
+                """
+                Handles the button click.
+
+                This function calls the clear function.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the scale field.
+                """
+                try:
+                    # Clear the scale field
+                    clear(dispatch=True)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_button_clicked' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def on_scale_changed(dispatch: int = True) -> None:
+                """
+                Handles the SCALE_FIELD_CHANGED event.
+
+                This function is called when the value of the scale field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the SCALE_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_scale_changed' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def set(
+                dispatch: int = True,
+                value: int = False,
+            ) -> None:
+                """
+                Sets the value of the scale field.
+
+                Args:
+                    dispatch (int, optional): Whether to dispatch the SCALE_FIELD_SET event. Defaults to True.
+                    value (int, optional): The value to set for the scale field. Defaults to False.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the scale field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    if value not in result["values"]:
+                        # Add the value to the values list
+                        result["values"].append(value)
+
+                    # Set the value of the scale field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            # Create the "Variable" string variable
+            result["variable"] = cls.get_int_variable(value=value)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs.get("root", {}),
+            )
+
+            # Configure the "Root" frame widget's 0th column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+                **kwargs.get("label", {}),
+            )
+
+            # Add the "Label" label widget to the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Scale" scale widget
+            result["scale"] = cls.get_scale(
+                command=on_scale_changed,
+                from_=from_,
+                master=result["root"],
+                to=to,
+                value=value,
+                variable=result["variable"],
+                **kwargs.get("scale", {}),
+            )
+
+            # Add the "Scale" scale widget to the "Root" frame widget
+            result["scale"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                command=on_button_clicked,
+                master=result["root"],
+                text="X",
+                **kwargs.get("button", {}),
+            )
+
+            # Add the "Button" scale widget to the "Root" frame widget
+            result["button"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=0,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_scale_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+
             return None
 
     @classmethod
@@ -4715,147 +5702,279 @@ class UIBuilder:
         cls,
         label: str,
         master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str], None]] = None,
+        value: str = "",
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
-        Creates and returns a new instance of a single-line text field widget.
+        Creates and returns a new instance of tkinter.Entry that is used as a field.
 
-        The returned dictionary contains the following keys:
-            - "root": The master widget (Call your geometry manager (.place, .grid, .pack, etc.) on this widget)
-            - "label": The label widget
-            - "entry": The entry widget
-            - "button": The button widget
-            - "clear": A function to clear all content from the entry widget
-            - "get": A function to get the content of the entry widget
-            - "set": A function to set the content of the entry widget
+        This method creates a dictionary that holds all functions and widgets that facilitate the single line text field.
+        Contained keys are:
+            - "clearer": A function that clears the single line text field.
+            - "getter": A function that retrieves the value of the single line text field.
+            - "setter": A function that sets the value of the single line textfield.
+            - "variable": A tkinter.stringVar instance that holds the value of the single line textfield.
+            - "root": A tkinter.Frame instance that holds the single line textfield.
+            - "label": A tkinter.Label instance that holds the label for the single line textfield.
+            - "entry": A tkinter.Entry instance that is used as a field.
+            - "button": A tkinter.Button that clears the single line text field.
+
+        Args:
+            label (str): The label for the single line text field.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the single line text field. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the single line text field changes. Defaults to None.
+            value (bool): The initial value of the single line text field. Defaults to an empty string.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
 
         Returns:
-            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+            Optional[Dict[str, Any]]: The created tkinter.Entry instance or None if an exception occurs.
 
         Raises:
-            Exception: If an exception occurs while attempting to create the widgets
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Entry.
         """
         try:
-            # Initialize the result dictionary as an empty
+            # Initialize the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            # Create a method to clear the content of the entry widget
-            def clear() -> None:
+            def clear(dispatch: bool = True) -> None:
                 """
-                Clears the content of the entry widget.
-
-                Returns:
-                    None
-                """
-
-                # Delete all content from the entry widget
-                result["entry"].delete(
-                    0,
-                    END,
-                )
-
-            # Create a method to get the content of the entry widget
-            def get() -> Optional[str]:
-                """
-                Retrieves the content of the entry widget.
-
-                Returns:
-                    Optional[str]: The content of the entry widget.
-                """
-
-                # Attempt to obtain the current value of the entry widget
-                string: Optional[str] = result["entry"].get()
-
-                # Check, if the content of the entry widget is an empty string
-                if string == "" or string is None:
-                    # Return early
-                    return None
-
-                # Return the content of the entry widget
-                return string
-
-            # Create a method to set the content of the entry widget
-            def set(value: str) -> None:
-                """
-                Sets the content of the entry widget to the given value.
+                Clears the single line text field by setting its value to an empty string.
 
                 Args:
-                    value (str): The value to set in the entry widget.
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the single line text field.
+                """
+                try:
+                    # Set the value of the single line text field field to an empty string
+                    result["variable"].set(value="")
+
+                    if dispatch:
+                        # Dispatch the SINGLE_LINE_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SINGLE_LINE_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+            def get(dispatch: bool = True) -> Optional[str]:
+                """
+                Retrieves the value of the single line text field as a string.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[str]: The value of the single line text field as a string. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the single line text field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SINGLE_LINE_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SINGLE_LINE_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the single line text field as a string
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_button_clicked() -> None:
+                """
+                Handles the button click.
+
+                This function calls the clear function.
+
+                Args:
+                    None
 
                 Returns:
                     None
                 """
+                try:
+                    # Clear the single line text field
+                    clear(dispatch=True)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_button_clicked' method from '{cls.__name__}': {e}"
+                    )
 
-                # Clear the content of the entry widget
-                result["entry"].delete(
-                    0,
-                    END,
-                )
+            def on_entry_changed(dispatch: bool = True) -> None:
+                """
+                Handles the SINGLE_LINE_FIELD_CHANGED event.
 
-                # Insert the given value into the entry widget
-                result["entry"].insert(
-                    0,
-                    value,
-                )
+                This function is called when the value of the single line text field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the SINGLE_LINE_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SINGLE_LINE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SINGLE_LINE_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_entry_changed' method from '{cls.__name__}': {e}"
+                    )
+
+            def set(
+                dispatch: bool = True,
+                value: str = "",
+            ) -> None:
+                """
+                Sets the value of the single line text field.
+
+                Args:
+                    dispatch (bool, optional): Whether to dispatch the SINGLE_LINE_FIELD_SET event. Defaults to True.
+                    value (str, optional): The value to set for the single line text field. Defaults to an empty string.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the single line text field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SINGLE_LINE_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SINGLE_LINE_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    # Set the value of the single line text field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+            # Create the "Variable" string variable
+            result["variable"] = cls.get_str_variable(value=value)
 
             # Create the "Root" frame widget
-            result["root"] = cls.get_frame(master=master)
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs,
+            )
 
-            # Configure the "Root" frame widget's 1st column to weight 0
+            # Configure the "Root" frame widget's 0th column to weight 0
             result["root"].grid_columnconfigure(
-                index=(
-                    0,
-                    2,
-                ),
+                index=0,
                 weight=0,
             )
 
-            # Configure the "Root" frame widget's 2nd column to weight 1
+            # Configure the "Root" frame widget's 1st column to weight 0
             result["root"].grid_columnconfigure(
                 index=1,
-                weight=1,
+                weight=0,
             )
 
-            # Configure the "Root" frame widget's 1st row to weight 1
+            # Configure the "Root" frame widget's 2nd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
             result["root"].grid_rowconfigure(
                 index=0,
                 weight=1,
             )
 
-            # Create the label widget
+            # Create the "Label" label widget
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
-            )
-
-            # Grid the label widget
-            result["label"].grid(
-                column=0,
-                row=0,
-                sticky=NSEW,
-            )
-
-            # Create the entry widget
-            result["entry"] = cls.get_entry(
-                master=result["root"],
                 **kwargs,
             )
 
-            # Grid the entry widget
-            result["entry"].grid(
-                column=1,
+            # Add the "Label" label widget to the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
                 row=0,
                 sticky=NSEW,
             )
 
-            # Create the button widget
-            result["button"] = cls.get_button(
-                command=clear,
+            # Create the "Entry" entry widget
+            result["entry"] = cls.get_entry(
                 master=result["root"],
-                text="Clear",
+                variable=result["variable"],
+                **kwargs,
             )
 
-            # Grid the button widget
+            # Bind the "Entry" entry widget to the "on_entry_changed" function
+            result["entry"].bind(
+                func=lambda event: on_entry_changed(),
+                sequence="<KeyRelease>",
+            )
+
+            # Add the "Entry" entry widget to the "Root" frame widget
+            result["entry"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_checkbutton(
+                command=on_button_clicked,
+                master=result["root"],
+                text="X",
+                **kwargs,
+            )
+
+            # Add the "Entry" entry widget to the "Root" frame widget
             result["button"].grid(
                 column=2,
                 padx=5,
@@ -4877,7 +5996,7 @@ class UIBuilder:
         except Exception as e:
             # Log an error message indicating an exception occured
             cls.logger.error(
-                message=f"Caught an exception while attempting to run 'get_single_line_text_field' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_checkbutton_field' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured

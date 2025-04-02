@@ -64,6 +64,7 @@ class LearningSessionUI(BaseUI):
         navigation_item: NavigationHistoryItem,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
+        settings: Dict[str, Any],
         stacks: List[ImmutableStack],
         unified_manager: UnifiedObjectManager,
         difficulties: Optional[List[ImmutableDifficulty]] = None,
@@ -80,6 +81,7 @@ class LearningSessionUI(BaseUI):
             navigation_item (NavigationHistoryItem): The navigation history item instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
+            settings (Dict[str, Any]): The settings dictionary.
             stacks (List[ImmutableStack]): The stacks instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
@@ -120,6 +122,9 @@ class LearningSessionUI(BaseUI):
 
         # Initialize the question learning view as an empty instance variable
         self.question_learning_view: Optional[QuestionLearningView] = None
+
+        # Store the passed settings dictionary as an instance variable
+        self.settings: Dict[str, Any] = settings
 
         # Store the passed stacks ImmutableStack list as an instance variable
         self.stacks: List[ImmutableStack] = stacks
@@ -1131,6 +1136,7 @@ class LearningSessionUI(BaseUI):
                 dispatcher=self.dispatcher,
                 namespace=Constants.LEARNING_SESSION_NAMESPACE,
                 priorities=self.priorities,
+                settings=self.settings,
                 stacks=self.stacks,
             )
         except Exception as e:

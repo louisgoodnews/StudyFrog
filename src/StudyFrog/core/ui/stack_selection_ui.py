@@ -703,7 +703,7 @@ class StackSelectionUI(BaseUI):
 
             # Create the mode select widget
             self.mode_select: Optional[Dict[str, Any]] = (
-                UIBuilder.get_combobox_select_field(
+                UIBuilder.get_combobox_field(
                     label="Mode: ",
                     master=master,
                 )

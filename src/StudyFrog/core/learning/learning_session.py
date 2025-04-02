@@ -54,6 +54,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
         id (Optional[int]): The ID of the learning session.
         key (Optional[str]): The key of the learning session.
         result (Optional[int]): The result of the learning session.
+        settings (Optional[Dict[str, Any]]): The settings of the learning session.
         stacks (Optional[List[str]]): The stacks associated with the learning session.
         start (Optional[datetime]): The start time of the learning session.
         status (Optional[int]): The status of the learning session.
@@ -73,6 +74,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         result: Optional[int] = None,
+        settings: Optional[Dict[str, Any]] = None,
         stacks: Optional[List[str]] = None,
         start: Optional[datetime] = None,
         status: Optional[int] = None,
@@ -93,6 +95,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
             result (Optional[int]): The result of the learning session.
+            settings (Optional[Dict[str, Any]]): The settings of the learning session.
             stacks (Optional[List[str]]): The stacks associated with the learning session.
             start (Optional[datetime]): The start time of the learning session.
             status (Optional[int]): The status of the learning session.
@@ -115,6 +118,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
             id=id,
             key=key,
             result=result,
+            settings=settings,
             stacks=stacks,
             start=start,
             status=status,
@@ -146,6 +150,31 @@ class ImmutableLearningSession(ImmutableBaseObject):
             # Log an error message to indicate that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_custom_field_value' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_setting(
+        self,
+        key: str,
+    ) -> Optional[Any]:
+        """
+        Retrieves the value of a setting by its key.
+
+        Args:
+            key (str): The key of the setting to retrieve.
+
+        Returns:
+            Optional[Any]: The value of the setting if found, otherwise None.
+        """
+        try:
+            # Iterate over the settings and return the value for the matching key
+            return next(item["value"] for item in self.settings if item["key"] == key)
+        except StopIteration as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_setting' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -190,6 +219,7 @@ class MutableLearningSession(MutableBaseObject):
         id (Optional[int]): The ID of the learning session.
         key (Optional[str]): The key of the learning session.
         result (Optional[int]): The result of the learning session.
+        settings (Optional[Dict[str, Any]]): The settings of the learning session.
         stacks (Optional[List[str]]): The stacks associated with the learning session.
         start (Optional[datetime]): The start time of the learning session.
         status (Optional[int]): The status of the learning session.
@@ -209,6 +239,7 @@ class MutableLearningSession(MutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         result: Optional[int] = None,
+        settings: Optional[Dict[str, Any]] = None,
         stacks: Optional[List[str]] = None,
         start: Optional[datetime] = None,
         status: Optional[int] = None,
@@ -229,6 +260,7 @@ class MutableLearningSession(MutableBaseObject):
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
             result (Optional[int]): The result of the learning session.
+            settings (Optional[Dict[str, Any]]): The settings of the learning session.
             stacks (Optional[List[str]]): The stacks associated with the learning session.
             start (Optional[datetime]): The start time of the learning session.
             status (Optional[int]): The status of the learning session.
@@ -251,6 +283,7 @@ class MutableLearningSession(MutableBaseObject):
             id=id,
             key=key,
             result=result,
+            settings=settings,
             stacks=stacks,
             start=start,
             status=status,
@@ -339,6 +372,31 @@ class MutableLearningSession(MutableBaseObject):
             # Return None indicating an exception has occurred
             return None
 
+    def get_setting(
+        self,
+        key: str,
+    ) -> Optional[Any]:
+        """
+        Retrieves the value of a setting by its key.
+
+        Args:
+            key (str): The key of the setting to retrieve.
+
+        Returns:
+            Optional[Any]: The value of the setting if found, otherwise None.
+        """
+        try:
+            # Iterate over the settings and return the value for the matching key
+            return next(item["value"] for item in self.settings if item["key"] == key)
+        except StopIteration as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_setting' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def set_custom_field_value(
         self,
         customfield_id: str,
@@ -364,6 +422,36 @@ class MutableLearningSession(MutableBaseObject):
             # Log an error message to indicate that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'set_custom_field_value' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return indicating an error has occurred
+            return
+
+    def set_setting(
+        self,
+        key: str,
+        value: Any,
+    ) -> None:
+        """
+        Sets the value of a setting by its key.
+
+        Args:
+            key (str): The key of the setting to set.
+            value (Any): The value to set for the setting.
+
+        Returns:
+            None
+        """
+        try:
+            # Iterate over the settings and update the value for the matching key
+            for item in self.settings:
+                if item["key"] == key:
+                    item["value"] = value
+                    return
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'set_setting' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return indicating an error has occurred
@@ -503,6 +591,7 @@ class LearningSessionFactory:
         id: Optional[int] = None,
         key: Optional[str] = None,
         result: Optional[int] = None,
+        settings: Optional[List[Dict[str, Any]]] = None,
         stacks: Optional[List[str]] = None,
         start: Optional[datetime] = None,
         status: Optional[int] = None,
@@ -523,6 +612,7 @@ class LearningSessionFactory:
             id (Optional[int], optional): The ID of the learning session. Defaults to None.
             key (Optional[str], optional): The key of the learning session. Defaults to None.
             result (Optional[int], optional): The result of the learning session. Defaults to None.
+            settings (Optional[List[Dict[str, Any]]], optional): The settings of the learning session. Defaults to None.
             stacks (Optional[List[str]], optional): The stacks associated with the learning session. Defaults to None.
             start (Optional[datetime], optional): The start time of the learning session. Defaults to None.
             status (Optional[int], optional): The status of the learning session. Defaults to None.
@@ -548,6 +638,7 @@ class LearningSessionFactory:
                 id=id,
                 key=key,
                 result=result,
+                settings=settings,
                 stacks=stacks,
                 start=start,
                 status=status,
@@ -656,8 +747,11 @@ class LearningSessionBuilder(BaseObjectBuilder):
             else self.configuration["children"].append(value)
         )
         return self
-    
-    def contents(self, value: Union[List[str], str],) -> Self:
+
+    def contents(
+        self,
+        value: Union[List[str], str],
+    ) -> Self:
         """
         Sets the contents attribute of the builder.
 
@@ -803,6 +897,28 @@ class LearningSessionBuilder(BaseObjectBuilder):
             Self: The builder instance with the result attribute set.
         """
         self.configuration["result"] = value
+        return self
+
+    def settings(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the settings attribute of the builder.
+
+        Args:
+            value (Dict[str, Any]): The value to set for the settings attribute.
+
+        Returns:
+            Self: The builder instance with the settings attribute set.
+        """
+        # Check if the "settings" key is already present in the configuration
+        if "settings" not in self.configuration:
+            # Initialize the "settings" key with an empty dictionary
+            self.configuration["settings"] = {}
+
+        # Update the settings dictionary
+        self.configuration["settings"].update(value)
         return self
 
     def stacks(
@@ -1565,6 +1681,7 @@ class LearningSessionModel(ImmutableBaseModel):
         id (Field): The ID of the learning session.
         key (Field): The key of the learning session.
         result (Field): The result of the learning session.
+        settings (Field): The settings of the learning session.
         stacks (Field): The stacks associated with the learning session.
         start (Field): The start time of the learning session.
         status (Field): The status of the learning session.
@@ -1750,6 +1867,22 @@ class LearningSessionModel(ImmutableBaseModel):
         unique=False,
     )
 
+    settings: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="settings",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     stacks: Field = Field(
         autoincrement=False,
         default=None,
@@ -1842,6 +1975,7 @@ class LearningSessionModel(ImmutableBaseModel):
         id: Optional[int] = None,
         key: Optional[str] = None,
         result: Optional[int] = None,
+        settings: Optional[Dict[str, Any]] = None,
         stacks: Optional[List[str]] = None,
         start: Optional[datetime] = None,
         status: Optional[int] = None,
@@ -1862,6 +1996,7 @@ class LearningSessionModel(ImmutableBaseModel):
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
             result (Optional[int]): The result of the learning session.
+            settings (Optional[Dict[str, Any]]): The settings of the learning session.
             stacks (Optional[List[str]]): The stacks associated with the learning session.
             start (Optional[datetime]): The start time of the learning session.
             status (Optional[int]): The status of the learning session.
@@ -1881,6 +2016,7 @@ class LearningSessionModel(ImmutableBaseModel):
             id=id,
             key=key,
             result=result,
+            settings=settings,
             stacks=stacks,
             start=start,
             status=status,

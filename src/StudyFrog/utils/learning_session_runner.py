@@ -53,6 +53,7 @@ class LearningSessionRunner:
         dispatcher: Dispatcher,
         namespace: str,
         priorities: List[Union[ImmutablePriority]],
+        settings: Dict[str, Any],
         stacks: List[Union[ImmutableStack, MutableStack]],
     ) -> "LearningSessionRunner":
         """
@@ -68,6 +69,7 @@ class LearningSessionRunner:
             dispatcher (Dispatcher): The dispatcher instance to be used by the runner.
             namespace (str): The namespace to be used by the runner.
             priorities (List[Union[ImmutablePriority, MutablePriority]]): The priorities to be used by the runner.
+            settings (Dict[str, Any]): The settings dictionary.
             stacks (List[Union[ImmutableStack, MutableStack]]): The stacks to be used by the runner.
 
         Returns:
@@ -84,6 +86,7 @@ class LearningSessionRunner:
                 dispatcher=dispatcher,
                 namespace=namespace,
                 priorities=priorities,
+                settings=settings,
                 stacks=stacks,
             )
         # Return the shared instance
@@ -95,6 +98,7 @@ class LearningSessionRunner:
         dispatcher: Dispatcher,
         namespace: str,
         priorities: List[Union[ImmutablePriority]],
+        settings: Dict[str, Any],
         stacks: List[Union[ImmutableStack, MutableStack]],
     ) -> None:
         """
@@ -108,6 +112,7 @@ class LearningSessionRunner:
             dispatcher (Dispatcher): The dispatcher instance.
             namespace (str): The namespace to be used by the runner.
             priorities (List[Union[ImmutablePriority]]): The priorities to be used by the runner.
+            settings (Dict[str, Any]): The settings dictionary.
             stacks (List[Union[ImmutableStack, MutableStack]]): The stacks to be used by the runner.
 
         Returns:
@@ -140,6 +145,9 @@ class LearningSessionRunner:
 
         # Store the passed priority list in an immutable instance variable
         self.priorities: Final[List[Union[ImmutablePriority]]] = priorities
+
+        # Store the passed settings dictionary in an immutable instance variable
+        self.settings: Final[Dict[str, Any]] = settings
 
         # Store the passed stack list in an immutable instance variable
         self.stacks: Final[List[Union[ImmutableStack, MutableStack]]] = stacks
@@ -356,6 +364,10 @@ class LearningSessionRunner:
                 "priority": [priority.id for priority in self.priorities],
             }
         )
+
+        # Set the settings of the learning session
+        # The settings are set to the settings of the learning session
+        builder.settings(value=self.settings)
 
         # Set the stacks of the learning session
         # The stacks are set to the stacks of the learning session
