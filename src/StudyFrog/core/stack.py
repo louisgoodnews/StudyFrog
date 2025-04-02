@@ -122,6 +122,17 @@ class ImmutableStack(ImmutableBaseObject):
             uuid=uuid,
         )
 
+    def has_descendants(self) -> bool:
+        """
+        Returns True if the stack has descendants, False otherwise.
+
+        Returns:
+            bool: True if the stack has descendants, False otherwise.
+        """
+
+        # Check if the stack has descendants
+        return self.descendants is not None and len(self.descendants) > 0
+
     def to_mutable(self) -> "MutableStack":
         """
         Returns a mutable copy of the ImmuutableStack instance.
@@ -274,6 +285,17 @@ class MutableStack(MutableBaseObject):
 
         # Append the key of the given object to the stack's descendants
         self["descendants"].append(obj.key)
+
+    def has_descendants(self) -> bool:
+        """
+        Returns True if the stack has descendants, False otherwise.
+
+        Returns:
+            bool: True if the stack has descendants, False otherwise.
+        """
+
+        # Check if the stack has descendants
+        return self.descendants is not None and len(self.descendants) > 0
 
     def remove_from_contents(
         self,

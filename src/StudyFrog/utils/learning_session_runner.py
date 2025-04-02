@@ -182,14 +182,19 @@ class LearningSessionRunner:
         """
         try:
             # Initialize an empty list to store the filtered contents
-            self.contents: List[str] = []
+            self.contents: Final[List[str]] = []
 
-            # Get the contents of the stacks
+            # Get the keys of the stacks
             keys: List[str] = []
 
             for stack in self.stacks:
                 # Add the contents of the stack to the list
                 keys.extend(stack.contents)
+
+                # Check if the stack has descendants
+                if stack.has_descendants():
+                    # Add the descendants of the stack to the list
+                    keys.extend(stack.descendants)
 
             # Dispatch a request to get the contents of the stacks
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(

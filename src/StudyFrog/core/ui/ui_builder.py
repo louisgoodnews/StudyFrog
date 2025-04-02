@@ -5910,10 +5910,10 @@ class UIBuilder:
                 weight=0,
             )
 
-            # Configure the "Root" frame widget's 1st column to weight 0
+            # Configure the "Root" frame widget's 1st column to weight 1
             result["root"].grid_columnconfigure(
                 index=1,
-                weight=0,
+                weight=1,
             )
 
             # Configure the "Root" frame widget's 2nd column to weight 0
