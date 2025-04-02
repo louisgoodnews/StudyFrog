@@ -215,6 +215,10 @@ class Events:
         name="backend:flashcard:updated"
     )
 
+    # An event that indicates that a float spinbox field has been changed
+    FLOAT_SPINBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_spinbox:field:changed")
+    )
     # An event that indicates that a float spinbox field has been cleared
     FLOAT_SPINBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:float_spinbox:field:cleared")
@@ -240,6 +244,10 @@ class Events:
         name="ui:help:button:clicked"
     )
 
+    # An event that indicates that an int spinbox field has been changed
+    INT_SPINBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_spinbox:field:changed")
+    )
     # An event that indicates that an int spinbox field has been cleared
     INT_SPINBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:int_spinbox:field:cleared")
@@ -265,6 +273,11 @@ class Events:
         name="ui:menu:button:clicked"
     )
 
+    # An event that indicates that a multi line text field has changed
+    MULTI_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_line_text:field:changed")
+    )
+
     # An event that indicates that a multi line text field has been cleared
     MULTI_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:multi_line_text:field:cleared")
@@ -278,6 +291,11 @@ class Events:
     # An event that indicates that a multi line text field has been set
     MULTI_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:multi_line_text:field:set")
+    )
+
+    # An event that indicates that a multi select field has changed
+    MULTI_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_select:field:changed")
     )
 
     # An event that indicates that a multi select field has been cleared
@@ -427,6 +445,11 @@ class Events:
         name="backend:question:updated"
     )
 
+    # An event that indicates that a radiobutton field has been changed
+    RADIOBUTTON_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:radio:button:field:changed")
+    )
+
     # An event that indicates that a radiobutton field has been cleared
     RADIOBUTTON_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:radio:button:field:cleared")
@@ -440,6 +463,11 @@ class Events:
     # An event that indicates that a radiobutton field has been set
     RADIOBUTTON_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="ui:radio:button:field:set"
+    )
+
+    # An event that indicates that a read-only field has been changed
+    READONLY_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:readonly:field:changed")
     )
 
     # An event that indicates that a read-only field has been cleared
@@ -1154,6 +1182,11 @@ class Events:
         DispatcherEventFactory.create_event(name="global:request:validate:navigation")
     )
 
+    # An event that indicates that a scale field has been changed
+    SCALE_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:scale:field:changed")
+    )
+
     # An event that indicates that a scale field has been cleared
     SCALE_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:scale:field:cleared")
@@ -1179,6 +1212,11 @@ class Events:
         name="ui:search:query:changed"
     )
 
+    # An event that indicates that a single line text field has been changed
+    SINGLE_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:single_line_text:field:changed")
+    )
+
     # An event that indicates that a single line text field has been cleared
     SINGLE_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:single_line_text:field:cleared")
@@ -1192,6 +1230,11 @@ class Events:
     # An event that indicates that a single line text field has been set
     SINGLE_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:single_line_text:field:set")
+    )
+
+    # An event that indicates that a single select field has been changed
+    SINGLE_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:single_select:field:changed")
     )
 
     # An event that indicates that a single select field has been cleared
@@ -1447,6 +1490,7 @@ class Events:
             List[DispatcherEvent]: A list of all combobox field events in the Events class.
         """
         return [
+            cls.COMBOBOX_FIELD_CHANGED,
             cls.COMBOBOX_FIELD_CLEARED,
             cls.COMBOBOX_FIELD_GET,
             cls.COMBOBOX_FIELD_SET,
@@ -1509,6 +1553,7 @@ class Events:
             List[DispatcherEvent]: A list of all float spinbox field events in the Events class.
         """
         return [
+            cls.FLOAT_SPINBOX_FIELD_CHANGED,
             cls.FLOAT_SPINBOX_FIELD_CLEARED,
             cls.FLOAT_SPINBOX_FIELD_GET,
             cls.FLOAT_SPINBOX_FIELD_SET,
@@ -1523,6 +1568,7 @@ class Events:
             List[DispatcherEvent]: A list of all int spinbox field events in the Events class.
         """
         return [
+            cls.INT_SPINBOX_FIELD_CHANGED,
             cls.INT_SPINBOX_FIELD_CLEARED,
             cls.INT_SPINBOX_FIELD_GET,
             cls.INT_SPINBOX_FIELD_SET,
@@ -1569,6 +1615,7 @@ class Events:
             List[DispatcherEvent]: A list of all multi line text field events in the Events class.
         """
         return [
+            cls.MULTI_LINE_TEXT_FIELD_CHANGED,
             cls.MULTI_LINE_TEXT_FIELD_CLEARED,
             cls.MULTI_LINE_TEXT_FIELD_GET,
             cls.MULTI_LINE_TEXT_FIELD_SET,
@@ -1583,6 +1630,7 @@ class Events:
             List[DispatcherEvent]: A list of all multi select field events in the Events class.
         """
         return [
+            cls.MULTI_SELECT_FIELD_CHANGED,
             cls.MULTI_SELECT_FIELD_CLEARED,
             cls.MULTI_SELECT_FIELD_GET,
             cls.MULTI_SELECT_FIELD_SET,
@@ -1674,6 +1722,7 @@ class Events:
             List[DispatcherEvent]: A list of all radiobutton field events in the Events class.
         """
         return [
+            cls.RADIOBUTTON_FIELD_CHANGED,
             cls.RADIOBUTTON_FIELD_CLEARED,
             cls.RADIOBUTTON_FIELD_GET,
             cls.RADIOBUTTON_FIELD_SET,
@@ -1688,6 +1737,7 @@ class Events:
             List[DispatcherEvent]: A list of all readonly field events in the Events class.
         """
         return [
+            cls.READONLY_FIELD_CHANGED,
             cls.READONLY_FIELD_CLEARED,
             cls.READONLY_FIELD_GET,
             cls.READONLY_FIELD_SET,
@@ -1702,6 +1752,7 @@ class Events:
             List[DispatcherEvent]: A list of all scale field events in the Events class.
         """
         return [
+            cls.SCALE_FIELD_CHANGED,
             cls.SCALE_FIELD_CLEARED,
             cls.SCALE_FIELD_GET,
             cls.SCALE_FIELD_SET,
@@ -1732,6 +1783,7 @@ class Events:
             List[DispatcherEvent]: A list of all single line text field events in the Events class.
         """
         return [
+            cls.SINGLE_LINE_TEXT_FIELD_CHANGED,
             cls.SINGLE_LINE_TEXT_FIELD_CLEARED,
             cls.SINGLE_LINE_TEXT_FIELD_GET,
             cls.SINGLE_LINE_TEXT_FIELD_SET,
@@ -1746,6 +1798,7 @@ class Events:
             List[DispatcherEvent]: A list of all single select field events in the Events class.
         """
         return [
+            cls.SINGLE_SELECT_FIELD_CHANGED,
             cls.SINGLE_SELECT_FIELD_CLEARED,
             cls.SINGLE_SELECT_FIELD_GET,
             cls.SINGLE_SELECT_FIELD_SET,

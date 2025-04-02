@@ -1696,15 +1696,347 @@ class UIBuilder:
             return None
 
     @classmethod
+    def get_float_scale_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        from_: float = 0,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str], None]] = None,
+        resolution: float = 1,
+        to: float = 100,
+        value: float = 0,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of tkinter.Scale that is used as a field.
+
+        This method creates a dictionary that holds all functions and widgets that facilitate the scale field.
+        Contained keys are:
+            - "clearer": A function that clears the scale field.
+            - "getter": A function that retrieves the value of the scale field.
+            - "setter": A function that sets the value of the scale field.
+            - "variable": A tkinter.BooleanVar instance that holds the value of the scale field.
+            - "root": A tkinter.Frame instance that holds the scale field.
+            - "label": A tkinter.Label instance that holds the label for the scale field.
+            - "scale": A tkinter.Scale instance that is used as a field.
+
+        Args:
+            from_ (float): The minimum of the scale.
+            label (str): The label for the scale.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the scale. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the scale field changes. Defaults to None.
+            resolution (float): The step size of the scale.
+            to (float): The maximum of the scale.
+            value (float): The float value of the scale field.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created tkinter.Scale instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Scale.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear(dispatch: int = True) -> None:
+                """
+                Clears the scale field by setting its value to an empty float.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the scale field.
+                """
+                try:
+                    # Set the value of the scale field to an empty float
+                    result["variable"].set(value="")
+
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def get(dispatch: int = True) -> Optional[float]:
+                """
+                Retrieves the value of the scale field as a float.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[float]: The value of the scale field as a float. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the scale field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the scale field as a float
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_button_clicked() -> None:
+                """
+                Handles the button click.
+
+                This function calls the clear function.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the scale field.
+                """
+                try:
+                    # Clear the scale field
+                    clear(dispatch=True)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_button_clicked' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def on_scale_changed(dispatch: int = True) -> None:
+                """
+                Handles the SCALE_FIELD_CHANGED event.
+
+                This function is called when the value of the scale field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the SCALE_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_scale_changed' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def set(
+                value: float,
+                dispatch: int = True,
+            ) -> None:
+                """
+                Sets the value of the scale field.
+
+                Args:
+                    dispatch (int, optional): Whether to dispatch the SCALE_FIELD_SET event. Defaults to True.
+                    value (float, optional): The value to set for the scale field.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the scale field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    if value not in result["values"]:
+                        # Add the value to the values list
+                        result["values"].append(value)
+
+                    # Set the value of the scale field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            # Create the "Variable" float variable
+            result["variable"] = cls.get_double_variable(value=value)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs.get("root", {}),
+            )
+
+            # Configure the "Root" frame widget's 0th column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+                **kwargs.get("label", {}),
+            )
+
+            # Add the "Label" label widget to the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Scale" scale widget
+            result["scale"] = cls.get_scale(
+                command=on_scale_changed,
+                from_=from_,
+                master=result["root"],
+                resolution=resolution,
+                to=to,
+                value=value,
+                variable=result["variable"],
+                **kwargs.get("scale", {}),
+            )
+
+            # Add the "Scale" scale widget to the "Root" frame widget
+            result["scale"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                command=on_button_clicked,
+                master=result["root"],
+                text="X",
+                **kwargs.get("button", {}),
+            )
+
+            # Add the "Button" scale widget to the "Root" frame widget
+            result["button"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=0,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_float_scale_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+
+            return None
+
+    @classmethod
     def get_float_spinbox_field(
         cls,
         label: str,
         master: tkinter.Misc,
-        step_size: float = 1.0,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[float], None]] = None,
+        setp_size: float = 1,
+        value: float = 0,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
-        Creates and returns a new instance of a tkinter widgets dictionary for a float spinbox field.
+        Creates and returns a new instance of a tkinter widgets dictionary for an int spinbox field.
 
         The returned dictionary contains the following keys:
             - "root": The container frame for the widgets
@@ -1720,82 +2052,174 @@ class UIBuilder:
         Args:
             label (str): The text for the label widget.
             master (tkinter.Misc): The master widget for placing the container frame.
-            step_size (float): The step size for the float spinbox. Defaults to 1.0.
+            namespace (str): The namespace for the widgets. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[float], None]]): A callback function to be called when the value of the variable changes. Defaults to None.
+            setp_size (int): The step size for the integer spinbox. Defaults to 1.
+            value (int): The initial value for the variable. Defaults to 0.
             **kwargs: Additional keyword arguments for the entry widget.
 
         Returns:
             Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
 
         Raises:
-            Exception: If an exception occurs while attempting to create the tkinter widgets dictionary.
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.DoubleVar.
         """
         try:
             # Initialize the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            def clear() -> None:
+            def clear(dispatch: bool = True) -> None:
                 """
-                Clears the value of the variable.
-
-                Returns:
-                    None
-                """
-
-                # Set the value of the variable to 0
-                result["variable"].set(value=0.0)
-
-            def decrement() -> None:
-                """
-                Decrements the value of the variable by the step size.
-
-                Returns:
-                    None
-                """
-
-                # Decrement the value of the variable
-                result["variable"].set(result["variable"].get() - step_size)
-
-            def get() -> float:
-                """
-                Returns the current value of the variable.
-
-                Returns:
-                    float: The current value of the variable.
-                """
-
-                # Return the value of the variable
-                return result["variable"].get()
-
-            def increment() -> None:
-                """
-                Increments the value of the variable by the step size.
-
-                Returns:
-                    None
-                """
-
-                # Increment the value of the variable
-                result["variable"].set(result["variable"].get() + step_size)
-
-            def set(value: float) -> None:
-                """
-                Sets the value of the variable.
+                Clears the readonly field by setting its value to 0.
 
                 Args:
-                    value (float): The value to set the variable to.
+                    None
 
                 Returns:
                     None
-                """
 
-                # Set the value of the variable
-                result["variable"].set(value=value)
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the int spinbox field.
+                """
+                try:
+                    # Clear the tkinter.DoubleVar widget
+                    result["variable"].set(value=0)
+
+                    if dispatch:
+                        # Dispatch the FLOAT_SPINBOX_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.FLOAT_SPINBOX_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def get(dispatch: bool = True) -> Optional[float]:
+                """
+                Retrieves the value of the int spinbox field as an integer.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[float]: The value of the int spinbox field as an integer. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the int spinbox field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the FLOAT_SPINBOX_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.FLOAT_SPINBOX_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the readonly field as an int.
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_entry_changed(dispatch: bool = True) -> None:
+                """
+                Handles the SINGLE_LINE_FIELD_CHANGED event.
+
+                This function is called when the value of the int spinbox field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the SINGLE_LINE_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SINGLE_LINE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.FLOAT_SPINBOX_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_entry_changed' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def set(
+                value: float,
+                dispatch: bool = True,
+            ) -> None:
+                """
+                Sets the value of the readonly field.
+
+                Args:
+                    dispatch (bool, optional): Whether to dispatch the SINGLE_LINE_FIELD_SET event. Defaults to True.
+                    value (str, optional): The value to set for the readonly field. Defaults to an empty string.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the readonly field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the FLOAT_SPINBOX_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.FLOAT_SPINBOX_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    # Set the value of the readonly field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
 
             # Create the "Variable" tkinter.DoubleVar variable
-            result["variable"] = cls.get_double_variable(value=0.0)
+            result["variable"] = cls.get_double_variable(value=value)
 
             # Create the "Root" frame widget
-            result["root"] = cls.get_frame(master=master)
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs.get("root", {}),
+            )
 
             # Configure the "Root" frame widget's 0th column to weight 1
             result["root"].grid_columnconfigure(
@@ -1831,13 +2255,18 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
+                **kwargs.get("label", {}),
             )
 
             # Create the "Decrement" button widget
             result["decrement_button"] = cls.get_button(
-                command=decrement,
+                command=lambda: (
+                    result["variable"].set(value=result["variable"].get() - setp_size),
+                    on_entry_changed(),
+                ),
                 master=result["root"],
                 text="-",
+                **kwargs.get("decrement_button", {}),
             )
 
             # Create the "Entry" entry widget
@@ -1845,17 +2274,21 @@ class UIBuilder:
                 master=result["root"],
                 state="readonly",
                 textvariable=result["variable"],
-                **kwargs,
+                **kwargs.get("entry", {}),
             )
 
             # Create the "Increment" button widget
             result["increment_button"] = cls.get_button(
-                command=increment,
+                command=lambda: (
+                    result["variable"].set(value=result["variable"].get() + setp_size),
+                    on_entry_changed(),
+                ),
                 master=result["root"],
                 text="+",
+                **kwargs.get("increment_button", {}),
             )
 
-            # Add the clear function to the result dictionary
+            # Add the clearer function to the result dictionary
             result["clearer"] = clear
 
             # Add the getter function to the result dictionary
@@ -1984,20 +2417,352 @@ class UIBuilder:
             return None
 
     @classmethod
-    def get_integer_spinbox_field(
+    def get_int_scale_field(
         cls,
         label: str,
         master: tkinter.Misc,
-        setp_size: int = 1,
+        from_: int = 0,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str], None]] = None,
+        resolution: int = 1,
+        to: int = 100,
+        value: int = 0,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
-        Creates and returns a new instance of a tkinter widgets dictionary for an integer spinbox field.
+        Creates and returns a new instance of tkinter.Scale that is used as a field.
+
+        This method creates a dictionary that holds all functions and widgets that facilitate the scale field.
+        Contained keys are:
+            - "clearer": A function that clears the scale field.
+            - "getter": A function that retrieves the value of the scale field.
+            - "setter": A function that sets the value of the scale field.
+            - "variable": A tkinter.BooleanVar instance that holds the value of the scale field.
+            - "root": A tkinter.Frame instance that holds the scale field.
+            - "label": A tkinter.Label instance that holds the label for the scale field.
+            - "scale": A tkinter.Scale instance that is used as a field.
+
+        Args:
+            from_ (int): The minimum value of the scale.
+            label (str): The label for the scale.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the scale. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the scale field changes. Defaults to None.
+            resolution (int): The resolution of the scale. Defaults to 1.
+            to (int): The maximum value of the scale. Defaults to 100.
+            value (int): The initial value of the scale. Defaults to 0.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
+
+        Returns:
+            Optional[Dict[str, Any]]: The created tkinter.Scale instance or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Scale.
+        """
+        try:
+            # Initialize the result dictionary as an empty dictionary
+            result: Dict[str, Any] = {}
+
+            def clear(dispatch: int = True) -> None:
+                """
+                Clears the scale field by setting its value to an empty string.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the scale field.
+                """
+                try:
+                    # Set the value of the scale field to an empty string
+                    result["variable"].set(value=value)
+
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def get(dispatch: int = True) -> Optional[str]:
+                """
+                Retrieves the value of the scale field as a string.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[str]: The value of the scale field as a string. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the scale field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the scale field as a string
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_button_clicked() -> None:
+                """
+                Handles the button click.
+
+                This function calls the clear function.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the scale field.
+                """
+                try:
+                    # Clear the scale field
+                    clear(dispatch=True)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_button_clicked' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def on_scale_changed(dispatch: int = True) -> None:
+                """
+                Handles the SCALE_FIELD_CHANGED event.
+
+                This function is called when the value of the scale field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the SCALE_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_scale_changed' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def set(
+                value: int,
+                dispatch: int = True,
+            ) -> None:
+                """
+                Sets the value of the scale field.
+
+                Args:
+                    dispatch (int, optional): Whether to dispatch the SCALE_FIELD_SET event. Defaults to True.
+                    value (int): The value to set for the scale field.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the scale field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SCALE_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.SCALE_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    if value not in result["values"]:
+                        # Add the value to the values list
+                        result["values"].append(value)
+
+                    # Set the value of the scale field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            # Create the "Variable" string variable
+            result["variable"] = cls.get_int_variable(value=value)
+
+            # Create the "Root" frame widget
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs.get("root", {}),
+            )
+
+            # Configure the "Root" frame widget's 0th column to weight 0
+            result["root"].grid_columnconfigure(
+                index=0,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 1st column to weight 0
+            result["root"].grid_columnconfigure(
+                index=1,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 2nd column to weight 0
+            result["root"].grid_columnconfigure(
+                index=2,
+                weight=0,
+            )
+
+            # Configure the "Root" frame widget's 0th row to weight 1
+            result["root"].grid_rowconfigure(
+                index=0,
+                weight=1,
+            )
+
+            # Create the "Label" label widget
+            result["label"] = cls.get_label(
+                master=result["root"],
+                text=label,
+                **kwargs.get("label", {}),
+            )
+
+            # Add the "Label" label widget to the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Scale" scale widget
+            result["scale"] = cls.get_scale(
+                command=on_scale_changed,
+                from_=from_,
+                master=result["root"],
+                orient=HORIZONTAL,
+                resolution=resolution,
+                to=to,
+                variable=result["variable"],
+                **kwargs.get("scale", {}),
+            )
+
+            # Add the "Scale" scale widget to the "Root" frame widget
+            result["scale"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the "Button" button widget
+            result["button"] = cls.get_button(
+                command=on_button_clicked,
+                master=result["root"],
+                text="X",
+                **kwargs.get("button", {}),
+            )
+
+            # Add the "Button" scale widget to the "Root" frame widget
+            result["button"].grid(
+                column=2,
+                padx=5,
+                pady=5,
+                row=0,
+            )
+
+            # Add the "clearer" function to the result dictionary
+            result["clearer"] = clear
+
+            # Add the "getter" function to the result dictionary
+            result["getter"] = get
+
+            # Add the "setter" function to the result dictionary
+            result["setter"] = set
+
+            # Return the result dictionary
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception occured
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_int_scale_field' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception occured
+
+            return None
+
+    @classmethod
+    def get_int_spinbox_field(
+        cls,
+        label: str,
+        master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[int], None]] = None,
+        setp_size: int = 1,
+        value: int = 0,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Creates and returns a new instance of a tkinter widgets dictionary for an int spinbox field.
 
         The returned dictionary contains the following keys:
             - "root": The container frame for the widgets
             - "label": The label widget
-            - "variable": The tkinter.IntVar variable
+            - "variable": The tkinter.DoubleVar variable
             - "decrement_button": The decrement button widget
             - "entry": The entry widget
             - "increment_button": The increment button widget
@@ -2008,82 +2773,174 @@ class UIBuilder:
         Args:
             label (str): The text for the label widget.
             master (tkinter.Misc): The master widget for placing the container frame.
+            namespace (str): The namespace for the widgets. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[int], None]]): A callback function to be called when the value of the variable changes. Defaults to None.
             setp_size (int): The step size for the integer spinbox. Defaults to 1.
+            value (int): The initial value for the variable. Defaults to 0.
             **kwargs: Additional keyword arguments for the entry widget.
 
         Returns:
             Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
 
         Raises:
-            Exception: If an exception occurs while attempting to create a new instance of tkinter.IntVar.
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.DoubleVar.
         """
         try:
             # Initialize the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            def clear() -> None:
+            def clear(dispatch: bool = True) -> None:
                 """
-                Clears the value of the variable.
-
-                Returns:
-                    None
-                """
-
-                # Set the value of the variable to 0
-                result["variable"].set(value=0)
-
-            def decrement() -> None:
-                """
-                Decrements the value of the variable by the step size.
-
-                Returns:
-                    None
-                """
-
-                # Decrement the value of the variable
-                result["variable"].set(result["variable"].get() - setp_size)
-
-            def get() -> int:
-                """
-                Returns the current value of the variable.
-
-                Returns:
-                    int: The current value of the variable.
-                """
-
-                # Return the value of the variable
-                return result["variable"].get()
-
-            def increment() -> None:
-                """
-                Increments the value of the variable by the step size.
-
-                Returns:
-                    None
-                """
-
-                # Increment the value of the variable
-                result["variable"].set(result["variable"].get() + setp_size)
-
-            def set(value: int) -> None:
-                """
-                Sets the value of the variable.
+                Clears the readonly field by setting its value to 0.
 
                 Args:
-                    value (int): The value to set the variable to.
+                    None
 
                 Returns:
                     None
-                """
 
-                # Set the value of the variable
-                result["variable"].set(value=value)
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the int spinbox field.
+                """
+                try:
+                    # Clear the tkinter.DoubleVar widget
+                    result["variable"].set(value=0)
+
+                    if dispatch:
+                        # Dispatch the INT_SPINBOX_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.INT_SPINBOX_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def get(dispatch: bool = True) -> Optional[int]:
+                """
+                Retrieves the value of the int spinbox field as an integer.
+
+                Args:
+                    None
+
+                Returns:
+                    Optional[int]: The value of the int spinbox field as an integer. Or None if an exception occurs.
+
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the int spinbox field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the INT_SPINBOX_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.INT_SPINBOX_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the readonly field as an int.
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
+                    return None
+
+            def on_entry_changed(dispatch: bool = True) -> None:
+                """
+                Handles the SINGLE_LINE_FIELD_CHANGED event.
+
+                This function is called when the value of the int spinbox field changes.
+
+                Args:
+                    None
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the SINGLE_LINE_FIELD_CHANGED event.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SINGLE_LINE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.INT_SPINBOX_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_entry_changed' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
+
+            def set(
+                value: int,
+                dispatch: bool = True,
+            ) -> None:
+                """
+                Sets the value of the readonly field.
+
+                Args:
+                    dispatch (bool, optional): Whether to dispatch the SINGLE_LINE_FIELD_SET event. Defaults to True.
+                    value (str, optional): The value to set for the readonly field. Defaults to an empty string.
+
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the readonly field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the INT_SPINBOX_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.INT_SPINBOX_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    # Set the value of the readonly field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Re-raise the exception to the caller
+                    raise e
 
             # Create the "Variable" tkinter.IntVar variable
-            result["variable"] = cls.get_int_variable(value=0)
+            result["variable"] = cls.get_int_variable(value=value)
 
             # Create the "Root" frame widget
-            result["root"] = cls.get_frame(master=master)
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs.get("root", {}),
+            )
 
             # Configure the "Root" frame widget's 0th column to weight 1
             result["root"].grid_columnconfigure(
@@ -2119,13 +2976,35 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
+                **kwargs.get("label", {}),
+            )
+
+            # Place the "Label" label widget within the "Root" frame widget
+            result["label"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
             )
 
             # Create the "Decrement" button widget
             result["decrement_button"] = cls.get_button(
-                command=decrement,
+                command=lambda: (
+                    result["variable"].set(value=result["variable"].get() - setp_size),
+                    on_entry_changed(),
+                ),
                 master=result["root"],
                 text="-",
+                **kwargs.get("decrement_button", {}),
+            )
+
+            # Place the "Decrement" button widget within the "Root" frame widget
+            result["decrement_button"].grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
             )
 
             # Create the "Entry" entry widget
@@ -2133,14 +3012,33 @@ class UIBuilder:
                 master=result["root"],
                 state="readonly",
                 textvariable=result["variable"],
-                **kwargs,
+                **kwargs.get("entry", {}),
+            )
+
+            # Place the "Entry" entry widget within the "Root" frame widget
+            result["entry"].grid(
+                column=2,
+                row=0,
+                sticky=NSEW,
             )
 
             # Create the "Increment" button widget
             result["increment_button"] = cls.get_button(
-                command=increment,
+                command=lambda: (
+                    result["variable"].set(value=result["variable"].get() + setp_size),
+                    on_entry_changed(),
+                ),
                 master=result["root"],
                 text="+",
+                **kwargs.get("increment_button", {}),
+            )
+
+            # Place the "Increment" button widget within the "Root" frame widget
+            result["increment_button"].grid(
+                column=3,
+                padx=5,
+                pady=5,
+                row=0,
             )
 
             # Add the clearer function to the result dictionary
@@ -2157,7 +3055,7 @@ class UIBuilder:
         except Exception as e:
             # Log an error message indicating an exception occured
             cls.logger.error(
-                message=f"Caught an exception while attempting to run 'get_integer_spinbox_field' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_int_spinbox_field' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occured
@@ -2514,7 +3412,7 @@ class UIBuilder:
                     if dispatch:
                         # Dispatch the MULTI_LINE_FIELD_CLEARED event
                         cls.dispatcher.dispatch(
-                            event=Events.MULTI_LINE_FIELD_CLEARED,
+                            event=Events.MULTI_LINE_TEXT_FIELD_CLEARED,
                             label=label,
                             namespace=namespace,
                             value=result["text"].get(
@@ -2545,7 +3443,7 @@ class UIBuilder:
                     if dispatch:
                         # Dispatch the MULTI_LINE_FIELD_GET event
                         cls.dispatcher.dispatch(
-                            event=Events.MULTI_LINE_FIELD_GET,
+                            event=Events.MULTI_LINE_TEXT_FIELD_GET,
                             label=label,
                             namespace=namespace,
                             value=result["text"].get(
@@ -2602,7 +3500,7 @@ class UIBuilder:
                     if dispatch:
                         # Dispatch the MULTI_LINE_FIELD_CHANGED event
                         cls.dispatcher.dispatch(
-                            event=Events.MULTI_LINE_FIELD_CHANGED,
+                            event=Events.MULTI_LINE_TEXT_FIELD_CHANGED,
                             label=label,
                             namespace=namespace,
                             value=result["text"].get(
@@ -2777,7 +3675,7 @@ class UIBuilder:
             result["text"].config(yscrollcommand=result["scrollbar"].set)
 
             # Create the "Button" button widget
-            result["button"] = cls.get_multi_line_text(
+            result["button"] = cls.get_button(
                 command=on_button_clicked,
                 master=result["root"],
                 text="X",
@@ -4478,130 +5376,185 @@ class UIBuilder:
         cls,
         label: str,
         master: tkinter.Misc,
-        value: Optional[str] = None,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str], None]] = None,
+        value: str = "",
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
-        Creates and returns a dictionary containing widgets to facilitate a readonly field.
+        Creates and returns a new instance of tkinter.Entry that is used as a field.
 
-        The widgets contained are:
-            - "root" (tkinter.Frame): The root widget of the readonly field.
-            - "label" (tkinter.Label): The label widget of the readonly field.
-            - "entry" (tkinter.Entry): The entry widget of the readonly field.
-
-        The returned dictionary contains the following functions:
-            - "clearer": A function to clear the content of the entry widget and set it to readonly.
-            - "configurer": A function to configure the widget corresponding to the given key with provided options.
-            - "getter": A function to retrieve the content of the entry widget.
-            - "setter": A function to set the content of the entry widget and make it readonly.
+        This method creates a dictionary that holds all functions and widgets that facilitate the readonly field.
+        Contained keys are:
+            - "clearer": A function that clears the readonly field.
+            - "getter": A function that retrieves the value of the readonly field.
+            - "setter": A function that sets the value of the readonly field.
+            - "variable": A tkinter.stringVar instance that holds the value of the readonly field.
+            - "root": A tkinter.Frame instance that holds the readonly field.
+            - "label": A tkinter.Label instance that holds the label for the readonly field.
+            - "entry": A tkinter.Entry instance that is used as a field.
 
         Args:
-            label (str): The text for the label widget.
-            master (tkinter.Misc): The master widget for placing the container frame.
-            value (Optional[str], optional): The value to set in the entry widget. Defaults to None.
-            **kwargs: Additional keyword arguments to configure the entry widget.
+            label (str): The label for the readonly field.
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace for the readonly field. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the readonly field changes. Defaults to None.
+            value (bool): The initial value of the readonly field. Defaults to an empty string.
+            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
 
         Returns:
-            Optional[Dict[str, Any]]: The created widgets dictionary or None if an exception occurs.
+            Optional[Dict[str, Any]]: The created tkinter.Entry instance or None if an exception occurs.
 
         Raises:
-            Exception: If an exception occurs while running the method.
+            Exception: If an exception occurs while attempting to create a new instance of tkinter.Entry.
         """
         try:
             # Initialize the result dictionary as an empty dictionary
             result: Dict[str, Any] = {}
 
-            def clear() -> None:
+            def clear(dispatch: bool = True) -> None:
                 """
-                Clears the content of the entry widget and sets it to readonly.
-
-                Returns:
-                    None
-                """
-
-                # Set the entry widget state to NORMAL to allow modifications
-                result["entry"].configure(state=NORMAL)
-
-                # Delete the content of the entry widget
-                result["entry"].delete(
-                    0,
-                    END,
-                )
-
-                # Set the entry widget state back to readonly
-                result["entry"].configure(state="readonly")
-
-            def configure(
-                key: str,
-                **kwargs,
-            ) -> None:
-                """
-                Configures the widget corresponding to the given key with provided options.
+                Clears the readonly field by setting its value to an empty string.
 
                 Args:
-                    key (str): The key identifying the widget to configure.
-                    **kwargs: Additional keyword arguments to configure the widget.
+                    None
 
                 Returns:
                     None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to clear the readonly field.
                 """
+                try:
+                    # Clear the tkinter.Entry widget
+                    result["variable"].set(value="")
 
-                # Check if the key is in the result dictionary
-                if key not in result:
-                    # Return early if the key is not present
-                    return
+                    if dispatch:
+                        # Dispatch the READONLY_FIELD_CLEARED event
+                        cls.dispatcher.dispatch(
+                            event=Events.READONLY_FIELD_CLEARED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
+                    )
 
-                # Configure the widget with the given key using the provided options
-                result[key].configure(**kwargs)
-
-            def get() -> Optional[str]:
+            def get(dispatch: bool = True) -> Optional[str]:
                 """
-                Retrieves the content of the entry widget.
+                Retrieves the value of the readonly field as a string.
+
+                Args:
+                    None
 
                 Returns:
-                    Optional[str]: The content of the entry widget or None if the content is empty.
-                """
-                # Get the content of the entry widget
-                content: str = result["entry"].get()
+                    Optional[str]: The value of the readonly field as a string. Or None if an exception occurs.
 
-                # Check, if the content is empty
-                if content == "":
-                    # Return None if the content is empty
+                Raises:
+                    Exception: If an exception occurs while attempting to retrieve the value of the readonly field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the READONLY_FIELD_GET event
+                        cls.dispatcher.dispatch(
+                            event=Events.READONLY_FIELD_GET,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
+
+                    # Return the value of the readonly field as a string
+                    return result["variable"].get()
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Return None indicating an exception occurred
                     return None
 
-                # Return the content of the entry widget
-                return content
-
-            def set(value: Optional[str]) -> None:
+            def on_entry_changed(dispatch: bool = True) -> None:
                 """
-                Sets the content of the entry widget and makes it readonly.
+                Handles the SINGLE_LINE_FIELD_CHANGED event.
 
-                Parameters:
-                    value (Optional[str]): The value to set in the entry widget.
+                This function is called when the value of the readonly field changes.
+
+                Args:
+                    None
 
                 Returns:
                     None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to dispatch the SINGLE_LINE_FIELD_CHANGED event.
                 """
+                try:
+                    if dispatch:
+                        # Dispatch the SINGLE_LINE_FIELD_CHANGED event
+                        cls.dispatcher.dispatch(
+                            event=Events.READONLY_FIELD_CHANGED,
+                            label=label,
+                            namespace=namespace,
+                            value=result["variable"].get(),
+                        )
 
-                # Set the entry widget to NORMAL mode to allow modifications
-                result["entry"].configure(state=NORMAL)
+                    # Check, if the on_change_callback is present
+                    if on_change_callback:
+                        # Call the on_change_callback function with the new value
+                        on_change_callback(result["variable"].get())
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'on_entry_changed' method from '{cls.__name__}': {e}"
+                    )
 
-                # Clear the content of the entry widget
-                result["entry"].delete(
-                    0,
-                    END,
-                )
+            def set(
+                dispatch: bool = True,
+                value: str = "",
+            ) -> None:
+                """
+                Sets the value of the readonly field.
 
-                result["entry"].insert(
-                    0,
-                    value,
-                )
+                Args:
+                    dispatch (bool, optional): Whether to dispatch the SINGLE_LINE_FIELD_SET event. Defaults to True.
+                    value (str, optional): The value to set for the readonly field. Defaults to an empty string.
 
-                # Set the entry widget to readonly mode
-                result["entry"].configure(state="readonly")
+                Returns:
+                    None
+
+                Raises:
+                    Exception: If an exception occurs while attempting to set the value of the readonly field.
+                """
+                try:
+                    if dispatch:
+                        # Dispatch the SINGLE_LINE_FIELD_SET event
+                        cls.dispatcher.dispatch(
+                            event=Events.READONLY_FIELD_SET,
+                            label=label,
+                            namespace=namespace,
+                            value=value,
+                        )
+
+                    # Set the value of the readonly field
+                    result["variable"].set(value=value)
+                except Exception as e:
+                    # Log an error message indicating an exception occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
+                    )
+
+            # Create the "Variable" StrVar object
+            result["variable"] = cls.get_str_variable(value=value)
 
             # Create the "Root" frame widget
-            result["root"] = cls.get_frame(master=master)
+            result["root"] = cls.get_frame(
+                master=master,
+                **kwargs.get("root", {}),
+            )
 
             # Configure the "Root" frame widget's 0th column to weight 0
             result["root"].grid_columnconfigure(
@@ -4625,11 +5578,14 @@ class UIBuilder:
             result["label"] = cls.get_label(
                 master=result["root"],
                 text=label,
+                **kwargs.get("label", {}),
             )
 
-            # Place the "Label" label widget within the "Root" frame widget
+            # Add the "Label" label widget to the "Root" frame widget
             result["label"].grid(
                 column=0,
+                padx=5,
+                pady=5,
                 row=0,
                 sticky=NSEW,
             )
@@ -4638,32 +5594,33 @@ class UIBuilder:
             result["entry"] = cls.get_entry(
                 master=result["root"],
                 state="readonly",
-                **kwargs,
+                textvariable=result["variable"],
+                **kwargs.get("entry", {}),
             )
 
-            # Place the "Entry" entry widget within the "Root" frame widget
+            # Bind the "Entry" entry widget to the "on_entry_changed" function
+            result["entry"].bind(
+                func=lambda event: on_entry_changed(),
+                sequence="<KeyRelease>",
+            )
+
+            # Add the "Entry" entry widget to the "Root" frame widget
             result["entry"].grid(
                 column=1,
+                padx=5,
+                pady=5,
                 row=0,
                 sticky=NSEW,
             )
 
-            # Add the clearer function to the result dictionary
+            # Add the "clearer" function to the result dictionary
             result["clearer"] = clear
 
-            # Add the configurer function to the result dictionary
-            result["configurer"] = configure
-
-            # Add the getter function to the result dictionary
+            # Add the "getter" function to the result dictionary
             result["getter"] = get
 
-            # Add the setter function to the result dictionary
+            # Add the "setter" function to the result dictionary
             result["setter"] = set
-
-            # Check, if a value was passed
-            if value:
-                # Set the value of the entry widget
-                set(value=value)
 
             # Return the result dictionary
             return result
@@ -4708,664 +5665,6 @@ class UIBuilder:
             )
 
             # Return None indicating an exception occurred
-            return None
-
-    @classmethod
-    def get_float_scale_field(
-        cls,
-        label: str,
-        master: tkinter.Misc,
-        from_: float = 0,
-        namespace: str = Constants.GLOBAL_NAMESPACE,
-        on_change_callback: Optional[Callable[[str], None]] = None,
-        resolution: float = 1,
-        to: float = 100,
-        value: float = 0,
-        **kwargs,
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Creates and returns a new instance of tkinter.Scale that is used as a field.
-
-        This method creates a dictionary that holds all functions and widgets that facilitate the scale field.
-        Contained keys are:
-            - "clearer": A function that clears the scale field.
-            - "getter": A function that retrieves the value of the scale field.
-            - "setter": A function that sets the value of the scale field.
-            - "variable": A tkinter.BooleanVar instance that holds the value of the scale field.
-            - "root": A tkinter.Frame instance that holds the scale field.
-            - "label": A tkinter.Label instance that holds the label for the scale field.
-            - "scale": A tkinter.Scale instance that is used as a field.
-
-        Args:
-            from_ (float): The minimum of the scale.
-            label (str): The label for the scale.
-            master (tkinter.Misc): The master widget.
-            namespace (str): The namespace for the scale. Defaults to Constants.GLOBAL_NAMESPACE.
-            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the scale field changes. Defaults to None.
-            resolution (float): The step size of the scale.
-            to (float): The maximum of the scale.
-            value (float): The float value of the scale field.
-            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
-
-        Returns:
-            Optional[Dict[str, Any]]: The created tkinter.Scale instance or None if an exception occurs.
-
-        Raises:
-            Exception: If an exception occurs while attempting to create a new instance of tkinter.Scale.
-        """
-        try:
-            # Initialize the result dictionary as an empty dictionary
-            result: Dict[str, Any] = {}
-
-            def clear(dispatch: int = True) -> None:
-                """
-                Clears the scale field by setting its value to an empty float.
-
-                Args:
-                    None
-
-                Returns:
-                    None
-
-                Raises:
-                    Exception: If an exception occurs while attempting to clear the scale field.
-                """
-                try:
-                    # Set the value of the scale field to an empty float
-                    result["variable"].set(value="")
-
-                    if dispatch:
-                        # Dispatch the SCALE_FIELD_CLEARED event
-                        cls.dispatcher.dispatch(
-                            event=Events.SCALE_FIELD_CLEARED,
-                            label=label,
-                            namespace=namespace,
-                            value=result["variable"].get(),
-                        )
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Re-raise the exception to the caller
-                    raise e
-
-            def get(dispatch: int = True) -> Optional[float]:
-                """
-                Retrieves the value of the scale field as a float.
-
-                Args:
-                    None
-
-                Returns:
-                    Optional[float]: The value of the scale field as a float. Or None if an exception occurs.
-
-                Raises:
-                    Exception: If an exception occurs while attempting to retrieve the value of the scale field.
-                """
-                try:
-                    if dispatch:
-                        # Dispatch the SCALE_FIELD_GET event
-                        cls.dispatcher.dispatch(
-                            event=Events.SCALE_FIELD_GET,
-                            label=label,
-                            namespace=namespace,
-                            value=result["variable"].get(),
-                        )
-
-                    # Return the value of the scale field as a float
-                    return result["variable"].get()
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Return None indicating an exception occurred
-                    return None
-
-            def on_button_clicked() -> None:
-                """
-                Handles the button click.
-
-                This function calls the clear function.
-
-                Args:
-                    None
-
-                Returns:
-                    None
-
-                Raises:
-                    Exception: If an exception occurs while attempting to clear the scale field.
-                """
-                try:
-                    # Clear the scale field
-                    clear(dispatch=True)
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'on_button_clicked' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Re-raise the exception to the caller
-                    raise e
-
-            def on_scale_changed(dispatch: int = True) -> None:
-                """
-                Handles the SCALE_FIELD_CHANGED event.
-
-                This function is called when the value of the scale field changes.
-
-                Args:
-                    None
-
-                Returns:
-                    None
-
-                Raises:
-                    Exception: If an exception occurs while attempting to dispatch the SCALE_FIELD_CHANGED event.
-                """
-                try:
-                    if dispatch:
-                        # Dispatch the SCALE_FIELD_CHANGED event
-                        cls.dispatcher.dispatch(
-                            event=Events.SCALE_FIELD_CHANGED,
-                            label=label,
-                            namespace=namespace,
-                            value=result["variable"].get(),
-                        )
-
-                    # Check, if the on_change_callback is present
-                    if on_change_callback:
-                        # Call the on_change_callback function with the new value
-                        on_change_callback(result["variable"].get())
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'on_scale_changed' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Re-raise the exception to the caller
-                    raise e
-
-            def set(
-                value: float,
-                dispatch: int = True,
-            ) -> None:
-                """
-                Sets the value of the scale field.
-
-                Args:
-                    dispatch (int, optional): Whether to dispatch the SCALE_FIELD_SET event. Defaults to True.
-                    value (float, optional): The value to set for the scale field.
-
-                Returns:
-                    None
-
-                Raises:
-                    Exception: If an exception occurs while attempting to set the value of the scale field.
-                """
-                try:
-                    if dispatch:
-                        # Dispatch the SCALE_FIELD_SET event
-                        cls.dispatcher.dispatch(
-                            event=Events.SCALE_FIELD_SET,
-                            label=label,
-                            namespace=namespace,
-                            value=value,
-                        )
-
-                    if value not in result["values"]:
-                        # Add the value to the values list
-                        result["values"].append(value)
-
-                    # Set the value of the scale field
-                    result["variable"].set(value=value)
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Re-raise the exception to the caller
-                    raise e
-
-            # Create the "Variable" float variable
-            result["variable"] = cls.get_double_variable(value=value)
-
-            # Create the "Root" frame widget
-            result["root"] = cls.get_frame(
-                master=master,
-                **kwargs.get("root", {}),
-            )
-
-            # Configure the "Root" frame widget's 0th column to weight 0
-            result["root"].grid_columnconfigure(
-                index=0,
-                weight=0,
-            )
-
-            # Configure the "Root" frame widget's 1st column to weight 0
-            result["root"].grid_columnconfigure(
-                index=1,
-                weight=0,
-            )
-
-            # Configure the "Root" frame widget's 2nd column to weight 0
-            result["root"].grid_columnconfigure(
-                index=2,
-                weight=0,
-            )
-
-            # Configure the "Root" frame widget's 0th row to weight 1
-            result["root"].grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
-
-            # Create the "Label" label widget
-            result["label"] = cls.get_label(
-                master=result["root"],
-                text=label,
-                **kwargs.get("label", {}),
-            )
-
-            # Add the "Label" label widget to the "Root" frame widget
-            result["label"].grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=0,
-                sticky=NSEW,
-            )
-
-            # Create the "Scale" scale widget
-            result["scale"] = cls.get_scale(
-                command=on_scale_changed,
-                from_=from_,
-                master=result["root"],
-                resolution=resolution,
-                to=to,
-                value=value,
-                variable=result["variable"],
-                **kwargs.get("scale", {}),
-            )
-
-            # Add the "Scale" scale widget to the "Root" frame widget
-            result["scale"].grid(
-                column=1,
-                padx=5,
-                pady=5,
-                row=0,
-                sticky=NSEW,
-            )
-
-            # Create the "Button" button widget
-            result["button"] = cls.get_button(
-                command=on_button_clicked,
-                master=result["root"],
-                text="X",
-                **kwargs.get("button", {}),
-            )
-
-            # Add the "Button" scale widget to the "Root" frame widget
-            result["button"].grid(
-                column=2,
-                padx=5,
-                pady=5,
-                row=0,
-            )
-
-            # Add the "clearer" function to the result dictionary
-            result["clearer"] = clear
-
-            # Add the "getter" function to the result dictionary
-            result["getter"] = get
-
-            # Add the "setter" function to the result dictionary
-            result["setter"] = set
-
-            # Return the result dictionary
-            return result
-        except Exception as e:
-            # Log an error message indicating an exception occured
-            cls.logger.error(
-                message=f"Caught an exception while attempting to run 'get_float_scale_field' method from '{cls.__name__}': {e}"
-            )
-
-            # Return None indicating an exception occured
-
-            return None
-
-    @classmethod
-    def get_int_scale_field(
-        cls,
-        label: str,
-        master: tkinter.Misc,
-        from_: int = 0,
-        namespace: str = Constants.GLOBAL_NAMESPACE,
-        on_change_callback: Optional[Callable[[str], None]] = None,
-        resolution: int = 1,
-        to: int = 100,
-        value: int = 0,
-        **kwargs,
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Creates and returns a new instance of tkinter.Scale that is used as a field.
-
-        This method creates a dictionary that holds all functions and widgets that facilitate the scale field.
-        Contained keys are:
-            - "clearer": A function that clears the scale field.
-            - "getter": A function that retrieves the value of the scale field.
-            - "setter": A function that sets the value of the scale field.
-            - "variable": A tkinter.BooleanVar instance that holds the value of the scale field.
-            - "root": A tkinter.Frame instance that holds the scale field.
-            - "label": A tkinter.Label instance that holds the label for the scale field.
-            - "scale": A tkinter.Scale instance that is used as a field.
-
-        Args:
-            from_ (int): The minimum value of the scale.
-            label (str): The label for the scale.
-            master (tkinter.Misc): The master widget.
-            namespace (str): The namespace for the scale. Defaults to Constants.GLOBAL_NAMESPACE.
-            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the scale field changes. Defaults to None.
-            resolution (int): The resolution of the scale. Defaults to 1.
-            to (int): The maximum value of the scale. Defaults to 100.
-            value (int): The initial value of the scale. Defaults to 0.
-            **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
-
-        Returns:
-            Optional[Dict[str, Any]]: The created tkinter.Scale instance or None if an exception occurs.
-
-        Raises:
-            Exception: If an exception occurs while attempting to create a new instance of tkinter.Scale.
-        """
-        try:
-            # Initialize the result dictionary as an empty dictionary
-            result: Dict[str, Any] = {}
-
-            def clear(dispatch: int = True) -> None:
-                """
-                Clears the scale field by setting its value to an empty string.
-
-                Args:
-                    None
-
-                Returns:
-                    None
-
-                Raises:
-                    Exception: If an exception occurs while attempting to clear the scale field.
-                """
-                try:
-                    # Set the value of the scale field to an empty string
-                    result["variable"].set(value="")
-
-                    if dispatch:
-                        # Dispatch the SCALE_FIELD_CLEARED event
-                        cls.dispatcher.dispatch(
-                            event=Events.SCALE_FIELD_CLEARED,
-                            label=label,
-                            namespace=namespace,
-                            value=result["variable"].get(),
-                        )
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'clear' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Re-raise the exception to the caller
-                    raise e
-
-            def get(dispatch: int = True) -> Optional[str]:
-                """
-                Retrieves the value of the scale field as a string.
-
-                Args:
-                    None
-
-                Returns:
-                    Optional[str]: The value of the scale field as a string. Or None if an exception occurs.
-
-                Raises:
-                    Exception: If an exception occurs while attempting to retrieve the value of the scale field.
-                """
-                try:
-                    if dispatch:
-                        # Dispatch the SCALE_FIELD_GET event
-                        cls.dispatcher.dispatch(
-                            event=Events.SCALE_FIELD_GET,
-                            label=label,
-                            namespace=namespace,
-                            value=result["variable"].get(),
-                        )
-
-                    # Return the value of the scale field as a string
-                    return result["variable"].get()
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Return None indicating an exception occurred
-                    return None
-
-            def on_button_clicked() -> None:
-                """
-                Handles the button click.
-
-                This function calls the clear function.
-
-                Args:
-                    None
-
-                Returns:
-                    None
-
-                Raises:
-                    Exception: If an exception occurs while attempting to clear the scale field.
-                """
-                try:
-                    # Clear the scale field
-                    clear(dispatch=True)
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'on_button_clicked' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Re-raise the exception to the caller
-                    raise e
-
-            def on_scale_changed(dispatch: int = True) -> None:
-                """
-                Handles the SCALE_FIELD_CHANGED event.
-
-                This function is called when the value of the scale field changes.
-
-                Args:
-                    None
-
-                Returns:
-                    None
-
-                Raises:
-                    Exception: If an exception occurs while attempting to dispatch the SCALE_FIELD_CHANGED event.
-                """
-                try:
-                    if dispatch:
-                        # Dispatch the SCALE_FIELD_CHANGED event
-                        cls.dispatcher.dispatch(
-                            event=Events.SCALE_FIELD_CHANGED,
-                            label=label,
-                            namespace=namespace,
-                            value=result["variable"].get(),
-                        )
-
-                    # Check, if the on_change_callback is present
-                    if on_change_callback:
-                        # Call the on_change_callback function with the new value
-                        on_change_callback(result["variable"].get())
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'on_scale_changed' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Re-raise the exception to the caller
-                    raise e
-
-            def set(
-                value: int,
-                dispatch: int = True,
-            ) -> None:
-                """
-                Sets the value of the scale field.
-
-                Args:
-                    dispatch (int, optional): Whether to dispatch the SCALE_FIELD_SET event. Defaults to True.
-                    value (int): The value to set for the scale field.
-
-                Returns:
-                    None
-
-                Raises:
-                    Exception: If an exception occurs while attempting to set the value of the scale field.
-                """
-                try:
-                    if dispatch:
-                        # Dispatch the SCALE_FIELD_SET event
-                        cls.dispatcher.dispatch(
-                            event=Events.SCALE_FIELD_SET,
-                            label=label,
-                            namespace=namespace,
-                            value=value,
-                        )
-
-                    if value not in result["values"]:
-                        # Add the value to the values list
-                        result["values"].append(value)
-
-                    # Set the value of the scale field
-                    result["variable"].set(value=value)
-                except Exception as e:
-                    # Log an error message indicating an exception occurred
-                    cls.logger.error(
-                        message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
-                    )
-
-                    # Re-raise the exception to the caller
-                    raise e
-
-            # Create the "Variable" string variable
-            result["variable"] = cls.get_int_variable(value=value)
-
-            # Create the "Root" frame widget
-            result["root"] = cls.get_frame(
-                master=master,
-                **kwargs.get("root", {}),
-            )
-
-            # Configure the "Root" frame widget's 0th column to weight 0
-            result["root"].grid_columnconfigure(
-                index=0,
-                weight=0,
-            )
-
-            # Configure the "Root" frame widget's 1st column to weight 0
-            result["root"].grid_columnconfigure(
-                index=1,
-                weight=0,
-            )
-
-            # Configure the "Root" frame widget's 2nd column to weight 0
-            result["root"].grid_columnconfigure(
-                index=2,
-                weight=0,
-            )
-
-            # Configure the "Root" frame widget's 0th row to weight 1
-            result["root"].grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
-
-            # Create the "Label" label widget
-            result["label"] = cls.get_label(
-                master=result["root"],
-                text=label,
-                **kwargs.get("label", {}),
-            )
-
-            # Add the "Label" label widget to the "Root" frame widget
-            result["label"].grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=0,
-                sticky=NSEW,
-            )
-
-            # Create the "Scale" scale widget
-            result["scale"] = cls.get_scale(
-                command=on_scale_changed,
-                from_=from_,
-                master=result["root"],
-                resolution=resolution,
-                to=to,
-                value=value,
-                variable=result["variable"],
-                **kwargs.get("scale", {}),
-            )
-
-            # Add the "Scale" scale widget to the "Root" frame widget
-            result["scale"].grid(
-                column=1,
-                padx=5,
-                pady=5,
-                row=0,
-                sticky=NSEW,
-            )
-
-            # Create the "Button" button widget
-            result["button"] = cls.get_button(
-                command=on_button_clicked,
-                master=result["root"],
-                text="X",
-                **kwargs.get("button", {}),
-            )
-
-            # Add the "Button" scale widget to the "Root" frame widget
-            result["button"].grid(
-                column=2,
-                padx=5,
-                pady=5,
-                row=0,
-            )
-
-            # Add the "clearer" function to the result dictionary
-            result["clearer"] = clear
-
-            # Add the "getter" function to the result dictionary
-            result["getter"] = get
-
-            # Add the "setter" function to the result dictionary
-            result["setter"] = set
-
-            # Return the result dictionary
-            return result
-        except Exception as e:
-            # Log an error message indicating an exception occured
-            cls.logger.error(
-                message=f"Caught an exception while attempting to run 'get_int_scale_field' method from '{cls.__name__}': {e}"
-            )
-
-            # Return None indicating an exception occured
-
             return None
 
     @classmethod
@@ -6086,16 +6385,19 @@ class UIBuilder:
                     Exception: If an exception occurs while attempting to clear the single line text field.
                 """
                 try:
-                    # Set the value of the single line text field field to an empty string
-                    result["variable"].set(value="")
+                    # Clear the tkinter.Entry widget
+                    result["entry"].delete(
+                        first=0,
+                        last=END,
+                    )
 
                     if dispatch:
-                        # Dispatch the SINGLE_LINE_FIELD_CLEARED event
+                        # Dispatch the SINGLE_LINE_TEXT_FIELD_CLEARED event
                         cls.dispatcher.dispatch(
-                            event=Events.SINGLE_LINE_FIELD_CLEARED,
+                            event=Events.SINGLE_LINE_TEXT_FIELD_CLEARED,
                             label=label,
                             namespace=namespace,
-                            value=result["variable"].get(),
+                            value=result["entry"].get(),
                         )
                 except Exception as e:
                     # Log an error message indicating an exception occurred
@@ -6120,14 +6422,14 @@ class UIBuilder:
                     if dispatch:
                         # Dispatch the SINGLE_LINE_FIELD_GET event
                         cls.dispatcher.dispatch(
-                            event=Events.SINGLE_LINE_FIELD_GET,
+                            event=Events.SINGLE_LINE_TEXT_FIELD_GET,
                             label=label,
                             namespace=namespace,
-                            value=result["variable"].get(),
+                            value=result["entry"].get(),
                         )
 
                     # Return the value of the single line text field as a string
-                    return result["variable"].get()
+                    return result["entry"].get()
                 except Exception as e:
                     # Log an error message indicating an exception occurred
                     cls.logger.error(
@@ -6177,16 +6479,16 @@ class UIBuilder:
                     if dispatch:
                         # Dispatch the SINGLE_LINE_FIELD_CHANGED event
                         cls.dispatcher.dispatch(
-                            event=Events.SINGLE_LINE_FIELD_CHANGED,
+                            event=Events.SINGLE_LINE_TEXT_FIELD_CHANGED,
                             label=label,
                             namespace=namespace,
-                            value=result["variable"].get(),
+                            value=result["entry"].get(),
                         )
 
                     # Check, if the on_change_callback is present
                     if on_change_callback:
                         # Call the on_change_callback function with the new value
-                        on_change_callback(result["variable"].get())
+                        on_change_callback(result["entry"].get())
                 except Exception as e:
                     # Log an error message indicating an exception occurred
                     cls.logger.error(
@@ -6214,22 +6516,28 @@ class UIBuilder:
                     if dispatch:
                         # Dispatch the SINGLE_LINE_FIELD_SET event
                         cls.dispatcher.dispatch(
-                            event=Events.SINGLE_LINE_FIELD_SET,
+                            event=Events.SINGLE_LINE_TEXT_FIELD_SET,
                             label=label,
                             namespace=namespace,
                             value=value,
                         )
 
+                    # Clear the tkinter.Entry widget
+                    result["entry"].delete(
+                        first=0,
+                        last=END,
+                    )
+
                     # Set the value of the single line text field
-                    result["variable"].set(value=value)
+                    result["entry"].insert(
+                        0,
+                        value,
+                    )
                 except Exception as e:
                     # Log an error message indicating an exception occurred
                     cls.logger.error(
                         message=f"Caught an exception while attempting to run 'set' method from '{cls.__name__}': {e}"
                     )
-
-            # Create the "Variable" string variable
-            result["variable"] = cls.get_str_variable(value=value)
 
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(
@@ -6280,7 +6588,6 @@ class UIBuilder:
             # Create the "Entry" entry widget
             result["entry"] = cls.get_entry(
                 master=result["root"],
-                variable=result["variable"],
                 **kwargs.get("entry", {}),
             )
 
@@ -6300,7 +6607,7 @@ class UIBuilder:
             )
 
             # Create the "Button" button widget
-            result["button"] = cls.get_checkbutton(
+            result["button"] = cls.get_button(
                 command=on_button_clicked,
                 master=result["root"],
                 text="X",

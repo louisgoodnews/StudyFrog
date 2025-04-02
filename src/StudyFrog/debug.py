@@ -4,6 +4,7 @@ Date: 2025-02-05
 """
 
 import asyncio
+import tkinter
 
 from tkinter.constants import *
 from typing import *
@@ -31,6 +32,8 @@ from core.status import StatusModel
 from core.tag import TagModel
 from core.user import UserModel
 
+from core.ui.ui_builder import UIBuilder
+
 from utils.constants import Constants
 from utils.events import Events
 from utils.logger import Logger
@@ -52,13 +55,10 @@ def debug() -> None:
     # Log a debug message
     logger.debug(message="Debugging...")
 
-    def clear_database(logger: Logger) -> bool:
+    def clear_database() -> bool:
         """
         Clears the database tables by iterating the set of model classes and
         dropping and creating the tables.
-
-        Args:
-            logger (Logger): The logger to use for logging.
 
         Returns:
             bool: True if the tables were successfully cleared, False otherwise.
@@ -113,11 +113,10 @@ def debug() -> None:
         return True
 
     # Clear the database
-    clear_database(logger=logger)
+    clear_database()
 
     # Log a debug message
     logger.debug(message="Debugging completed.")
-
 
 if __name__ == "__main__":
     debug()
