@@ -53,6 +53,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
         filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
         id (Optional[int]): The ID of the learning session.
         key (Optional[str]): The key of the learning session.
+        mode (Optional[str]): The mode of the learning session.
         result (Optional[int]): The result of the learning session.
         settings (Optional[Dict[str, Any]]): The settings of the learning session.
         stacks (Optional[List[str]]): The stacks associated with the learning session.
@@ -73,6 +74,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
         filters: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        mode: Optional[str] = None,
         result: Optional[int] = None,
         settings: Optional[Dict[str, Any]] = None,
         stacks: Optional[List[str]] = None,
@@ -94,6 +96,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
             filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
+            mode (Optional[str]): The mode of the learning session.
             result (Optional[int]): The result of the learning session.
             settings (Optional[Dict[str, Any]]): The settings of the learning session.
             stacks (Optional[List[str]]): The stacks associated with the learning session.
@@ -117,6 +120,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
             filters=filters,
             id=id,
             key=key,
+            mode=mode,
             result=result,
             settings=settings,
             stacks=stacks,
@@ -218,6 +222,7 @@ class MutableLearningSession(MutableBaseObject):
         filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
         id (Optional[int]): The ID of the learning session.
         key (Optional[str]): The key of the learning session.
+        mode (Optional[str]): The mode of the learning session.
         result (Optional[int]): The result of the learning session.
         settings (Optional[Dict[str, Any]]): The settings of the learning session.
         stacks (Optional[List[str]]): The stacks associated with the learning session.
@@ -238,6 +243,7 @@ class MutableLearningSession(MutableBaseObject):
         filters: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        mode: Optional[str] = None,
         result: Optional[int] = None,
         settings: Optional[Dict[str, Any]] = None,
         stacks: Optional[List[str]] = None,
@@ -259,6 +265,7 @@ class MutableLearningSession(MutableBaseObject):
             filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
+            mode (Optional[str]): The mode of the learning session.
             result (Optional[int]): The result of the learning session.
             settings (Optional[Dict[str, Any]]): The settings of the learning session.
             stacks (Optional[List[str]]): The stacks associated with the learning session.
@@ -282,6 +289,7 @@ class MutableLearningSession(MutableBaseObject):
             filters=filters,
             id=id,
             key=key,
+            mode=mode,
             result=result,
             settings=settings,
             stacks=stacks,
@@ -590,6 +598,7 @@ class LearningSessionFactory:
         filters: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        mode: Optional[str] = None,
         result: Optional[int] = None,
         settings: Optional[List[Dict[str, Any]]] = None,
         stacks: Optional[List[str]] = None,
@@ -611,6 +620,7 @@ class LearningSessionFactory:
             filters (Optional[List[Dict[str, Any]]], optional): The filters applied to the learning session. Defaults to None.
             id (Optional[int], optional): The ID of the learning session. Defaults to None.
             key (Optional[str], optional): The key of the learning session. Defaults to None.
+            mode (Optional[str], optional): The mode of the learning session. Defaults to None.
             result (Optional[int], optional): The result of the learning session. Defaults to None.
             settings (Optional[List[Dict[str, Any]]], optional): The settings of the learning session. Defaults to None.
             stacks (Optional[List[str]], optional): The stacks associated with the learning session. Defaults to None.
@@ -637,6 +647,7 @@ class LearningSessionFactory:
                 filters=filters,
                 id=id,
                 key=key,
+                mode=mode,
                 result=result,
                 settings=settings,
                 stacks=stacks,
@@ -881,6 +892,19 @@ class LearningSessionBuilder(BaseObjectBuilder):
             Self: The builder instance with the key attribute set.
         """
         self.configuration["key"] = value
+        return self
+
+    def mode(self, value: str,) -> Self:
+        """
+        Sets the mode attribute of the builder.
+
+        Args:
+            value (str): The value to set for the mode attribute.
+
+        Returns:
+            Self: The builder instance with the mode attribute set.
+        """
+        self.configuration["mode"] = value
         return self
 
     def result(
@@ -1680,6 +1704,7 @@ class LearningSessionModel(ImmutableBaseModel):
         filters (Field): The filters applied to the learning session.
         id (Field): The ID of the learning session.
         key (Field): The key of the learning session.
+        mode (Field): The mode of the learning session.
         result (Field): The result of the learning session.
         settings (Field): The settings of the learning session.
         stacks (Field): The stacks associated with the learning session.
@@ -1851,6 +1876,22 @@ class LearningSessionModel(ImmutableBaseModel):
         unique=True,
     )
 
+    mode: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=True,
+        name="mode",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     result: Field = Field(
         autoincrement=False,
         default=None,
@@ -1974,6 +2015,7 @@ class LearningSessionModel(ImmutableBaseModel):
         filters: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        mode: Optional[str] = None,
         result: Optional[int] = None,
         settings: Optional[Dict[str, Any]] = None,
         stacks: Optional[List[str]] = None,
@@ -1995,6 +2037,7 @@ class LearningSessionModel(ImmutableBaseModel):
             filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
+            mode (Optional[str]): The mode of the learning session.
             result (Optional[int]): The result of the learning session.
             settings (Optional[Dict[str, Any]]): The settings of the learning session.
             stacks (Optional[List[str]]): The stacks associated with the learning session.
@@ -2015,6 +2058,7 @@ class LearningSessionModel(ImmutableBaseModel):
             filters=filters,
             id=id,
             key=key,
+            mode=mode,
             result=result,
             settings=settings,
             stacks=stacks,

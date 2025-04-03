@@ -702,11 +702,11 @@ class StackSelectionUI(BaseUI):
             )
 
             # Create the mode select widget
-            self.mode_select: Optional[Dict[str, Any]] = (
-                UIBuilder.get_combobox_field(
-                    label="Mode: ",
-                    master=master,
-                )
+            self.mode_select: Optional[Dict[str, Any]] = UIBuilder.get_combobox_field(
+                label="Mode: ",
+                master=master,
+                values=Constants.LEARNING_MODES,
+                value=Constants.LEARNING_MODES[0],
             )
 
             if not self.mode_select:
@@ -736,11 +736,7 @@ class StackSelectionUI(BaseUI):
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 state="readonly",
-                values=Constants.LEARNING_MODES,
             )
-
-            # Set the initial value of the mode select widget
-            self.mode_select["setter"](value=Constants.LEARNING_MODES[0])
 
             # Style the mode select widget's label
             self.mode_select["label"].configure(
@@ -824,6 +820,7 @@ class StackSelectionUI(BaseUI):
                     label="Enable countup timer?: ",
                     master=master,
                     namespace=Constants.STACK_SELECTION_NAMESPACE,
+                    on_change_callback=self.on_countup_check_toggle,
                 )
             )
 
@@ -866,6 +863,60 @@ class StackSelectionUI(BaseUI):
                 padx=5,
                 pady=5,
                 row=7,
+                sticky=NSEW,
+            )
+
+            # Create the countdown check widget
+            self.countdown_check: Optional[Dict[str, Any]] = (
+                UIBuilder.get_checkbutton_field(
+                    label="Enable countdown timer?: ",
+                    master=master,
+                    namespace=Constants.STACK_SELECTION_NAMESPACE,
+                    on_change_callback=self.on_countdown_check_toggle,
+                )
+            )
+
+            if not self.countdown_check:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create countdown check in '{self.__class__.__name__}'. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Style the countdown check widget's checkbutton
+            self.countdown_check["checkbutton"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                relief=FLAT,
+            )
+
+            # Style the countdown check widget's label
+            self.countdown_check["label"].configure(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+            )
+
+            # Style the countdown check widget's root frame
+            self.countdown_check["root"].configure(
+                background=Constants.BLUE_GREY["700"]
+            )
+
+            # Place the countdown check widget in the main window
+            self.countdown_check["root"].grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=8,
                 sticky=NSEW,
             )
         except Exception as e:
@@ -1182,6 +1233,72 @@ class StackSelectionUI(BaseUI):
             # Re-raise the exception to the caller
             raise e
 
+    def on_countdown_check_toggle(
+        self,
+        value: bool,
+    ) -> None:
+        """
+        Handles the toggle event for the countdown checkbutton.
+
+        This method ensures that the countup checkbutton is not
+        selected when the countdown checkbutton is toggled.
+
+        Args:
+            value (bool): The new value for the countdown checkbutton.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during the handling of the toggle event.
+        """
+        try:
+            # Check if the countup checkbutton is selected
+            if self.countdown_check["getter"]() == self.countup_check["getter"]():
+                # Deselect the countup checkbutton
+                self.countup_check["setter"](value=not value)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_countdown_check_toggle' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def on_countup_check_toggle(
+        self,
+        value: bool,
+    ) -> None:
+        """
+        Handles the toggle event for the countup checkbutton.
+
+        This method ensures that the countdown checkbutton is not
+        selected when the countup checkbutton is toggled.
+
+        Args:
+            value (bool): The new value for the countup checkbutton.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during the handling of the toggle event.
+        """
+        try:
+            # Check if the countup and countdown checkbuttons have the same state
+            if self.countup_check["getter"]() == self.countdown_check["getter"]():
+                # Set the countdown checkbutton to the opposite state
+                self.countdown_check["setter"](value=not value)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_countup_check_toggle' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
     def on_stack_item_checkbutton_click(
         self,
         stack: ImmutableStack,
@@ -1263,10 +1380,11 @@ class StackSelectionUI(BaseUI):
             kwargs: Dict[str, Any] = {
                 "direction": Constants.FORWARD_DIRECTION,
                 "event": Events.REQUEST_VALIDATE_NAVIGATION,
-                "mode": self.mode_select["getter"](),
+                "mode": Miscellaneous.any_to_snake(string=self.mode_select["getter"]()),
                 "namespace": Constants.GLOBAL_NAMESPACE,
                 "settings": {
                     "enable_randomisation": self.randomisation_check["getter"](),
+                    "enable_countdown": self.countdown_check["getter"](),
                     "enable_countup": self.countup_check["getter"](),
                 },
                 "source": "stack_selection_ui",

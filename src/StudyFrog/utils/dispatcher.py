@@ -672,7 +672,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
 
             # Calculate the duration of the notification
             result.duration(
-                value=result["configuration"]["end"] - result["configuration"]["start"]
+                value=(result["configuration"]["end"] - result["configuration"]["start"]).total_seconds()
             )
 
             # Build the notification and return it
@@ -875,7 +875,7 @@ class Dispatcher(ImmutableBaseObject):
 
             # Log additional information about the exception
             self.logger.error(
-                message=f"An error occurred while dispatching event '{event.name}' in namespace '{namespace}'.",
+                message=f"An error occurred while dispatching event '{event.name}' in namespace '{namespace}' with arguments '{args}' and '{kwargs}'.",
             )
 
             # Return None indicating an exception has occurred

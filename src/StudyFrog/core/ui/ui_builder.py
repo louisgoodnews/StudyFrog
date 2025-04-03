@@ -777,6 +777,7 @@ class UIBuilder:
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str], None]] = None,
         values: List[str] = [],
+        value: str = "",
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """
@@ -944,15 +945,15 @@ class UIBuilder:
                     raise e
 
             def set(
+                value: str,
                 dispatch: bool = True,
-                value: bool = False,
             ) -> None:
                 """
                 Sets the value of the combobox field.
 
                 Args:
                     dispatch (bool, optional): Whether to dispatch the COMBOBOX_FIELD_SET event. Defaults to True.
-                    value (bool, optional): The value to set for the combobox field. Defaults to False.
+                    value (str): The value to set for the combobox field.
 
                 Returns:
                     None
@@ -989,7 +990,7 @@ class UIBuilder:
             result["values"] = values
 
             # Create the "Variable" string variable
-            result["variable"] = cls.get_str_variable(value="")
+            result["variable"] = cls.get_str_variable(value=value)
 
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(

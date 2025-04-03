@@ -10,6 +10,8 @@ from tkinter.constants import *
 
 from typing import *
 
+from torch._dynamo import exc
+
 from core.answer import ImmutableAnswer
 from core.difficulty import ImmutableDifficulty
 from core.flashcard import ImmutableFlashcard
@@ -114,6 +116,9 @@ class LearningSessionUI(BaseUI):
         # Initialize the flashcard learning view as an empty instance variable
         self.flashcard_learning_view: Optional[FlashcardLearningView] = None
 
+        # Store the passed mode as an instance variable
+        self.mode: Final[str] = mode
+
         # Initialize the note learning view as an empty instance variable
         self.note_learning_view: Optional[NoteLearningView] = None
 
@@ -134,6 +139,9 @@ class LearningSessionUI(BaseUI):
 
         # Bind the left and right arrow keys to the back and forward navigation methods
         self.bind_keys()
+
+        # Update the title label
+        self.update_title_label()
 
     def bind_keys(self) -> None:
         """
@@ -734,7 +742,7 @@ class LearningSessionUI(BaseUI):
                 weight=1,
             )
 
-            label: Optional[tkinter.Label] = UIBuilder.get_label(
+            self.title_label: Optional[tkinter.Label] = UIBuilder.get_label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -745,7 +753,7 @@ class LearningSessionUI(BaseUI):
                 text="You are currently viewing item x of X.",
             )
 
-            if not label:
+            if not self.title_label:
                 # Log a warning message
                 self.logger.warning(
                     message=f"Failed to create label in '{self.__class__.__name__}'. This is likely a bug."
@@ -755,7 +763,7 @@ class LearningSessionUI(BaseUI):
                 return
 
             # Grid the label widget in the top frame
-            label.grid(
+            self.title_label.grid(
                 column=0,
                 row=0,
                 sticky=NSEW,
@@ -964,6 +972,12 @@ class LearningSessionUI(BaseUI):
 
             # Re-raise the exception to the caller
             raise e
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'handle_loaded_content' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
 
     def load_learning_view(
         self,
@@ -1134,6 +1148,7 @@ class LearningSessionUI(BaseUI):
             self.runner: LearningSessionRunner = LearningSessionRunner(
                 difficulties=self.difficulties,
                 dispatcher=self.dispatcher,
+                mode=self.mode,
                 namespace=Constants.LEARNING_SESSION_NAMESPACE,
                 priorities=self.priorities,
                 settings=self.settings,
@@ -1297,6 +1312,9 @@ class LearningSessionUI(BaseUI):
 
             # Handle the loaded content
             self.handle_loaded_content(content=content)
+                
+            # Update the title label
+            self.update_title_label()
         except Exception as e:
             # Log an error message if an exception occurs
             self.logger.error(
@@ -1455,3 +1473,61 @@ class LearningSessionUI(BaseUI):
 
         # Clear the list of bindings
         self.bindings.clear()
+
+    def update_title_label(self) -> None:
+        """
+        Updates the title label with the current index and limit.
+
+        This method dispatches a request to the learning session runner to get the current index and limit.
+        After receiving the result, it updates the title label with the current index and limit.
+
+        Returns:
+            None
+        """
+        try:
+            # Dispatch the event to get the current index and limit of the learning session runner
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_LEARNING_SESSION_RUNNER_GET_INDEX_AND_LIMIT,
+                namespace=Constants.LEARNING_SESSION_NAMESPACE,
+            )
+
+            if not notification:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch event '{Events.REQUEST_LEARNING_SESSION_RUNNER_GET_INDEX_AND_LIMIT}' in '{self.__class__.__name__}'"
+                )
+
+                # Return early
+                return
+
+            # Get the result from the notification
+            result: Optional[Any] = notification.get_one_and_only_result()
+
+            if not result:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get one and only result from event '{Events.REQUEST_LEARNING_SESSION_RUNNER_GET_INDEX_AND_LIMIT}' in '{self.__class__.__name__}'"
+                )
+
+                # Return early
+                return
+
+            # Obtain the index and limit from the result
+            (
+                index,
+                limit,
+            ) = result
+
+            # Update the title label
+            self.title_label.configure(
+                text=f"You are currently viewing item {index + 1} of {limit}.",
+            )
+
+        except Exception as e:
+            # Log an error message if an exception occurs
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'update_title_label' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e

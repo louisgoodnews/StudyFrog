@@ -405,6 +405,27 @@ class MutableBaseObject:
             if key not in exclude
         }
 
+    def update(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Updates the attributes of the object with the given keyword arguments.
+
+        :param kwargs: The keyword arguments representing attribute names and their new values.
+        :type kwargs: Dict[str, Any]
+
+        :return: None
+        :rtype: None
+        """
+        # Iterate over the keyword arguments
+        for (
+            key,
+            value,
+        ) in kwargs.items():
+            # Set the value of the attribute in the object's dictionary
+            self.__dict__[key] = value
+
 
 class ImmutableBaseObject(MutableBaseObject):
     """
@@ -429,11 +450,13 @@ class ImmutableBaseObject(MutableBaseObject):
         :type kwargs: Dict[str, Any]
 
         :return: None
+        :rtyoe: None
         """
 
         # Call the parent class constructor
         super().__init__(**kwargs)
 
+    @override
     def __delattr__(
         self,
         name: str,
@@ -445,6 +468,9 @@ class ImmutableBaseObject(MutableBaseObject):
         :type name: str
 
         :return: None
+        :rtyoe: None
+
+        :raises AttributeError: If the attribute is immutable.
         """
 
         # Check if the attribute exists
@@ -460,6 +486,7 @@ class ImmutableBaseObject(MutableBaseObject):
             f"Cannot delete attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
         )
 
+    @override
     def __repr__(self) -> str:
         """
         Returns a string representation of the object.
@@ -478,6 +505,7 @@ class ImmutableBaseObject(MutableBaseObject):
             )
         )
 
+    @override
     def __setattr__(
         self,
         name: str,
@@ -494,6 +522,8 @@ class ImmutableBaseObject(MutableBaseObject):
 
         :return: None
         :rtype: None
+
+        :raises AttributeError: If the attribute is immutable.
         """
 
         # Check if the attribute exists
@@ -512,6 +542,7 @@ class ImmutableBaseObject(MutableBaseObject):
             f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
         )
 
+    @override
     def __setitem__(
         self,
         name: str,
@@ -528,6 +559,8 @@ class ImmutableBaseObject(MutableBaseObject):
 
         :return: None
         :rtype: None
+
+        :raises AttributeError: If the attribute is immutable.
         """
 
         # Check if the attribute exists
@@ -546,6 +579,7 @@ class ImmutableBaseObject(MutableBaseObject):
             f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
         )
 
+    @override
     def delete(
         self,
         name: str,
@@ -558,6 +592,8 @@ class ImmutableBaseObject(MutableBaseObject):
 
         :return: None
         :rtype: None
+
+        :raises AttributeError: If the attribute is immutable.
         """
 
         # Check if the attribute exists
@@ -573,6 +609,7 @@ class ImmutableBaseObject(MutableBaseObject):
             f"Cannot delete attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
         )
 
+    @override
     def set(
         self,
         name: str,
@@ -589,6 +626,8 @@ class ImmutableBaseObject(MutableBaseObject):
 
         :return: None
         :rtype: None
+
+        :raises AttributeError: If the attribute is immutable.
         """
 
         # Check if the attribute exists
@@ -606,3 +645,42 @@ class ImmutableBaseObject(MutableBaseObject):
         raise AttributeError(
             f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
         )
+
+    @override
+    def update(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Updates the attributes of the object with the given keyword arguments.
+
+        :param kwargs: The keyword arguments representing attribute names and their new values.
+        :type kwargs: Dict[str, Any]
+
+        :return: None
+        :rtype: None
+
+        :raises AttributeError: If the attribute is immutable.
+        """
+
+        # Iterate over the keyword arguments
+        for (
+            key,
+            value,
+        ) in kwargs.items():
+            # Check if the attribute exists
+            if not hasattr(
+                self,
+                key,
+            ):
+                # Set the value of the attribute
+                super().update(
+                    **{
+                        key: value,
+                    }
+                )
+            else:
+                # Raise an attribute error as the attribute is immutable
+                raise AttributeError(
+                    f"Cannot set attribute '{key}' in {self.__class__.__name__}, attribute is immutable."
+                )

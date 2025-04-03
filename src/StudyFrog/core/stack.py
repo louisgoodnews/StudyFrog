@@ -888,6 +888,9 @@ class StackManager(BaseObjectManager):
             # Set the key of the stack
             stack.key = f"STACK_{self.count_stacks() + 1}"
 
+            # Set the last_viewed_at timestamp of the stack
+            stack.last_viewed_at = Miscellaneous.get_current_datetime()
+
             # Set the tags of the stack
             stack.tags = [] or stack.tags
 

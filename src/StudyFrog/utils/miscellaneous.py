@@ -318,6 +318,41 @@ class Miscellaneous:
         return datetime.now() + timedelta(days=increment)
 
     @classmethod
+    def get_random_int(
+        cls,
+        min: int,
+        max: int,
+    ) -> int:
+        """
+        Returns a random integer between min and max (inclusive).
+
+        Args:
+            min (int): The minimum value of the random integer.
+            max (int): The maximum value of the random integer.
+
+        Returns:
+            int: A random integer between min and max (inclusive).
+        """
+        return random.randint(
+            a=min,
+            b=max,
+        )
+
+    @classmethod
+    def get_range(cls, min: int, max: int) -> Tuple[int, ...]:
+        """
+        Returns a range of integers between min and max (inclusive).
+
+        Args:
+            min (int): The minimum value of the range.
+            max (int): The maximum value of the range.
+
+        Returns:
+            range: A range of integers between min and max (inclusive).
+        """
+        return tuple(range(min, max + 1))
+
+    @classmethod
     def get_uuid(cls) -> str:
         """
         Returns a new UUID.
@@ -328,7 +363,10 @@ class Miscellaneous:
         return str(uuid.uuid4())
 
     @classmethod
-    def pluralize(cls, string: str,) -> str:
+    def pluralize(
+        cls,
+        string: str,
+    ) -> str:
         """
         Returns the plural form of a word.
 

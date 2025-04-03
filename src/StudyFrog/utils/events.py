@@ -1292,6 +1292,16 @@ class Events:
         name="backend:tag:updated"
     )
 
+    # An event that indicates that a text analysis has been completed
+    TEXT_ANALYZER_ANALYSIS_COMPLETED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_analyzer:analysis:completed")
+    )
+
+    # An event that indicates that a text analysis has been started
+    TEXT_ANALYZER_ANALYSIS_STARTED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_analyzer:analysis:started")
+    )
+
     # An event that indicates that a toast has been clicked
     TOAST_CLICKED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="ui:toast:clicked"

@@ -3,7 +3,6 @@ Author: lodego
 Date: 2025-03-29
 """
 
-from tkinter import N
 from typing import *
 
 from core.learning.learning_session import (
@@ -25,6 +24,7 @@ from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
+from utils.text_analyzer import TextAnalyzer
 
 
 __all__: Final[List[str]] = ["LearningSessionRunner"]
@@ -51,6 +51,7 @@ class LearningSessionRunner:
         cls,
         difficulties: List[Union[ImmutableDifficulty]],
         dispatcher: Dispatcher,
+        mode: str,
         namespace: str,
         priorities: List[Union[ImmutablePriority]],
         settings: Dict[str, Any],
@@ -67,6 +68,7 @@ class LearningSessionRunner:
         Args:
             difficulties (List[Union[ImmutableDifficulty, MutableDifficulty]]): The difficulties to be used by the runner.
             dispatcher (Dispatcher): The dispatcher instance to be used by the runner.
+            mode (str): The mode to be used by the runner.
             namespace (str): The namespace to be used by the runner.
             priorities (List[Union[ImmutablePriority, MutablePriority]]): The priorities to be used by the runner.
             settings (Dict[str, Any]): The settings dictionary.
@@ -84,6 +86,7 @@ class LearningSessionRunner:
             cls._shared_instance.init(
                 difficulties=difficulties,
                 dispatcher=dispatcher,
+                mode=mode,
                 namespace=namespace,
                 priorities=priorities,
                 settings=settings,
@@ -96,6 +99,7 @@ class LearningSessionRunner:
         self,
         difficulties: List[Union[ImmutableDifficulty]],
         dispatcher: Dispatcher,
+        mode: str,
         namespace: str,
         priorities: List[Union[ImmutablePriority]],
         settings: Dict[str, Any],
@@ -110,11 +114,11 @@ class LearningSessionRunner:
         Args:
             difficulties (List[Union[ImmutableDifficulty]]): The difficulties to be used by the runner.
             dispatcher (Dispatcher): The dispatcher instance.
+            mode (str): The mode to be used by the runner.
             namespace (str): The namespace to be used by the runner.
             priorities (List[Union[ImmutablePriority]]): The priorities to be used by the runner.
             settings (Dict[str, Any]): The settings dictionary.
             stacks (List[Union[ImmutableStack, MutableStack]]): The stacks to be used by the runner.
-
         Returns:
             None
         """
@@ -140,6 +144,9 @@ class LearningSessionRunner:
         # Initialize the current item index
         self.item_index: int = -1
 
+        # Store the passed mode in an immutable instance variable
+        self.mode: Final[str] = mode
+
         # Store the passed namespace in an immutable instance variable
         self.namespace: Final[str] = namespace
 
@@ -154,6 +161,9 @@ class LearningSessionRunner:
 
         # Initialize an empty list to store the subscription UUIDs
         self.subscriptions: Final[List[str]] = []
+
+        # Initialize the text analyzer
+        self.text_analyzer: Optional[TextAnalyzer] = None
 
         # Subscribe to events
         self.subscribe_to_events()
@@ -370,6 +380,10 @@ class LearningSessionRunner:
             }
         )
 
+        # Set the mode of the learning session
+        # The mode is set to an empty string
+        builder.mode(value=self.mode)
+
         # Set the settings of the learning session
         # The settings are set to the settings of the learning session
         builder.settings(value=self.settings)
@@ -564,6 +578,18 @@ class LearningSessionRunner:
 
                 # Return None indicating an exception occurred
                 return None
+
+            # Check if the learning session is in recall mode
+            if self.mode == "Recall":
+                #TODO:
+                #   - dispatch event to request recall view to be loaded
+                pass
+            elif self.mode == "Recall (at random)":
+                #TODO:
+                #   - implement random check for a random int to then determine, if recall with be dispatched or not
+                #   - dispatch event to request recall random view to be loaded
+                if Miscellaneous.get_random_int(1, 4) == 1:
+                    pass
 
             # Return the item
             return notification.get_one_and_only_result()

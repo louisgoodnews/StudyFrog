@@ -4,9 +4,7 @@ Date: 2025-02-05
 """
 
 import asyncio
-import tkinter
 
-from tkinter.constants import *
 from typing import *
 
 from core.learning.learning_session import (
@@ -32,12 +30,8 @@ from core.status import StatusModel
 from core.tag import TagModel
 from core.user import UserModel
 
-from core.ui.ui_builder import UIBuilder
-
 from utils.constants import Constants
-from utils.events import Events
 from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
 from utils.model import ImmutableBaseModel
 
 
@@ -95,8 +89,11 @@ def debug() -> None:
                 asyncio.run(model_class.drop_table(database=Constants.DATABASE_PATH))
             except Exception as e:
                 # Log an error message indicating an exception has occurred
-                logger.error(f"Failed to drop table '{model_class.__name__}': {str(e)}")
+                logger.error(
+                    message=f"Failed to drop table '{model_class.__name__}': {str(e)}"
+                )
 
+                # Return False indicating an exception has occurred
                 return False
 
             try:
@@ -105,9 +102,10 @@ def debug() -> None:
             except Exception as e:
                 # Log an error message indicating an exception has occurred
                 logger.error(
-                    f"Failed to create table '{model_class.__name__}': {str(e)}"
+                    message=f"Failed to create table '{model_class.__name__}': {str(e)}"
                 )
 
+                # Return False indicating an exception has occurred
                 return False
 
         return True
@@ -117,6 +115,7 @@ def debug() -> None:
 
     # Log a debug message
     logger.debug(message="Debugging completed.")
+
 
 if __name__ == "__main__":
     debug()
