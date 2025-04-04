@@ -649,17 +649,33 @@ class LearningSessionRunner:
             # This is a dictionary with some metadata about the learning session action
             builder.action_metadata(
                 value={
+                    # The action number
+                    "action_number": len(self.learning_session_item.actions) + 1,
                     # The flashcard that was flipped
                     "flashcard": {
                         "id": flashcard.id,
                         "key": flashcard.key,
                     },
-                    # The time elapsed after the start of the learning session
-                    "time_elapsed_after_start": (
-                        timestamp - self.learning_session_item.start
-                    ).total_seconds(),
+                    # The learning session
+                    "learning_session": {
+                        "id": self.learning_session.id,
+                        "key": self.learning_session.key,
+                    },
+                    # The learning session item
+                    "learning_session_item": {
+                        "id": self.learning_session_item.id,
+                        "key": self.learning_session_item.key,
+                    },
+                    # The mode of the learning session
+                    "mode": self.mode,
+                    # The settings of the learning session
+                    "settings": self.settings,
                     # The timestamp of the learning session action
                     "timestamp": Miscellaneous.datetime_to_string(datetime=timestamp),
+                    # The time elapsed since the start of the learning session
+                    "time_elapsed_since_start": (
+                        timestamp - self.learning_session_item.start
+                    ).total_seconds(),
                 }
             )
 
@@ -742,10 +758,235 @@ class LearningSessionRunner:
         self,
         difficulty: Literal["easy", "medium", "hard"],
     ) -> None:
+        """
+        Handles the 'request_learning_session_difficulty_button_clicked' event and updates the difficulty of the current item in the learning session.
+
+        This method is dispatched by the learning session UI when the user clicks on the difficulty button.
+
+        Args:
+            difficulty (Literal["easy", "medium", "hard"]): The difficulty level of the flashcard.
+        
+        Returns:
+            None
+        
+        Raises:
+            Exception: If an exception occurs while attempting to run the method.
+        """
         try:
-            self.logger.debug(
-                message=f"{self.__class__.__name__} received notification that the difficulty button with key '{difficulty}' has been clicked"
+            # Get the current timestamp
+            timestamp: datetime = Miscellaneous.get_current_datetime()
+
+            # Dispatch a request to get the difficulty
+            passed_difficulty_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                    name=difficulty,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
+
+            # Check if the notification is None
+            if not passed_difficulty_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch request to get difficulty in 'on_notify_learning_session_difficulty_button_clicked' method from '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return
+
+            # Get the difficulty
+            passed_difficulty: ImmutableDifficulty = (
+                passed_difficulty_notification.get_one_and_only_result()
+            )
+
+            # Dispatch a request to get the Content object
+            content_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_GET_BY_KEY,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    key=self.contents[self.content_index],
+                )
+            )
+
+            # Check if the notification is None
+            if not content_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch request to get Content object in 'on_notify_learning_session_difficulty_button_clicked' method from '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return
+
+            # Get the Content object
+            content: Union[
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+            ] = content_notification.get_one_and_only_result()
+
+            # Dispatch a request to get the difficulty
+            content_difficulty_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                    id=content.difficulty,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
+            )
+
+            # Convert the Content object to mutable
+            content = content.to_mutable()
+
+            # Update the difficulty
+            content.difficulty = passed_difficulty.id
+
+            # Dispatch a request to update the Content object
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_UPDATE,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                **{
+                    Miscellaneous.find_match(string=content.key).lower(): content,
+                },
+            )
+
+            # Check if the notification is None
+            if not content_difficulty_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch request to get difficulty in 'on_notify_learning_session_difficulty_button_clicked' method from '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return
+
+            # Get the difficulty
+            content_difficulty: ImmutableDifficulty = (
+                content_difficulty_notification.get_one_and_only_result()
+            )
+
+            # Create a builder for the learning session action
+            builder: LearningSessionActionBuilder = LearningSessionActionBuilder()
+
+            # Set the reference of the learning session action to the flashcard's key
+            # This is necessary to identify the learning session action later on
+            builder.reference(value=self.contents[self.content_index])
+
+            # Set the start time of the learning session action
+            builder.start(value=timestamp)
+
+            # Set the action type of the learning session action
+            builder.action_type(value="DIFFICULTY_CHANGED")
+
+            # Set the action metadata of the learning session action
+            # This is a dictionary with some metadata about the learning session action
+            builder.action_metadata(
+                value={
+                    # The action number
+                    "action_number": len(self.learning_session_item.actions) + 1,
+                    "difficulty": {
+                        "from": {
+                            "id": content_difficulty.id,
+                            "key": content_difficulty.key,
+                            "name": content_difficulty.name,
+                        },
+                        "to": {
+                            "id": passed_difficulty.id,
+                            "key": passed_difficulty.key,
+                            "name": passed_difficulty.name,
+                        },
+                    },
+                    # The flashcard that was flipped
+                    Miscellaneous.find_match(string=content.key).lower(): {
+                        "id": content.id,
+                        "key": content.key,
+                    },
+                    # The learning session
+                    "learning_session": {
+                        "id": self.learning_session.id,
+                        "key": self.learning_session.key,
+                    },
+                    # The learning session item
+                    "learning_session_item": {
+                        "id": self.learning_session_item.id,
+                        "key": self.learning_session_item.key,
+                    },
+                    # The mode of the learning session
+                    "mode": self.mode,
+                    # The settings of the learning session
+                    "settings": self.settings,
+                    # The timestamp of the learning session action
+                    "timestamp": Miscellaneous.datetime_to_string(datetime=timestamp),
+                    # The time elapsed since the start of the learning session
+                    "time_elapsed_since_start": (
+                        timestamp - self.learning_session_item.start
+                    ).total_seconds(),
+                }
+            )
+
+            # Set the end time of the learning session action
+            builder.end(value=timestamp)
+
+            # Set the duration of the learning session action
+            # This is the time difference between the end and start of the learning session action
+            builder.duration(
+                value=(
+                    builder.configuration["end"] - builder.configuration["start"]
+                ).total_seconds()
+            )
+
+            # Dispatch a request to create the learning session action
+            create_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_LEARNING_SESSION_ACTION_CREATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    learning_session_action=builder.build(),
+                )
+            )
+
+            # Check if the notification is None
+            if not create_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch request to create LearningSessionAction object in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return
+
+            # The learning session action is retrieved from the notification
+            learning_session_action: ImmutableLearningSessionAction = (
+                create_notification.get_one_and_only_result()
+            )
+
+            # Convert the learning session item to mutable
+            learning_session_item: MutableLearningSessionItem = (
+                self.learning_session_item.to_mutable()
+            )
+
+            # Append the key of the learning session action to the actions of the learning session item
+            learning_session_item.actions.append(learning_session_action.key)
+
+            update_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    learning_session_item=learning_session_item,
+                )
+            )
+
+            # Check if the notification is None
+            if not update_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch request to update LearningSessionItem object in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return
+
+            # Convert the learning session item back to immutable
+            self.learning_session_item = update_notification.get_one_and_only_result()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

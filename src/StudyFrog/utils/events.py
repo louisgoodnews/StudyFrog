@@ -1187,6 +1187,16 @@ class Events:
         DispatcherEventFactory.create_event(name="ui:request:validate:navigation")
     )
 
+    # An event that indicates that the user wants to update an object
+    REQUEST_UPDATE: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:update")
+    )
+
+    # An event that indicates that the user wants to update objects in bulk
+    REQUEST_BULK_UPDATE: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:bulk_update")
+    )
+
     # An event that indicates that the user wants to create a new user
     REQUEST_USER_CREATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="global:request:user:create"
