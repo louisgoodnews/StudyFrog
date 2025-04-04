@@ -1193,8 +1193,8 @@ class Events:
     )
 
     # An event that indicates that the user wants to update objects in bulk
-    REQUEST_BULK_UPDATE: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="global:request:bulk_update")
+    REQUEST_UPDATE_IN_BULK: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:update_in_bulk")
     )
 
     # An event that indicates that the user wants to create a new user

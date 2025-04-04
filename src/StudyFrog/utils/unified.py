@@ -3,6 +3,8 @@ Author: lodego
 Date: 2025-02-09
 """
 
+import traceback
+
 from typing import *
 
 from core.learning.learning_session import (
@@ -442,6 +444,184 @@ class UnifiedObjectManager(ImmutableBaseObject):
 
             # Raise the exception to the caller
             raise e
+
+    def update(
+        self,
+        update: Union[
+            ImmutableAssociation,
+            ImmutableCustomField,
+            ImmutableStack,
+            ImmutableFlashcard,
+            ImmutableQuestion,
+            ImmutableAnswer,
+            ImmutableOption,
+            ImmutableTag,
+            ImmutableStatus,
+            ImmutablePriority,
+            ImmutableDifficulty,
+            ImmutableSetting,
+            ImmutableNote,
+            ImmutableUser,
+            ImmutableDefault,
+        ],
+    ) -> Optional[
+        Union[
+            ImmutableAssociation,
+            ImmutableCustomField,
+            ImmutableStack,
+            ImmutableFlashcard,
+            ImmutableQuestion,
+            ImmutableAnswer,
+            ImmutableOption,
+            ImmutableTag,
+            ImmutableStatus,
+            ImmutablePriority,
+            ImmutableDifficulty,
+            ImmutableSetting,
+            ImmutableNote,
+            ImmutableUser,
+            ImmutableDefault,
+        ]
+    ]:
+        """
+        Updates a unified object with the given key.
+
+        Args:
+            update (Union[ImmutableAssociation, ...]): The unified object to update.
+
+        Returns:
+            Optional[Union[ImmutableAssociation, ...]]: The updated unified object if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Attempt to find a match in the given key
+            match: Optional[str] = Miscellaneous.find_match(
+                string=key,
+                group=1,
+                pattern=r"([A-Za-z]+)",
+            )
+
+            if not match:
+                # Log an error message indicating that the key format is invalid
+                self.logger.error(message=f"Invalid key format: '{key}'")
+
+                # Return early since the key is invalid
+                return
+
+            # Run the 'update' method of the corresponding manager
+            return self.run(
+                manager=f"{match.lower()}_manager",
+                method=f"update_{match.lower()}",
+                **{match.lower(): update},
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Return None indicating that an exception has occurred
+            return None
+
+    def update_in_bulk(
+        self,
+        updates: List[
+            Union[
+                ImmutableAssociation,
+                ImmutableCustomField,
+                ImmutableStack,
+                ImmutableFlashcard,
+                ImmutableQuestion,
+                ImmutableAnswer,
+                ImmutableOption,
+                ImmutableTag,
+                ImmutableStatus,
+                ImmutablePriority,
+                ImmutableDifficulty,
+                ImmutableSetting,
+                ImmutableNote,
+                ImmutableUser,
+                ImmutableDefault,
+            ]
+        ],
+    ) -> Optional[
+        List[
+            Union[
+                ImmutableAssociation,
+                ImmutableCustomField,
+                ImmutableStack,
+                ImmutableFlashcard,
+                ImmutableQuestion,
+                ImmutableAnswer,
+                ImmutableOption,
+                ImmutableTag,
+                ImmutableStatus,
+                ImmutablePriority,
+                ImmutableDifficulty,
+                ImmutableSetting,
+                ImmutableNote,
+                ImmutableUser,
+                ImmutableDefault,
+            ]
+        ]
+    ]:
+        """
+        Updates multiple unified objects in bulk.
+
+        Args:
+            updates (List[Union[...]]): A list of unified objects to update.
+
+        Returns:
+            Optional[List[Union[...]]]: The updated unified objects if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Initialize an empty list to store the updated objects
+            result: List[
+                Union[
+                    ImmutableAssociation,
+                    ImmutableCustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                ]
+            ] = []
+
+            # Iterate over the list of objects to update
+            for update in updates:
+                # Run the 'update' method for each object
+                result.append(self.update(update=update))
+
+            # Return the list of updated objects
+            return result
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'update_in_bulk' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Return None indicating that an exception has occurred
+            return None
 
 
 class UnifiedObjectService(ImmutableBaseObject):
@@ -2320,6 +2500,108 @@ class UnifiedObjectService(ImmutableBaseObject):
 
         # Update the tag in the database and return the result of the update
         return self.unified_manager.update_tag(tag=tag)
+
+    def on_request_update(
+        self,
+        update: Union[
+            ImmutableAssociation,
+            ImmutableCustomField,
+            ImmutableStack,
+            ImmutableFlashcard,
+            ImmutableQuestion,
+            ImmutableAnswer,
+            ImmutableOption,
+            ImmutableTag,
+            ImmutableStatus,
+            ImmutablePriority,
+            ImmutableDifficulty,
+            ImmutableSetting,
+            ImmutableNote,
+            ImmutableUser,
+            ImmutableDefault,
+        ],
+    ) -> Union[
+        ImmutableAssociation,
+        ImmutableCustomField,
+        ImmutableStack,
+        ImmutableFlashcard,
+        ImmutableQuestion,
+        ImmutableAnswer,
+        ImmutableOption,
+        ImmutableTag,
+        ImmutableStatus,
+        ImmutablePriority,
+        ImmutableDifficulty,
+        ImmutableSetting,
+        ImmutableNote,
+        ImmutableUser,
+        ImmutableDefault,
+    ]:
+        """
+        Handles the 'request_update' event and updates an existing object in the database.
+
+        Args:
+            update (Union[ImmutableAssociation, ...]): The object to be updated.
+
+        Returns:
+            Union[ImmutableAssociation, ...]: The updated object if no exception occurs. Otherwise, None.
+        """
+
+        # Update the object in the database and return the result of the update
+        return self.unified_manager.update(update=update)
+
+    def on_request_update_in_bulk(
+        self,
+        updates: List[
+            Union[
+                ImmutableAssociation,
+                ImmutableCustomField,
+                ImmutableStack,
+                ImmutableFlashcard,
+                ImmutableQuestion,
+                ImmutableAnswer,
+                ImmutableOption,
+                ImmutableTag,
+                ImmutableStatus,
+                ImmutablePriority,
+                ImmutableDifficulty,
+                ImmutableSetting,
+                ImmutableNote,
+                ImmutableUser,
+                ImmutableDefault,
+            ]
+        ],
+    ) -> List[
+        Union[
+            ImmutableAssociation,
+            ImmutableCustomField,
+            ImmutableStack,
+            ImmutableFlashcard,
+            ImmutableQuestion,
+            ImmutableAnswer,
+            ImmutableOption,
+            ImmutableTag,
+            ImmutableStatus,
+            ImmutablePriority,
+            ImmutableDifficulty,
+            ImmutableSetting,
+            ImmutableNote,
+            ImmutableUser,
+            ImmutableDefault,
+        ]
+    ]:
+        """
+        Handles the 'request_update_in_bulk' event and updates a existing objecta in the database.
+
+        Args:
+            updates (List[Union[ImmutableAssociation, ...]]): The objects to be updated.
+
+        Returns:
+            List[Union[ImmutableAssociation, ...]]: The updated objects if no exception occurs. Otherwise, None.
+        """
+
+        # Update the object in the database and return the result of the update
+        return self.unified_manager.update_in_bulk(updates=updates)
 
     def on_request_user_create(
         self,

@@ -844,6 +844,14 @@ class BootstrapService(ImmutableBaseObject):
                     "function": self.unified_object_service.on_request_tag_update,
                 },
                 {
+                    "event": Events.REQUEST_UPDATE,
+                    "function": self.unified_object_service.on_request_update,
+                },
+                {
+                    "event": Events.REQUEST_UPDATE_IN_BULK,
+                    "function": self.unified_object_service.on_request_update_in_bulk,
+                },
+                {
                     "event": Events.REQUEST_USER_CREATE,
                     "function": self.unified_object_service.on_request_user_create,
                 },
