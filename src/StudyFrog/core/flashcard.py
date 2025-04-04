@@ -762,16 +762,6 @@ class FlashcardBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
-    def key(
-        self,
-        value: Optional[str] = None,
-    ) -> Self:
-        # Set the key value in the configuration dictionary
-        self.configuration["key"] = value
-
-        # Return the builder instance
-        return self
-
     def last_viewed_at(
         self,
         value: Optional[datetime] = None,
@@ -828,16 +818,6 @@ class FlashcardBuilder(BaseObjectBuilder):
     ) -> Self:
         # Set the updated_at value in the configuration dictionary
         self.configuration["updated_at"] = value
-
-        # Return the builder instance
-        return self
-
-    def uuid(
-        self,
-        value: Optional[str] = None,
-    ) -> Self:
-        # Set the uuid value in the configuration dictionary
-        self.configuration["uuid"] = value
 
         # Return the builder instance
         return self

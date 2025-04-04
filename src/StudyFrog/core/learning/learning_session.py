@@ -4,6 +4,7 @@ Date: 2025-03-29
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 
@@ -27,6 +28,13 @@ __all__: Final[List[str]] = [
     "LearningSessionBuilder",
     "LearningSessionManager",
     "LearningSessionModel",
+    "ImmutableLearningSessionAction",
+    "MutableLearningSessionAction",
+    "LearningSessionActionConverter",
+    "LearningSessionActionFactory",
+    "LearningSessionActionBuilder",
+    "LearningSessionActionManager",
+    "LearningSessionActionModel",
     "ImmutableLearningSessionItem",
     "MutableLearningSessionItem",
     "LearningSessionItemConverter",
@@ -894,7 +902,10 @@ class LearningSessionBuilder(BaseObjectBuilder):
         self.configuration["key"] = value
         return self
 
-    def mode(self, value: str,) -> Self:
+    def mode(
+        self,
+        value: str,
+    ) -> Self:
         """
         Sets the mode attribute of the builder.
 
@@ -2070,6 +2081,1546 @@ class LearningSessionModel(ImmutableBaseModel):
         )
 
 
+class ImmutableLearningSessionAction(ImmutableBaseObject):
+    """
+    An immutable version of the MutableLearningSessionAction class.
+
+    This class extends the ImmutableBaseObject class and provides an immutable version of the MutableLearningSessionAction class.
+    It is used to represent a learning session action in an immutable form, which cannot be modified after creation.
+
+    Attributes:
+        action_metadata (Dict[str, Any]): Metadata related to the action.
+        action_type (str): The type of the action.
+        created_at (Optional[datetime]): The timestamp when the item was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): Custom field values.
+        duration (Optional[float]): The duration of the item.
+        end (Optional[datetime]): The end time of the item.
+        id (Optional[int]): The ID of the item.
+        key (Optional[str]): The key of the item.
+        reference (Optional[str]): The reference of the item.
+        start (Optional[datetime]): The start time of the item.
+        updated_at (Optional[datetime]): The timestamp when the item was last updated.
+        uuid (Optional[str]): The UUID of the item.
+    """
+
+    def __init__(
+        self,
+        action_metadata: Dict[str, Any],
+        action_type: str,
+        created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        duration: Optional[float] = None,
+        end: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        reference: Optional[str] = None,
+        start: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance with the given parameters.
+
+        Args:
+        action_metadata (Dict[str, Any]): Metadata related to the action.
+        action_type (str): The type of the action.
+        created_at (Optional[datetime]): The timestamp when the item was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): Custom field values.
+        duration (Optional[float]): The duration of the item.
+        end (Optional[datetime]): The end time of the item.
+        id (Optional[int]): The ID of the item.
+        key (Optional[str]): The key of the item.
+        reference (Optional[str]): The reference of the item.
+        start (Optional[datetime]): The start time of the item.
+        updated_at (Optional[datetime]): The timestamp when the item was last updated.
+        uuid (Optional[str]): The UUID of the item.
+        """
+
+        # Call the parent class constructor with the provided parameters
+        super().__init__(
+            action_metadata=action_metadata,
+            action_type=action_type,
+            created_at=created_at,
+            custom_field_values=custom_field_values,
+            duration=duration,
+            end=end,
+            id=id,
+            key=key,
+            reference=reference,
+            start=start,
+            updated_at=updated_at,
+            uuid=uuid,
+        )
+
+    def to_mutable(self) -> Optional["MutableLearningSessionAction"]:
+        """
+        Converts the immutable learning session action to a mutable learning session action.
+
+        Returns:
+            Optional[MutableLearningSessionAction]: The mutable learning session action if successful, otherwise None.
+
+        Raises:
+            Exception: If an exception occurs during the conversion process.
+        """
+        try:
+            # Attempt to create and return an instance of the MutableLearningSessionAction class
+            return MutableLearningSessionAction(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback for additional debugging information
+            self.logger.error(message=traceback.format_exc())
+
+            # Return None indicating that an exception has occurred
+            return None
+
+
+class MutableLearningSessionAction(MutableBaseObject):
+    """
+    A mutable version of the ImmutableLearningSessionAction class.
+
+    This class extends the MutableBaseObject class and provides a mutable version of the ImmutableLearningSessionAction class.
+    It is used to represent a learning session action in a mutable form, which can be modified after creation.
+
+    Attributes:
+        action_metadata (Dict[str, Any]): Metadata related to the action.
+        action_type (str): The type of the action.
+        created_at (Optional[datetime]): The timestamp when the item was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): Custom field values.
+        duration (Optional[float]): The duration of the item.
+        end (Optional[datetime]): The end time of the item.
+        id (Optional[int]): The ID of the item.
+        key (Optional[str]): The key of the item.
+        reference (Optional[str]): The reference of the item.
+        start (Optional[datetime]): The start time of the item.
+        updated_at (Optional[datetime]): The timestamp when the item was last updated.
+        uuid (Optional[str]): The UUID of the item.
+    """
+
+    def __init__(
+        self,
+        action_metadata: Dict[str, Any],
+        action_type: str,
+        created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        duration: Optional[float] = None,
+        end: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        reference: Optional[str] = None,
+        start: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance with the given parameters.
+
+        Args:
+        action_metadata (Dict[str, Any]): Metadata related to the action.
+        action_type (str): The type of the action.
+        created_at (Optional[datetime]): The timestamp when the item was created.
+        custom_field_values (Optional[List[Dict[str, Any]]]): Custom field values.
+        duration (Optional[float]): The duration of the item.
+        end (Optional[datetime]): The end time of the item.
+        id (Optional[int]): The ID of the item.
+        key (Optional[str]): The key of the item.
+        reference (Optional[str]): The reference of the item.
+        start (Optional[datetime]): The start time of the item.
+        updated_at (Optional[datetime]): The timestamp when the item was last updated.
+        uuid (Optional[str]): The UUID of the item.
+        """
+
+        # Call the parent class constructor with the provided parameters
+        super().__init__(
+            action_metadata=action_metadata,
+            action_type=action_type,
+            created_at=created_at,
+            custom_field_values=custom_field_values,
+            duration=duration,
+            end=end,
+            id=id,
+            key=key,
+            reference=reference,
+            start=start,
+            updated_at=updated_at,
+            uuid=uuid,
+        )
+
+    def to_immutable(self) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Converts the mutable learning session action to an immutable learning session action.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The immutable learning session action if successful, otherwise None.
+
+        Raises:
+            Exception: If an exception occurs during the conversion process.
+        """
+        try:
+            # Attempt to create and return an instance of the ImmutableLearningSessionAction class
+            return ImmutableLearningSessionAction(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback for additional debugging information
+            self.logger.error(message=traceback.format_exc())
+
+            # Return None indicating that an exception has occurred
+            return None
+
+
+class LearningSessionActionConverter:
+    """
+    A converter class for transforming between LearningSessionActionModel and ImmutableLearningSessionAction instances.
+
+    This class provides methods to convert a LearningSessionActionModel instance to an ImmutableLearningSessionAction instance,
+    and vice versa. It utilizes a logger to capture and log exceptions that may occur during the conversion process.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the LearningSessionActionConverter class.
+    """
+
+    logger: Final[Logger] = Logger.get_logger(name="LearningSessionActionConverter")
+
+    @classmethod
+    def model_to_object(
+        cls,
+        model: "LearningSessionActionModel",
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Converts a given LearningSessionActionModel instance to an ImmutableLearningSessionAction instance.
+
+        Args:
+            model (LearningSessionActionModel): The LearningSessionActionModel instance to be converted.
+
+        Returns:
+            ImmutableLearningSessionAction: The converted ImmutableLearningSessionAction instance if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to convert the LearningSessionActionModel instance.
+        """
+        try:
+            # Attempt to create and return a new instance of the ImmutableLearningSessionAction class from the dictionary representation of the LearningSessionActionModel instance
+            return ImmutableLearningSessionAction(
+                **model.to_dict(
+                    exclude=[
+                        "_logger",
+                        "table",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def object_to_model(
+        cls,
+        object: ImmutableLearningSessionAction,
+    ) -> Optional["LearningSessionActionModel"]:
+        """
+        Converts a given ImmutableLearningSessionAction instance to a LearningSessionActionModel instance.
+
+        Args:
+            object (ImmutableLearningSessionAction): The ImmutableLearningSessionAction instance to be converted.
+
+        Returns:
+            LearningSessionActionModel: The converted LearningSessionActionModel instance if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to convert the ImmutableLearningSessionAction instance.
+        """
+        try:
+            # Attempt to create and return a new instance of the LearningSessionActionModel class from the dictionary representation of the ImmutableLearningSessionAction instance
+            return LearningSessionActionModel(
+                **object.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+
+class LearningSessionActionFactory:
+    """
+    Provides a method to create a new learning session action.
+
+    This class extends the BaseFactory class and provides a method to create an ImmutableLearningSessionAction object by accepting
+    various parameters related to a learning session action. It uses a logger to capture and log any exceptions that may occur during the creation process.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the LearningSessionActionFactory class.
+    """
+
+    logger: Final[Logger] = Logger.get_logger(name="LearningSessionActionFactory")
+
+    @classmethod
+    def create_learning_session_action(
+        cls,
+        action_type: str,
+        action_metadata: Dict[str, Any],
+        created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        duration: Optional[float] = None,
+        end: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        reference: Optional[str] = None,
+        start: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Creates a new learning session action.
+
+        Args:
+            action_type (str): The type of the action.
+            action_metadata (Dict[str, Any]): The metadata of the action.
+            created_at (Optional[datetime]): The timestamp when the action was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            duration (Optional[float]): The duration of the action.
+            end (Optional[datetime]): The end time of the action.
+            id (Optional[int]): The ID of the action.
+            key (Optional[str]): The key of the action.
+            reference (Optional[str]): The reference of the action.
+            start (Optional[datetime]): The start time of the action.
+            updated_at (Optional[datetime]): The timestamp when the action was last updated.
+            uuid (Optional[str]): The UUID of the action.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The created learning session action if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Attempt to create and return a new instance of the ImmutableLearningSessionAction class from the dictionary representation of the MutableLearningSessionAction instance
+            return ImmutableLearningSessionAction(
+                action_type=action_type,
+                action_metadata=action_metadata,
+                created_at=created_at,
+                custom_field_values=custom_field_values,
+                duration=duration,
+                end=end,
+                id=id,
+                key=key,
+                reference=reference,
+                start=start,
+                updated_at=updated_at,
+                uuid=uuid,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_learning_session_action' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=traceback.format_exc())
+
+            # Return None indicating an exception has occurred
+            return None
+
+
+class LearningSessionActionBuilder(BaseObjectBuilder):
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the LearningSessionActionBuilder class.
+
+        This class extends the BaseObjectBuilder class and provides a method to create an ImmutableLearningSessionAction object by accepting
+        various parameters related to a learning session action. It uses a logger to capture and log any exceptions that may occur during the creation process.
+        """
+        super().__init__()
+
+    @override
+    def build(self) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Builds and returns an instance of the ImmutableLearningSessionAction class using the configuration dictionary.
+
+        This method attempts to create an instance of the ImmutableLearningSessionAction class using the configuration dictionary passed to the constructor.
+        If an exception occurs while creating the instance, this method will log an error message and return None.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The created learning session action if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Attempt to create and return a new instance of the ImmutableLearningSessionAction class from the dictionary representation of the MutableLearningSessionAction instance
+            learning_session_action: Optional[ImmutableLearningSessionAction] = (
+                LearningSessionAction.create_learning_session_action(
+                    **self.configuration
+                )
+            )
+
+            if not learning_session_action:
+                # Log an error message indicating an exception has occurred
+                self.logger.error(
+                    message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+                )
+
+                # Log the traceback of the exception
+                self.logger.error(message=traceback.format_exc())
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Return the created learning session action
+            return learning_session_action
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=traceback.format_exc())
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def action_type(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the action_type attribute of the builder.
+
+        Args:
+            value (str): The value to set for the action_type attribute.
+
+        Returns:
+            Self: The builder instance with the action_type attribute set.
+        """
+
+        # Set the action_type value in the configuration dictionary
+        self.configuration["action_type"] = value
+
+        # Return the builder instance
+        return self
+
+    def action_metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the action_metadata attribute of the builder.
+
+        Args:
+            value (Dict[str, Any]): The value to set for the action_metadata attribute.
+
+        Returns:
+            Self: The builder instance with the action_metadata attribute set.
+        """
+
+        # Check if the "action_metadata" key is already present in the configuration
+        if "action_metadata" not in self.configuration:
+            # Initialize the "action_metadata" key with an empty dictionary
+            self.configuration["action_metadata"] = {}
+
+        # Set the action_metadata value in the configuration dictionary
+        self.configuration["action_metadata"].update(value)
+
+        # Return the builder instance
+        return self
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the created_at attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the created_at attribute.
+
+        Returns:
+            Self: The builder instance with the created_at attribute set.
+        """
+
+        # Set the created_at value in the configuration dictionary
+        self.configuration["created_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def custom_field_values(
+        self,
+        value: Optional[List[Dict[str, Any]]] = None,
+    ) -> Self:
+        """
+        Sets the custom_field_values attribute of the builder.
+
+        Args:
+            value (Optional[List[Dict[str, Any]]]): The value to set for the custom_field_values attribute.
+
+        Returns:
+            Self: The builder instance with the custom_field_values attribute set.
+        """
+
+        # Set the custom_field_values value in the configuration dictionary
+        self.configuration["custom_field_values"] = value
+
+        # Return the builder instance
+        return self
+
+    def duration(
+        self,
+        value: float,
+    ) -> Self:
+        """
+        Sets the duration attribute of the builder.
+
+        Args:
+            value (float): The value to set for the duration attribute.
+
+        Returns:
+            Self: The builder instance with the duration attribute set.
+        """
+
+        # Set the duration value in the configuration dictionary
+        self.configuration["duration"] = value
+
+        # Return the builder instance
+        return self
+
+    def end(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the end attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the end attribute.
+
+        Returns:
+            Self: The builder instance with the end attribute set.
+        """
+
+        # Set the end value in the configuration dictionary
+        self.configuration["end"] = value
+
+        # Return the builder instance
+        return self
+
+    def reference(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the reference attribute of the builder.
+
+        Args:
+            value (str): The value to set for the reference attribute.
+
+        Returns:
+            Self: The builder instance with the reference attribute set.
+        """
+
+        # Set the reference value in the configuration dictionary
+        self.configuration["reference"] = value
+
+        # Return the builder instance
+        return self
+
+    def start(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the start attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the start attribute.
+
+        Returns:
+            Self: The builder instance with the start attribute set.
+        """
+
+        # Set the start value in the configuration dictionary
+        self.configuration["start"] = value
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: Optional[datetime] = None,
+    ) -> Self:
+        """
+        Sets the updated_at attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the updated_at attribute.
+
+        Returns:
+            Self: The builder instance with the updated_at attribute set.
+        """
+
+        # Set the updated_at value in the configuration dictionary
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
+
+
+class LearningSessionActionManager(BaseObjectManager):
+    """
+    A manager class for managing learning_session_actions in the application.
+
+    This class extends the BaseObjectManager class and provides CRUD (Create, Read, Update, Delete) methods for learning_session_actions.
+
+    Attributes:
+        cache: (List[Any]): The cache for storing learning_session_actions.
+        logger (Logger): The logger instance associated with the object.
+    """
+
+    _shared_instance: Optional["LearningSessionActionManager"] = None
+
+    def __new__(cls) -> "LearningSessionActionManager":
+        """
+        Creates and returns a new instance of the LearningSessionActionManager class.
+
+        If the instance does not exist, creates a new one by calling the parent class
+        constructor and initializes it by calling the `init` method of the class.
+
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            LearningSessionActionManager: The created or existing instance of LearningSessionActionManager class.
+        """
+
+        # Check if the shared instance does not exist
+        if cls._shared_instance is None:
+            # Create a new instance by calling the parent class constructor
+            cls._shared_instance = super(LearningSessionActionManager, cls).__new__(cls)
+            # Initialize the instance with the dispatcher and stacks
+            cls._shared_instance.init()
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
+        """
+        Initializes a new instance of the LearningSessionActionManager class.
+
+        Returns:
+            None
+        """
+        pass
+
+    def count_learning_session_actions(self) -> int:
+        """
+        Returns the number of learning_session_actions in the database.
+
+        Returns:
+            int: The number of learning_session_actions in the database.
+        """
+        try:
+            # Count and return the number of learning_session_actions in the database
+            return asyncio.run(
+                LearningSessionActionModel.count(database=Constants.DATABASE_PATH)
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'count' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return 0 indicating an exception has occurred
+            return 0
+
+    def create_learning_session_action(
+        self,
+        learning_session_action: Union[
+            ImmutableLearningSessionAction, MutableLearningSessionAction
+        ],
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Creates a new learning_session_action in the database.
+
+        Args:
+            learning_session_action (Union[ImmutableLearningSessionAction, MutableLearningSessionAction]): The learning_session_action to be created.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The newly created immutable learning_session_action if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the learning_session_action.
+        """
+        try:
+            # Check if the learning_session_action object is immutable
+            if isinstance(
+                learning_session_action,
+                ImmutableLearningSessionAction,
+            ):
+                # If it is, convert it to a mutable learning_session_action
+                learning_session_action = learning_session_action.to_mutable()
+
+            # Set the actions of the learning_session_action
+            learning_session_action.actions = [] or learning_session_action.actions
+
+            # Set the created_at timestamp of the learning_session_action
+            learning_session_action.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the custom_field_values of the learning_session_action
+            learning_session_action.custom_field_values = (
+                [] or learning_session_action.custom_field_values
+            )
+
+            # Set the key of the learning_session_action
+            learning_session_action.key = (
+                f"LEARNING_SESSION_ACTION_{self.count_learning_session_actions() + 1}"
+            )
+
+            # Set the updated_at timestamp of the learning_session_action
+            learning_session_action.updated_at = Miscellaneous.get_current_datetime()
+
+            # Set the uuid of the learning_session_action
+            learning_session_action.uuid = Miscellaneous.get_uuid()
+
+            # Convert the learning_session_action object to a LearningSessionActionModel object
+            model: LearningSessionActionModel = (
+                LearningSessionActionConverter.object_to_model(
+                    object=learning_session_action
+                )
+            )
+
+            # Create a new learning_session_action in the database
+            id: Optional[int] = asyncio.run(
+                model.create(database=Constants.DATABASE_PATH)
+            )
+
+            if id:
+                # Set the ID of the learning_session_action
+                learning_session_action.id = id
+
+                # Convert the learning_session_action to an immutable learning_session_action
+                learning_session_action = (
+                    LearningSessionActionFactory.create_learning_session_action(
+                        **learning_session_action.to_dict(
+                            exclude=[
+                                "_logger",
+                            ]
+                        )
+                    )
+                )
+
+                # Add the learning_session_action to the cache
+                self.add_to_cache(
+                    key=learning_session_action.key,
+                    value=learning_session_action,
+                )
+
+                # Return the newly created immutable learning_session_action
+                return learning_session_action
+
+            # Log a warning message indicating an error has occurred
+            self.logger.warning(
+                message=f"It seems that an error has occured while attempting to create a learning_session_action ({learning_session_action}) in the database."
+            )
+
+            # Return None indicating an error has occurred
+            return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'create_learning_session_action' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def delete_learning_session_action(
+        self,
+        learning_session_action: Union[
+            ImmutableLearningSessionAction, MutableLearningSessionAction
+        ],
+    ) -> bool:
+        """
+        Deletes a learning_session_action from the database.
+
+        Args:
+            learning_session_action (Union[ImmutableLearningSessionAction, MutableLearningSessionAction]): The learning_session_action to be deleted.
+
+        Returns:
+            bool: True if the learning_session_action was deleted successfully. False otherwise.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Convert the learning_session_action to an immutable learning_session_action and delete the learning_session_action from the database
+            result: bool = asyncio.run(
+                LearningSessionActionConverter.object_to_model(
+                    object=LearningSessionActionFactory.create_learning_session_action(
+                        **learning_session_action.to_dict(
+                            exclude=[
+                                "_logger",
+                            ]
+                        )
+                    )
+                ).delete()
+            )
+
+            # Remove the learning_session_action from the cache
+            self.remove_from_cache(key=learning_session_action.key)
+
+            # Return True if the learning_session_action was deleted successfully
+            return result
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return False indicating an exception has occurred
+            return False
+
+    def get_all_learning_session_actions(
+        self,
+    ) -> Optional[List[ImmutableLearningSessionAction]]:
+        """
+        Returns a list of all learning_session_actions in the database.
+
+        Returns:
+            Optional[List[ImmutableLearningSessionAction]]: A list of all learning_session_actions in the database if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if cache and table size are equal
+            if self.cache and len(self._cache) == self.count_learning_session_actions():
+                # Return the list of immutable learning_session_actions from the cache
+                return self.get_cache_values()
+
+            # Get all learning_session_actions from the database
+            models: List[LearningSessionActionModel] = asyncio.run(
+                LearningSessionActionModel.get_all(database=Constants.DATABASE_PATH)
+            )
+
+            # Convert the list of LearningSessionActionModel objects to a list of ImmutableLearningSessionAction objects
+            learning_session_actions: List[ImmutableLearningSessionAction] = [
+                LearningSessionActionFactory.create_learning_session_action(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
+            ]
+
+            # Iterate over the list of immutable learning_session_actions
+            for learning_session_action in learning_session_actions:
+                # Add the immutable learning_session_action to the cache
+                self.add_to_cache(
+                    key=learning_session_action.key,
+                    value=learning_session_action,
+                )
+
+            # Return the list of immutable learning_session_actions
+            return learning_session_actions
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_learning_session_action_by(
+        self,
+        field: str,
+        value: Any,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Retrieves a learning_session_action by the given field and value.
+
+        Args:
+            field (str): The field to search by.
+            value (Any): The value to search for.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The learning_session_action with the given field and value if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the learning_session_action is already in the cache
+            if self.is_key_in_cache(key=field):
+                # Return the learning_session_action from the cache
+                return self.get_value_from_cache(key=field)
+
+            # Get the learning_session_action with the given field and value from the database
+            model: Optional[LearningSessionActionModel] = asyncio.run(
+                LearningSessionActionModel.get_by(
+                    column=field,
+                    database=Constants.DATABASE_PATH,
+                    value=value,
+                )
+            )
+
+            # Return the learning_session_action if it exists
+            if model is not None:
+                # Convert the LearningSessionActionModel object to an ImmutableLearningSessionAction object
+                learning_session_action: ImmutableLearningSessionAction = (
+                    LearningSessionActionFactory.create_learning_session_action(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                )
+
+                # Add the learning_session_action to the cache
+                self.add_to_cache(
+                    key=learning_session_action.key,
+                    value=learning_session_action,
+                )
+
+                # Return the learning_session_action
+                return learning_session_action
+            else:
+                # Return None indicating that the learning_session_action does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_learning_session_action_by_id(
+        self,
+        id: int,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Returns a learning_session_action with the given ID.
+
+        Args:
+            id (int): The ID of the learning_session_action.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The learning_session_action with the given ID if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the learning_session_action is already in the cache
+            if self.is_key_in_cache(key=f"LEARNING_SESSION_ACTION_{id}"):
+                # Return the learning_session_action from the cache
+                return self.get_value_from_cache(key=f"LEARNING_SESSION_ACTION_{id}")
+
+            # Get the learning_session_action with the given ID from the database
+            model: Optional[LearningSessionActionModel] = asyncio.run(
+                LearningSessionActionModel.get_by(
+                    column="id",
+                    database=Constants.DATABASE_PATH,
+                    value=id,
+                )
+            )
+
+            # Return the learning_session_action if it exists
+            if model is not None:
+                # Convert the LearningSessionActionModel object to an ImmutableLearningSessionAction object
+                learning_session_action: ImmutableLearningSessionAction = (
+                    LearningSessionActionFactory.create_learning_session_action(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                )
+
+                # Add the learning_session_action to the cache
+                self.add_to_cache(
+                    key=learning_session_action.key,
+                    value=learning_session_action,
+                )
+
+                # Return the learning_session_action
+                return learning_session_action
+            else:
+                # Return None indicating that the learning_session_action does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_id' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_learning_session_action_by_key(
+        self,
+        key: str,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Returns a learning_session_action with the given key.
+
+        Args:
+            key (str): The key of the learning_session_action.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The learning_session_action with the given key if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the learning_session_action is already in the cache
+            if self.is_key_in_cache(key=key):
+                # Return the learning_session_action from the cache
+                return self.get_value_from_cache(key=key)
+
+            # Get the learning_session_action with the given key from the database
+            model: Optional[LearningSessionActionModel] = asyncio.run(
+                LearningSessionActionModel.get_by(
+                    column="key",
+                    database=Constants.DATABASE_PATH,
+                    value=key,
+                )
+            )
+
+            # Return the learning_session_action if it exists
+            if model is not None:
+                # Convert the LearningSessionActionModel object to an ImmutableLearningSessionAction object
+                learning_session_action: ImmutableLearningSessionAction = (
+                    LearningSessionActionFactory.create_learning_session_action(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                )
+
+                # Add the learning_session_action to the cache
+                self.add_to_cache(
+                    key=learning_session_action.key,
+                    value=learning_session_action,
+                )
+
+                # Return the learning_session_action
+                return learning_session_action
+            else:
+                # Return None indicating that the learning_session_action does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_key' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def get_learning_session_action_by_uuid(
+        self,
+        uuid: str,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Returns a learning_session_action with the given UUID.
+
+        Args:
+            uuid (str): The UUID of the learning_session_action.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The learning_session_action with the given UUID if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the learning_session_action is already in the cache
+            if self.is_key_in_cache(key=uuid):
+                # Return the learning_session_action from the cache
+                return self.get_value_from_cache(key=uuid)
+
+            # Get the learning_session_action with the given UUID from the database
+            model: Optional[LearningSessionActionModel] = asyncio.run(
+                LearningSessionActionModel.get_by(
+                    column="uuid",
+                    database=Constants.DATABASE_PATH,
+                    value=uuid,
+                )
+            )
+
+            # Return the learning_session_action if it exists
+            if model is not None:
+                # Convert the LearningSessionActionModel object to an ImmutableLearningSessionAction object
+                learning_session_action: ImmutableLearningSessionAction = (
+                    LearningSessionActionFactory.create_learning_session_action(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                )
+
+                # Add the learning_session_action to the cache
+                self.add_to_cache(
+                    key=learning_session_action.key,
+                    value=learning_session_action,
+                )
+
+                # Return the learning_session_action
+                return learning_session_action
+            else:
+                # Return None indicating that the learning_session_action does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_uuid' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def search_learning_session_actions(
+        self,
+        **kwargs,
+    ) -> Optional[Union[List[ImmutableLearningSessionAction]]]:
+        """
+        Searches for learning_session_actions in the database.
+
+        Args:
+            **kwargs: Any additional keyword arguments to be passed to the search method of the LearningSessionActionModel class.
+
+        Returns:
+            Optional[Union[List[ImmutableLearningSessionAction]]]: The found learning_session_actions if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Search for learning_session_actions in the database
+            models: Optional[List[LearningSessionActionModel]] = asyncio.run(
+                LearningSessionActionModel.search(
+                    database=Constants.DATABASE_PATH,
+                    **kwargs,
+                )
+            )
+
+            # Return the found learning_session_actions if any
+            if models is not None and len(models) > 0:
+                learning_session_actions: List[ImmutableLearningSessionAction] = [
+                    LearningSessionActionFactory.create(
+                        **model.to_dict(
+                            exclude=[
+                                "_logger",
+                                "table",
+                            ]
+                        )
+                    )
+                    for model in models
+                ]
+
+                # Iterate over the found learning_session_actions
+                for learning_session_action in learning_session_actions:
+                    # Add the learning_session_action to the cache
+                    self.add_to_cache(
+                        key=learning_session_action.key,
+                        value=learning_session_action,
+                    )
+
+                # Return the found learning_session_actions
+                return learning_session_actions
+            else:
+                # Return None indicating that no learning_session_actions were found
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def update_learning_session_action(
+        self,
+        learning_session_action: Union[
+            ImmutableLearningSessionAction, MutableLearningSessionAction
+        ],
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Updates a learning_session_action with the given ID.
+
+        Args:
+            learning_session_action (Union[ImmutableLearningSessionAction, MutableLearningSessionAction]): The learning_session_action to update.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The updated learning_session_action if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check if the learning_session_action object is immutable
+            if isinstance(
+                learning_session_action,
+                ImmutableLearningSessionAction,
+            ):
+                # If it is, convert it to a mutable learning_session_action
+                learning_session_action = learning_session_action.to_mutable()
+
+            # Update the updated_at timestamp of the learning_session_action
+            learning_session_action.updated_at = Miscellaneous.get_current_datetime()
+
+            # Convert the learning_session_action to an immutable learning_session_action and update the learning_session_action in the database
+            result: bool = asyncio.run(
+                LearningSessionActionConverter.object_to_model(
+                    object=LearningSessionActionFactory.create_learning_session_action(
+                        **learning_session_action.to_dict(
+                            exclude=[
+                                "_logger",
+                            ]
+                        )
+                    )
+                ).update(
+                    database=Constants.DATABASE_PATH,
+                    **learning_session_action.to_dict(
+                        exclude=[
+                            "_id",
+                            "_key",
+                            "_logger",
+                            "_uuid",
+                        ]
+                    ),
+                )
+            )
+
+            # Check, if the learning_session_action was updated successfully
+            if result:
+                # Update the learning_session_action in the cache
+                self.update_in_cache(
+                    key=learning_session_action.key,
+                    value=learning_session_action,
+                )
+
+                # Return the updated learning_session_action
+                return learning_session_action.to_immutable()
+            else:
+                # Return None indicating that the learning_session_action does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+
+class LearningSessionActionModel(ImmutableBaseModel):
+    """
+    Represents the structure of the LearningSessionActionModel.
+
+    Attributes:
+        id (Field): The ID of the learning session action.
+        action_type (Field): The type of action associated with the learning session action.
+        action_metadata (Field): A list of custom field values.
+        created_at (Field): The timestamp when the action was created.
+        custom_field_values (Field): A list of custom field values.
+        duration (Field): The duration of the action.
+        end (Field): The end time of the action.
+        key (Field): The key of the action.
+        reference (Field): The reference of the action.
+        start (Field): The start time of the action.
+        updated_at (Field): The timestamp when the action was last updated.
+        uuid (Field): The UUID of the action.
+    """
+
+    table: Final[str] = Constants.LEARNING_SESSION_ACTIONS
+
+    id: Field = Field(
+        autoincrement=True,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=True,
+        name="id",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=True,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    action_type: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="action_type",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    action_metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="action_metadata",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
+    created_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="created_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    custom_field_values: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="custom_field_values",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
+    duration: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="duration",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="FLOAT",
+        unique=False,
+    )
+
+    end: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="end",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    key: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="key",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
+    )
+
+    reference: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="reference",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
+    start: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="start",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    updated_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="updated_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    uuid: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="uuid",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
+    )
+
+    def __init__(
+        self,
+        action_type: Optional[str] = None,
+        action_metadata: Optional[Dict[str, Any]] = None,
+        created_at: Optional[datetime] = None,
+        custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        duration: Optional[float] = None,
+        end: Optional[datetime] = None,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        reference: Optional[str] = None,
+        start: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
+        uuid: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes a new instance of the LearningSessionActionModel class.
+
+        Args:
+            action_type (Optional[str]): The type of action associated with the action.
+            action_metadata (Optional[Dict[str, Any]]): A dictionary of metadata associated with the action.
+            created_at (Optional[datetime]): The timestamp when the action was created.
+            custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            duration (Optional[float]): The duration of the action.
+            end (Optional[datetime]): The end time of the action.
+            id (Optional[int]): The ID of the action.
+            key (Optional[str]): The key of the action.
+            reference (Optional[str]): The reference of the action.
+            start (Optional[datetime]): The start time of the action.
+            updated_at (Optional[datetime]): The timestamp when the action was last updated.
+            uuid (Optional[str]): The UUID of the action.
+        """
+
+        # Call the parent class constructor
+        super().__init__(
+            action_type=action_type,
+            action_metadata=action_metadata,
+            created_at=created_at,
+            custom_field_values=custom_field_values,
+            duration=duration,
+            end=end,
+            id=id,
+            key=key,
+            reference=reference,
+            start=start,
+            table=Constants.LEARNING_SESSION_ACTIONS,
+            updated_at=updated_at,
+            uuid=uuid,
+        )
+
+
 class ImmutableLearningSessionItem(ImmutableBaseObject):
     """
     An immutable version of the MutableLearningSessionItem class.
@@ -2078,6 +3629,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
     It is used to represent a learning session item in an immutable form, which cannot be modified after creation.
 
     Attributes:
+        actions (Optional[List[str]]): A list of actions associated with the learning session item.
         created_at (Optional[datetime]): The timestamp when the learning session item was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         duration (Optional[float]): The duration of the learning session item.
@@ -2092,6 +3644,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
 
     def __init__(
         self,
+        actions: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
@@ -2107,6 +3660,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
         Initializes a new instance of the ImmutableLearningSessionItem class.
 
         Args:
+            actions (Optional[List[str]]): A list of actions associated with the learning session item.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             duration (Optional[float]): The duration of the learning session item.
             end (Optional[datetime]): The end time of the learning session item.
@@ -2120,6 +3674,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
+            actions=actions,
             custom_field_values=custom_field_values,
             duration=duration,
             end=end,
@@ -2164,6 +3719,8 @@ class MutableLearningSessionItem(MutableBaseObject):
     It is used to represent a learning session item in a mutable form, which can be modified and updated.
 
     Attributes:
+        actions (Optional[List[str]]): A list of actions associated with the learning session item.
+        created_at (Optional[datetime]): The timestamp when the item was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         duration (Optional[float]): The duration of the learning session item.
         end (Optional[datetime]): The end time of the learning session item.
@@ -2177,6 +3734,7 @@ class MutableLearningSessionItem(MutableBaseObject):
 
     def __init__(
         self,
+        actions: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
@@ -2192,6 +3750,7 @@ class MutableLearningSessionItem(MutableBaseObject):
         Initializes a new instance of the MutableLearningSessionItem class.
 
         Args:
+            actions (Optional[List[str]]): A list of actions associated with the learning session item.
             created_at (Optional[datetime]): The timestamp when the item was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             duration (Optional[float]): The duration of the item.
@@ -2206,6 +3765,7 @@ class MutableLearningSessionItem(MutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
+            actions=actions,
             created_at=created_at,
             custom_field_values=custom_field_values,
             duration=duration,
@@ -2329,11 +3889,22 @@ class LearningSessionItemConverter:
 
 
 class LearningSessionItemFactory:
+    """
+    Provides a method to create a new learning session item.
+
+    This class extends the BaseFactory class and provides a method to create an ImmutableLearningSessionItem object by accepting
+    various parameters related to a learning session item. It uses a logger to capture and log any exceptions that may occur during the creation process.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the LearningSessionItemFactory class.
+    """
+
     logger: Final[Logger] = Logger.get_logger(name="LearningSessionItemFactory")
 
     @classmethod
     def create_learning_session_item(
         cls,
+        actrions: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
@@ -2349,6 +3920,7 @@ class LearningSessionItemFactory:
         Creates a new learning session item.
 
         Args:
+            actions (Optional[List[str]]): A list of actions associated with the learning session item.
             created_at (Optional[datetime]): The timestamp when the item was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             duration (Optional[float]): The duration of the item.
@@ -2366,6 +3938,7 @@ class LearningSessionItemFactory:
         try:
             # Attempt to create and return a new instance of the ImmutableLearningSessionItem class from the dictionary representation of the MutableLearningSessionItem instance
             return ImmutableLearningSessionItem(
+                actions=actions,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
                 duration=duration,
@@ -2383,8 +3956,236 @@ class LearningSessionItemFactory:
                 message=f"Caught an exception while attempting to run 'create_learning_session_item' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=traceback.format_exc())
+
             # Return None indicating an exception has occurred
             return None
+
+
+class LearningSessionItemBuilder(BaseObjectBuilder):
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the LearningSessionItemBuilder class.
+
+        This class extends the BaseObjectBuilder class and provides a method to create an ImmutableLearningSessionItem object by accepting
+        various parameters related to a learning session item. It uses a logger to capture and log any exceptions that may occur during the creation process.
+        """
+        super().__init__()
+
+    @override
+    def build(self) -> Optional[ImmutableLearningSessionItem]:
+        """
+        Builds and returns an instance of the ImmutableLearningSessionItem class using the configuration dictionary.
+
+        This method attempts to create an instance of the ImmutableLearningSessionItem class using the configuration dictionary passed to the constructor.
+        If an exception occurs while creating the instance, this method will log an error message and return None.
+
+        Returns:
+            Optional[ImmutableLearningSessionItem]: The created learning session item if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Attempt to create and return a new instance of the ImmutableLearningSessionItem class from the dictionary representation of the MutableLearningSessionItem instance
+            learning_session_item: Optional[ImmutableLearningSessionItem] = (
+                LearningSessionItem.create_learning_session_item(**self.configuration)
+            )
+
+            if not learning_session_item:
+                # Log an error message indicating an exception has occurred
+                self.logger.error(
+                    message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+                )
+
+                # Log the traceback of the exception
+                self.logger.error(message=traceback.format_exc())
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Return the created learning session item
+            return learning_session_item
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=traceback.format_exc())
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def actions(
+        self,
+        value: Union[List[str], str],
+    ) -> Self:
+        """
+        Sets the actions attribute of the builder.
+
+        Args:
+            value (Union[List[str], str]): The value to set for the actions attribute.
+
+        Returns:
+            Self: The builder instance with the actions attribute set.
+        """
+        # Check if the "actions" key is already present in the configuration
+        if "actions" not in self.configuration:
+            # Initialize the "actions" key with an empty list
+            self.configuration["actions"] = []
+
+        # Add the value to the actions list
+        if isinstance(
+            value,
+            str,
+        ):
+            # Add a single action
+            self.configuration["actions"].append(value)
+        else:
+            # Add multiple actions
+            self.configuration["actions"].extend(value)
+
+        return self
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the created_at attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the created_at attribute.
+
+        Returns:
+            Self: The builder instance with the created_at attribute set.
+        """
+
+        # Set the created_at value in the configuration dictionary
+        self.configuration["created_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def custom_field_values(
+        self,
+        value: Optional[List[Dict[str, Any]]] = None,
+    ) -> Self:
+        """
+        Sets the custom_field_values attribute of the builder.
+
+        Args:
+            value (Optional[List[Dict[str, Any]]]): The value to set for the custom_field_values attribute.
+
+        Returns:
+            Self: The builder instance with the custom_field_values attribute set.
+        """
+
+        # Set the custom_field_values value in the configuration dictionary
+        self.configuration["custom_field_values"] = value
+
+        # Return the builder instance
+        return self
+
+    def duration(
+        self,
+        value: float,
+    ) -> Self:
+        """
+        Sets the duration attribute of the builder.
+
+        Args:
+            value (float): The value to set for the duration attribute.
+
+        Returns:
+            Self: The builder instance with the duration attribute set.
+        """
+
+        # Set the duration value in the configuration dictionary
+        self.configuration["duration"] = value
+
+        # Return the builder instance
+        return self
+
+    def end(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the end attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the end attribute.
+
+        Returns:
+            Self: The builder instance with the end attribute set.
+        """
+
+        # Set the end value in the configuration dictionary
+        self.configuration["end"] = value
+
+        # Return the builder instance
+        return self
+
+    def reference(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the reference attribute of the builder.
+
+        Args:
+            value (str): The value to set for the reference attribute.
+
+        Returns:
+            Self: The builder instance with the reference attribute set.
+        """
+
+        # Set the reference value in the configuration dictionary
+        self.configuration["reference"] = value
+
+        # Return the builder instance
+        return self
+
+    def start(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the start attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the start attribute.
+
+        Returns:
+            Self: The builder instance with the start attribute set.
+        """
+
+        # Set the start value in the configuration dictionary
+        self.configuration["start"] = value
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: Optional[datetime] = None,
+    ) -> Self:
+        """
+        Sets the updated_at attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the updated_at attribute.
+
+        Returns:
+            Self: The builder instance with the updated_at attribute set.
+        """
+
+        # Set the updated_at value in the configuration dictionary
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
 
 
 class LearningSessionItemManager(BaseObjectManager):
@@ -2478,6 +4279,9 @@ class LearningSessionItemManager(BaseObjectManager):
             ):
                 # If it is, convert it to a mutable learning_session_item
                 learning_session_item = learning_session_item.to_mutable()
+
+            # Set the actions of the learning_session_item
+            learning_session_item.actions = [] or learning_session_item.actions
 
             # Set the created_at timestamp of the learning_session_item
             learning_session_item.created_at = Miscellaneous.get_current_datetime()
@@ -3056,6 +4860,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
 
     Attributes:
         id (Field): The ID of the learning session item.
+        actions (Field): A list of actions associated with the learning session item.
         created_at (Field): The timestamp when the item was created.
         custom_field_values (Field): A list of custom field values.
         duration (Field): The duration of the item.
@@ -3082,6 +4887,22 @@ class LearningSessionItemModel(ImmutableBaseModel):
         primary_key=True,
         size=None,
         type="INTEGER",
+        unique=False,
+    )
+
+    actions: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="actions",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
         unique=False,
     )
 
@@ -3231,6 +5052,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
 
     def __init__(
         self,
+        actions: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
@@ -3246,6 +5068,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
         Initializes a new instance of the LearningSessionItemModel class.
 
         Args:
+            actions (Optional[List[str]]): A list of actions associated with the item.
             created_at (Optional[datetime]): The timestamp when the item was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             duration (Optional[float]): The duration of the item.
@@ -3260,6 +5083,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
 
         # Call the parent class constructor
         super().__init__(
+            actions=actions,
             created_at=created_at,
             custom_field_values=custom_field_values,
             duration=duration,

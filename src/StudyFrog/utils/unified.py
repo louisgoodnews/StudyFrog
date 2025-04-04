@@ -7,6 +7,7 @@ from typing import *
 
 from core.learning.learning_session import (
     ImmutableLearningSession,
+    ImmutableLearningSessionAction,
     ImmutableLearningSessionItem,
 )
 
@@ -1458,6 +1459,97 @@ class UnifiedObjectService(ImmutableBaseObject):
         # Update the learning session in the database and return the updated immutable learning session
         return self.unified_manager.update_learning_session(
             learning_session=learning_session
+        )
+
+    def on_request_learning_session_action_create(
+        self,
+        learning_session_action: ImmutableLearningSessionAction,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Handles the 'request_learning_session_action_create' event and creates a new learning session action in the database.
+
+        Args:
+            learning_session_action (ImmutableLearningSessionAction): The learning session action to be created.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The created immutable learning session action if no exception occurs. Otherwise, None.
+        """
+
+        # Create a new learning session action in the database and return the created immutable learning session action
+        return self.unified_manager.create_learning_session_action(
+            learning_session_action=learning_session_action
+        )
+
+    def on_request_learning_session_action_delete(
+        self,
+        learning_session_action: ImmutableLearningSessionAction,
+    ) -> bool:
+        """
+        Handles the 'request_learning_session_action_delete' event and deletes a learning session action from the database.
+
+        Args:
+            learning_session_action (ImmutableLearningSessionAction): The learning session action to be deleted.
+
+        Returns:
+            bool: True if the learning session action was deleted successfully. False otherwise.
+        """
+
+        # Delete the learning session action from the database and return the result of the deletion
+        return self.unified_manager.delete_learning_session_action(
+            learning_session_action=learning_session_action
+        )
+
+    def on_request_learning_session_action_load(
+        self,
+        **kwargs,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Handles the 'request_learning_session_action_load' event and loads a learning session action from the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the learning session action.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The loaded immutable learning session action if no exception occurs. Otherwise, None.
+        """
+
+        # Load the learning session action from the database and return the loaded immutable learning session action
+        return self.unified_manager.get_learning_session_action_by(**kwargs)
+
+    def on_request_learning_session_action_lookup(
+        self,
+        **kwargs,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Handles the 'request_learning_session_action_lookup' event and looks up a learning session action in the database.
+
+        Args:
+            **kwargs: The keyword arguments to be used for querying the learning session action.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The looked up immutable learning session action if no exception occurs. Otherwise, None.
+        """
+
+        # Look up the learning session action in the database and return the looked up immutable learning session action
+        return self.unified_manager.search_learning_session_actions(**kwargs)
+
+    def on_request_learning_session_action_update(
+        self,
+        learning_session_action: ImmutableLearningSessionAction,
+    ) -> Optional[ImmutableLearningSessionAction]:
+        """
+        Handles the 'request_learning_session_action_update' event and updates a learning session action in the database.
+
+        Args:
+            learning_session_action (ImmutableLearningSessionAction): The learning session action to be updated.
+
+        Returns:
+            Optional[ImmutableLearningSessionAction]: The updated immutable learning session action if no exception occurs. Otherwise, None.
+        """
+
+        # Update the learning session action in the database and return the updated immutable learning session action
+        return self.unified_manager.update_learning_session_action(
+            learning_session_action=learning_session_action
         )
 
     def on_request_learning_session_item_create(

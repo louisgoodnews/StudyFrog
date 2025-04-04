@@ -836,6 +836,41 @@ class Events:
         )
     )
 
+    # An event that indicates that the user wants to create a new learning session action
+    REQUEST_LEARNING_SESSION_ACTION_CREATE: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_action:create"
+        )
+    )
+
+    # An event that indicates that the user wants to delete a learning session action
+    REQUEST_LEARNING_SESSION_ACTION_DELETE: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_action:delete"
+        )
+    )
+
+    # An event that indicates that the user wants to load a learning session action
+    REQUEST_LEARNING_SESSION_ACTION_LOAD: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_action:load"
+        )
+    )
+
+    # An event that indicates that the user wants to lookup a learning session action
+    REQUEST_LEARNING_SESSION_ACTION_LOOKUP: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_action:lookup"
+        )
+    )
+
+    # An event that indicates that the user wants to update a learning session action
+    REQUEST_LEARNING_SESSION_ACTION_UPDATE: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:request:learning_session_action:update"
+        )
+    )
+
     # An event that indicates that the user wants to create a new learning session item
     REQUEST_LEARNING_SESSION_ITEM_CREATE: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
@@ -1598,6 +1633,22 @@ class Events:
             cls.REQUEST_LEARNING_SESSION_LOAD,
             cls.REQUEST_LEARNING_SESSION_LOOKUP,
             cls.REQUEST_LEARNING_SESSION_UPDATE,
+        ]
+
+    @classmethod
+    def get_learning_session_action_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all learning session action events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all learning session action events in the Events class.
+        """
+        return [
+            cls.REQUEST_LEARNING_SESSION_ACTION_CREATE,
+            cls.REQUEST_LEARNING_SESSION_ACTION_DELETE,
+            cls.REQUEST_LEARNING_SESSION_ACTION_LOAD,
+            cls.REQUEST_LEARNING_SESSION_ACTION_LOOKUP,
+            cls.REQUEST_LEARNING_SESSION_ACTION_UPDATE,
         ]
 
     @classmethod

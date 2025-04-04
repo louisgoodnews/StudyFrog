@@ -9,6 +9,7 @@ from typing import *
 
 from core.learning.learning_session import (
     LearningSessionModel,
+    LearningSessionActionModel,
     LearningSessionItemModel,
 )
 
@@ -70,6 +71,7 @@ def debug() -> None:
             DifficultyModel,
             FlashcardModel,
             LearningSessionModel,
+            LearningSessionActionModel,
             LearningSessionItemModel,
             NoteModel,
             OptionModel,

@@ -3,11 +3,21 @@ Author: lodego
 Date: 2025-03-29
 """
 
+from argparse import Namespace
+import traceback
+
 from typing import *
 
 from core.learning.learning_session import (
     ImmutableLearningSession,
+    MutableLearningSession,
     LearningSessionBuilder,
+    ImmutableLearningSessionAction,
+    MutableLearningSessionAction,
+    LearningSessionActionBuilder,
+    ImmutableLearningSessionItem,
+    MutableLearningSessionItem,
+    LearningSessionItemBuilder,
 )
 
 from core.answer import ImmutableAnswer, MutableAnswer
@@ -144,6 +154,12 @@ class LearningSessionRunner:
         # Initialize the current item index
         self.item_index: int = -1
 
+        # Initialize the learning session
+        self.learning_session: Optional[ImmutableLearningSession] = None
+
+        # Initialize the learning session item
+        self.learning_session_item: Optional[ImmutableLearningSessionItem] = None
+
         # Store the passed mode in an immutable instance variable
         self.mode: Final[str] = mode
 
@@ -261,6 +277,9 @@ class LearningSessionRunner:
                 message=f"Caught an exception while attempting to run 'apply_filters' method in '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=traceback.format_exc())
+
             # Re-raise the exception to the caller
             raise e
 
@@ -327,100 +346,217 @@ class LearningSessionRunner:
         Returns:
             None: This method does not return any value.
         """
-
-        # Dispatch a request to lookup the status of the learning session
-        status_notification: Optional[DispatcherNotification] = (
-            self.dispatcher.dispatch(
-                event=Events.REQUEST_STATUS_LOOKUP,
-                name="new",
-                namespace=Constants.GLOBAL_NAMESPACE,
+        try:
+            # Dispatch a request to lookup the status of the learning session
+            status_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STATUS_LOOKUP,
+                    name="new",
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
-        )
 
-        # Check if the notification is None
-        if not status_notification:
-            # Log a warning message indicating that something went wrong
-            self.logger.warning(message="Failed to create learning session")
+            # Check if the notification is None
+            if not status_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(message="Failed to create learning session")
 
-            # Return early
-            return
+                # Return early
+                return
 
-        # Get the status of the learning session
-        status: Optional[ImmutableStatus] = (
-            status_notification.get_one_and_only_result()
-        )
-
-        # Check if the status is None
-        if not status:
-            # Log a warning message indicating that something went wrong
-            self.logger.warning(message="Failed to create learning session")
-
-            # Return early
-            return
-
-        # Create a builder instance
-        builder: LearningSessionBuilder = LearningSessionBuilder()
-
-        # Set the children of the learning session
-        # The children are set to an empty list
-        builder.children(value=[])
-
-        # Set the contents of the learning session
-        # The contents are set to the contents of the stacks
-        builder.contents(value=self.contents)
-
-        # Set the filters of the learning session
-        # The filters are set to the difficulties and priorities
-        builder.filters(
-            value={
-                # Set the difficulty filter
-                "difficulty": [difficulty.id for difficulty in self.difficulties],
-                # Set the priority filter
-                "priority": [priority.id for priority in self.priorities],
-            }
-        )
-
-        # Set the mode of the learning session
-        # The mode is set to an empty string
-        builder.mode(value=self.mode)
-
-        # Set the settings of the learning session
-        # The settings are set to the settings of the learning session
-        builder.settings(value=self.settings)
-
-        # Set the stacks of the learning session
-        # The stacks are set to the stacks of the learning session
-        builder.stacks(value=[stack.id for stack in self.stacks])
-
-        # Set the start of the learning session
-        # The start is set to the current datetime
-        builder.start(value=Miscellaneous.get_current_datetime())
-
-        # Set the status of the learning session
-        # The status is set to the status of the learning session
-        builder.status(value=status.get(name="id"))
-
-        # Dispatch the request to create the learning session
-        create_notification: Optional[DispatcherNotification] = (
-            self.dispatcher.dispatch(
-                event=Events.REQUEST_LEARNING_SESSION_CREATE,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                learning_session=builder.build(),
+            # Get the status of the learning session
+            status: Optional[ImmutableStatus] = (
+                status_notification.get_one_and_only_result()
             )
-        )
 
-        # Check if the notification is None
-        if not create_notification:
-            # Log a warning message indicating that something went wrong
-            self.logger.warning(message="Failed to create learning session")
+            # Check if the status is None
+            if not status:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(message="Failed to create learning session")
 
-            # Return early
-            return
+                # Return early
+                return
 
-        # The learning session is retrieved from the notification
-        self.learning_session: ImmutableLearningSession = (
-            create_notification.get_one_and_only_result()
-        )
+            # Create a builder instance
+            builder: LearningSessionBuilder = LearningSessionBuilder()
+
+            # Set the children of the learning session
+            # The children are set to an empty list
+            builder.children(value=[])
+
+            # Set the contents of the learning session
+            # The contents are set to the contents of the stacks
+            builder.contents(value=self.contents)
+
+            # Set the filters of the learning session
+            # The filters are set to the difficulties and priorities
+            builder.filters(
+                value={
+                    # Set the difficulty filter
+                    "difficulty": [difficulty.id for difficulty in self.difficulties],
+                    # Set the priority filter
+                    "priority": [priority.id for priority in self.priorities],
+                }
+            )
+
+            # Set the mode of the learning session
+            # The mode is set to an empty string
+            builder.mode(value=self.mode)
+
+            # Set the settings of the learning session
+            # The settings are set to the settings of the learning session
+            builder.settings(value=self.settings)
+
+            # Set the stacks of the learning session
+            # The stacks are set to the stacks of the learning session
+            builder.stacks(value=[stack.id for stack in self.stacks])
+
+            # Set the start of the learning session
+            # The start is set to the current datetime
+            builder.start(value=Miscellaneous.get_current_datetime())
+
+            # Set the status of the learning session
+            # The status is set to the status of the learning session
+            builder.status(value=status.get(name="id"))
+
+            # Dispatch the request to create the learning session
+            create_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_LEARNING_SESSION_CREATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    learning_session=builder.build(),
+                )
+            )
+
+            # Check if the notification is None
+            if not create_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(message="Failed to create learning session")
+
+                # Return early
+                return
+
+            # The learning session is retrieved from the notification
+            self.learning_session = create_notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while atttempting to run 'create_learning_session' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def create_learning_session_item(self) -> None:
+        """
+        Creates a learning session item in the database.
+
+        This method dispatches a request to create the learning session item and
+        updates the learning session with the newly created learning session item.
+
+        Returns:
+            None
+        """
+        try:
+            if self.learning_session_item:
+                # Convert the learning session item to a mutable object
+                learning_session_item: MutableLearningSessoinItem = (
+                    self.learning_session_item.to_mutable()
+                )
+
+                # Set the end time of the learning session item
+                learning_session_item.set(
+                    name="end", value=Miscellaneous.get_current_datetime()
+                )
+
+                # Set the duration of the learning session item
+                learning_session_item.set(
+                    name="duration",
+                    value=(
+                        self.learning_session_item.end
+                        - self.learning_session_item.start
+                    ).total_seconds(),
+                )
+
+                # Dispatch the request to update the learning session item
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    learning_session_item=learning_session_item,
+                )
+
+            # Create a builder instance
+            builder: LearningSessionItemBuilder = LearningSessionItemBuilder()
+
+            # Set the actions attribute of the builder
+            builder.actions(value=[])
+
+            # Set the created_at attribute of the builder
+            builder.created_at(value=Miscellaneous.get_current_datetime())
+
+            # Set the reference attribute of the builder
+            builder.reference(value=self.contents[self.content_index])
+
+            # Set the start attribute of the builder
+            builder.start(value=Miscellaneous.get_current_datetime())
+
+            # Dispatch the request to create the learning session
+            create_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_LEARNING_SESSION_ITEM_CREATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    learning_session_item=builder.build(),
+                )
+            )
+
+            # Check if the notification is None
+            if not create_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(message="Failed to create learning session item")
+
+                # Return early
+                return
+
+            # The learning session item is retrieved from the notification
+            self.learning_session_item = create_notification.get_one_and_only_result()
+
+            # Add the learning session item to the learning session
+            self.learning_session.add_child(child=self.learning_session_item)
+
+            # Dispatch the request to update the learning session
+            update_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_LEARNING_SESSION_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    learning_session=self.learning_session,
+                )
+            )
+
+            if not update_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(message="Failed to update learning session")
+
+                # Return early
+                return
+
+            # The learning session is retrieved from the notification
+            self.learning_session: ImmutableLearningSession = (
+                update_notification.get_one_and_only_result()
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while atttempting to run 'create_learning_session_item' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
 
     def is_running(self) -> bool:
         """
@@ -479,15 +615,125 @@ class LearningSessionRunner:
         self,
         flashcard: ImmutableFlashcard,
     ) -> None:
+        """
+        Handles the 'notify_flashcard_learning_view_flashcard_flipped' event and creates a new learning session action.
+
+        This method creates a builder for the learning session action and assigns the necessary values to it.
+        It then dispatches a request to create the learning session action and appends its key to the actions
+        of the learning session item.
+
+        Args:
+            flashcard (ImmutableFlashcard): The flashcard that was flipped.
+
+        Returns:
+            None
+        """
         try:
-            self.logger.debug(
-                message=f"{self.__class__.__name__} received notification that the flashcard with key '{flashcard.key}' has been flipped"
+            # Get the current timestamp
+            timestamp: datetime = Miscellaneous.get_current_datetime()
+
+            # Create a builder for the learning session action
+            builder: LearningSessionActionBuilder = LearningSessionActionBuilder()
+
+            # Set the reference of the learning session action to the flashcard's key
+            # This is necessary to identify the learning session action later on
+            builder.reference(value=flashcard.key)
+
+            # Set the start time of the learning session action
+            builder.start(value=timestamp)
+
+            # Set the action type of the learning session action
+            builder.action_type(value="FLASHCARD_FLIPPED")
+
+            # Set the action metadata of the learning session action
+            # This is a dictionary with some metadata about the learning session action
+            builder.action_metadata(
+                value={
+                    # The flashcard that was flipped
+                    "flashcard": {
+                        "id": flashcard.id,
+                        "key": flashcard.key,
+                    },
+                    # The time elapsed after the start of the learning session
+                    "time_elapsed_after_start": (
+                        timestamp - self.learning_session_item.start
+                    ).total_seconds(),
+                    # The timestamp of the learning session action
+                    "timestamp": Miscellaneous.datetime_to_string(datetime=timestamp),
+                }
             )
+
+            # Set the end time of the learning session action
+            builder.end(value=timestamp)
+
+            # Set the duration of the learning session action
+            # This is the time difference between the end and start of the learning session action
+            builder.duration(
+                value=(
+                    builder.configuration["end"] - builder.configuration["start"]
+                ).total_seconds()
+            )
+
+            # Dispatch a request to create the learning session action
+            create_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_LEARNING_SESSION_ACTION_CREATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    learning_session_action=builder.build(),
+                )
+            )
+
+            # Check if the notification is None
+            if not create_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch request to create LearningSessionAction object in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return
+
+            # The learning session action is retrieved from the notification
+            learning_session_action: ImmutableLearningSessionAction = (
+                create_notification.get_one_and_only_result()
+            )
+
+            # Convert the learning session item to mutable
+            learning_session_item: MutableLearningSessionItem = (
+                self.learning_session_item.to_mutable()
+            )
+
+            # Append the key of the learning session action to the actions of the learning session item
+            learning_session_item.actions.append(learning_session_action.key)
+
+            update_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    learning_session_item=learning_session_item,
+                )
+            )
+
+            # Check if the notification is None
+            if not update_notification:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch request to update LearningSessionItem object in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return
+
+            # Convert the learning session item back to immutable
+            self.learning_session_item = update_notification.get_one_and_only_result()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class: {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=traceback.format_exc())
 
             # Re-raise the exception to the caller
             raise e
@@ -579,13 +825,16 @@ class LearningSessionRunner:
                 # Return None indicating an exception occurred
                 return None
 
+            # Create a learning session item
+            self.create_learning_session_item()
+
             # Check if the learning session is in recall mode
             if self.mode == "Recall":
-                #TODO:
+                # TODO:
                 #   - dispatch event to request recall view to be loaded
                 pass
             elif self.mode == "Recall (at random)":
-                #TODO:
+                # TODO:
                 #   - implement random check for a random int to then determine, if recall with be dispatched or not
                 #   - dispatch event to request recall random view to be loaded
                 if Miscellaneous.get_random_int(1, 4) == 1:
@@ -653,6 +902,9 @@ class LearningSessionRunner:
 
                 # Return None indicating an exception occurred
                 return None
+
+            # Create a learning session item
+            self.create_learning_session_item()
 
             # Return the item
             return notification.get_one_and_only_result()

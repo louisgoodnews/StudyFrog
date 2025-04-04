@@ -12,6 +12,8 @@ from typing import *
 from core.learning.learning_session import (
     LearningSessionManager,
     LearningSessionModel,
+    LearningSessionActionManager,
+    LearningSessionActionModel,
     LearningSessionItemManager,
     LearningSessionItemModel,
 )
@@ -367,6 +369,7 @@ class BootstrapService(ImmutableBaseObject):
                 DifficultyModel,
                 FlashcardModel,
                 LearningSessionModel,
+                LearningSessionActionModel,
                 LearningSessionItemModel,
                 NoteModel,
                 OptionModel,
@@ -639,6 +642,26 @@ class BootstrapService(ImmutableBaseObject):
                 {
                     "event": Events.REQUEST_LEARNING_SESSION_UPDATE,
                     "function": self.unified_object_service.on_request_learning_session_update,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ACTION_CREATE,
+                    "function": self.unified_object_service.on_request_learning_session_action_create,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ACTION_DELETE,
+                    "function": self.unified_object_service.on_request_learning_session_action_delete,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ACTION_LOAD,
+                    "function": self.unified_object_service.on_request_learning_session_action_load,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ACTION_LOOKUP,
+                    "function": self.unified_object_service.on_request_learning_session_action_lookup,
+                },
+                {
+                    "event": Events.REQUEST_LEARNING_SESSION_ACTION_UPDATE,
+                    "function": self.unified_object_service.on_request_learning_session_action_update,
                 },
                 {
                     "event": Events.REQUEST_LEARNING_SESSION_ITEM_CREATE,
@@ -939,6 +962,7 @@ class BootstrapService(ImmutableBaseObject):
                 "difficulty_manager": DifficultyManager,
                 "flashcard_manager": FlashcardManager,
                 "learning_session_manager": LearningSessionManager,
+                "learning_session_action_manager": LearningSessionActionManager,
                 "learning_session_item_manager": LearningSessionItemManager,
                 "note_manager": NoteManager,
                 "option_manager": OptionManager,
