@@ -3,7 +3,6 @@ Author: lodego
 Date: 2025-03-29
 """
 
-from argparse import Namespace
 import traceback
 
 from typing import *

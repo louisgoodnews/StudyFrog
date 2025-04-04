@@ -27,7 +27,7 @@ from core.change_history import (
     ChangeHistoryItemModel,
 )
 from core.custom_field import CustomFieldManager, CustomFieldModel
-from core.default import ImmutableDefault, DefaultFactory, DefaultManager, DefaultModel
+from core.default import  DefaultFactory, DefaultManager, DefaultModel
 from core.difficulty import DifficultyManager, DifficultyModel
 from core.flashcard import FlashcardManager, FlashcardModel
 from core.note import NoteManager, NoteModel
