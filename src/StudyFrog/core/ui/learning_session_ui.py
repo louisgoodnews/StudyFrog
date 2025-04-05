@@ -10,8 +10,6 @@ from tkinter.constants import *
 
 from typing import *
 
-from torch._dynamo import exc
-
 from core.answer import ImmutableAnswer
 from core.difficulty import ImmutableDifficulty
 from core.flashcard import ImmutableFlashcard
@@ -31,8 +29,6 @@ from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.learning_session_runner import LearningSessionRunner
-from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
@@ -107,35 +103,31 @@ class LearningSessionUI(BaseUI):
 
         # Initialize the current learning view as an empty instance variable
         self.current_learning_view: Optional[
-            Literal["flashcard", "note", "question"]
+            Literal[
+                "flashcard",
+                "note",
+                "question",
+            ]
         ] = None
-
-        # Store the passed difficulty list as an instance variable
-        self.difficulties: Optional[List[ImmutableDifficulty]] = difficulties
 
         # Initialize the flashcard learning view as an empty instance variable
         self.flashcard_learning_view: Optional[FlashcardLearningView] = None
 
-        # Store the passed mode as an instance variable
-        self.mode: Final[str] = mode
+        # Load the learning session runner and store it in a final instance variable
+        self.learning_session_runner: Final[LearningSessionRunner] = self.load_learning_session_runner(
+            difficulties=difficulties,
+            dispatcher=dispatcher,
+            mode=mode,
+            priorities=priorities,
+            settings=settings,
+            stacks=stacks,
+        )
 
         # Initialize the note learning view as an empty instance variable
         self.note_learning_view: Optional[NoteLearningView] = None
 
-        # Store the passed priority list as an instance variable
-        self.priorities: Optional[List[ImmutablePriority]] = priorities
-
         # Initialize the question learning view as an empty instance variable
         self.question_learning_view: Optional[QuestionLearningView] = None
-
-        # Store the passed settings dictionary as an instance variable
-        self.settings: Dict[str, Any] = settings
-
-        # Store the passed stacks ImmutableStack list as an instance variable
-        self.stacks: List[ImmutableStack] = stacks
-
-        # Load the learning session runner
-        self.load_learning_session_runner()
 
         # Bind the left and right arrow keys to the back and forward navigation methods
         self.bind_keys()
@@ -1132,12 +1124,32 @@ class LearningSessionUI(BaseUI):
             # Re-raise the exception to the caller
             raise e
 
-    def load_learning_session_runner(self) -> None:
-        """Loads the learning session runner as an instance variable.
+    def load_learning_session_runner(
+        self,
+        difficulties: List[ImmutableDifficulty],
+        dispatcher: Dispatcher,
+        mode: str,
+        priorities: List[ImmutablePriority],
+        settings: Dict[str, Any],
+        stacks: List[ImmutableStack],
+    ) -> LearningSessionRunner:
+        """
+        Loads the learning session runner as an instance variable.
 
         This method attempts to create a new instance of the LearningSessionRunner
         class and assigns it to an instance variable. If an exception occurs,
         it logs an error message and re-raises the exception to the caller.
+
+        Args:
+            difficulties (List[ImmutableDifficulty]): A list of ImmutableDifficulty objects to be passed to the LearningSessionRunner instance
+            dispatcher (Dispatcher): The Dispatcher class instance to be passed to the LearningSessionRunner instance
+            mode (str): The mode string to be passed to the LearningSessionRunner instance
+            priorities (List[ImmutablePriority]): A list of ImmutablePriority objects to be passed to the LearningSessionRunner instance
+            settings (Dict[str, Any]): The settings (metadata) dictionary to be passed to the LearningSessionRunner instance
+            stacks (List[ImmutableStack]): A list of ImmutableStack objects to be passed to the LearningSessionRunner instance
+
+        Returns:
+            LearningSessionRunner: The created LearningSessionRunner instance
 
         Raises:
             Exception: If an exception occurs while attempting to create the
@@ -1145,14 +1157,14 @@ class LearningSessionUI(BaseUI):
         """
         try:
             # Initialize the learning session runner as an instance variable
-            self.runner: LearningSessionRunner = LearningSessionRunner(
-                difficulties=self.difficulties,
-                dispatcher=self.dispatcher,
-                mode=self.mode,
+            return LearningSessionRunner(
+                difficulties=difficulties,
+                dispatcher=dispatcher,
+                mode=mode,
                 namespace=Constants.LEARNING_SESSION_NAMESPACE,
-                priorities=self.priorities,
-                settings=self.settings,
-                stacks=self.stacks,
+                priorities=priorities,
+                settings=settings,
+                stacks=stacks,
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
@@ -1312,7 +1324,7 @@ class LearningSessionUI(BaseUI):
 
             # Handle the loaded content
             self.handle_loaded_content(content=content)
-                
+
             # Update the title label
             self.update_title_label()
         except Exception as e:
