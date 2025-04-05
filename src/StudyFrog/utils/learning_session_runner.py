@@ -5,6 +5,7 @@ Date: 2025-03-29
 
 import traceback
 
+from datetime import datetime
 from typing import *
 
 from core.learning.learning_session import (
@@ -231,7 +232,7 @@ class LearningSessionRunner:
             if not notification:
                 # Log a warning message indicating that something went wrong
                 self.logger.warning(
-                    message=f"Failed to get contents for stacks: {', '.join(stack.__repr__ for stack in self.stacks)}"
+                    message=f"Failed to get contents for stacks: {', '.join(stack.__repr__() for stack in self.stacks)}"
                 )
 
                 # Return early
@@ -462,7 +463,7 @@ class LearningSessionRunner:
         try:
             if self.learning_session_item:
                 # Convert the learning session item to a mutable object
-                learning_session_item: MutableLearningSessoinItem = (
+                learning_session_item: MutableLearningSessionItem = (
                     self.learning_session_item.to_mutable()
                 )
 
