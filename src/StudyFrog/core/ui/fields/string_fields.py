@@ -220,7 +220,7 @@ class MultiLineTextField(BaseField):
             label,
             value,
         ) = (
-            self.label.cget(key="text"),
+            self.display_name,
             self.text.get(
                 index1="1.0",
                 index2=END,
@@ -271,7 +271,7 @@ class MultiLineTextField(BaseField):
             # Dispatch the MULTI_LINE_TEXT_FIELD_CLEARED event
             self.dispatcher.dispatch(
                 event=Events.MULTI_LINE_TEXT_FIELD_CLEARED,
-                label=self.label.cget(key="text"),
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.text.get(
                     index1="1.0",
@@ -633,7 +633,7 @@ class MultiLineTextField(BaseField):
             label,
             value,
         ) = (
-            self.label.cget(key="text"),
+            self.display_name,
             self.text.get(
                 index1="1.0",
                 index2=END,
@@ -690,7 +690,7 @@ class MultiLineTextField(BaseField):
             # Dispatch the MULTI_LINE_TEXT_FIELD_SET
             self.dispatcher.dispatch(
                 event=Events.MULTI_LINE_TEXT_FIELD_SET,
-                label=self.label.cget(key="text"),
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.text.get(
                     index1="1.0",
@@ -785,7 +785,7 @@ class ReadOnlyMultiLineTextField(MultiLineTextField):
             label,
             value,
         ) = (
-            self.label.cget(key="text"),
+            self.display_name,
             self.variable.get(),
         )
 
@@ -919,7 +919,7 @@ class SingleLineTextField(BaseField):
             label,
             value,
         ) = (
-            self.label.cget(key="text"),
+            self.display_name,
             self.variable.get(),
         )
 
@@ -964,7 +964,7 @@ class SingleLineTextField(BaseField):
             # Dispatch the SINGLE_LINE_TEXT_FIELD_CLEARED event
             self.dispatcher.dispatch(
                 event=Events.SINGLE_LINE_TEXT_FIELD_CLEARED,
-                label=self.label.cget(key="text"),
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.variable.get(),
             )
@@ -1222,7 +1222,7 @@ class SingleLineTextField(BaseField):
             label,
             value,
         ) = (
-            self.label.cget(key="text"),
+            self.display_name,
             self.variable.get(),
         )
 
@@ -1267,7 +1267,7 @@ class SingleLineTextField(BaseField):
             # Dispatch the SINGLE_LINE_TEXT_FIELD_SET
             self.dispatcher.dispatch(
                 event=Events.SINGLE_LINE_TEXT_FIELD_SET,
-                label=self.label.cget(key="text"),
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.variable.get(),
             )
@@ -1345,7 +1345,7 @@ class PasswordTextField(SingleLineTextField):
             # Dispatch the PASSWORD_TEXT_FIELD_CHANGED event
             self.dispatcher.dispatch(
                 event=Events.PASSWORD_TEXT_FIELD_CHANGED,
-                label=self.label.cget(key="text"),
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.variable.get(),
             )
@@ -1370,7 +1370,7 @@ class PasswordTextField(SingleLineTextField):
             label,
             value,
         ) = (
-            self.label.cget(key="text"),
+            self.display_name,
             self.variable.get(),
         )
 
@@ -1415,7 +1415,7 @@ class PasswordTextField(SingleLineTextField):
             # Dispatch the PASSWORD_TEXT_FIELD_SET event
             self.dispatcher.dispatch(
                 event=Events.PASSWORD_TEXT_FIELD_SET,
-                label=self.label.cget(key="text"),
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.variable.get(),
             )
@@ -1507,7 +1507,7 @@ class ReadOnlySingleLineTextField(SingleLineTextField):
             label,
             value,
         ) = (
-            self.label.cget(key="text"),
+            self.display_name,
             self.variable.get(),
         )
 

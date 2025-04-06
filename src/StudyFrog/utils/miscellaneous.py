@@ -239,6 +239,64 @@ class Miscellaneous:
         return datetime.strftime(format=format)
 
     @classmethod
+    def detect_date_format(
+        cls,
+        date_input: Union[str, datetime],
+    ) -> Optional[str]:
+        """
+        Detects the format of a given date input.
+
+        Args:
+            date_input (Union[str, datetime]): A date string or datetime object.
+
+        Returns:
+            Optional[str]: The detected date format string (e.g., "%d.%m.%Y") or None if detection fails.
+        """
+
+        # Check, if the passed date tnput is a datetime object
+        if isinstance(
+            date_input,
+            datetime,
+        ):
+            # Use ISO by default for datetime objects
+            return "%Y-%m-%d %H:%M:%S"
+
+        # List containing various date formats
+        date_formats: List[str] = [
+            "%d.%m.%Y",
+            "%d.%m.%y",
+            "%Y-%m-%d",
+            "%y-%m-%d",
+            "%m/%d/%Y",
+            "%d/%m/%Y",
+            "%d %b %Y",
+            "%d %B %Y",
+            "%b %d, %Y",
+            "%B %d, %Y",
+        ]
+
+        # Iterate over the list of dateformats
+        for format in date_formats:
+            try:
+                # Attempt to creaate a datetime object from the input string and format
+                _ = datetime.strptime(
+                    date_input,
+                    format,
+                )
+
+                # Return the format string
+                return format
+            except ValueError:
+                # if an exception occurs, skip the current loop iteration
+                continue
+
+        # Log a warning message
+        cls.logger.warning(f"Could not detect date format for input: {date_input}")
+
+        # Return None
+        return None
+
+    @classmethod
     def find_match(
         cls,
         string: str,
@@ -587,7 +645,7 @@ class Miscellaneous:
         cls,
         date_string: str,
         format: str = "%Y-%m-%d %H:%M:%S",
-    ) -> datetime:
+    ) -> Optional[datetime]:
         """
         Converts a string representation of a date and time to a datetime object.
 
@@ -598,7 +656,37 @@ class Miscellaneous:
         Returns:
             datetime: A datetime object representing the given date and time.
         """
-        return datetime.strptime(
-            date_string,
-            format,
-        )
+        try:
+            return datetime.strptime(
+                date_string,
+                format,
+            )
+        except ValueError:
+            return None
+
+    @classmethod
+    def validate_date_format(
+        cls,
+        format_string: str,
+    ) -> bool:
+        """
+        Validates whether the given format string is supported by datetime.strptime.
+
+        Args:
+            format_string (str): The date format string to test.
+
+        Returns:
+            bool: True if format is valid, False otherwise.
+        """
+        try:
+            # Try parsing a dummy date using the format
+            datetime.datetime.strptime(
+                cls.datetime_to_string(datetime=cls.get_current_datetime()),
+                format_string,
+            )
+
+            # Return True
+            return True
+        except (ValueError, TypeError):
+            # Return False, if an exception occures
+            return False

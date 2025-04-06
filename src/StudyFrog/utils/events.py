@@ -147,27 +147,67 @@ class Events:
 
     # An event that indicates that a combobox field has changed
     COMBOBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox:field:changed")
+        DispatcherEventFactory.create_event(name="ui:combobox_:field:changed")
     )
 
     # An event that indicates that a combobox field has been cleared
     COMBOBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:combobox_:field:cleared")
     )
 
     # An event that indicates that a combobox field's value has been retrieved
     COMBOBOX_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:combobox:field:get"
+        name="ui:combobox_:field:get"
     )
 
     # An event that indicates that a combobox field has been set
     COMBOBOX_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:combobox:field:set"
+        name="ui:combobox_:field:set"
+    )
+
+    # An event that indicates that a combobox field has changed
+    COMBOBOX_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:combobox_select:field:changed")
+    )
+
+    # An event that indicates that a combobox field has been cleared
+    COMBOBOX_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:combobox_select:field:cleared")
+    )
+
+    # An event that indicates that a combobox field's value has been retrieved
+    COMBOBOX_SELECT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:combobox_select:field:get"
+    )
+
+    # An event that indicates that a combobox field has been set
+    COMBOBOX_SELECT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:combobox_select:field:set"
     )
 
     # An event that indicates that a create button has been clicked
     CREATE_BUTTON_CLICKED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="ui:create:button:clicked"
+    )
+
+    # An event that indicates that a date select field has changed
+    DATE_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:combobox_select:field:changed")
+    )
+
+    # An event that indicates that a date select field has been cleared
+    DATE_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:combobox_select:field:cleared")
+    )
+
+    # An event that indicates that a date select field's value has been retrieved
+    DATE_SELECT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:combobox_select:field:get"
+    )
+
+    # An event that indicates that a date select field has been set
+    DATE_SELECT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:combobox_select:field:set"
     )
 
     # An event that indicates that a difficulty has been created in the backend
@@ -462,22 +502,42 @@ class Events:
 
     # An event that indicates that a radiobutton field has been changed
     RADIOBUTTON_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:radio:button:field:changed")
+        DispatcherEventFactory.create_event(name="ui:radiobutton_field:changed")
     )
 
     # An event that indicates that a radiobutton field has been cleared
     RADIOBUTTON_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:radio:button:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:radiobutton_field:cleared")
     )
 
     # An event that indicates that a radiobutton field has been retrieved
     RADIOBUTTON_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:radio:button:field:get"
+        name="ui:radiobutton_field:get"
     )
 
     # An event that indicates that a radiobutton field has been set
     RADIOBUTTON_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:radio:button:field:set"
+        name="ui:radiobutton_field:set"
+    )
+
+    # An event that indicates that a radiobutton select field has been changed
+    RADIOBUTTON_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:radiobutton_select_field:changed")
+    )
+
+    # An event that indicates that a radiobutton select field has been cleared
+    RADIOBUTTON_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:radiobutton_select_field:cleared")
+    )
+
+    # An event that indicates that a radiobutton select field has been retrieved
+    RADIOBUTTON_SELECT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:radiobutton_select_field:get"
+    )
+
+    # An event that indicates that a radiobutton select field has been set
+    RADIOBUTTON_SELECT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:radiobutton_select_field:set"
     )
 
     # An event that indicates that a read-only field has been changed
@@ -1590,6 +1650,21 @@ class Events:
         ]
 
     @classmethod
+    def get_combobox_select_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all combobox select field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all combobox select field events in the Events class.
+        """
+        return [
+            cls.COMBOBOX_SELECT_FIELD_CHANGED,
+            cls.COMBOBOX_SELECT_FIELD_CLEARED,
+            cls.COMBOBOX_SELECT_FIELD_GET,
+            cls.COMBOBOX_SELECT_FIELD_SET,
+        ]
+
+    @classmethod
     def get_custom_field_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all custom field events in the Events class.
@@ -1605,6 +1680,21 @@ class Events:
             cls.REQUEST_CUSTOM_FIELD_UPDATE,
         ]
 
+    @classmethod
+    def get_date_select_fiel_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all date select field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all date select field events in the Events class.
+        """
+        return [
+            cls.DATE_SELECT_FIELD_CHANGED,
+            cls.DATE_SELECT_FIELD_CLEARED,
+            cls.DATE_SELECT_FIELD_GET,
+            cls.DATE_SELECT_FIELD_SET,
+        ]
+    
     @classmethod
     def get_difficulty_events(cls) -> List[DispatcherEvent]:
         """
@@ -1851,6 +1941,21 @@ class Events:
             cls.RADIOBUTTON_FIELD_SET,
         ]
 
+    @classmethod
+    def get_radiobutton_select_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all radiobutton select field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all radiobutton select field events in the Events class.
+        """
+        return [
+            cls.RADIOBUTTON_SELECT_FIELD_CHANGED,
+            cls.RADIOBUTTON_SELECT_FIELD_CLEARED,
+            cls.RADIOBUTTON_SELECT_FIELD_GET,
+            cls.RADIOBUTTON_SELECT_FIELD_SET,
+        ]
+    
     @classmethod
     def get_readonly_multi_line_text_field_events(cls) -> List[DispatcherEvent]:
         """

@@ -80,7 +80,7 @@ class BaseField(tkinter.Frame):
         self.dispatcher: Dispatcher = Dispatcher()
 
         # Store the display name
-        self._display_name: str = label
+        self.display_name: str = label
 
         # Store the namespace
         self.namespace: str = namespace

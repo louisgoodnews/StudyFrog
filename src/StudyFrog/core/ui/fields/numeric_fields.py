@@ -256,7 +256,7 @@ class FloatSpinboxField(BaseField):
         # Dispatch the FLOAT_SPINBOX_FIELD_CHANGED event in the passed namespace
         self.dispatcher.dispatch(
             event=Events.FLOAT_SPINBOX_FIELD_CHANGED,
-            label=self._display_name,
+            label=self.display_name,
             namespace=self.namespace,
             value=float_value,
         )
@@ -264,7 +264,7 @@ class FloatSpinboxField(BaseField):
         # Check, if the 'on_change_callback' function exists
         if self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(self._display_name, self.variable.get())
+            self.on_change_callback(self.display_name, self.variable.get())
 
     def _on_entry_change(
         self,
@@ -315,7 +315,7 @@ class FloatSpinboxField(BaseField):
             # Dispatch the FLOAT_SPINBOX_FIELD_CHANGED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.FLOAT_SPINBOX_FIELD_CHANGED,
-                label=self._display_name,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=float_value,
             )
@@ -323,7 +323,7 @@ class FloatSpinboxField(BaseField):
         # Check, if the 'on_change_callback' function exists and the float value is not None
         if float_value is not None and self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(self._display_name, float_value)
+            self.on_change_callback(self.display_name, float_value)
 
     def _on_increment_button_click(self) -> None:
         """
@@ -356,7 +356,7 @@ class FloatSpinboxField(BaseField):
             # Dispatch the FLOAT_SPINBOX_FIELD_CHANGED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.FLOAT_SPINBOX_FIELD_CHANGED,
-                label=self._display_name,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=float(self.variable.get()),
             )
@@ -364,7 +364,7 @@ class FloatSpinboxField(BaseField):
         # Check, if the 'on_change_callback' function exists and the float value is not None
         if self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(self._display_name, self.variable.get())
+            self.on_change_callback(self.display_name, self.variable.get())
 
     def _on_reset_button_click(self) -> None:
         """
@@ -382,7 +382,7 @@ class FloatSpinboxField(BaseField):
         # Check, if the 'on_change_callback' function exists
         if self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(self._display_name, self.variable.get())
+            self.on_change_callback(self.display_name, self.variable.get())
 
     def clear(
         self,
@@ -409,7 +409,7 @@ class FloatSpinboxField(BaseField):
             # Dispatch the FLOAT_SPINBOX_FIELD_CLEARED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.FLOAT_SPINBOX_FIELD_CLEARED,
-                label=self._display_name,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=float(self.variable.get()),
             )
@@ -787,7 +787,7 @@ class FloatSpinboxField(BaseField):
             label,
             value,
         ) = (
-            self._display_name,
+            self.display_name,
             float(self.variable.get()),
         )
 
@@ -844,7 +844,7 @@ class FloatSpinboxField(BaseField):
             # Dispatch the FLOAT_SPINBOX_FIELD_SET event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.FLOAT_SPINBOX_FIELD_SET,
-                label=self._display_name,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=value,
             )
@@ -1085,7 +1085,7 @@ class IntegerSpinboxField(BaseField):
         # Dispatch the INT_SPINBOX_FIELD_CHANGED event in the passed namespace
         self.dispatcher.dispatch(
             event=Events.INT_SPINBOX_FIELD_CHANGED,
-            label=self._display_name,
+            label=self.display_name,
             namespace=self.namespace,
             value=int_value,
         )
@@ -1093,7 +1093,7 @@ class IntegerSpinboxField(BaseField):
         # Check, if the 'on_change_callback' function exists
         if self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(self._display_name, self.variable.get())
+            self.on_change_callback(self.display_name, self.variable.get())
 
     def _on_entry_change(
         self,
@@ -1144,7 +1144,7 @@ class IntegerSpinboxField(BaseField):
             # Dispatch the INT_SPINBOX_FIELD_CHANGED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.INT_SPINBOX_FIELD_CHANGED,
-                label=self._display_name,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=int_value,
             )
@@ -1152,7 +1152,7 @@ class IntegerSpinboxField(BaseField):
         # Check, if the 'on_change_callback' function exists and the int value is not None
         if int_value is not None and self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(self._display_name, int_value)
+            self.on_change_callback(self.display_name, int_value)
 
     def _on_increment_button_click(self) -> None:
         """
@@ -1185,7 +1185,7 @@ class IntegerSpinboxField(BaseField):
             # Dispatch the INT_SPINBOX_FIELD_CHANGED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.INT_SPINBOX_FIELD_CHANGED,
-                label=self._display_name,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=int(self.variable.get()),
             )
@@ -1193,7 +1193,7 @@ class IntegerSpinboxField(BaseField):
         # Check, if the 'on_change_callback' function exists and the int value is not None
         if self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(self._display_name, self.variable.get())
+            self.on_change_callback(self.display_name, self.variable.get())
 
     def _on_reset_button_click(self) -> None:
         """
@@ -1211,7 +1211,7 @@ class IntegerSpinboxField(BaseField):
         # Check, if the 'on_change_callback' function exists
         if self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(self._display_name, self.variable.get())
+            self.on_change_callback(self.display_name, self.variable.get())
 
     def clear(
         self,
@@ -1238,7 +1238,7 @@ class IntegerSpinboxField(BaseField):
             # Dispatch the INT_SPINBOX_FIELD_CLEARED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.INT_SPINBOX_FIELD_CLEARED,
-                label=self._display_name,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=int(self.variable.get()),
             )
@@ -1616,7 +1616,7 @@ class IntegerSpinboxField(BaseField):
             label,
             value,
         ) = (
-            self._display_name,
+            self.display_name,
             int(self.variable.get()),
         )
 
@@ -1673,7 +1673,7 @@ class IntegerSpinboxField(BaseField):
             # Dispatch the INT_SPINBOX_FIELD_SET event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.INT_SPINBOX_FIELD_SET,
-                label=self._display_name,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=value,
             )

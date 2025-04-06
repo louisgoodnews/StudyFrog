@@ -290,10 +290,10 @@ class CreateUI(BaseUI):
         """
 
         # Get a list of all children widgets in the center frame
-        children: List[tkinter.Misc] = self.center_frame.winfo_children()
+        children: Optional[List[tkinter.Misc]] = self.center_frame.winfo_children()
 
         # Check if there are any children
-        if not children:
+        if not children or len(children) == 0:
             # Return early
             return
 

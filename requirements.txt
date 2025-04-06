@@ -1,3 +1,4 @@
 aiosqlite~=0.21.0
 numpy~=2.2.4
 sentence-transformers~=4.0.1
+tkcalendar~=1.6.1
