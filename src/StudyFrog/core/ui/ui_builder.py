@@ -775,7 +775,7 @@ class UIBuilder:
         label: str,
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
-        on_change_callback: Optional[Callable[[str], None]] = None,
+        on_change_callback: Optional[Callable[[str, str], None]] = None,
         values: List[str] = [],
         value: str = "",
         **kwargs,
@@ -797,7 +797,7 @@ class UIBuilder:
             label (str): The label for the combobox.
             master (tkinter.Misc): The master widget.
             namespace (str): The namespace for the combobox. Defaults to Constants.GLOBAL_NAMESPACE.
-            on_change_callback (Optional[Callable[[str], None]]): A callback function that is called when the value of the combobox field changes. Defaults to None.
+            on_change_callback (Optional[Callable[[str, str], None]]): A callback function that is called when the value of the combobox field changes. Defaults to None.
             values (List[str]): The list of string values of the combobox field.
             **kwargs: Any additional keyword arguments to be passed to the various tkinter widgets.
 
@@ -826,7 +826,7 @@ class UIBuilder:
                 """
                 try:
                     # Set the value of the combobox field to an empty string
-                    result["variable"].set(value="")
+                    result["combobox"].set(value="")
 
                     if dispatch:
                         # Dispatch the COMBOBOX_FIELD_CLEARED event
@@ -834,7 +834,7 @@ class UIBuilder:
                             event=Events.COMBOBOX_FIELD_CLEARED,
                             label=label,
                             namespace=namespace,
-                            value=result["variable"].get(),
+                            value=result["combobox"].get(),
                         )
                 except Exception as e:
                     # Log an error message indicating an exception occurred
@@ -865,11 +865,11 @@ class UIBuilder:
                             event=Events.COMBOBOX_FIELD_GET,
                             label=label,
                             namespace=namespace,
-                            value=result["variable"].get(),
+                            value=result["combobox"].get(),
                         )
 
                     # Return the value of the combobox field as a string
-                    return result["variable"].get()
+                    return result["combobox"].get()
                 except Exception as e:
                     # Log an error message indicating an exception occurred
                     cls.logger.error(
@@ -928,13 +928,13 @@ class UIBuilder:
                             event=Events.COMBOBOX_FIELD_CHANGED,
                             label=label,
                             namespace=namespace,
-                            value=result["variable"].get(),
+                            value=result["combobox"].get(),
                         )
 
                     # Check, if the on_change_callback is present
                     if on_change_callback:
                         # Call the on_change_callback function with the new value
-                        on_change_callback(result["variable"].get())
+                        on_change_callback(label, result["combobox"].get())
                 except Exception as e:
                     # Log an error message indicating an exception occurred
                     cls.logger.error(
@@ -976,7 +976,7 @@ class UIBuilder:
                         result["values"].append(value)
 
                     # Set the value of the combobox field
-                    result["variable"].set(value=value)
+                    result["combobox"].set(value=value)
                 except Exception as e:
                     # Log an error message indicating an exception occurred
                     cls.logger.error(
@@ -988,9 +988,6 @@ class UIBuilder:
 
             # Store the values in the result dictionary
             result["values"] = values
-
-            # Create the "Variable" string variable
-            result["variable"] = cls.get_str_variable(value=value)
 
             # Create the "Root" frame widget
             result["root"] = cls.get_frame(
@@ -1041,6 +1038,7 @@ class UIBuilder:
             # Create the "Combobox" combobox widget
             result["combobox"] = cls.get_combobox(
                 master=result["root"],
+                state="readonly",
                 text="False",
                 values=result["values"],
                 **kwargs.get("combobox", {}),
@@ -1085,6 +1083,13 @@ class UIBuilder:
 
             # Add the "setter" function to the result dictionary
             result["setter"] = set
+
+            if value:
+                # Set the value of the combobox field
+                result["setter"](
+                    dispatch=False,
+                    value=value,
+                )
 
             # Return the result dictionary
             return result

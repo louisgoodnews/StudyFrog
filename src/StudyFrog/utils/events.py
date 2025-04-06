@@ -136,13 +136,13 @@ class Events:
     )
 
     # An event that indicates that a checkbox field's value has been retrieved
-    CHECKBUTTON_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:checkbox:field:get")
+    CHECKBUTTON_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:checkbox:field:get"
     )
 
     # An event that indicates that a checkbox field has been set
-    CHECKBUTTON_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:checkbox:field:set")
+    CHECKBUTTON_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:checkbox:field:set"
     )
 
     # An event that indicates that a combobox field has changed
@@ -405,6 +405,21 @@ class Events:
         name="ui:button:okay:clicked"
     )
 
+    # An event that indicates that a password text field has changed
+    PASSWORD_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:password_text_field:changed")
+    )
+
+    # An event that indicates that a password text field has been retrieved
+    PASSWORD_TEXT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:password_text_field:get")
+    )
+
+    # An event that indicates that a password text field has been set
+    PASSWORD_TEXT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:password_text_field:set")
+    )
+
     # An event that indicates that a priority has been created in the backend
     PRIORITY_CREATED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="backend:priority:created"
@@ -466,23 +481,43 @@ class Events:
     )
 
     # An event that indicates that a read-only field has been changed
-    READONLY_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:readonly:field:changed")
+    READONLY_MULTI_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:readonly:multi_line_text_field:changed")
     )
 
     # An event that indicates that a read-only field has been cleared
-    READONLY_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:readonly:field:cleared")
+    READONLY_MULTI_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:readonly:multi_line_text_field:cleared")
     )
 
     # An event that indicates that a read-only field has been retrieved
-    READONLY_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:readonly:field:get"
+    READONLY_MULTI_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:readonly:multi_line_text_field:get"
     )
 
     # An event that indicates that a read-only field has been set
-    READONLY_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:readonly:field:set"
+    READONLY_MULTI_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:readonly:multi_line_text_field:set"
+    )
+
+    # An event that indicates that a read-only field has been changed
+    READONLY_SINGLE_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:readonly:single_line_text_field:changed")
+    )
+
+    # An event that indicates that a read-only field has been cleared
+    READONLY_SINGLE_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:readonly:single_line_text_field:cleared")
+    )
+
+    # An event that indicates that a read-only field has been retrieved
+    READONLY_SINGLE_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:readonly:single_line_text_field:get"
+    )
+
+    # An event that indicates that a read-only field has been set
+    READONLY_SINGLE_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:readonly:single_line_text_field:set"
     )
 
     # An event that indicates that the user wants to create a new answer
@@ -1188,8 +1223,8 @@ class Events:
     )
 
     # An event that indicates that the user wants to update an object
-    REQUEST_UPDATE: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="global:request:update")
+    REQUEST_UPDATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:update"
     )
 
     # An event that indicates that the user wants to update objects in bulk
@@ -1228,23 +1263,23 @@ class Events:
     )
 
     # An event that indicates that a scale field has been changed
-    SCALE_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:scale:field:changed")
+    SCALE_FIELD_CHANGED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:scale:field:changed"
     )
 
     # An event that indicates that a scale field has been cleared
-    SCALE_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:scale:field:cleared")
+    SCALE_FIELD_CLEARED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:scale:field:cleared"
     )
 
     # An event that indicates that a scale field has been retrieved
-    SCALE_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:scale:field:get")
+    SCALE_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:scale:field:get"
     )
 
     # An event that indicates that a scale field has been set
-    SCALE_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:scale:field:set")
+    SCALE_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:scale:field:set"
     )
 
     # An event that indicates that the settings button has been clicked
@@ -1393,7 +1428,10 @@ class Events:
     )
 
     @classmethod
-    def get_all_events(cls, as_dict: bool = False,) -> Union[List[DispatcherEvent], Dict[str, DispatcherEvent]]:
+    def get_all_events(
+        cls,
+        as_dict: bool = False,
+    ) -> Union[List[DispatcherEvent], Dict[str, DispatcherEvent]]:
         """
         Returns a list or dictionary of all events in the Events class.
 
@@ -1403,7 +1441,7 @@ class Events:
         Returns:
             Union[List[DispatcherEvent], Dict[str, DispatcherEvent]]: A list or dictionary of all events in the Events class.
         """
-        if (as_dict):
+        if as_dict:
             return {
                 value.name: value
                 for value in cls.__dict__.values()
@@ -1520,7 +1558,7 @@ class Events:
             cls.REQUEST_CHANGE_HISTORY_ITEM_LOOKUP,
             cls.REQUEST_CHANGE_HISTORY_ITEM_UPDATE,
         ]
-    
+
     @classmethod
     def get_checkbutton_field_events(cls) -> List[DispatcherEvent]:
         """
@@ -1753,6 +1791,20 @@ class Events:
         ]
 
     @classmethod
+    def get_password_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all password field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all password field events in the Events class.
+        """
+        return [
+            cls.PASSWORD_TEXT_FIELD_CHANGED,
+            cls.PASSWORD_TEXT_FIELD_GET,
+            cls.PASSWORD_TEXT_FIELD_SET,
+        ]
+
+    @classmethod
     def get_priority_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all priority events in the Events class.
@@ -1800,18 +1852,33 @@ class Events:
         ]
 
     @classmethod
-    def get_readonly_field_events(cls) -> List[DispatcherEvent]:
+    def get_readonly_multi_line_text_field_events(cls) -> List[DispatcherEvent]:
         """
-        Returns a list of all readonly field events in the Events class.
+        Returns a list of all readonly multi line text field events in the Events class.
 
         Returns:
-            List[DispatcherEvent]: A list of all readonly field events in the Events class.
+            List[DispatcherEvent]: A list of all readonly multi line text field events in the Events class.
         """
         return [
-            cls.READONLY_FIELD_CHANGED,
-            cls.READONLY_FIELD_CLEARED,
-            cls.READONLY_FIELD_GET,
-            cls.READONLY_FIELD_SET,
+            cls.READONLY_MULTI_LINE_TEXT_FIELD_CHANGED,
+            cls.READONLY_MULTI_LINE_TEXT_FIELD_CLEARED,
+            cls.READONLY_MULTI_LINE_TEXT_FIELD_GET,
+            cls.READONLY_MULTI_LINE_TEXT_FIELD_SET,
+        ]
+
+    @classmethod
+    def get_readonly_single_line_text_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all readonly single line text field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all readonly single line text field events in the Events class.
+        """
+        return [
+            cls.READONLY_SINGLE_LINE_TEXT_FIELD_CHANGED,
+            cls.READONLY_SINGLE_LINE_TEXT_FIELD_CLEARED,
+            cls.READONLY_SINGLE_LINE_TEXT_FIELD_GET,
+            cls.READONLY_SINGLE_LINE_TEXT_FIELD_SET,
         ]
 
     @classmethod

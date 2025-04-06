@@ -246,7 +246,7 @@ class LearningSessionRunner:
             if not contents:
                 # Log a warning message indicating that no contents were found
                 self.logger.warning(
-                    message=f"No contents found for stacks: {', '.join(stack.__repr__ for stack in self.stacks)}"
+                    message=f"No contents found for stacks: {', '.join(stack.__repr__() for stack in self.stacks)}"
                 )
 
                 # Return early

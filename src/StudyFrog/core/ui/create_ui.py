@@ -118,12 +118,18 @@ class CreateUI(BaseUI):
         # Check, if a type string was passed
         if type is not None:
             # Set the combobox value to the passed type
-            self.combobox.set(value=type.capitalize())
+            self.type_field["setter"](
+                dispatch=False,
+                value=type.capitalize(),
+            )
         else:
             self.preselect_combobox_value()
 
         # Call the on_combobox_select method
-        self.on_combobox_select()
+        self.on_type_field_change(
+            label="Type: ",
+            value=self.type_field["getter"](),
+        )
 
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
@@ -504,79 +510,68 @@ class CreateUI(BaseUI):
         # Configure the top frame widget's 1st row to weight 1
         master.grid_rowconfigure(index=0, weight=1)
 
-        # Create the top frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
-            background=Constants.BLUE_GREY["700"],
+        # Create the "Type" combobox field widget
+        # This field allows the user to select the type of object to create
+        type_valuess: List[str] = [
+            "Flashcard",
+            "Question",
+            "Stack",
+        ]
+
+        # Create the "Type" combobox field widget
+        self.type_field: Optional[Dict[str, Any]] = UIBuilder.get_combobox_field(
+            label="Type: ",
             master=master,
+            on_change_callback=self.on_type_field_change,
+            value=Miscellaneous.select_random(iterable=type_valuess),
+            values=type_valuess,
         )
 
-        # Configure the top frame widget's 1st and 2nd columns to weight 1
-        top_frame.grid_columnconfigure(
-            index=(
-                0,
-                1,
-            ),
-            weight=1,
-        )
+        # Check if the creation response is None, indicating failure
+        if self.type_field is None:
+            # Log a warning message indicating that the creation was not successful
+            self.logger.warning(
+                message=f"Failed while attempting to create 'Type' combobox field."
+            )
 
-        # Configure the top frame widget's 1st row to weight 1
-        top_frame.grid_rowconfigure(
-            index=0,
-            weight=1,
-        )
+            # Return early
+            return
 
-        # Place the top frame widget in the main window
-        top_frame.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create the label widget
-        label: tkinter.Label = UIBuilder.get_label(
+        # Configure the style of the button of the "Type" combobox field widget
+        self.type_field["button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
+                Constants.LARGE_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            master=top_frame,
-            text="Type: ",
+            relief=FLAT,
         )
 
-        # Place the label widget in the top frame
-        label.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create the combobox widget
-        self.combobox: ttk.Combobox = UIBuilder.get_combobox(
+        # Configure the style of the combobox of the "Type" combobox field widget
+        self.type_field["combobox"].configure(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
+                Constants.LARGE_FONT_SIZE,
             ),
-            master=top_frame,
-            state="readonly",
-            values=[
-                "Flashcard",
-                "Question",
-                "Stack",
-            ],
         )
 
-        # Bind the combobox widget to the on_combobox_select method
-        self.combobox.bind(
-            func=lambda event: self.on_combobox_select(),
-            sequence="<<ComboboxSelected>>",
+        # Configure the style of the label of the "Type" combobox field widget
+        self.type_field["label"].configure(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.LARGE_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
         )
 
-        # Place the combobox widget in the top frame
-        self.combobox.grid(
-            column=1,
+        # Configure the style of the root widget of the "Type" combobox field
+        self.type_field["root"].configure(background=Constants.BLUE_GREY["700"])
+
+        # Place the "Type" combobox field widget in the top frame
+        self.type_field["root"].grid(
+            column=0,
             padx=5,
             pady=5,
             row=0,
@@ -988,34 +983,6 @@ class CreateUI(BaseUI):
             # Raise the exception to the caller
             raise e
 
-    def on_combobox_select(self) -> None:
-        """
-        Handles the selection event of the combobox widget.
-
-        Args:
-            None
-
-        Returns:
-            None
-        """
-
-        # A dictionary mapping the selected values to the corresponding form classes
-        forms: Dict[str, Any] = {
-            "flashcard": FlashcardCreateForm,
-            "question": QuestionCreateForm,
-            "stack": StackCreateForm,
-        }
-
-        # Clear the center frame to remove any existing widgets
-        self.clear()
-
-        # Create a new form widget based on the selected value
-        self.form = forms[self.combobox.get().lower()](
-            dispatcher=self.dispatcher,
-            master=self.center_frame,
-            unified_manager=self.unified_manager,
-        )
-
     def on_cancel_button_click(self) -> None:
         """
         Handles the click event of the "Cancel" button.
@@ -1101,6 +1068,44 @@ class CreateUI(BaseUI):
                 # Destroy the toplevel widget
                 self.master.destroy()
 
+    def on_type_field_change(
+        self,
+        label: str,
+        value: str,
+    ) -> None:
+        """
+        Handles the selection event of the combobox widget.
+
+        Args:
+            label (str): The label of the combobox widget.
+            value (str): The value of the combobox widget.
+
+        Returns:
+            None
+        """
+
+        # A dictionary mapping the selected values to the corresponding form classes
+        forms: Dict[str, Any] = {
+            "flashcard": FlashcardCreateForm,
+            "question": QuestionCreateForm,
+            "stack": StackCreateForm,
+        }
+
+        # Clear the center frame to remove any existing widgets
+        self.clear()
+
+        # Create a new form widget based on the selected value
+        self.form = forms[value.lower()](
+            dispatcher=self.dispatcher,
+            master=self.center_frame,
+            unified_manager=self.unified_manager,
+        )
+
+        # Log an info message
+        self.logger.info(
+            message=f"Created form widget for {value} type based on current '{label}' field selection."
+        )
+
     def preselect_combobox_value(self) -> None:
         """
         Preselects a random value for the combobox widget.
@@ -1115,7 +1120,8 @@ class CreateUI(BaseUI):
         """
 
         # Set the combobox value to a random value
-        self.combobox.set(
+        self.type_field["setter"](
+            dispatch=False,
             value=Miscellaneous.select_random(
                 [
                     # The type of object to be created

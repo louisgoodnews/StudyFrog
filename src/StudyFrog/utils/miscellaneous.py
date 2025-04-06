@@ -363,6 +363,66 @@ class Miscellaneous:
         return str(uuid.uuid4())
 
     @classmethod
+    def is_float_number(
+        cls,
+        string: str,
+    ) -> bool:
+        """
+        Checks if the given string can be converted to a float number.
+
+        Args:
+            string (str): The string to be checked.
+
+        Returns:
+            bool: True if the string can be converted to a float number, False otherwise.
+        """
+        try:
+            float(string)
+            # If the string can be converted to a float number, return True
+            return True
+        except ValueError:
+            # If the string cannot be converted to a float number, return False
+            return False
+
+    @classmethod
+    def is_int_number(
+        cls,
+        string: str,
+    ) -> bool:
+        """
+        Checks if the given string can be converted to an int number.
+
+        Args:
+            string (str): The string to be checked.
+
+        Returns:
+            bool: True if the string can be converted to an int number, False otherwise.
+        """
+        try:
+            int(string)
+            # If the string can be converted to an int number, return True
+            return True
+        except ValueError:
+            # If the string cannot be converted to an int number, return False
+            return False
+
+    @classmethod
+    def is_numeric(
+        cls,
+        string: str,
+    ) -> bool:
+        """
+        Checks if the given string can be converted to a numeric value.
+
+        Args:
+            string (str): The string to be checked.
+
+        Returns:
+            bool: True if the string can be converted to a numeric value, False otherwise.
+        """
+        return cls.is_float_number(string=string) or cls.is_int_number(string=string)
+
+    @classmethod
     def pluralize(
         cls,
         string: str,
