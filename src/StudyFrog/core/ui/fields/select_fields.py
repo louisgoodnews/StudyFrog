@@ -14,6 +14,7 @@ from typing import *
 from utils.base_field import BaseField
 from utils.constants import Constants
 from utils.events import Events
+from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 
 
@@ -474,7 +475,7 @@ class CheckbuttonSelectField(BaseField):
         """
 
         # Initialize the fields dictionary 
-        self.fields: Dict[str, Optional[CheckbuttonField]] = {field: None for field in fields}
+        self.fields: Dict[str, Optional[CheckbuttonField]] = {field: None for field in labels}
 
         # Store the passed selection mode in an instance variable
         self.selection_mode: Final[str] = selection_mode
@@ -620,7 +621,7 @@ class CheckbuttonSelectField(BaseField):
             # Dispatch the CHECKBUTTON_SELECT_FIELD_CLEARED event
             self.dispatcher.dispatch(
                 event=Events.CHECKBUTTON_SELECT_FIELD_CLEARED,
-                label=label,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.get(dispatch=False),
             )
@@ -816,7 +817,7 @@ class CheckbuttonSelectField(BaseField):
             row,
             label,
         ) in enumerate(
-            iterable=fields.keys(),
+            iterable=self.fields.keys(),
             start=1,
         ):
             # Create a checkbutton field widget
@@ -846,7 +847,7 @@ class CheckbuttonSelectField(BaseField):
         self,
         label: str,
         dispatch: bool = False,
-    ) -> Tuple[str, Dict[str, bool]:
+    ) -> Tuple[str, Dict[str, bool]]:
         """
         Retrieves the current selection from the field.
 
@@ -1552,7 +1553,7 @@ class ComboboxelectField(BaseField):
         """
 
         # Initialize the fields dictionary 
-        self.fields: Dict[str, Optional[CheckbuttonField]] = {field: None for field in fields}
+        self.fields: Dict[str, Optional[CheckbuttonField]] = {field: None for field in labels}
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -1686,7 +1687,7 @@ class ComboboxelectField(BaseField):
             # Dispatch the COMBOBOXS_SELECT_FIELD_CLEARED event
             self.dispatcher.dispatch(
                 event=Events.COMBOBOXS_SELECT_FIELD_CLEARED,
-                label=label,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.get(dispatch=False),
             )
@@ -1887,7 +1888,7 @@ class ComboboxelectField(BaseField):
             row,
             label,
         ) in enumerate(
-            iterable=fields.keys(),
+            iterable=self.fields.keys(),
             start=1,
         ):
             # Create a combobox field widget
@@ -1921,7 +1922,7 @@ class ComboboxelectField(BaseField):
         self,
         label: str,
         dispatch: bool = False,
-    ) -> Tuple[str, Dict[str, str]:
+    ) -> Tuple[str, Dict[str, str]]:
         """
         Retrieves the current selection from the field.
 
@@ -2031,11 +2032,20 @@ class MultiOptionSelectField(BaseField):
         master: tkinter.Misc,
         namespace: str = Constants:GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, str], None]] = None,
-        values: Optional[List[str]] = None
+        values: Optional[List[str]] = None,
     ) -> None:
         """
         """
 
+        pass
+
+    def add_value(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        """
+        
         pass
 
     @override
@@ -2607,7 +2617,7 @@ class RadiobuttonSelectField(BaseField):
         """
 
         # Initialize the fields dictionary 
-        self.fields: Dict[str, Optional[RadiobuttonField]] = {field: None for field in fields}
+        self.fields: Dict[str, Optional[RadiobuttonField]] = {label: None for label in labels}
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -2745,7 +2755,7 @@ class RadiobuttonSelectField(BaseField):
             # Dispatch the RADIOBUTTON_SELECT_FIELD_CLEARED event
             self.dispatcher.dispatch(
                 event=Events.RADIOBUTTON_SELECT_FIELD_CLEARED,
-                label=label,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=self.get(dispatch=False),
             )
@@ -2941,7 +2951,7 @@ class RadiobuttonSelectField(BaseField):
             row,
             label,
         ) in enumerate(
-            iterable=fields.keys(),
+            iterable=self.fields.keys(),
             start=1,
         ):
             # Create a radiobutton field widget
@@ -2971,7 +2981,7 @@ class RadiobuttonSelectField(BaseField):
         self,
         label: str,
         dispatch: bool = False,
-    ) -> Tuple[str, Dict[str, bool]:
+    ) -> Tuple[str, Dict[str, bool]]:
         """
         Retrieves the current selection from the field.
 
@@ -3082,6 +3092,15 @@ class SingleOptionSelectField(BaseField):
         """
         """
 
+        pass
+
+    def add_value(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        """
+        
         pass
 
     @override
