@@ -7,421 +7,25 @@ import tkinter
 import traceback
 import uuid
 
-from datetime import datetime
 from tkinter.constants import *
 from typing import *
+
+from core.ui.fields.boolean_fields import CheckbuttonField, RadiobuttonField
 
 from utils.base_field import BaseField
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
 
 
 __all__: Final[List[str]] = [
-    "CheckbuttonField",
-    "CheckbuttonSelectField",
     "ComboboxField",
-    "ComboboxelectField",
+    "ComboboxSelectField",
+    "ListboxField",
     "MultiOptionSelectField",
-    "RadiobuttonField",
-    "RadiobuttonSelectField",
     "SingleOptionSelectField",
 ]
-
-
-class CheckbuttonField(BaseField):
-    """
-    A boolean field using a checkbutton widget.
-
-    CheckbuttonField represents a binary user input field consisting of a label and a tkinter.Checkbutton.
-    It stores its state in a tkinter.BooleanVar and provides event dispatching and callback support on change.
-
-    The field layout consists of:
-        [ Label | Checkbutton ]
-
-    Attributes:
-        variable (tkinter.BooleanVar): Holds the current boolean state of the checkbutton.
-        label (tkinter.Label): The label widget describing the checkbutton.
-        checkbutton (tkinter.Checkbutton): The interactive checkbox widget.
-
-    Inherits from:
-        BaseField
-    """
-
-    def __init__(
-        self,
-        label: str,
-        master: tkinter.Misc,
-        namespace: str = Constants.GLOBAL_NAMESPACE,
-        on_change_callback: Optional[Callable[[str, bool], None]] = None,
-        value: bool = False,
-    ) -> None:
-        """
-        Initializes a new instance of the CheckbuttonField class.
-
-        This constructor sets up the label and checkbutton widget, binds the necessary variable,
-        and prepares the field for interaction and layout configuration.
-
-        Args:
-            label (str): The label text displayed next to the checkbutton.
-            master (tkinter.Misc): The parent container in which this widget is placed.
-            namespace (str, optional): The namespace identifier for event dispatching. Defaults to Constants.GLOBAL_NAMESPACE.
-            on_change_callback (Optional[Callable[[str, bool], None]], optional): Callback function called when the boolean value changes.
-            value (bool, optional): The initial boolean state of the checkbutton. Defaults to False.
-
-        Returns:
-            None
-        """
-
-        # Call the parent class constructor with the passed arguments
-        super().__init__(
-            label=label,
-            master=master,
-            namespace=namespace,
-            on_change_callback=on_change_callback,
-        )
-
-    @property
-    def checkbutton(self) -> tkinter.Checkbutton:
-        """
-        Returns the checkbutton widget associated with this field.
-
-        The checkbutton displays the name or description of the field.
-
-        Returns:
-            tkinter.Checkbutton: The checkbutton widget.
-        """
-
-        # Return the tkinter.Checkbutton checkbutton widget
-        return self._checkbutton
-
-    @property
-    def label(self) -> tkinter.Label:
-        """
-        Returns the label widget associated with this field.
-
-        The label displays the name or description of the field.
-
-        Returns:
-            tkinter.Label: The label widget.
-        """
-
-        # Return the tkinter.Label label widget
-        return self._label
-
-    def _on_checkbutton_change(
-        self,
-        event: Optional[tkinter.Event] = None,
-    ) -> None:
-        """
-        Handles changes in the checkbutton state.
-
-        This method is triggered when the user toggles the checkbutton. It dispatches an event
-        with the new boolean value and triggers an optional callback function.
-
-        Args:
-            event (Optional[tkinter.Event], optional): The event object. Defaults to None.
-
-        Returns:
-            None
-        """
-
-        # Dispatch the CHECKBUTTON_FIELD_CLEARED event
-        self.dispatcher.dispatch(
-            event=Events.CHECKBUTTON_FIELD_CLEARED,
-            label=self.display_name,
-            namespace=self.namespace,
-            value=self.variable.get(),
-        )
-
-        # Check, if the 'on_change_callback' function exists
-        if self.on_change_callback:
-            # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(
-                self.display_name,
-                self.variable.get(),
-            )
-
-    @override
-    def clear(
-        self,
-        dispatch: bool = False,
-    ) -> None:
-        """
-        Clears the state of the checkbutton, setting it to False.
-
-        If `dispatch` is True, it also dispatches a clear event to notify any listeners.
-
-        Args:
-            dispatch (bool, optional): Whether to dispatch a clear event. Defaults to False.
-
-        Returns:
-            None
-        """
-
-        # Update the variable's value to an empty string
-        self.variable.set(value=False)
-
-        # Check, if the dispatch flag is set to True
-        if dispatch:
-            # Dispatch the CHECKBUTTON_FIELD_CLEARED event
-            self.dispatcher.dispatch(
-                event=Events.CHECKBUTTON_FIELD_CLEARED,
-                label=self.display_name,
-                namespace=self.namespace,
-                value=self.variable.get(),
-            )
-
-    def configure_checkbutton(
-        self,
-        **kwargs,
-    ) -> None:
-        """
-        Configures the checkbutton widget in this field.
-
-        This method configures the checkbutton widget in this field
-        using the provided keyword arguments.
-
-        Args:
-            **kwargs: The keyword arguments to be passed to the configure method
-                of the checkbutton widget.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an exception occurs while attempting to configure the
-                checkbutton widget.
-        """
-        try:
-            # Attempt to configure the checkbutton widget
-            self._checkbutton.configure(**kwargs)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_checkbutton' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
-
-    @override
-    def configure_grid(self) -> None:
-        """
-        Configures the grid layout of the CheckbuttonField widget.
-
-        This method sets the column and row weights for the internal layout of the CheckbuttonField.
-        It ensures proper resizing behavior and alignment of label and checkbutton.
-
-        Columns:
-            - Column 0: Label (fixed width)
-            - Column 1: Checkbutton field (fixed width)
-
-        Rows:
-            - Row 0: Main field layout (fixed height)
-
-        Returns:
-            None
-        """
-
-        # Set the weight of the 0th column to 0
-        # This means that the column will not stretch when the window is resized
-        self.grid_columnconfigure(
-            index=0,
-            weight=0,
-        )
-
-        # Set the weight of the 1st column to 0
-        # This means that the column will not stretch when the window is resized
-        self.grid_columnconfigure(
-            index=1,
-            weight=0,
-        )
-
-        # Set the weight of the 0th row to 0
-        # This means that the row will not stretch when the window is resized
-        self.grid_rowconfigure(
-            index=0,
-            weight=0,
-        )
-
-    def configure_label(
-        self,
-        **kwargs,
-    ) -> None:
-        """
-        Configures the label widget in this field.
-
-        This method configures the label widget in this field
-        using the provided keyword arguments.
-
-        Args:
-            **kwargs: The keyword arguments to be passed to the configure method
-                of the label widget.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an exception occurs while attempting to configure the
-                label widget.
-        """
-        try:
-            # Attempt to configure the label widget
-            self._label.configure(**kwargs)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
-
-    @override
-    def create_widgets(
-        self,
-        label: str,
-        **kwargs,
-    ) -> None:
-        """
-        Creates and configures the widgets for the CheckbuttonField.
-
-        This method initializes the label and the checkbutton widget, binds the internal BooleanVar,
-        and places the widgets in the grid layout.
-
-        Args:
-            label (str): The label text to be displayed next to the checkbutton.
-            **kwargs: Additional keyword arguments passed to individual widget constructors.
-
-        Returns:
-            None
-        """
-
-        # Create a label widget
-        self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
-        )
-
-       # Place the label widget within the grid
-        self._label.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create a string variable
-        self.variable: tkinter.BooleanVar = tkinter.BooleanVar(value=False)
-
-        # Create a checkbutton widget
-        self._checkbutton: tkinter.Checkbutton = tkinter.Checkbutton(
-            command=self._on_checkbutton_change,
-            master=self,
-            text=f"{self.variable.get()}",
-            variable=self.variable,
-            **kwargs.get(
-                "checkbutton",
-               {}
-            )
-        )
-
-       # Place the checkbutton widget within the grid
-        self._checkbutton.grid(
-            column=1,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-    @override
-    def get(
-        self,
-        dispatch: bool = False,
-    ) -> Tuple[str, bool]:
-        """
-        Retrieves the current state of the checkbutton.
-
-        If `dispatch` is set to True, it also dispatches a GET event.
-
-        Args:
-            dispatch (bool, optional): Whether to dispatch a get event. Defaults to False.
-
-        Returns:
-            Tuple[str, bool]: A tuple containing the display label and the boolean value of the checkbutton.
-        """
-
-        # Obtain the label and value strings from the widgets
-        (
-            label,
-            value,
-        ) = (
-            self.display_name,
-            self.variable.get(),
-        )
-
-        # Check, if the dispatch flag is set to True
-        if dispatch:
-            # Dispatch the CHECKBUTTON_FIELD_GET event
-            self.dispatcher.dispatch(
-                event=Events.CHECKBUTTON_FIELD_GET,
-                label=label,
-                namespace=self.namespace,
-                value=value,
-            )
-
-        # Return the text of the label and the value of the text field
-        return (
-            label,
-            value,
-        )
-
-    @override
-    def set(
-        self,
-        value: bool,
-        dispatch: bool = False,
-    ) -> None:
-        """
-        Sets the state of the checkbutton to the given boolean value.
-
-        If `dispatch` is set to True, a SET event is dispatched.
-
-        Args:
-            value (bool): The boolean value to set (True or False).
-            dispatch (bool, optional): Whether to dispatch a set event. Defaults to False.
-
-        Returns:
-            None
-        """
-
-        # Update the variable with the passed value string
-        self.variable.set(value=value)
-
-        # Check, if the dispatch flag is set to True
-        if dispatch:
-            # Dispatch the CHECKBUTTON_FIELD_SET event
-            self.dispatcher.dispatch(
-                event=Events.CHECKBUTTON_FIELD_SET,
-                label=self.display_name,
-                namespace=self.namespace,
-                value=self.variable.get(),
-            )
 
 
 class CheckbuttonSelectField(BaseField):
@@ -429,7 +33,7 @@ class CheckbuttonSelectField(BaseField):
     A grouped boolean selection field using multiple checkbuttons.
 
     CheckbuttonSelectField represents a set of binary input fields, each rendered as a CheckbuttonField.
-    It allows users to select one or multiple options from a list of labels, depending on the defined 
+    It allows users to select one or multiple options from a list of labels, depending on the defined
     selection mode ("single" or "multi").
 
     The field layout consists of:
@@ -460,7 +64,7 @@ class CheckbuttonSelectField(BaseField):
         Initializes a new instance of the CheckbuttonSelectField class.
 
         This constructor sets up a group of checkbutton widgets corresponding to the given labels.
-        It allows configuration of a selection mode ('multi' or 'single') and manages individual 
+        It allows configuration of a selection mode ('multi' or 'single') and manages individual
         CheckbuttonField instances in a centralized layout.
 
         Args:
@@ -475,8 +79,10 @@ class CheckbuttonSelectField(BaseField):
             None
         """
 
-        # Initialize the fields dictionary 
-        self.fields: Dict[str, Optional[CheckbuttonField]] = {field: None for field in labels}
+        # Initialize the fields dictionary
+        self.fields: Dict[str, Optional[CheckbuttonField]] = {
+            field: None for field in labels
+        }
 
         # Store the passed selection mode in an instance variable
         self.selection_mode: Final[str] = selection_mode
@@ -554,8 +160,8 @@ class CheckbuttonSelectField(BaseField):
         """
         Internal handler for state changes in individual checkbuttons.
 
-        This method is triggered whenever a CheckbuttonField changes its value. It enforces 
-        the selection mode (e.g. unselecting other fields in 'single' mode), dispatches 
+        This method is triggered whenever a CheckbuttonField changes its value. It enforces
+        the selection mode (e.g. unselecting other fields in 'single' mode), dispatches
         a change event, and invokes the on_change_callback if provided.
 
         Args:
@@ -567,10 +173,7 @@ class CheckbuttonSelectField(BaseField):
         """
 
         # Enforce the selection mode
-        self._enforce_selection_mode(
-            label=label,
-            value=value
-        )
+        self._enforce_selection_mode(label=label, value=value)
 
         # Dispatch the CHECKBUTTON_SELECT_FIELD_CHANGED event
         self.dispatcher.dispatch(
@@ -796,15 +399,10 @@ class CheckbuttonSelectField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
+            master=self, text=label, **kwargs.get("label", {})
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -830,12 +428,7 @@ class CheckbuttonSelectField(BaseField):
             )
 
             # Place the checkbutton field widget within the grid
-            checkbutton_field.grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=row
-            )
+            checkbutton_field.grid(column=0, padx=5, pady=5, row=row)
 
             # Add the checkbutton field widget to the fields dictionary instance variable
             self.fields[label] = checkbutton_field
@@ -868,7 +461,7 @@ class CheckbuttonSelectField(BaseField):
             self.logger.warning(
                 message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
             )
-            
+
             # Return early
             return
 
@@ -879,11 +472,12 @@ class CheckbuttonSelectField(BaseField):
         ) = (
             self.display_name,
             {
-                key: value.get(dispatch=False) for (
+                key: value.get(dispatch=False)
+                for (
                     key,
                     value,
                 ) in self.fields.items()
-            }
+            },
         )
 
         # Check, if the dispatch flag is set to True
@@ -926,7 +520,7 @@ class CheckbuttonSelectField(BaseField):
             self.logger.warning(
                 message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
             )
-            
+
             # Return early
             return
 
@@ -949,7 +543,7 @@ class ComboboxField(BaseField):
     A string selection field using a tkinter Combobox.
 
     ComboboxField represents a selectable user input field consisting of a label, a combobox,
-    and an optional clear button. It supports both readonly and editable input modes, making it 
+    and an optional clear button. It supports both readonly and editable input modes, making it
     suitable for predefined options as well as user-defined values.
 
     The field layout consists of:
@@ -1070,7 +664,6 @@ class ComboboxField(BaseField):
         Returns:
             None
         """
-
 
         # Obtain the current value of the tkinter.StringVar variable
         value: str = self.variable.get()
@@ -1346,15 +939,10 @@ class ComboboxField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
+            master=self, text=label, **kwargs.get("label", {})
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -1371,13 +959,10 @@ class ComboboxField(BaseField):
             master=self,
             textvariable=self.variable,
             values=self.values,
-            **kwargs.get(
-                "combobox",
-               {}
-            )
+            **kwargs.get("combobox", {}),
         )
 
-       # Place the combobox widget within the grid
+        # Place the combobox widget within the grid
         self._combobox.grid(
             column=1,
             padx=5,
@@ -1408,13 +993,10 @@ class ComboboxField(BaseField):
             command=lambda: self.clear(dispatch=True),
             master=self,
             text="X",
-            **kwargs.get(
-                "button",
-               {}
-            )
+            **kwargs.get("button", {}),
         )
 
-       # Place the button widget within the grid
+        # Place the button widget within the grid
         self._button.grid(
             column=2,
             padx=5,
@@ -1507,8 +1089,8 @@ class ComboboxelectField(BaseField):
     """
     A grouped dropdown selection field using multiple ComboboxFields.
 
-    ComboboxelectField represents a group of labeled dropdowns (comboboxes), where each dropdown is 
-    an independent selection field. It is useful for capturing multiple structured selections from 
+    ComboboxelectField represents a group of labeled dropdowns (comboboxes), where each dropdown is
+    an independent selection field. It is useful for capturing multiple structured selections from
     the user, such as assigning a category to each option label.
 
     The layout consists of:
@@ -1538,7 +1120,7 @@ class ComboboxelectField(BaseField):
         Initializes a new instance of the ComboboxelectField class.
 
         This constructor sets up multiple ComboboxFields, each associated with a specific label,
-        and arranges them in a unified vertical layout. Optionally, predefined values can be 
+        and arranges them in a unified vertical layout. Optionally, predefined values can be
         assigned to each dropdown.
 
         Args:
@@ -1553,8 +1135,10 @@ class ComboboxelectField(BaseField):
             None
         """
 
-        # Initialize the fields dictionary 
-        self.fields: Dict[str, Optional[CheckbuttonField]] = {field: None for field in labels}
+        # Initialize the fields dictionary
+        self.fields: Dict[str, Optional[ComboboxField]] = {
+            field: None for field in labels
+        }
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -1580,9 +1164,9 @@ class ComboboxelectField(BaseField):
         return self._label
 
     def _on_field_change(
-       self,
-       label: str,
-       value: str,
+        self,
+        label: str,
+        value: str,
     ) -> None:
         """
         Handles internal changes from individual ComboboxFields.
@@ -1639,7 +1223,7 @@ class ComboboxelectField(BaseField):
             self.logger.warning(
                 message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
             )
-            
+
             # Return early
             return
 
@@ -1652,7 +1236,6 @@ class ComboboxelectField(BaseField):
 
         # Extend the 'values' of the corresponding combobox field with the passed values
         self.fields[label].cget("values").extend(value)
-
 
     @override
     def clear(
@@ -1730,7 +1313,7 @@ class ComboboxelectField(BaseField):
                 return
 
             # Store the looked up field in a variable
-            field: CheckbuttonField = self.fields[field]
+            field: ComboboxField = self.fields[field]
 
             # Generate the corresponding method name
             method: str = f"configure_{attribute}"
@@ -1861,15 +1444,10 @@ class ComboboxelectField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
+            master=self, text=label, **kwargs.get("label", {})
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -1905,12 +1483,7 @@ class ComboboxelectField(BaseField):
             )
 
             # Place the combobox field widget within the grid
-            combobox_field.grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=row
-            )
+            combobox_field.grid(column=0, padx=5, pady=5, row=row)
 
             # Add the combobox field widget to the fields dictionary instance variable
             self.fields[label] = combobox_field
@@ -1944,7 +1517,7 @@ class ComboboxelectField(BaseField):
             self.logger.warning(
                 message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
             )
-            
+
             # Return early
             return
 
@@ -1955,11 +1528,12 @@ class ComboboxelectField(BaseField):
         ) = (
             self.display_name,
             {
-                key: value.get(dispatch=False) for (
+                key: value.get(dispatch=False)
+                for (
                     key,
                     value,
                 ) in self.fields.items()
-            }
+            },
         )
 
         # Check, if the dispatch flag is set to True
@@ -2005,7 +1579,7 @@ class ComboboxelectField(BaseField):
             self.logger.warning(
                 message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
             )
-            
+
             # Return early
             return
 
@@ -2023,9 +1597,15 @@ class ComboboxelectField(BaseField):
             )
 
 
+class ListboxField(BaseField):
+    """
+    """
+
+    pass
+
+
 class OptionSelectFieldItem(tkinter.Frame):
-    """
-    """
+    """ """
 
     def __init__(
         self,
@@ -2037,8 +1617,7 @@ class OptionSelectFieldItem(tkinter.Frame):
         value: str,
         **kwargs,
     ) -> None:
-        """
-        """
+        """ """
 
         # Initialize the logger instance of this clas
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
@@ -2069,39 +1648,44 @@ class OptionSelectFieldItem(tkinter.Frame):
 
     @property
     def id(self) -> int:
-        """
-        """
+        """ """
 
         # Return the ID int
         return self._int
 
     @property
     def uuid(self) -> str:
-        """
-        """
+        """ """
 
         # Return the UUID str
         return self._uuid
 
     @property
     def value(self) -> str:
-        """
-        """
+        """ """
 
         # Return the value str
         return self._value
 
     def _on_button_click(self) -> None:
         """
+        Handles the click event of the 'X' button in the option select field item.
+
+        This method dispatches the REQUEST_OPTION_SELECT_FIELD_ITEM_DESTROY event to request
+        that the corresponding item be removed from the parent field's selection.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during dispatch or internal processing.
         """
         try:
             # Attempt to disptach the REQUEST_OPTION_SELECT_FIELD_ITEM_DESTROY event in the local namespace
             self.dispatcher.dispatch(
                 event=Events.REQUEST_OPTION_SELECT_FIELD_ITEM_DESTROY,
-                id=self._id,
-                label=self.display_name,
                 namespace=self.namespace,
-                uuid=self._uuid,
+                value=self._value,
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
@@ -2111,7 +1695,7 @@ class OptionSelectFieldItem(tkinter.Frame):
 
             # Log the traceback
             self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-            
+
             # Re-raise the exception to the caller
             raise e
 
@@ -2153,28 +1737,26 @@ class OptionSelectFieldItem(tkinter.Frame):
 
     def configure_grid(self) -> None:
         """
+        Configures the grid layout for the option select field item.
+
+        This method defines the row and column weights for the item, ensuring proper layout
+        behavior when resizing the window.
+
+        Returns:
+            None
         """
 
         # Set the weight of the 0th column to 1
         # This means that the column will stretch when the window is resized
-        self.grid_columnconfigure(
-            index=0,
-            weight=1
-        )
+        self.grid_columnconfigure(index=0, weight=1)
 
         # Set the weight of the 1st column to 0
         # This means that the column will not stretch when the window is resized
-        self.grid_columnconfigure(
-            index=1,
-            weight=0
-        )
+        self.grid_columnconfigure(index=1, weight=0)
 
         # Set the weight of the 0th row to 1
         # This means that the row will stretch when the window is resized
-        self.grid_rowconfigure(
-            index=0,
-            weight=1
-        )
+        self.grid_rowconfigure(index=0, weight=1)
 
     def configure_label(
         self,
@@ -2217,8 +1799,7 @@ class OptionSelectFieldItem(tkinter.Frame):
         value: str,
         **kwargs,
     ) -> None:
-        """
-        """
+        """ """
 
         # Create a label widget
         self.label: tkinter.Label = tkinter.Label(
@@ -2226,7 +1807,7 @@ class OptionSelectFieldItem(tkinter.Frame):
             text=value,
             **kwargs,
         )
-        
+
         # Place the label widget within the grid
         self.label.grid(
             column=0,
@@ -2254,8 +1835,7 @@ class OptionSelectFieldItem(tkinter.Frame):
 
 
 class OptionSelectFieldItemFactory:
-    """
-    """
+    """ """
 
     index: int = Constants.get_base_id()
 
@@ -2270,8 +1850,7 @@ class OptionSelectFieldItemFactory:
         value: str,
         **kwargs,
     ) -> Optional[OptionSelectFieldItem]:
-        """
-        """
+        """ """
         try:
             # Generate a new UUID code
             uuid: str = str(uuid.uuid4())
@@ -2288,7 +1867,7 @@ class OptionSelectFieldItemFactory:
             )
 
             # Increment the class index
-            cls.index+=1
+            cls.index += 1
 
             # Return the OptionSelectFieldItem instance
             return option_select_field_item
@@ -2306,8 +1885,7 @@ class OptionSelectFieldItemFactory:
 
 
 class MultiOptionSelectField(BaseField):
-    """
-    """
+    """ """
 
     def __init__(
         self,
@@ -2315,10 +1893,9 @@ class MultiOptionSelectField(BaseField):
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, str], None]] = None,
-        values: Optional[List[str]] = None
+        values: Optional[List[str]] = None,
     ) -> None:
-        """
-        """
+        """ """
 
         # Generate a uniqe internal namespace
         self.internal_namespace: str = f"MULTI_OPTION_SELECT_FIELD({str(uuid.uuid4())})"
@@ -2361,12 +1938,12 @@ class MultiOptionSelectField(BaseField):
     @property
     def container_frame(self) -> tkinter.Frame:
         """
-        Returns the 'container frame' frame widget associated with this field.
+            Returns the 'container frame' frame widget associated with this field.
 
-    The 'container frame' frame widget holds the selected values.
+        The 'container frame' frame widget holds the selected values.
 
-        Returns:
-            tkinter.Frame: The 'container frame' frame widget.
+            Returns:
+                tkinter.Frame: The 'container frame' frame widget.
         """
 
         # Return the 'container frame' frame widget
@@ -2399,16 +1976,15 @@ class MultiOptionSelectField(BaseField):
         return self._clear_button
 
     def _on_clear_button_click(self) -> None:
-        """
-        """
+        """ """
 
         # Get a list of  childr widgets of the container frame
         children: List[tkinter.Misc] = self._container_frame.winfo_children()
 
         # Check,  if any child widgets exist
         if len(children) == 0:
-                # Return early
-                return
+            # Return early
+            return
 
         # Iterate over the list of child widgets
         for child in children:
@@ -2435,8 +2011,7 @@ class MultiOptionSelectField(BaseField):
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
-        """
-        """
+        """ """
 
         # Obtain the current selection from the listbox
         value_tuple: Tuple[int] = self.listbox.curselection()
@@ -2463,11 +2038,10 @@ class MultiOptionSelectField(BaseField):
             value_list.append(string_values[index])
 
         for (
-                row,
-                value,
+            row,
+            value,
         ) in enumerate(
-            iterable=value_list,
-            start=len(self.container_frame.winfo_children())
+            iterable=value_list, start=len(self.container_frame.winfo_children())
         ):
             # Check, if the current value already has been selected
             if value in self.selection.keys():
@@ -2475,11 +2049,13 @@ class MultiOptionSelectField(BaseField):
                 continue
 
             # Attempt to create a OptionSelectFieldItem instance
-            select_option_field_item: Optional[OptionSelectFieldItem] = OptionSelectFieldItemFactory.create_select_option_field_item(
-                dispatcher=self.dispatcher,
-                master=self.container,
-                namespace=self.internal_namespace,
-                value=value,
+            select_option_field_item: Optional[OptionSelectFieldItem] = (
+                OptionSelectFieldItemFactory.create_select_option_field_item(
+                    dispatcher=self.dispatcher,
+                    master=self.container,
+                    namespace=self.internal_namespace,
+                    value=value,
+                )
             )
 
             # Check, if the creation of the OptionSelectFieldItem instance was successfull
@@ -2487,7 +2063,7 @@ class MultiOptionSelectField(BaseField):
                 # Log a warning message
                 self.logger.warning(
                     message=f"Failed to create OptionSelectFieldItem instance in '{self.__class__.__name__}' class. This is likely due to something serious having gone wrong."
-            )
+                )
 
                 # Skip the current iteration
                 continue
@@ -2506,19 +2082,27 @@ class MultiOptionSelectField(BaseField):
 
         # Dispatch the MULTI_OPTION_SELECT_FIELD_CHANGED event
         self.dispatcher.dispatch(
-                event=Events.MULTI_OPTION_SELECT_FIELD_CHANGED,
-                label=self.display_name,
-                namespace=self.namespace,
-                value=self.selection.keys(),
+            event=Events.MULTI_OPTION_SELECT_FIELD_CHANGED,
+            label=self.display_name,
+            namespace=self.namespace,
+            value=self.selection.keys(),
         )
 
     def _on_request_option_select_field_item_destroy(
         self,
-        id: int,
-        uuid: str,
         value: str,
     ) -> None:
         """
+        Handles the event for removing a selected item from the option select field.
+
+        This method removes the corresponding OptionSelectFieldItem from the internal selection
+        and destroys its widget.
+
+        Args:
+            value (str): The string label of the item to be removed.
+
+        Returns:
+            None
         """
         try:
             # Check, if the value is contained within the list of the selection dictionaries instance variable
@@ -2553,6 +2137,13 @@ class MultiOptionSelectField(BaseField):
 
     def _on_select_button_click(self) -> None:
         """
+        Opens the selection popup window for the option select field.
+
+        This method creates a Toplevel window with a label, entry field, listbox, and close button,
+        allowing the user to select one or more options.
+
+        Returns:
+            None
         """
 
         # Check, if the toplevel instance variable is not None
@@ -2625,7 +2216,7 @@ class MultiOptionSelectField(BaseField):
             padx=5,
             pady=5,
             row=0,
-            sticky=NSEW,        
+            sticky=NSEW,
         )
 
         # Create a frame widget
@@ -2637,7 +2228,7 @@ class MultiOptionSelectField(BaseField):
             padx=5,
             pady=5,
             row=1,
-            sticky=NSEW,        
+            sticky=NSEW,
         )
 
         # Create the 'search label' label widget
@@ -2652,15 +2243,14 @@ class MultiOptionSelectField(BaseField):
             padx=5,
             pady=5,
             row=0,
-            sticky=NSEW,        
+            sticky=NSEW,
         )
 
         def _on_entry_change(
             entry: tkinter.Entry,
             event: Optional[tkinter.Event] = None,
         ) -> None:
-            """
-            """
+            """ """
 
             # Obtain the string value from the entry
             string_value: str = entry.get()
@@ -2693,20 +2283,20 @@ class MultiOptionSelectField(BaseField):
 
         # Place the entry widget within the grid
         entry.grid(
-                column=1,
-                padx=5,
-                pady=5,
-                row=0,
-                sticky=NSEW,        
-            )
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
 
         # Bind the 'on_entry_change' method to the listbox widget via the '<KeyRelease>' event
         self.listbox.bind(
-                func=lambda entry, event: _on_entry_change(
-                    entry=entry,
-                    event=event,
-                ),
-                sequence="<KeyRelease>",
+            func=lambda entry, event: _on_entry_change(
+                entry=entry,
+                event=event,
+            ),
+            sequence="<KeyRelease>",
         )
 
         # Update the value of the tkinter.StringVar instance variable
@@ -2714,24 +2304,24 @@ class MultiOptionSelectField(BaseField):
 
         # Create a listbox widget and store it in the (optional) listbox instance variable
         self.listbox = tkinter.Listbox(
-                listvariable=self.variable,
-                master=self.toplevel,
-                selectmode="extended",
+            listvariable=self.variable,
+            master=self.toplevel,
+            selectmode="extended",
         )
 
         # Place the listbox widget within the grid
         self.listbox.grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=2,
-                sticky=NSEW,        
-            )
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
 
         # Bind the 'on_listbox_select' method to the listbox widget via the '<<ListboxSelect>>' event
         self.listbox.bind(
-                func=self._on_listbox_select,
-                sequence="<<ListboxSelect>>",
+            func=self._on_listbox_select,
+            sequence="<<ListboxSelect>>",
         )
 
         # Create a button widget
@@ -2746,7 +2336,7 @@ class MultiOptionSelectField(BaseField):
             column=0,
             padx=5,
             pady=5,
-            row=3,      
+            row=3,
         )
 
     def _on_toplevel_destroy(self) -> None:
@@ -2768,9 +2358,19 @@ class MultiOptionSelectField(BaseField):
         values: Union[List[str], str],
     ) -> None:
         """
+        Adds one or more values to the option select field.
+
+        This method checks whether the given values are already part of the field's allowed values,
+        and appends them if valid.
+
+        Args:
+            values (Union[List[str], str]): A single string or a list of strings to be added.
+
+        Returns:
+            None
         """
 
-    # Check, if the passed values argument is not an instance of list
+        # Check, if the passed values argument is not an instance of list
         if not isinstance(
             values,
             list,
@@ -2794,6 +2394,16 @@ class MultiOptionSelectField(BaseField):
         dispatch: bool = False,
     ) -> None:
         """
+        Clears the selected items from the option select field.
+
+        This method destroys all currently selected OptionSelectFieldItem widgets,
+        clears the internal selection dictionary, and optionally dispatches an event.
+
+        Args:
+            dispatch (bool): If True, an event is dispatched to signal that the field was cleared.
+
+        Returns:
+            None
         """
 
         # Get a list of  childr widgets of the container frame
@@ -2824,8 +2434,7 @@ class MultiOptionSelectField(BaseField):
 
     @override
     def configure_grid(self) -> None:
-        """
-        """
+        """ """
 
         # Set the weight of the 0th column to 0
         # This means that the column will not stretch when the window is resized
@@ -2940,20 +2549,14 @@ class MultiOptionSelectField(BaseField):
         label: str,
         **kwargs,
     ) -> None:
-        """
-        """
+        """ """
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
+            master=self, text=label, **kwargs.get("label", {})
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -2964,14 +2567,10 @@ class MultiOptionSelectField(BaseField):
 
         # Create a 'container frame' frame widget
         self._container_frame: tkinter.Frame = tkinter.Frame(
-            master=self,
-            **kwargs.get(
-                "container_frame",
-               {}
-            )
+            master=self, **kwargs.get("container_frame", {})
         )
 
-       # Place the 'container frame' frame widget within the grid
+        # Place the 'container frame' frame widget within the grid
         self._container_frame.grid(
             column=1,
             padx=5,
@@ -2985,13 +2584,10 @@ class MultiOptionSelectField(BaseField):
             command=self._on_clear_button_click,
             master=self,
             text="X",
-            **kwargs.get(
-                "clear_button",
-               {}
-            )
+            **kwargs.get("clear_button", {}),
         )
 
-       # Place the 'clear button' button widget within the grid
+        # Place the 'clear button' button widget within the grid
         self._clear_button.grid(
             column=2,
             padx=5,
@@ -3004,13 +2600,10 @@ class MultiOptionSelectField(BaseField):
             command=self._on_select_button_click,
             master=self,
             text="Select",
-            **kwargs.get(
-                "select_button",
-               {}
-            )
+            **kwargs.get("select_button", {}),
         )
 
-       # Place the 'select button' button widget within the grid
+        # Place the 'select button' button widget within the grid
         self._select_button.grid(
             column=3,
             padx=5,
@@ -3023,8 +2616,7 @@ class MultiOptionSelectField(BaseField):
         self,
         dispatch: bool = False,
     ) -> Tuple[str, List[str]]:
-        """
-        """
+        """ """
 
         # Obtain the label and values of this field
         (
@@ -3057,8 +2649,7 @@ class MultiOptionSelectField(BaseField):
         values: Union[List[str], str],
         dispatch: bool = False,
     ) -> None:
-        """
-        """
+        """ """
 
         # Check, if the passed values argument is not an instance of list
         if not isinstance(
@@ -3078,13 +2669,11 @@ class MultiOptionSelectField(BaseField):
             # Append the value to the list of values
             self.values.append(value)
 
-
         for (
             row,
             value,
         ) in enumerate(
-            iterable=self.values,
-            start=len(self.container_frame.winfo_children())
+            iterable=self.values, start=len(self.container_frame.winfo_children())
         ):
             # Check, if the current value already has been selected
             if value in self.selection.keys():
@@ -3092,11 +2681,13 @@ class MultiOptionSelectField(BaseField):
                 continue
 
             # Attempt to create a OptionSelectFieldItem instance
-            select_option_field_item: Optional[OptionSelectFieldItem] = OptionSelectFieldItemFactory.create_select_option_field_item(
-                dispatcher=self.dispatcher,
-                master=self.container,
-                namespace=self.internal_namespace,
-                value=value,
+            select_option_field_item: Optional[OptionSelectFieldItem] = (
+                OptionSelectFieldItemFactory.create_select_option_field_item(
+                    dispatcher=self.dispatcher,
+                    master=self.container,
+                    namespace=self.internal_namespace,
+                    value=value,
+                )
             )
 
             # Check, if the creation of the OptionSelectFieldItem instance was successfull
@@ -3104,7 +2695,7 @@ class MultiOptionSelectField(BaseField):
                 # Log a warning message
                 self.logger.warning(
                     message=f"Failed to create OptionSelectFieldItem instance in '{self.__class__.__name__}' class. This is likely due to something serious having gone wrong."
-            )
+                )
 
                 # Skip the current iteration
                 continue
@@ -3129,399 +2720,6 @@ class MultiOptionSelectField(BaseField):
                 label=self.display_name,
                 namespace=self.namespace,
                 value=value,
-            )
-
-
-class RadiobuttonField(BaseField):
-    """
-    A boolean field using a radiobutton widget.
-
-    RadiobuttonField represents a binary user input field consisting of a label and a tkinter.Radiobutton.
-    It stores its state in a tkinter.BooleanVar and provides event dispatching and callback support on change.
-
-    The field layout consists of:
-        [ Label | Radiobutton ]
-
-    Attributes:
-        variable (tkinter.BooleanVar): Holds the current boolean state of the radiobutton.
-        label (tkinter.Label): The label widget describing the radiobutton.
-        radiobutton (tkinter.Radiobutton): The interactive radiobox widget.
-
-    Inherits from:
-        BaseField
-    """
-
-    def __init__(
-        self,
-        label: str,
-        master: tkinter.Misc,
-        namespace: str = Constants.GLOBAL_NAMESPACE,
-        on_change_callback: Optional[Callable[[str, bool], None]] = None,
-        value: bool = False,
-    ) -> None:
-        """
-        Initializes a new instance of the RadiobuttonField class.
-
-        This constructor sets up the label and radiobutton widget, binds the necessary variable,
-        and prepares the field for interaction and layout configuration.
-
-        Args:
-            label (str): The label text displayed next to the radiobutton.
-            master (tkinter.Misc): The parent container in which this widget is placed.
-            namespace (str, optional): The namespace identifier for event dispatching. Defaults to Constants.GLOBAL_NAMESPACE.
-            on_change_callback (Optional[Callable[[str, bool], None]], optional): Callback function called when the boolean value changes.
-            value (bool, optional): The initial boolean state of the radiobutton. Defaults to False.
-
-        Returns:
-            None
-        """
-
-        # Call the parent class constructor with the passed arguments
-        super().__init__(
-            label=label,
-            master=master,
-            namespace=namespace,
-            on_change_callback=on_change_callback,
-        )
-
-    @property
-    def radiobutton(self) -> tkinter.Radiobutton:
-        """
-        Returns the radiobutton widget associated with this field.
-
-        The radiobutton displays the name or description of the field.
-
-        Returns:
-            tkinter.Radiobutton: The radiobutton widget.
-        """
-
-        # Return the tkinter.Radiobutton radiobutton widget
-        return self._radiobutton
-
-    @property
-    def label(self) -> tkinter.Label:
-        """
-        Returns the label widget associated with this field.
-
-        The label displays the name or description of the field.
-
-        Returns:
-            tkinter.Label: The label widget.
-        """
-
-        # Return the tkinter.Label label widget
-        return self._label
-
-    def _on_radiobutton_change(
-        self,
-        event: Optional[tkinter.Event] = None,
-    ) -> None:
-        """
-        Handles changes in the radiobutton state.
-
-        This method is triggered when the user toggles the radiobutton. It dispatches an event
-        with the new boolean value and triggers an optional callback function.
-
-        Args:
-            event (Optional[tkinter.Event], optional): The event object. Defaults to None.
-
-        Returns:
-            None
-        """
-
-        # Dispatch the RADIOBUTTON_FIELD_CLEARED event
-        self.dispatcher.dispatch(
-            event=Events.RADIOBUTTON_FIELD_CLEARED,
-            label=self.display_name,
-            namespace=self.namespace,
-            value=self.variable.get(),
-        )
-
-        # Check, if the 'on_change_callback' function exists
-        if self.on_change_callback:
-            # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
-            self.on_change_callback(
-                self.display_name,
-                self.variable.get(),
-            )
-
-    @override
-    def clear(
-        self,
-        dispatch: bool = False,
-    ) -> None:
-        """
-        Clears the state of the radiobutton, setting it to False.
-
-        If `dispatch` is True, it also dispatches a clear event to notify any listeners.
-
-        Args:
-            dispatch (bool, optional): Whether to dispatch a clear event. Defaults to False.
-
-        Returns:
-            None
-        """
-
-        # Update the variable's value to an empty string
-        self.variable.set(value=False)
-
-        # Check, if the dispatch flag is set to True
-        if dispatch:
-            # Dispatch the RADIOBUTTON_FIELD_CLEARED event
-            self.dispatcher.dispatch(
-                event=Events.RADIOBUTTON_FIELD_CLEARED,
-                label=self.display_name,
-                namespace=self.namespace,
-                value=self.variable.get(),
-            )
-
-    def configure_radiobutton(
-        self,
-        **kwargs,
-    ) -> None:
-        """
-        Configures the radiobutton widget in this field.
-
-        This method configures the radiobutton widget in this field
-        using the provided keyword arguments.
-
-        Args:
-            **kwargs: The keyword arguments to be passed to the configure method
-                of the radiobutton widget.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an exception occurs while attempting to configure the
-                radiobutton widget.
-        """
-        try:
-            # Attempt to configure the radiobutton widget
-            self._radiobutton.configure(**kwargs)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_radiobutton' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
-
-    @override
-    def configure_grid(self) -> None:
-        """
-        Configures the grid layout of the RadiobuttonField widget.
-
-        This method sets the column and row weights for the internal layout of the RadiobuttonField.
-        It ensures proper resizing behavior and alignment of label and radiobutton.
-
-        Columns:
-            - Column 0: Label (fixed width)
-            - Column 1: Radiobutton field (fixed width)
-
-        Rows:
-            - Row 0: Main field layout (fixed height)
-
-        Returns:
-            None
-        """
-
-        # Set the weight of the 0th column to 0
-        # This means that the column will not stretch when the window is resized
-        self.grid_columnconfigure(
-            index=0,
-            weight=0,
-        )
-
-        # Set the weight of the 1st column to 0
-        # This means that the column will not stretch when the window is resized
-        self.grid_columnconfigure(
-            index=1,
-            weight=0,
-        )
-
-        # Set the weight of the 0th row to 0
-        # This means that the row will not stretch when the window is resized
-        self.grid_rowconfigure(
-            index=0,
-            weight=0,
-        )
-
-    def configure_label(
-        self,
-        **kwargs,
-    ) -> None:
-        """
-        Configures the label widget in this field.
-
-        This method configures the label widget in this field
-        using the provided keyword arguments.
-
-        Args:
-            **kwargs: The keyword arguments to be passed to the configure method
-                of the label widget.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an exception occurs while attempting to configure the
-                label widget.
-        """
-        try:
-            # Attempt to configure the label widget
-            self._label.configure(**kwargs)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
-
-    @override
-    def create_widgets(
-        self,
-        label: str,
-        **kwargs,
-    ) -> None:
-        """
-        Creates and configures the widgets for the RadiobuttonField.
-
-        This method initializes the label and the radiobutton widget, binds the internal BooleanVar,
-        and places the widgets in the grid layout.
-
-        Args:
-            label (str): The label text to be displayed next to the radiobutton.
-            **kwargs: Additional keyword arguments passed to individual widget constructors.
-
-        Returns:
-            None
-        """
-
-        # Create a label widget
-        self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
-        )
-
-       # Place the label widget within the grid
-        self._label.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create a string variable
-        self.variable: tkinter.BooleanVar = tkinter.BooleanVar(value=False)
-
-        # Create a radiobutton widget
-        self._radiobutton: tkinter.Radiobutton = tkinter.Radiobutton(
-            command=self._on_radiobutton_change,
-            master=self,
-            text=f"{self.variable.get()}",
-            variable=self.variable,
-            **kwargs.get(
-                "radiobutton",
-               {}
-            )
-        )
-
-       # Place the radiobutton widget within the grid
-        self._radiobutton.grid(
-            column=1,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-    @override
-    def get(
-        self,
-        dispatch: bool = False,
-    ) -> Tuple[str, bool]:
-        """
-        Retrieves the current state of the radiobutton.
-
-        If `dispatch` is set to True, it also dispatches a GET event.
-
-        Args:
-            dispatch (bool, optional): Whether to dispatch a get event. Defaults to False.
-
-        Returns:
-            Tuple[str, bool]: A tuple containing the display label and the boolean value of the radiobutton.
-        """
-
-        # Obtain the label and value strings from the widgets
-        (
-            label,
-            value,
-        ) = (
-            self.display_name,
-            self.variable.get(),
-        )
-
-        # Check, if the dispatch flag is set to True
-        if dispatch:
-            # Dispatch the RADIOBUTTON_FIELD_GET event
-            self.dispatcher.dispatch(
-                event=Events.RADIOBUTTON_FIELD_GET,
-                label=label,
-                namespace=self.namespace,
-                value=value,
-            )
-
-        # Return the text of the label and the value of the text field
-        return (
-            label,
-            value,
-        )
-
-    @override
-    def set(
-        self,
-        value: bool,
-        dispatch: bool = False,
-    ) -> None:
-        """
-        Sets the state of the radiobutton to the given boolean value.
-
-        If `dispatch` is set to True, a SET event is dispatched.
-
-        Args:
-            value (bool): The boolean value to set (True or False).
-            dispatch (bool, optional): Whether to dispatch a set event. Defaults to False.
-
-        Returns:
-            None
-        """
-
-        # Update the variable with the passed value string
-        self.variable.set(value=value)
-
-        # Check, if the dispatch flag is set to True
-        if dispatch:
-            # Dispatch the RADIOBUTTON_FIELD_SET event
-            self.dispatcher.dispatch(
-                event=Events.RADIOBUTTON_FIELD_SET,
-                label=self.display_name,
-                namespace=self.namespace,
-                value=self.variable.get(),
             )
 
 
@@ -3572,8 +2770,10 @@ class RadiobuttonSelectField(BaseField):
             None
         """
 
-        # Initialize the fields dictionary 
-        self.fields: Dict[str, Optional[RadiobuttonField]] = {label: None for label in labels}
+        # Initialize the fields dictionary
+        self.fields: Dict[str, Optional[RadiobuttonField]] = {
+            label: None for label in labels
+        }
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -3643,8 +2843,8 @@ class RadiobuttonSelectField(BaseField):
         """
         Internal handler for state changes in individual radiobuttons.
 
-        This method is triggered whenever a RadiobuttonField changes its value. It enforces 
-        the selection (e.g. unselecting other fields), dispatches 
+        This method is triggered whenever a RadiobuttonField changes its value. It enforces
+        the selection (e.g. unselecting other fields), dispatches
         a change event, and invokes the on_change_callback if provided.
 
         Args:
@@ -3656,10 +2856,7 @@ class RadiobuttonSelectField(BaseField):
         """
 
         # Enforce the selection
-        self._enforce_selection(
-            label=label,
-            value=value
-        )
+        self._enforce_selection(label=label, value=value)
 
         # Dispatch the RADIOBUTTON_SELECT_FIELD_CHANGED event
         self.dispatcher.dispatch(
@@ -3885,15 +3082,10 @@ class RadiobuttonSelectField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
+            master=self, text=label, **kwargs.get("label", {})
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -3919,12 +3111,7 @@ class RadiobuttonSelectField(BaseField):
             )
 
             # Place the radiobutton field widget within the grid
-            radiobutton_field.grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=row
-            )
+            radiobutton_field.grid(column=0, padx=5, pady=5, row=row)
 
             # Add the radiobutton field widget to the fields dictionary instance variable
             self.fields[label] = radiobutton_field
@@ -3957,7 +3144,7 @@ class RadiobuttonSelectField(BaseField):
             self.logger.warning(
                 message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
             )
-            
+
             # Return early
             return
 
@@ -3968,11 +3155,12 @@ class RadiobuttonSelectField(BaseField):
         ) = (
             self.display_name,
             {
-                key: value.get(dispatch=False) for (
+                key: value.get(dispatch=False)
+                for (
                     key,
                     value,
                 ) in self.fields.items()
-            }
+            },
         )
 
         # Check, if the dispatch flag is set to True
@@ -4015,7 +3203,7 @@ class RadiobuttonSelectField(BaseField):
             self.logger.warning(
                 message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
             )
-            
+
             # Return early
             return
 
@@ -4034,8 +3222,7 @@ class RadiobuttonSelectField(BaseField):
 
 
 class SingleOptionSelectField(BaseField):
-    """
-    """
+    """ """
 
     def __init__(
         self,
@@ -4043,13 +3230,14 @@ class SingleOptionSelectField(BaseField):
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, str], None]] = None,
-        values: Optional[List[str]] = None
+        values: Optional[List[str]] = None,
     ) -> None:
-        """
-        """
+        """ """
 
         # Generate a uniqe internal namespace
-        self.internal_namespace: str = f"SINGLE_OPTION_SELECT_FIELD({str(uuid.uuid4())})"
+        self.internal_namespace: str = (
+            f"SINGLE_OPTION_SELECT_FIELD({str(uuid.uuid4())})"
+        )
 
         # Initialize the (optional) listbox instance variable as None
         self.listbox: Optional[tkinter.Listbox] = None
@@ -4089,12 +3277,12 @@ class SingleOptionSelectField(BaseField):
     @property
     def container_frame(self) -> tkinter.Frame:
         """
-        Returns the 'container frame' frame widget associated with this field.
+            Returns the 'container frame' frame widget associated with this field.
 
-    The 'container frame' frame widget holds the selected values.
+        The 'container frame' frame widget holds the selected values.
 
-        Returns:
-            tkinter.Frame: The 'container frame' frame widget.
+            Returns:
+                tkinter.Frame: The 'container frame' frame widget.
         """
 
         # Return the 'container frame' frame widget
@@ -4127,8 +3315,7 @@ class SingleOptionSelectField(BaseField):
         return self._clear_button
 
     def _on_clear_button_click(self) -> None:
-        """
-        """
+        """ """
 
         # Get a list of  childr widgets of the container frame
         children: List[tkinter.Misc] = self._container_frame.winfo_children()
@@ -4163,8 +3350,7 @@ class SingleOptionSelectField(BaseField):
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
-        """
-        """
+        """ """
 
         # Obtain the current selection from the listbox
         value_tuple: Tuple[int] = self.listbox.curselection()
@@ -4195,8 +3381,10 @@ class SingleOptionSelectField(BaseField):
             # Iterate over the keys of the selection dictionary instance variable
             for key in self.selection.keys():
                 # Obtain the OptionSelectFieldItem from the instance
-                select_option_field_item: OptionSelectFieldItem = self.selection.pop(key)
-                
+                select_option_field_item: OptionSelectFieldItem = self.selection.pop(
+                    key
+                )
+
                 # Destroy the OptionSelectFieldItem instance
                 select_option_field_item.destroy()
 
@@ -4204,8 +3392,7 @@ class SingleOptionSelectField(BaseField):
             row,
             value,
         ) in enumerate(
-            iterable=value_list,
-            start=len(self.container_frame.winfo_children())
+            iterable=value_list, start=len(self.container_frame.winfo_children())
         ):
             # Check, if the current value already has been selected
             if value in self.selection.keys():
@@ -4213,11 +3400,13 @@ class SingleOptionSelectField(BaseField):
                 continue
 
             # Attempt to create a OptionSelectFieldItem instance
-            select_option_field_item: Optional[OptionSelectFieldItem] = OptionSelectFieldItemFactory.create_select_option_field_item(
-                dispatcher=self.dispatcher,
-                master=self.container,
-                namespace=self.internal_namespace,
-                value=value,
+            select_option_field_item: Optional[OptionSelectFieldItem] = (
+                OptionSelectFieldItemFactory.create_select_option_field_item(
+                    dispatcher=self.dispatcher,
+                    master=self.container,
+                    namespace=self.internal_namespace,
+                    value=value,
+                )
             )
 
             # Check, if the creation of the OptionSelectFieldItem instance was successfull
@@ -4225,7 +3414,7 @@ class SingleOptionSelectField(BaseField):
                 # Log a warning message
                 self.logger.warning(
                     message=f"Failed to create OptionSelectFieldItem instance in '{self.__class__.__name__}' class. This is likely due to something serious having gone wrong."
-            )
+                )
 
                 # Skip the current iteration
                 continue
@@ -4244,10 +3433,10 @@ class SingleOptionSelectField(BaseField):
 
         # Dispatch the SINGLE_OPTION_SELECT_FIELD_CHANGED event
         self.dispatcher.dispatch(
-                event=Events.SINGLE_OPTION_SELECT_FIELD_CHANGED,
-                label=self.display_name,
-                namespace=self.namespace,
-                value=self.selection.keys(),
+            event=Events.SINGLE_OPTION_SELECT_FIELD_CHANGED,
+            label=self.display_name,
+            namespace=self.namespace,
+            value=self.selection.keys(),
         )
 
     def _on_request_option_select_field_item_destroy(
@@ -4256,8 +3445,7 @@ class SingleOptionSelectField(BaseField):
         uuid: str,
         value: str,
     ) -> None:
-        """
-        """
+        """ """
         try:
             # Check, if the value is contained within the list of the selection dictionaries instance variable
             if value not in self.selection.keys():
@@ -4290,8 +3478,7 @@ class SingleOptionSelectField(BaseField):
             raise e
 
     def _on_select_button_click(self) -> None:
-        """
-        """
+        """ """
 
         # Check, if the toplevel instance variable is not None
         if self.toplevel is not None:
@@ -4363,7 +3550,7 @@ class SingleOptionSelectField(BaseField):
             padx=5,
             pady=5,
             row=0,
-            sticky=NSEW,        
+            sticky=NSEW,
         )
 
         # Create a frame widget
@@ -4375,7 +3562,7 @@ class SingleOptionSelectField(BaseField):
             padx=5,
             pady=5,
             row=1,
-            sticky=NSEW,        
+            sticky=NSEW,
         )
 
         # Create the 'search label' label widget
@@ -4390,15 +3577,14 @@ class SingleOptionSelectField(BaseField):
             padx=5,
             pady=5,
             row=0,
-            sticky=NSEW,        
+            sticky=NSEW,
         )
 
         def _on_entry_change(
             entry: tkinter.Entry,
             event: Optional[tkinter.Event] = None,
         ) -> None:
-            """
-            """
+            """ """
 
             # Obtain the string value from the entry
             string_value: str = entry.get()
@@ -4436,7 +3622,7 @@ class SingleOptionSelectField(BaseField):
             padx=5,
             pady=5,
             row=0,
-            sticky=NSEW,        
+            sticky=NSEW,
         )
 
         # Bind the 'on_entry_change' method to the listbox widget via the '<KeyRelease>' event
@@ -4464,7 +3650,7 @@ class SingleOptionSelectField(BaseField):
             padx=5,
             pady=5,
             row=2,
-            sticky=NSEW,        
+            sticky=NSEW,
         )
 
         # Bind the 'on_listbox_select' method to the listbox widget via the '<<ListboxSelect>>' event
@@ -4485,7 +3671,7 @@ class SingleOptionSelectField(BaseField):
             column=0,
             padx=5,
             pady=5,
-            row=3,      
+            row=3,
         )
 
     def _on_toplevel_destroy(self) -> None:
@@ -4506,10 +3692,9 @@ class SingleOptionSelectField(BaseField):
         self,
         values: Union[List[str], str],
     ) -> None:
-        """
-        """
+        """ """
 
-    # Check, if the passed values argument is not an instance of list
+        # Check, if the passed values argument is not an instance of list
         if not isinstance(
             values,
             list,
@@ -4532,8 +3717,7 @@ class SingleOptionSelectField(BaseField):
         self,
         dispatch: bool = False,
     ) -> None:
-        """
-        """
+        """ """
 
         # Get a list of  childr widgets of the container frame
         children: List[tkinter.Misc] = self._container_frame.winfo_children()
@@ -4563,8 +3747,7 @@ class SingleOptionSelectField(BaseField):
 
     @override
     def configure_grid(self) -> None:
-        """
-        """
+        """ """
 
         # Set the weight of the 0th column to 0
         # This means that the column will not stretch when the window is resized
@@ -4679,20 +3862,14 @@ class SingleOptionSelectField(BaseField):
         label: str,
         **kwargs,
     ) -> None:
-        """
-        """
+        """ """
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
+            master=self, text=label, **kwargs.get("label", {})
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -4703,14 +3880,10 @@ class SingleOptionSelectField(BaseField):
 
         # Create a 'container frame' frame widget
         self._container_frame: tkinter.Frame = tkinter.Frame(
-            master=self,
-            **kwargs.get(
-                "container_frame",
-               {}
-            )
+            master=self, **kwargs.get("container_frame", {})
         )
 
-       # Place the 'container frame' frame widget within the grid
+        # Place the 'container frame' frame widget within the grid
         self._container_frame.grid(
             column=1,
             padx=5,
@@ -4724,13 +3897,10 @@ class SingleOptionSelectField(BaseField):
             command=self._on_clear_button_click,
             master=self,
             text="X",
-            **kwargs.get(
-                "clear_button",
-               {}
-            )
+            **kwargs.get("clear_button", {}),
         )
 
-       # Place the 'clear button' button widget within the grid
+        # Place the 'clear button' button widget within the grid
         self._clear_button.grid(
             column=2,
             padx=5,
@@ -4743,13 +3913,10 @@ class SingleOptionSelectField(BaseField):
             command=self._on_select_button_click,
             master=self,
             text="Select",
-            **kwargs.get(
-                "select_button",
-               {}
-            )
+            **kwargs.get("select_button", {}),
         )
 
-       # Place the 'select button' button widget within the grid
+        # Place the 'select button' button widget within the grid
         self._select_button.grid(
             column=3,
             padx=5,
@@ -4762,8 +3929,7 @@ class SingleOptionSelectField(BaseField):
         self,
         dispatch: bool = False,
     ) -> Tuple[str, List[str]]:
-        """
-        """
+        """ """
 
         # Obtain the label and values of this field
         (
@@ -4796,8 +3962,7 @@ class SingleOptionSelectField(BaseField):
         values: str,
         dispatch: bool = False,
     ) -> None:
-        """
-        """
+        """ """
 
         # Check, if the passed values argument is not an instance of list
         if not isinstance(
@@ -4822,8 +3987,10 @@ class SingleOptionSelectField(BaseField):
             # Iterate over the keys of the selection dictionary instance variable
             for key in self.selection.keys():
                 # Obtain the OptionSelectFieldItem from the instance
-                select_option_field_item: OptionSelectFieldItem = self.selection.pop(key)
-                
+                select_option_field_item: OptionSelectFieldItem = self.selection.pop(
+                    key
+                )
+
                 # Destroy the OptionSelectFieldItem instance
                 select_option_field_item.destroy()
 
@@ -4831,8 +3998,7 @@ class SingleOptionSelectField(BaseField):
             row,
             value,
         ) in enumerate(
-            iterable=[values],
-            start=len(self.container_frame.winfo_children())
+            iterable=[values], start=len(self.container_frame.winfo_children())
         ):
             # Check, if the current value already has been selected
             if value in self.selection.keys():
@@ -4840,11 +4006,13 @@ class SingleOptionSelectField(BaseField):
                 continue
 
             # Attempt to create a OptionSelectFieldItem instance
-            select_option_field_item: Optional[OptionSelectFieldItem] = OptionSelectFieldItemFactory.create_select_option_field_item(
-                dispatcher=self.dispatcher,
-                master=self.container,
-                namespace=self.internal_namespace,
-                value=value,
+            select_option_field_item: Optional[OptionSelectFieldItem] = (
+                OptionSelectFieldItemFactory.create_select_option_field_item(
+                    dispatcher=self.dispatcher,
+                    master=self._container,
+                    namespace=self.internal_namespace,
+                    value=value,
+                )
             )
 
             # Check, if the creation of the OptionSelectFieldItem instance was successfull
@@ -4852,7 +4020,7 @@ class SingleOptionSelectField(BaseField):
                 # Log a warning message
                 self.logger.warning(
                     message=f"Failed to create OptionSelectFieldItem instance in '{self.__class__.__name__}' class. This is likely due to something serious having gone wrong."
-            )
+                )
 
                 # Skip the current iteration
                 continue
@@ -4878,4 +4046,3 @@ class SingleOptionSelectField(BaseField):
                 namespace=self.namespace,
                 value=value,
             )
-

@@ -145,6 +145,26 @@ class Events:
         name="ui:checkbox:field:set"
     )
 
+    # An event that indicates that a checkbox field has changed
+    CHECKBUTTON_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:checkbox_select:field:changed")
+    )
+
+    # An event that indicates that a checkbox field has been cleared
+    CHECKBUTTON_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:checkbox_select:field:cleared")
+    )
+
+    # An event that indicates that a checkbox field's value has been retrieved
+    CHECKBUTTON_SELECT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:checkbox_select:field:get")
+    )
+
+    # An event that indicates that a checkbox field has been set
+    CHECKBUTTON_SELECT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:checkbox_select:field:set")
+    )
+
     # An event that indicates that a combobox field has changed
     COMBOBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:combobox_:field:changed")
@@ -176,13 +196,13 @@ class Events:
     )
 
     # An event that indicates that a combobox field's value has been retrieved
-    COMBOBOX_SELECT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:combobox_select:field:get"
+    COMBOBOX_SELECT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:combobox_select:field:get")
     )
 
     # An event that indicates that a combobox field has been set
-    COMBOBOX_SELECT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:combobox_select:field:set"
+    COMBOBOX_SELECT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:combobox_select:field:set")
     )
 
     # An event that indicates that a create button has been clicked
@@ -241,8 +261,10 @@ class Events:
     )
 
     # An event that indicates that a flashcard has been flipped in the flashcard learning view
-    FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED: DispatcherEventFactory.create_event(
-        name="flashcardlearningview:flashcard:flipped"
+    FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="flashcardlearningview:flashcard:flipped"
+        )
     )
 
     # An event that indicates that a flashcard has been loaed in the backend
@@ -333,24 +355,24 @@ class Events:
         DispatcherEventFactory.create_event(name="ui:multi_line_text:field:set")
     )
 
-    # An event that indicates that a multi select field has changed
-    MULTI_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_select:field:changed")
+    # An event that indicates that a multi option select field has changed
+    MULTI_OPTION_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_option_select_field:changed")
     )
 
-    # An event that indicates that a multi select field has been cleared
-    MULTI_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_select:field:cleared")
+    # An event that indicates that a multi option select field has been cleared
+    MULTI_OPTION_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_option_select_field:cleared")
     )
 
-    # An event that indicates that a multi select field has been retrieved
-    MULTI_SELECT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_select:field:get")
+    # An event that indicates that a multi option select field has been retrieved
+    MULTI_OPTION_SELECT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_option_select_field:get")
     )
 
-    # An event that indicates that a multi select field has been set
-    MULTI_SELECT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_select:field:set")
+    # An event that indicates that a multi option select field has been set
+    MULTI_OPTION_SELECT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_option_select_field:set")
     )
 
     # An event that indicates that a navigate event has occurred
@@ -531,53 +553,69 @@ class Events:
     )
 
     # An event that indicates that a radiobutton select field has been retrieved
-    RADIOBUTTON_SELECT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:radiobutton_select_field:get"
+    RADIOBUTTON_SELECT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:radiobutton_select_field:get")
     )
 
     # An event that indicates that a radiobutton select field has been set
-    RADIOBUTTON_SELECT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:radiobutton_select_field:set"
+    RADIOBUTTON_SELECT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:radiobutton_select_field:set")
     )
 
     # An event that indicates that a read-only field has been changed
     READONLY_MULTI_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:readonly:multi_line_text_field:changed")
+        DispatcherEventFactory.create_event(
+            name="ui:readonly:multi_line_text_field:changed"
+        )
     )
 
     # An event that indicates that a read-only field has been cleared
     READONLY_MULTI_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:readonly:multi_line_text_field:cleared")
+        DispatcherEventFactory.create_event(
+            name="ui:readonly:multi_line_text_field:cleared"
+        )
     )
 
     # An event that indicates that a read-only field has been retrieved
-    READONLY_MULTI_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:readonly:multi_line_text_field:get"
+    READONLY_MULTI_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="ui:readonly:multi_line_text_field:get"
+        )
     )
 
     # An event that indicates that a read-only field has been set
-    READONLY_MULTI_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:readonly:multi_line_text_field:set"
+    READONLY_MULTI_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="ui:readonly:multi_line_text_field:set"
+        )
     )
 
     # An event that indicates that a read-only field has been changed
     READONLY_SINGLE_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:readonly:single_line_text_field:changed")
+        DispatcherEventFactory.create_event(
+            name="ui:readonly:single_line_text_field:changed"
+        )
     )
 
     # An event that indicates that a read-only field has been cleared
     READONLY_SINGLE_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:readonly:single_line_text_field:cleared")
+        DispatcherEventFactory.create_event(
+            name="ui:readonly:single_line_text_field:cleared"
+        )
     )
 
     # An event that indicates that a read-only field has been retrieved
-    READONLY_SINGLE_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:readonly:single_line_text_field:get"
+    READONLY_SINGLE_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="ui:readonly:single_line_text_field:get"
+        )
     )
 
     # An event that indicates that a read-only field has been set
-    READONLY_SINGLE_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:readonly:single_line_text_field:set"
+    READONLY_SINGLE_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="ui:readonly:single_line_text_field:set"
+        )
     )
 
     # An event that indicates that the user wants to create a new answer
@@ -1102,7 +1140,9 @@ class Events:
 
     # An event that indicates that the user wants to destroy an option select field item
     REQUEST_OPTION_SELECT_FIELD_ITEM_DESTROY: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="global:request:option_select_field_item:destroy")
+        DispatcherEventFactory.create_event(
+            name="global:request:option_select_field_item:destroy"
+        )
     )
 
     # An event that indicates that the user wants to create a new priority
@@ -1377,24 +1417,28 @@ class Events:
         DispatcherEventFactory.create_event(name="ui:single_line_text:field:set")
     )
 
-    # An event that indicates that a single select field has been changed
-    SINGLE_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_select:field:changed")
+    # An event that indicates that a single option select field has changed
+    SINGLE_OPTION_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="ui:single_option_select_field:changed"
+        )
     )
 
-    # An event that indicates that a single select field has been cleared
-    SINGLE_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_select:field:cleared")
+    # An event that indicates that a single option select field has been cleared
+    SINGLE_OPTION_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="ui:single_option_select_field:cleared"
+        )
     )
 
-    # An event that indicates that a single select field has been retrieved
-    SINGLE_SELECT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_select:field:get")
+    # An event that indicates that a single option select field has been retrieved
+    SINGLE_OPTION_SELECT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:single_option_select_field:get")
     )
 
-    # An event that indicates that a single select field has been set
-    SINGLE_SELECT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_select:field:set")
+    # An event that indicates that a single option select field has been set
+    SINGLE_OPTION_SELECT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:single_option_select_field:set")
     )
 
     # An event that indicates that a stack has been created in the backend
@@ -1640,6 +1684,21 @@ class Events:
         ]
 
     @classmethod
+    def get_checkbutton_select_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all checkbutton select field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all checkbutton select field events in the Events class.
+        """
+        return [
+            cls.CHECKBUTTON_SELECT_FIELD_CHANGED,
+            cls.CHECKBUTTON_SELECT_FIELD_CLEARED,
+            cls.CHECKBUTTON_SELECT_FIELD_GET,
+            cls.CHECKBUTTON_SELECT_FIELD_SET,
+        ]
+
+    @classmethod
     def get_combobox_field_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all combobox field events in the Events class.
@@ -1699,7 +1758,7 @@ class Events:
             cls.DATE_SELECT_FIELD_GET,
             cls.DATE_SELECT_FIELD_SET,
         ]
-    
+
     @classmethod
     def get_difficulty_events(cls) -> List[DispatcherEvent]:
         """
@@ -1826,18 +1885,18 @@ class Events:
         ]
 
     @classmethod
-    def get_multi_select_field_events(cls) -> List[DispatcherEvent]:
+    def get_multi_option_select_field_events(cls) -> List[DispatcherEvent]:
         """
-        Returns a list of all multi select field events in the Events class.
+        Returns a list of all multi option select field events in the Events class.
 
         Returns:
-            List[DispatcherEvent]: A list of all multi select field events in the Events class.
+            List[DispatcherEvent]: A list of all multi option select field events in the Events class.
         """
         return [
-            cls.MULTI_SELECT_FIELD_CHANGED,
-            cls.MULTI_SELECT_FIELD_CLEARED,
-            cls.MULTI_SELECT_FIELD_GET,
-            cls.MULTI_SELECT_FIELD_SET,
+            cls.MULTI_OPTION_SELECT_FIELD_CHANGED,
+            cls.MULTI_OPTION_SELECT_FIELD_CLEARED,
+            cls.MULTI_OPTION_SELECT_FIELD_GET,
+            cls.MULTI_OPTION_SELECT_FIELD_SET,
         ]
 
     @classmethod
@@ -1960,7 +2019,7 @@ class Events:
             cls.RADIOBUTTON_SELECT_FIELD_GET,
             cls.RADIOBUTTON_SELECT_FIELD_SET,
         ]
-    
+
     @classmethod
     def get_readonly_multi_line_text_field_events(cls) -> List[DispatcherEvent]:
         """
@@ -2038,18 +2097,18 @@ class Events:
         ]
 
     @classmethod
-    def get_single_select_field_events(cls) -> List[DispatcherEvent]:
+    def get_single_option_select_field_events(cls) -> List[DispatcherEvent]:
         """
-        Returns a list of all single select field events in the Events class.
+        Returns a list of all single option select field events in the Events class.
 
         Returns:
-            List[DispatcherEvent]: A list of all single select field events in the Events class.
+            List[DispatcherEvent]: A list of all single option select field events in the Events class.
         """
         return [
-            cls.SINGLE_SELECT_FIELD_CHANGED,
-            cls.SINGLE_SELECT_FIELD_CLEARED,
-            cls.SINGLE_SELECT_FIELD_GET,
-            cls.SINGLE_SELECT_FIELD_SET,
+            cls.SINGLE_OPTION_SELECT_FIELD_CHANGED,
+            cls.SINGLE_OPTION_SELECT_FIELD_CLEARED,
+            cls.SINGLE_OPTION_SELECT_FIELD_GET,
+            cls.SINGLE_OPTION_SELECT_FIELD_SET,
         ]
 
     @classmethod

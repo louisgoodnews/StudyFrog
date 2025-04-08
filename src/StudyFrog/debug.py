@@ -4,6 +4,7 @@ Date: 2025-02-05
 """
 
 import asyncio
+import tkinter
 
 from typing import *
 
@@ -113,7 +114,11 @@ def debug() -> None:
         return True
 
     # Clear the database
-    clear_database()
+    # clear_database()
+
+    root: tkinter.Tk = tkinter.Tk()
+
+    root.mainloop()
 
     # Log a debug message
     logger.debug(message="Debugging completed.")

@@ -351,8 +351,8 @@ class FloatSpinboxField(BaseField):
             # Return early
             return
 
-        # Check, if the float value is not None and the dispatch flag is set to True
-        if float_value is not None and dispatch:
+        # Check, if the float value is not None
+        if float_value is not None:
             # Dispatch the FLOAT_SPINBOX_FIELD_CHANGED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.FLOAT_SPINBOX_FIELD_CHANGED,
@@ -1180,8 +1180,8 @@ class IntegerSpinboxField(BaseField):
             # Return early
             return
 
-        # Check, if the int value is not None and the dispatch flag is set to True
-        if int_value is not None and dispatch:
+        # Check, if the int value is not None
+        if int_value is not None:
             # Dispatch the INT_SPINBOX_FIELD_CHANGED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.INT_SPINBOX_FIELD_CHANGED,
