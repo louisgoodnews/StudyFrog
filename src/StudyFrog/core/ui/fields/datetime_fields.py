@@ -193,7 +193,7 @@ class DateSelectField(BaseField):
         # Check, if the value is not None
         if value is None:
             # Log a warning message
-            self.logger.warning(message=f"")
+            self.logger.warning(message=f"Could not obtain value from Calendar widget. This is likely a bug.")
             
             # Return early
             return
