@@ -1100,6 +1100,11 @@ class Events:
         name="global:request:option:update"
     )
 
+    # An event that indicates that the user wants to destroy an option select field item
+    REQUEST_OPTION_SELECT_FIELD_ITEM_DESTROY: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:option_select_field_item:destroy")
+    )
+
     # An event that indicates that the user wants to create a new priority
     REQUEST_PRIORITY_CREATE: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="global:request:priority:create")

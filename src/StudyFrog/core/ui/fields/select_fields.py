@@ -13,6 +13,7 @@ from typing import *
 
 from utils.base_field import BaseField
 from utils.constants import Constants
+from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
@@ -2450,7 +2451,7 @@ class OptionSelectFieldItem(tkinter.Frame):
             self.dispatcher.dispatch(
                 event=Events.REQUEST_OPTION_SELECT_FIELD_ITEM_DESTROY,
                 id=self._id,
-                label=label,
+                label=self.display_name,
                 namespace=self.namespace,
                 uuid=self._uuid,
             )
