@@ -1598,10 +1598,186 @@ class ComboboxelectField(BaseField):
 
 
 class ListboxField(BaseField):
-    """
-    """
+    """ """
 
-    pass
+    def __init__(
+        self,
+        label: str,
+        master: tkinter.Misc,
+        values: List[str],
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str, List[str]], None]] = None,
+        selectmode: Literal["expanded", "single"] = "single",
+        value: Union[str, List[str]] = None,
+        **kwargs,
+    ) -> None:
+        """ """
+
+        # Initialize an empty list instance variable to hold the user's selection
+        self.selection: Final[str] = []
+
+        # Store the passed values string list in an instance variable
+        self.values: List[str] = values
+
+        # Call the parent clas constructor
+        super().__init__(
+            label=label,
+            master=master,
+            namespace=namespace,
+            on_change_callback=on_change_callback,
+            selectmode=selectmode,
+            value=value,
+            **kwargs,
+        )
+
+    @property
+    def button(self) -> tkinter.Button:
+
+        # Return the tkinter.Button button widget
+        return self._button
+
+    @property
+    def label(self) -> tkinter.Label:
+
+        # Return the tkinter.Label label widget
+        return self._label
+
+    @property
+    def listbox(self) -> tkinter.Listbox:
+
+        # Return the tkinter.Listbox listbox widget
+        return self._listbox
+
+    def _on_button_click(self) -> None:
+        pass
+
+    def _on_listbox_select(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
+        pass
+
+    @override
+    def clear(
+        self,
+        dispatch: bool = False,
+    ) -> None:
+        pass
+
+    @override
+    def configure_button(
+        self,
+        **kwargs,
+    ) -> None:
+        pass
+
+    @override
+    def configure_grid(self) -> None:
+        pass
+
+    @override
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        pass
+
+    @override
+    def configure_listbox(
+        self,
+        **kwargs,
+    ) -> None:
+        pass
+
+    @override
+    def create_widgets(
+        self,
+        label: str,
+        value: Union[str, List[str]],
+        selectmode: Literal["expanded", "single"] = "single",
+        **kwargs,
+    ) -> None:
+        # Create a label widget
+        self._label: tkinter.Label = tkinter.Label(
+            master=self,
+            text=label,
+            **kwargs.get(
+                "label",
+                {},
+            ),
+        )
+
+        # Place the label within the grid
+        self._label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a string variable
+        self.variable: tkinter.StringVar = tkinter.StringVar(value=dir(self.values))
+
+        # Create the listbox widget
+        self._listbox: tkinter.Listbox = tkinter.Listbox(
+            listvariable=self.variable,
+            master=self,
+            selectmode=selectmode,
+            **kwargs.get(
+                "listbox",
+                {},
+            ),
+        )
+
+        # Place the listbox within the grid
+        self._listbox.grid(
+            column=2,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
+
+        # Bind the 'on_listbox_select' method to the listbox widget via the "<<ListboxSelected>>" event
+        self._listbox.bind(
+            func=self._on_listbox_select,
+            sequence="<<ListboxSelect>>",
+        )
+
+        # Create a button widget
+        self._button: tkinter.Button = tkinter.Button(
+            command=self._on_button_click,
+            master=self,
+            text="X",
+            **kwargs.get(
+                "button",
+                {},
+            ),
+        )
+
+        # Place the label within the grid
+        self._button.grid(
+            column=3,
+            padx=5,
+            pady=5,
+            row=2,
+        )
+
+    @override
+    def get(
+        self,
+        dispatch: bool = False,
+    ) -> Tuple[str, List[str]]:
+        pass
+
+    @override
+    def set(
+        self,
+        value: Union[List[str], str],
+        dispatch: bool = False,
+    ) -> None:
+        pass
 
 
 class OptionSelectFieldItem(tkinter.Frame):
