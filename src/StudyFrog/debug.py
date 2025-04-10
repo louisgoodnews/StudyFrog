@@ -114,11 +114,7 @@ def debug() -> None:
         return True
 
     # Clear the database
-    # clear_database()
-
-    root: tkinter.Tk = tkinter.Tk()
-
-    root.mainloop()
+    clear_database()
 
     # Log a debug message
     logger.debug(message="Debugging completed.")

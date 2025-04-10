@@ -6,14 +6,15 @@ Date: 2025-02-13
 import tkinter
 
 from tkinter.constants import *
-
 from tkinter import ttk
-
 from typing import *
 
-from core.stack import ImmutableStack
+from core.ui.fields.select_fields import ComboboxField
+from core.ui.fields.string_fields import MultiLineTextField
 
 from core.ui.ui_builder import UIBuilder
+
+from core.stack import ImmutableStack
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -72,6 +73,12 @@ class FlashcardCreateForm(tkinter.Frame):
         # Store the dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
 
+        # Initialize the form dictionary instance variable as an empty dictionary
+        self.form: Final[Dict[str, Any]] = {
+            "object_data": {},
+            "related_objects": {},
+        }
+
         # Store the unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager
 
@@ -90,6 +97,28 @@ class FlashcardCreateForm(tkinter.Frame):
             row=0,
             sticky=NSEW,
         )
+
+    def _on_field_change(
+        self,
+        label: str,
+        value: Any,
+    ) -> None:
+        """ """
+
+        # Obtain the inner key as a snake case version of the passed label
+        inner_key: str = Miscellaneous.any_to_snake(string=label.replace("*: ", ""))
+
+        # Determine the outer key based on the inner key
+        outer_key: str = "object_data" if inner_key != "stack" else "related_objects"
+
+        # Update the value of the label in the form with the passed value
+        self.form[outer_key][
+            Miscellaneous.any_to_snake(string=label.replace("*: ", ""))
+        ] = value
+
+        # TODO:
+        #   - implement check for 'front_text' field
+        #   - if any other flashcard with an identical 'front_text' value exists, then there must be a warning for the user
 
     def check_required_fields(
         self,
@@ -298,36 +327,41 @@ class FlashcardCreateForm(tkinter.Frame):
         )
 
         # Create a combobox widget to select a stack
-        self.stack_field = UIBuilder.get_combobox_field(
+        self.stack_field: ComboboxField = ComboboxField(
+            label="Stack*: ",
+            master=scrolled_frame["frame"],
+            on_change_callback=self._on_field_change,
+            values=[stack.name for stack in self.unified_manager.get_all_stacks()],
+        )
+
+        # Style the stack field "Root" frame widget
+        self.stack_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the stack field "Button" button widget
+        self.stack_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Combobox" combobox widget
+        self.stack_field.configure_combobox(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
-            label="Stack*: ",
-            master=scrolled_frame["frame"],
             state="readonly",
-            values=[stack.name for stack in self.unified_manager.get_all_stacks()],
-        )
-
-        # Style the stack field "Button" button widget
-        self.stack_field["button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
         )
 
         # Style the stack field "Label" label widget
-        self.stack_field["label"].configure(
+        self.stack_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
-        # Style the stack field "Root" frame widget
-        self.stack_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
         # Place the stack field in the grid
-        self.stack_field["root"].grid(
+        self.stack_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -336,34 +370,39 @@ class FlashcardCreateForm(tkinter.Frame):
         )
 
         # Create a multi-line text field for the front text of the flashcard
-        self.front_field: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
+        self.front_field: MultiLineTextField = MultiLineTextField(
             label="Front Text*: ",
             master=scrolled_frame["frame"],
+            on_change_callback=self._on_field_change,
         )
 
+        # Style the front field "Root" frame widget
+        self.front_field.configure(background=Constants.BLUE_GREY["700"])
+
         # Style the front field "Button" button widget
-        self.front_field["button"].configure(
+        self.front_field.configure_button(
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
         # Style the front field "Label" label widget
-        self.front_field["label"].configure(
+        self.front_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
-        # Style the front field "Root" frame widget
-        self.front_field["root"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the back field "Text" text widget
+        self.front_field.configure_text(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+        )
 
         # Place the front field in the grid
-        self.front_field["root"].grid(
+        self.front_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -372,34 +411,39 @@ class FlashcardCreateForm(tkinter.Frame):
         )
 
         # Create a multi-line text field for the back text of the flashcard
-        self.back_field: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
+        self.back_field: MultiLineTextField = MultiLineTextField(
             label="Back Text*: ",
             master=scrolled_frame["frame"],
+            on_change_callback=self._on_field_change,
         )
 
+        # Style the back field "Root" frame widget
+        self.back_field.configure(background=Constants.BLUE_GREY["700"])
+
         # Style the back field "Button" button widget
-        self.back_field["button"].configure(
+        self.back_field.configure_button(
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
         # Style the back field "Label" label widget
-        self.back_field["label"].configure(
+        self.back_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
-        # Style the back field "Root" frame widget
-        self.back_field["root"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the back field "Text" text widget
+        self.back_field.configure_text(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+        )
 
         # Place the back field in the grid
-        self.back_field["root"].grid(
+        self.back_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -435,34 +479,36 @@ class FlashcardCreateForm(tkinter.Frame):
                 # Return early
                 return None
 
-            # Initialize the result dictionary
-            result: Dict[str, Any] = {
-                "object_data": {
-                    "back_text": self.back_field["getter"](),
-                    "back_word_count": len(self.back_field["getter"]().split()),
-                    "created_at": Miscellaneous.get_current_datetime(),
-                    "custom_field_values": [],
-                    "difficulty": stack["difficulty"],
-                    "familiarity": 0.0,
-                    "front_text": self.front_field["getter"](),
-                    "front_word_count": len(self.front_field["getter"]().split()),
-                    "icon": None,
-                    "id": None,
-                    "key": None,
-                    "last_viewed_at": Miscellaneous.get_current_datetime(),
-                    "priority": stack["priority"],
-                    "total_word_count": (
-                        len(self.front_field["getter"]().split())
-                        + len(self.back_field["getter"]().split())
-                    ),
-                    "updated_at": Miscellaneous.get_current_datetime(),
-                    "uuid": Miscellaneous.get_uuid(),
-                },
-                "related_objects": {"stack": stack},
-            }
+            # Set the 'back text' word count for the flashcard
+            self.form["object_data"]["back_word_count"] = len(
+                self.form["object_data"]["back_text"].split()
+            )
+
+            # Copy the difficulty of the flashcard from the stack
+            self.form["object_data"]["difficulty"] = stack.difficulty
+
+            # Set the familiarity of the flashcard to 0.0
+            self.form["object_data"]["familiarity"] = 0.0
+
+            # Set the 'front text' word count for the flashcard
+            self.form["object_data"]["front_word_count"] = len(
+                self.form["object_data"]["back_text"].split()
+            )
+
+            # Copy the priority of the flashcard from the stack
+            self.form["object_data"]["difficulty"] = stack.priority
+
+            # Set the total word count for the flashcard
+            self.form["object_data"]["total_word_count"] = (
+                self.form["object_data"]["front_word_count"]
+                + self.form["object_data"]["back_word_count"]
+            )
+
+            # Add the stack to the 'related object' nested dictionary
+            self.form["related_object"]["stack"] = stack
 
             # Return the result dictionary
-            return result
+            return self.form
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

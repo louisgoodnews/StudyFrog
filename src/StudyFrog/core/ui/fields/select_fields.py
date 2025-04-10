@@ -8,6 +8,7 @@ import traceback
 import uuid
 
 from tkinter.constants import *
+from tkinter import ttk
 from typing import *
 
 from core.ui.fields.boolean_fields import CheckbuttonField, RadiobuttonField
@@ -552,7 +553,7 @@ class ComboboxField(BaseField):
     Attributes:
         values (List[str]): List of predefined selectable values shown in the dropdown.
         label (tkinter.Label): The label widget associated with this field.
-        combobox (tkinter.Combobox): The interactive dropdown widget.
+        combobox (ttk.Combobox): The interactive dropdown widget.
         button (tkinter.Button): A button used to clear the combobox content.
         variable (tkinter.StringVar): A string variable bound to the combobox value.
         readonly (bool): Whether the combobox is readonly (non-editable).
@@ -590,22 +591,24 @@ class ComboboxField(BaseField):
             None
         """
 
+        # Store the passed 'values' list or initialize it as an empty list
+        self.values: List[str] = values if values is not None else []
+
         # Call the parent class constructor with the passed arguments
         super().__init__(
             label=label,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
-            readonly=readonly,
         )
-
-        # Store the passed 'values' list or initialize it as an empty list
-        self.values: List[str] = values if values is not None else []
 
         # Check, if the passed value is not None
         if value is not None:
             # Set the value of the field to the passed value
             self.set(value=value)
+
+        # Configure the combobox widget's state to normal or readonly
+        self._combobox.configure(state="normal" if not readonly else "readonly")
 
     @property
     def button(self) -> tkinter.Button:
@@ -622,15 +625,15 @@ class ComboboxField(BaseField):
         return self._button
 
     @property
-    def combobox(self) -> tkinter.Combobox:
+    def combobox(self) -> ttk.Combobox:
         """
         Returns the combobox widget used for selecting or entering a value.
 
         Returns:
-            tkinter.Combobox: The combobox widget tied to this field.
+            ttk.Combobox: The combobox widget tied to this field.
         """
 
-        # Return the tkinter.Combobox combobox widget
+        # Return the ttk.Combobox combobox widget
         return self._combobox
 
     @property
@@ -705,7 +708,7 @@ class ComboboxField(BaseField):
         It dispatches a change event with the selected value.
 
         Args:
-            event (Optional[tkinter.Event], optional): The event object triggered by <ComboboxSelect>. Defaults to None.
+            event (Optional[tkinter.Event], optional): The event object triggered by <<ComboboxSelected>>. Defaults to None.
 
         Returns:
             None
@@ -955,11 +958,14 @@ class ComboboxField(BaseField):
         self.variable: tkinter.StringVar = tkinter.StringVar(value="")
 
         # Create a combobox widget
-        self._combobox: tkinter.Combobox = tkinter.Combobox(
+        self._combobox: ttk.Combobox = ttk.Combobox(
             master=self,
             textvariable=self.variable,
             values=self.values,
-            **kwargs.get("combobox", {}),
+            **kwargs.get(
+                "combobox",
+                {},
+            ),
         )
 
         # Place the combobox widget within the grid
@@ -971,21 +977,16 @@ class ComboboxField(BaseField):
             sticky=NSEW,
         )
 
-        # Check, if the 'readonly' key is within kwargs and if so, True
-        if kwargs.get("readonly", False):
-            # Configure the tkinter.Combobox entry widget's state to 'readonly'
-            self._combobox.configure(state="readonly")
-        else:
-            # Bind the 'on_combobox_change' method to the combobox via the '<Return>' event
-            self._combobox.bind(
-                func=self._on_combobox_change,
-                sequence="<Return>",
-            )
+        # Bind the 'on_combobox_change' method to the combobox via the '<Return>' event
+        self._combobox.bind(
+            func=self._on_combobox_change,
+            sequence="<Return>",
+        )
 
-        # Bind the 'on_combobox_select' method to the combobox via the '<ComboboxSelect>' event
+        # Bind the 'on_combobox_select' method to the combobox via the '<<ComboboxSelected>>' event
         self._combobox.bind(
             func=self._on_combobox_select,
-            sequence="<ComboboxSelect>",
+            sequence="<<ComboboxSelected>>",
         )
 
         # Create the button widget
@@ -993,7 +994,10 @@ class ComboboxField(BaseField):
             command=lambda: self.clear(dispatch=True),
             master=self,
             text="X",
-            **kwargs.get("button", {}),
+            **kwargs.get(
+                "button",
+                {},
+            ),
         )
 
         # Place the button widget within the grid
@@ -1598,7 +1602,29 @@ class ComboboxelectField(BaseField):
 
 
 class ListboxField(BaseField):
-    """ """
+    """
+    A field for selecting one or multiple values from a predefined list using a Listbox.
+
+    This widget provides a user interface consisting of a label, a listbox, and a clear button.
+    It supports both single and multiple selection modes and allows dynamic handling of selection
+    changes and callbacks.
+
+    The field layout consists of:
+        [ Label ]
+        [          Listbox          ]
+                      [ Clearbutton ]
+
+    Attributes:
+        values (List[str]): The list of selectable values shown in the listbox.
+        selection (List[str]): The currently selected values.
+        variable (tkinter.StringVar): The underlying variable for the listbox items.
+        listbox (tkinter.Listbox): The listbox widget.
+        button (tkinter.Button): The button used to clear the selection.
+        label (tkinter.Label): The descriptive label for the listbox field.
+
+    Inherits from:
+        BaseField
+    """
 
     def __init__(
         self,
@@ -1614,7 +1640,7 @@ class ListboxField(BaseField):
         """ """
 
         # Initialize an empty list instance variable to hold the user's selection
-        self.selection: Final[str] = []
+        self.selection: Final[List[str]] = []
 
         # Store the passed values string list in an instance variable
         self.values: List[str] = values
@@ -1637,13 +1663,22 @@ class ListboxField(BaseField):
     @property
     def button(self) -> tkinter.Button:
         """
+        Returns the clear button widget.
+
+        Returns:
+            tkinter.Button: The button used to clear the listbox selection.
         """
+
         # Return the tkinter.Button button widget
         return self._button
 
     @property
     def label(self) -> tkinter.Label:
         """
+        Returns the label widget.
+
+        Returns:
+            tkinter.Label: The label describing the listbox field.
         """
 
         # Return the tkinter.Label label widget
@@ -1652,6 +1687,10 @@ class ListboxField(BaseField):
     @property
     def listbox(self) -> tkinter.Listbox:
         """
+        Returns the listbox widget.
+
+        Returns:
+            tkinter.Listbox: The listbox containing selectable values.
         """
 
         # Return the tkinter.Listbox listbox widget
@@ -1659,18 +1698,46 @@ class ListboxField(BaseField):
 
     def _on_button_click(self) -> None:
         """
+        Handles the clear button click.
+
+        This method clears the current selection and resets the internal selection list.
         """
 
-        pass
+        # Clear the current selection of the listbox widget
+        self._listbox.selection_clear(
+            index1=0,
+            index2=END,
+        )
+
+        # Clear the selection string list instace variable
+        self.selection.clear()
 
     def _on_listbox_select(
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
         """
+        Handles selection events from the listbox.
+
+        Updates the internal selection state and optionally calls the change callback and dispatches
+        a change event.
         """
 
-        pass
+        # Obtain the indeces of the currently selected items of the listbox widget
+        selection: Tuple[int, ...] = self.listbox.curselection()
+
+        # Iterate over the indexes in the selection
+        for index in selection:
+            # Append the values from the index of the values list to the current selection
+            self.selection.append(self.values[index])
+
+        # Dispatch the LISTBOX_FIELD_CHANGED event
+        self.dispatcher.dispatch(
+            event=Events.LISTBOX_FIELD_CHANGED,
+            label=self.display_name,
+            namespace=self.namespace,
+            value=self.selection,
+        )
 
     @override
     def clear(
@@ -1678,9 +1745,14 @@ class ListboxField(BaseField):
         dispatch: bool = False,
     ) -> None:
         """
+        Clears the listbox selection.
+
+        Args:
+            dispatch (bool, optional): Whether to dispatch a clear event. Defaults to False.
         """
 
-        pass
+        # Clear the selection string list instace variable
+        self.selection.clear()
 
     @override
     def configure_button(
@@ -1688,16 +1760,57 @@ class ListboxField(BaseField):
         **kwargs,
     ) -> None:
         """
-        """
+        Configures the clear button widget.
 
-        pass
+        Args:
+            **kwargs: Keyword arguments for tkinter.Button.configure.
+        """
+        try:
+            # Attempt to configure the button widget
+            self._button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
     @override
     def configure_grid(self) -> None:
-        """
-        """
+        """ """
 
-        pass
+        # Set the weight of the 0th column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Set the weight of the 1st column to 1
+        # This means that the column will stretch when the window is resized
+        self.grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Set the weight of the 2nd column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=2,
+            weight=0,
+        )
+
+        # Set the weight of the 0th row to 1
+        # This means that the row will stretch when the window is resized
+        self.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
 
     @override
     def configure_label(
@@ -1705,9 +1818,25 @@ class ListboxField(BaseField):
         **kwargs,
     ) -> None:
         """
-        """
+        Configures the label widget.
 
-        pass
+        Args:
+            **kwargs: Keyword arguments for tkinter.Label.configure.
+        """
+        try:
+            # Attempt to configure the label widget
+            self._label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
     @override
     def configure_listbox(
@@ -1715,9 +1844,25 @@ class ListboxField(BaseField):
         **kwargs,
     ) -> None:
         """
-        """
+        Configures the listbox widget.
 
-        pass
+        Args:
+            **kwargs: Keyword arguments for tkinter.Listbox.configure.
+        """
+        try:
+            # Attempt to configure the listbox widget
+            self._listbox.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_listbox' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
     @override
     def create_widgets(
@@ -1727,6 +1872,12 @@ class ListboxField(BaseField):
         **kwargs,
     ) -> None:
         """
+        Creates and places the label, listbox, and clear button.
+
+        Args:
+            label (str): The field's label.
+            selectmode (Literal["expanded", "single"], optional): Listbox selection mode. Defaults to "single".
+            **kwargs: Additional customization for label, listbox, and button.
         """
 
         # Create a label widget
@@ -1764,7 +1915,7 @@ class ListboxField(BaseField):
 
         # Place the listbox within the grid
         self._listbox.grid(
-            column=2,
+            column=1,
             padx=5,
             pady=5,
             row=1,
@@ -1790,7 +1941,7 @@ class ListboxField(BaseField):
 
         # Place the label within the grid
         self._button.grid(
-            column=3,
+            column=2,
             padx=5,
             pady=5,
             row=2,
@@ -1802,9 +1953,37 @@ class ListboxField(BaseField):
         dispatch: bool = False,
     ) -> Tuple[str, List[str]]:
         """
+        Returns the current selection from the listbox.
+
+        Args:
+            dispatch (bool, optional): Whether to dispatch a get event. Defaults to False.
+
+        Returns:
+            Tuple[str, List[str]]: A tuple of field label and the selected values.
         """
 
-        pass
+        (
+            label,
+            value,
+        ) = (
+            self.display_name,
+            self.selection,
+        )
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the LISTBOX_FIELD_GET event
+            self.dispatcher.dispatch(
+                event=Events.LISTBOX_FIELD_GET,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=value,
+            )
+
+        return (
+            label,
+            value,
+        )
 
     @override
     def set(
@@ -1813,9 +1992,28 @@ class ListboxField(BaseField):
         dispatch: bool = False,
     ) -> None:
         """
+        Sets the selection of the listbox to the given value(s).
+
+        Args:
+            value (Union[List[str], str]): A single or list of values to select.
+            dispatch (bool, optional): Whether to dispatch a set event. Defaults to False.
         """
 
-        pass
+        if not isinstance(
+            value,
+            list,
+        ):
+            value = [value]
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the LISTBOX_FIELD_SET event
+            self.dispatcher.dispatch(
+                event=Events.LISTBOX_FIELD_SET,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=value,
+            )
 
 
 class OptionSelectFieldItem(tkinter.Frame):
@@ -2255,7 +2453,7 @@ class MultiOptionSelectField(BaseField):
             row,
             value,
         ) in enumerate(
-            iterable=value_list, start=len(self.container_frame.winfo_children())
+            iterable=value_list, start=len(self.container_frame.winfo_children(),)
         ):
             # Check, if the current value already has been selected
             if value in self.selection.keys():
@@ -2798,7 +2996,10 @@ class MultiOptionSelectField(BaseField):
             command=self._on_clear_button_click,
             master=self,
             text="X",
-            **kwargs.get("clear_button", {}),
+            **kwargs.get(
+                "clear_button",
+                {},
+            ),
         )
 
         # Place the 'clear button' button widget within the grid
@@ -2814,7 +3015,10 @@ class MultiOptionSelectField(BaseField):
             command=self._on_select_button_click,
             master=self,
             text="Select",
-            **kwargs.get("select_button", {}),
+            **kwargs.get(
+                "select_button",
+                {},
+            ),
         )
 
         # Place the 'select button' button widget within the grid
@@ -4070,6 +4274,21 @@ class SingleOptionSelectField(BaseField):
             # Re-raise the exception to the caller
             raise e
 
+    def configure_option_select_field_items(self) -> None:
+        try:
+            pass
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_option_select_field_items' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
     @override
     def create_widgets(
         self,
@@ -4111,7 +4330,10 @@ class SingleOptionSelectField(BaseField):
             command=self._on_clear_button_click,
             master=self,
             text="X",
-            **kwargs.get("clear_button", {}),
+            **kwargs.get(
+                "clear_button",
+                {},
+            ),
         )
 
         # Place the 'clear button' button widget within the grid
@@ -4127,7 +4349,10 @@ class SingleOptionSelectField(BaseField):
             command=self._on_select_button_click,
             master=self,
             text="Select",
-            **kwargs.get("select_button", {}),
+            **kwargs.get(
+                "select_button",
+                {},
+            ),
         )
 
         # Place the 'select button' button widget within the grid

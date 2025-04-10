@@ -118,13 +118,16 @@ class CheckbuttonField(BaseField):
             None
         """
 
-        # Dispatch the CHECKBUTTON_FIELD_CLEARED event
+        # Dispatch the CHECKBUTTON_FIELD_CHANGED event
         self.dispatcher.dispatch(
-            event=Events.CHECKBUTTON_FIELD_CLEARED,
+            event=Events.CHECKBUTTON_FIELD_CHANGED,
             label=self.display_name,
             namespace=self.namespace,
             value=self.variable.get(),
         )
+
+        # Update the text of the checkbutton widget
+        self._checkbutton.configure(text=f"{self.variable.get()}")
 
         # Check, if the 'on_change_callback' function exists
         if self.on_change_callback:
@@ -153,6 +156,9 @@ class CheckbuttonField(BaseField):
 
         # Update the variable's value to an empty string
         self.variable.set(value=False)
+
+        # Update the text of the checkbutton widget
+        self._checkbutton.configure(text=f"{self.variable.get()}")
 
         # Check, if the dispatch flag is set to True
         if dispatch:
@@ -402,6 +408,9 @@ class CheckbuttonField(BaseField):
 
         # Update the variable with the passed value string
         self.variable.set(value=value)
+
+        # Update the text of the checkbutton widget
+        self._checkbutton.configure(text=f"{self.variable.get()}")
 
         # Check, if the dispatch flag is set to True
         if dispatch:

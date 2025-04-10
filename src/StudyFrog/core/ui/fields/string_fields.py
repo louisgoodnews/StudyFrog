@@ -205,11 +205,17 @@ class MultiLineTextField(BaseField):
             self.text.unbind(sequence="<Button-4>")  # Linux (X11)
             self.text.unbind(sequence="<Button-5>")  # Linux (X11)
 
-    def _on_text_change(self) -> None:
+    def _on_text_change(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
         """
         This method is called when the value of the multi line text field changes.
 
         It dispatches the MULTI_LINE_TEXT_FIELD_CHANGED event and calls the on_change_callback function with the new label and value.
+
+        Args:
+            event (tkinter.Event, optional): The event passed to this method.
 
         Returns:
             None
@@ -329,42 +335,42 @@ class MultiLineTextField(BaseField):
 
         # Set the weight of the 0th column to 0
         # This means that the column will not stretch when the window is resized
-        self.grid_column_configure(
+        self.grid_columnconfigure(
             index=0,
             weight=0,
         )
 
         # Set the weight of the 1st column to 1
         # This means that the column will stretch when the window is resized
-        self.grid_column_configure(
+        self.grid_columnconfigure(
             index=1,
             weight=1,
         )
 
         # Set the weight of the 2nd column to 0
         # This means that the column will not stretch when the window is resized
-        self.grid_column_configure(
+        self.grid_columnconfigure(
             index=2,
             weight=0,
         )
 
         # Set the weight of the 0th row to 0
         # This means that the row will not stretch when the window is resized
-        self.grid_row_configure(
+        self.grid_rowconfigure(
             index=0,
             weight=0,
         )
 
         # Set the weight of the 1st row to 1
         # This means that the row will stretch when the window is resized
-        self.grid_row_configure(
+        self.grid_rowconfigure(
             index=1,
             weight=1,
         )
 
         # Set the weight of the 2nd row to 0
         # This means that the row will not stretch when the window is resized
-        self.grid_row_configure(
+        self.grid_rowconfigure(
             index=2,
             weight=0,
         )
@@ -535,6 +541,12 @@ class MultiLineTextField(BaseField):
             sequence="<Leave>",
         )
 
+        # Bind the 'on_text_change' method the tkinter.Text widget via the '<KeyRelease>' event
+        self._text.bind(
+            func=self._on_text_change,
+            sequence="<KeyRelease>",
+        )
+
         # Place the text widget in the grid
         self._text.grid(
             column=1,
@@ -587,7 +599,7 @@ class MultiLineTextField(BaseField):
 
         # Place the (horizontal) scrollbar widget in the grid
         self._horizontal_scrollbar.grid(
-            column=2,
+            column=1,
             padx=5,
             pady=5,
             row=2,
@@ -1054,28 +1066,28 @@ class SingleLineTextField(BaseField):
 
         # Set the weight of the 0th column to 0
         # This means that the column will not stretch when the window is resized
-        self.grid_column_configure(
+        self.grid_columnconfigure(
             index=0,
             weight=0,
         )
 
         # Set the weight of the 1st column to 1
         # This means that the column will stretch when the window is resized
-        self.grid_column_configure(
+        self.grid_columnconfigure(
             index=1,
             weight=1,
         )
 
         # Set the weight of the 2nd column to 0
         # This means that the column will not stretch when the window is resized
-        self.grid_column_configure(
+        self.grid_columnconfigure(
             index=2,
             weight=0,
         )
 
         # Set the weight of the 0th row to 1
         # This means that the row will stretch when the window is resized
-        self.grid_row_configure(
+        self.grid_rowconfigure(
             index=0,
             weight=1,
         )

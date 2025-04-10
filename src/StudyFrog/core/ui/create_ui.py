@@ -11,6 +11,8 @@ from tkinter import ttk
 
 from typing import *
 
+from core.ui.fields.select_fields import CheckbuttonField, ComboboxField
+
 from core.answer import AnswerFactory, ImmutableAnswer
 from core.flashcard import FlashcardFactory, ImmutableFlashcard
 from core.question import MutableQuestion, QuestionFactory, ImmutableQuestion
@@ -79,11 +81,11 @@ class CreateUI(BaseUI):
             None
         """
 
-        # Create a boolean variable in an instance variable
-        self.create_another: tkinter.BooleanVar = tkinter.BooleanVar(value=True)
-
         # Initialize the form instance variable as None
         self.form: Optional[tkinter.Misc] = None
+
+        # Initialize the namespace instance variable
+        self.namespace: Final[str] = "CREATE_UI"
 
         # Call the parent class constructor
         super().__init__(
@@ -118,17 +120,15 @@ class CreateUI(BaseUI):
         # Check, if a type string was passed
         if type is not None:
             # Set the combobox value to the passed type
-            self.type_field["setter"](
+            self.type_field.set(
                 dispatch=False,
                 value=type.capitalize(),
             )
-        else:
-            self.preselect_combobox_value()
 
         # Call the on_combobox_select method
         self.on_type_field_change(
             label="Type: ",
-            value=self.type_field["getter"](),
+            value=self.type_field.get()[1],
         )
 
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
@@ -341,15 +341,9 @@ class CreateUI(BaseUI):
             master=master,
         )
 
-        # Configure the "Left Frame" frame widget's 1st column to weight 0
+        # Configure the "Left Frame" frame widget's 1st column to weight 1
         left_frame.grid_columnconfigure(
             index=0,
-            weight=0,
-        )
-
-        # Configure the "Left Frame" frame widget's 2nd column to weight 1
-        left_frame.grid_columnconfigure(
-            index=1,
             weight=1,
         )
 
@@ -367,40 +361,38 @@ class CreateUI(BaseUI):
         )
 
         # Create the "Create Another" check button widget
-        create_another: tkinter.Checkbutton = UIBuilder.get_checkbutton(
+        self.create_another: CheckbuttonField = CheckbuttonField(
+            label="Create another? ",
+            master=left_frame,
+            namespace=self.namespace,
+        )
+
+        # Configure the background of the "Create another" combobox field widget
+        self.create_another.configure(background=Constants.BLUE_GREY["700"])
+
+        # Configure the checkbutton of the "Create another" checkbutton field widget
+        self.create_another.configure_checkbutton(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            master=left_frame,
-            variable=self.create_another,
+        )
+
+        # Configure the label of the "Create another" checkbutton field widget
+        self.create_another.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
         )
 
         # Place the "Create Another" check button widget in the "Left Frame"
-        create_another.grid(
+        self.create_another.grid(
             column=0,
-            padx=5,
-            pady=5,
-            row=0,
-        )
-
-        # Create the "Label" widget
-        label: tkinter.Label = UIBuilder.get_label(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            master=left_frame,
-            text="Create another? ",
-        )
-
-        # Place the "Label" widget in the "Left Frame"
-        label.grid(
-            column=1,
             padx=5,
             pady=5,
             row=0,
@@ -461,7 +453,7 @@ class CreateUI(BaseUI):
             padx=5,
             pady=5,
             row=0,
-            sticky=W,
+            sticky=E,
         )
 
         # Create the "Create" button widget
@@ -484,7 +476,7 @@ class CreateUI(BaseUI):
             padx=5,
             pady=5,
             row=0,
-            sticky=W,
+            sticky=E,
         )
 
     def create_top_frame_widgets(
@@ -505,75 +497,71 @@ class CreateUI(BaseUI):
         """
 
         # Configure the top frame widget's 1st column to weight 1
-        master.grid_columnconfigure(index=0, weight=1)
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
 
         # Configure the top frame widget's 1st row to weight 1
-        master.grid_rowconfigure(index=0, weight=1)
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
 
-        # Create the "Type" combobox field widget
-        # This field allows the user to select the type of object to create
-        type_valuess: List[str] = [
+        # Define the values for the type field
+        values: List[str] = [
             "Flashcard",
             "Question",
             "Stack",
         ]
 
         # Create the "Type" combobox field widget
-        self.type_field: Optional[Dict[str, Any]] = UIBuilder.get_combobox_field(
+        # This field allows the user to select the type of object to create
+        self.type_field: ComboboxField = ComboboxField(
             label="Type: ",
             master=master,
+            namespace=self.namespace,
             on_change_callback=self.on_type_field_change,
-            value=Miscellaneous.select_random(iterable=type_valuess),
-            values=type_valuess,
+            value=Miscellaneous.select_random(iterable=values),
+            values=values,
         )
 
-        # Check if the creation response is None, indicating failure
-        if self.type_field is None:
-            # Log a warning message indicating that the creation was not successful
-            self.logger.warning(
-                message=f"Failed while attempting to create 'Type' combobox field."
-            )
+        # Configure the background of the "Type" combobox field widget
+        self.type_field.configure(background=Constants.BLUE_GREY["700"])
 
-            # Return early
-            return
-
-        # Configure the style of the button of the "Type" combobox field widget
-        self.type_field["button"].configure(
+        # Configure the button of the "Type" combobox field widget
+        self.type_field.configure_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
-                Constants.LARGE_FONT_SIZE,
+                Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
-        # Configure the style of the combobox of the "Type" combobox field widget
-        self.type_field["combobox"].configure(
+        # Configure the combobox of the "Type" combobox field widget
+        self.type_field.configure_combobox(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
-                Constants.LARGE_FONT_SIZE,
+                Constants.DEFAULT_FONT_SIZE,
             ),
+            state="readonly",
         )
 
-        # Configure the style of the label of the "Type" combobox field widget
-        self.type_field["label"].configure(
+        # Configure the label of the "Type" combobox field widget
+        self.type_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
-                Constants.LARGE_FONT_SIZE,
+                Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
         )
 
-        # Configure the style of the root widget of the "Type" combobox field
-        self.type_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
         # Place the "Type" combobox field widget in the top frame
-        self.type_field["root"].grid(
+        self.type_field.grid(
             column=0,
-            padx=5,
-            pady=5,
             row=0,
             sticky=NSEW,
         )
@@ -1059,7 +1047,7 @@ class CreateUI(BaseUI):
             related_objects=form_data["related_objects"],
         )
 
-        if not self.create_another.get():
+        if not self.create_another.get()[1]:
             # Check if the master widget is of type toplevel
             if isinstance(
                 self.master,
@@ -1104,30 +1092,4 @@ class CreateUI(BaseUI):
         # Log an info message
         self.logger.info(
             message=f"Created form widget for {value} type based on current '{label}' field selection."
-        )
-
-    def preselect_combobox_value(self) -> None:
-        """
-        Preselects a random value for the combobox widget.
-
-        This method is called after the UI has been created and
-        before the toplevel widget is shown. It preselects a random
-        value from the list of available values for the combobox
-        widget.
-
-        Returns:
-            None
-        """
-
-        # Set the combobox value to a random value
-        self.type_field["setter"](
-            dispatch=False,
-            value=Miscellaneous.select_random(
-                [
-                    # The type of object to be created
-                    "Flashcard",
-                    "Question",
-                    "Stack",
-                ]
-            )
         )

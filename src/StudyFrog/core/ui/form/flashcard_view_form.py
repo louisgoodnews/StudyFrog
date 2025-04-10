@@ -5,11 +5,13 @@ Date 2025-03-03
 
 import tkinter
 
+from datetime import datetime
 from tkinter.constants import *
-
 from tkinter import ttk
-
 from typing import *
+
+from core.ui.fields.select_fields import ComboboxelectField
+from core.ui.fields.string_fields import MultiLineTextField
 
 from core.difficulty import ImmutableDifficulty
 from core.flashcard import ImmutableFlashcard, MutableFlashcard
@@ -261,20 +263,13 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create the single line text field for the stack name
-        self.front_text_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_scrolled_text_field(
-                font=(
-                    Constants.DEFAULT_FONT_FAMILY,
-                    Constants.DEFAULT_FONT_SIZE,
-                ),
-                height=5,
-                label="Front Text*: ",
-                master=master,
-            )
+        self.front_text_field: MultiLineTextField = MultiLineTextField(
+            label="Front Text*: ",
+            master=master,
         )
 
         # Style the name field's button widget
-        self.front_text_field["button"].configure(
+        self.front_text_field.configure_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -285,33 +280,36 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Bind the name field to the on_front_text_field_changed function
-        self.front_text_field["scrolled_text_field"]["text"].bind(
-            func=lambda event: self.on_front_text_field_changed(),
+        self.front_text_field.text.bind(
+            func=self.on_front_text_field_changed(),
             sequence="<KeyRelease>",
         )
 
-        # Style the name field's label widget
-        self.front_text_field["label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-        )
-
         # Style the name field's root widget
-        self.front_text_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Set the name field's value to the flashcard's front text
-        self.front_text_field["setter"](value=self.flashcard.front_text)
+        self.front_text_field.configure(background=Constants.BLUE_GREY["700"])
 
         # Configure the name field
-        self.front_text_field["label"].configure(
+        self.front_text_field.configure_label(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
         )
 
+        # Configure the name field
+        self.front_text_field.configure_text(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            height=5,
+        )
+
+        # Set the name field's value to the flashcard's front text
+        self.front_text_field.set(value=self.flashcard.front_text)
+
         # Place the name field in the top frame
-        self.front_text_field["root"].grid(
+        self.front_text_field.grid(
             column=0,
             row=0,
             sticky=NSEW,
@@ -797,17 +795,15 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a combobox select field for the difficulty
-        self.difficulty_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_combobox_field(
-                font=(
-                    Constants.DEFAULT_FONT_FAMILY,
-                    Constants.MEDIUM_FONT_SIZE,
-                ),
-                label="Difficulty*: ",
-                master=master,
-                state="readonly",
-                values=[difficulty.name for difficulty in difficulties],
-            )
+        self.difficulty_field: Optional[Dict[str, Any]] = UIBuilder.get_combobox_field(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.MEDIUM_FONT_SIZE,
+            ),
+            label="Difficulty*: ",
+            master=master,
+            state="readonly",
+            values=[difficulty.name for difficulty in difficulties],
         )
 
         # Style the difficulty field's button widget
@@ -861,17 +857,15 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a combobox select field for the priority
-        self.priority_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_combobox_field(
-                font=(
-                    Constants.DEFAULT_FONT_FAMILY,
-                    Constants.MEDIUM_FONT_SIZE,
-                ),
-                label="Priority*: ",
-                master=master,
-                state="readonly",
-                values=[priority.name for priority in priorities],
-            )
+        self.priority_field: Optional[Dict[str, Any]] = UIBuilder.get_combobox_field(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.MEDIUM_FONT_SIZE,
+            ),
+            label="Priority*: ",
+            master=master,
+            state="readonly",
+            values=[priority.name for priority in priorities],
         )
 
         # Style the priority field's button widget
@@ -966,7 +960,10 @@ class FlashcardViewForm(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def on_front_text_field_changed(self) -> None:
+    def on_front_text_field_changed(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
         try:
             value: Optional[str] = self.front_text_field["getter"]()
 
