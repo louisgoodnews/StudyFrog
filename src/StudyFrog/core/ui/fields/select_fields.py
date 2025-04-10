@@ -1626,35 +1626,50 @@ class ListboxField(BaseField):
             namespace=namespace,
             on_change_callback=on_change_callback,
             selectmode=selectmode,
-            value=value,
             **kwargs,
         )
 
+        # Check, if the passed value is not None
+        if value is not None:
+            # Set the value of the listbox field
+            self.set(value=value)
+
     @property
     def button(self) -> tkinter.Button:
-
+        """
+        """
         # Return the tkinter.Button button widget
         return self._button
 
     @property
     def label(self) -> tkinter.Label:
+        """
+        """
 
         # Return the tkinter.Label label widget
         return self._label
 
     @property
     def listbox(self) -> tkinter.Listbox:
+        """
+        """
 
         # Return the tkinter.Listbox listbox widget
         return self._listbox
 
     def _on_button_click(self) -> None:
+        """
+        """
+
         pass
 
     def _on_listbox_select(
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
+        """
+        """
+
         pass
 
     @override
@@ -1662,6 +1677,9 @@ class ListboxField(BaseField):
         self,
         dispatch: bool = False,
     ) -> None:
+        """
+        """
+
         pass
 
     @override
@@ -1669,10 +1687,16 @@ class ListboxField(BaseField):
         self,
         **kwargs,
     ) -> None:
+        """
+        """
+
         pass
 
     @override
     def configure_grid(self) -> None:
+        """
+        """
+
         pass
 
     @override
@@ -1680,6 +1704,9 @@ class ListboxField(BaseField):
         self,
         **kwargs,
     ) -> None:
+        """
+        """
+
         pass
 
     @override
@@ -1687,16 +1714,21 @@ class ListboxField(BaseField):
         self,
         **kwargs,
     ) -> None:
+        """
+        """
+
         pass
 
     @override
     def create_widgets(
         self,
         label: str,
-        value: Union[str, List[str]],
         selectmode: Literal["expanded", "single"] = "single",
         **kwargs,
     ) -> None:
+        """
+        """
+
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
             master=self,
@@ -1769,6 +1801,9 @@ class ListboxField(BaseField):
         self,
         dispatch: bool = False,
     ) -> Tuple[str, List[str]]:
+        """
+        """
+
         pass
 
     @override
@@ -1777,6 +1812,9 @@ class ListboxField(BaseField):
         value: Union[List[str], str],
         dispatch: bool = False,
     ) -> None:
+        """
+        """
+
         pass
 
 
