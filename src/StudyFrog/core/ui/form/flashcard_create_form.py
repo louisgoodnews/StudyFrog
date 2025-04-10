@@ -543,23 +543,32 @@ class FlashcardCreateForm(tkinter.Frame):
 
         missing_fields: List[str] = []
 
-        check: List[bool] = []
+        checks: List[bool] = []
 
         # Iterate over all required fields
         for required_field in required_fields:
             # Check if the required field is in the object data
-            if required_field in object_data.get("object_data", {}):
+            if required_field in object_data.get(
+                "object_data",
+                {},
+            ):
                 # If the field is present, append True to the check list
-                check.append(True)
+                checks.append(True)
             # Check if the required field is in the related objects
-            elif required_field in object_data.get("related_objects", {}):
+            elif required_field in object_data.get(
+                "related_objects",
+                {},
+            ):
                 # If the field is present, append True to the check list
-                check.append(True)
+                checks.append(True)
             else:
                 # If the field is not present, append the field to the missing fields
                 # list and append False to the check list
                 missing_fields.append(required_field)
-                check.append(False)
+                checks.append(False)
 
         # Return the result
-        return all(check), missing_fields
+        return (
+            all(checks),
+            missing_fields,
+        )
