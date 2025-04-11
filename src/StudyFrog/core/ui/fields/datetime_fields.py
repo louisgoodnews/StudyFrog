@@ -37,7 +37,7 @@ class DateSelectField(BaseField):
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, Optional[datetime]], None]] = None,
         readonly: bool = False,
-        value: Optional[Union[datetime, string]] = None,
+        value: Optional[Union[datetime, str]] = None,
         **kwargs
     ) -> None:
         """

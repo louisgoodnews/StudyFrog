@@ -4,7 +4,6 @@ Date: 2025-02-05
 """
 
 import asyncio
-import tkinter
 
 from typing import *
 
