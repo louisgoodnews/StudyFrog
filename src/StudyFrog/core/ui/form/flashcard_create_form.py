@@ -227,6 +227,16 @@ class FlashcardCreateForm(tkinter.Frame):
     ) -> tkinter.Frame:
         """ """
 
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
         # Create the scrolled frame widgets
         scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
 
@@ -242,7 +252,7 @@ class FlashcardCreateForm(tkinter.Frame):
         # Create a combobox widget to select a stack
         self.stack_field: ComboboxField = ComboboxField(
             label="Stack*: ",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             on_change_callback=self._on_field_change,
             values=[stack.name for stack in self.unified_manager.get_all_stacks()],
         )
@@ -285,7 +295,7 @@ class FlashcardCreateForm(tkinter.Frame):
         # Create a multi-line text field for the front text of the flashcard
         self.front_field: MultiLineTextField = MultiLineTextField(
             label="Front Text*: ",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             on_change_callback=self._on_field_change,
         )
 
@@ -326,7 +336,7 @@ class FlashcardCreateForm(tkinter.Frame):
         # Create a multi-line text field for the back text of the flashcard
         self.back_field: MultiLineTextField = MultiLineTextField(
             label="Back Text*: ",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             on_change_callback=self._on_field_change,
         )
 
@@ -365,7 +375,6 @@ class FlashcardCreateForm(tkinter.Frame):
         )
 
         # Return the scrolled frame
-        
         return scrolled_frame
 
     def create_secondary_attributes_widgets(
@@ -373,6 +382,16 @@ class FlashcardCreateForm(tkinter.Frame):
         master: tkinter.Misc,
     ) -> tkinter.Frame:
         """ """
+
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
 
         # Create the scrolled frame widgets
         scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)

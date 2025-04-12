@@ -394,8 +394,6 @@ class ScrolledFrame(tkinter.Frame):
     def __init__(
         self,
         master: tkinter.Misc,
-        column: int = 0,
-        row: int = 0,
         **kwargs,
     ) -> None:
         """
@@ -406,66 +404,16 @@ class ScrolledFrame(tkinter.Frame):
 
         Args:
             master (tkinter.Misc): The parent widget in which to place the scrolled frame.
-            column (int): The grid column in which to place the container. Defaults to 0.
-            row (int): The grid row in which to place the container. Defaults to 0.
             **kwargs: Additional keyword arguments passed to the container frame.
 
         Returns:
             None
         """
 
+        super().__init__(master=master)
+
         # Initialize this class' logger instance in an instance variable
         self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
-
-        # Create the 'container' frame widget
-        self._container: tkinter.Frame = tkinter.Frame(
-            master=master,
-            **kwargs,
-        )
-
-        #
-        self._container.grid_columnconfigure(
-            index=0,
-            weight=1,
-        )
-
-        #
-        self._container.grid_columnconfigure(
-            index=1,
-            weight=0,
-        )
-
-        #
-        self._container.grid_rowconfigure(
-            index=0,
-            weight=1,
-        )
-
-        #
-        self._container.grid_rowconfigure(
-            index=1,
-            weight=0,
-        )
-
-        # Place the container widget within the grid
-        self._container.grid(
-            column=column,
-            row=row,
-            sticky=NSEW,
-        )
-
-        # Create a canvas widget
-        self._canvas: tkinter.Canvas = tkinter.Canvas(master=self._container)
-
-        # Place the canvas widget within the frame
-        self._canvas.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Call the parent class constructor
-        super().__init__(master=self._container)
 
         #
         self.grid_columnconfigure(
@@ -474,9 +422,31 @@ class ScrolledFrame(tkinter.Frame):
         )
 
         #
+        self.grid_columnconfigure(
+            index=1,
+            weight=0,
+        )
+
+        #
         self.grid_rowconfigure(
             index=0,
             weight=1,
+        )
+
+        #
+        self.grid_rowconfigure(
+            index=1,
+            weight=0,
+        )
+
+        # Create a canvas widget
+        self._canvas: tkinter.Canvas = tkinter.Canvas(master=self)
+
+        # Place the canvas widget within the frame
+        self._canvas.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
         )
 
         # Bind the 'on_canvas_configure' method to this widget via the '<Configure>' event
@@ -497,28 +467,49 @@ class ScrolledFrame(tkinter.Frame):
         # Check, if the OS is 'Windows"
         if system.lower() == "windows":
             #
-            self._canvas.bind_all(
+            self.bind_all(
                 func=self._on_mousewheel,
                 sequence="<MouseWheel>",
             )
         elif system.lower() == "darwin":
             #
-            self._canvas.bind_all(
+            self.bind_all(
                 func=self._on_mousewheel,
                 sequence="<MouseWheel>",
             )
         else:
             #
-            self._canvas.bind_all(
+            self.bind_all(
                 func=self._on_mousewheel,
                 sequence="<Button-4>",
             )
 
             #
-            self._canvas.bind_all(
+            self.bind_all(
                 func=self._on_mousewheel,
                 sequence="<Button-5>",
             )
+
+        # Create the 'container' frame widget
+        self._container: tkinter.Frame = tkinter.Frame(
+            master=self._canvas,
+            **kwargs,
+        )
+
+        #
+        self._container.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        #
+        self._container.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Update idle tasks
+        self.update_idletasks()
 
         # Add this frame to the canvas widget
         self._canvas.create_window(
@@ -527,29 +518,30 @@ class ScrolledFrame(tkinter.Frame):
                 0,
             ),
             anchor=NW,
-            window=self,
+            tags="window",
+            window=self._container,
         )
 
         # Create the 'vertical scrollbar' scrollbar widget
         self._vertical_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
             command=self._canvas.yview,
-            master=self._container,
+            master=self,
             orient=VERTICAL,
         )
 
         # Place the 'vertical scrollbar' scrollbar widget within the frame
         self._vertical_scrollbar.grid(
-            column=0,
+            column=1,
             padx=5,
             pady=5,
-            row=1,
-            sticky=EW,
+            row=0,
+            sticky=NS,
         )
 
         # Create the 'horizontal scrollbar' scrollbar widget
         self._horizontal_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
             command=self._canvas.xview,
-            master=self._container,
+            master=self,
             orient=HORIZONTAL,
         )
 
@@ -633,8 +625,17 @@ class ScrolledFrame(tkinter.Frame):
             None
         """
         try:
+            # Update idle tasks
+            self.update_idletasks()
+
             # Update scrollregion to encompass the entire embedded frame
             self._canvas.configure(scrollregion=self._canvas.bbox(ALL))
+
+            # Configure the width of the container frame
+            self._canvas.itemconfig(
+                tagOrId="window",
+                width=self._container.winfo_reqwidth(),
+            )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -673,25 +674,27 @@ class ScrolledFrame(tkinter.Frame):
             system: str = platform.system()
 
             # Initialise the amount int to 0
-            amount: int = 0
+            amount: int = event.delta
 
             # Check, if teh OS is either Windows or Darwin (MacOS)
             if system.lower() in [
                 "darwin",
                 "windows",
             ]:
-                amount = -1 if event.delta > 0 else 1
-            else:
-                amount = -1 if event.num == 4 else 1
+                amount = int(1 * (amount // 120))
 
-            # Control key pressed → horizontal scroll
-            if event.state & 0x0004:
-                self._canvas.xview_scroll(
+            # Update idle tasks
+            self.update_idletasks()
+
+            if event.state == "Mod1":
+                # Scroll the canvas in y-direction
+                self._canvas.yview_scroll(
                     number=amount,
                     what=UNITS,
                 )
-            else:
-                self._canvas.yview_scroll(
+            elif event.state == "Shift|Mod1":
+                # Scroll the canvas in x-direction
+                self._canvas.xview_scroll(
                     number=amount,
                     what=UNITS,
                 )
@@ -796,7 +799,7 @@ class ScrolledFrame(tkinter.Frame):
         """
         try:
             # Attempt to configure the 'horizontal scrollbar' scrolblar widget
-            self.button.configure(**kwargs)
+            self._horizontal_scrollbar.configure(**kwargs)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -925,10 +928,40 @@ class TabbedFrame(tkinter.Frame):
             **kwargs,
         )
 
+        self._container.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        self._container.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+        self._container.grid_rowconfigure(
+            index=1,
+            weight=1,
+        )
+
         # Place the 'container' frame widget within the grid
         self._container.grid(
             column=column,
             row=row,
+            sticky=NSEW,
+        )
+
+        # Create the 'top frame' frame widget
+        self._top_frame: tkinter.Frame = tkinter.Frame(
+            master=self._container,
+            **kwargs,
+        )
+
+        # Place the 'top frame' frame widget within the grid
+        self._top_frame.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
             sticky=NSEW,
         )
 
@@ -938,16 +971,14 @@ class TabbedFrame(tkinter.Frame):
             **kwargs,
         )
 
-        # Create the 'top frame' frame widget
-        self._top_frame: tkinter.Frame = tkinter.Frame(master=self._container)
+        self.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
 
-        # Place the 'top frame' frame widget within the grid
-        self._top_frame.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
+        self.grid_rowconfigure(
+            index=0,
+            weight=1,
         )
 
         # Place this frame within the grid
@@ -1034,7 +1065,7 @@ class TabbedFrame(tkinter.Frame):
         self,
         label: str,
         widget: tkinter.Misc,
-    ) -> str:
+    ) -> None:
         """
         Adds a new tab with an associated widget to the tabbed interface.
 
@@ -1046,7 +1077,7 @@ class TabbedFrame(tkinter.Frame):
             widget (tkinter.Misc): The widget to be shown when the tab is active.
 
         Returns:
-            str: The snake_case version of the label, which is used as an internal key.
+            None
         """
 
         # Convert the passed label to snake case
@@ -1080,15 +1111,23 @@ class TabbedFrame(tkinter.Frame):
 
         # Check, if this is the first tab
         if len(self.tabs) == 1:
-            # Show the passed widget
-            widget.grid(
-                column=0,
-                row=0,
-                sticky=NSEW,
-            )
+            # Disable the button widget
+            self.tabs[key]["button"].configure(state=DISABLED)
 
-        # Return a snake case representation of the passed label
-        return Miscellaneous.any_to_snake(string=label)
+            # Check, if the widget has been mapped already
+            if not widget.winfo_ismapped():
+                # Show the passed widget
+                self.tabs[key]["widget"].grid(
+                    column=0,
+                    row=0,
+                    sticky=NSEW,
+                )
+
+            # Set the current tab
+            self.current_tab = label
+        else:
+            # Hide the widegt from the grid
+            self.tabs[key]["widget"].grid_forget()
 
     def configure_button(
         self,
@@ -1113,15 +1152,15 @@ class TabbedFrame(tkinter.Frame):
         """
         try:
             # Convert the passed name to snake case
-            name = Miscellaneous.any_to_snake(string=name)
+            key = Miscellaneous.any_to_snake(string=name)
 
             # Check, if the passed name string is contained in the tabs dictionary instance variable
-            if name not in self.tabs:
+            if key not in self.tabs:
                 # Return early
                 return
 
             # Attempt to configure the button widget corresponding to the passed name
-            self.tabs[name]["button"].configure(**kwargs)
+            self.tabs[key]["button"].configure(**kwargs)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
