@@ -12,6 +12,8 @@ from typing import *
 from core.ui.fields.select_fields import ComboboxField
 from core.ui.fields.string_fields import MultiLineTextField
 
+from core.ui.frames.frames import ScrolledFrame, TabbedFrame
+
 from core.ui.ui_builder import UIBuilder
 
 from core.stack import ImmutableStack
@@ -219,6 +221,174 @@ class FlashcardCreateForm(tkinter.Frame):
             weight=1,
         )
 
+    def create_core_attributes_widgets(
+        self,
+        master: TabbedFrame,
+    ) -> tkinter.Frame:
+        """ """
+
+        # Create the scrolled frame widgets
+        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+
+        # Style the scrolled frame widget
+        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "canvas" widget
+        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "container frame" widget
+        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
+
+        # Create a combobox widget to select a stack
+        self.stack_field: ComboboxField = ComboboxField(
+            label="Stack*: ",
+            master=scrolled_frame,
+            on_change_callback=self._on_field_change,
+            values=[stack.name for stack in self.unified_manager.get_all_stacks()],
+        )
+
+        # Style the stack field "Root" frame widget
+        self.stack_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the stack field "Button" button widget
+        self.stack_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Combobox" combobox widget
+        self.stack_field.configure_combobox(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            state="readonly",
+        )
+
+        # Style the stack field "Label" label widget
+        self.stack_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Place the stack field in the grid
+        self.stack_field.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a multi-line text field for the front text of the flashcard
+        self.front_field: MultiLineTextField = MultiLineTextField(
+            label="Front Text*: ",
+            master=scrolled_frame,
+            on_change_callback=self._on_field_change,
+        )
+
+        # Style the front field "Root" frame widget
+        self.front_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the front field "Button" button widget
+        self.front_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the front field "Label" label widget
+        self.front_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the back field "Text" text widget
+        self.front_field.configure_text(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+        )
+
+        # Place the front field in the grid
+        self.front_field.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
+
+        # Create a multi-line text field for the back text of the flashcard
+        self.back_field: MultiLineTextField = MultiLineTextField(
+            label="Back Text*: ",
+            master=scrolled_frame,
+            on_change_callback=self._on_field_change,
+        )
+
+        # Style the back field "Root" frame widget
+        self.back_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the back field "Button" button widget
+        self.back_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the back field "Label" label widget
+        self.back_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the back field "Text" text widget
+        self.back_field.configure_text(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+        )
+
+        # Place the back field in the grid
+        self.back_field.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
+
+        # Return the scrolled frame
+        
+        return scrolled_frame
+
+    def create_secondary_attributes_widgets(
+        self,
+        master: tkinter.Misc,
+    ) -> tkinter.Frame:
+        """ """
+
+        # Create the scrolled frame widgets
+        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+
+        # Style the scrolled frame widget
+        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "canvas" widget
+        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "container frame" widget
+        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
+
+        # Return the scrolled frame
+        return scrolled_frame
+
     def create_widgets(self) -> None:
         """
         Creates and configures the main widgets of the flashcard create form widget.
@@ -267,188 +437,56 @@ class FlashcardCreateForm(tkinter.Frame):
             sticky=EW,
         )
 
-        # Attempt to create the tabbed view widgets
-        tabbed_view: Optional[Dict[str, Any]] = UIBuilder.get_tabbed_view(master=self)
-
-        if not tabbed_view:
-            # Log a warning message to indicate that something went wrong
-            self.logger.warning(
-                f"Failed to get tabbed view widgets in {self.__class__.__name__}. This is likely a bug."
-            )
-
-            # Return early
-            return
-
-        # Style the tabbed view widget's "Center Frame" frame widget
-        tabbed_view["center_frame"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the tabbed view widget's "Root" frame widget
-        tabbed_view["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the tabbed view widget's "Top Frame" frame widget
-        tabbed_view["top_frame"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the tabbed view widgets within the passed master widget
-        tabbed_view["root"].grid(
+        # Attempt to create the tabbed frame widgets
+        tabbed_frame: TabbedFrame = TabbedFrame(
             column=0,
+            master=self,
             row=2,
-            sticky=NSEW,
         )
 
-        # Create the scrolled frame widgets
-        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
-            master=tabbed_view["center_frame"]
-        )
+        # Style the tabbed frame widget
+        tabbed_frame.configure(background=Constants.BLUE_GREY["700"])
 
-        # Style the scrolled frame "Canvas" widget
-        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the tabbed frame widget's "container frame" frame widget
+        tabbed_frame.configure_container(background=Constants.BLUE_GREY["700"])
 
-        # Style the scrolled frame "Frame" widget
-        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the tabbed frame widget's "top frame" frame widget
+        tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
 
-        # Style the scrolled frame "Root" frame widget
-        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Add the scrolled frame widget to the tabbed view
-        tabbed_view["adder"](
+        # Add the scrolled frame widget to the tabbed frame
+        tabbed_frame.add(
             label="Core attributes",
-            widget=scrolled_frame["root"],
+            widget=self.create_core_attributes_widgets(master=tabbed_frame),
         )
 
-        # Style the "Core attributes" button
-        tabbed_view["core_attributes_button"].configure(
+        # Add the scrolled frame widget to the tabbed frame
+        tabbed_frame.add(
+            label="Secondary attributes",
+            widget=self.create_secondary_attributes_widgets(master=tabbed_frame),
+        )
+
+        # Style the "core attributes" button
+        tabbed_frame.configure_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
+            name="core_attributes",
             relief=FLAT,
         )
 
-        # Create a combobox widget to select a stack
-        self.stack_field: ComboboxField = ComboboxField(
-            label="Stack*: ",
-            master=scrolled_frame["frame"],
-            on_change_callback=self._on_field_change,
-            values=[stack.name for stack in self.unified_manager.get_all_stacks()],
-        )
-
-        # Style the stack field "Root" frame widget
-        self.stack_field.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the stack field "Button" button widget
-        self.stack_field.configure_button(
+        # Style the "secondary attributes" button
+        tabbed_frame.configure_button(
             background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the stack field "Combobox" combobox widget
-        self.stack_field.configure_combobox(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
-            state="readonly",
-        )
-
-        # Style the stack field "Label" label widget
-        self.stack_field.configure_label(
-            background=Constants.BLUE_GREY["700"],
             foreground=Constants.WHITE,
+            name="secondary_attributes",
             relief=FLAT,
-        )
-
-        # Place the stack field in the grid
-        self.stack_field.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create a multi-line text field for the front text of the flashcard
-        self.front_field: MultiLineTextField = MultiLineTextField(
-            label="Front Text*: ",
-            master=scrolled_frame["frame"],
-            on_change_callback=self._on_field_change,
-        )
-
-        # Style the front field "Root" frame widget
-        self.front_field.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the front field "Button" button widget
-        self.front_field.configure_button(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the front field "Label" label widget
-        self.front_field.configure_label(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the back field "Text" text widget
-        self.front_field.configure_text(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-        )
-
-        # Place the front field in the grid
-        self.front_field.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=1,
-            sticky=NSEW,
-        )
-
-        # Create a multi-line text field for the back text of the flashcard
-        self.back_field: MultiLineTextField = MultiLineTextField(
-            label="Back Text*: ",
-            master=scrolled_frame["frame"],
-            on_change_callback=self._on_field_change,
-        )
-
-        # Style the back field "Root" frame widget
-        self.back_field.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the back field "Button" button widget
-        self.back_field.configure_button(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the back field "Label" label widget
-        self.back_field.configure_label(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the back field "Text" text widget
-        self.back_field.configure_text(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-        )
-
-        # Place the back field in the grid
-        self.back_field.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=2,
-            sticky=NSEW,
         )
 
     def get(self) -> Optional[Dict[str, Any]]:

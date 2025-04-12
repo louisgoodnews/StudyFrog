@@ -51,7 +51,12 @@ class ToplevelNotification:
             result: str = "cancel"
 
             # Create a toplevel widget
-            toplevel: tkinter.Toplevel = tkinter.Toplevel(**kwargs)
+            toplevel: tkinter.Toplevel = tkinter.Toplevel(
+                **kwargs.get(
+                    "toplevel",
+                    {},
+                )
+            )
 
             # Set the window title
             toplevel.wm_title(string=title)
@@ -88,7 +93,10 @@ class ToplevelNotification:
             title_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=title,
-                **kwargs,
+                **kwargs.get(
+                    "title_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -102,7 +110,10 @@ class ToplevelNotification:
             message_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=message,
-                **kwargs,
+                **kwargs.get(
+                    "message_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -134,7 +145,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="cancel"),
                 master=toplevel,
                 text="Cancel",
-                **kwargs,
+                **kwargs.get(
+                    "button",
+                    {},
+                ),
             )
 
             # Place the button widget within the grid
@@ -176,7 +190,12 @@ class ToplevelNotification:
             result: str = "okay"
 
             # Create a toplevel widget
-            toplevel: tkinter.Toplevel = tkinter.Toplevel(**kwargs)
+            toplevel: tkinter.Toplevel = tkinter.Toplevel(
+                **kwargs.get(
+                    "toplevel",
+                    {},
+                )
+            )
 
             # Set the window title
             toplevel.wm_title(string=title)
@@ -213,7 +232,10 @@ class ToplevelNotification:
             title_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=title,
-                **kwargs,
+                **kwargs.get(
+                    "title_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -227,7 +249,10 @@ class ToplevelNotification:
             message_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=message,
-                **kwargs,
+                **kwargs.get(
+                    "message_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -259,7 +284,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="okay"),
                 master=toplevel,
                 text="Okay",
-                **kwargs,
+                **kwargs.get(
+                    "button",
+                    {},
+                ),
             )
 
             # Place the button widget within the grid
@@ -302,7 +330,12 @@ class ToplevelNotification:
             result: str = "cancel"
 
             # Create a toplevel widget
-            toplevel: tkinter.Toplevel = tkinter.Toplevel(**kwargs)
+            toplevel: tkinter.Toplevel = tkinter.Toplevel(
+                **kwargs.get(
+                    "toplevel",
+                    {},
+                )
+            )
 
             # Set the window title
             toplevel.wm_title(string=title)
@@ -339,7 +372,10 @@ class ToplevelNotification:
             title_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=title,
-                **kwargs,
+                **kwargs.get(
+                    "title_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -353,7 +389,10 @@ class ToplevelNotification:
             message_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=message,
-                **kwargs,
+                **kwargs.get(
+                    "message_label",
+                    {},
+                ),
             )
 
             # Place the 'message label' label widget within the grid
@@ -381,7 +420,10 @@ class ToplevelNotification:
             # Create a frame widget
             frame: tkinter.Frame = tkinter.Frame(
                 master=toplevel,
-                **kwargs,
+                **kwargs.get(
+                    "frame",
+                    {},
+                ),
             )
 
             # Set the weight of the 0th column to 1
@@ -410,7 +452,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="okay"),
                 master=frame,
                 text="Okay",
-                **kwargs,
+                **kwargs.get(
+                    "okay_button",
+                    {},
+                ),
             )
 
             # Place the 'okay button' button widget within the grid
@@ -426,7 +471,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="cancel"),
                 master=frame,
                 text="Cancel",
-                **kwargs,
+                **kwargs.get(
+                    "cancel_button",
+                    {},
+                ),
             )
 
             # Place the button widget within the grid
@@ -468,7 +516,12 @@ class ToplevelNotification:
             result: str = "retry"
 
             # Create a toplevel widget
-            toplevel: tkinter.Toplevel = tkinter.Toplevel(**kwargs)
+            toplevel: tkinter.Toplevel = tkinter.Toplevel(
+                **kwargs.get(
+                    "toplevel",
+                    {},
+                )
+            )
 
             # Set the window title
             toplevel.wm_title(string=title)
@@ -505,7 +558,10 @@ class ToplevelNotification:
             title_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=title,
-                **kwargs,
+                **kwargs.get(
+                    "title_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -519,7 +575,10 @@ class ToplevelNotification:
             message_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=message,
-                **kwargs,
+                **kwargs.get(
+                    "message_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -551,7 +610,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="retry"),
                 master=toplevel,
                 text="retry",
-                **kwargs,
+                **kwargs.get(
+                    "button",
+                    {},
+                ),
             )
 
             # Place the button widget within the grid
@@ -594,7 +656,12 @@ class ToplevelNotification:
             result: str = "cancel"
 
             # Create a toplevel widget
-            toplevel: tkinter.Toplevel = tkinter.Toplevel(**kwargs)
+            toplevel: tkinter.Toplevel = tkinter.Toplevel(
+                **kwargs.get(
+                    "toplevel",
+                    {},
+                )
+            )
 
             # Set the window title
             toplevel.wm_title(string=title)
@@ -631,7 +698,10 @@ class ToplevelNotification:
             title_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=title,
-                **kwargs,
+                **kwargs.get(
+                    "title_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -645,7 +715,10 @@ class ToplevelNotification:
             message_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=message,
-                **kwargs,
+                **kwargs.get(
+                    "message_label",
+                    {},
+                ),
             )
 
             # Place the 'message label' label widget within the grid
@@ -673,7 +746,10 @@ class ToplevelNotification:
             # Create a frame widget
             frame: tkinter.Frame = tkinter.Frame(
                 master=toplevel,
-                **kwargs,
+                **kwargs.get(
+                    "frame",
+                    {},
+                ),
             )
 
             # Set the weight of the 0th column to 1
@@ -702,7 +778,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="retry"),
                 master=frame,
                 text="retry",
-                **kwargs,
+                **kwargs.get(
+                    "retry_button",
+                    {},
+                ),
             )
 
             # Place the 'retry button' button widget within the grid
@@ -718,7 +797,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="cancel"),
                 master=frame,
                 text="Cancel",
-                **kwargs,
+                **kwargs.get(
+                    "cancel_button",
+                    {},
+                ),
             )
 
             # Place the button widget within the grid
@@ -761,7 +843,12 @@ class ToplevelNotification:
             result: str = "no"
 
             # Create a toplevel widget
-            toplevel: tkinter.Toplevel = tkinter.Toplevel(**kwargs)
+            toplevel: tkinter.Toplevel = tkinter.Toplevel(
+                **kwargs.get(
+                    "toplevel",
+                    {},
+                )
+            )
 
             # Set the window title
             toplevel.wm_title(string=title)
@@ -798,7 +885,10 @@ class ToplevelNotification:
             title_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=title,
-                **kwargs,
+                **kwargs.get(
+                    "title_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -812,7 +902,10 @@ class ToplevelNotification:
             message_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=message,
-                **kwargs,
+                **kwargs.get(
+                    "message_label",
+                    {},
+                ),
             )
 
             # Place the 'message label' label widget within the grid
@@ -840,7 +933,10 @@ class ToplevelNotification:
             # Create a frame widget
             frame: tkinter.Frame = tkinter.Frame(
                 master=toplevel,
-                **kwargs,
+                **kwargs.get(
+                    "frame",
+                    {},
+                ),
             )
 
             # Set the weight of the 0th column to 1
@@ -869,7 +965,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="yes"),
                 master=frame,
                 text="yes",
-                **kwargs,
+                **kwargs.get(
+                    "yes_button",
+                    {},
+                ),
             )
 
             # Place the 'yes button' button widget within the grid
@@ -885,7 +984,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="no"),
                 master=frame,
                 text="no",
-                **kwargs,
+                **kwargs.get(
+                    "no_button",
+                    {},
+                ),
             )
 
             # Place the button widget within the grid
@@ -928,7 +1030,12 @@ class ToplevelNotification:
             result: str = "no"
 
             # Create a toplevel widget
-            toplevel: tkinter.Toplevel = tkinter.Toplevel(**kwargs)
+            toplevel: tkinter.Toplevel = tkinter.Toplevel(
+                **kwargs.get(
+                    "toplevel",
+                    {},
+                )
+            )
 
             # Set the window title
             toplevel.wm_title(string=title)
@@ -965,7 +1072,10 @@ class ToplevelNotification:
             title_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=title,
-                **kwargs,
+                **kwargs.get(
+                    "title_label",
+                    {},
+                ),
             )
 
             # Place the label widget within the grid
@@ -979,7 +1089,10 @@ class ToplevelNotification:
             message_label: tkinter.Label = tkinter.Label(
                 master=toplevel,
                 text=message,
-                **kwargs,
+                **kwargs.get(
+                    "message_label",
+                    {},
+                ),
             )
 
             # Place the 'message label' label widget within the grid
@@ -1007,7 +1120,10 @@ class ToplevelNotification:
             # Create a frame widget
             frame: tkinter.Frame = tkinter.Frame(
                 master=toplevel,
-                **kwargs,
+                **kwargs.get(
+                    "frame",
+                    {},
+                ),
             )
 
             # Set the weight of the 0th column to 1
@@ -1043,7 +1159,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="yes"),
                 master=frame,
                 text="yes",
-                **kwargs,
+                **kwargs.get(
+                    "yes_button",
+                    {},
+                ),
             )
 
             # Place the 'yes button' button widget within the grid
@@ -1059,7 +1178,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="no"),
                 master=frame,
                 text="no",
-                **kwargs,
+                **kwargs.get(
+                    "no_button",
+                    {},
+                ),
             )
 
             # Place the button widget within the grid
@@ -1075,7 +1197,10 @@ class ToplevelNotification:
                 command=lambda: _on_button_click(string="cancel"),
                 master=frame,
                 text="cancel",
-                **kwargs,
+                **kwargs.get(
+                    "cancel_button",
+                    {},
+                ),
             )
 
             # Place the button widget within the grid

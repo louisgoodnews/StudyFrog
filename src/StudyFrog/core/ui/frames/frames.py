@@ -467,6 +467,18 @@ class ScrolledFrame(tkinter.Frame):
         # Call the parent class constructor
         super().__init__(master=self._container)
 
+        #
+        self.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        #
+        self.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
         # Bind the 'on_canvas_configure' method to this widget via the '<Configure>' event
         self.bind(
             func=self._on_container_configure,
@@ -504,16 +516,18 @@ class ScrolledFrame(tkinter.Frame):
 
             #
             self._canvas.bind_all(
-                sunc=self._on_mousewheel,
+                func=self._on_mousewheel,
                 sequence="<Button-5>",
             )
 
         # Add this frame to the canvas widget
         self._canvas.create_window(
+            *(
+                0,
+                0,
+            ),
             anchor=NW,
             window=self,
-            x=0,
-            y=0,
         )
 
         # Create the 'vertical scrollbar' scrollbar widget
@@ -918,6 +932,12 @@ class TabbedFrame(tkinter.Frame):
             sticky=NSEW,
         )
 
+        # Call the parent class constructor with the passed arguments
+        super().__init__(
+            master=self._container,
+            **kwargs,
+        )
+
         # Create the 'top frame' frame widget
         self._top_frame: tkinter.Frame = tkinter.Frame(master=self._container)
 
@@ -937,6 +957,30 @@ class TabbedFrame(tkinter.Frame):
             sticky=NSEW,
         )
 
+    @property
+    def container(self) -> tkinter.Frame:
+        """
+        Returns the container frame widget.
+
+        Returns:
+            tkinter.Frame: The container frame widget.
+        """
+
+        # Return the 'container' frame widget
+        return self._container
+
+    @property
+    def top_frame(self) -> tkinter.Frame:
+        """
+        Returns the top frame widget.
+
+        Returns:
+            tkinter.Frame: The top frame widget.
+        """
+
+        # Return the 'top frame' frame widget
+        return self._top_frame
+
     def _on_button_click(
         self,
         label: str,
@@ -954,32 +998,35 @@ class TabbedFrame(tkinter.Frame):
             None
         """
 
-        #
-        if self.current_tab:
-            #
+        # Initialize the 'key' variable as None
+        key: Optional[str] = Miscellaneous.any_to_snake(string=label)
+
+        # Check, if a current tab is already active
+        if self.current_tab is not None:
+            # Disable the currently active button
             self.configure_button(
-                label=self.current_tab,
+                name=self.current_tab,
                 state=NORMAL,
             )
 
-            #
+            # Hide the currently active widget
             self.tabs[Miscellaneous.any_to_snake(string=self.current_tab)][
                 "widget"
             ].grid_forget()
 
-        #
-        self.tabs[Miscellaneous.any_to_snake(string=label)]["widget"].grid(
+        # Show the selected widget
+        self.tabs[key]["widget"].grid(
             column=0,
             row=0,
             sticky=NSEW,
         )
 
-        #
+        # Set the current tab
         self.current_tab = label
 
-        #
+        # Disable the clicked button
         self.configure_button(
-            label=label,
+            name=label,
             state=DISABLED,
         )
 
@@ -1002,17 +1049,25 @@ class TabbedFrame(tkinter.Frame):
             str: The snake_case version of the label, which is used as an internal key.
         """
 
-        #
-        self.tabs[Miscellaneous.any_to_snake(string=label)]["widget"] = widget
+        # Convert the passed label to snake case
+        key: str = Miscellaneous.any_to_snake(string=label)
 
-        #
+        # Check, if the tab with the passed label already exists
+        if key not in self.tabs:
+            # Initialize the tab dictionary
+            self.tabs[key] = {}
+
+        # Store the passed widget in the tab dictionary
+        self.tabs[key]["widget"] = widget
+
+        # Create a button for the tab
         button: tkinter.Button = tkinter.Button(
             command=lambda: self._on_button_click(label=label),
             master=self._top_frame,
             text=label,
         )
 
-        #
+        # Place the button within the grid
         button.grid(
             column=len(self.tabs),
             padx=5,
@@ -1020,12 +1075,12 @@ class TabbedFrame(tkinter.Frame):
             row=0,
         )
 
-        #
-        self.tabs[Miscellaneous.any_to_snake(string=label)]["button"] = button
+        # Store the button in the tab dictionary
+        self.tabs[key]["button"] = button
 
-        #
+        # Check, if this is the first tab
         if len(self.tabs) == 1:
-            #
+            # Show the passed widget
             widget.grid(
                 column=0,
                 row=0,
@@ -1105,6 +1160,40 @@ class TabbedFrame(tkinter.Frame):
             # Log an error message indicating that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'configure_contaier' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def configure_top_frame(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the top frame containing the tab buttons.
+
+        This method allows external customization of the top frame,
+        such as padding, borders, or colors.
+
+        Args:
+            **kwargs: Keyword arguments to pass to the top frame's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: Raises an exception if any errors occur while attempting configuration.
+        """
+        try:
+            # Attempt to configure the 'top_frame' frame widget
+            self._top_frame.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_top_frame' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message
