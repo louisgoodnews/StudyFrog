@@ -210,6 +210,11 @@ class Events:
         name="ui:create:button:clicked"
     )
 
+    # An event that indicates that a create form field has changed
+    CREATE_FORM_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:create:form:field:changed")
+    )
+
     # An event that indicates that a date select field has changed
     DATE_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:combobox_select:field:changed")
@@ -373,6 +378,26 @@ class Events:
     # An event that indicates that a multi option select field has been set
     MULTI_OPTION_SELECT_FIELD_SET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:multi_option_select_field:set")
+    )
+
+    # An event that indicates that a multi select answer field has changed
+    MULTI_SELECT_ANSWER_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_select_answer_field:changed")
+    )
+
+    # An event that indicates that a multi select answer field has been cleared
+    MULTI_SELECT_ANSWER_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_select_answer_field:cleared")
+    )
+
+    # An event that indicates that a multi select answer field has been retrieved
+    MULTI_SELECT_ANSWER_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_select_answer_field:get")
+    )
+
+    # An event that indicates that a multi select answer field has been set
+    MULTI_SELECT_ANSWER_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:multi_select_answer_field:set")
     )
 
     # An event that indicates that a navigate event has occurred
@@ -1897,6 +1922,21 @@ class Events:
             cls.MULTI_OPTION_SELECT_FIELD_CLEARED,
             cls.MULTI_OPTION_SELECT_FIELD_GET,
             cls.MULTI_OPTION_SELECT_FIELD_SET,
+        ]
+
+    @classmethod
+    def get_multi_select_answer_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all multi select answer field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all multi select answer field events in the Events class.
+        """
+        return [
+            cls.MULTI_SELECT_ANSWER_FIELD_CHANGED,
+            cls.MULTI_SELECT_ANSWER_FIELD_CLEARED,
+            cls.MULTI_SELECT_ANSWER_FIELD_GET,
+            cls.MULTI_SELECT_ANSWER_FIELD_SET,
         ]
 
     @classmethod

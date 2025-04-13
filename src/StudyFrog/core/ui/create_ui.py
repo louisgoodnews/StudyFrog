@@ -20,7 +20,7 @@ from core.setting import SettingService
 from core.stack import StackFactory, ImmutableStack, MutableStack
 from core.status import ImmutableStatus
 
-from core.ui.base_ui import BaseUI
+from utils.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 from core.ui.form.flashcard_create_form import FlashcardCreateForm
 from core.ui.form.question_create_form import QuestionCreateForm

@@ -68,10 +68,7 @@ class BaseField(tkinter.Frame):
         """
 
         # Call the parent class constructor
-        super().__init__(
-            master=master,
-            **kwargs,
-        )
+        super().__init__(master=master)
 
         # Create an instance of the Logger class
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
@@ -94,7 +91,10 @@ class BaseField(tkinter.Frame):
         self.configure_grid()
 
         # Create the widgets
-        self.create_widgets(label=label)
+        self.create_widgets(
+            label=label,
+            **kwargs,
+        )
 
         # Check, if the passed value is not None
         if value is not None:

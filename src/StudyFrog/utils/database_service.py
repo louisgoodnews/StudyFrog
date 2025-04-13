@@ -69,7 +69,7 @@ class DatabaseService:
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(
-                message=f"Caught an exception while attempting to run 'create_database' method from '{cls.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'create' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception occurred

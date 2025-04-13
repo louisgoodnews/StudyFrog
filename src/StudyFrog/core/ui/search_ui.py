@@ -17,7 +17,7 @@ from core.question import ImmutableQuestion
 from core.setting import SettingService
 from core.stack import ImmutableStack
 
-from core.ui.base_ui import BaseUI
+from utils.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants

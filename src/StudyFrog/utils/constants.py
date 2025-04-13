@@ -600,6 +600,14 @@ class Constants:
         "Spaced Repetition",
     ]
 
+    # The question types
+    QUESTION_TYPES: Final[List[str]] = [
+        "Multiple Select",
+        "Open Answer",
+        "Single Select",
+        "True or False",
+    ]
+
     @classmethod
     def get_base_id(cls) -> int:
         """

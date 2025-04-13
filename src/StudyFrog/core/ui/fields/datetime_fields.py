@@ -58,6 +58,15 @@ class DateSelectField(BaseField):
             None
         """
 
+        # Initialize the (optional) calendar instance variable as None
+        self.calendar: Optional[tkcalendar.Calendar] = None
+
+        # Store the passed date format string
+        self._date_format: str = date_format
+
+        # Initialize the (optional) toplevel instance variable as None
+        self.toplevel: Optional[tkinter.Toplevel] = None
+
         # Call the parent class constructor with the passed arguments
         super().__init__(
             label=label,
@@ -68,15 +77,6 @@ class DateSelectField(BaseField):
             value=value,
             **kwargs,
         )
-
-        # Initialize the (optional) calendar instance variable as None
-        self.calendar: Optional[tkcalendar.Calendar] = None
-
-        # Store the passed date format string
-        self._date_format: str = date_format
-
-        # Initialize the (optional) toplevel instance variable as None
-        self.toplevel: Optional[tkinter.Toplevel] = None
 
         # Check, if the passed value is not None
         if value is not None:
@@ -340,7 +340,7 @@ class DateSelectField(BaseField):
         # Bind the 'on_toplevel_destroy' to the toplevel widget via the 'WM_DESTROY' event
         self.toplevel.protocol(
             func=self._on_toplevel_destroy,
-            sequence="WM_DESTROY",
+            name="WM_DESTROY",
         )
 
         # Create a label widget

@@ -12,9 +12,10 @@ from typing import *
 from core.setting import SettingService
 from core.stack import ImmutableStack
 
-from core.ui.base_ui import BaseUI
-
+from utils.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
+
+from core.ui.frames.frames import ScrolledFrame, TabbedFrame
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
@@ -449,34 +450,37 @@ class DashboardUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Create the "Notebook" frame widget
-        notebook: Dict[str, Any] = UIBuilder.get_tabbed_view(master=right_frame)
-
-        # Style the "Notebook" frame "Top Frame" widget
-        notebook["top_frame"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the "Notebook" frame widget in the master frame
-        notebook["root"].grid(
+        # Create the "TabbedView" widget
+        tabbed_view: TabbedFrame = TabbedFrame(
             column=0,
+            master=right_frame,
             row=1,
-            sticky=NSEW,
         )
 
-        # Create the "Notebook" widgets
-        self.create_notebook_widgets(master=notebook)
+        # Style the TabbedView's "Top Frame" widget
+        tabbed_view.configure(background=Constants.BLUE_GREY["700"])
 
-    def create_notebook_widgets(
+        # Style the TabbedView's "Container Frame" widget
+        tabbed_view.configure_container(background=Constants.BLUE_GREY["700"])
+
+        # Style the TabbedView's "Top Frame" widget
+        tabbed_view.configure_top_frame(background=Constants.BLUE_GREY["700"])
+
+        # Create the "TabbedView" widgets
+        self.create_TabbedView_widgets(master=tabbed_view)
+
+    def create_TabbedView_widgets(
         self,
-        master: Dict[str, Any],
+        master: TabbedFrame,
     ) -> None:
         """
-        Creates and configures the main widgets of the notebook.
+        Creates and configures the main widgets of the TabbedView.
 
-        This method initializes the main widgets of the notebook within the
+        This method initializes the main widgets of the TabbedView within the
         dashboard UI, setting their layout configuration.
 
         Args:
-            master (Dict[str, Any]): The parent widget assembly dictionary.
+            master (TabbedFrame): The parent widget assembly dictionary.
 
         Returns:
             None
@@ -485,71 +489,72 @@ class DashboardUI(BaseUI):
             # Create the "New Stacks" frame widget
             new_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
                 background=Constants.BLUE_GREY["700"],
-                master=master["center_frame"],
+                master=master,
             )
 
-            # Add the "New Stacks" frame widget to the notebook
-            master["adder"](
+            # Add the "New Stacks" frame widget to the TabbedView
+            master.add(
                 label="My New Stacks",
                 widget=new_stacks_frame,
             )
 
             # Configure the "My New Stacks" button
-            master["my_new_stacks_button"].configure(
+            master.configure_button(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
+                name="My New Stacks",
                 relief=FLAT,
             )
 
             # Create the "Recently Viewed" frame widget
             recently_viewed_frame: tkinter.Frame = UIBuilder.get_frame(
                 background=Constants.BLUE_GREY["700"],
-                master=master["center_frame"],
+                master=master,
             )
 
-            # Add the "Recently Viewed" frame widget to the notebook
-            master["adder"](
+            # Add the "Recently Viewed" frame widget to the TabbedView
+            master.add(
                 label="Recently Viewed",
-                sticky=NSEW,
                 widget=recently_viewed_frame,
             )
 
             # Configure the "Recently Viewed" button
-            master["recently_viewed_button"].configure(
+            master.configure_button(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
+                name="Recently Viewed",
                 relief=FLAT,
             )
 
             # Create the "Completed Stacks" frame widget
             completed_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
                 background=Constants.BLUE_GREY["700"],
-                master=master["center_frame"],
+                master=master,
             )
 
-            # Add the "Completed Stacks" frame widget to the notebook
-            master["adder"](
+            # Add the "Completed Stacks" frame widget to the TabbedView
+            master.add(
                 label="Completed Stacks",
-                sticky=NSEW,
                 widget=completed_stacks_frame,
             )
 
             # Configure the "Completed Stacks" button
-            master["completed_stacks_button"].configure(
+            master.configure_button(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
+                name="Completed Stacks",
                 relief=FLAT,
             )
 
@@ -566,7 +571,7 @@ class DashboardUI(BaseUI):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_notebook_widgets' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run 'create_TabbedView_widgets' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Re-raise the exception to the caller
@@ -657,29 +662,26 @@ class DashboardUI(BaseUI):
         )
 
         # Get a new scrolled frame widget
-        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=master)
-
-        # Style the scrolled frame "Canvas" widget
-        # Set the background color to the main background color
-        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "Frame" widget
-        # Set the background color to the main background color
-        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+        self.new_stacks_frame: ScrolledFrame = ScrolledFrame(master=master)
 
         # Style the scrolled frame "Root" widget
         # Set the background color to the main background color
-        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+        self.new_stacks_frame.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Canvas" widget
+        # Set the background color to the main background color
+        self.new_stacks_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Frame" widget
+        # Set the background color to the main background color
+        self.new_stacks_frame.configure_container(background=Constants.BLUE_GREY["700"])
 
         # Place the scrolled frame widget in the main window
-        scrolled_frame["root"].grid(
+        self.new_stacks_frame.grid(
             column=0,
             row=1,
             sticky=NSEW,
         )
-
-        # Store the scrolled frame's "Frame" widget in an instance variable
-        self.new_stacks_frame = scrolled_frame["frame"]
 
     def create_recently_viewed_stacks_frame_widgets(
         self,
@@ -766,29 +768,32 @@ class DashboardUI(BaseUI):
         )
 
         # Get a new scrolled frame widget
-        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=master)
-
-        # Style the scrolled frame "Canvas" widget
-        # Set the background color to the main background color
-        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "Frame" widget
-        # Set the background color to the main background color
-        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+        self.recently_viewed_stacks_frame: ScrolledFrame = ScrolledFrame(master=master)
 
         # Style the scrolled frame "Root" widget
         # Set the background color to the main background color
-        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+        self.recently_viewed_stacks_frame.configure(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Style the scrolled frame "Canvas" widget
+        # Set the background color to the main background color
+        self.recently_viewed_stacks_frame.configure_canvas(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Style the scrolled frame "Frame" widget
+        # Set the background color to the main background color
+        self.recently_viewed_stacks_frame.configure_container(
+            background=Constants.BLUE_GREY["700"]
+        )
 
         # Place the scrolled frame widget in the main window
-        scrolled_frame["root"].grid(
+        self.recently_viewed_stacks_frame.grid(
             column=0,
             row=1,
             sticky=NSEW,
         )
-
-        # Store the scrolled frame's "Frame" widget in an instance variable
-        self.recently_viewed_stacks_frame = scrolled_frame["frame"]
 
     def create_completed_stacks_frame_widgets(
         self,
@@ -876,29 +881,30 @@ class DashboardUI(BaseUI):
         )
 
         # Get a new scrolled frame widget
-        scrolled_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(master=master)
-
-        # Style the scrolled frame "Canvas" widget
-        # Set the background color to the main background color
-        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "Frame" widget
-        # Set the background color to the main background color
-        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+        self.completed_stacks_frame: ScrolledFrame = ScrolledFrame(master=master)
 
         # Style the scrolled frame "Root" widget
         # Set the background color to the main background color
-        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+        self.completed_stacks_frame.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "Canvas" widget
+        # Set the background color to the main background color
+        self.completed_stacks_frame.configure_canvas(
+            background=Constants.BLUE_GREY["700"]
+        )
+
+        # Style the scrolled frame "Frame" widget
+        # Set the background color to the main background color
+        self.completed_stacks_frame.configure_container(
+            background=Constants.BLUE_GREY["700"]
+        )
 
         # Place the scrolled frame widget in the main window
-        scrolled_frame["root"].grid(
+        self.completed_stacks_frame.grid(
             column=0,
             row=1,
             sticky=NSEW,
         )
-
-        # Store the scrolled frame's "Frame" widget in an instance variable
-        self.completed_stacks_frame = scrolled_frame["frame"]
 
     def create_stack_item_widgets(
         self,

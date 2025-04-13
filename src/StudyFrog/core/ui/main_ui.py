@@ -11,7 +11,7 @@ from typing import *
 
 from core.setting import SettingService
 
-from core.ui.base_ui import BaseUI
+from utils.base_ui import BaseUI
 from core.ui.ui_registry import UIRegistry
 from core.ui.topbar import TopBar
 

@@ -3,6 +3,8 @@ Author: lodego
 Date: 2025-02-06
 """
 
+import traceback
+
 from datetime import datetime
 from typing import *
 
@@ -148,6 +150,7 @@ class DispatcherNotification(ImmutableBaseObject):
     Attributes:
         duration (float): The duration of the notification in seconds.
         end (datetime): The timestamp when the notification ended.
+        errors (list, optional): A list of dictionary containing information regarding exceptions.
         event (DispatcherEvent): The event associated with the notification.
         id (int): The unique identifier of the notification.
         namespace (str): The namespace under which the notification was created.
@@ -164,6 +167,7 @@ class DispatcherNotification(ImmutableBaseObject):
         namespace: str,
         result: Dict[str, Any],
         start: datetime,
+        errors: Optional[List[Dict[str, Any]]] = None,
     ) -> None:
         """
         Initializes a new instance of the DispatcherNotification class.
@@ -171,6 +175,7 @@ class DispatcherNotification(ImmutableBaseObject):
         Args:
             duration (float): The duration of the notification in seconds.
             end (datetime): The timestamp when the notification ended.
+            errors (list, optional): A list of dictionary containing information regarding exceptions.
             event (DispatcherEvent): The event associated with the notification.
             id (int): The unique identifier of the notification.
             namespace (str): The namespace under which the notification was created.
@@ -185,6 +190,7 @@ class DispatcherNotification(ImmutableBaseObject):
         super().__init__(
             duration=duration,
             end=end,
+            errors=errors,
             event=event,
             id=id,
             namespace=namespace,
@@ -202,6 +208,15 @@ class DispatcherNotification(ImmutableBaseObject):
 
         # Get the result of the notification
         return self["result"].values()
+
+    def get_errors(self) -> List[Dict[str, Any]]:
+        """ """
+
+        # Return the list associated with the 'errors' key or an empty list
+        return self.get(
+            "errors",
+            [],
+        )
 
     def get_one_and_only_result(self) -> Optional[Any]:
         """
@@ -285,6 +300,12 @@ class DispatcherNotification(ImmutableBaseObject):
         """
         return key in self["result"].keys()
 
+    def has_errors(self) -> bool:
+        """ """
+
+        # Return True, if the 'errors' key is present, otherwise False
+        return self.has(key="errors")
+
     def is_empty(self) -> bool:
         """
         Returns True if the notification is empty, False otherwise.
@@ -322,6 +343,7 @@ class DispatcherNotificationFactory:
         namespace: str,
         result: Any,
         start: datetime,
+        errors: Optional[List[Dict[str, Any]]] = None,
     ) -> Optional[DispatcherNotification]:
         """
         Creates a new instance of the DispatcherNotification class.
@@ -329,6 +351,7 @@ class DispatcherNotificationFactory:
         Args:
             duration (float): The duration of the notification in seconds.
             end (datetime): The timestamp when the notification ended.
+            errors (list, optional): A list of dictionary containing information regarding exceptions.
             event (DispatcherEvent): The event associated with the notification.
             namespace (str): The namespace under which the notification was created.
             result (Any): The result of the notification.
@@ -345,6 +368,7 @@ class DispatcherNotificationFactory:
             notification: DispatcherNotification = DispatcherNotification(
                 duration=duration,
                 end=end,
+                errors=errors,
                 event=event,
                 id=cls.index,
                 namespace=namespace,
@@ -451,6 +475,41 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
             Self: The builder instance.
         """
         self.configuration["end"] = value
+        return self
+
+    def errors(
+        self: str,
+        function: Callable[[Optional[Any]], Optional[Any]],
+        exception: Exception,
+        traceback: str,
+    ) -> Self:
+        """
+        Sets the error associated with the notification.
+
+        Args:
+            exception (Exception): The Exception object.
+            function (callable): The function who's execution resulted in an exception occurring.
+            traceback (str): The traceback related to the exception.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'errors' key is already present in the configuration dictionary
+        if "errors" not in self.configuration:
+            # Initialize an empty list under the 'errors' key
+            self.configuration["errors"] = []
+
+        # Append a dictionary of error related information to the errors list
+        self.configuration["errors"].append(
+            {
+                "exception": exception,
+                "function": function.__name__,
+                "traceback": traceback,
+            }
+        )
+
+        # Return the builder instance to th caller
         return self
 
     def event(
@@ -614,45 +673,45 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         Raises:
             Exception: If an exception occurs while building the notification.
         """
-        try:
-            # Initialize a notification builder
-            result: DispatcherNotificationBuilder = DispatcherNotificationBuilder()
+        # Initialize a notification builder
+        result: DispatcherNotificationBuilder = DispatcherNotificationBuilder()
 
-            # Initialize a list to store the UUIDs of non-persistent subscriptions
-            non_persistents: List[str] = []
+        # Initialize a list to store the UUIDs of non-persistent subscriptions
+        non_persistents: List[str] = []
 
-            # Set the event of the notification
-            result.event(value=self.event)
+        # Set the event of the notification
+        result.event(value=self.event)
 
-            # Set the namespace of the notification
-            result.namespace(value=namespace)
+        # Set the namespace of the notification
+        result.namespace(value=namespace)
 
-            # Set the start time of the notification
-            result.start(value=Miscellaneous.get_current_datetime())
+        # Set the start time of the notification
+        result.start(value=Miscellaneous.get_current_datetime())
 
-            # Get the subscriptions in the namespace
-            subscriptions: Dict[str, Any] = self.subscriptions.get(namespace, {})
+        # Get the subscriptions in the namespace
+        subscriptions: Dict[str, Any] = self.subscriptions.get(namespace, {})
 
-            # Check if there are any subscriptions in the namespace
-            if len(subscriptions) == 0:
-                # Set the result of the notification
-                result.configuration["result"] = {}
-            else:
-                # Iterate over the subscriptions in the namespace
-                for (
-                    uuid,
-                    subscription,
-                ) in subscriptions.items():
-                    # Check if the subscription is persistent
-                    if not subscription["persistent"]:
-                        # Add the subscription to the subscriptions dictionary
-                        non_persistents.append(uuid)
+        # Check if there are any subscriptions in the namespace
+        if len(subscriptions) == 0:
+            # Set the result of the notification
+            result.configuration["result"] = {}
+        else:
+            # Iterate over the subscriptions in the namespace
+            for (
+                uuid,
+                subscription,
+            ) in subscriptions.items():
+                # Check if the subscription is persistent
+                if not subscription["persistent"]:
+                    # Add the subscription to the subscriptions dictionary
+                    non_persistents.append(uuid)
 
-                    # Log a message indicating the function is beeing called
-                    self.logger.info(
-                        message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
-                    )
+                # Log a message indicating the function is beeing called
+                self.logger.info(
+                    message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
+                )
 
+                try:
                     # Call the function associated with the subscription
                     result.result(
                         key=subscription["function"].__name__,
@@ -661,30 +720,39 @@ class DispatcherEventSubscription(ImmutableBaseObject):
                             **kwargs,
                         ),
                     )
+                except Exception as exception:
+                    # Log an error message indicating that an exception has occurred
+                    self.logger.error(
+                        message=f"Caught an exception while attempting to run '{subscription["function"].__name__}' 'notify_subscription' from '{self.__class__.__name__}' class : {exception}"
+                    )
 
-            # Iterate over the non-persistent subscriptions
-            for uuid in non_persistents:
-                # Remove the subscription from the dispatcher
-                self.remove_subscription(uuid=uuid)
+                    # Log the traceback
+                    self.logger.error(message=traceback.format_exc())
 
-            # Set the end time of the notification
-            result.end(value=Miscellaneous.get_current_datetime())
+                    # Add the error to the result indicating that an exception has occurred
+                    result.errors(
+                        exception=exception,
+                        function=subscription["function"],
+                        traceback=traceback.format_exc(),
+                    )
 
-            # Calculate the duration of the notification
-            result.duration(
-                value=(result["configuration"]["end"] - result["configuration"]["start"]).total_seconds()
-            )
+        # Iterate over the non-persistent subscriptions
+        for uuid in non_persistents:
+            # Remove the subscription from the dispatcher
+            self.remove_subscription(uuid=uuid)
 
-            # Build the notification and return it
-            return result.build()
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'notify_subscriptions' method from '{self.__class__.__name__}': {e}"
-            )
+        # Set the end time of the notification
+        result.end(value=Miscellaneous.get_current_datetime())
 
-            # Return None indicating an exception has occurred
-            return None
+        # Calculate the duration of the notification
+        result.duration(
+            value=(
+                result["configuration"]["end"] - result["configuration"]["start"]
+            ).total_seconds()
+        )
+
+        # Build the notification and return it
+        return result.build()
 
     def remove_subscription(
         self,

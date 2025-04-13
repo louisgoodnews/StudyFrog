@@ -1,631 +1,384 @@
 """
 Author: lodego
-Date: 2025-02-13
+Date: 2025-04-13
 """
 
 import tkinter
 
 from tkinter.constants import *
-from tkinter import ttk
 from typing import *
 
 from core.ui.fields.select_fields import ComboboxField
 from core.ui.fields.string_fields import MultiLineTextField
 
-from core.ui.frames.frames import ScrolledFrame, TabbedFrame
+from core.ui.frames.frames import ScrolledFrame
 
-from core.ui.ui_builder import UIBuilder
+from core.ui.notifications.notifications import ToplevelNotification
 
-from core.stack import ImmutableStack
-
+from utils.base_create_form import BaseCreateForm
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
-from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
-from utils.unified import UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["FlashcardCreateForm"]
 
 
-class FlashcardCreateForm(tkinter.Frame):
+class FlashcardCreateForm(BaseCreateForm):
     """
-    Represents a form for creating a new flashcard.
+    A form widget for creating new Flashcards within the StudyFrog application.
 
-    This form contains fields for the front and back text of the flashcard, as well as a
-    combobox for selecting a stack to add the flashcard to.
+    This class provides a structured interface for inputting the core attributes of a Flashcard, 
+    such as the associated Stack, front text, and back text. It inherits from BaseCreateForm and 
+    extends it by adding domain-specific logic, including input validation and duplicate-checking 
+    for the front text value.
+
+    Additionally, this form utilizes the Dispatcher to coordinate event-based lookups 
+    (e.g., checking for existing Flashcards with the same front text).
 
     Attributes:
-        front_field (Dict[str, Any]): The single-line text field for the front text of the flashcard.
-        back_field (Dict[str, Any]): The multi-line text field for the back text of the flashcard.
-        dispatcher (Dispatcher): The dispatcher instance for the class.
-        logger (Logger): The logger instance for the class.
-        master (tkinter.Misc): The parent widget.
-        stack_field (Dict[str, Any]): The combobox field for selecting a stack.
-        unified_manager (UnifiedObjectManager): The unified manager instance.
+        logger (Logger): This class' Logger instance.
+        dispatcher (Dispatcher): The Dispatcher instance used for event communication.
+        field_dict (dict): A dictionary in which fields are registered.
+        namespace (str): The namespace to dispatch events with.
+        value_dict(dict): A dictionary in which the form's value is being tracked.
     """
 
     def __init__(
         self,
         dispatcher: Dispatcher,
         master: tkinter.Misc,
-        unified_manager: UnifiedObjectManager,
+        namespace: str,
     ) -> None:
         """
         Initializes a new instance of the FlashcardCreateForm class.
 
+        This constructor sets up the FlashcardCreateForm by delegating shared setup 
+        logic to the BaseCreateForm constructor. It registers the passed Dispatcher,
+        master frame, and namespace, allowing the form to function as an event-driven,
+        modular UI component within the application.
+
         Args:
-            dispatcher (Dispatcher): The dispatcher instance.
-            master (tkinter.Misc): The parent widget.
-            unified_manager (UnifiedObjectManager): The unified manager instance.
+            dispatcher (Dispatcher): The central dispatcher responsible for handling UI events and coordination.
+            master (tkinter.Misc): The parent widget (typically a Frame or Toplevel) where the form will be rendered.
+            namespace (str): A string used to group related UI events and callbacks within the Dispatcher system.
 
         Returns:
             None
         """
 
-        # Call the parent class constructor
+        # Call the parent class constructor with the passed arguments
         super().__init__(
+            dispatcher=dispatcher,
             master=master,
+            namespace=namespace,
         )
 
-        # Create a logger instance for the class
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
-
-        # Store the dispatcher instance in an instance variable
-        self.dispatcher: Dispatcher = dispatcher
-
-        # Initialize the form dictionary instance variable as an empty dictionary
-        self.form: Final[Dict[str, Any]] = {
-            "object_data": {},
-            "related_objects": {},
-        }
-
-        # Store the unified manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
-
-        # Set the background color of the flashcard create form widget
-        self.configure(background=Constants.BLUE_GREY["700"])
-
-        # Configure the grid of the flashcard create form widget
-        self.configure_grid()
-
-        # Initialize and place the widgets of the flashcard create form
-        self.create_widgets()
-
-        # Position the flashcard create form widget in the parent widget
-        self.grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
-        )
-
+    @override
     def _on_field_change(
         self,
         label: str,
         value: Any,
     ) -> None:
-        """ """
-
-        # Obtain the inner key as a snake case version of the passed label
-        inner_key: str = Miscellaneous.any_to_snake(string=label.replace("*: ", ""))
-
-        # Determine the outer key based on the inner key
-        outer_key: str = "object_data" if inner_key != "stack" else "related_objects"
-
-        # Update the value of the label in the form with the passed value
-        self.form[outer_key][
-            Miscellaneous.any_to_snake(string=label.replace("*: ", ""))
-        ] = value
-
-        # TODO:
-        #   - implement check for 'front_text' field
-        #   - if any other flashcard with an identical 'front_text' value exists, then there must be a warning for the user
-
-    def check_required_fields(
-        self,
-        object_data: Dict[str, Any],
-    ) -> bool:
         """
-        Checks if all required fields are filled in the object data.
+        Handles field value changes and performs additional logic for specific fields.
+
+        This method overrides the parent class' '_on_field_change' method and adds additional
+        logic for specific fields. When the 'front_text' field is changed, this method will dispatch
+        a REQUEST_STACK_LOOKUP event in the global namespace to determine if a Flashcard with the
+        same 'front_text' already exists in the database. If so, a warning will be shown via a
+        ToplevelNotification dialog.
 
         Args:
-            object_data (Dict[str, Any]): The data to be validated.
-
-        Returns:
-            bool: True if all required fields are filled, False otherwise.
-        """
-
-        validation: Tuple[bool, List[str]] = self.validate_required_fields(
-            object_data=object_data
-        )
-
-        # Validate the required fields using the helper method
-        if validation[0]:
-            # Return True if validation is successful
-            return True
-
-        # Show a dialog informing the user to fill all required fields
-        okay: Optional[Dict[str, Any]] = UIBuilder.get_okay(
-            dispatcher=self.dispatcher,
-            message=f"Please fill in all required fields: {', '.join(validation[1])}",
-            title="Required fields are missing.",
-        )
-
-        # Style the okay dialog's "Root" toplevel widget
-        okay["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the okay dialog's "Button" button widget
-        okay["button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the okay dialog's "Message Label" label widget
-        okay["message_label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-        )
-
-        # Style the okay dialog's "Title Label" label widget
-        okay["title_label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-        )
-
-        # Return False if validation fails
-        return False
-
-    def configure_grid(self) -> None:
-        """
-        Configures the grid of the flashcard create form widget.
-
-        This method configures the grid of the flashcard create form widget by setting the
-        weights of the columns and rows.
+            label (str): The label of the field that was changed.
+            value (Any): The new value of the field.
 
         Returns:
             None
         """
 
-        # Configure the flashcard create form widget's 1st column to weight 1.
-        self.grid_columnconfigure(
+        # Call the parent class' '_on_field_change' method with the passed arguments
+        super()._on_field_change(
+            label=label,
+            value=value,
+        )
+
+        # Check, if the changed field is not the 'Front Text' field
+        if label != "front_text":
+            # Return early
+            return
+
+        # Dispatch the REQUEST_STACK_LOOKUP event in the global namespace
+        notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+            event=Events.REQUEST_STACK_LOOKUP,
+            namespace=Constants.GLOBAL_NAMESPACE,
+            **{
+                "name": value,
+            },
+        )
+
+        # Check, if the notification exists
+        if not notification:
+            # Log a warning message
+            self.logger.warning(message=f"Failed to dispatch the REQUEST_STACK_LOOKUP event in the global namespace.")
+
+            # Return early
+            return
+
+        # Attempt to obtain the one and only result of the notification
+        notification_result: Optional[Any] = notification.get_one_and_only_result()
+
+        # Check, if no result could be obtained
+        if not notification_result:
+            # Return early
+            return
+
+        # Notify the user with a ToplevelNotification
+        ToplevelNotification.okay(
+            message=f"The value you entered in the 'Front Text' field is already contained in the database. At least {len(notification_result)} other Flashcard(s) were found with an identical 'Front Text'.",
+            on_click_callback=self._on_front_text_warning_okay,
+            title=f"'Front Text' is not unique",
+        )
+
+    def _on_front_text_warning_okay(
+        self,
+        message: str,
+    ) -> None:
+        """
+        Handles the 'okay' click event from the front text warning notification.
+
+        This method is called when the user clicks the 'okay' button in the warning notification
+        that is shown when a duplicate 'front_text' was detected. It clears the field's value if
+        the user confirmed the warning.
+
+        Args:
+            message (str): The message returned from the notification, e.g., "okay".
+
+        Returns:
+            None
+        """
+
+        # Check, if the message is not 'okay'
+        if message != "okay":
+            # Log a warning
+            self.logger.warning(message=f"Unexpected response to 'stack warning okay': '{message}'.")
+
+            # Return early
+            return
+
+        # Clear the value of the 'front_text' field
+        self.field_dict["front_text"]["widget"].clear(dispatch=False)
+
+    @override
+    def create_primary_attribute_widgets(
+        self,
+        master: ScrolledFrame,
+    ) -> None:
+        """
+        Creates and places the primary widgets for the Flashcard form.
+
+        This method creates and configures the required widgets for creating a Flashcard,
+        including the stack selector, front text, and back text fields. These widgets are
+        placed in the provided master container using the grid layout.
+
+        Args:
+            master (ScrolledFrame): The parent frame in which the primary widgets are to be placed.
+
+        Returns:
+            None
+        """
+
+        # Configure the weight of the 0th column to 1
+        master.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the flashcard create form widget's 1st and 2nd row to weight 0.
-        self.grid_rowconfigure(
-            index=(
-                0,
-                1,
-            ),
+        # Configure the weight of the 0th row to 0
+        master.grid_rowconfigure(
+            index=0,
             weight=0,
         )
 
-        # Configure the flashcard create form widget's 3rd row to weight 1.
-        self.grid_rowconfigure(
+        # Configure the weight of the 1st row to 1
+        master.grid_rowconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Configure the weight of the 2nd row to 1
+        master.grid_rowconfigure(
             index=2,
             weight=1,
         )
 
-    def create_core_attributes_widgets(
-        self,
-        master: TabbedFrame,
-    ) -> tkinter.Frame:
-        """ """
-
-        master.grid_columnconfigure(
-            index=0,
-            weight=1,
+        # Dispatch the REQUEST_GET_ALL_STACKS event in the global namespace
+        notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+            event=Events.REQUEST_GET_ALL_STACKS,
+            namespace=Constants.GLOBAL_NAMESPACE,
         )
 
-        master.grid_rowconfigure(
-            index=0,
-            weight=1,
-        )
+        # Check, if the notification exists
+        if not notification:
+            # Log a warning message
+            self.logger.warning(message=f"Failed to dispatch the REQUEST_GET_ALL_STACKS event in the global namespace.")
 
-        # Create the scrolled frame widgets
-        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+            # Return early
+            return
 
-        # Style the scrolled frame widget
-        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "canvas" widget
-        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "container frame" widget
-        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
-
-        # Create a combobox widget to select a stack
-        self.stack_field: ComboboxField = ComboboxField(
+        # Create the 'stack' ComboboxField widget
+        stack_field: ComboboxField = ComboboxField(
             label="Stack*: ",
-            master=scrolled_frame.container,
+            master=master,
             on_change_callback=self._on_field_change,
-            values=[stack.name for stack in self.unified_manager.get_all_stacks()],
+            readonly=True,
+            values=[stack.name for stack in notification.get_one_and_only_result()],
         )
 
-        # Style the stack field "Root" frame widget
-        self.stack_field.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the stack field "Button" button widget
-        self.stack_field.configure_button(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the stack field "Combobox" combobox widget
-        self.stack_field.configure_combobox(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            state="readonly",
-        )
-
-        # Style the stack field "Label" label widget
-        self.stack_field.configure_label(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Place the stack field in the grid
-        self.stack_field.grid(
+        # Place the 'stack' ComboboxField widget in the grid
+        stack_field.grid(
             column=0,
-            padx=5,
-            pady=5,
+            padx=10,
+            pady=10,
             row=0,
             sticky=NSEW,
         )
 
-        # Create a multi-line text field for the front text of the flashcard
-        self.front_field: MultiLineTextField = MultiLineTextField(
-            label="Front Text*: ",
-            master=scrolled_frame.container,
-            on_change_callback=self._on_field_change,
-        )
+        # Style the 'stack' ComboboxField widget
+        stack_field.configure(background=Constants.BLUE_GREY["700"])
 
-        # Style the front field "Root" frame widget
-        self.front_field.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the front field "Button" button widget
-        self.front_field.configure_button(
+        # Style the 'stack' ComboboxField widget's button
+        stack_field.configure_button(
             background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
-        # Style the front field "Label" label widget
-        self.front_field.configure_label(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the back field "Text" text widget
-        self.front_field.configure_text(
+        # Style the 'stack' ComboboxField widget's combobox
+        stack_field.configure_combobox(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
         )
 
-        # Place the front field in the grid
-        self.front_field.grid(
+        # Register the 'stack' ComboboxField widget
+        self._register_field(
+            label="Stack*: ",
+            field=stack_field,
+            required=True,
+        )
+
+        # Create the 'back text' MultiLineTextField widget
+        back_text_field: MultiLineTextField = MultiLineTextField(
+            label="Back Text*: ",
+            master=master,
+            on_change_callback=self._on_field_change,
+        )
+
+        # Place the 'back text' MultiLineTextField widget in the grid
+        back_text_field.grid(
             column=0,
-            padx=5,
-            pady=5,
+            padx=10,
+            pady=10,
             row=1,
             sticky=NSEW,
         )
 
-        # Create a multi-line text field for the back text of the flashcard
-        self.back_field: MultiLineTextField = MultiLineTextField(
-            label="Back Text*: ",
-            master=scrolled_frame.container,
-            on_change_callback=self._on_field_change,
-        )
+        # Style the 'back text' MultiLineTextField widget
+        back_text_field.configure(background=Constants.BLUE_GREY["700"])
 
-        # Style the back field "Root" frame widget
-        self.back_field.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the back field "Button" button widget
-        self.back_field.configure_button(
+        # Style the 'back text' MultiLineTextField widget's button
+        back_text_field.configure_button(
             background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
             foreground=Constants.WHITE,
             relief=FLAT,
         )
 
-        # Style the back field "Label" label widget
-        self.back_field.configure_label(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the back field "Text" text widget
-        self.back_field.configure_text(
+        # Style the 'back text' MultiLineTextField widget's text
+        back_text_field.configure_text(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
         )
 
-        # Place the back field in the grid
-        self.back_field.grid(
+        # Register the 'back text' MultiLineTextField widget
+        self._register_field(
+            label="Back Text*: ",
+            field=back_text_field,
+            required=True,
+        )
+
+        # Create the 'front text' MultiLineTextField widget
+        front_text_field: MultiLineTextField = MultiLineTextField(
+            label="Front Text*: ",
+            master=master,
+            on_change_callback=self._on_field_change,
+        )
+
+        # Place the 'front text' MultiLineTextField widget in the grid
+        front_text_field.grid(
             column=0,
-            padx=5,
-            pady=5,
+            padx=10,
+            pady=10,
             row=2,
             sticky=NSEW,
         )
 
-        # Return the scrolled frame
-        return scrolled_frame
+        # Style the 'front text' MultiLineTextField widget
+        front_text_field.configure(background=Constants.BLUE_GREY["700"])
 
-    def create_secondary_attributes_widgets(
+        # Style the 'front text' MultiLineTextField widget's button
+        front_text_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the 'front text' MultiLineTextField widget's text
+        front_text_field.configure_text(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+        )
+
+        # Register the 'front text' MultiLineTextField widget
+        self._register_field(
+            label="Front Text*: ",
+            field=front_text_field,
+            required=True,
+        )
+
+    @override
+    def create_secondary_attribute_widgets(
         self,
-        master: tkinter.Misc,
-    ) -> tkinter.Frame:
-        """ """
-
-        master.grid_columnconfigure(
-            index=0,
-            weight=1,
-        )
-
-        master.grid_rowconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Create the scrolled frame widgets
-        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
-
-        # Style the scrolled frame widget
-        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "canvas" widget
-        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "container frame" widget
-        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
-
-        # Return the scrolled frame
-        return scrolled_frame
-
-    def create_widgets(self) -> None:
+        master: ScrolledFrame,
+    ) -> None:
         """
-        Creates and configures the main widgets of the flashcard create form widget.
+        Creates and places optional secondary widgets for the Flashcard form.
 
-        This method sets up the necessary widgets for the flashcard creation form,
-        including labels, text fields, and a combobox for selecting a stack.
-        All widgets are styled and placed on the grid layout.
+        This method is intended to be overridden to include additional widgets such as tags,
+        metadata, or advanced options. It is currently left empty.
+
+        Args:
+            master (ScrolledFrame): The parent frame in which the secondary widgets would be placed.
 
         Returns:
             None
         """
 
-        # Create a label widget to display instructions
-        instruction_label: tkinter.Label = UIBuilder.get_label(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            master=self,
-            text="Please fill in the fields below to create a new flashcard.\nFields marked with an asterisk (*) are required.",
-        )
-
-        # Place the instruction label in the grid
-        instruction_label.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create a separator widget to divide the flashcard create form widget
-        separator: ttk.Separator = UIBuilder.get_separator(
-            master=self,
-            orient=HORIZONTAL,
-        )
-
-        # Place the separator in the grid
-        separator.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=1,
-            sticky=EW,
-        )
-
-        # Attempt to create the tabbed frame widgets
-        tabbed_frame: TabbedFrame = TabbedFrame(
-            column=0,
-            master=self,
-            row=2,
-        )
-
-        # Style the tabbed frame widget
-        tabbed_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the tabbed frame widget's "container frame" frame widget
-        tabbed_frame.configure_container(background=Constants.BLUE_GREY["700"])
-
-        # Style the tabbed frame widget's "top frame" frame widget
-        tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
-
-        # Add the scrolled frame widget to the tabbed frame
-        tabbed_frame.add(
-            label="Core attributes",
-            widget=self.create_core_attributes_widgets(master=tabbed_frame),
-        )
-
-        # Add the scrolled frame widget to the tabbed frame
-        tabbed_frame.add(
-            label="Secondary attributes",
-            widget=self.create_secondary_attributes_widgets(master=tabbed_frame),
-        )
-
-        # Style the "core attributes" button
-        tabbed_frame.configure_button(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            name="core_attributes",
-            relief=FLAT,
-        )
-
-        # Style the "secondary attributes" button
-        tabbed_frame.configure_button(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            name="secondary_attributes",
-            relief=FLAT,
-        )
-
-    def get(self) -> Optional[Dict[str, Any]]:
-        """
-        Retrieves the values from the form fields.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing the name and description
-            entered in the form fields.
-
-        Raises:
-            Exception: If an exception occurs while running the 'get' method.
-        """
-        try:
-            # Get the stack from the stack field
-            stack: Optional[ImmutableStack] = self.unified_manager.get_stack_by(
-                field="name",
-                value=self.stack_field["getter"](),
-            )
-
-            # Check, if a stack was found
-            if not stack:
-                # Log a warning message indicating that no stack was found
-                self.logger.warning(
-                    message=f"No stack found with name '{self.stack_field['getter']()}'",
-                )
-
-                # Return early
-                return None
-
-            # Set the 'back text' word count for the flashcard
-            self.form["object_data"]["back_word_count"] = len(
-                self.form["object_data"]["back_text"].split()
-            )
-
-            # Copy the difficulty of the flashcard from the stack
-            self.form["object_data"]["difficulty"] = stack.difficulty
-
-            # Set the familiarity of the flashcard to 0.0
-            self.form["object_data"]["familiarity"] = 0.0
-
-            # Set the 'front text' word count for the flashcard
-            self.form["object_data"]["front_word_count"] = len(
-                self.form["object_data"]["back_text"].split()
-            )
-
-            # Copy the priority of the flashcard from the stack
-            self.form["object_data"]["difficulty"] = stack.priority
-
-            # Set the total word count for the flashcard
-            self.form["object_data"]["total_word_count"] = (
-                self.form["object_data"]["front_word_count"]
-                + self.form["object_data"]["back_word_count"]
-            )
-
-            # Add the stack to the 'related object' nested dictionary
-            self.form["related_object"]["stack"] = stack
-
-            # Return the result dictionary
-            return self.form
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'get' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Return None indicating an exception has occurred
-            return None
-
-    def validate_required_fields(
-        self,
-        object_data: Dict[str, Any],
-    ) -> Tuple[bool, List[str]]:
-        """
-        Validates the object data to ensure all required fields have been provided.
-
-        Args:
-            object_data (Dict[str, Any]): The object data to validate.
-
-        Returns:
-            bool: True if all required fields have been provided, False otherwise.
-            List[str]: A list of missing fields if the validation fails.
-        """
-
-        # Define the required fields
-        required_fields: List[str] = [
-            "back_text",  # The back side of the flashcard
-            "difficulty",  # The difficulty of the flashcard
-            "front_text",  # The front side of the flashcard
-            "priority",  # The priority of the flashcard
-        ]
-
-        missing_fields: List[str] = []
-
-        checks: List[bool] = []
-
-        # Iterate over all required fields
-        for required_field in required_fields:
-            # Check if the required field is in the object data
-            if required_field in object_data.get(
-                "object_data",
-                {},
-            ):
-                # If the field is present, append True to the check list
-                checks.append(True)
-            # Check if the required field is in the related objects
-            elif required_field in object_data.get(
-                "related_objects",
-                {},
-            ):
-                # If the field is present, append True to the check list
-                checks.append(True)
-            else:
-                # If the field is not present, append the field to the missing fields
-                # list and append False to the check list
-                missing_fields.append(required_field)
-                checks.append(False)
-
-        # Return the result
-        return (
-            all(checks),
-            missing_fields,
-        )
+        pass

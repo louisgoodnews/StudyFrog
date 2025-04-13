@@ -16,7 +16,7 @@ from core.question import ImmutableQuestion
 from core.setting import SettingService
 from core.stack import ImmutableStack, StackFactory
 
-from core.ui.base_ui import BaseUI
+from utils.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 from core.ui.form.answer_view_form import AnswerViewForm
 from core.ui.form.flashcard_view_form import FlashcardViewForm

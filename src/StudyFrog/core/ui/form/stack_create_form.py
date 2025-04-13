@@ -4,6 +4,7 @@ Date: 2025-02-13
 """
 
 import tkinter
+import traceback
 
 from tkinter.constants import *
 
@@ -11,7 +12,17 @@ from tkinter import ttk
 
 from typing import *
 
+from core.stack import ImmutableStack
+
 from core.ui.ui_builder import UIBuilder
+
+from core.ui.fields.datetime_fields import DateSelectField
+
+from core.ui.fields.select_fields import ComboboxField
+
+from core.ui.fields.string_fields import MultiLineTextField, SingleLineTextField
+
+from core.ui.frames.frames import ScrolledFrame, TabbedFrame
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -64,6 +75,17 @@ class StackCreateForm(tkinter.Frame):
         # Store the passed dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
 
+        # Initialize the form dictionary instance variable as an empty dictionary
+        self.form: Dict[str, Any] = {
+            "object_data": {
+                "contents": [],
+                "custom_field_values": [],
+                "descendants": [],
+                "tags": [],
+            },
+            "related_objects": {},
+        }
+
         # Store the passed unified manager instance in an instance variable
         self.unified_manager: UnifiedObjectManager = unified_manager
 
@@ -81,6 +103,25 @@ class StackCreateForm(tkinter.Frame):
             row=0,
             sticky=NSEW,
         )
+
+    def _on_field_change(
+        self,
+        labeL: str,
+        value: Optional[Any] = None,
+    ) -> None:
+        try:
+            self.form[labeL] = value
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_on_field_change' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
 
     def configure_grid(self) -> None:
         """
@@ -177,6 +218,349 @@ class StackCreateForm(tkinter.Frame):
         # Return False if validation fails
         return False
 
+    def create_core_attributes_widgets(
+        self,
+        master: tkinter.Misc,
+    ) -> tkinter.Frame:
+        """ """
+
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Create the scrolled frame widgets
+        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+
+        scrolled_frame.container.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        scrolled_frame.container.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        scrolled_frame.container.grid_rowconfigure(
+            index=1,
+            weight=1,
+        )
+
+        scrolled_frame.container.grid_rowconfigure(
+            index=2,
+            weight=1,
+        )
+
+        scrolled_frame.container.grid_rowconfigure(
+            index=3,
+            weight=1,
+        )
+
+        scrolled_frame.container.grid_rowconfigure(
+            index=4,
+            weight=1,
+        )
+
+        scrolled_frame.container.grid_rowconfigure(
+            index=5,
+            weight=1,
+        )
+
+        # Style the scrolled frame widget
+        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "canvas" widget
+        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "container frame" widget
+        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
+
+        # Create a combobox widget to select a stack
+        self.ancestor_stack_field: ComboboxField = ComboboxField(
+            label="Ancestor Stack: ",
+            master=scrolled_frame.container,
+            on_change_callback=self._on_field_change,
+            readonly=True,
+            values=[stack.name for stack in self.unified_manager.get_all_stacks()],
+        )
+
+        # Style the stack field "Root" frame widget
+        self.ancestor_stack_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the stack field "Button" button widget
+        self.ancestor_stack_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Label" label widget
+        self.ancestor_stack_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Place the stack field in the grid
+        self.ancestor_stack_field.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a single-line text field for the stack name.
+        self.name: SingleLineTextField = SingleLineTextField(
+            label="Name* : ",
+            master=scrolled_frame.container,
+            on_change_callback=self._on_field_change,
+        )
+
+        # Style the single-line text field "Root" frame widget
+        self.name.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the single-line text field "Button" button widget
+        self.name.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the single-line text field "Label" widget
+        self.name.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Focus the name entry field
+        self.name.entry.focus_set()
+
+        # Place the single-line text field in the grid.
+        self.name.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
+
+        # Create a stack field for the difficulty
+        self.difficulty_field: ComboboxField = ComboboxField(
+            label="Difficulty* : ",
+            master=scrolled_frame.container,
+            on_change_callback=self._on_field_change,
+            readonly=True,
+            value=Constants.MEDIUM.capitalize(),
+            values=[
+                difficulty.name
+                for difficulty in self.unified_manager.get_all_difficulties()
+            ],
+        )
+
+        # Style the stack field "Root" frame widget
+        self.difficulty_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the stack field "Button" button widget
+        self.difficulty_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Label" label widget
+        self.difficulty_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Place the stack field in the grid
+        self.difficulty_field.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
+
+        # Create a stack field for the priority
+        self.priority_field: ComboboxField = ComboboxField(
+            label="Priority* : ",
+            master=scrolled_frame.container,
+            readonly=True,
+            value=Constants.MEDIUM.capitalize(),
+            values=[
+                priority.name for priority in self.unified_manager.get_all_priorities()
+            ],
+        )
+
+        # Style the stack field "Root" frame widget
+        self.priority_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the stack field "Button" button widget
+        self.priority_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the stack field "Label" label widget
+        self.priority_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Place the stack field in the grid
+        self.priority_field.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=3,
+            sticky=NSEW,
+        )
+
+        # Create a multi-line text field for the stack description.
+        self.description: MultiLineTextField = MultiLineTextField(
+            label="Description: ",
+            master=scrolled_frame.container,
+            on_change_callback=self._on_field_change,
+        )
+
+        self.description.configure(background=Constants.BLUE_GREY["700"])
+
+        self.description.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        self.description.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+        )
+
+        self.description.configure_text(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            )
+        )
+
+        # Place the multi-line text field in the grid.
+        self.description.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=4,
+            sticky=NSEW,
+        )
+
+        # Create a date entry widget for the due by date
+        self.due_by: DateSelectField = DateSelectField(
+            label="Due by*: ",
+            master=scrolled_frame.container,
+            on_change_callback=self._on_field_change,
+            value=Miscellaneous.get_date_increment(increment=30),
+        )
+
+        self.due_by.configure(background=Constants.BLUE_GREY["700"])
+
+        self.due_by.configure_clear_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        self.due_by.configure_select_button(
+            background=Constants.BLUE_GREY["700"],
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        self.due_by.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Place the date entry widget in the grid.
+        self.due_by.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=5,
+            sticky=NSEW,
+        )
+
+        # Return the scrolled frame
+        return scrolled_frame
+
+    def create_secondary_attributes_widgets(
+        self,
+        master: tkinter.Misc,
+    ) -> tkinter.Frame:
+        """ """
+
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Create the scrolled frame widgets
+        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+
+        # Style the scrolled frame widget
+        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "canvas" widget
+        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+
+        # Style the scrolled frame "container frame" widget
+        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
+
+        # Return the scrolled frame
+        return scrolled_frame
+
     def create_widgets(self) -> None:
         """
         Creates and configures the main widgets of the stack create form widget.
@@ -187,6 +571,26 @@ class StackCreateForm(tkinter.Frame):
         Returns:
             None
         """
+
+        self.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        self.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+        self.grid_rowconfigure(
+            index=1,
+            weight=0,
+        )
+
+        self.grid_rowconfigure(
+            index=2,
+            weight=1,
+        )
 
         # Create a label widget to display instructions
         instruction_label: tkinter.Label = UIBuilder.get_label(
@@ -225,338 +629,55 @@ class StackCreateForm(tkinter.Frame):
         )
 
         # Create tabbed view widgets
-        notebook: Dict[str, Any] = UIBuilder.get_tabbed_view(master=self)
-
-        # Style the notebook "Center frame" frame widget
-        notebook["center_frame"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the notebook "Root" frame widget
-        notebook["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the notebook "Top frame" frame widget
-        notebook["top_frame"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the tabbed view widget frame in the grid
-        notebook["root"].grid(
+        tabbed_view: TabbedFrame = TabbedFrame(
             column=0,
+            master=self,
             row=2,
-            sticky=NSEW,
         )
 
-        # Create a scrolled frame to hold the question create form widget
-        core_attributes_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
-            master=notebook["center_frame"]
-        )
+        # Style the tabbed_view "Root" frame widget
+        tabbed_view.configure(background=Constants.BLUE_GREY["700"])
 
-        # Style the scrolled frame "Canvas" widget
-        core_attributes_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the tabbed_view "container frame" frame widget
+        tabbed_view.configure_container(background=Constants.BLUE_GREY["700"])
 
-        # Style the scrolled frame "Frame" widget
-        core_attributes_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+        # Style the tabbed_view "top frame" frame widget
+        tabbed_view.configure_top_frame(background=Constants.BLUE_GREY["700"])
 
-        # Style the scrolled frame "Root" frame widget
-        core_attributes_frame["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Create a scrolled frame to hold the question create form widget
-        secondary_attributes_frame: Dict[str, Any] = UIBuilder.get_scrolled_frame(
-            master=notebook["center_frame"]
-        )
-
-        # Style the scrolled frame "Canvas" widget
-        secondary_attributes_frame["canvas"].configure(
-            background=Constants.BLUE_GREY["700"]
-        )
-
-        # Style the scrolled frame "Frame" widget
-        secondary_attributes_frame["frame"].configure(
-            background=Constants.BLUE_GREY["700"]
-        )
-
-        # Style the scrolled frame "Root" frame widget
-        secondary_attributes_frame["root"].configure(
-            background=Constants.BLUE_GREY["700"]
-        )
-
-        # Add the scrolled frame to the notebook widget's children
-        notebook["adder"](
+        # Add the scrolled frame to the tabbed_view widget's children
+        tabbed_view.add(
             label="Core Attributes",
-            state=NORMAL,
-            sticky=NSEW,
-            widget=core_attributes_frame["root"],
+            widget=self.create_core_attributes_widgets(master=tabbed_view),
+        )
+
+        # Add the scrolled frame to the tabbed_view widget's children
+        tabbed_view.add(
+            label="Secondary Attributes",
+            widget=self.create_secondary_attributes_widgets(master=tabbed_view),
         )
 
         # Style the scrolled frame "Core attributes" button widget
-        notebook["core_attributes_button"].configure(
+        tabbed_view.configure_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
+            name="Core attributes",
             relief=FLAT,
-        )
-
-        # Add the scrolled frame to the notebook widget's children
-        notebook["adder"](
-            label="Secondary Attributes",
-            state=NORMAL,
-            sticky=NSEW,
-            widget=secondary_attributes_frame["root"],
         )
 
         # Style the scrolled frame "Secondary attributes" button widget
-        notebook["secondary_attributes_button"].configure(
+        tabbed_view.configure_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
+            name="Secondary attributes",
             relief=FLAT,
-        )
-
-        # Create a combobox widget to select a stack
-        self.ancestor_stack_field = UIBuilder.get_combobox_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            label="Ancestor Stack: ",
-            master=core_attributes_frame["frame"],
-            state="readonly",
-            values=[stack.name for stack in self.unified_manager.get_all_stacks()],
-        )
-
-        # Style the stack field "Button" button widget
-        self.ancestor_stack_field["button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Bind the combobox widget to the on_ancestor_stack_select method
-        self.ancestor_stack_field["combobox"].bind(
-            func=self.on_ancestor_stack_select,
-            sequence="<<ComboboxSelected>>",
-        )
-
-        # Style the stack field "Label" label widget
-        self.ancestor_stack_field["label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the stack field "Root" frame widget
-        self.ancestor_stack_field["root"].configure(
-            background=Constants.BLUE_GREY["700"]
-        )
-
-        # Place the stack field in the grid
-        self.ancestor_stack_field["root"].grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Create a single-line text field for the stack name.
-        self.name: Dict[str, Any] = UIBuilder.get_single_line_text_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            label="Name* : ",
-            master=core_attributes_frame["frame"],
-        )
-
-        # Style the single-line text field "Button" button widget
-        self.name["button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the single-line text field "Label" widget
-        self.name["label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-        )
-
-        # Style the single-line text field "Root" frame widget
-        self.name["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Focus the name entry field
-        self.name["entry"].focus_set()
-
-        # Place the single-line text field in the grid.
-        self.name["root"].grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=1,
-            sticky=NSEW,
-        )
-
-        # Create a stack field for the difficulty
-        self.difficulty_field: Dict[str, Any] = UIBuilder.get_combobox_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            label="Difficulty* : ",
-            master=core_attributes_frame["frame"],
-            state="readonly",
-            value=Constants.MEDIUM.capitalize(),
-            values=[
-                difficulty.name
-                for difficulty in self.unified_manager.get_all_difficulties()
-            ],
-        )
-
-        # Set the default value for the difficulty field
-        self.difficulty_field["setter"](value=Constants.MEDIUM.capitalize())
-
-        # Style the stack field "Button" button widget
-        self.difficulty_field["button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the stack field "Label" label widget
-        self.difficulty_field["label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the stack field "Root" frame widget
-        self.difficulty_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the stack field in the grid
-        self.difficulty_field["root"].grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=2,
-            sticky=NSEW,
-        )
-
-        # Create a stack field for the priority
-        self.priority_field: Dict[str, Any] = UIBuilder.get_combobox_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            label="Priority* : ",
-            master=core_attributes_frame["frame"],
-            state="readonly",
-            values=[
-                priority.name for priority in self.unified_manager.get_all_priorities()
-            ],
-        )
-
-        # Set the default value for the priority field
-        self.priority_field["setter"](value=Constants.MEDIUM.capitalize())
-
-        # Style the stack field "Button" button widget
-        self.priority_field["button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the stack field "Label" label widget
-        self.priority_field["label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the stack field "Root" frame widget
-        self.priority_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the stack field in the grid
-        self.priority_field["root"].grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=3,
-            sticky=NSEW,
-        )
-
-        # Create a multi-line text field for the stack description.
-        self.description: Dict[str, Any] = UIBuilder.get_multi_line_text_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            label="Description: ",
-            master=core_attributes_frame["frame"],
-        )
-
-        self.description["button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        self.description["label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-        )
-
-        self.description["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the multi-line text field in the grid.
-        self.description["root"].grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=4,
-            sticky=NSEW,
-        )
-
-        # Create a date entry widget for the due by date
-        self.due_by: Dict[str, Any] = UIBuilder.get_date_entry(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            label="Due by*: ",
-            master=core_attributes_frame["frame"],
-        )
-
-        self.due_by["button"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        self.due_by["label"].configure(
-            background=Constants.BLUE_GREY["700"],
-            foreground=Constants.WHITE,
-        )
-
-        self.due_by["root"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the date entry widget in the grid.
-        self.due_by["root"].grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=5,
-            sticky=NSEW,
-        )
-
-        # Set the default value to the next 30 days
-        self.due_by["setter"](
-            value=Miscellaneous.datetime_to_string(
-                datetime=Miscellaneous.get_date_increment(increment=30),
-                format="%Y-%m-%d",
-            )
         )
 
     def get(self) -> Dict[str, Any]:
@@ -592,13 +713,13 @@ class StackCreateForm(tkinter.Frame):
         }
 
         # Get the value of the stack name from the single-line text field
-        result["object_data"]["name"] = self.name["getter"]()
+        result["object_data"]["name"] = self.name.get()
 
         # Get the value of the stack description from the multi-line text field
-        result["object_data"]["description"] = self.description["getter"]() or ""
+        result["object_data"]["description"] = self.description.get() or ""
 
         # Get the value of the due by date from the date entry widget
-        result["object_data"]["due_by"] = self.due_by["getter"]()
+        result["object_data"]["due_by"] = self.due_by.get()
 
         # Get the difficulty from the difficulty field
         result["related_objects"]["ancestor_stack"] = self.unified_manager.get_stack_by(
@@ -610,7 +731,7 @@ class StackCreateForm(tkinter.Frame):
         result["related_objects"]["difficulty"] = (
             self.unified_manager.get_difficulty_by(
                 field="name",
-                value=self.difficulty_field["getter"](),
+                value=self.difficulty_field.get(),
             )
         )
 
@@ -640,56 +761,6 @@ class StackCreateForm(tkinter.Frame):
 
         # Return the result dictionary
         return result
-
-    def on_ancestor_stack_select(
-        self,
-        event: Optional[tkinter.Event] = None,
-    ) -> None:
-        """
-        Handles the selection event of the ancestor stack field.
-
-        Args:
-            event (tkinter.Event): The event object. Defaults to None
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an exception occurs
-        """
-        try:
-            # Get the value from the ancestor stack field
-            value: Optional[str] = self.ancestor_stack_field["getter"]()
-
-            if not value:
-                # Log a warning message
-                self.logger.warning(message="Got no value from 'Ancestor stack' field.")
-
-                # Return early
-                return
-
-            stack: Optional[ImmutableStack] = self.unified_manager.get_stack_by(
-                field="name",
-                value=value,
-            )
-
-            if not stack:
-                # Log a warning message
-                self.logger.warning(message="Got no stack from 'Ancestor stack' field.")
-
-                # Return early
-                return
-
-            # Set the due by date
-            self.due_by["setter"](value=stack["due_by"])
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'on_ancestor_stack_select' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Re-raise the exception to the caller
-            raise e
 
     def validate_required_fields(
         self,
