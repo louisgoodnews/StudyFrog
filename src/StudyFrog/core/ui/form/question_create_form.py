@@ -454,7 +454,7 @@ class QuestionCreateForm(BaseCreateForm):
             ),
         )
 
-        # Register the 'back text' MultiLineTextField widget
+        # Register the 'question text' MultiLineTextField widget
         self._register_field(
             label="Question Text*: ",
             field=question_text_field,

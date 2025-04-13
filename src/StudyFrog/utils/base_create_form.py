@@ -73,7 +73,7 @@ class BaseCreateForm(tkinter.Frame):
 
         # Initialize the value dictionary instance variable as an empty dictionary
         self._value_dict: Dict[str, Dict[str, Optional[Any]]] = {}
-        
+
         # Create the widgets
         self.create_widgets()
 
@@ -83,7 +83,7 @@ class BaseCreateForm(tkinter.Frame):
         Returns a copy of the registered field dictionary.
 
         This property exposes a deep copy of the internal field registration dictionary `_field_dict`.
-        Each entry maps a normalized label (snake_case) to a dictionary that contains the actual widget 
+        Each entry maps a normalized label (snake_case) to a dictionary that contains the actual widget
         and a flag indicating whether the field is required.
 
         Returns:
@@ -98,8 +98,8 @@ class BaseCreateForm(tkinter.Frame):
         """
         Returns a copy of the current value dictionary.
 
-        This property exposes a deep copy of the `_value_dict`, which holds the current values of all 
-        registered fields. Each key corresponds to a normalized label and maps to a dictionary with a 
+        This property exposes a deep copy of the `_value_dict`, which holds the current values of all
+        registered fields. Each key corresponds to a normalized label and maps to a dictionary with a
         "value" key storing the current input.
 
         Returns:
@@ -152,7 +152,9 @@ class BaseCreateForm(tkinter.Frame):
         self._value_dict[label]["value"] = value
 
         # Log the update for debugging purposes
-        self.logger.debug(message=f"Field changed - Label: '{label}' | Normalized Key: '{label}' | Value: {value}")
+        self.logger.debug(
+            message=f"Field changed - Label: '{label}' | Normalized Key: '{label}' | Value: {value}"
+        )
 
         # Dispatch the CREATE_FORM_FIELD_CHANGED event
         self.dispatcher.dispatch(
@@ -207,7 +209,9 @@ class BaseCreateForm(tkinter.Frame):
             return
 
         # Log the registration for debugging
-        self.logger.debug(message=f"Registered field - Key: '{label}' | Field Type: {type(field).__name__}")
+        self.logger.debug(
+            message=f"Registered field - Key: '{label}' | Field Type: {type(field).__name__}"
+        )
 
         # Add the passed field widget and bool flag to the field dictionary instance variable under the passed label
         self._field_dict[label] = {
@@ -313,16 +317,24 @@ class BaseCreateForm(tkinter.Frame):
         tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
 
         # Create the 'primary attributes' ScrolledFrame widget
-        primary_attributes_scrolled_frame: ScrolledFrame = ScrolledFrame(master=tabbed_frame)
+        primary_attributes_scrolled_frame: ScrolledFrame = ScrolledFrame(
+            master=tabbed_frame
+        )
 
         # Create the 'primary attributes' ScrolledFrame widget
-        primary_attributes_scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
+        primary_attributes_scrolled_frame.configure(
+            background=Constants.BLUE_GREY["700"]
+        )
 
         # Style the 'primary attributes' ScrolledFrame widget's tkinter.Canvas widget
-        primary_attributes_scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+        primary_attributes_scrolled_frame.configure_canvas(
+            background=Constants.BLUE_GREY["700"]
+        )
 
         # Style the 'primary attributes' ScrolledFrame widget's 'container frame'
-        primary_attributes_scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
+        primary_attributes_scrolled_frame.configure_container(
+            background=Constants.BLUE_GREY["700"]
+        )
 
         # Add the 'primary attributes' ScrolledFrame widget to the TabbedFrame widget
         tabbed_frame.add(
@@ -343,16 +355,24 @@ class BaseCreateForm(tkinter.Frame):
         )
 
         # Create the 'secondary attributes' ScrolledFrame widget
-        secondary_attributes_scrolled_frame: ScrolledFrame = ScrolledFrame(master=tabbed_frame)
+        secondary_attributes_scrolled_frame: ScrolledFrame = ScrolledFrame(
+            master=tabbed_frame
+        )
 
         # Style the 'secondary attributes' ScrolledFrame widget
-        secondary_attributes_scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
+        secondary_attributes_scrolled_frame.configure(
+            background=Constants.BLUE_GREY["700"]
+        )
 
         # Style the 'secondary attributes' ScrolledFrame widget's tkinter.Canvas widget
-        secondary_attributes_scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+        secondary_attributes_scrolled_frame.configure_canvas(
+            background=Constants.BLUE_GREY["700"]
+        )
 
         # Style the 'secondary attributes' ScrolledFrame widget's 'container frame'
-        secondary_attributes_scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
+        secondary_attributes_scrolled_frame.configure_container(
+            background=Constants.BLUE_GREY["700"]
+        )
 
         # Add the 'secondary attributes' ScrolledFrame widget to the TabbedFrame widget
         tabbed_frame.add(
@@ -376,7 +396,9 @@ class BaseCreateForm(tkinter.Frame):
         self.create_primary_attribute_widgets(master=primary_attributes_scrolled_frame)
 
         # Create the 'secondary attributes' widgets
-        self.create_secondary_attribute_widgets(master=secondary_attributes_scrolled_frame)
+        self.create_secondary_attribute_widgets(
+            master=secondary_attributes_scrolled_frame
+        )
 
     def create_primary_attribute_widgets(
         self,
@@ -398,7 +420,9 @@ class BaseCreateForm(tkinter.Frame):
         """
 
         # Raise a NotImplementedError as subclasses of the BaseCreateForm class must implement the 'create_primary_attribute_widgets' method
-        raise NotImplementedError(f"{self.__class__.__name__} must implement the 'create_primary_attribute_widgets' method.")
+        raise NotImplementedError(
+            f"{self.__class__.__name__} must implement the 'create_primary_attribute_widgets' method."
+        )
 
     def create_secondary_attribute_widgets(
         self,
@@ -420,7 +444,9 @@ class BaseCreateForm(tkinter.Frame):
         """
 
         # Raise a NotImplementedError as subclasses of the BaseCreateForm class must implement the 'create_secondary_attribute_widgets' method
-        raise NotImplementedError(f"{self.__class__.__name__} must implement the 'create_secondary_attribute_widgets' method.")
+        raise NotImplementedError(
+            f"{self.__class__.__name__} must implement the 'create_secondary_attribute_widgets' method."
+        )
 
     def create_top_frame_widgets(
         self,
@@ -451,7 +477,9 @@ class BaseCreateForm(tkinter.Frame):
         )
 
         # Create an instruction string to be passed to the instruction label
-        instruction: str = "Fields marked with an asterisk (*) are required and must be filled."
+        instruction: str = (
+            "Fields marked with an asterisk (*) are required and must be filled."
+        )
 
         # Create the 'instruction label' tkinter.Label widget
         instruction_label: tkinter.Label = UIBuilder.get_label(
@@ -531,7 +559,10 @@ class BaseCreateForm(tkinter.Frame):
         """
 
         # Return a copy of the value dictionary to the caller
-        return self.value_dict
+        return {
+            Miscellaneous.any_to_snake(string=key): self.value_dict[key]
+            for key in sorted(self.value_dict.keys())
+        }
 
     def set(
         self,
@@ -586,7 +617,7 @@ class BaseCreateForm(tkinter.Frame):
             key,
             value,
         ) in self._field_dict.items():
-            # Check, if the current value is not marked as required 
+            # Check, if the current value is not marked as required
             if not value["required"]:
                 # Continue with the next iteration
                 continue
