@@ -264,7 +264,7 @@ class DateSelectField(BaseField):
                 event=Events.DATE_SELECT_FIELD_CHANGED,
                 label=self.display_name,
                 namespace=self.namespace,
-                value=Miscellaneous.datetime_to_string(
+                value=Miscellaneous.string_to_datetime(
                     date_string=match,
                     format=self.date_format,
                 ),
@@ -674,7 +674,8 @@ class DateSelectField(BaseField):
         # Create a string variable
         self.variable: tkinter.StringVar = tkinter.StringVar(
             value=Miscellaneous.datetime_to_string(
-                datetime=Miscellaneous.get_current_datetime()
+                datetime=Miscellaneous.get_current_datetime(),
+                format=self.date_format,
             )
         )
 

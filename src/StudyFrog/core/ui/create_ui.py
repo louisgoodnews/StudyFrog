@@ -6,9 +6,7 @@ Date: 2025-02-11
 import tkinter
 
 from tkinter.constants import *
-
 from tkinter import ttk
-
 from typing import *
 
 from core.ui.fields.select_fields import CheckbuttonField, ComboboxField
@@ -320,17 +318,63 @@ class CreateUI(BaseUI):
             None
         """
 
-        # Configure the top frame widget's 1st and 2nd column to weight 0
+        # Configure the top frame widget's 0th column to weight 0
         master.grid_columnconfigure(
-            index=(
-                0,
-                1,
-            ),
+            index=0,
             weight=1,
+        )
+
+        # Configure the top frame widget's 0th row to weight 0
+        master.grid_rowconfigure(
+            index=0,
+            weight=0,
         )
 
         # Configure the top frame widget's 1st row to weight 1
         master.grid_rowconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Create a separator widget
+        separator: ttk.Separator = UIBuilder.get_separator(
+            master=master,
+            orient=HORIZONTAL,
+        )
+
+        # Place the separator widget in the grid
+        separator.grid(
+            column=0,
+            padx=5,
+            pady=10,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a frame widget
+        frame: tkinter.Frame = UIBuilder.get_frame(
+            background=Constants.BLUE_GREY["700"],
+            master=master,
+        )
+
+        # Place the frame widget in the grid
+        frame.grid(
+            column=0,
+            row=1,
+            sticky=NSEW,
+        )
+
+        frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        frame.grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+
+        frame.grid_rowconfigure(
             index=0,
             weight=1,
         )
@@ -338,7 +382,7 @@ class CreateUI(BaseUI):
         # Create the "Left Frame" frame widget
         left_frame: tkinter.Frame = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
-            master=master,
+            master=frame,
         )
 
         # Configure the "Left Frame" frame widget's 1st column to weight 1
@@ -402,7 +446,7 @@ class CreateUI(BaseUI):
         # Create the "Right Frame" frame widget
         right_frame: tkinter.Frame = UIBuilder.get_frame(
             background=Constants.BLUE_GREY["700"],
-            master=master,
+            master=frame,
         )
 
         # Configure the "Right Frame" frame widget's 1st column to weight 1
@@ -496,16 +540,22 @@ class CreateUI(BaseUI):
             None
         """
 
-        # Configure the top frame widget's 1st column to weight 1
+        # Configure the top frame widget's 0th column to weight 1
         master.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the top frame widget's 1st row to weight 1
+        # Configure the top frame widget's 0th row to weight 1
         master.grid_rowconfigure(
             index=0,
             weight=1,
+        )
+
+        # Configure the top frame widget's 1st row to weight 0
+        master.grid_rowconfigure(
+            index=1,
+            weight=0,
         )
 
         # Define the values for the type field
@@ -564,6 +614,21 @@ class CreateUI(BaseUI):
         self.type_field.grid(
             column=0,
             row=0,
+            sticky=NSEW,
+        )
+
+        # Create a separator widget
+        separator: ttk.Separator = UIBuilder.get_separator(
+            master=master,
+            orient=HORIZONTAL,
+        )
+
+        # Place the separator widget in the grid
+        separator.grid(
+            column=0,
+            padx=5,
+            pady=10,
+            row=1,
             sticky=NSEW,
         )
 
@@ -1010,6 +1075,10 @@ class CreateUI(BaseUI):
         # Get the data from the form
         form_data: Dict[str, Any] = self.form.get()
 
+        self.logger.debug(form_data)
+
+        return
+
         # Check if all required fields are filled
         if not self.form.check_required_fields(object_data=form_data):
             # Log an info message indicating that not all required fields were filled
@@ -1019,7 +1088,7 @@ class CreateUI(BaseUI):
             return
 
         # Get the type of form
-        type: str = self.combobox.get()
+        type: str = self.type_field.get()
 
         # Attempt to retrieve the "new" status from the database
         status_response: Optional[DispatcherNotification] = self.dispatcher.dispatch(

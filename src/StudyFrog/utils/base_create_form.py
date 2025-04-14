@@ -71,6 +71,9 @@ class BaseCreateForm(tkinter.Frame):
         # Store the passed namespace string in a constant instance variable
         self.namespace: Final[str] = namespace
 
+        # Initialize the list of subscription UUIDs as an empty list
+        self.subscriptions: Final[List[str]] = []
+
         # Initialize the value dictionary instance variable as an empty dictionary
         self._value_dict: Dict[str, Dict[str, Optional[Any]]] = {}
 
@@ -619,8 +622,8 @@ class BaseCreateForm(tkinter.Frame):
 
         # Return a copy of the value dictionary to the caller
         return {
-            Miscellaneous.any_to_snake(string=key): self.value_dict[key]
-            for key in sorted(self.value_dict.keys())
+            Miscellaneous.any_to_snake(string=key): self.field_dict[key]
+            for key in sorted(self.field_dict.keys())
         }
 
     def set(

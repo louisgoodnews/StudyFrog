@@ -11,7 +11,7 @@ from typing import *
 from core.ui.fields.boolean_fields import CheckbuttonField
 from core.ui.fields.datetime_fields import DateSelectField
 from core.ui.fields.select_fields import ComboboxField
-from core.ui.fields.string_fields import MultiSelectAnswerField, MultiLineTextField
+from core.ui.fields.string_fields import MultiSelectAnswerField, MultiLineTextField, SingleLineTextField
 
 from core.ui.frames.frames import ScrolledFrame
 
@@ -102,10 +102,61 @@ class StackCreateForm(BaseCreateForm):
             weight=0,
         )
 
-        # Configure the weight of the 4th row to 1
+        # Configure the weight of the 4th row to 0
         master.grid_rowconfigure(
             index=4,
+            weight=0,
+        )
+
+        # Configure the weight of the 5ft row to 1
+        master.grid_rowconfigure(
+            index=5,
             weight=1,
+        )
+
+        # Create the 'name' SingleLineTextField widget
+        name_field: SingleLineTextField = SingleLineTextField(
+            label="Name*: ",
+            master=master,
+            on_change_callback=self._on_field_change,
+        )
+
+        # Place the 'name' SingleLineTextField widget in the grid
+        name_field.grid(
+            column=0,
+            padx=10,
+            pady=10,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Style the 'name' SingleLineTextField widget
+        name_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the 'name' SingleLineTextField widget's button
+        name_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the 'name' SingleLineTextField widget's text
+        name_field.configure_entry(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+        )
+
+        # Register the 'name' SingleLineTextField widget
+        self._register_field(
+            label="Name*: ",
+            field=name_field,
+            required=True,
         )
 
         # Dispatch the REQUEST_GET_ALL_STACKS event in the global namespace
@@ -136,7 +187,7 @@ class StackCreateForm(BaseCreateForm):
             column=0,
             padx=10,
             pady=10,
-            row=0,
+            row=1,
             sticky=NSEW,
         )
 
@@ -197,7 +248,7 @@ class StackCreateForm(BaseCreateForm):
             column=0,
             padx=10,
             pady=10,
-            row=1,
+            row=2,
             sticky=NSEW,
         )
 
@@ -258,7 +309,7 @@ class StackCreateForm(BaseCreateForm):
             column=0,
             padx=10,
             pady=10,
-            row=2,
+            row=3,
             sticky=NSEW,
         )
 
@@ -293,6 +344,7 @@ class StackCreateForm(BaseCreateForm):
 
         # Create the 'due by' DateSelectField widget
         due_by_field: DateSelectField = DateSelectField(
+            date_format="%d.%m.%Y",
             label="Due By*: ",
             master=master,
             on_change_callback=self._on_field_change,
@@ -303,7 +355,7 @@ class StackCreateForm(BaseCreateForm):
             column=0,
             padx=10,
             pady=10,
-            row=3,
+            row=4,
             sticky=NSEW,
         )
 
@@ -369,7 +421,7 @@ class StackCreateForm(BaseCreateForm):
             column=0,
             padx=10,
             pady=10,
-            row=4,
+            row=5,
             sticky=NSEW,
         )
 
