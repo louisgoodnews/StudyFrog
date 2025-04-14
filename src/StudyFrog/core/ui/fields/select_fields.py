@@ -7,6 +7,7 @@ import tkinter
 import traceback
 import uuid
 
+from enum import Enum
 from tkinter.constants import *
 from tkinter import ttk
 from typing import *
@@ -23,10 +24,31 @@ from utils.logger import Logger
 __all__: Final[List[str]] = [
     "ComboboxField",
     "ComboboxSelectField",
+    "EntityComboboxSelectField",
+    "EntityMultiOptionSelectField",
+    "EntitSingleOptionSelectField",
     "ListboxField",
     "MultiOptionSelectField",
     "SingleOptionSelectField",
 ]
+
+
+class EntitySelectTypes(Enum):
+    """
+    """
+
+    ANSWER: Literal["answer"] = "answer"
+    DIFFICULTY: Literal["difficulty"] = "difficulty"
+    FLASHCARD: Literal["Flashcard"] = "flashcard"
+    NOTE: Literal["note"] = "note"
+    PRIORITY: Literal["priority"] = "priority"
+    QUESTION: Literal["question"] = "question"
+    STACK: Literal["stack"] = "stack"
+    STATUS: Literal["status"] = "status"
+    SUBJECT: Literal["subject"] = "subject"
+    TAG: Literal["tag"] = "tag"
+    TEACHER: Literal["teacher"] = "teacher"
+    USER: Literal["user"] = "user"
 
 
 class CheckbuttonSelectField(BaseField):
@@ -1601,6 +1623,27 @@ class ComboboxelectField(BaseField):
             )
 
 
+class EntityComboboxSelectField(BaseField):
+    """
+    """
+
+    pass
+
+
+class EntityMultiOptionSelectField(BaseField):
+    """
+    """
+
+    pass
+
+
+class EntitySingleOptionSelectField(BaseField):
+    """
+    """
+
+    pass
+
+
 class ListboxField(BaseField):
     """
     A field for selecting one or multiple values from a predefined list using a Listbox.
@@ -2453,7 +2496,10 @@ class MultiOptionSelectField(BaseField):
             row,
             value,
         ) in enumerate(
-            iterable=value_list, start=len(self.container_frame.winfo_children(),)
+            iterable=value_list,
+            start=len(
+                self.container_frame.winfo_children(),
+            ),
         ):
             # Check, if the current value already has been selected
             if value in self.selection.keys():
