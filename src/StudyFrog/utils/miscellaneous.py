@@ -123,32 +123,15 @@ class Miscellaneous:
                 key,
                 value,
             ) in data.items():
-                # Check if the value is a string (since DB stores JSON/datetime as strings)
-                if isinstance(
-                    value,
-                    str,
-                ):
-                    # Try parsing as JSON
-                    try:
-                        parsed_value = json.loads(value)
-                        if isinstance(
-                            parsed_value,
-                            (
-                                dict,
-                                list,
-                            ),
-                        ):  # Only accept valid JSON
-                            result[key] = parsed_value
-                            continue
-                    except json.JSONDecodeError:
-                        pass  # Not a valid JSON, continue
+                # Check, if the current value is a JSON string
+                if cls.is_json_string(string=value):
+                    # Convert the JSON string into a JSON object
+                    result[key] = json.loads(s=value)
 
-                    # Try parsing as datetime
-                    try:
-                        result[key] = cls.string_to_datetime(value)
-                        continue
-                    except ValueError:
-                        pass  # Not a valid datetime, keep original value
+                # Check, if the current value is a datetime string
+                if cls.is_datetime_string(string=value):
+                    # Convert the datetime string into a datetime object
+                    result[key] = cls.string_to_datetime(date_string=value)
 
                 # Keep unchanged if no conversion applied
                 result[key] = value
@@ -421,6 +404,58 @@ class Miscellaneous:
         return str(uuid.uuid4())
 
     @classmethod
+    def is_datetime_string(
+        cls,
+        string: str,
+    ) -> bool:
+        """
+        Checks whether the given string can be interpreted as a datetime.
+
+        This method tries to parse the string using a list of common datetime formats.
+        If one of the formats matches, the string is considered a valid datetime.
+
+        Args:
+            string (str): The input string to check.
+
+        Returns:
+            bool: True if the string can be parsed as a datetime, False otherwise.
+        """
+
+        # Check, if the passed string argument is in fact a string object
+        if not isinstance(string, str,):
+            # Return False
+            return False
+
+        # Strip off any leading or trailing whitespaces
+        stripped: str = string.strip()
+
+        # A list of common date formats
+        common_formats: List[str] = [
+            "%Y-%m-%d %H:%M:%S",  # 2025-04-14 08:57:23
+            "%Y-%m-%d",           # 2025-04-14
+            "%d.%m.%Y",           # 14.04.2025
+            "%d.%m.%y",           # 14.04.25
+            "%m/%d/%Y",           # 04/14/2025
+            "%Y/%m/%d",           # 2025/04/14
+            "%d-%b-%Y",           # 14-Apr-2025
+        ]
+
+        # Iterate over the common date formats list
+        for format in common_formats:
+            try:
+                # Attempt to create a datetime object from the string with the format
+                datetime.strptime(stripped, format,)
+
+                # Return True
+                return True
+            except ValueError:
+                # Skip the current iteration if an exception occurs
+                continue
+
+        # Return False
+        return False
+
+    @classmethod
     def is_float_number(
         cls,
         string: str,
@@ -463,6 +498,33 @@ class Miscellaneous:
         except ValueError:
             # If the string cannot be converted to an int number, return False
             return False
+
+    @classmethod
+    def is_json_string(
+        cls,
+        string: str,
+    ) -> bool:
+        """
+        Checks whether the given string is likely to be a JSON string.
+
+        This method checks if the string starts and ends with curly braces `{}` (indicating a JSON object)
+        or square brackets `[]` (indicating a JSON array). It does not validate the full JSON structure,
+        but is useful as a lightweight pre-check.
+
+        Args:
+            string (str): The input string to check.
+
+        Returns:
+            bool: True if the string looks like a JSON object or array, False otherwise.
+        """
+        if not isinstance(string, str):
+            return False
+
+        stripped: str = string.strip()
+
+        return (stripped.startswith("{") and stripped.endswith("}")) or (
+            stripped.startswith("[") and stripped.endswith("]")
+        )
 
     @classmethod
     def is_numeric(

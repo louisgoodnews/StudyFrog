@@ -122,17 +122,17 @@ class StackCreateForm(BaseCreateForm):
             # Return early
             return
 
-        # Create the 'stack' ComboboxField widget
-        stack_field: ComboboxField = ComboboxField(
-            label="Stack*: ",
+        # Create the 'ancestor field' ComboboxField widget
+        ancestor_field: ComboboxField = ComboboxField(
+            label="Ancestor: ",
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
             values=[stack.name for stack in stack_notification.get_one_and_only_result()],
         )
 
-        # Place the 'stack' ComboboxField widget in the grid
-        stack_field.grid(
+        # Place the 'ancestor field' ComboboxField widget in the grid
+        ancestor_field.grid(
             column=0,
             padx=10,
             pady=10,
@@ -140,11 +140,11 @@ class StackCreateForm(BaseCreateForm):
             sticky=NSEW,
         )
 
-        # Style the 'stack' ComboboxField widget
-        stack_field.configure(background=Constants.BLUE_GREY["700"])
+        # Style the 'ancestor field' ComboboxField widget
+        ancestor_field.configure(background=Constants.BLUE_GREY["700"])
 
-        # Style the 'stack' ComboboxField widget's button
-        stack_field.configure_button(
+        # Style the 'ancestor field' ComboboxField widget's button
+        ancestor_field.configure_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -154,19 +154,19 @@ class StackCreateForm(BaseCreateForm):
             relief=FLAT,
         )
 
-        # Style the 'stack' ComboboxField widget's combobox
-        stack_field.configure_combobox(
+        # Style the 'ancestor field' ComboboxField widget's combobox
+        ancestor_field.configure_combobox(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
         )
 
-        # Register the 'stack' ComboboxField widget
+        # Register the 'ancestor field' ComboboxField widget
         self._register_field(
-            label="Stack*: ",
-            field=stack_field,
-            required=True,
+            label="Ancestor: ",
+            field=ancestor_field,
+            required=False,
         )
 
         # Dispatch the REQUEST_GET_ALL_DIFFICULTIES event in the global namespace
@@ -226,7 +226,7 @@ class StackCreateForm(BaseCreateForm):
         # Register the 'difficulty' ComboboxField widget
         self._register_field(
             label="Difficulty*: ",
-            field=stack_field,
+            field=difficulty_field,
             required=True,
         )
 
@@ -287,7 +287,7 @@ class StackCreateForm(BaseCreateForm):
         # Register the 'priority' ComboboxField widget
         self._register_field(
             label="Priority*: ",
-            field=stack_field,
+            field=priority_field,
             required=True,
         )
 

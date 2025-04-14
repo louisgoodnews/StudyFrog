@@ -1173,7 +1173,7 @@ class TabbedFrame(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def configure_container(
+    def configure_container_frame(
         self,
         **kwargs,
     ) -> None:

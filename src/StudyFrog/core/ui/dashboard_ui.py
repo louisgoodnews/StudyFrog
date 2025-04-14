@@ -461,7 +461,7 @@ class DashboardUI(BaseUI):
         tabbed_view.configure(background=Constants.BLUE_GREY["700"])
 
         # Style the TabbedView's "Container Frame" widget
-        tabbed_view.configure_container(background=Constants.BLUE_GREY["700"])
+        tabbed_view.configure_container_frame(background=Constants.BLUE_GREY["700"])
 
         # Style the TabbedView's "Top Frame" widget
         tabbed_view.configure_top_frame(background=Constants.BLUE_GREY["700"])

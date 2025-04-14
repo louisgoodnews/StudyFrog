@@ -17,7 +17,7 @@ __all__: Final[List[str]] = [
 ]
 
 
-T: TypeVar("T") = TypeVar("T")
+T: TypeVar = TypeVar("T")
 
 
 class ImmutableBaseModel(ImmutableBaseObject):
@@ -258,14 +258,14 @@ class ImmutableBaseModel(ImmutableBaseObject):
         cls,
         database: str,
         sql: str,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> Any:
         """
         Executes a custom SQL query.
 
         Args:
             database (str): Path to the SQLite database file.
-            parameters (Tuple[..., Any], optional): Parameters for the query.
+            parameters (Tuple[Any, ...], optional): Parameters for the query.
             sql (str): The SQL query to execute.
 
         Returns:
@@ -289,7 +289,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
     @classmethod
     async def get_all(
-        cls: Type[T],
+        cls,
         database: str,
     ) -> List[T]:
         """

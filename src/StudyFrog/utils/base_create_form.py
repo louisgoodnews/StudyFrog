@@ -74,8 +74,14 @@ class BaseCreateForm(tkinter.Frame):
         # Initialize the value dictionary instance variable as an empty dictionary
         self._value_dict: Dict[str, Dict[str, Optional[Any]]] = {}
 
+        # Configure the grid layout
+        self.configure_grid()
+
         # Create the widgets
         self.create_widgets()
+
+        # Subscribe to events
+        self.subscribe_to_events()
 
     @property
     def field_dict(self) -> Dict[str, Any]:
@@ -185,18 +191,18 @@ class BaseCreateForm(tkinter.Frame):
             None
         """
 
-        # Check, if the passed label ends with ': '
-        if label.endswith(": "):
-            # Remove the ': ' suffix and update the passed label
-            label = label.replace(": ", "")
+        # Check, if the passed label contains ':'
+        if ":" in label:
+            # Remove the ':' and update the passed label
+            label = label.replace(":", "")
 
-        # Check, if the passed label ends with ': '
-        elif label.endswith("*: "):
-            # Remove the '*: ' suffix and update the passed label
-            label = label.replace("*: ", "")
+        # Check, if the passed label contains '*'
+        if "*" in label:
+            # Remove the '*' and update the passed label
+            label = label.replace("*", "")
 
         # Convert the passed label string to snake case
-        label = Miscellaneous.any_to_snake(string=label)
+        label = Miscellaneous.any_to_snake(string=label.strip())
 
         # Check, if the passed label is already contained in the field dictionary instance variable
         if label in set(self._field_dict.keys()):
@@ -239,6 +245,23 @@ class BaseCreateForm(tkinter.Frame):
 
         # Clear the value dictionary instance variable
         self._value_dict.clear()
+
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects and returns a list of subscriptions.
+
+        This method creates an empty list of dictionaries containing event subscription configurations.
+        This method should be implemented in any subclasses, that should handle events.
+
+        Returns:
+            List[Dict[str, Any]]: A list representing the subscriptions for events.
+        """
+
+        # Initialize the list of subscriptions as an empty list
+        subscriptions: List[Dict[str, Any]] = []
+
+        # Return the list to the caller
+        return subscriptions
 
     def configure_grid(self) -> None:
         """
@@ -393,11 +416,13 @@ class BaseCreateForm(tkinter.Frame):
         )
 
         # Create the 'primary attributes' widgets
-        self.create_primary_attribute_widgets(master=primary_attributes_scrolled_frame)
+        self.create_primary_attribute_widgets(
+            master=primary_attributes_scrolled_frame.container
+        )
 
         # Create the 'secondary attributes' widgets
         self.create_secondary_attribute_widgets(
-            master=secondary_attributes_scrolled_frame
+            master=secondary_attributes_scrolled_frame.container
         )
 
     def create_primary_attribute_widgets(
@@ -547,6 +572,40 @@ class BaseCreateForm(tkinter.Frame):
         # Create the 'center frame' widgets
         self.create_center_frame_widgets(master=center_frame)
 
+    def destroy(self) -> None:
+        """
+        Cleans up resources and unsubscribes from events.
+
+        This method attempts to unsubscribe from all events
+        and calls the parent class's destroy method to clean
+        up resources. Logs any exceptions that occur.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs during the destroy process.
+        """
+        try:
+            # Attempt to unsubscribe from all events
+            self.unsubscribe_from_events()
+
+            # Log an info message
+            self.logger.info(
+                message=f"Unsubscribed from all events. Destroying '{self.__class__.__name__}' instance..."
+            )
+
+            # Call the parent class's destroy method
+            super().destroy()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'destroy' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
     def get(self) -> Dict[str, Any]:
         """
         Returns the current values of the form.
@@ -595,6 +654,71 @@ class BaseCreateForm(tkinter.Frame):
 
         # Update the value at the passed label with the passed value
         self._value_dict[label]["value"] = value
+
+    def subscribe_to_events(self) -> None:
+        """
+        Subscribes to all events in the subscriptions dictionary.
+
+        This method iterates over the events and functions in the subscriptions
+        dictionary and registers them with the dispatcher. It also stores the
+        UUIDs of the subscriptions in the subscriptions list.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs while subscribing to events.
+        """
+        try:
+            # Create a dictionary of events and functions
+            subscriptions: List[Dict[str, Any]] = self.collect_subscriptions()
+
+            # Iterate over the events and functions in the subscriptions dictionary
+            for subscription in subscriptions:
+                # Store the UUID of the subscription in the subscriptions list
+                self.subscriptions.append(
+                    self.dispatcher.register(
+                        event=subscription["event"],
+                        function=subscription["function"],
+                        namespace=subscription["namespace"],
+                        persistent=subscription["persistent"],
+                    )
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'subscribe_to_events' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def unsubscribe_from_events(self) -> None:
+        """
+        Unsubscribes from all events subscribed in the edit UI.
+
+        This method iterates over the UUIDs in the subscriptions dictionary and
+        unregisters the event handlers associated with each UUID.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs while unsubscribing from events.
+        """
+        try:
+            # Iterate over the UUIDs in the subscriptions dictionary
+            for uuid in self.subscriptions:
+                # Unregister the handler for the given UUID
+                self.dispatcher.unregister(uuid=uuid)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'unsubscribe_from_events' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Re-raise the exception to the caller
+            raise e
 
     def validate_form(self) -> Dict[str, Any]:
         """

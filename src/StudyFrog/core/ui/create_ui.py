@@ -522,6 +522,7 @@ class CreateUI(BaseUI):
             master=master,
             namespace=self.namespace,
             on_change_callback=self.on_type_field_change,
+            readonly=True,
             value=Miscellaneous.select_random(iterable=values),
             values=values,
         )
@@ -1082,14 +1083,31 @@ class CreateUI(BaseUI):
         # Clear the center frame to remove any existing widgets
         self.clear()
 
+        self.center_frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        self.center_frame.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
         # Create a new form widget based on the selected value
         self.form = forms[value.lower()](
             dispatcher=self.dispatcher,
             master=self.center_frame,
-            unified_manager=self.unified_manager,
+            namespace=self.namespace,
+        )
+
+        # Place the new form widget in the grid
+        self.form.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
         )
 
         # Log an info message
         self.logger.info(
-            message=f"Created form widget for {value} type based on current '{label}' field selection."
+            message=f"Created form widget for '{value}' type based on current '{label.replace(": ", "")}' field selection."
         )
