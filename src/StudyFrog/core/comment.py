@@ -378,7 +378,6 @@ class CommentManager(BaseObjectManager):
 
     _shared_instance: Optional["CommentManager"] = None
 
-    @classmethod
     def __new__(cls) -> "CommentManager":
         """
         Creates and returns a new instance of the CommentManager class.
@@ -391,11 +390,14 @@ class CommentManager(BaseObjectManager):
         Returns:
             CommentManager: The created or existing instance of CommentManager class.
         """
+
+        # Check if the shared instance does not exist
         if cls._shared_instance is None:
             # Create a new instance by calling the parent class constructor
             cls._shared_instance = super(CommentManager, cls).__new__(cls)
             # Initialize the instance
             cls._shared_instance.init()
+
         # Return the shared instance
         return cls._shared_instance
 

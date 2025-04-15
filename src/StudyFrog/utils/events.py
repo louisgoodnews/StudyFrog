@@ -255,6 +255,26 @@ class Events:
         name="backend:difficulty:updated"
     )
 
+    # An event that indicates that an entity combobox field has changed
+    ENTITY_COMBOBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:entity_combobox:field:changed")
+    )
+
+    # An event that indicates that an entity combobox field has been cleared
+    ENTITY_COMBOBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:entity_combobox:field:cleared")
+    )
+
+    # An event that indicates that an entity combobox field has been retrieved
+    ENTITY_COMBOBOX_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:entity_combobox:field:get")
+    )
+
+    # An event that indicates that an entity combobox field has been set
+    ENTITY_COMBOBOX_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:entity_combobox:field:set")
+    )
+
     # An event that indicates that a flashcard has been created in the backend
     FLASHCARD_CREATED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="backend:flashcard:created"
@@ -941,6 +961,16 @@ class Events:
         DispatcherEventFactory.create_event(name="global:request:get:all:statuses")
     )
 
+    # An event that indicates that the user wants to get all subjects
+    REQUEST_GET_ALL_SUBJECTS: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:get:all:subjects")
+    )
+
+    # An event that indicates that the user wants to get all teachers
+    REQUEST_GET_ALL_TEACHERS: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:get:all:teachers")
+    )
+
     # An event that indicates that the user wants to get all tags
     REQUEST_GET_ALL_TAGS: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="global:request:get:all:tags"
@@ -1302,6 +1332,31 @@ class Events:
         name="global:request:status:update"
     )
 
+    # An event that indicates that the user wants to create a new subject
+    REQUEST_SUBJECT_CREATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:subject:create"
+    )
+
+    # An event that indicates that the user wants to delete a subject
+    REQUEST_SUBJECT_DELETE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:subject:delete"
+    )
+
+    # An event that indicates that the user wants to load a subject
+    REQUEST_SUBJECT_LOAD: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:subject:load"
+    )
+
+    # An event that indicates that the user wants to lookup a subject
+    REQUEST_SUBJECT_LOOKUP: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:subject:lookup"
+    )
+
+    # An event that indicates that the user wants to update a subject
+    REQUEST_SUBJECT_UPDATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:subject:update"
+    )
+
     # An event that indicates that the user wants to create a new tag
     REQUEST_TAG_CREATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="global:request:tag:create"
@@ -1325,6 +1380,31 @@ class Events:
     # An event that indicates that the user wants to update a tag
     REQUEST_TAG_UPDATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="global:request:tag:update"
+    )
+
+    # An event that indicates that the user wants to create a new teacher
+    REQUEST_TEACHER_CREATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:teacher:create"
+    )
+
+    # An event that indicates that the user wants to delete a teacher
+    REQUEST_TEACHER_DELETE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:teacher:delete"
+    )
+
+    # An event that indicates that the user wants to load a teacher
+    REQUEST_TEACHER_LOAD: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:teacher:load"
+    )
+
+    # An event that indicates that the user wants to lookup a teacher
+    REQUEST_TEACHER_LOOKUP: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:teacher:lookup"
+    )
+
+    # An event that indicates that the user wants to update a teacher
+    REQUEST_TEACHER_UPDATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:teacher:update"
     )
 
     # An event that indicates that the user wants to pause a timer
@@ -1486,6 +1566,26 @@ class Events:
         name="backend:stack:updated"
     )
 
+    # An event that indicates that a subject has been created in the backend
+    SUBJECT_CREATED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="backend:subject:created"
+    )
+
+    # An event that indicates that a subject has been deleted in the backend
+    SUBJECT_DELETED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="backend:subject:deleted"
+    )
+
+    # An event that indicates that a subject has been loaed in the backend
+    SUBJECT_LOADED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="backend:subject:loaded"
+    )
+
+    # An event that indicates that a subject has been updated in the backend
+    SUBJECT_UPDATED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="backend:subject:updated"
+    )
+
     # An event that indicates that a tag has been created in the backend
     TAG_CREATED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="backend:tag:created"
@@ -1504,6 +1604,26 @@ class Events:
     # An event that indicates that a tag has been updated in the backend
     TAG_UPDATED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="backend:tag:updated"
+    )
+
+    # An event that indicates that a teacher has been created in the backend
+    TEACHER_CREATED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="backend:teacher:created"
+    )
+
+    # An event that indicates that a teacher has been deleted in the backend
+    TEACHER_DELETED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="backend:teacher:deleted"
+    )
+
+    # An event that indicates that a teacher has been loaed in the backend
+    TEACHER_LOADED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="backend:teacher:loaded"
+    )
+
+    # An event that indicates that a teacher has been updated in the backend
+    TEACHER_UPDATED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="backend:teacher:updated"
     )
 
     # An event that indicates that a text analysis has been completed
@@ -1798,6 +1918,21 @@ class Events:
             cls.REQUEST_DIFFICULTY_LOAD,
             cls.REQUEST_DIFFICULTY_LOOKUP,
             cls.REQUEST_DIFFICULTY_UPDATE,
+        ]
+
+    @classmethod
+    def get_entity_combobox_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all entity combobox field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all entity combobox field events in the Events class.
+        """
+        return [
+            cls.ENTITY_COMBOBOX_FIELD_CHANGED,
+            cls.ENTITY_COMBOBOX_FIELD_CLEARED,
+            cls.ENTITY_COMBOBOX_FIELD_GET,
+            cls.ENTITY_COMBOBOX_FIELD_SET,
         ]
 
     @classmethod
@@ -2185,6 +2320,22 @@ class Events:
         ]
 
     @classmethod
+    def get_subject_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all subject events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all subject events in the Events class.
+        """
+        return [
+            cls.REQUEST_SUBJECT_CREATE,
+            cls.REQUEST_SUBJECT_DELETE,
+            cls.REQUEST_SUBJECT_LOAD,
+            cls.REQUEST_SUBJECT_LOOKUP,
+            cls.REQUEST_SUBJECT_UPDATE,
+        ]
+
+    @classmethod
     def get_tag_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all tag events in the Events class.
@@ -2198,6 +2349,22 @@ class Events:
             cls.REQUEST_TAG_LOAD,
             cls.REQUEST_TAG_LOOKUP,
             cls.REQUEST_TAG_UPDATE,
+        ]
+
+    @classmethod
+    def get_teacher_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all teacher events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all teacher events in the Events class.
+        """
+        return [
+            cls.REQUEST_TEACHER_CREATE,
+            cls.REQUEST_TEACHER_DELETE,
+            cls.REQUEST_TEACHER_LOAD,
+            cls.REQUEST_TEACHER_LOOKUP,
+            cls.REQUEST_TEACHER_UPDATE,
         ]
 
     @classmethod

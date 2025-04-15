@@ -375,14 +375,14 @@ class AnswerManager(BaseObjectManager):
         Returns:
             AnswerManager: The created or existing instance of AnswerManager class.
         """
-        
+
         # Check if the shared instance does not exist
         if cls._shared_instance is None:
             # Create a new instance by calling the parent class constructor
             cls._shared_instance = super(AnswerManager, cls).__new__(cls)
             # Initialize the instance
             cls._shared_instance.init()
-        
+
         # Return the shared instance
         return cls._shared_instance
 

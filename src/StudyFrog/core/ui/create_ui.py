@@ -3,29 +3,39 @@ Author: lodego
 Date: 2025-02-11
 """
 
+import traceback
 import tkinter
 
 from tkinter.constants import *
 from tkinter import ttk
 from typing import *
 
+from core.ui.notifications.notifications import (
+    ToplevelNotification,
+    ToplevelToastNotification,
+)
+
+from core.ui.form.flashcard_create_form import FlashcardCreateForm
+from core.ui.form.question_create_form import QuestionCreateForm
+from core.ui.form.stack_create_form import StackCreateForm
+
 from core.ui.fields.select_fields import CheckbuttonField, ComboboxField
 
+from core.ui.ui_builder import UIBuilder
+
 from core.answer import AnswerFactory, ImmutableAnswer
+from core.difficulty import ImmutableDifficulty
 from core.flashcard import FlashcardFactory, ImmutableFlashcard
+from core.priority import ImmutablePriority
 from core.question import MutableQuestion, QuestionFactory, ImmutableQuestion
 from core.setting import SettingService
 from core.stack import StackFactory, ImmutableStack, MutableStack
 from core.status import ImmutableStatus
 
 from utils.base_ui import BaseUI
-from core.ui.ui_builder import UIBuilder
-from core.ui.form.flashcard_create_form import FlashcardCreateForm
-from core.ui.form.question_create_form import QuestionCreateForm
-from core.ui.form.stack_create_form import StackCreateForm
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher, DispatcherNotification
+from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
@@ -128,6 +138,44 @@ class CreateUI(BaseUI):
             label="Type: ",
             value=self.type_field.get()[1],
         )
+
+    def _request_entity(
+        self,
+        event: DispatcherEvent,
+        **kwargs,
+    ) -> Optional[ImmutableDifficulty]:
+        """ """
+        try:
+            # Dispatch the passed event in the 'global' namespace along with the passed keyword arguments
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=event,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                **kwargs,
+            )
+
+            # Check, if the notification does not exist or has errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to notify {event.__repr__()} event for 'global' namespace in {self.__class__.__name__} class."
+                )
+
+                # Return early
+                return
+
+            # Return the one and only result
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_request_entity' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
 
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
@@ -634,407 +682,103 @@ class CreateUI(BaseUI):
 
     def handle_answer_creation(
         self,
-        question: ImmutableQuestion,
-        related_objects: Optional[Dict[str, Any]] = None,
-    ) -> MutableQuestion:
-        """
-        Handles the creation of answers for a question.
-
-        Args:
-            question (ImmutableQuestion): The question to be associated with the answer.
-            related_objects (Optional[Dict[str, Any]], optional): Related objects, if any. Defaults to None.
-
-        Returns:
-            MutableQuestion: The question with the answers associated.
-
-        Raises:
-            Exception: If an error occurs during answer creation.
-        """
+        **kwargs,
+    ) -> Optional[ImmutableAnswer]:
+        """ """
         try:
-            if isinstance(
-                question,
-                ImmutableQuestion,
-            ):
-                # Convert the immutable question object into a mutable object
-                question = question.to_mutable()
-
-            # Handle answer creation depending on the question type
-            if question["question_type"] == "MULTIPLE_CHOICE":
-                # Iterate over the answers for the multiple choice question
-                for answer_dict in related_objects.get(
-                    "answers",
-                    [],
-                ):
-                    # Create a new answer
-                    answer: ImmutableAnswer = AnswerFactory.create_answer(
-                        answer_text=answer_dict["value"]
-                    )
-
-                    # Dispatch a request to create the answer
-                    create_response: Optional[DispatcherNotification] = (
-                        self.dispatcher.dispatch(
-                            answer=answer,
-                            event=Events.REQUEST_ANSWER_CREATE,
-                            namespace=Constants.GLOBAL_NAMESPACE,
-                        )
-                    )
-
-                    # Retrieve the created answer
-                    answer = create_response.get_result_by_key(
-                        key="on_request_answer_create"
-                    )
-
-                    # Add the answer to the question
-                    question.add_to_answers(answer=answer)
-
-                    # If the answer is correct, add it to the correct answers
-                    if answer_dict["is_correct"]:
-                        question.add_to_correct_answers(answer=answer)
-
-            elif question["question_type"] == "OPEN_ANSWER":
-                # Create a new answer
-                answer: ImmutableAnswer = AnswerFactory.create_answer(
-                    answer_text=related_objects["answers"][0]
-                )
-
-                # Dispatch a request to create the answer
-                create_response: Optional[DispatcherNotification] = (
-                    self.dispatcher.dispatch(
-                        answer=answer,
-                        event=Events.REQUEST_ANSWER_CREATE,
-                        namespace=Constants.GLOBAL_NAMESPACE,
-                    )
-                )
-
-                # Retrieve the created answer
-                answer = create_response.get_result_by_key(
-                    key="on_request_answer_create"
-                )
-
-                # Add the answer to the question
-                question.add_to_answers(answer=answer)
-
-                # Add the answer to the correct answers
-                question.add_to_correct_answers(answer=answer)
-
-            elif question["question_type"] == "TRUE_FALSE":
-                # Get the true answer
-                true_answer_response: Optional[DispatcherNotification] = (
-                    self.dispatcher.dispatch(
-                        answer_text="True",
-                        event=Events.REQUEST_ANSWER_LOOKUP,
-                        namespace=Constants.GLOBAL_NAMESPACE,
-                    )
-                )
-
-                # Get the true answer from the response
-                true_answer: ImmutableAnswer = true_answer_response.get_result_by_key(
-                    key="on_request_answer_lookup"
-                )[0]
-
-                # Get the false answer
-                false_answer_response: Optional[DispatcherNotification] = (
-                    self.dispatcher.dispatch(
-                        answer_text="False",
-                        event=Events.REQUEST_ANSWER_LOOKUP,
-                        namespace=Constants.GLOBAL_NAMESPACE,
-                    )
-                )
-
-                # Get the false answer from the response
-                false_answer: ImmutableAnswer = false_answer_response.get_result_by_key(
-                    key="on_request_answer_lookup"
-                )[0]
-
-                # Add the true answer to the question
-                question.add_to_answers(answer=true_answer)
-
-                # Add the false answer to the question
-                question.add_to_answers(answer=false_answer)
-
-                # Add the correct answer to the correct answers
-                if related_objects["answers"][0]:
-                    question.add_to_correct_answers(answer=true_answer)
-                else:
-                    question.add_to_correct_answers(answer=false_answer)
-
-            # Return the question with the answers associated
-            return question
+            # Obtain the type from the kwargs
+            type: Optional[str] = kwargs.get("type")
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'handle_answer_creation' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Raise the exception to the caller
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
             raise e
 
     def handle_flashcard_creation(
         self,
-        object_data: Dict[str, Any],
-        related_objects: Optional[Dict[str, Any]] = None,
-    ) -> None:
+        **kwargs,
+    ) -> Optional[ImmutableFlashcard]:
+        """ """
         try:
-            # Check if related objects have been provided
-            if not related_objects:
-                # Initialize the related objects dictionary as an empty dictionary
-                related_objects = {}
+            # Obtain the type from the kwargs
+            type: Optional[str] = kwargs.get("type")
 
-            # Create a new flashcard
-            flashcard: ImmutableFlashcard = FlashcardFactory.create_flashcard(
-                **object_data
-            )
-
-            # Dispatch a request to create the flashcard
-            create_response: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_FLASHCARD_CREATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    flashcard=flashcard,
-                )
-            )
-
-            # Check if the creation response is None, indicating failure
-            if create_response is None:
-                # Log a warning message indicating that the creation was not successful
-                self.logger.warning(
-                    message=f"Attempt to create flashcard {flashcard} was not successfull: {create_response}."
-                )
-
-                # Return early
-                return
-
-            # Retrieve the created flashcard
-            flashcard = create_response.get_result_by_key(
-                key="on_request_flashcard_create"
-            )
-
-            if related_objects.get(
-                "stack",
-                None,
-            ):
-                # Set the stack to be mutable
-                stack: Optional[ImmutableStack] = related_objects.get(
-                    "stack",
-                    None,
-                )
-
-                # Set the stack to be mutable
-                stack = stack.to_mutable()
-
-                # Add the flashcard key to the stack contents
-                stack.contents.append(flashcard.key)
-
-                # Dispatch the REQUEST_STACK_UPDATE event in the global namespace
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_STACK_UPDATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    stack=stack,
-                )
-
-                # Dispatch the STACK_UPDATED event in the global namespace
-                self.dispatcher.dispatch(
-                    event=Events.STACK_UPDATED,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    stack=stack,
-                )
-
-            # Dispatch the FLASHCARD_CREATED event in the global namespace
-            self.dispatcher.dispatch(
-                event=Events.FLASHCARD_CREATED,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                flashcard=flashcard,
-            )
+            # Check, if the 'type' keyword has been passed to this method
+            if not type:
+                pass
+            else:
+                # Remove the 'type' key from the dictionary
+                kwargs.pop("type")
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'handle_flashcard_creation' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Raise the exception to the caller
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
             raise e
 
     def handle_question_creation(
         self,
-        object_data: Dict[str, Any],
-        related_objects: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        """
-        Handles the creation of a new question.
-
-        Args:
-            object_data (Dict[str, Any]): The data required to create a question.
-            related_objects (Optional[Dict[str, Any]], optional): Related objects, if any. Defaults to None.
-
-        Raises:
-            Exception: If an error occurs during question creation.
-        """
+        **kwargs,
+    ) -> Optional[ImmutableQuestion]:
+        """ """
         try:
-            # Check if related objects have been provided
-            if not related_objects:
-                # Initialize the related objects dictionary as an empty dictionary
-                related_objects = {}
+            # Obtain the type from the kwargs
+            type: Optional[str] = kwargs.get("type")
 
-            # Create a new question
-            question: ImmutableQuestion = QuestionFactory.create_question(**object_data)
-
-            # Dispatch a request to create the question
-            create_response: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_QUESTION_CREATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    question=question,
-                )
-            )
-
-            # Check if the creation response is None, indicating failure
-            if create_response is None:
-                # Log a warning message indicating that the creation was not successful
-                self.logger.warning(
-                    message=f"Attempt to create question {question} was not successfull: {create_response}."
-                )
-
-                # Return early
-                return
-
-            # Retrieve the created question
-            question: ImmutableQuestion = create_response.get_result_by_key(
-                key="on_request_question_create"
-            )
-
-            # Check, if the "answer" key exists in the related objects
-            if related_objects.get(
-                "answers",
-                None,
-            ):
-                # Create answers and update the question
-                question = self.handle_answer_creation(
-                    question=question,
-                    related_objects=related_objects,
-                )
-
-                # Dispatch a request to update the question
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_QUESTION_UPDATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    question=question,
-                )
-
-            if related_objects.get(
-                "stack",
-                None,
-            ):
-                # Retrieve the stack from related objects
-                stack: ImmutableStack = related_objects["stack"]
-
-                # Convert the stack to a mutable stack
-                stack = stack.to_mutable()
-
-                # Add the question to the contents of the stack
-                stack.add_to_contents(obj=question)
-
-                # Dispatch a request to update the stack
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_STACK_UPDATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    stack=stack,
-                )
-
-            # Dispatch the QUESTION_CREATED event in the global namespace
-            self.dispatcher.dispatch(
-                event=Events.QUESTION_CREATED,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                question=question,
-            )
+            # Check, if the 'type' keyword has been passed to this method
+            if not type:
+                pass
+            else:
+                # Remove the 'type' key from the dictionary
+                kwargs.pop("type")
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'handle_question_creation' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Raise the exception to the caller
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
             raise e
 
     def handle_stack_creation(
         self,
-        object_data: Dict[str, Any],
-        related_objects: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        """
-        Handles the creation of a new stack.
-
-        Args:
-            object_data (Dict[str, Any]): The data required to create a stack.
-            related_objects (Optional[Dict[str, Any]]): Related objects, if any.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an error occurs during stack creation.
-        """
+        **kwargs,
+    ) -> Optional[ImmutableStack]:
+        """ """
         try:
-            # Check if related objects have been provided
-            if not related_objects:
-                # Initialize the related objects dictionary as an empty dictionary
-                related_objects = {}
+            # Obtain the type from the kwargs
+            type: Optional[str] = kwargs.get("type")
 
-            # Create a new stack using the provided object data
-            stack: ImmutableStack = StackFactory.create_stack(**object_data)
-
-            # Dispatch a request to create the stack
-            create_response: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_STACK_CREATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    stack=stack,
-                )
-            )
-
-            # Check if the creation response is None, indicating failure
-            if create_response is None:
-                # Log a warning message indicating that the creation was not successful
-                self.logger.warning(
-                    message=f"Attempt to create stack {stack} was not successful: {create_response}."
-                )
-
-                # Return early
-                return
-
-            # Retrieve the created stack
-            stack = create_response.get_result_by_key(key="on_request_stack_create")
-
-            # Check, if the "ancestor_stack" key exists in the related objects
-            if related_objects.get(
-                "ancestor_stack",
-                None,
-            ):
-                # Get and convert the ancestor stack to a mutable object
-                ancestor: MutableStack = related_objects["ancestor_stack"].to_mutable()
-
-                # Add the created stack to the list of descendants
-                ancestor.descendants.append(stack.key)
-
-                # Dispatch a request to update the ancestor stack
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_STACK_UPDATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    stack=ancestor,
-                )
-
-            # Dispatch the STACK_CREATED event in the global namespace
-            self.dispatcher.dispatch(
-                event=Events.STACK_CREATED,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                stack=stack,
-            )
+            # Check, if the 'type' keyword has been passed to this method
+            if not type:
+                pass
+            else:
+                # Remove the 'type' key from the dictionary
+                kwargs.pop("type")
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'handle_stack_creation' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Raise the exception to the caller
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
             raise e
 
     def on_cancel_button_click(self) -> None:
@@ -1067,56 +811,30 @@ class CreateUI(BaseUI):
             None
         """
 
-        # Check if a form is present
-        if not self.form:
+        # Check, if form validation is successfull
+        if not self.form or not self.validate_form():
             # Return early
             return
 
         # Get the data from the form
         form_data: Dict[str, Any] = self.form.get()
 
-        self.logger.debug(form_data)
+        # Obtain the type of the entity to be created
+        type: str = Miscellaneous.any_to_snake(string=form_data["type"]["value"])
 
-        return
-
-        # Check if all required fields are filled
-        if not self.form.check_required_fields(object_data=form_data):
-            # Log an info message indicating that not all required fields were filled
-            self.logger.info(message="Seems like not all required fields were filled.")
-
-            # Return early
-            return
-
-        # Get the type of form
-        type: str = self.type_field.get()
-
-        # Attempt to retrieve the "new" status from the database
-        status_response: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-            event=Events.REQUEST_STATUS_LOOKUP,
-            name="New",
-            namespace=Constants.GLOBAL_NAMESPACE,
-        )
-
-        # Retrieve the status from the response
-        status: Optional[ImmutableStatus] = status_response.get_result_by_key(
-            key="on_request_status_lookup",
-        )[0]
-
-        # Add the status to the object data
-        form_data["object_data"]["status"] = status["id"]
-
-        # Add the status to the related objects
-        form_data["related_objects"]["status"] = status
-
-        # Call the appropriate creation method based on the form type
-        getattr(
+        # Call the handler corresponding to the type of the entity to be created
+        entity: Any = getattr(
             self,
-            f"handle_{type.lower()}_creation",
-        )(
-            object_data=form_data["object_data"],
-            related_objects=form_data["related_objects"],
+            f"handle_{type}_creation",
+        )(**{key: form_data[key]["value"] for key in sorted(form_data.keys())})
+
+        # Display a toast message to the user
+        ToplevelToastNotification(
+            title=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} created successfully",
+            message=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} with ID {entity.id} created successfully.",
         )
 
+        # Check, if the 'Create another' CheckbuttonField' value is False
         if not self.create_another.get()[1]:
             # Check if the master widget is of type toplevel
             if isinstance(
@@ -1125,6 +843,9 @@ class CreateUI(BaseUI):
             ):
                 # Destroy the toplevel widget
                 self.master.destroy()
+
+        # Clear the current form
+        self.form.clear()
 
     def on_type_field_change(
         self,
@@ -1180,3 +901,23 @@ class CreateUI(BaseUI):
         self.logger.info(
             message=f"Created form widget for '{value}' type based on current '{label.replace(": ", "")}' field selection."
         )
+
+    def validate_form(self) -> None:
+        """ """
+
+        # Obtain a validation report from the form as a dictionary
+        report: Dict[str, bool] = self.form.validate_form()
+
+        # Check, if the overall result of the report is True
+        if report["result"]:
+            # Return True early
+            return True
+
+        # Display a notification to the user
+        ToplevelNotification.okay(
+            title="Error during validation",
+            message=f"It seems that at least one required field has no value.\n\nPlease review:\n {"\n\t*".join([Miscellaneous.snake_to_pascal(string=key) for key in report.keys()])}",
+        )
+
+        # Return False
+        return False

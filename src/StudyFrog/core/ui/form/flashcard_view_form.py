@@ -10,7 +10,7 @@ from tkinter.constants import *
 from tkinter import ttk
 from typing import *
 
-from core.ui.fields.select_fields import ComboboxelectField
+from core.ui.fields.select_fields import ComboboxSelectField
 from core.ui.fields.string_fields import MultiLineTextField
 
 from core.difficulty import ImmutableDifficulty

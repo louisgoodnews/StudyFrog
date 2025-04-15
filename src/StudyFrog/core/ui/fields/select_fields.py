@@ -16,15 +16,16 @@ from core.ui.fields.boolean_fields import CheckbuttonField, RadiobuttonField
 
 from utils.base_field import BaseField
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
+from utils.unified import UnifiedObjectFactory
 
 
 __all__: Final[List[str]] = [
     "ComboboxField",
     "ComboboxSelectField",
-    "EntityComboboxSelectField",
+    "EntityComboboxField",
     "EntityMultiOptionSelectField",
     "EntitySelectTypes",
     "EntitSingleOptionSelectField",
@@ -35,8 +36,7 @@ __all__: Final[List[str]] = [
 
 
 class EntitySelectTypes(Enum):
-    """
-    """
+    """ """
 
     ANSWER: Literal["answer"] = "answer"
     DIFFICULTY: Literal["difficulty"] = "difficulty"
@@ -631,7 +631,7 @@ class ComboboxField(BaseField):
             self.set(value=value)
 
         # Configure the combobox widget's state to normal or readonly
-        self._combobox.configure(state="normal" if not readonly else "readonly")
+        self._combobox.configure(state=NORMAL if not readonly else "readonly")
 
     @property
     def button(self) -> tkinter.Button:
@@ -673,7 +673,7 @@ class ComboboxField(BaseField):
         # Return the tkinter.Label label widget
         return self._label
 
-    def _on_combobox_change(
+    def _on_combobox_return(
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
@@ -1002,7 +1002,7 @@ class ComboboxField(BaseField):
 
         # Bind the 'on_combobox_change' method to the combobox via the '<Return>' event
         self._combobox.bind(
-            func=self._on_combobox_change,
+            func=self._on_combobox_return,
             sequence="<Return>",
         )
 
@@ -1112,11 +1112,11 @@ class ComboboxField(BaseField):
             )
 
 
-class ComboboxelectField(BaseField):
+class ComboboxSelectField(BaseField):
     """
     A grouped dropdown selection field using multiple ComboboxFields.
 
-    ComboboxelectField represents a group of labeled dropdowns (comboboxes), where each dropdown is
+    ComboboxSelectField represents a group of labeled dropdowns (comboboxes), where each dropdown is
     an independent selection field. It is useful for capturing multiple structured selections from
     the user, such as assigning a category to each option label.
 
@@ -1624,23 +1624,848 @@ class ComboboxelectField(BaseField):
             )
 
 
-class EntityComboboxSelectField(BaseField):
+class EntityComboboxField(BaseField):
     """
+    A generic field widget for selecting entities via a combobox.
+
+    The `EntityComboboxField` is a reusable form element that displays a combobox
+    with selectable entity labels (e.g., names of stacks, questions, teachers, etc.).
+    It supports filtering, mapping, and selection handling through callback logic
+    and dynamic internal storage.
+
+    Features:
+    - Automatically maps a list of entities to a dictionary of display labels and corresponding objects.
+    - Supports dynamic filtering of the entity list via a user-defined `filter_func`.
+    - Notifies selection changes via dispatcher events and optional callback handlers.
+    - Can optionally support the creation of new entities via Return key input.
+
+    Args:
+        label (str): The label displayed to the left of the combobox.
+        master (tkinter.Misc): The parent widget for this field.
+        namespace (str): The namespace used for dispatching events.
+        on_change_callback (Optional[Callable[[str, Any], None]]): Callback function triggered on value change.
+        value (Optional[Any]): The initial value to display and map from.
+        entities (Optional[List[Any]]): The list of entities to populate the combobox with.
+        key (Optional[str]): The name of the attribute to use as the display label for each entity.
+        filter_func (Optional[Callable[[Any], bool]]): An optional filtering function to narrow down shown entities.
+        **kwargs: Additional keyword arguments passed to sub-widgets (label, combobox, etc.).
     """
 
-    pass
+    def __init__(
+        self,
+        entity_select_type: EntitySelectTypes,
+        label,
+        master,
+        display_callback: Optional[Callable[[Any], str]] = None,
+        filter_callback: Optional[Callable[[Any], bool]] = None,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str, Any], None]] = None,
+        readonly: bool = False,
+        value: Optional[Any] = None,
+        **kwargs,
+    ) -> None:
+        """
+        Initializes a new instance of the EntityComboboxField class.
+
+        This special field displays a combobox populated with entities from the database,
+        allowing the user to select one. It supports filtering and custom display formatting
+        through optional callbacks.
+
+        Args:
+            entity_select_type (EntitySelectTypes): The type of entity to be displayed and selected.
+            label (str): The label to display next to the combobox.
+            master (tkinter.Misc): The parent widget for this field.
+            display_callback (Optional[Callable[[Any], str]]): A function used to convert entities into display strings.
+            filter_callback (Optional[Callable[[Any], bool]]): A function used to filter the list of available entities.
+            namespace (str, optional): The namespace for event dispatching.
+            on_change_callback (Optional[Callable[[str, Any], None]], optional): A callback invoked when the selection changes.
+            readonly (bool, optional): Whether the combobox should be read-only. Defaults to False.
+            value (Optional[Any], optional): The initial value of the field.
+            **kwargs: Additional keyword arguments for styling and widget customization.
+        """
+
+        # Store the passed entity select type in an instance variable
+        self.entity_select_type: EntitySelectTypes = entity_select_type
+
+        self.values: Dict[str, Any] = self._compile_values(
+            display_callback=display_callback,
+            filter_callback=filter_callback,
+        )
+
+        # Call the parent class constructor with the passed arguments
+        super().__init__(
+            label=label,
+            master=master,
+            namespace=namespace,
+            on_change_callback=on_change_callback,
+            value=value,
+            **kwargs,
+        )
+
+        # Check, if the passed value is not None
+        if value is not None:
+            # Set the value of the field to the passed value
+            self.set(value=value)
+
+        # Configure the combobox widget's state to normal or readonly
+        self._combobox.configure(state=NORMAL if not readonly else "readonly")
+
+    @property
+    def button(self) -> tkinter.Button:
+        """
+        Returns the clear button widget associated with this field.
+
+        This button allows the user to clear the current selection in the combobox.
+
+        Returns:
+            tkinter.Button: The button widget.
+        """
+
+        # Return the tkinter.Button button widget
+        return self._button
+
+    @property
+    def combobox(self) -> ttk.Combobox:
+        """
+        Returns the combobox widget used for selecting or entering a value.
+
+        Returns:
+            ttk.Combobox: The combobox widget tied to this field.
+        """
+
+        # Return the ttk.Combobox combobox widget
+        return self._combobox
+
+    @property
+    def label(self) -> tkinter.Label:
+        """
+        Returns the label widget associated with this field.
+
+        The label displays the name or description of the field.
+
+        Returns:
+            tkinter.Label: The label widget.
+        """
+
+        # Return the tkinter.Label label widget
+        return self._label
+
+    def _apply_display_callback(
+        self,
+        entity: Any,
+        display_callback: Optional[Callable[[Any], str]] = None,
+    ) -> str:
+        """
+        Applies a display formatting function to the given entity.
+
+        This method determines how a given entity will be shown in the combobox.
+        If no display_callback is provided, a default representation (ID and key) is used.
+
+        Args:
+            entity (Any): The entity to format.
+            display_callback (Optional[Callable[[Any], str]]): The formatting function.
+
+        Returns:
+            str: A string representing the entity for display in the combobox.
+        """
+
+        # Check, if a display callback has been passed
+        if not display_callback:
+            # Return a string of the entity's ID and key attributes
+            return f"{entity.id} - {entity.key}"
+
+        try:
+            # Attempt to run the display callback and return its result
+            return display_callback(entity)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to call 'filter_callback' function ('{display_callback:__name__}') with '{entity.__repr__()}' entity. in '{self.__class__.__name__}' class."
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Return a string of the entity's ID and key attributes
+            return f"{entity.id} - {entity.key}"
+
+    def _apply_filter_callback(
+        self,
+        entity: Any,
+        filter_callback: Callable[[Any], bool],
+    ) -> Any:
+        """
+        Applies a filter function to determine if the given entity should be included.
+
+        If no filter_callback is defined, all entities are included.
+
+        Args:
+            entity (Any): The entity to evaluate.
+            filter_callback (Optional[Callable[[Any], bool]]): The filtering function.
+
+        Returns:
+            Any: The original entity if included, or None if filtered out.
+        """
+
+        # Check, if a filter callback has been passed
+        if not filter_callback:
+            # Return the entity early
+            return entity
+
+        try:
+            # Attempt to run the filter callback and return its result
+            return filter_callback(entity)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to call 'filter_callback' function ('{filter_callback:__name__}') with '{entity.__repr__()}' entity. in '{self.__class__.__name__}' class."
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Return the entity
+            return entity
+
+    def _compile_values(
+        self,
+        display_callback: Optional[Callable[[Any], str]] = None,
+        filter_callback: Optional[Callable[[Any], bool]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Compiles the values to be displayed in the combobox.
+
+        This method fetches all available entities of the specified type from the database
+        and applies the optional filter and display callbacks. It returns a dictionary that maps
+        display strings to the actual entity instances.
+
+        Args:
+            display_callback (Optional[Callable[[Any], str]]): A function to convert each entity to a string.
+            filter_callback (Optional[Callable[[Any], bool]]): A function to filter which entities are included.
+
+        Returns:
+            Dict[str, Any]: A dictionary where the keys are display names and the values are the original entities.
+        """
+
+
+        # Obtain the entities from the database
+        entities: List[Any] = self._get_entities()
+
+        # Filter the entities list by applying the filter function
+        entities = [
+            entity
+            for entity in entities
+            if self._apply_filter_callback(
+                entity=entity,
+                filter_callback=filter_callback,
+            )
+        ]
+
+        # Return a dictionary where the keys are generated through the display name callable
+        return {
+            self._apply_display_callback(
+                entity=entity,
+                display_callback=display_callback,
+            ): entity
+            for entity in entities
+        }
+
+    def _get_entities(self) -> List[Any]:
+        """
+        Retrieves all entities of the specified type from the database.
+
+        Returns:
+            List[Any]: A list of entities corresponding to the selected EntitySelectType.
+                    Returns an empty list if no entities are found or if an error occurs.
+        """
+        try:
+            # Notify the REQUEST_GET_ALL event corresponding to the EntitySelectType
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=self._get_fetch_event(),
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Check, if the notification exists or if it has errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to notify {self._get_fetch_event(entity_select_type=self.entity_select_type).__repr__()} event for 'global' namespace in {self.__class__.__name__} class."
+                )
+
+                # Return an empty list early
+                return []
+
+            # Return the one and only result of the notification
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_get_entities' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return an empty list
+            return []
+
+    def _get_create_event(self) -> Optional[DispatcherEvent]:
+        """
+        Retrieves the DispatcherEvent for creating new entities of the current type.
+
+        This event is used when the user wants to create a new instance of the selected entity type.
+
+        Returns:
+            Optional[DispatcherEvent]: The DispatcherEvent associated with creating this type of entity.
+                                        Returns None if the event is not defined.
+        """
+
+        # A dictionary of EntitySelectTypes literals associated to DispatcherEvent objects
+        dictionary: Dict[str, DispatcherEvent] = {
+            "answer": Events.REQUEST_ANSWER_CREATE,
+            "difficulty": Events.REQUEST_DIFFICULTY_CREATE,
+            "flashcard": Events.REQUEST_FLASHCARD_CREATE,
+            "note": Events.REQUEST_NOTE_CREATE,
+            "priority": Events.REQUEST_PRIORITY_CREATE,
+            "question": Events.REQUEST_QUESTION_CREATE,
+            "stack": Events.REQUEST_STACK_CREATE,
+            "status": Events.REQUEST_STATUS_CREATE,
+            "subject": Events.REQUEST_SUBJECT_CREATE,
+            "teacher": Events.REQUEST_TEACHER_CREATE,
+            "user": Events.REQUEST_USER_CREATE,
+        }
+
+        # Attemt to get the DispatcherEvent associated with the passed EntitySelectTypes literal or None
+        result: Optional[DispatcherEvent] = dictionary.get(
+            self.entity_select_type,
+            None,
+        )
+
+        # Check, if the result is not None
+        if not result:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Unexpected EntitySelectTypes literal '{self.entity_select_type}'. This is likely due to it not being implemented in the '{self.__class__.__name__}' class."
+            )
+
+        # Return the result, no matter what
+        return result
+
+    def _get_fetch_event(self) -> Optional[DispatcherEvent]:
+        """
+        Retrieves the DispatcherEvent used to fetch entities of the current type from the database.
+
+        This method helps centralize the event logic for loading data dynamically.
+
+        Returns:
+            Optional[DispatcherEvent]: The DispatcherEvent associated with fetching entities of the current type.
+                                        Returns None if the event is not defined.
+        """
+
+        # A dictionary of EntitySelectTypes literals associated to DispatcherEvent objects
+        dictionary: Dict[str, DispatcherEvent] = {
+            "answer": Events.REQUEST_GET_ALL_ANSWERS,
+            "difficulty": Events.REQUEST_GET_ALL_DIFFICULTIES,
+            "flashcard": Events.REQUEST_GET_ALL_FLASHCARDS,
+            "note": Events.REQUEST_GET_ALL_NOTES,
+            "priority": Events.REQUEST_GET_ALL_PRIORITIES,
+            "question": Events.REQUEST_GET_ALL_QUESTIONS,
+            "stack": Events.REQUEST_GET_ALL_STACKS,
+            "status": Events.REQUEST_GET_ALL_STATUSES,
+            "subject": Events.REQUEST_GET_ALL_SUBJECTS,
+            "teacher": Events.REQUEST_GET_ALL_TEACHERS,
+            "user": Events.REQUEST_GET_ALL_USERS,
+        }
+
+        # Attemt to get the DispatcherEvent associated with the passed EntitySelectTypes literal or None
+        result: Optional[DispatcherEvent] = dictionary.get(
+            self.entity_select_type,
+            None,
+        )
+
+        # Check, if the result is not None
+        if not result:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Unexpected EntitySelectTypes literal '{self.entity_select_type}'. This is likely due to it not being implemented in the '{self.__class__.__name__}' class."
+            )
+
+        # Return the result, no matter what
+        return result
+
+    def _on_combobox_return(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
+        """
+        Handles the Return (Enter) key event for the combobox.
+
+        This method is triggered when the user presses the Return key while the combobox
+        is focused. If the current input does not match any known entity, a new one may be
+        created by dispatching the corresponding creation event.
+
+        Args:
+            event (tkinter.Event): The keypress event object containing context about the Return keypress.
+
+        Returns:
+            None
+        """
+
+        # Obtain the entity from the values dictionary instance variable based on the user's current selection
+        entity: Optional[Any] = UnifiedObjectFactory.create_default(
+            factory=self.entity_select_type, **{"unspecified": self.variable.get()}
+        )
+
+        notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+            event=self._get_create_event(),
+            namespace=self.namespace,
+            **{
+                entity.__class__.__name__.replace(
+                    "Immutable",
+                    "",
+                ): entity
+            },
+        )
+
+        # Check, if the notification exists or has errors
+        if not notification or notification.has_errors():
+            # Log a warning message
+            self.logger.warning(
+                message=f"Failed to notify {self._get_fetch_event(entity_select_type=self.entity_select_type).__repr__()} event for 'global' namespace in {self.__class__.__name__} class."
+            )
+
+            # Return early
+            return
+
+        # Update the entity with the notification's result
+        entity = notification.get_one_and_only_result()
+
+        # Add the newly created entity to the values dictionary instance variable
+        self.values[self._apply_display_callback(entity=entity)] = (
+            notification.get_one_and_only_result()
+        )
+
+        # Dispatch the ENTITY_COMBOBOX_FIELD_CHANGED event
+        self.dispatcher.dispatch(
+            event=Events.ENTITY_COMBOBOX_FIELD_CHANGED,
+            label=self.display_name,
+            namespace=self.namespace,
+            value=entity,
+        )
+
+        # Check, if the 'on_change_callback' function exists
+        if self.on_change_callback:
+            # Call the 'on_change_callback' function and pass the display name as well as the entity to it
+            self.on_change_callback(
+                self.display_name,
+                entity,
+            )
+
+    def _on_combobox_select(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
+        """
+        Handles the selection of an item from the combobox dropdown.
+
+        When the user selects an item, this method updates the internal value,
+        dispatches a corresponding change event, and invokes the on_change_callback
+        if one is defined.
+
+        Args:
+            event (tkinter.Event): The event object triggered by the selection action.
+
+        Returns:
+            None
+        """
+
+        # Obtain the entity from the values dictionary instance variable based on the user's current selection
+        entity: Optional[Any] = self.values.get(
+            self.variable.get(),
+            None,
+        )
+
+        # Dispatch the ENTITY_COMBOBOX_FIELD_CHANGED event
+        self.dispatcher.dispatch(
+            event=Events.ENTITY_COMBOBOX_FIELD_CHANGED,
+            label=self.display_name,
+            namespace=self.namespace,
+            value=entity,
+        )
+
+        # Check, if the 'on_change_callback' function exists
+        if self.on_change_callback:
+            # Call the 'on_change_callback' function and pass the display name as well as the entity to it
+            self.on_change_callback(
+                self.display_name,
+                entity,
+            )
+
+    @override
+    def clear(
+        self,
+        dispatch: bool = False,
+    ) -> None:
+        """
+        Clears the current selection in the combobox and optionally dispatches a clear event.
+
+        Args:
+            dispatch (bool): Whether to dispatch a clear event. Defaults to False.
+        """
+        self.variable.set(value="")
+
+        if dispatch:
+            self.dispatcher.dispatch(
+                event=Events.ENTITY_COMBOBOX_FIELD_CLEARED,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=None,
+            )
+
+    def configure_button(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the button widget in the date select field.
+
+        This method configures the button widget in the date select field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the button widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                button widget.
+        """
+        try:
+            # Attempt to configure the button widget
+            self._button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def configure_combobox(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the combobox widget in the date select field.
+
+        This method configures the combobox widget in the date select field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the combobox widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                combobox widget.
+        """
+        try:
+            # Attempt to configure the combobox widget
+            self._combobox.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_combobox' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @override
+    def configure_grid(self) -> None:
+        """
+        Configures the grid layout of the ComboboxField widget.
+
+        This method sets the column and row weights for the internal layout of the ComboboxField.
+        It ensures proper resizing behavior and alignment of label, combobox, and buttons.
+
+        Columns:
+            - Column 0: Label (fixed width)
+            - Column 1: Combobox field (expandable)
+            - Column 2: Button (fixed width)
+
+        Rows:
+            - Row 0: Main field layout (fixed height)
+
+        Returns:
+            None
+        """
+
+        # Set the weight of the 0th column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Set the weight of the 1st column to 1
+        # This means that the column will stretch when the window is resized
+        self.grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Set the weight of the 2nd column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=2,
+            weight=0,
+        )
+
+        # Set the weight of the 0th row to 0
+        # This means that the row will not stretch when the window is resized
+        self.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the label widget in this field.
+
+        This method configures the label widget in this field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the label widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                label widget.
+        """
+        try:
+            # Attempt to configure the label widget
+            self._label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @override
+    def create_widgets(
+        self,
+        label: str,
+        **kwargs,
+    ) -> None:
+        """
+        Creates and configures the widgets for the EntityComboboxField.
+
+        This method initializes the label, combobox (with optional readonly state),
+        and clear button. It also binds keyboard and selection events to appropriate
+        handlers and sets the widget layout within the grid.
+
+        Args:
+            label (str): The text to display in the label.
+            values (Optional[List[str]], optional): The list of values to populate the combobox with.
+            value (Optional[str], optional): The default value to pre-fill the combobox. Defaults to None.
+            **kwargs: Additional keyword arguments for the individual widgets (label, combobox, button).
+
+        Returns:
+            None
+        """
+
+        # Create a label widget
+        self._label: tkinter.Label = tkinter.Label(
+            master=self,
+            text=label,
+            **kwargs.get(
+                "label",
+                {},
+            ),
+        )
+
+        # Place the label widget within the grid
+        self._label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a string variable
+        self.variable: tkinter.StringVar = tkinter.StringVar(value="")
+
+        # Create a combobox widget
+        self._combobox: ttk.Combobox = ttk.Combobox(
+            master=self,
+            textvariable=self.variable,
+            values=list(self.values.keys()),
+            **kwargs.get(
+                "combobox",
+                {},
+            ),
+        )
+
+        # Place the combobox widget within the grid
+        self._combobox.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Bind the 'on_combobox_change' method to the combobox via the '<Return>' event
+        self._combobox.bind(
+            func=self._on_combobox_return,
+            sequence="<Return>",
+        )
+
+        # Bind the 'on_combobox_select' method to the combobox via the '<<ComboboxSelected>>' event
+        self._combobox.bind(
+            func=self._on_combobox_select,
+            sequence="<<ComboboxSelected>>",
+        )
+
+        # Create the button widget
+        self._button: tkinter.Button = tkinter.Button(
+            command=lambda: self.clear(dispatch=True),
+            master=self,
+            text="X",
+            **kwargs.get(
+                "button",
+                {},
+            ),
+        )
+
+        # Place the button widget within the grid
+        self._button.grid(
+            column=2,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+    @override
+    def get(
+        self,
+        dispatch: bool = False,
+    ) -> Tuple[str, Any]:
+        """
+        Retrieves the current selected or entered value of the combobox.
+
+        If `dispatch` is set to True, a get event is dispatched.
+
+        Args:
+            dispatch (bool, optional): Whether to dispatch a get event. Defaults to False.
+
+        Returns:
+            Tuple[str, Any]: A tuple containing the label and the current value of the field.
+        """
+
+        # Obtain the label and value strings from the widgets
+        (
+            label,
+            value,
+        ) = (
+            self.display_name,
+            self.values.get(self.variable.get(), None,),
+        )
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the COMBOBOX_FIELD_GET event
+            self.dispatcher.dispatch(
+                event=Events.COMBOBOX_FIELD_GET,
+                label=label,
+                namespace=self.namespace,
+                value=value,
+            )
+
+        # Return the text of the label and the value of the text field
+        return (
+            label,
+            value,
+        )
+
+    @override
+    def set(
+        self,
+        value: Any,
+        dispatch: bool = False,
+    ) -> None:
+        """
+        Sets the combobox value to the specified input.
+
+        If the value is not already in the list of values, it is added. Optionally,
+        a set event is dispatched if `dispatch` is True.
+
+        Args:
+            value (Any): The value to be set in the combobox.
+            dispatch (bool, optional): Whether to dispatch a set event. Defaults to False.
+
+        Returns:
+            None
+        """
+
+        # Generate a string key by calling the display callback on the passed value
+        key: str = self._apply_display_callback(entity=value)
+
+        # Check, if the value string is not already within the list of values
+        if key not in set(self.values.keys()):
+            # Append the value string to the list of values
+            self.values[key] = value
+
+        # Update the variable with the passed value string
+        self.variable.set(value=key)
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the COMBOBOX_FIELD_SET event
+            self.dispatcher.dispatch(
+                event=Events.COMBOBOX_FIELD_SET,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=self.variable.get(),
+            )
 
 
 class EntityMultiOptionSelectField(BaseField):
-    """
-    """
+    """ """
 
     pass
 
 
 class EntitySingleOptionSelectField(BaseField):
-    """
-    """
+    """ """
 
     pass
 

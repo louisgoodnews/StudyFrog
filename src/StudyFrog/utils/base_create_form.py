@@ -3,7 +3,6 @@ Author: lodego
 Date: 2025-04-13
 """
 
-import copy
 import tkinter
 
 from tkinter.constants import *
@@ -75,7 +74,14 @@ class BaseCreateForm(tkinter.Frame):
         self.subscriptions: Final[List[str]] = []
 
         # Initialize the value dictionary instance variable as an empty dictionary
-        self._value_dict: Dict[str, Dict[str, Optional[Any]]] = {}
+        self._value_dict: Dict[str, Dict[str, Optional[Any]]] = {
+            "type": {
+                "value": self.__class__.__name__.replace(
+                    "CreateForm",
+                    "",
+                )
+            }
+        }
 
         # Configure the grid layout
         self.configure_grid()
@@ -89,9 +95,9 @@ class BaseCreateForm(tkinter.Frame):
     @property
     def field_dict(self) -> Dict[str, Any]:
         """
-        Returns a copy of the registered field dictionary.
+        Returns a the registered field dictionary.
 
-        This property exposes a deep copy of the internal field registration dictionary `_field_dict`.
+        This property exposes a deep the internal field registration dictionary `_field_dict`.
         Each entry maps a normalized label (snake_case) to a dictionary that contains the actual widget
         and a flag indicating whether the field is required.
 
@@ -99,15 +105,15 @@ class BaseCreateForm(tkinter.Frame):
             Dict[str, Any]: A dictionary of registered fields with their widget and required status.
         """
 
-        # Return a copy of the field dictionary to the caller
-        return copy.deepcopy(self._field_dict)
+        # Return a the field dictionary to the caller
+        return self._field_dict
 
     @property
     def value_dict(self) -> Dict[str, Any]:
         """
-        Returns a copy of the current value dictionary.
+        Returns a the current value dictionary.
 
-        This property exposes a deep copy of the `_value_dict`, which holds the current values of all
+        This property exposes a deep the `_value_dict`, which holds the current values of all
         registered fields. Each key corresponds to a normalized label and maps to a dictionary with a
         "value" key storing the current input.
 
@@ -115,8 +121,8 @@ class BaseCreateForm(tkinter.Frame):
             Dict[str, Any]: A dictionary mapping normalized labels to their current field values.
         """
 
-        # Return a copy of the value dictionary to the caller
-        return copy.deepcopy(self._value_dict)
+        # Return a the value dictionary to the caller
+        return self._value_dict
 
     def _on_field_change(
         self,
@@ -139,15 +145,15 @@ class BaseCreateForm(tkinter.Frame):
             None
         """
 
-        # Check, if the passed label ends with ': '
-        if label.endswith(": "):
-            # Remove the ': ' suffix and update the passed label
+        # Check, if the passed label contains ': '
+        if ":" in label:
+            # Remove the ':' and update the passed label
             label = label.replace(": ", "")
 
-        # Check, if the passed label ends with ': '
-        elif label.endswith("*: "):
-            # Remove the '*: ' suffix and update the passed label
-            label = label.replace("*: ", "")
+        # Check, if the passed label contains ': '
+        elif "*" in label:
+            # Remove the '*' and update the passed label
+            label = label.replace("*", "")
 
         # Convert the passed label string to snake case
         label = Miscellaneous.any_to_snake(string=label)
@@ -158,11 +164,8 @@ class BaseCreateForm(tkinter.Frame):
             self._value_dict[label] = {"value": None}
 
         # Add the passed value to the value dictionary instance variable under the passed label
-        self._value_dict[label]["value"] = value
-
-        # Log the update for debugging purposes
-        self.logger.debug(
-            message=f"Field changed - Label: '{label}' | Normalized Key: '{label}' | Value: {value}"
+        self._value_dict[label]["value"] = (
+            value if not isinstance(value, (list, set, tuple)) else value[0]
         )
 
         # Dispatch the CREATE_FORM_FIELD_CHANGED event
@@ -216,11 +219,6 @@ class BaseCreateForm(tkinter.Frame):
 
             # Return early
             return
-
-        # Log the registration for debugging
-        self.logger.debug(
-            message=f"Registered field - Key: '{label}' | Field Type: {type(field).__name__}"
-        )
 
         # Add the passed field widget and bool flag to the field dictionary instance variable under the passed label
         self._field_dict[label] = {
@@ -620,11 +618,18 @@ class BaseCreateForm(tkinter.Frame):
             Dict[str, Any]: A dictionary containing all field values by normalized label.
         """
 
-        # Return a copy of the value dictionary to the caller
-        return {
-            Miscellaneous.any_to_snake(string=key): self.field_dict[key]
-            for key in sorted(self.field_dict.keys())
-        }
+        # Update the value dictionary instance variable
+        for (
+            key,
+            value,
+        ) in self.field_dict.items():
+            self.value_dict[key.replace(":", "").replace("*", "")] = {
+                "type": type(value["widget"].get()[1]),
+                "value": value["widget"].get()[1]
+            }
+
+        # Return a the value dictionary to the caller
+        return self._value_dict
 
     def set(
         self,
@@ -748,6 +753,11 @@ class BaseCreateForm(tkinter.Frame):
             if not value["required"]:
                 # Continue with the next iteration
                 continue
+
+            # Check, if the key is contained within the value dictionary instance variable
+            if key not in self._value_dict:
+                # Add a dictionary value: None to the value dictionary instance variable
+                self._value_dict[key] = {"value": None}
 
             # Add True to the result dictionary if the required field is not empty otherwise False
             result[key] = True if self._value_dict[key]["value"] is not None else False

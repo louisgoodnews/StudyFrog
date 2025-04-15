@@ -36,9 +36,189 @@ from utils.object import ImmutableBaseObject
 
 
 __all__: Final[List[str]] = [
+    "UnifiedObjectFactory",
     "UnifiedObjectManager",
     "UnifiedObjectService",
 ]
+
+
+class UnifiedObjectFactory:
+    """
+    A dynamic factory class for creating various domain-specific objects in StudyFrog.
+
+    This factory provides a unified interface for object creation based on a factory registry.
+    It supports registering custom factory classes, dynamic method delegation, and flexible
+    creation mechanisms with optional default configurations.
+
+    Attributes:
+        logger (Logger): Logger instance for the factory.
+        factories (Dict[str, Type[Any]]): A registry of available factory classes.
+
+    Methods:
+        __getattr__(name): Delegates method calls to registered factories.
+        create(factory, **kwargs): Creates an object using the registered factory.
+        create_default(factory, **kwargs): Creates a default-configured object.
+        register_factory(name, factory): Registers a new factory class.
+    """
+
+    logger: Final[Logger] = Logger.get_logger(name="UnifiedObjectFactory")
+
+    factories: Final[Dict[str, Type[Any]]] = {}
+
+    @override
+    def __getattr__(
+        cls,
+        name: str,
+    ) -> Optional[Any]:
+        """
+        Allows dynamic access to methods of registered factories.
+
+        Args:
+            name (str): The name of the method to retrieve.
+
+        Returns:
+            The method from the registered factory or raises AttributeError.
+        """
+
+        # Iterate over the registered factories
+        for factory in cls.factories.values():
+            # Check, if the factory has an attribute corresponding to the passed name
+            if not hasattr(
+                factory,
+                name,
+            ):
+                # Skip the current iteration
+                continue
+
+            try:
+                # Attempt to get the attribute from the factory
+                return getattr(
+                    factory,
+                    name,
+                )
+            except AttributeError:
+                # Ignore the attribute error and try the next factory
+                pass
+
+        # Raise an AttributeError if the attribute is not found in any factory
+        raise AttributeError(
+            f"'{cls.__class__.__name__}' object has no attribute '{name}'"
+        )
+
+    @classmethod
+    def create(
+        cls,
+        factory: str,
+        **kwargs,
+    ) -> Optional[Any]:
+        """
+        Creates an object using a registered factory with the given keyword arguments.
+
+        This method uses the factory name to retrieve the corresponding factory class
+        from the internal registry and invokes its 'create' method to generate the object.
+
+        Args:
+            factory (str): The name of the registered factory to use for object creation.
+            **kwargs: Arbitrary keyword arguments passed to the factory's 'create' method.
+
+        Returns:
+            Any: The object created by the specified factory.
+
+        Raises:
+            KeyError: If no factory is registered under the provided name.
+            AttributeError: If the factory does not implement a 'create' method.
+            Exception: If an unexpected error occurs during creation.
+        """
+
+        # Check, if the passed factory is registered in the factories class attribute
+        if f"{Miscellaneous.any_to_snake(string=factory.lower())}_factory" not in set(
+            cls.factories.keys()
+        ):
+            # Return early
+            return
+
+        # Create and return the created object
+        return getattr(
+            cls.factories[f"{factory}_factory"],
+            f"create_{factory}",
+        )(**kwargs)
+
+    @classmethod
+    def create_default(
+        cls,
+        factory: str,
+        **kwargs,
+    ) -> Optional[Any]:
+        """
+        Creates an object using the default creation logic of a registered factory.
+
+        This method delegates to the 'create_default' method of the specified factory,
+        which should generate a default instance of the target object.
+
+        Args:
+            factory (str): The name of the factory to use for default object creation.
+            **kwargs: Optional keyword arguments passed to the 'create_default' method.
+
+        Returns:
+            Any: The default object created by the factory.
+
+        Raises:
+            KeyError: If no factory is registered under the provided name.
+            AttributeError: If the factory does not implement a 'create_default' method.
+            Exception: If an unexpected error occurs during creation.
+        """
+
+        # Check, if the passed factory is registered in the factories class attribute
+        if f"{Miscellaneous.any_to_snake(string=factory.lower())}_factory" not in set(
+            cls.factories.keys()
+        ):
+            # Return early
+            return
+
+        # Create and return the created object
+        return getattr(
+            cls.factories[f"{factory}_factory"],
+            f"create_default_{factory}",
+        )(**kwargs)
+
+    @classmethod
+    def register_factory(
+        cls,
+        name: str,
+        factory: Type[Any],
+    ) -> None:
+        """
+        Registers a factory instance with the UnifiedObjectFactory.
+
+        Args:
+            name (str): The name of the factory to be registered.
+            factory (Type[Any]): The factory class to be registered.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during registration.
+        """
+        try:
+            # Add the factory to the factories dictionary using its class name as the key
+            cls.factories[name] = factory
+
+            # Log a success message indicating the factory has been registered
+            cls.logger.info(
+                message=f"Registered factory '{name}' with class '{factory.__name__}'"
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'register_factory' from '{cls.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            cls.logger.error(message=traceback.format_exc())
+
+            # Raise the exception to the caller
+            raise e
 
 
 class UnifiedObjectManager(ImmutableBaseObject):

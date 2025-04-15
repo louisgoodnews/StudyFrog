@@ -18,27 +18,30 @@ from core.learning.learning_session import (
     LearningSessionItemModel,
 )
 
-from core.answer import AnswerManager, AnswerModel
-from core.association import AssociationManager, AssociationModel
+from core.answer import AnswerFactory, AnswerManager, AnswerModel
+from core.association import AssociationFactory, AssociationManager, AssociationModel
 from core.change_history import (
+    ChangeHistoryFactory,
     ChangeHistoryManager,
     ChangeHistoryModel,
+    ChangeHistoryItemFactory,
     ChangeHistoryItemManager,
     ChangeHistoryItemModel,
 )
-from core.custom_field import CustomFieldManager, CustomFieldModel
-from core.default import  DefaultFactory, DefaultManager, DefaultModel
-from core.difficulty import DifficultyManager, DifficultyModel
-from core.flashcard import FlashcardManager, FlashcardModel
-from core.note import NoteManager, NoteModel
-from core.option import OptionManager, OptionModel
-from core.priority import PriorityManager, PriorityModel
-from core.question import QuestionManager, QuestionModel
-from core.setting import SettingManager, SettingModel, SettingService
-from core.stack import StackManager, StackModel
-from core.status import StatusManager, StatusModel
-from core.tag import TagManager, TagModel
-from core.user import UserManager, UserModel
+from core.comment import CommentFactory, CommentManager, CommentModel
+from core.custom_field import CustomFieldFactory, CustomFieldManager, CustomFieldModel
+from core.default import DefaultFactory, DefaultManager, DefaultModel
+from core.difficulty import DifficultyFactory, DifficultyManager, DifficultyModel
+from core.flashcard import FlashcardFactory, FlashcardManager, FlashcardModel
+from core.note import NoteFactory, NoteManager, NoteModel
+from core.option import OptionFactory, OptionManager, OptionModel
+from core.priority import PriorityFactory, PriorityManager, PriorityModel
+from core.question import QuestionFactory, QuestionManager, QuestionModel
+from core.setting import SettingFactory, SettingManager, SettingModel, SettingService
+from core.stack import StackFactory, StackManager, StackModel
+from core.status import StatusFactory, StatusManager, StatusModel
+from core.tag import TagFactory, TagManager, TagModel
+from core.user import UserFactory, UserManager, UserModel
 
 from core.ui.calendar_ui import CalendarUI
 from core.ui.create_ui import CreateUI
@@ -71,7 +74,11 @@ from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryService
 from utils.notification_service import NotificationService
 from utils.object import ImmutableBaseObject
-from utils.unified import UnifiedObjectManager, UnifiedObjectService
+from utils.unified import (
+    UnifiedObjectFactory,
+    UnifiedObjectManager,
+    UnifiedObjectService,
+)
 
 
 __all__: Final[List[str]] = ["BootstrapService"]
@@ -365,6 +372,7 @@ class BootstrapService(ImmutableBaseObject):
                 ChangeHistoryItemModel,
                 ChangeHistoryModel,
                 CustomFieldModel,
+                CommentModel,
                 DefaultModel,
                 DifficultyModel,
                 FlashcardModel,
@@ -392,6 +400,48 @@ class BootstrapService(ImmutableBaseObject):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to create tables: {e}"
+            )
+
+            # Reraise the exception to the caller
+            raise e
+
+    def register_factories(self) -> None:
+        """
+        """
+        try:
+            factories: Dict[str, Type[Any]] = {
+                "answer_factory": AnswerFactory,
+                "association_facotry": AssociationFactory,
+                "change_history_factory": ChangeHistoryFactory,
+                "change_history_item_factory": ChangeHistoryItemFactory,
+                "comment_factory": CommentFactory,
+                "custom_field_factory": CustomFieldFactory,
+                "default_factory": DefaultFactory,
+                "difficulty_factory": DifficultyFactory,
+                "flashcard_factory": FlashcardFactory,
+                "note_factory": NoteFactory,
+                "option_factory": OptionFactory,
+                "priority_factory": PriorityFactory,
+                "question_factory": QuestionFactory,
+                "setting_factory": SettingFactory,
+                "stack_factory": StackFactory,
+                "status_factory": StatusFactory,
+                "tag_factory": TagFactory,
+                "user_factory": UserFactory,
+            }
+
+            for (
+                name,
+                factory,
+            ) in factories.items():
+                UnifiedObjectFactory.register_factory(
+                    factory=factory,
+                    name=name,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to register factories: {e}"
             )
 
             # Reraise the exception to the caller
@@ -894,6 +944,61 @@ class BootstrapService(ImmutableBaseObject):
             # Re-raise the exception to the caller
             raise e
 
+    def register_managers(self) -> None:
+        """
+        Registers the managers with the UnifiedObjectManager.
+
+        This method registers all manager classes with the UnifiedObjectManager,
+        which allows them to be accessed and used elsewhere in the application.
+
+        Returns:
+            None
+        """
+        try:
+            # Store the manager classes in a dictionary
+            managers: Dict[str, Type[Any]] = {
+                "answer_manager": AnswerManager,
+                "association_manager": AssociationManager,
+                "change_history_manager": ChangeHistoryManager,
+                "change_history_item_manager": ChangeHistoryItemManager,
+                "comment_manager": CommentManager,
+                "custom_field_manager": CustomFieldManager,
+                "default_manager": DefaultManager,
+                "difficulty_manager": DifficultyManager,
+                "flashcard_manager": FlashcardManager,
+                "learning_session_manager": LearningSessionManager,
+                "learning_session_action_manager": LearningSessionActionManager,
+                "learning_session_item_manager": LearningSessionItemManager,
+                "note_manager": NoteManager,
+                "option_manager": OptionManager,
+                "priority_manager": PriorityManager,
+                "question_manager": QuestionManager,
+                "setting_manager": SettingManager,
+                "stack_manager": StackManager,
+                "status_manager": StatusManager,
+                "tag_manager": TagManager,
+                "user_manager": UserManager,
+            }
+
+            # Iterate over the managers and register each one with the UnifiedObjectManager
+            for (
+                name,
+                manager,
+            ) in managers.items():
+                # Register the manager with the UnifiedObjectManager
+                self.unified_object_manager.register_manager(
+                    name=name,
+                    manager=manager,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'register_managers' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Re-raise the exception to the caller
+            raise e
+
     def register_menus(self) -> None:
         """
         Registers the UI classes for the main menu with the UIRegistry.
@@ -943,60 +1048,6 @@ class BootstrapService(ImmutableBaseObject):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'run_startup_tasks' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
-    def register_managers(self) -> None:
-        """
-        Registers the managers with the UnifiedObjectManager.
-
-        This method registers all manager classes with the UnifiedObjectManager,
-        which allows them to be accessed and used elsewhere in the application.
-
-        Returns:
-            None
-        """
-        try:
-            # Store the manager classes in a dictionary
-            managers: Dict[str, Type[Any]] = {
-                "answer_manager": AnswerManager,
-                "association_manager": AssociationManager,
-                "change_history_manager": ChangeHistoryManager,
-                "change_history_item_manager": ChangeHistoryItemManager,
-                "custom_field_manager": CustomFieldManager,
-                "default_manager": DefaultManager,
-                "difficulty_manager": DifficultyManager,
-                "flashcard_manager": FlashcardManager,
-                "learning_session_manager": LearningSessionManager,
-                "learning_session_action_manager": LearningSessionActionManager,
-                "learning_session_item_manager": LearningSessionItemManager,
-                "note_manager": NoteManager,
-                "option_manager": OptionManager,
-                "priority_manager": PriorityManager,
-                "question_manager": QuestionManager,
-                "setting_manager": SettingManager,
-                "stack_manager": StackManager,
-                "status_manager": StatusManager,
-                "tag_manager": TagManager,
-                "user_manager": UserManager,
-            }
-
-            # Iterate over the managers and register each one with the UnifiedObjectManager
-            for (
-                name,
-                manager,
-            ) in managers.items():
-                # Register the manager with the UnifiedObjectManager
-                self.unified_object_manager.register_manager(
-                    name=name,
-                    manager=manager,
-                )
-        except Exception as e:
-            # Log an error message indicating an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'register_managers' method from '{self.__class__.__name__}': {e}"
             )
 
             # Re-raise the exception to the caller
@@ -1076,6 +1127,9 @@ class BootstrapService(ImmutableBaseObject):
 
             # Create the database tables
             self.create_tables()
+
+            # Register the factories with the UnifiedObjectFactory
+            self.register_factories()
 
             # Register the managers with the UnifiedObjectManager
             self.register_managers()
