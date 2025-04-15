@@ -26,6 +26,7 @@ __all__: Final[List[str]] = [
     "ComboboxSelectField",
     "EntityComboboxSelectField",
     "EntityMultiOptionSelectField",
+    "EntitySelectTypes",
     "EntitSingleOptionSelectField",
     "ListboxField",
     "MultiOptionSelectField",
