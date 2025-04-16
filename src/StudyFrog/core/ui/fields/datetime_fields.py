@@ -79,7 +79,7 @@ class DateSelectField(BaseField):
         )
 
         # Check, if the passed value is not None
-        if value is not None:
+        if value:
             # Set the value of the field to the passed value
             self.set(value=value)
 
@@ -175,7 +175,7 @@ class DateSelectField(BaseField):
         """
 
         # Check, the calendar widget exists
-        if self.calendar is not None:
+        if not self.calendar:
             # Log a warning message
             self.logger.warning(
                 message=f"Calendar not present. Cannot handle 'confirm button' button click. This is likely a serious issue."
@@ -191,7 +191,7 @@ class DateSelectField(BaseField):
         value: Optional[str] = self.calendar.get_date()
 
         # Check, if the value is not None
-        if value is None:
+        if not value:
             # Log a warning message
             self.logger.warning(message=f"Could not obtain value from Calendar widget. This is likely a bug.")
             
@@ -236,12 +236,16 @@ class DateSelectField(BaseField):
 
         # Attempt to find matches for the date_format within the current entry value
         match: Optional[str] = Miscellaneous.find_match(
-            pattern=self.date_format,
+            fullmatch=True,
+            pattern=Miscellaneous.date_format_to_regex_pattern(date_format=self.date_format),
             string=string_value,
         )
 
         # Check, if a match has been found
-        if match is None:
+        if not match:
+            # Configure the warning label's text
+            self.warning_label.configure(text=f"Entry value '{self.variable.get()}' is not in a valid format. Expected: '{self.date_format}'.")
+
             # Place the 'warning label' label widget within the grid
             self.warning_label.grid(
                 column=1,
@@ -258,7 +262,7 @@ class DateSelectField(BaseField):
             self.warning_label.grid_forget()
 
         # Check, if the match string is not None and the dispatch flag is set to True
-        if match is not None and dispatch:
+        if match and dispatch:
             # Dispatch the DATE_SELECT_FIELD_CHANGED event in the passed namespace
             self.dispatcher.dispatch(
                 event=Events.DATE_SELECT_FIELD_CHANGED,
@@ -271,7 +275,7 @@ class DateSelectField(BaseField):
             )
 
         # Check, if the 'on_change_callback' function exists and the match string is not None
-        if match is not None and self.on_change_callback:
+        if match and self.on_change_callback:
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
             self.on_change_callback(
                 self.display_name,
@@ -293,7 +297,7 @@ class DateSelectField(BaseField):
         """
 
         # Check, if the toplevel instance variable is not None
-        if self.toplevel is not None:
+        if not self.toplevel:
             # Return early
             return
 
@@ -802,35 +806,22 @@ class DateSelectField(BaseField):
 
     def set(
         self,
-        value: Union[datetime, str],
+        value: Optional[Union[datetime, str]] = None,
         dispatch: bool = False,
     ) -> None:
         """
         Sets the value of the field either from string or datetime.
 
         Args:
-            value (Union[datetime, str]): The value to set.
+            value (Union[datetime, str], optional): The value to set. Defaults to None.
             dispatch (bool): Whether to dispatch a set event.
 
         Returns:
             None
         """
 
-        # Check, if the passed value is a string
-        if isinstance(
-            value,
-            str,
-        ):
-            # Update the variable with the passed value
-            self.variable.set(value=value)
-            
-            # Attempt to convert the string to a datetime object
-            value = Miscellaneous.string_to_datetime(
-                date_string=value,
-                format=self.date_format,
-            )
-
-        if value is None:
+        # Check, if the value is not None
+        if not value:
             # Log a warning message
             self.logger.warning(
                 message=f"The passed value did not match expected format of '{self.date_format}'. This is likely a bug."
@@ -841,6 +832,20 @@ class DateSelectField(BaseField):
 
             # Return early
             return
+
+        # Check, if the passed value is a datetime object
+        if isinstance(
+            value,
+            datetime,
+        ):
+            # Attempt to convert the string to a datetime object
+            value = Miscellaneous.datetime_to_string(
+                datetime=value,
+                format=self.date_format,
+            )
+
+        # Update the variable with the passed value
+        self.variable.set(value=value)
 
         # Check, if the dispatch flag is set to True
         if dispatch:

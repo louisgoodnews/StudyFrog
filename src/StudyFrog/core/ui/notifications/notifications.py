@@ -1275,14 +1275,14 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Make the window non-transparent
         self.attributes(
-            option="-alpha",
-            value=1.0,
+            "-alpha",
+            1.0,
         )
 
         # Raise the window to the top
         self.attributes(
-            option="-topmost",
-            value=True,
+            "-topmost",
+            True,
         )
 
         # Make the window non-resizable
@@ -1424,8 +1424,8 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Set the opacity of the window
         self.attributes(
-            option="-alpha",
-            value=alpha,
+            "-alpha",
+            alpha,
         )
 
         # Schedule the next fade step
@@ -1505,8 +1505,8 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Set the opacity of the window to 100%
         self.attributes(
-            option="-alpha",
-            value=1.0,
+            "-alpha",
+            1.0,
         )
 
         # Schedule the fade out

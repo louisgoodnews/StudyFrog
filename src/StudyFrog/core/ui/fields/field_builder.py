@@ -8,9 +8,6 @@ import traceback
 
 from typing import *
 
-from core.ui.fields.numeric_fields import *
-from core.ui.fields.string_fields import *
-
 from utils.base_field import BaseField
 from utils.builder import BaseObjectBuilder
 
@@ -22,10 +19,6 @@ __all__: Final[List[str]] = [
 
 
 FIELD_TYPE_MAPING: Final[Dict[str, Type[BaseField]]] = {
-    "float_spinbox_field": FloatSpinboxField,
-    "integer_spinbox_field": IntegerSpinboxField,
-    "multi_line_text_field": MultiLineTextField,
-    "single_line_text_field": SingleLineTextField,
 }
 
 

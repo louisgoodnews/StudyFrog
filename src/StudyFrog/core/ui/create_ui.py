@@ -161,9 +161,13 @@ class CreateUI(BaseUI):
             # Dispatch the passed REQUEST_CREATE event in the global namespace
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
                 event=event,
+                namespace=Constants.GLOBAL_NAMESPACE,
                 **{
                     Miscellaneous.any_to_snake(
-                        string=entity.__class__.__name__
+                        string=entity.__class__.__name__.replace(
+                            "Immutable",
+                            "",
+                        )
                     ): entity,
                 },
             )
@@ -306,7 +310,7 @@ class CreateUI(BaseUI):
 
     def _get_status(
         self,
-        name: str,
+        status_name: str,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """ """
@@ -314,14 +318,14 @@ class CreateUI(BaseUI):
             # Request the ImmutableStatus object from the database
             status: Optional[Union[ImmutableStatus, int, str]] = self._request_entity(
                 event=Events.REQUEST_STATUS_LOOKUP,
-                name=name,
+                name=status_name,
             )
 
             # Check, if the status ImmutableStatus object exists
             if not status:
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Failed to fetch ImmutableStatus object with name '{name}' from the database."
+                    message=f"Failed to fetch ImmutableStatus object with name '{status_name}' from the database."
                 )
 
                 # Return the kwargs to the caller early
@@ -1025,17 +1029,17 @@ class CreateUI(BaseUI):
                     )
                 )
 
-            # Update the kwargs with the priority's ID
+            # Update the kwargs with the status's ID
             kwargs.update(
                 self._get_status(
-                    name="",
+                    status_name="New",
                     **kwargs,
                 )
             )
 
             # Attempt to create the ImmutableStack object in the database and update the reference
             stack: ImmutableStack = self._create_entity(
-                entity=UnifiedObjectFactory.create_stack(**kwargs),
+                entity=UnifiedObjectFactory().create_stack(**kwargs),
                 event=Events.REQUEST_STACK_CREATE,
             )
 

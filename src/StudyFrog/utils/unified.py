@@ -42,159 +42,92 @@ __all__: Final[List[str]] = [
 ]
 
 
-class UnifiedObjectFactory:
+class UnifiedObjectFactory(ImmutableBaseObject):
     """
-    A dynamic factory class for creating various domain-specific objects in StudyFrog.
+    A singleton Factory class for registering and managing multiple Factory instances.
 
-    This factory provides a unified interface for object creation based on a factory registry.
-    It supports registering custom factory classes, dynamic method delegation, and flexible
-    creation mechanisms with optional default configurations.
+    This class provides methods to create a single shared instance of the UnifiedObjectFactory,
+    initialize it with a logger and a dictionary for storing registered Factorys, and
+    register Factory instances using their class names as keys.
 
     Attributes:
-        logger (Logger): Logger instance for the factory.
-        factories (Dict[str, Type[Any]]): A registry of available factory classes.
-
-    Methods:
-        __getattr__(name): Delegates method calls to registered factories.
-        create(factory, **kwargs): Creates an object using the registered factory.
-        create_default(factory, **kwargs): Creates a default-configured object.
-        register_factory(name, factory): Registers a new factory class.
+        _shared_instance (Optional[UnifiedObjectFactory]): The shared singleton instance of the class.
+        logger (Logger): The logger instance associated with the UnifiedObjectFactory.
+        Factorys (Dict[str, Any]): The dictionary storing registered Factorys.
     """
 
-    logger: Final[Logger] = Logger.get_logger(name="UnifiedObjectFactory")
+    _shared_instance: Optional["UnifiedObjectFactory"] = None
 
-    factories: Final[Dict[str, Type[Any]]] = {}
+    def __new__(cls) -> "UnifiedObjectFactory":
+        """
+        Creates and returns a new instance of the UnifiedObjectFactory class.
+
+        If the instance does not exist, creates a new one by calling the parent class constructor.
+        If the instance already exists, returns the existing instance.
+
+        Returns:
+            UnifiedObjectfactory: The created or existing instance of UnifiedObjectFactory class.
+        """
+
+        # Check if a shared instance already exists
+        if cls._shared_instance is None:
+            # Create a new instance
+            cls._shared_instance = super(UnifiedObjectFactory, cls).__new__(cls)
+
+            # Initialize the instance
+            cls._shared_instance.init()
+
+        # Return the shared instance
+        return cls._shared_instance
+
+    def init(self) -> None:
+        """
+        Initializes the UnifiedObjectFactory instance by creating a logger and an empty dictionary for storing registered Factorys.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+        # Initialize an empty dictionary for storing registered Factorys
+        self.factories: Final[Dict[str, Any]] = {}
 
     @override
     def __getattr__(
-        cls,
+        self,
         name: str,
     ) -> Optional[Any]:
         """
-        Allows dynamic access to methods of registered factories.
+        Allows dynamic access to methods of registered Factorys.
 
         Args:
             name (str): The name of the method to retrieve.
 
         Returns:
-            The method from the registered factory or raises AttributeError.
+            The method from the registered Factory or raises AttributeError.
         """
 
-        # Check, if the attribute is one of this class
-        if hasattr(
-            cls,
-            name,
-        ):
-            # Return the corresponding attribute of this class
-            return getattr(
-                cls,
-                name,
-            )
-
-        # Iterate over the registered factories
-        for factory in cls.factories.values():
-            # Check, if the factory has an attribute corresponding to the passed name
-            if not hasattr(
-                factory,
-                name,
-            ):
-                # Skip the current iteration
-                continue
-
+        # Iterate over the registered Factorys
+        for Factory in self.factories.values():
             try:
-                # Attempt to get the attribute from the factory
+                # Attempt to get the attribute from the Factory
                 return getattr(
-                    factory,
+                    Factory,
                     name,
                 )
             except AttributeError:
-                # Ignore the attribute error and try the next factory
+                # Ignore the attribute error and try the next Factory
                 pass
 
-        # Raise an AttributeError if the attribute is not found in any factory
+        # Raise an AttributeError if the attribute is not found in any Factory
         raise AttributeError(
-            f"'{cls.__class__.__name__}' object has no attribute '{name}'"
+            f"'{self.__class__.__name__}' object has no attribute '{name}'"
         )
 
-    @classmethod
-    def create(
-        cls,
-        factory: str,
-        **kwargs,
-    ) -> Optional[Any]:
-        """
-        Creates an object using a registered factory with the given keyword arguments.
-
-        This method uses the factory name to retrieve the corresponding factory class
-        from the internal registry and invokes its 'create' method to generate the object.
-
-        Args:
-            factory (str): The name of the registered factory to use for object creation.
-            **kwargs: Arbitrary keyword arguments passed to the factory's 'create' method.
-
-        Returns:
-            Any: The object created by the specified factory.
-
-        Raises:
-            KeyError: If no factory is registered under the provided name.
-            AttributeError: If the factory does not implement a 'create' method.
-            Exception: If an unexpected error occurs during creation.
-        """
-
-        # Check, if the passed factory is registered in the factories class attribute
-        if f"{Miscellaneous.any_to_snake(string=factory.lower())}_factory" not in set(
-            cls.factories.keys()
-        ):
-            # Return early
-            return
-
-        # Create and return the created object
-        return getattr(
-            cls.factories[f"{factory}_factory"],
-            f"create_{factory}",
-        )(**kwargs)
-
-    @classmethod
-    def create_default(
-        cls,
-        factory: str,
-        **kwargs,
-    ) -> Optional[Any]:
-        """
-        Creates an object using the default creation logic of a registered factory.
-
-        This method delegates to the 'create_default' method of the specified factory,
-        which should generate a default instance of the target object.
-
-        Args:
-            factory (str): The name of the factory to use for default object creation.
-            **kwargs: Optional keyword arguments passed to the 'create_default' method.
-
-        Returns:
-            Any: The default object created by the factory.
-
-        Raises:
-            KeyError: If no factory is registered under the provided name.
-            AttributeError: If the factory does not implement a 'create_default' method.
-            Exception: If an unexpected error occurs during creation.
-        """
-
-        # Check, if the passed factory is registered in the factories class attribute
-        if f"{Miscellaneous.any_to_snake(string=factory.lower())}_factory" not in set(
-            cls.factories.keys()
-        ):
-            # Return early
-            return
-
-        # Create and return the created object
-        return getattr(
-            cls.factories[f"{factory}_factory"],
-            f"create_default_{factory}",
-        )(**kwargs)
-
-    @classmethod
     def register_factory(
-        cls,
+        self,
         name: str,
         factory: Type[Any],
     ) -> None:
@@ -203,7 +136,7 @@ class UnifiedObjectFactory:
 
         Args:
             name (str): The name of the factory to be registered.
-            factory (Type[Any]): The factory class to be registered.
+            factory (Type[Any]): The factory instance to be registered.
 
         Returns:
             None
@@ -212,21 +145,76 @@ class UnifiedObjectFactory:
             Exception: If an exception occurs during registration.
         """
         try:
-            # Add the factory to the factories dictionary using its class name as the key
-            cls.factories[name] = factory
+            # Add the Factory to the Factorys dictionary using its class name as the key
+            self.factories[name] = factory
 
-            # Log a success message indicating the factory has been registered
-            cls.logger.info(
-                message=f"Registered factory '{name}' with class '{factory.__name__}'"
+            # Log a success message indicating the Factory has been registered
+            self.logger.info(
+                message=f"Registered Factory '{name}' with class '{factory.__name__}'"
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
-            cls.logger.error(
-                message=f"Caught an exception while attempting to run 'register_factory' from '{cls.__class__.__name__}': {e}"
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'register_Factory' from '{self.__class__.__name__}': {e}"
             )
 
-            # Log the traceback
-            cls.logger.error(message=traceback.format_exc())
+            # Raise the exception to the caller
+            raise e
+
+    def run(
+        self,
+        factory: str,
+        method: str,
+        **kwargs,
+    ) -> Any:
+        """
+        Dynamically calls a method on a specified factory.
+
+        Args:
+            factory (str): The name of the factory (e.g., 'flashcard').
+            method (str): The name of the method to call (e.g., 'get_by_id').
+            **kwargs: Additional parameters to pass to the method.
+
+        Returns:
+            Any: The result of the method execution.
+
+        Raises:
+            AttributeError: If the factory or method does not exist.
+        """
+
+        # Check if the specified Factory exists
+        if factory not in self.factories:
+            raise AttributeError(
+                f"Factory '{factory}' not found in UnifiedObjectFactory."
+            )
+
+        # Get the Factory instance from the dictionary
+        Factory_instance: Optional[Any] = self.factories.get(factory, None,)
+
+        # Check if the Factory instance is None
+        if not Factory_instance:
+            raise AttributeError(
+                f"Factory '{factory}' not found in UnifiedObjectFactory."
+            )
+
+        # Check if the specified method exists in the Factory
+        if not hasattr(
+            Factory_instance,
+            method,
+        ):
+            raise AttributeError(f"Method '{method}' not found in factory '{factory}'.")
+
+        # Dynamically call the method on the Factory instance
+        try:
+            return getattr(
+                Factory_instance,
+                method,
+            )(**kwargs)
+        except Exception as e:
+            # Log an error message if an exception occurs
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '{factory}.{method}' from '{self.__class__.__name__}': {e}"
+            )
 
             # Raise the exception to the caller
             raise e
@@ -277,6 +265,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
         Returns:
             None
         """
+
+        # Call the parent class constructor
+        super().__init__()
 
         # Initialize an empty dictionary for storing registered managers
         self.managers: Final[Dict[str, Any]] = {}
@@ -871,6 +862,9 @@ class UnifiedObjectService(ImmutableBaseObject):
         Returns:
             None
         """
+
+        # Call the parent class constructor
+        super().__init__()
 
         # Store the passed unified_manager instance in an instance variable
         self.unified_manager: Final[UnifiedObjectManager] = unified_manager

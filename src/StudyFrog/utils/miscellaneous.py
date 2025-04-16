@@ -204,6 +204,85 @@ class Miscellaneous:
             return None
 
     @classmethod
+    def date_format_to_regex_pattern(
+        cls,
+        date_format: str,
+    ) -> Optional[str]:
+        """
+        Converts a datetime format string into a regex pattern.
+
+        This method transforms a strftime-compatible format (e.g., "%Y-%m-%d")
+        into a regex pattern that can be used to validate or match strings
+        with the same structure.
+
+        Example:
+            "%d.%m.%Y" -> r"\d{1,2}\.\d{1,2}\.\d{4}"
+
+        Args:
+            date_format (str): The datetime format string to convert.
+
+        Returns:
+            Optional[str]: A regex pattern matching the given format, or None if the input is invalid.
+        """
+
+        # Check, if the format is empty or None
+        if not date_format:
+            # Return early
+            return None
+
+        # Mapping of strftime tokens to regex equivalents
+        token_map: Dict[str, str] = {
+            "%d": r"\d{1,2}",             # Day of the month (1–31)
+            "%m": r"\d{1,2}",             # Month (1–12)
+            "%y": r"\d{2}",               # Two-digit year
+            "%Y": r"\d{4}",               # Four-digit year
+            "%H": r"\d{1,2}",             # Hour (0–23)
+            "%I": r"\d{1,2}",             # Hour (1–12)
+            "%M": r"\d{1,2}",             # Minute (0–59)
+            "%S": r"\d{1,2}",             # Second (0–59)
+            "%f": r"\d{1,6}",             # Microsecond
+            "%p": r"(AM|PM|am|pm)",       # AM/PM in various cases
+            "%b": r"[A-Za-z]{3}",         # Abbreviated month name
+            "%B": r"[A-Za-z]+",           # Full month name
+            "%a": r"[A-Za-z]{3}",         # Abbreviated weekday name
+            "%A": r"[A-Za-z]+",           # Full weekday name
+            "%j": r"\d{1,3}",             # Day of the year (1–366)
+            "%U": r"\d{1,2}",             # Week number (Sunday first)
+            "%W": r"\d{1,2}",             # Week number (Monday first)
+            "%w": r"\d",                  # Weekday as a digit (0–6)
+            "%z": r"[\+\-]\d{4}",         # UTC offset (e.g., +0200)
+            "%Z": r"[A-Za-z]+",           # Time zone abbreviation
+            "%c": r".+",                  # Locale-specific datetime representation
+            "%x": r".+",                  # Locale-specific date
+            "%X": r".+",                  # Locale-specific time
+            "%%": r"%"                    # Literal '%'
+        }
+
+        # Prepare the final regex string
+        regex_pattern: str = ""
+
+        # Iterate through the format string by index
+        i: int = 0
+
+        while i < len(date_format):
+            # If a token begins with '%', try to match a known format token
+            if date_format[i] == "%" and i + 1 < len(date_format):
+                token: str = date_format[i:i+2]
+
+                # If it's a recognized token, add its regex form
+                if token in token_map:
+                    regex_pattern += token_map[token]
+                    i += 2
+                    continue
+
+            # If not a format token, escape and add the character literally
+            regex_pattern += re.escape(date_format[i])
+            i += 1
+
+        # Return the assembled regex pattern
+        return regex_pattern
+
+    @classmethod
     def datetime_to_string(
         cls,
         datetime: datetime,
@@ -283,6 +362,7 @@ class Miscellaneous:
     def find_match(
         cls,
         string: str,
+        fullmatch: bool = False,
         group: int = 0,
         pattern: str = r"([A-Za-z]+)",
     ) -> Optional[str]:
@@ -298,11 +378,18 @@ class Miscellaneous:
             Optional[str]: The string that matched the pattern, or None if no match was found.
         """
 
-        # Find a match for the string against the pattern
-        match: Optional[re.Match] = re.match(
-            pattern=pattern,
-            string=string,
-        )
+        if fullmatch:
+            # Find a match for the string against the pattern
+            match: Optional[re.Match] = re.fullmatch(
+                pattern=pattern,
+                string=string,
+            )
+        elif not fullmatch:
+            # Find a match for the string against the pattern
+            match: Optional[re.Match] = re.match(
+                pattern=pattern,
+                string=string,
+            )
 
         if not match:
             # Log an error message indicating that no match was found

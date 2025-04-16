@@ -69,7 +69,6 @@ from core.ui.user_ui import UserUI
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
-from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryService
 from utils.notification_service import NotificationService
@@ -147,6 +146,11 @@ class BootstrapService(ImmutableBaseObject):
         # Initialize the notification service instance
         self.notification_service: Final[NotificationService] = NotificationService(
             dispatcher=self.dispatcher
+        )
+
+        # Initialize the unified object factory instance
+        self.unified_object_factory: Final[UnifiedObjectFactory] = (
+            UnifiedObjectFactory()
         )
 
         # Initialize the unified object manager instance
@@ -434,7 +438,7 @@ class BootstrapService(ImmutableBaseObject):
                 name,
                 factory,
             ) in factories.items():
-                UnifiedObjectFactory.register_factory(
+                self.unified_object_factory.register_factory(
                     factory=factory,
                     name=name,
                 )

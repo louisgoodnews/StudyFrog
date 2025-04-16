@@ -395,6 +395,7 @@ class StackCreateForm(BaseCreateForm):
             label="Due By*: ",
             master=master,
             on_change_callback=self._on_field_change,
+            value=Miscellaneous.get_date_increment(increment=45)
         )
 
         # Place the 'due by' DateSelectField widget in the grid

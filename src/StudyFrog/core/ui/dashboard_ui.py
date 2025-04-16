@@ -1225,7 +1225,7 @@ class DashboardUI(BaseUI):
             for stack in stacks:
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.completed_stacks_frame,
+                    master=self.completed_stacks_frame.container,
                     stack=stack,
                 )
         except Exception as e:
@@ -1286,7 +1286,7 @@ class DashboardUI(BaseUI):
             for stack in stacks:
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.new_stacks_frame,
+                    master=self.new_stacks_frame.container,
                     stack=stack,
                 )
         except Exception as e:
@@ -1347,7 +1347,7 @@ class DashboardUI(BaseUI):
             ):
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.recently_viewed_stacks_frame,
+                    master=self.recently_viewed_stacks_frame.container,
                     stack=stack,
                 )
         except Exception as e:
