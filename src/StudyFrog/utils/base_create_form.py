@@ -145,13 +145,13 @@ class BaseCreateForm(tkinter.Frame):
             None
         """
 
-        # Check, if the passed label contains ': '
+        # Check, if the passed label contains ':'
         if ":" in label:
             # Remove the ':' and update the passed label
-            label = label.replace(": ", "")
+            label = label.replace(":", "")
 
-        # Check, if the passed label contains ': '
-        elif "*" in label:
+        # Check, if the passed label contains '*'
+        if "*" in label:
             # Remove the '*' and update the passed label
             label = label.replace("*", "")
 
@@ -625,7 +625,7 @@ class BaseCreateForm(tkinter.Frame):
         ) in self.field_dict.items():
             self.value_dict[key.replace(":", "").replace("*", "")] = {
                 "type": type(value["widget"].get()[1]),
-                "value": value["widget"].get()[1]
+                "value": value["widget"].get()[1],
             }
 
         # Return a the value dictionary to the caller
@@ -742,7 +742,10 @@ class BaseCreateForm(tkinter.Frame):
         """
 
         # Initialize the result dictionary as an empty dictionary
-        result: Dict[str, bool] = {"result": False}
+        result: Dict[str, bool] = {
+            "fields": {},
+            "result": False,
+        }
 
         # Iterate over the field dictionary instance variable's items
         for (
@@ -760,16 +763,18 @@ class BaseCreateForm(tkinter.Frame):
                 self._value_dict[key] = {"value": None}
 
             # Add True to the result dictionary if the required field is not empty otherwise False
-            result[key] = True if self._value_dict[key]["value"] is not None else False
+            result["fields"][key] = (
+                True if self._value_dict[key]["value"] is not None else False
+            )
 
         # Update the 'result' key's value
-        result["result"] = all(set(result.values()))
+        result["result"] = all(set(result["fields"].values()))
 
         # Check, if any required fields are missing
         if not result["result"]:
             # Log a warning message
             self.logger.warning(
-                message=f"Required fields ({", ".join(set([key for key, value, in result.items() if not value]))}) are missing"
+                message=f"Required fields ({", ".join(set([key for key, value, in result["fields"].items() if not value]))}) are missing"
             )
 
         # Return the result dictionary

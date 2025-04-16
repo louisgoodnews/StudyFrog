@@ -11,11 +11,17 @@ from typing import *
 from core.ui.fields.boolean_fields import CheckbuttonField
 from core.ui.fields.datetime_fields import DateSelectField
 from core.ui.fields.select_fields import ComboboxField
-from core.ui.fields.string_fields import MultiSelectAnswerField, MultiLineTextField, SingleLineTextField
+from core.ui.fields.string_fields import (
+    MultiSelectAnswerField,
+    MultiLineTextField,
+    SingleLineTextField,
+)
 
 from core.ui.frames.frames import ScrolledFrame
 
 from core.ui.notifications.notifications import ToplevelNotification
+
+from core.stack import ImmutableStack
 
 from utils.base_create_form import BaseCreateForm
 from utils.constants import Constants
@@ -28,8 +34,7 @@ __all__: Final[List[str]] = ["StackCreateForm"]
 
 
 class StackCreateForm(BaseCreateForm):
-    """
-    """
+    """ """
 
     def __init__(
         self,
@@ -38,8 +43,7 @@ class StackCreateForm(BaseCreateForm):
         namespace: str,
         **kwargs,
     ) -> None:
-        """
-        """
+        """ """
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -49,14 +53,40 @@ class StackCreateForm(BaseCreateForm):
             **kwargs,
         )
 
+    def _on_stack_created(
+        self,
+        stack: ImmutableStack,
+    ) -> None:
+        """ """
+
+        # Append the passed stack ImmutableStack object's name to the ComboboxField's value
+        self.field_dict["ancestor"]["widget"].add(value=stack.name)
+
+    @override
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        # Call the parent class' 'collect_subscriptions' Method
+        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+
+        # Append event subscription configurations to the list
+        subscriptions.append(
+            {
+                "event": Events.STACK_CREATED,
+                "function": self._on_stack_created,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            }
+        )
+
+        # Return the subscriptions list
+        return subscriptions
+
     @override
     def _on_field_change(
         self,
         label: str,
         value: Any,
     ) -> None:
-        """
-        """
+        """ """
 
         # Call the super class' '_on_field_change' method with the passed arguments
         super()._on_field_change(
@@ -69,8 +99,7 @@ class StackCreateForm(BaseCreateForm):
         self,
         master: ScrolledFrame,
     ) -> None:
-        """
-        """
+        """ """
 
         # Configure the weight of the 0th column to 1
         master.grid_columnconfigure(
@@ -168,7 +197,9 @@ class StackCreateForm(BaseCreateForm):
         # Check, if the notification exists
         if not stack_notification:
             # Log a warning message
-            self.logger.warning(message=f"Failed to dispatch the REQUEST_GET_ALL_STACKS event in the global namespace.")
+            self.logger.warning(
+                message=f"Failed to dispatch the REQUEST_GET_ALL_STACKS event in the global namespace."
+            )
 
             # Return early
             return
@@ -179,7 +210,9 @@ class StackCreateForm(BaseCreateForm):
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
-            values=[stack.name for stack in stack_notification.get_one_and_only_result()],
+            values=[
+                stack.name for stack in stack_notification.get_one_and_only_result()
+            ],
         )
 
         # Place the 'ancestor field' ComboboxField widget in the grid
@@ -221,15 +254,19 @@ class StackCreateForm(BaseCreateForm):
         )
 
         # Dispatch the REQUEST_GET_ALL_DIFFICULTIES event in the global namespace
-        difficulty_notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-            event=Events.REQUEST_GET_ALL_DIFFICULTIES,
-            namespace=Constants.GLOBAL_NAMESPACE,
+        difficulty_notification: Optional[DispatcherNotification] = (
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_ALL_DIFFICULTIES,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
         )
 
         # Check, if the notification exists
         if not difficulty_notification:
             # Log a warning message
-            self.logger.warning(message=f"Failed to dispatch the REQUEST_GET_ALL_DIFFICULTIES event in the global namespace.")
+            self.logger.warning(
+                message=f"Failed to dispatch the REQUEST_GET_ALL_DIFFICULTIES event in the global namespace."
+            )
 
             # Return early
             return
@@ -240,7 +277,10 @@ class StackCreateForm(BaseCreateForm):
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
-            values=[difficulty.name for difficulty in difficulty_notification.get_one_and_only_result()],
+            values=[
+                difficulty.name
+                for difficulty in difficulty_notification.get_one_and_only_result()
+            ],
         )
 
         # Place the 'difficulty' ComboboxField widget in the grid
@@ -282,15 +322,19 @@ class StackCreateForm(BaseCreateForm):
         )
 
         # Dispatch the REQUEST_GET_ALL_PRIORITIES event in the global namespace
-        priority_notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-            event=Events.REQUEST_GET_ALL_PRIORITIES,
-            namespace=Constants.GLOBAL_NAMESPACE,
+        priority_notification: Optional[DispatcherNotification] = (
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_ALL_PRIORITIES,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
         )
 
         # Check, if the notification exists
         if not priority_notification:
             # Log a warning message
-            self.logger.warning(message=f"Failed to dispatch the REQUEST_GET_ALL_PRIORITIES event in the global namespace.")
+            self.logger.warning(
+                message=f"Failed to dispatch the REQUEST_GET_ALL_PRIORITIES event in the global namespace."
+            )
 
             # Return early
             return
@@ -301,7 +345,10 @@ class StackCreateForm(BaseCreateForm):
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
-            values=[priority.name for priority in priority_notification.get_one_and_only_result()],
+            values=[
+                priority.name
+                for priority in priority_notification.get_one_and_only_result()
+            ],
         )
 
         # Place the 'priority' ComboboxField widget in the grid
@@ -344,7 +391,7 @@ class StackCreateForm(BaseCreateForm):
 
         # Create the 'due by' DateSelectField widget
         due_by_field: DateSelectField = DateSelectField(
-            date_format="%d.%m.%Y",
+            date_format=Constants.DEFAULT_DATE_FORMAT,
             label="Due By*: ",
             master=master,
             on_change_callback=self._on_field_change,
@@ -459,7 +506,6 @@ class StackCreateForm(BaseCreateForm):
         self,
         master: ScrolledFrame,
     ) -> None:
-        """
-        """
+        """ """
 
         pass

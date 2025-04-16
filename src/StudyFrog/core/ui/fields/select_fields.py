@@ -753,6 +753,17 @@ class ComboboxField(BaseField):
                 self.variable.get(),
             )
 
+    def add(
+        self,
+        value: str,
+    ) -> None:
+        """ """
+
+        # Check, if the value is not already contained within the values list instacne variable
+        if value not in self.values:
+            # Append the passed value to the list of values
+            self.values.append(value)
+
     @override
     def clear(
         self,
@@ -1847,7 +1858,6 @@ class EntityComboboxField(BaseField):
             Dict[str, Any]: A dictionary where the keys are display names and the values are the original entities.
         """
 
-
         # Obtain the entities from the database
         entities: List[Any] = self._get_entities()
 
@@ -2397,7 +2407,10 @@ class EntityComboboxField(BaseField):
             value,
         ) = (
             self.display_name,
-            self.values.get(self.variable.get(), None,),
+            self.values.get(
+                self.variable.get(),
+                None,
+            ),
         )
 
         # Check, if the dispatch flag is set to True

@@ -40,7 +40,7 @@ from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["CreateUI"]
@@ -138,6 +138,211 @@ class CreateUI(BaseUI):
             label="Type: ",
             value=self.type_field.get()[1],
         )
+
+    def _create_entity(
+        self,
+        entity: Union[
+            ImmutableAnswer,
+            ImmutableFlashcard,
+            ImmutableQuestion,
+            ImmutableStack,
+        ],
+        event: DispatcherEvent,
+    ) -> Optional[
+        Union[
+            ImmutableAnswer,
+            ImmutableFlashcard,
+            ImmutableQuestion,
+            ImmutableStack,
+        ]
+    ]:
+        """ """
+        try:
+            # Dispatch the passed REQUEST_CREATE event in the global namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=event,
+                **{
+                    Miscellaneous.any_to_snake(
+                        string=entity.__class__.__name__
+                    ): entity,
+                },
+            )
+
+            # Check, if the notification exists or has no errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch '{event.name}' to 'global' namespace with '{entity.__repr__()}' entity."
+                )
+
+                # Return the entity
+                return entity
+
+            # Return the created entity to the caller
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message
+            self.logger.error(
+                message=f"Caught an exception while attempting to call '_create_entity' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def _get_difficulty(
+        self,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """ """
+        try:
+            # Obtain the 'difficulty' value from the kwargs dictionary
+            difficulty: Optional[Union[ImmutableDifficulty, int, str]] = kwargs.get(
+                "difficulty",
+                None,
+            )
+
+            # Check, if the difficulty value exists and is not an empty string
+            if difficulty and difficulty != "":
+                # Request the difficulty ImmutableDifficulty object from the database
+                difficulty = self._request_entity(
+                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                    name=difficulty,
+                )
+
+                # Add the ID of the difficulty ImmutableDifficulty object to the kwargs dictionary
+                kwargs["difficulty"] = difficulty.id
+
+            # Return the kwargs to the caller
+            return kwargs
+        except Exception as e:
+            # Log an error message
+            self.logger.error(
+                message=f"Caught an exception while attempting to call '_get_difficulty' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def _get_priority(
+        self,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """ """
+        try:
+            # Obtain the 'priority' value from the kwargs dictionary
+            priority: Optional[Union[ImmutablePriority, int, str]] = kwargs.get(
+                "priority",
+                None,
+            )
+
+            # Check, if the priority value exists and is not an empty string
+            if priority and priority != "":
+                # Request the priority ImmutablePriority object from the database
+                priority = self._request_entity(
+                    event=Events.REQUEST_PRIORITY_LOOKUP,
+                    name=priority,
+                )
+
+                # Add the ID of the priority ImmutablePriority object to the kwargs dictionary
+                kwargs["priority"] = priority.id
+
+            # Return the kwargs to the caller
+            return kwargs
+        except Exception as e:
+            # Log an error message
+            self.logger.error(
+                message=f"Caught an exception while attempting to call '_get_priority' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def _get_stack(
+        self,
+        field: str,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """ """
+        try:
+            # Obtain the 'field' value from the kwargs dictionary
+            stack: Optional[Union[ImmutableStack, int, str]] = kwargs.get(
+                field,
+                None,
+            )
+
+            # Check, if the field value exists and is not an empty string
+            if stack and stack != "":
+                # Request the field ImmutableStack object from the database
+                stack = self._request_entity(
+                    event=Events.REQUEST_STACK_LOOKUP,
+                    name=stack,
+                )
+
+                # Add the ID of the field ImmutableStack object to the kwargs dictionary
+                kwargs[field] = stack.id
+
+            # Return the kwargs to the caller
+            return kwargs
+        except Exception as e:
+            # Log an error message
+            self.logger.error(
+                message=f"Caught an exception while attempting to call '_get_stack' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def _get_status(
+        self,
+        name: str,
+        **kwargs,
+    ) -> Optional[Dict[str, Any]]:
+        """ """
+        try:
+            # Request the ImmutableStatus object from the database
+            status: Optional[Union[ImmutableStatus, int, str]] = self._request_entity(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                name=name,
+            )
+
+            # Check, if the status ImmutableStatus object exists
+            if not status:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to fetch ImmutableStatus object with name '{name}' from the database."
+                )
+
+                # Return the kwargs to the caller early
+                return kwargs
+
+            # Add the ID of the ImmutableStatus object to the kwargs dictionary
+            kwargs["status"] = status.id
+
+            # Return the kwargs to the caller
+            return kwargs
+        except Exception as e:
+            # Log an error message
+            self.logger.error(
+                message=f"Caught an exception while attempting to call '_get_status' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
 
     def _request_entity(
         self,
@@ -761,14 +966,101 @@ class CreateUI(BaseUI):
         """ """
         try:
             # Obtain the type from the kwargs
-            type: Optional[str] = kwargs.get("type")
+            type: Optional[str] = kwargs.get(
+                "type",
+                None,
+            )
 
             # Check, if the 'type' keyword has been passed to this method
             if not type:
-                pass
-            else:
-                # Remove the 'type' key from the dictionary
-                kwargs.pop("type")
+                # Return early
+                return
+
+            # Remove the 'type' key from the dictionary
+            kwargs.pop("type")
+
+            # Check, if the 'ancestor' key is assciated to any (non-empty string) value
+            if (
+                kwargs.get(
+                    "ancestor",
+                    None,
+                )
+                is not None
+            ):
+                # Update the kwargs with the ancestor stack's ID
+                kwargs.update(
+                    self._get_stack(
+                        field="ancestor",
+                        **kwargs,
+                    )
+                )
+
+            # Check, if the 'difficulty' key is assciated to any (non-empty string) value
+            if (
+                kwargs.get(
+                    "difficulty",
+                    None,
+                )
+                is not None
+            ):
+                # Update the kwargs with the difficulty's ID
+                kwargs.update(
+                    self._get_difficulty(
+                        **kwargs,
+                    )
+                )
+
+            # Check, if the 'priority' key is assciated to any (non-empty string) value
+            if (
+                kwargs.get(
+                    "priority",
+                    None,
+                )
+                is not None
+            ):
+                # Update the kwargs with the priority's ID
+                kwargs.update(
+                    self._get_priority(
+                        **kwargs,
+                    )
+                )
+
+            # Update the kwargs with the priority's ID
+            kwargs.update(
+                self._get_status(
+                    name="",
+                    **kwargs,
+                )
+            )
+
+            # Attempt to create the ImmutableStack object in the database and update the reference
+            stack: ImmutableStack = self._create_entity(
+                entity=UnifiedObjectFactory.create_stack(**kwargs),
+                event=Events.REQUEST_STACK_CREATE,
+            )
+
+            # Check, if the stack was created succcessfully (i.e. if it has an ID)
+            if not stack.get(
+                default=None,
+                name="id",
+            ):
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create ImmutableStack object in the database. This is likely due to a bug."
+                )
+
+                # Return early
+                return
+
+            # Dispatch the STACK_CREATED event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.STACK_CREATED,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                stack=stack,
+            )
+
+            # Return the stack to the caller
+            return stack
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -810,42 +1102,67 @@ class CreateUI(BaseUI):
         Returns:
             None
         """
+        try:
+            # Check, if form validation is successfull
+            if not self.form or not self.validate_form():
+                # Return early
+                return
 
-        # Check, if form validation is successfull
-        if not self.form or not self.validate_form():
-            # Return early
-            return
+            # Get the data from the form
+            form_data: Dict[str, Any] = self.form.get()
 
-        # Get the data from the form
-        form_data: Dict[str, Any] = self.form.get()
+            # Obtain the type of the entity to be created
+            type: str = Miscellaneous.any_to_snake(string=form_data["type"]["value"])
 
-        # Obtain the type of the entity to be created
-        type: str = Miscellaneous.any_to_snake(string=form_data["type"]["value"])
+            # Call the handler corresponding to the type of the entity to be created
+            entity: Optional[Any] = getattr(
+                self,
+                f"handle_{type}_creation",
+            )(**{key: form_data[key]["value"] for key in sorted(form_data.keys())})
 
-        # Call the handler corresponding to the type of the entity to be created
-        entity: Any = getattr(
-            self,
-            f"handle_{type}_creation",
-        )(**{key: form_data[key]["value"] for key in sorted(form_data.keys())})
+            # Check, if the entity exists
+            if not entity:
+                # Log a warning message
+                self.logger.warning(message=f"")
 
-        # Display a toast message to the user
-        ToplevelToastNotification(
-            title=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} created successfully",
-            message=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} with ID {entity.id} created successfully.",
-        )
+                # Notify the user
+                ToplevelToastNotification(
+                    message=f"Failed to create {Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} in the database. Please check the logs for additional information.",
+                    title=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} could no be created successfully",
+                )
 
-        # Check, if the 'Create another' CheckbuttonField' value is False
-        if not self.create_another.get()[1]:
-            # Check if the master widget is of type toplevel
-            if isinstance(
-                self.master,
-                tkinter.Toplevel,
-            ):
-                # Destroy the toplevel widget
-                self.master.destroy()
+                # Return early
+                return
 
-        # Clear the current form
-        self.form.clear()
+            # Display a toast message to the user
+            ToplevelToastNotification(
+                title=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} created successfully",
+                message=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} with ID {entity.id} created successfully.",
+            )
+
+            # Check, if the 'Create another' CheckbuttonField' value is False
+            if not self.create_another.get()[1]:
+                # Check if the master widget is of type toplevel
+                if isinstance(
+                    self.master,
+                    tkinter.Toplevel,
+                ):
+                    # Destroy the toplevel widget
+                    self.master.destroy()
+
+            # Clear the current form
+            self.form.clear()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_create_button_click' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
 
     def on_type_field_change(
         self,
@@ -916,7 +1233,7 @@ class CreateUI(BaseUI):
         # Display a notification to the user
         ToplevelNotification.okay(
             title="Error during validation",
-            message=f"It seems that at least one required field has no value.\n\nPlease review:\n {"\n\t*".join([Miscellaneous.snake_to_pascal(string=key) for key in report.keys()])}",
+            message=f"It seems that at least one required field has no value.\n\nPlease review:\n {"\n\t*".join([Miscellaneous.snake_to_pascal(string=key) for key in report["fields"].keys() if not report["fields"][key]])}",
         )
 
         # Return False

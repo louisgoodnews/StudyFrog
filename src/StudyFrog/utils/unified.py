@@ -80,6 +80,17 @@ class UnifiedObjectFactory:
             The method from the registered factory or raises AttributeError.
         """
 
+        # Check, if the attribute is one of this class
+        if hasattr(
+            cls,
+            name,
+        ):
+            # Return the corresponding attribute of this class
+            return getattr(
+                cls,
+                name,
+            )
+
         # Iterate over the registered factories
         for factory in cls.factories.values():
             # Check, if the factory has an attribute corresponding to the passed name

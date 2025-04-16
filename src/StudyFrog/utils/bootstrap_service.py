@@ -411,7 +411,7 @@ class BootstrapService(ImmutableBaseObject):
         try:
             factories: Dict[str, Type[Any]] = {
                 "answer_factory": AnswerFactory,
-                "association_facotry": AssociationFactory,
+                "association_factory": AssociationFactory,
                 "change_history_factory": ChangeHistoryFactory,
                 "change_history_item_factory": ChangeHistoryItemFactory,
                 "comment_factory": CommentFactory,
