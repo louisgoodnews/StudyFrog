@@ -993,7 +993,9 @@ class CreateUI(BaseUI):
                 kwargs.get(
                     "back_text",
                     "",
-                ).strip().split(" ")
+                )
+                .strip()
+                .split(" ")
             )
 
             # Set the front word count of the flashcard
@@ -1001,7 +1003,9 @@ class CreateUI(BaseUI):
                 kwargs.get(
                     "front_text",
                     "",
-                ).strip().split(" ")
+                )
+                .strip()
+                .split(" ")
             )
 
             # Set the total word count of the flashcard

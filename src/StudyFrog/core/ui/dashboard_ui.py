@@ -957,7 +957,7 @@ class DashboardUI(BaseUI):
                 return
 
             # Obtain the difficulty from the one and only result of the notification
-            difficulty: Optional[ImmutableDifficulty] = difficulty_notification.get_one_and_only_result()[0]
+            difficulty: Optional[ImmutableDifficulty] = difficulty_notification.get_one_and_only_result()
 
             # Check, if the priority exists
             if not difficulty:
@@ -987,7 +987,7 @@ class DashboardUI(BaseUI):
                 return
 
             # Obtain the priority from the one and only result of the notification
-            priority: Optional[ImmutablePriority] = priority_notification.get_one_and_only_result()[0]
+            priority: Optional[ImmutablePriority] = priority_notification.get_one_and_only_result()
 
             # Check, if the priority exists
             if not priority:
@@ -1017,7 +1017,7 @@ class DashboardUI(BaseUI):
                 return
 
             # Obtain the status from the one and only result of the notification
-            status: Optional[ImmutableStatus] = status_notification.get_one_and_only_result()[0]
+            status: Optional[ImmutableStatus] = status_notification.get_one_and_only_result()
 
             # Check, if the priority exists
             if not status:
@@ -1059,11 +1059,11 @@ class DashboardUI(BaseUI):
 
                 # Determine the text to display based on column type
                 if column == "priority":
-                    text = priority_notification.get_one_and_only_result()[0]["emoji"]
+                    text = priority_notification.get_one_and_only_result()["emoji"]
                 elif column == "difficulty":
-                    text = difficulty_notification.get_one_and_only_result()[0]["emoji"]
+                    text = difficulty_notification.get_one_and_only_result()["emoji"]
                 elif column == "status":
-                    text = status_notification.get_one_and_only_result()[0]["emoji"]
+                    text = status_notification.get_one_and_only_result()["emoji"]
                 else:
                     text = data[column]
 

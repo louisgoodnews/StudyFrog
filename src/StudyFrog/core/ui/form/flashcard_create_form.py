@@ -235,12 +235,8 @@ class FlashcardCreateForm(BaseCreateForm):
             stack_notification.get_one_and_only_result()
         )
 
-        # Check, if the ImmutableStack list exists
-        if not stacks:
-            # Set the ImmutableStack list to an empty list
-            stacks = []
         # Check if the ImmutableStack is an instance of ImmutableStack
-        elif stacks and isinstance(
+        if isinstance(
             stacks,
             ImmutableStack,
         ):
