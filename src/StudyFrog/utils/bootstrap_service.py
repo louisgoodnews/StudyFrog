@@ -130,36 +130,36 @@ class BootstrapService(ImmutableBaseObject):
         """
 
         # Initialize the dispatcher instance
-        self.dispatcher: Final[Dispatcher] = Dispatcher()
+        self.dispatcher: Dispatcher = Dispatcher()
 
         # Initialize the navigation service instance
-        self.navigation_history_service: Final[NavigationHistoryService] = (
+        self.navigation_history_service: NavigationHistoryService = (
             NavigationHistoryService(dispatcher=self.dispatcher)
         )
 
         # Initialize the setting service instance
-        self.setting_service: Final[SettingService] = SettingService()
+        self.setting_service: SettingService = SettingService()
 
         # Initialize the list of subscriptions
-        self.subscriptions: Final[List[str]] = []
+        self.subscriptions: List[str] = []
 
         # Initialize the notification service instance
-        self.notification_service: Final[NotificationService] = NotificationService(
+        self.notification_service: NotificationService = NotificationService(
             dispatcher=self.dispatcher
         )
 
         # Initialize the unified object factory instance
-        self.unified_object_factory: Final[UnifiedObjectFactory] = (
+        self.unified_object_factory: UnifiedObjectFactory = (
             UnifiedObjectFactory()
         )
 
         # Initialize the unified object manager instance
-        self.unified_object_manager: Final[UnifiedObjectManager] = (
+        self.unified_object_manager: UnifiedObjectManager = (
             UnifiedObjectManager()
         )
 
         # Initialize the unified object service instance
-        self.unified_object_service: Final[UnifiedObjectService] = UnifiedObjectService(
+        self.unified_object_service: UnifiedObjectService = UnifiedObjectService(
             unified_manager=self.unified_object_manager
         )
 
@@ -1103,6 +1103,7 @@ class BootstrapService(ImmutableBaseObject):
         Optional[NavigationHistoryService],
         Optional[NotificationService],
         Optional[SettingService],
+        Optional[UnifiedObjectFactory],
         Optional[UnifiedObjectManager],
         Optional[UnifiedObjectService],
     ]:
@@ -1114,9 +1115,9 @@ class BootstrapService(ImmutableBaseObject):
         unified object manager, and unified object service.
 
         Returns:
-            Tuple[Optional[Dispatcher], Optional[NavigationHistoryService], Optional[NotificationService], Optional[SettingService], Optional[UnifiedObjectManager], Optional[UnifiedObjectService]]:
+            Tuple[Optional[Dispatcher], Optional[NavigationHistoryService], Optional[NotificationService], Optional[SettingService], Optional[UnifiedObjectFactory], Optional[UnifiedObjectManager], Optional[UnifiedObjectService]]:
             A tuple containing the dispatcher, navigation service, setting service,
-            unified object manager, and unified object service instances, or None
+            unified object factory, unified object manager, and unified object service instances, or None
             values if an exception occurs.
 
         Raises:
@@ -1173,6 +1174,7 @@ class BootstrapService(ImmutableBaseObject):
                 self.navigation_history_service,
                 self.notification_service,
                 self.setting_service,
+                self.unified_object_factory,
                 self.unified_object_manager,
                 self.unified_object_service,
             )

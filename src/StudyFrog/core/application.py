@@ -59,10 +59,10 @@ class Application:
         """
 
         # Initialize a logger
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
         # Bootstrap the application services
-        self.bootstrap_service: Final[BootstrapService] = BootstrapService()
+        self.bootstrap_service: BootstrapService = BootstrapService()
 
         # Initialize the dispatcher, navigation service, notification service, setting service, unified manager, and unified object service
         (
@@ -70,12 +70,13 @@ class Application:
             self.navigation_service,
             self.notification_service,
             self.setting_service,
+            self.unified_factory,
             self.unified_manager,
             self.unified_object_service,
         ) = self.bootstrap_service.run_startup_tasks()
 
         # Initialize the main UI
-        self.main_ui: Final[MainUI] = MainUI(
+        self.main_ui: MainUI = MainUI(
             dispatcher=self.dispatcher,
             navigation_service=self.navigation_service,
             setting_service=self.setting_service,
@@ -83,7 +84,7 @@ class Application:
         )
 
         # Get the start time
-        self.start_time: Final[datetime] = Miscellaneous.get_current_datetime()
+        self.start_time: datetime = Miscellaneous.get_current_datetime()
 
     def start_application(self) -> None:
         try:

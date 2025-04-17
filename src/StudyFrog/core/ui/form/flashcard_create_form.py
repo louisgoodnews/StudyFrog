@@ -15,6 +15,8 @@ from core.ui.frames.frames import ScrolledFrame
 
 from core.ui.notifications.notifications import ToplevelNotification
 
+from core.stack import ImmutableStack
+
 from utils.base_create_form import BaseCreateForm
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
@@ -213,18 +215,37 @@ class FlashcardCreateForm(BaseCreateForm):
         )
 
         # Dispatch the REQUEST_GET_ALL_STACKS event in the global namespace
-        notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+        stack_notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
             event=Events.REQUEST_GET_ALL_STACKS,
             namespace=Constants.GLOBAL_NAMESPACE,
         )
 
         # Check, if the notification exists
-        if not notification:
+        if not stack_notification:
             # Log a warning message
-            self.logger.warning(message=f"Failed to dispatch the REQUEST_GET_ALL_STACKS event in the global namespace.")
+            self.logger.warning(
+                message=f"Failed to dispatch the REQUEST_GET_ALL_STACKS event in the global namespace."
+            )
 
             # Return early
             return
+
+        # Obtain the ImmutableStack list from the DispatcherNotification's one and only result
+        stacks: Optional[Union[ImmutableStack, List[ImmutableStack]]] = (
+            stack_notification.get_one_and_only_result()
+        )
+
+        # Check, if the ImmutableStack list exists
+        if not stacks:
+            # Set the ImmutableStack list to an empty list
+            stacks = []
+        # Check if the ImmutableStack is an instance of ImmutableStack
+        elif stacks and isinstance(
+            stacks,
+            ImmutableStack,
+        ):
+            # Set the ImmutableStack list to an ImmutableStack list
+            stacks = [stacks]
 
         # Create the 'stack' ComboboxField widget
         stack_field: ComboboxField = ComboboxField(
@@ -232,7 +253,7 @@ class FlashcardCreateForm(BaseCreateForm):
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
-            values=[stack.name for stack in notification.get_one_and_only_result()],
+            values=[stack.get(name="name") for stack in stacks] if stacks else [],
         )
 
         # Place the 'stack' ComboboxField widget in the grid

@@ -19,7 +19,7 @@ from core.ui.fields.string_fields import (
 
 from core.ui.frames.frames import ScrolledFrame
 
-from core.ui.notifications.notifications import ToplevelNotification
+from core.ui.notifications.notifications import ToplevelToastNotification
 
 from core.stack import ImmutableStack
 
@@ -92,6 +92,39 @@ class StackCreateForm(BaseCreateForm):
         super()._on_field_change(
             label=label,
             value=value,
+        )
+
+        # Check, if the changed field is the 'name' field
+        if label != "Name*: ":
+            # Return early
+            return
+
+        # Dispatch the REQUEST_STACK_LOOKUP event in the 'global' namespace
+        notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+            event=Events.REQUEST_STACK_LOOKUP,
+            namespace=Constants.GLOBAL_NAMESPACE,
+            name=self._value_dict["name"]["value"],
+        )
+
+        if not notification or notification.has_errors():
+            # Log a warning message
+            self.logger.warning(message=f"")
+
+            # Return early
+            return
+
+        # Obtain the ImmutableStack or ImmutableStack list from the DispatcherNotification's one an only result
+        stacks: Optional[Union[ImmutableStack, List[ImmutableStack]]] = notification.get_one_and_only_result()
+
+        # Check, if no ImmutableStack or ImmutableStack list could be obtained
+        if not stacks:
+            # Return early
+            return
+
+        # Display a toast message to the user
+        ToplevelToastNotification(
+            title=f"Illegal value for 'name' field",
+            message=f"Stacks need to have a unique name in StudyFrog. It seems that a '{value}' stack already exists.",
         )
 
     @override
@@ -204,15 +237,30 @@ class StackCreateForm(BaseCreateForm):
             # Return early
             return
 
+        # Obtain the ImmutableStack list from the DispatcherNotification's one and only result
+        stacks: Optional[Union[ImmutableStack, List[ImmutableStack]]] = (
+            stack_notification.get_one_and_only_result()
+        )
+
+        # Check, if the ImmutableStack list exists
+        if not stacks:
+            # Set the ImmutableStack list to an empty list
+            stacks = []
+        # Check if the ImmutableStack is an instance of ImmutableStack
+        elif stacks and isinstance(
+            stacks,
+            ImmutableStack,
+        ):
+            # Set the ImmutableStack list to an ImmutableStack list
+            stacks = [stacks]
+
         # Create the 'ancestor field' ComboboxField widget
         ancestor_field: ComboboxField = ComboboxField(
             label="Ancestor: ",
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
-            values=[
-                stack.name for stack in stack_notification.get_one_and_only_result()
-            ],
+            values=[stack.get(name="name") for stack in stacks] if stacks else [],
         )
 
         # Place the 'ancestor field' ComboboxField widget in the grid
@@ -395,7 +443,7 @@ class StackCreateForm(BaseCreateForm):
             label="Due By*: ",
             master=master,
             on_change_callback=self._on_field_change,
-            value=Miscellaneous.get_date_increment(increment=45)
+            value=Miscellaneous.get_date_increment(increment=45),
         )
 
         # Place the 'due by' DateSelectField widget in the grid
@@ -455,6 +503,12 @@ class StackCreateForm(BaseCreateForm):
             label="Due By*: ",
             field=due_by_field,
             required=True,
+        )
+
+        # Call the 'on_field_change' method with the 'due by' DateSelectField widget's value
+        self._on_field_change(
+            label="Due By*: ",
+            value=due_by_field.get(),
         )
 
         # Create the 'description' MultiLineTextField widget

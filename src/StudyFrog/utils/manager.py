@@ -45,8 +45,8 @@ class BaseObjectManager:
         # Get an instance of the logger class and store it in the object
         self.logger = Logger.get_logger(name=self.__class__.__name__)
 
-        # Initialize the cache as an empty list
-        self._cache: List[Dict[str, Any]] = []
+        # Initialize the cache as an empty dictionary
+        self._cache: Dict[str, Any] = {}
 
         # Store the time limit in an instance variable
         self._time_limit: int = 3600
@@ -55,12 +55,12 @@ class BaseObjectManager:
         self._timestamp: datetime = datetime.now()
 
     @property
-    def cache(self) -> List[Dict[str, Any]]:
+    def cache(self) -> Dict[str, Any]:
         """
         Returns the cache.
 
         :return: The cache.
-        :rtype: List[Dict[str, Any]]
+        :rtype: Dict[str, Any]
         """
 
         # Return the cache
@@ -118,17 +118,12 @@ class BaseObjectManager:
         self.flush_cache()
 
         # Check if the key already exists
-        if key in [item["key"] for item in self._cache]:
+        if key in set(self._cache.keys()):
             # Log a warning message
             self.logger.warning(message=f"Key '{key}' already exists. Overwriting...")
 
         # Add the key-value pair to the cache
-        self._cache.append(
-            {
-                "key": key,
-                "value": value,
-            }
-        )
+        self._cache[key] = value
 
         # Log the addition to the cache
         self.logger.info(message=f"Added to cache: {key}")
@@ -186,7 +181,9 @@ class BaseObjectManager:
             self._timestamp = datetime.now()
 
             # Log updating the timestamp
-            self.logger.info(message=f"Updated the timestamp to {Miscellaneous.datetime_to_string(datetime=self._timestamp)}.")
+            self.logger.info(
+                message=f"Updated the timestamp to {Miscellaneous.datetime_to_string(datetime=self._timestamp)}."
+            )
 
     def get_cache_keys(self) -> List[str]:
         """
@@ -197,7 +194,7 @@ class BaseObjectManager:
         """
 
         # Return the keys of the cache
-        return [item["key"] for item in self._cache]
+        return list(self._cache.keys())
 
     def get_cache_values(self) -> List[Any]:
         """
@@ -208,12 +205,12 @@ class BaseObjectManager:
         """
 
         # Return the values of the cache
-        return [item["value"] for item in self._cache]
+        return list(self._cache.values())
 
     def get_key_from_cache(
         self,
         value: Any,
-    ) -> str:
+    ) -> Optional[str]:
         """
         Returns the key of the item with the given value from the cache.
 
@@ -224,10 +221,18 @@ class BaseObjectManager:
         :rtype: str
         """
 
-        # Return the key of the item with the given value
-        return [item["key"] for item in self._cache][
-            [item["value"] for item in self._cache].index(value)
-        ]
+        # Iterate over the keys and items in the cache
+        for key, item, in self._cache.items():
+            # Check, if the current item and the passed value are equal
+            if value != item:
+                # Skip the current iteration
+                continue
+
+            # Return the key
+            return key
+
+        # Return None
+        return None
 
     def get_value_from_cache(
         self,
@@ -243,18 +248,18 @@ class BaseObjectManager:
         :rtype: Any
         """
 
-        # Check if the key exists
-        if key not in [item["key"] for item in self._cache]:
-            # Log a warning message
-            self.logger.warning(
-                message=f"Key '{key}' does not exist. Returning None..."
-            )
+        # Iterate over the items and values in the cache
+        for item, value, in self._cache.items():
+            # Check, if the current item and the passed key are equal
+            if key != item:
+                # Skip the current iteration
+                continue
 
-            # Return early since the key does not exist
-            return
+            # Return the value
+            return value
 
-        # Return the value of the key
-        return self._cache[[item["key"] for item in self._cache].index(key)]["value"]
+        # Return None
+        return None
 
     def is_cache_empty(self) -> bool:
         """
@@ -295,7 +300,7 @@ class BaseObjectManager:
         """
 
         # Return True if the key exists, False otherwise
-        return key in [item["key"] for item in self._cache]
+        return key in set(self._cache.keys())
 
     def is_value_in_cache(
         self,
@@ -312,7 +317,7 @@ class BaseObjectManager:
         """
 
         # Return True if the value exists, False otherwise
-        return value in [item["value"] for item in self._cache]
+        return value in set(self._cache.values())
 
     def remove_from_cache(
         self,
@@ -329,10 +334,56 @@ class BaseObjectManager:
         """
 
         # Remove the item from the cache
-        self._cache.remove(self._cache[key])
+        self._cache.pop(key, None,)
 
         # Log the removal
         self.logger.info(message=f"Removed key '{key}' from cache.")
+
+    def search_cache(
+        self,
+        **kwargs,
+    ) -> Optional[List[Any]]:
+        """
+        Searches the internal cache for objects matching all specified attributes.
+
+        This method checks every cached object to determine whether all provided
+        key-value pairs match the object's corresponding attributes.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments representing the attribute names
+                    and their expected values.
+
+        Returns:
+            Optional[List[Any]]: A list of matching objects, or None if no matches are found.
+        """
+
+        # Initialize the result list
+        result: List[Any] = []
+
+        # Iterate over unique cache values (use set to avoid duplicates)
+        for cache_value in set(self._cache.values()):
+            try:
+                # Check if all provided attributes match the current cache object
+                if all(
+                    hasattr(
+                        cache_value,
+                        key,
+                    )
+                    and getattr(
+                        cache_value,
+                        key,
+                    )
+                    == value
+                    for key, value, in kwargs.items()
+                ):
+                    result.append(cache_value)
+            except Exception as e:
+                self.logger.error(
+                    message=f"Exception during cache search on '{cache_value}': {e}"
+                )
+
+        # Return None if no matching entries were found
+        return result if result else None
 
     def update_in_cache(
         self,
@@ -354,18 +405,16 @@ class BaseObjectManager:
         :raises KeyError: If the key does not exist.
         """
 
-        # Update the value of the item with the given key in the cache
-        for item in self._cache:
-            # Check if the key matches
-            if item["key"] == key:
-                # Update the value of the item
-                item["value"] = value
+        # Flush the cache, if needed
+        self.flush_cache()
 
-                # Log an info message about the update
-                self.logger.info(message=f"Updated in cache: {key}")
+        # Check if the key already exists
+        if key in set(self._cache.keys()):
+            # Log a warning message
+            self.logger.warning(message=f"Key '{key}' already exists. Overwriting...")
 
-                # Return early since the key was found
-                break
-            else:
-                # Raise a KeyError if the key was not found
-                raise KeyError("Key not found")
+        # Add the key-value pair to the cache
+        self._cache[key] = value
+
+        # Log the addition to the cache
+        self.logger.info(message=f"Added to cache: {key}")

@@ -203,7 +203,7 @@ class CreateUI(BaseUI):
         """ """
         try:
             # Obtain the 'difficulty' value from the kwargs dictionary
-            difficulty: Optional[Union[ImmutableDifficulty, int, str]] = kwargs.get(
+            difficulty: Optional[Union[ImmutableDifficulty, int, str]] = kwargs.pop(
                 "difficulty",
                 None,
             )
@@ -240,7 +240,7 @@ class CreateUI(BaseUI):
         """ """
         try:
             # Obtain the 'priority' value from the kwargs dictionary
-            priority: Optional[Union[ImmutablePriority, int, str]] = kwargs.get(
+            priority: Optional[Union[ImmutablePriority, int, str]] = kwargs.pop(
                 "priority",
                 None,
             )
@@ -308,7 +308,7 @@ class CreateUI(BaseUI):
             # Re-raise the exception to the caller
             raise e
 
-    def _get_status(
+    def _get_status_by_name(
         self,
         status_name: str,
         **kwargs,
@@ -339,7 +339,7 @@ class CreateUI(BaseUI):
         except Exception as e:
             # Log an error message
             self.logger.error(
-                message=f"Caught an exception while attempting to call '_get_status' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to call '_get_status_by_name' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback
@@ -896,7 +896,16 @@ class CreateUI(BaseUI):
         """ """
         try:
             # Obtain the type from the kwargs
-            type: Optional[str] = kwargs.get("type")
+            type: Optional[str] = kwargs.pop(
+                "type",
+                None,
+            )
+
+            # Check, if the 'type' keyword has been passed to this method
+            if not type:
+                # Return early
+                return
+
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -916,14 +925,156 @@ class CreateUI(BaseUI):
         """ """
         try:
             # Obtain the type from the kwargs
-            type: Optional[str] = kwargs.get("type")
+            type: Optional[str] = kwargs.pop(
+                "type",
+                None,
+            )
 
             # Check, if the 'type' keyword has been passed to this method
             if not type:
-                pass
-            else:
-                # Remove the 'type' key from the dictionary
-                kwargs.pop("type")
+                # Return early
+                return
+
+            # Check, if the 'stack' key is assciated to any (non-empty string) value
+            if not (
+                kwargs.get(
+                    "stack",
+                    None,
+                )
+            ):
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to obtain a value associated with the 'stack' key for ImmutableFlashcard creation. This is likely due to a bug."
+                )
+
+                # Return early
+                return
+
+            # Update the kwargs with the ancestor stack's ID
+            kwargs.update(
+                self._get_stack(
+                    field="stack",
+                    **kwargs,
+                )
+            )
+
+            # Attempt to get the ImmutableStack object from the database
+            stack: Optional[ImmutableStack] = self._request_entity(
+                event=Events.REQUEST_STACK_LOOKUP,
+                id=kwargs.get("stack"),
+            )
+
+            # Check, if the stack exists
+            if not stack:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to get stack with ID '{kwargs.get("stack")}' from the database. This is likely due to a bug."
+                )
+
+                # Return early
+                return
+
+            # Copy the ImmutableStack object's difficulty to the kwargs
+            kwargs["difficulty"] = stack.difficulty
+
+            # Copy the ImmutableStack object's priority to the kwargs
+            kwargs["priority"] = stack.priority
+
+            # Update the kwargs with the 'New' status' ID
+            kwargs.update(
+                self._get_status_by_name(
+                    status_name="New",
+                    **kwargs,
+                )
+            )
+
+            # Set the back word count of the flashcard
+            kwargs["back_word_count"] = len(
+                kwargs.get(
+                    "back_text",
+                    "",
+                ).strip().split(" ")
+            )
+
+            # Set the front word count of the flashcard
+            kwargs["front_word_count"] = len(
+                kwargs.get(
+                    "front_text",
+                    "",
+                ).strip().split(" ")
+            )
+
+            # Set the total word count of the flashcard
+            kwargs["total_word_count"] = (
+                kwargs["back_word_count"] + kwargs["front_word_count"]
+            )
+
+            # Set the familiarity of the flashcard
+            kwargs["familiarity"] = 0.0
+
+            # Set the custom field values of the flashcard
+            kwargs["custom_field_values"] = []
+
+            # Set the tags of the flashcard
+            kwargs["tags"] = []
+
+            # Remove the stack keyword from kwargs
+            kwargs.pop(
+                "stack",
+                None,
+            )
+
+            # Attempt to create the ImmutableFlashcard object in the database and update the reference
+            flashcard: Optional[ImmutableFlashcard] = self._create_entity(
+                entity=UnifiedObjectFactory().create_flashcard(**kwargs),
+                event=Events.REQUEST_FLASHCARD_CREATE,
+            )
+
+            # Check, if the flashcard exists
+            if not flashcard:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create ImmutableFlashcard in the databse in 'handle_flashcard_creation' method. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Check, if the flashcard was created succcessfully (i.e. if it has an ID)
+            if not flashcard.get(
+                default=None,
+                name="id",
+            ):
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create ImmutableFlashcard in the databse in 'handle_flashcard_creation' method. This is likely a bug."
+                )
+
+                # Return early
+                return
+
+            # Convert the stack to a MutableStack
+            stack = stack.to_mutable()
+
+            # Add the newly created ImmutableFlashcard object to the MutableStack's contents
+            stack.add_to_contents(content=flashcard)
+
+            # Dispatch the REQUEST_STACK_UPDATE event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_STACK_UPDATE,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                stack=stack,
+            )
+
+            # Dispatch the FLASHCARD_CREATED event in the global namespace
+            self.dispatcher.dispatch(
+                event=Events.FLASHCARD_CREATED,
+                flashcard=flashcard,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Return the ImmutableFlashcard object to the caller
+            return flashcard
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -943,14 +1094,16 @@ class CreateUI(BaseUI):
         """ """
         try:
             # Obtain the type from the kwargs
-            type: Optional[str] = kwargs.get("type")
+            type: Optional[str] = kwargs.pop(
+                "type",
+                None,
+            )
 
             # Check, if the 'type' keyword has been passed to this method
             if not type:
-                pass
-            else:
-                # Remove the 'type' key from the dictionary
-                kwargs.pop("type")
+                # Return early
+                return
+
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -970,7 +1123,7 @@ class CreateUI(BaseUI):
         """ """
         try:
             # Obtain the type from the kwargs
-            type: Optional[str] = kwargs.get(
+            type: Optional[str] = kwargs.pop(
                 "type",
                 None,
             )
@@ -980,16 +1133,10 @@ class CreateUI(BaseUI):
                 # Return early
                 return
 
-            # Remove the 'type' key from the dictionary
-            kwargs.pop("type")
-
             # Check, if the 'ancestor' key is assciated to any (non-empty string) value
-            if (
-                kwargs.get(
-                    "ancestor",
-                    None,
-                )
-                is not None
+            if kwargs.get(
+                "ancestor",
+                None,
             ):
                 # Update the kwargs with the ancestor stack's ID
                 kwargs.update(
@@ -1000,12 +1147,9 @@ class CreateUI(BaseUI):
                 )
 
             # Check, if the 'difficulty' key is assciated to any (non-empty string) value
-            if (
-                kwargs.get(
-                    "difficulty",
-                    None,
-                )
-                is not None
+            if kwargs.get(
+                "difficulty",
+                None,
             ):
                 # Update the kwargs with the difficulty's ID
                 kwargs.update(
@@ -1015,12 +1159,9 @@ class CreateUI(BaseUI):
                 )
 
             # Check, if the 'priority' key is assciated to any (non-empty string) value
-            if (
-                kwargs.get(
-                    "priority",
-                    None,
-                )
-                is not None
+            if kwargs.get(
+                "priority",
+                None,
             ):
                 # Update the kwargs with the priority's ID
                 kwargs.update(
@@ -1029,9 +1170,9 @@ class CreateUI(BaseUI):
                     )
                 )
 
-            # Update the kwargs with the status's ID
+            # Update the kwargs with the 'New' status's ID
             kwargs.update(
-                self._get_status(
+                self._get_status_by_name(
                     status_name="New",
                     **kwargs,
                 )
@@ -1153,6 +1294,9 @@ class CreateUI(BaseUI):
                 ):
                     # Destroy the toplevel widget
                     self.master.destroy()
+
+                    # Return early
+                    return
 
             # Clear the current form
             self.form.clear()

@@ -389,12 +389,12 @@ class MutableStack(MutableBaseObject):
         """
 
         # If the stack currently has no contents, create an empty list
-        if not self["contents"]:
+        if not self.get(name="contents"):
             # Initialize the contents list as an empty list
-            self["contents"] = []
+            self.contents = []
 
         # Append the key of the given object to the stack's contents
-        self["contents"].append(content.key)
+        self.contents.append(content.get(name="key"))
 
     def add_to_descendants(
         self,
@@ -1281,12 +1281,14 @@ class StackManager(BaseObjectManager):
 
     def search_stacks(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[Union[List[ImmutableStack]]]:
         """
         Searches for stacks in the database.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             **kwargs: Any additional keyword arguments to be passed to the search method of the StackModel class.
 
         Returns:

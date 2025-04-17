@@ -3,28 +3,30 @@ Author: lodego
 Date: 2025-03-15
 """
 
+import traceback
+
 from typing import *
 
-from core.answer import AnswerManager
-from core.association import AssociationManager
-from core.change_history import ChangeHistoryManager, ChangeHistoryItemManager
-from core.comment import CommentManager
-from core.custom_field import CustomFieldManager
-from core.default import DefaultManager
-from core.difficulty import DifficultyManager
-from core.flashcard import FlashcardManager
-from core.note import NoteManager
-from core.priority import PriorityManager
-from core.question import QuestionManager
-from core.setting import SettingManager
-from core.stack import StackManager
-from core.status import StatusManager
-from core.tag import TagManager
-from core.user import UserManager
+from core.answer import AnswerFactory, AnswerManager
+from core.association import AssociationFactory, AssociationManager
+from core.change_history import ChangeHistoryFactory, ChangeHistoryManager, ChangeHistoryItemFactory, ChangeHistoryItemManager
+from core.comment import CommentFactory, CommentManager
+from core.custom_field import CustomFieldFactory, CustomFieldManager
+from core.default import DefaultFactory, DefaultManager
+from core.difficulty import DifficultyFactory, DifficultyManager
+from core.flashcard import FlashcardFactory, FlashcardManager
+from core.note import NoteFactory, NoteManager
+from core.priority import PriorityFactory, PriorityManager
+from core.question import QuestionFactory, QuestionManager
+from core.setting import SettingFactory, SettingManager
+from core.stack import StackFactory, StackManager
+from core.status import StatusFactory, StatusManager
+from core.tag import TagFactory, TagManager
+from core.user import UserFactory, UserManager
 
 from utils.dispatcher import Dispatcher
 from utils.logger import Logger
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["ComponentAccessor"]
@@ -76,6 +78,7 @@ class ComponentAccessor:
         get_stack_manager(): Returns the stack manager instance.
         get_status_manager(): Returns the status manager instance.
         get_tag_manager(): Returns the tag manager instance.
+        get_unified_factory(): Returns the unified factory instance.
         get_unified_manager(): Returns the unified manager instance.
         get_user_manager(): Returns the user manager instance.
     """
@@ -99,6 +102,7 @@ class ComponentAccessor:
     stack_manager: StackManager = StackManager()
     status_manager: StatusManager = StatusManager()
     tag_manager: TagManager = TagManager()
+    unified_factory: UnifiedObjectFactory = UnifiedObjectFactory()
     unified_manager: UnifiedObjectManager = UnifiedObjectManager()
     user_manager: UserManager = UserManager()
 
@@ -332,6 +336,134 @@ class ComponentAccessor:
         return TagManager()
 
     @classmethod
+    def get_unified_factory(cls) -> UnifiedObjectFactory:
+        """
+        Returns the unified factory instance.
+
+        Returns:
+            UnifiedObjectFactory: The unified factory instance.
+        """
+        try:
+            # Create the factory instance
+            factory: UnifiedObjectFactory = UnifiedObjectFactory()
+
+            # Register the answer factory
+            factory.register_factory(
+                name="answer_factory",
+                manager=AnswerFactory,
+            )
+
+            # Register the association factory
+            factory.register_factory(
+                name="association_factory",
+                manager=AssociationFactory,
+            )
+
+            # Register the change history factory
+            factory.register_factory(
+                name="change_history_factory",
+                manager=ChangeHistoryFactory,
+            )
+
+            # Register the change history item factory
+            factory.register_factory(
+                name="change_history_item_factory",
+                manager=ChangeHistoryItemFactory,
+            )
+
+            # Register the comment factory
+            factory.register_factory(
+                name="comment_factory",
+                manager=CommentFactory,
+            )
+
+            # Register the custom field factory
+            factory.register_factory(
+                name="custom_field_factory",
+                manager=CustomFieldFactory,
+            )
+
+            # Register the default factory
+            factory.register_factory(
+                name="default_factory",
+                manager=DefaultFactory,
+            )
+
+            # Register the difficulty factory
+            factory.register_factory(
+                name="difficulty_factory",
+                manager=DifficultyFactory,
+            )
+
+            # Register the flashcard factory
+            factory.register_factory(
+                name="flashcard_manager",
+                manager=FlashcardManager,
+            )
+
+            # Register the note factory
+            factory.register_factory(
+                name="note_factory",
+                manager=NoteFactory,
+            )
+
+            # Register the priority factory
+            factory.register_factory(
+                name="priority_factory",
+                manager=PriorityFactory,
+            )
+
+            # Register the question factory
+            factory.register_factory(
+                name="question_factory",
+                manager=QuestionFactory,
+            )
+
+            # Register the setting factory
+            factory.register_factory(
+                name="setting_factory",
+                manager=SettingFactory,
+            )
+
+            # Register the stack factory
+            factory.register_factory(
+                name="stack_factory",
+                manager=StackFactory,
+            )
+
+            # Register the status factory
+            factory.register_factory(
+                name="status_factory",
+                manager=StatusFactory,
+            )
+
+            # Register the tag factory
+            factory.register_factory(
+                name="tag_factory",
+                manager=TagFactory,
+            )
+
+            # Register the user factory
+            factory.register_factory(
+                name="user_factory",
+                manager=UserFactory,
+            )
+
+            # Return the factory instance
+            return factory
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_unified_factory' method from '{cls.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            cls.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @classmethod
     def get_unified_manager(cls) -> UnifiedObjectManager:
         """
         Returns the unified manager instance.
@@ -452,6 +584,9 @@ class ComponentAccessor:
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_unified_manager' method from '{cls.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            cls.logger.error(message=traceback.format_exc())
 
             # Re-raise the exception to the caller
             raise e

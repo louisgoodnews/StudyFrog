@@ -5,12 +5,15 @@ Date: 2025-02-08
 
 import tkinter
 
+from datetime import datetime
 from tkinter.constants import *
-
 from typing import *
 
+from core.difficulty import ImmutableDifficulty
+from core.priority import ImmutablePriority
 from core.setting import SettingService
 from core.stack import ImmutableStack
+from core.status import ImmutableStatus
 
 from utils.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
@@ -20,7 +23,6 @@ from core.ui.frames.frames import ScrolledFrame, TabbedFrame
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
-from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
@@ -935,22 +937,95 @@ class DashboardUI(BaseUI):
                 master=master,
             )
 
-            # Dispatch events to lookup stack attribute details
-            difficulty_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_DIFFICULTY_LOOKUP,
-                id=stack["difficulty"],
-                namespace=Constants.GLOBAL_NAMESPACE,
+            # Dispatch the REQUEST_DIFFICULTY_LOOKUP event in the GLOBAL namespace
+            difficulty_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                    id=stack.get(name="difficulty"),
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
-            priority_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_PRIORITY_LOOKUP,
-                id=stack["priority"],
-                namespace=Constants.GLOBAL_NAMESPACE,
+
+            # Check, if the notification exists or has errors
+            if not difficulty_notification or difficulty_notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_DIFFICULTY_LOOKUP' event in 'global' namespace in 'lookup_recently_viewed_stacks' method: {difficulty_notification.get_errors() if difficulty_notification else None}"
+                )
+
+                # Return early
+                return
+
+            # Obtain the difficulty from the one and only result of the notification
+            difficulty: Optional[ImmutableDifficulty] = difficulty_notification.get_one_and_only_result()[0]
+
+            # Check, if the priority exists
+            if not difficulty:
+                # Log a warning message
+                self.logger.warning(message=f"Failed to get ImmutableDifficulty from DispatcherNotification object.")
+
+                # Return early
+                return
+
+            # Dispatch the REQUEST_PRIORITY_LOOKUP event in the GLOBAL namespace
+            priority_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_PRIORITY_LOOKUP,
+                    id=stack.get(name="priority"),
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
-            status_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_STATUS_LOOKUP,
-                id=stack["status"],
-                namespace=Constants.GLOBAL_NAMESPACE,
+
+            # Check, if the notification exists or has errors
+            if not priority_notification or priority_notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_PRIORITY_LOOKUP' event in 'global' namespace in 'lookup_recently_viewed_stacks' method: {priority_notification.get_errors() if priority_notification else None}"
+                )
+
+                # Return early
+                return
+
+            # Obtain the priority from the one and only result of the notification
+            priority: Optional[ImmutablePriority] = priority_notification.get_one_and_only_result()[0]
+
+            # Check, if the priority exists
+            if not priority:
+                # Log a warning message
+                self.logger.warning(message=f"Failed to get ImmutablePriority from DispatcherNotification object.")
+
+                # Return early
+                return
+
+            # Dispatch the REQUEST_STATUS_LOOKUP event in the GLOBAL namespace
+            status_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STATUS_LOOKUP,
+                    id=stack["status"],
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
+
+            # Check, if the notification exists or has errors
+            if not status_notification or status_notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_STATUS_LOOKUP' event in 'global' namespace in 'lookup_recently_viewed_stacks' method: {status_notification.get_errors() if status_notification else None}"
+                )
+
+                # Return early
+                return
+
+            # Obtain the status from the one and only result of the notification
+            status: Optional[ImmutableStatus] = status_notification.get_one_and_only_result()[0]
+
+            # Check, if the priority exists
+            if not status:
+                # Log a warning message
+                self.logger.warning(message=f"Failed to get ImmutableStatus from DispatcherNotification object.")
+
+                # Return early
+                return
 
             # Iterate over stack attributes to configure the frame and create labels
             for (
@@ -984,17 +1059,11 @@ class DashboardUI(BaseUI):
 
                 # Determine the text to display based on column type
                 if column == "priority":
-                    text = priority_notification.get_result_by_key(
-                        key="on_request_priority_lookup"
-                    )[0]["emoji"]
+                    text = priority_notification.get_one_and_only_result()[0]["emoji"]
                 elif column == "difficulty":
-                    text = difficulty_notification.get_result_by_key(
-                        key="on_request_difficulty_lookup"
-                    )[0]["emoji"]
+                    text = difficulty_notification.get_one_and_only_result()[0]["emoji"]
                 elif column == "status":
-                    text = status_notification.get_result_by_key(
-                        key="on_request_status_lookup"
-                    )[0]["emoji"]
+                    text = status_notification.get_one_and_only_result()[0]["emoji"]
                 else:
                     text = data[column]
 
@@ -1019,7 +1088,7 @@ class DashboardUI(BaseUI):
 
                 # Bind the label widget to a command that dispatches an event when clicked
                 label.bind(
-                    func=lambda event, stack=stack: self.dispatcher.dispatch(
+                    func=lambda stack=stack: self.dispatcher.dispatch(
                         direction="forward",
                         event=Events.REQUEST_VALIDATE_NAVIGATION,
                         namespace=Constants.GLOBAL_NAMESPACE,
@@ -1201,9 +1270,7 @@ class DashboardUI(BaseUI):
             stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
                 event=Events.REQUEST_STACK_LOOKUP,
                 namespace=Constants.GLOBAL_NAMESPACE,
-                status=status_notification.get_result_by_key(
-                    key="on_request_status_lookup"
-                )[0]["id"],
+                status=status_notification.get_one_and_only_result().id,
             )
 
             # Lookup the stacks from the DispatcherNotification
@@ -1221,6 +1288,14 @@ class DashboardUI(BaseUI):
                 # Return early
                 return
 
+            # Check, if stacks list is instance of ImmutableStack
+            if isinstance(
+                stacks,
+                ImmutableStack,
+            ):
+                # Convert ImmutableStack instance to a list of ImmutableStack
+                stacks = [stacks]
+
             # Iterate over the list of stacks
             for stack in stacks:
                 # Create the stack item widgets
@@ -1231,7 +1306,7 @@ class DashboardUI(BaseUI):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'lookup_stacks' method from '{self.__class__.__name__}': {e}",
+                message=f"Caught an exception while attempting to run 'lookup_completed_stacks' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller
@@ -1252,24 +1327,46 @@ class DashboardUI(BaseUI):
         """
         try:
             # Dispatch the REQUEST_GET_ALL_STACKS event
-            status_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_STATUS_LOOKUP,
-                name="New",
-                namespace=Constants.GLOBAL_NAMESPACE,
+            status_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STATUS_LOOKUP,
+                    name="New",
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                )
             )
+
+            # Check, if the notification exists or has errors
+            if not status_notification or status_notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_STATUS_LOOKUP' event in 'global' namespace in 'lookup_recently_viewed_stacks' method: {status_notification.get_errors() if status_notification else None}"
+                )
+
+                # Return early
+                return
 
             # Dispatch the REQUEST_GET_ALL_STACKS event
-            stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
-                event=Events.REQUEST_STACK_LOOKUP,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                status=status_notification.get_result_by_key(
-                    key="on_request_status_lookup"
-                )[0]["id"],
+            stacks_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STACK_LOOKUP,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    status=status_notification.get_one_and_only_result().id,
+                )
             )
 
-            # Lookup the stacks from the DispatcherNotification
-            stacks: Optional[List[ImmutableStack]] = (
-                stacks_notification.get_result_by_key(key="on_request_stack_lookup")
+            # Check, if the notification exists or has errors
+            if not stacks_notification or stacks_notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_STACK_LOOKUP' event in 'global' namespace in 'lookup_recently_viewed_stacks' method: {stacks_notification.get_errors() if stacks_notification else None}"
+                )
+
+                # Return early
+                return
+
+            # Obtain the ImmutableStack object list from the one and only result of the notification
+            stacks: Optional[Union[ImmutableStack, List[ImmutableStack]]] = (
+                stacks_notification.get_one_and_only_result()
             )
 
             # Check, if the stacks list is None
@@ -1282,6 +1379,14 @@ class DashboardUI(BaseUI):
                 # Return early
                 return
 
+            # Check, if stacks list is instance of ImmutableStack
+            if isinstance(
+                stacks,
+                ImmutableStack,
+            ):
+                # Convert ImmutableStack instance to a list of ImmutableStack
+                stacks = [stacks]
+
             # Iterate over the list of stacks
             for stack in stacks:
                 # Create the stack item widgets
@@ -1292,7 +1397,7 @@ class DashboardUI(BaseUI):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'lookup_stacks' method from '{self.__class__.__name__}': {e}",
+                message=f"Caught an exception while attempting to run 'lookup_new_stacks' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller
@@ -1316,14 +1421,24 @@ class DashboardUI(BaseUI):
         """
         try:
             # Dispatch the REQUEST_GET_ALL_STACKS event
-            stacks_notification: DispatcherNotification = self.dispatcher.dispatch(
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
                 event=Events.REQUEST_GET_ALL_STACKS,
                 namespace=Constants.GLOBAL_NAMESPACE,
             )
 
-            # Lookup the stacks from the DispatcherNotification
+            # Check, if the notification exists or has errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_GET_ALL_STACKS' event in 'global' namespace in 'lookup_recently_viewed_stacks' method: {notification.get_errors() if notification else None}"
+                )
+
+                # Return early
+                return
+
+            # Obtain the ImmutableStack object list from the one and only result of the notification
             stacks: Optional[List[ImmutableStack]] = (
-                stacks_notification.get_result_by_key(key="on_request_get_all_stacks")
+                notification.get_one_and_only_result()
             )
 
             # Check, if the stacks list is None
@@ -1336,12 +1451,20 @@ class DashboardUI(BaseUI):
                 # Return early
                 return
 
+            # Check, if stacks list is instance of ImmutableStack
+            if isinstance(
+                stacks,
+                ImmutableStack,
+            ):
+                # Convert ImmutableStack instance to a list of ImmutableStack
+                stacks = [stacks]
+
             # Iterate over the list of stacks
             for stack in filter(
                 # Filter the stacks to only include stacks that were viewed
                 # within the current week
                 lambda stack: Constants.START_OF_WEEK
-                <= stack["last_viewed_at"]
+                <=  stack["last_viewed_at"] if isinstance(stack["last_viewed_at"], datetime) else Miscellaneous.string_to_datetime(date_string=stack["last_viewed_at"])
                 <= Constants.END_OF_WEEK,
                 stacks,
             ):
@@ -1353,7 +1476,7 @@ class DashboardUI(BaseUI):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'lookup_stacks' method from '{self.__class__.__name__}': {e}",
+                message=f"Caught an exception while attempting to run 'lookup_recently_viewed_stacks' method from '{self.__class__.__name__}': {e}",
             )
 
             # Re-raise the exception to the caller
@@ -1415,7 +1538,7 @@ class DashboardUI(BaseUI):
         try:
             # Create the stack item widgets
             self.create_stack_item_widgets(
-                master=self.new_stacks_frame,
+                master=self.new_stacks_frame.container,
                 stack=stack,
             )
         except Exception as e:

@@ -1379,9 +1379,9 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Schedule the fade in
         self.fade_after_id = self.after(
-            func=self._fade_in,
-            ms=25,
-            *(0.0),
+            25,
+            self._fade_in,
+            0.0,
         )
 
     @property
@@ -1414,9 +1414,9 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
             # Schedule the fade out
             self.fade_after_id = self.after(
-                func=self._fade_out,
-                ms=self.fade_after,
-                *(1.0),
+                self.fade_after,
+                self._fade_out,
+                1.0,
             )
 
             # Return early
@@ -1430,9 +1430,9 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Schedule the next fade step
         self.after(
-            func=self._fade_in,
-            ms=50,
-            *(alpha + 0.05),
+            50,
+            self._fade_in,
+            alpha + 0.05,
         )
 
     def _fade_out(
@@ -1451,15 +1451,15 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Set the opacity of the window
         self.attributes(
-            option="-alpha",
-            value=alpha,
+            "-alpha",
+            alpha,
         )
 
         # Schedule the next fade step
         self.after(
-            func=self._fade_out,
-            ms=50,
-            *(alpha - 0.05),
+            50,
+            self._fade_out,
+            alpha - 0.05,
         )
 
     def _on_click(
@@ -1511,9 +1511,9 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Schedule the fade out
         self.fade_after_id = self.after(
-            func=self._fade_out,
-            ms=self.fade_after,
-            *(1.0),
+            self.fade_after,
+            self._fade_out,
+            1.0,
         )
 
     def _on_leave(
@@ -1524,9 +1524,9 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Schedule the fade out
         self.fade_after_id = self.after(
-            func=self._fade_out,
-            ms=25,
-            *(0.0),
+            25,
+            self._fade_out,
+            0.0,
         )
 
     def _place_toast(

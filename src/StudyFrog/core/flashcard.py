@@ -918,13 +918,16 @@ class FlashcardManager(BaseObjectManager):
             flashcard.created_at = Miscellaneous.get_current_datetime()
 
             # Set the custom_field_values of the flashcard
-            flashcard.custom_field_values = [] or flashcard.custom_field_values
+            flashcard.custom_field_values = flashcard.custom_field_values if flashcard.custom_field_values else []
+
+            # Set the familiarity of the flashcard
+            flashcard.familiarity = flashcard.familiarity if flashcard.familiarity else 0.0
 
             # Set the key of the flashcard
             flashcard.key = f"FLASHCARD_{self.count_flashcards() + 1}"
 
             # Set the tags of the flashcard
-            flashcard.tags = [] or flashcard.tags
+            flashcard.tags = flashcard.tags if flashcard.tags else []
 
             # Set the updated_at timestamp of the flashcard
             flashcard.updated_at = Miscellaneous.get_current_datetime()
