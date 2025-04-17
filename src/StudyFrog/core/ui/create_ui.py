@@ -1145,6 +1145,9 @@ class CreateUI(BaseUI):
                         **kwargs,
                     )
                 )
+            else:
+                # Set the 'ancestor' key to None
+                kwargs["ancestor"] = None
 
             # Check, if the 'difficulty' key is assciated to any (non-empty string) value
             if kwargs.get(
@@ -1177,6 +1180,18 @@ class CreateUI(BaseUI):
                     **kwargs,
                 )
             )
+
+            # Set the contents of the stack
+            kwargs["contents"] = []
+
+            # Set the descendants of the stack
+            kwargs["descendants"] = []
+
+            # Set the custom field values of the stack
+            kwargs["custom_field_values"] = []
+
+            # Set the tags of the stack
+            kwargs["tags"] = []
 
             # Attempt to create the ImmutableStack object in the database and update the reference
             stack: ImmutableStack = self._create_entity(
