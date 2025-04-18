@@ -5,9 +5,11 @@ Date: 2025-02-05
 
 import aiosqlite
 
+from datetime import datetime, timedelta
 from typing import *
 
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
 
 
 __all__: Final[List[str]] = ["DatabaseService"]
@@ -22,6 +24,71 @@ class DatabaseService:
     """
 
     logger: Final[Logger] = Logger.get_logger(name="DatabaseService")
+
+    cache: Final[Dict[str, Dict[str, Any]]] = {}
+
+    time_linit: Final[int] = 3600
+
+    timestamp: datetime = Miscellaneous.get_current_datetime()
+
+    @classmethod
+    def add_to_cache(
+        cls,
+        sql: str,
+        result: Any,
+        parameters: Optional[Tuple[..., Any]] = [],
+    ) -> None:
+        """
+        Adds a result to the cache with the given SQL query and parameters.
+
+        Args:
+            sql (str): The SQL query used to retrieve the result.
+            result (Any): The result to cache.
+            parameters (Optional[Tuple[..., Any]], optional): The parameters that were used to retrieve the result. Defaults to None.
+        """
+
+        # Check the timstamp
+        if cls.check_timestamp():
+            # Flush the cache
+            cls.flush_cache()
+
+        # Check, if the already exists in the cache
+        if cls.is_key_in_cache(key=sql):
+            # Log an info message
+            cls.logger.info(
+                message=f"Query '{sql}' already exists in cache. Overwriting..."
+            )
+
+        # Add the result to the cache
+        cls.cache[sql] = {
+            "parameters": parameters,
+            "result": result,
+        }
+
+        # Update the timestamp
+        cls.timestamp = Miscellaneous.get_current_datetime()
+
+    @classmethod
+    def check_timestamp(cls) -> bool:
+        """ """
+
+        # Return True if the cache needs to be cleared, False otherwise
+        return datetime.now() - cls.timestamp >= timedelta(seconds=cls.time_limit)
+
+    classmethod
+    def clear_cache(cls) -> None:
+        """ """
+
+        # Check, if the cache is empty
+        if cls.cache.empty():
+            # Return early
+            return
+
+        # Clear the cache
+        cls.cache.clear()
+
+        # Update the timestamp
+        cls.timestamp = Miscellaneous.get_current_datetime()
 
     @classmethod
     async def create(
@@ -178,6 +245,70 @@ class DatabaseService:
             return None
 
     @classmethod
+    def flush_cache(cls) -> None:
+        """ """
+
+        # Check, if the cache is empty
+        if cls.is_cache_empty():
+            # Update the timestamp
+            cls.timestamp = Miscellaneous.get_current_datetime()
+
+            # Return early
+            return
+
+        # Clear the cache
+        cls.clear_cache()
+
+    @classmethod
+    def get_cache_keys(cls) -> List[str]:
+        """ """
+
+        return cls.cache.keys()
+
+    @classmethod
+    def get_cache_values(cls) -> List[Any]:
+        """ """
+
+        return cls.cache.values()
+
+    @classmethod
+    def get_from_cache(
+        cls,
+        key: str,
+    ) -> Optional[Any]:
+        """ """
+
+        # Check, if the passed sql exists in the cache
+        if not cls.is_key_in_cache(key=key):
+            # Return early
+            return
+
+        # Return the value associated with the passed sql
+        return cls.cache[sql]
+
+    @classmethod
+    def is_cache_empty(cls) -> bool:
+        """ """
+
+        return cls.cache.empty()
+
+    @classmethod
+    def is_cachev_valid(cls) -> bool:
+        """ """
+
+        return cls.check_timestamp() and not cls.is_cache_empty()
+
+    @classmethod
+    def is_key_in_cache(
+        cls,
+        key: str,
+    ) -> bool:
+        """ """
+
+        # Return True if the pased key is contained in the cache or False if otherweise
+        return key in cls.cache
+
+    @classmethod
     async def read_all(
         cls,
         database: str,
@@ -278,6 +409,21 @@ class DatabaseService:
             return {}
 
     @classmethod
+    def remove_from_cache(
+        cls,
+        key: str,
+    ) -> None:
+        """ """
+
+        # Check, if th epassed key is contained in the cache
+        if not cls.is_key_in_cache():
+            # Return early
+            return
+
+        # Remove the items associated to the passed key from the cache
+        cls.cache.pop(key)
+
+    @classmethod
     async def update(
         cls,
         database: str,
@@ -332,3 +478,14 @@ class DatabaseService:
 
             # Return False indicating an exception occurred
             return False
+
+    @classmethod
+    def update_in_cache(
+        cls,
+        sql: str,
+        result: Any,
+        parameters: Optional[Tuple[..., Any]] = [],
+    ) -> None:
+        """ """
+
+        pa
