@@ -23,12 +23,16 @@ class DatabaseService:
         logger (Logger): The logger instance associated with the object.
     """
 
+    # This class' Logger instance
     logger: Final[Logger] = Logger.get_logger(name="DatabaseService")
 
+    # This class' cache dictionary
     cache: Final[Dict[str, Dict[str, Any]]] = {}
 
-    time_linit: Final[int] = 3600
+    # This class' time limit int
+    time_limit: Final[int] = 3600
 
+    # The timestamp datetime of when the cache was last updated/flushed
     timestamp: datetime = Miscellaneous.get_current_datetime()
 
     @classmethod
@@ -47,8 +51,8 @@ class DatabaseService:
             parameters (Optional[Tuple[..., Any]], optional): The parameters that were used to retrieve the result. Defaults to None.
         """
 
-        # Check the timstamp
-        if cls.check_timestamp():
+        # Check, if the cache is valid
+        if cls.is_cache_valid():
             # Flush the cache
             cls.flush_cache()
 
@@ -61,7 +65,7 @@ class DatabaseService:
 
         # Add the result to the cache
         cls.cache[sql] = {
-            "parameters": parameters,
+            "parameters": parameters or (),
             "result": result,
         }
 
@@ -69,15 +73,67 @@ class DatabaseService:
         cls.timestamp = Miscellaneous.get_current_datetime()
 
     @classmethod
+    def check_cache(
+        cls,
+        sql: str,
+        parameters: Optional[Tuple[Any, ...]] = None,
+    ) -> Union[Any, bool]:
+        """
+        Checks, if the cache contains the passed SQL query and if the parameters of the cached result
+        match the passed parameters.
+
+        If the cache contains the passed SQL query and the parameters of the cached result match the
+        passed parameters, the cached result is returned. Otherwise, False is returned.
+
+        Args:
+            sql (str): The SQL query to check.
+            parameters (Optional[Tuple[Any, ...]], optional): The parameters to check. Defaults to None.
+
+        Returns:
+            Union[Any, bool]: The cached result if the cache contains the passed SQL query and the
+            parameters of the cached result match the passed parameters, or False otherwise.
+        """
+
+        # Check, if the cache is valid
+        if not cls.is_cache_valid():
+            # Flush the cache
+            cls.flush_cache()
+
+            # Return False early
+            return False
+
+        # Check, if the passed sql is contained in the cache
+        if not cls.is_key_in_cache(key=sql):
+            # Return False early
+            return False
+
+        # Check, if the cache entry associated to the passed sql has the same parameters
+        if cls.cache[sql]["parameters"] != parameters:
+            # Return False early
+            return False
+
+        # Return the result associated with the passed sql
+        return cls.cache[sql]["result"]
+
+    @classmethod
     def check_timestamp(cls) -> bool:
-        """ """
+        """
+        Checks if the cache needs to be cleared.
+
+        Returns True if the cache needs to be cleared, False otherwise.
+        """
 
         # Return True if the cache needs to be cleared, False otherwise
         return datetime.now() - cls.timestamp >= timedelta(seconds=cls.time_limit)
 
-    classmethod
+    @classmethod
     def clear_cache(cls) -> None:
-        """ """
+        """
+        Clears the cache if it is not empty and updates the timestamp.
+
+        This method checks if the cache is empty. If not, it clears all cached
+        entries and updates the timestamp to the current datetime.
+        """
 
         # Check, if the cache is empty
         if cls.cache.empty():
@@ -117,6 +173,9 @@ class DatabaseService:
                 # Raise an error if it doesn't
                 raise ValueError("SQL query must start with 'INSERT'.")
 
+            # Initialize the result (optional) int as None
+            result: Optional[int] = None
+
             # Connect to the database
             async with aiosqlite.connect(database=database) as db:
                 # Execute the SQL query
@@ -124,15 +183,21 @@ class DatabaseService:
                     sql,
                     parameters,
                 ) as cursor:
-
-                    # Return the ID of the last row inserted
-                    result: int = cursor.lastrowid
+                    # Fetch the ID of the last row inserted
+                    result = cursor.lastrowid
 
                     # Commit the transaction
                     await db.commit()
 
-                    # Return the ID of the last row inserted
-                    return result
+            # Add the parameters, result and SQL query to the cache
+            cls.add_to_cache(
+                parameters=parameters,
+                result=result,
+                sql=sql,
+            )
+
+            # Return the ID of the last row inserted
+            return result
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(
@@ -148,7 +213,7 @@ class DatabaseService:
         database: str,
         sql: str,
         parameters: Optional[Tuple[..., Any]] = [],
-    ) -> Optional[int]:
+    ) -> Optional[Dict[str, Any]]:
         """
         Deletes a row from the database using a given SQL query.
 
@@ -158,7 +223,7 @@ class DatabaseService:
             sql (str): The SQL query to execute.
 
         Returns:
-            bool: True if at least one row was deleted, False otherwise.
+            Dict[str, Any]: A dictionary containing the result of the SQL query.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -168,6 +233,9 @@ class DatabaseService:
             if not sql.strip().upper().startswith("DELETE"):
                 # Raise an error if it doesn't
                 raise ValueError("SQL query must start with 'DELETE'.")
+
+            # Initialize the result (optional) bool as None
+            result: Optinoal[Dict[str, Any]] = None
 
             # Connect to the database
             async with aiosqlite.connect(database=database) as db:
@@ -188,15 +256,28 @@ class DatabaseService:
                     await db.commit()
 
                     # Return True if at least one row was deleted, False otherwise
-                    return True if rowcount > 0 else False
+                    result = {
+                        "result": True if rowcount > 0 else False,
+                        "rowcount": rowcount,
+                    }
+
+            # Add the parameters, result and SQL query to the cache
+            cls.add_to_cache(
+                parameters=parameters,
+                result=result,
+                sql=sql,
+            )
+
+            # Return the result
+            return result
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'delete' method from '{cls.__name__}': {e}"
             )
 
-            # Return False indicating an exception occurred
-            return False
+            # Return None indicating an exception occurred
+            return None
 
     @classmethod
     async def execute(
@@ -220,6 +301,23 @@ class DatabaseService:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check the cache:
+            cache_check: Union[Any, bool] = cls.check_cache(
+                parameters=parameters,
+                sql=sql,
+            )
+
+            # Check, if the cache check is not a boolean (i.e. False)
+            if not isinstance(
+                cache_check,
+                bool,
+            ):
+                # Return the check result early
+                return cache_check["result"]
+
+            # Initialize the (optional) result as None
+            result: Optional[Any] = None
+
             # Connect to the database
             async with aiosqlite.connect(database=database) as db:
                 # Execute the SQL query
@@ -228,13 +326,20 @@ class DatabaseService:
                     parameters,
                 ) as cursor:
                     # Fetch all rows
-                    result: Optional[Any] = await cursor.fetchall()
+                    result = await cursor.fetchall()
 
                     # Commit the transaction
                     await db.commit()
 
-                    # Return the result
-                    return result
+            # Add the parameters, result and SQL query to the cache
+            cls.add_to_cache(
+                parameters=parameters,
+                result=result,
+                sql=sql,
+            )
+
+            # Return the result
+            return result
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(
@@ -246,7 +351,14 @@ class DatabaseService:
 
     @classmethod
     def flush_cache(cls) -> None:
-        """ """
+        """
+        Flushes the cache.
+
+        Checks if the cache is empty. If it is, the timestamp is updated and the method returns early. Otherwise, the cache is cleared.
+
+        :return: None
+        :rtype: None
+        """
 
         # Check, if the cache is empty
         if cls.is_cache_empty():
@@ -261,22 +373,46 @@ class DatabaseService:
 
     @classmethod
     def get_cache_keys(cls) -> List[str]:
-        """ """
+        """
+        Returns the keys of the cache.
 
-        return cls.cache.keys()
+        The method returns a list of all keys in the cache.
+
+        :return: A list of keys in the cache.
+        :rtype: List[str]
+        """
+
+        return list(cls.cache.keys())
 
     @classmethod
     def get_cache_values(cls) -> List[Any]:
-        """ """
+        """
+        Returns the values of the cache.
 
-        return cls.cache.values()
+        The method returns a list of all values in the cache.
+
+        :return: A list of values in the cache.
+        :rtype: List[Any]
+        """
+
+        return list(cls.cache.values())
 
     @classmethod
     def get_from_cache(
         cls,
         key: str,
     ) -> Optional[Any]:
-        """ """
+        """
+        Retrieves a value from the cache by its key.
+
+        If the key is not found in the cache, the method returns None.
+
+        Args:
+            key (str): The key of the value to retrieve.
+
+        Returns:
+            Optional[Any]: The value associated with the passed key if the key is found, otherwise None.
+        """
 
         # Check, if the passed sql exists in the cache
         if not cls.is_key_in_cache(key=key):
@@ -288,13 +424,28 @@ class DatabaseService:
 
     @classmethod
     def is_cache_empty(cls) -> bool:
-        """ """
+        """
+        Checks if the cache is empty.
+
+        The method returns True if the cache is empty, otherwise False.
+
+        Returns:
+            bool: True if the cache is empty, otherwise False.
+        """
 
         return cls.cache.empty()
 
     @classmethod
-    def is_cachev_valid(cls) -> bool:
-        """ """
+    def is_cache_valid(cls) -> bool:
+        """
+        Checks if the cache is valid.
+
+        The cache is considered valid if the timestamp check passes
+        and the cache is not empty.
+
+        Returns:
+            bool: True if the cache is valid, False otherwise.
+        """
 
         return cls.check_timestamp() and not cls.is_cache_empty()
 
@@ -303,10 +454,18 @@ class DatabaseService:
         cls,
         key: str,
     ) -> bool:
-        """ """
+        """
+        Checks if a key exists in the cache.
+
+        Args:
+            key (str): The key to check.
+
+        Returns:
+            bool: True if the key exists in the cache, False otherwise.
+        """
 
         # Return True if the pased key is contained in the cache or False if otherweise
-        return key in cls.cache
+        return key in cls.cache.keys()
 
     @classmethod
     async def read_all(
@@ -314,7 +473,7 @@ class DatabaseService:
         database: str,
         sql: str,
         parameters: Optional[Tuple[..., Any]] = [],
-    ) -> List[Dict[str, Any]]:
+    ) -> Optional[List[Dict[str, Any]]]:
         """
         Reads all rows from the database using a given SQL query.
 
@@ -335,6 +494,23 @@ class DatabaseService:
                 # Raise an error if it doesn't
                 raise ValueError("SQL query must start with 'SELECT'.")
 
+            # Check the cache:
+            cache_check: Union[Any, bool] = cls.check_cache(
+                parameters=parameters,
+                sql=sql,
+            )
+
+            # Check, if the cache check is not a boolean (i.e. False)
+            if not isinstance(
+                cache_check,
+                bool,
+            ):
+                # Return the check result early
+                return cache_check["result"]
+
+            # Initialize the (optional) list result as None
+            result: Optional[List[Dict[str, Any]]] = None
+
             # Connect to the database
             async with aiosqlite.connect(database=database) as db:
                 # Set the row factory
@@ -347,8 +523,18 @@ class DatabaseService:
                     # Fetch the rows
                     rows: Optional[List[Dict[str, Any]]] = await cursor.fetchall()
 
-                    # Return the rows read from the database as a list of dictionaries
-                    return [dict(row) for row in rows]
+                    # Add a list of dictionary representations of the rows to the result or an empty list
+                    result = [dict(row) for row in rows] if rows else []
+
+            # Add the parameters, result and SQL query to the cache
+            cls.add_to_cache(
+                parameters=parameters,
+                result=result,
+                sql=sql,
+            )
+
+            # Return the rows read from the database as a list of dictionaries
+            return result
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(
@@ -385,6 +571,23 @@ class DatabaseService:
                 # Raise an error if it doesn't
                 raise ValueError("SQL query must start with 'SELECT'.")
 
+            # Check the cache:
+            cache_check: Union[Any, bool] = cls.check_cache(
+                parameters=parameters,
+                sql=sql,
+            )
+
+            # Check, if the cache check is not a boolean (i.e. False)
+            if not isinstance(
+                cache_check,
+                bool,
+            ):
+                # Return the check result early
+                return cache_check["result"]
+
+            # Initialize the (optional) dictionary result as None
+            result: Optional[Dict[str, Any]] = None
+
             # Connect to the database
             async with aiosqlite.connect(database=database) as db:
                 # Set the row factory
@@ -397,8 +600,18 @@ class DatabaseService:
                     # Fetch the row
                     row: Optional[Dict[str, Any]] = await cursor.fetchone()
 
-                    # Return the row
-                    return dict(row) if row else {}
+                    # Add a dictionary representations of the row to the result or an empty dictionary
+                    result = dict(row) if row else {}
+
+            # Add the parameters, result and SQL query to the cache
+            cls.add_to_cache(
+                parameters=parameters,
+                result=result,
+                sql=sql,
+            )
+
+            # Return the result
+            return result
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(
@@ -413,14 +626,22 @@ class DatabaseService:
         cls,
         key: str,
     ) -> None:
-        """ """
+        """
+        Removes an item from the cache by its key.
 
-        # Check, if th epassed key is contained in the cache
-        if not cls.is_key_in_cache():
+        Args:
+            key (str): The key of the item to remove.
+
+        Returns:
+            None
+        """
+
+        # Check if the passed key is contained in the cache
+        if not cls.is_key_in_cache(key=key):
             # Return early
             return
 
-        # Remove the items associated to the passed key from the cache
+        # Remove the item associated with the passed key from the cache
         cls.cache.pop(key)
 
     @classmethod
@@ -429,7 +650,7 @@ class DatabaseService:
         database: str,
         sql: str,
         parameters: Optional[Tuple[..., Any]] = [],
-    ) -> bool:
+    ) -> Optional[Dict[str, Any]]:
         """
         Updates a row in the database using a given SQL query.
 
@@ -450,6 +671,23 @@ class DatabaseService:
                 # Raise an error if it doesn't
                 raise ValueError("SQL query must start with 'UPDATE'.")
 
+            # Check the cache:
+            cache_check: Union[Any, bool] = cls.check_cache(
+                parameters=parameters,
+                sql=sql,
+            )
+
+            # Check, if the cache check is not a boolean (i.e. False)
+            if not isinstance(
+                cache_check,
+                bool,
+            ):
+                # Return the check result early
+                return cache_check["result"]
+
+            # Initialize the result (optional) int as None
+            result: Optional[int] = None
+
             # Connect to the database
             async with aiosqlite.connect(database=database) as db:
                 # Execute the SQL query
@@ -457,10 +695,10 @@ class DatabaseService:
                     sql,
                     parameters,
                 ) as cursor:
-                    # Fetch the number of rows updated
+                    # Fetch the number of rows deleted
                     rowcount: int = cursor.rowcount
 
-                    # Log a message indicating the number of rows updated
+                    # Log a message indicating the number of rows deleted
                     cls.logger.info(
                         message=f"Updated {rowcount} row(s) in the database."
                     )
@@ -468,8 +706,21 @@ class DatabaseService:
                     # Commit the transaction
                     await db.commit()
 
-                    # Return True if at least one row was updated, False otherwise
-                    return True if rowcount > 0 else False
+                    # Return True if at least one row was deleted, False otherwise
+                    result = {
+                        "result": True if rowcount > 0 else False,
+                        "rowcount": rowcount,
+                    }
+
+            # Add the parameters, result and SQL query to the cache
+            cls.add_to_cache(
+                parameters=parameters,
+                result=result,
+                sql=sql,
+            )
+
+            # Return the result
+            return result
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(
@@ -486,6 +737,20 @@ class DatabaseService:
         result: Any,
         parameters: Optional[Tuple[..., Any]] = [],
     ) -> None:
-        """ """
+        """
+        Updates the cache with the given SQL query, result, and parameters.
 
-        pa
+        If the SQL query already exists in the cache, it will be overwritten.
+
+        Args:
+            sql (str): The SQL query to associate with the result.
+            result (Any): The result to store in the cache.
+            parameters (Optional[Tuple[..., Any]], optional): The parameters used with the query.
+        """
+
+        # Add or update the result in the cache
+        cls.add_to_cache(
+            parameters=parameters,
+            result=result,
+            sql=sql,
+        )
