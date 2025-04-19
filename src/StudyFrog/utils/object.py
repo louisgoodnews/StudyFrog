@@ -45,11 +45,15 @@ class MutableBaseObject:
             Logger.get_logger(self.__class__.__name__),
         )
 
-        # Update the object's dictionary with the keyword arguments
+        # Iterate over the keys and values of the passed keyword arguments
         for (
             key,
             value,
         ) in kwargs.items():
+            # Format the key
+            # key = f"_{key}" if not key.strip().startswith("_") else key
+
+            # Set the attribute of the object
             object.__setattr__(
                 self,
                 key,
@@ -65,6 +69,82 @@ class MutableBaseObject:
         :rtype: Logger
         """
         return self._logger
+
+    def __deep_eq__(
+        self,
+        other: "MutableBaseObject",
+    ) -> bool:
+        """
+        Performs a deep equality check and logs differences between self and other.
+
+        This method compares all attributes of the current object with another object
+        of the same class and prints/logs differences field by field.
+
+        Args:
+            other (MutableBaseObject): The other object to compare with.
+
+        Returns:
+            bool: True if all attributes are equal, False otherwise.
+        """
+
+        # Check if both objects are of the same type
+        if not isinstance(
+            other,
+            self.__class__,
+        ):
+        # Log a warning message
+            self.logger.warning(
+                message=f"[DEEP_EQ] Type mismatch: {type(self)} != {type(other)}"
+            )
+
+            # Return False early
+            return False
+
+        # Initialize the differences list of tuples as an empty list
+        differences: List[
+            Tuple[
+                str,
+                Optional[Any],
+                Optional[Any],
+            ]
+        ] = []
+
+        # Iterate over the keys in the object's dictionary
+        for key in self.__dict__.keys():
+            # Obtain the value associated with the current key from the object's dictionary
+            self_val: Optional[Any] = self.__dict__.get(key)
+            
+            # Obtain the value associated with the current key from the other object's dictionary
+            other_val: Optional[Any] = other.__dict__.get(key)
+
+            # Check, if the two values are identical
+            if self_val != other_val:
+                # Add the key, this object's and the other object's value to the differences list of tuples
+                differences.append((key, self_val, other_val))
+
+        # Check, if there were any differneces
+        if differences:
+            # Log an info message
+            self.logger.info(
+                message=f"[DEEP_EQ] Found {len(differences)} differences between objects:"
+            )
+
+            # Iterate over the keys, this object's and the other object's values
+            for (
+                key,
+                self_val,
+                other_val,
+            ) in differences:
+                # Log a warning message
+                self.logger.info(
+                    message=f" - {key}: self={self_val} | other={other_val}"
+                )
+            
+            # Return False
+            return False
+
+        # Return True
+        return True
 
     def __delattr__(
         self,
@@ -105,7 +185,7 @@ class MutableBaseObject:
         """
 
         # Check if the objects are equal
-        return self.__dict__ == other.__dict__
+        return isinstance(other, MutableBaseObject) and self.__dict__ == other.__dict__
 
     def __getattr__(
         self,

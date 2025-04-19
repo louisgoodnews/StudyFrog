@@ -69,9 +69,6 @@ class DatabaseService:
             "result": result,
         }
 
-        # Update the timestamp
-        cls.timestamp = Miscellaneous.get_current_datetime()
-
     @classmethod
     def check_cache(
         cls,
