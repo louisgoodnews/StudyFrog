@@ -389,7 +389,7 @@ class MutableStack(MutableBaseObject):
         """
 
         # If the stack currently has no contents, create an empty list
-        if not self.get(name="contents"):
+        if not self.get(name="contents") or not isinstance(self.contents, list):
             # Initialize the contents list as an empty list
             self.contents = []
 

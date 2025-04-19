@@ -124,9 +124,9 @@ class Miscellaneous:
                 value,
             ) in data.items():
                 # Check, if the current value is a JSON string
-                if cls.is_json_string(string=value):
+                if isinstance(value, str) and cls.is_json_string(string=value):
                     # Convert the JSON string into a JSON object
-                    result[key] = json.loads(s=value)
+                    result[key] = json.loads(value)
 
                 # Check, if the current value is a datetime string
                 if cls.is_datetime_string(string=value):
@@ -604,11 +604,12 @@ class Miscellaneous:
         Returns:
             bool: True if the string looks like a JSON object or array, False otherwise.
         """
-        if not isinstance(string, str):
-            return False
 
+        # Strip off any leading or trailing whitespaces
         stripped: str = string.strip()
 
+        # Check if the string starts and ends with curly braces (indicating a JSON object)
+        # or square brackets (indicating a JSON array)
         return (stripped.startswith("{") and stripped.endswith("}")) or (
             stripped.startswith("[") and stripped.endswith("]")
         )
