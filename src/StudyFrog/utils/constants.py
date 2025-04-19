@@ -562,6 +562,8 @@ class Constants:
     SETTING_UI_NAMESPACE: Final[str] = "SETTING_UI"
     STACK_SELECTION_NAMESPACE: Final[str] = "STACK_SELECTION"
 
+    FLASHCARD_IMPORTER_NAMESPACE: Final[str] = "FLASHCARD_IMPORTER"
+
     # The current date and time
     NOW: Final[datetime] = datetime.now()
 
@@ -610,6 +612,27 @@ class Constants:
         "Single Select",
         "True or False",
     ]
+
+    # Template for JSON imports and exports from the application
+    JSON_TEMPLATE: Final[Dict[str, List[Optional[Any]]]] = {
+        "answers": [],
+        "associations": [],
+        "change_histories": [],
+        "change_history_items": [],
+        "comments": [],
+        "custom_fields": [],
+        "defaults": [],
+        "difficulties": [],
+        "flashcards": [],
+        "notes": [],
+        "options": [],
+        "priorities": [],
+        "questions": [],
+        "settings": [],
+        "stacks": [],
+        "statuses:": [],
+        "users": [],
+    }
 
     @classmethod
     def get_base_id(cls) -> int:

@@ -5,7 +5,7 @@ Date: 2024-01-24
 
 import asyncio
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from typing import *
 
@@ -25,7 +25,7 @@ class Logger:
     """
 
     # A dictionary of ANSI color codes
-    __COLORISATION__: Dict[str, str] = {
+    __COLORISATION__: Final[Dict[str, str]] = {
         "CRITICAL": "\033[91m",  # Red color code for critical messages
         "DEBUG": "\033[94m",  # Blue color code for debug messages
         "ERROR": "\033[93m",  # Yellow color code for error messages
@@ -155,7 +155,7 @@ class Logger:
         """
 
         # Store the return value of the function
-        result: Any
+        result: Optional[Any] = None
 
         # Create a timestamp at the start of the function
         start: datetime = datetime.now()

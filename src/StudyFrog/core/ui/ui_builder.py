@@ -7326,7 +7326,7 @@ class UIBuilder:
                 """
 
                 # Check if the string could be found in the "children" dictionary
-                if string not in set([label for label in result["children"].keys()]):
+                if string not in [label for label in result["children"].keys()]:
                     # Log a warning message, that the string could not be found
                     cls.logger.warning(
                         message=f"'{string}' could not be found in the 'children' dictionary. This is likely a bug.",
@@ -7336,9 +7336,7 @@ class UIBuilder:
                     return
 
                 # Hide all widgets in the "children" dictionary
-                for child in set(
-                    [value["widget"] for value in result["children"].values()]
-                ):
+                for child in [value["widget"] for value in result["children"].values()]:
                     child.grid_forget()
 
                 # Iterate over the items in the result dictionary

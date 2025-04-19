@@ -735,12 +735,14 @@ class SettingManager(BaseObjectManager):
 
     def search_settings(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[Union[List[ImmutableSetting]]]:
         """
         Searches for settings in the database.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             **kwargs: Any additional keyword arguments to be passed to the search method of the SettingModel class.
 
         Returns:
@@ -750,6 +752,16 @@ class SettingManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Search the stack for the passed keyword arguments
+                cached_result: Optional[List[ImmutableSetting]] = self.search_cache(**kwargs)
+
+                # Check, if any cached results exist
+                if cached_result:
+                    # Return the cached results
+                    return cached_result
+
             # Search for settings in the database
             models: Optional[List[SettingModel]] = asyncio.run(
                 SettingModel.search(
@@ -1085,7 +1097,7 @@ class SettingService:
         """
 
         # Initialize the logger
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the default manager
         self.default_manager: DefaultManager = DefaultManager()
@@ -1203,7 +1215,7 @@ class SettingService:
             if not setting:
                 # Log a warning message indicating the setting was not found
                 self.logger.warning(
-                    message=f"ImmutableSetting with {field} = {value} not found."
+                    message=f"ImmutableSetting with name '{name}' not found."
                 )
 
                 # Return None indicating the setting was not found

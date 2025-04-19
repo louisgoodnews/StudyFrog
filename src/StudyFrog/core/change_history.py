@@ -762,12 +762,14 @@ class ChangeHistoryManager(BaseObjectManager):
 
     def search_change_histories(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[Union[List[ImmutableChangeHistory]]]:
         """
         Searches for change histories in the database.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             **kwargs: Any additional keyword arguments to be passed to the search method of the ChangeHistoryModel class.
 
         Returns:
@@ -777,6 +779,16 @@ class ChangeHistoryManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Search the stack for the passed keyword arguments
+                cached_result: Optional[List[ImmutableChangeHistory]] = self.search_cache(**kwargs)
+
+                # Check, if any cached results exist
+                if cached_result:
+                    # Return the cached results
+                    return cached_result
+
             # Search for change histories in the database
             models: Optional[List[ChangeHistoryModel]] = asyncio.run(
                 ChangeHistoryModel.search(
@@ -1791,12 +1803,14 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
     def search_change_history_items(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[Union[List[ImmutableChangeHistoryItem]]]:
         """
         Searches for change history items in the database.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             **kwargs: Any additional keyword arguments to be passed to the search method of the ChangeHistoryItemModel class.
 
         Returns:
@@ -1806,6 +1820,16 @@ class ChangeHistoryItemManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Search the stack for the passed keyword arguments
+                cached_result: Optional[List[ImmutableChangeHistoryItem]] = self.search_cache(**kwargs)
+
+                # Check, if any cached results exist
+                if cached_result:
+                    # Return the cached results
+                    return cached_result
+
             # Search for change history items in the database
             models: Optional[List[ChangeHistoryItemModel]] = asyncio.run(
                 ChangeHistoryItemModel.search(

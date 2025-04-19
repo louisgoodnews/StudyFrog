@@ -16,6 +16,8 @@ from core.ui.frames.frames import ScrolledFrame
 
 from core.ui.notifications.notifications import ToplevelNotification
 
+from core.stack import ImmutableStack
+
 from utils.base_create_form import BaseCreateForm
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
@@ -27,8 +29,7 @@ __all__: Final[List[str]] = ["QuestionCreateForm"]
 
 
 class QuestionCreateForm(BaseCreateForm):
-    """
-    """
+    """ """
 
     def __init__(
         self,
@@ -36,8 +37,7 @@ class QuestionCreateForm(BaseCreateForm):
         master: tkinter.Misc,
         namespace: str,
     ) -> None:
-        """
-        """
+        """ """
 
         # Initialize the answer widgets dictionary instance variable as an empty dictionary
         self.answer_widgets: Final[Dict[str, Any]] = {}
@@ -50,12 +50,11 @@ class QuestionCreateForm(BaseCreateForm):
         )
 
     def _clear_answers_frame(self) -> None:
-        """
-        """
+        """ """
 
         # Obtain a list of child widgets from the 'answers frame' tkinter.Frame widget
         children: List[tkinter.Misc] = self.answers_frame.winfo_children()
-        
+
         if len(children) == 0:
             # Return early
             return
@@ -66,8 +65,7 @@ class QuestionCreateForm(BaseCreateForm):
             child.destroy()
 
     def _on_add_answer_button_click(self) -> None:
-        """
-        """
+        """ """
 
         # Create a unique label text from the number of child widgets in the 'answers frame' frame widget
         label: str = f"Answer {len(self.answers_frame.winfo_children())}*: "
@@ -119,11 +117,12 @@ class QuestionCreateForm(BaseCreateForm):
         label,
         value: Any,
     ) -> None:
-        """
-        """
+        """ """
 
         # Obtain the current question type from the 'value_dict' dictionary instance variable
-        question_type: str = Miscellaneous.any_to_snake(string=self.value_dict["question_type"])
+        question_type: str = Miscellaneous.any_to_snake(
+            string=self.value_dict["question_type"]
+        )
 
         # Check, if the 'answers' key exists in the 'value_dict' dictionary instance variable
         if "answers" not in self.value_dict:
@@ -140,10 +139,15 @@ class QuestionCreateForm(BaseCreateForm):
             "multi_select",
             "single_select",
         ]:
-            self.value_dict["answers"][question_type][Miscellaneous.find_match(pattern=r"([0-9]+)", string=label)] = value
+            self.value_dict["answers"][question_type][
+                Miscellaneous.find_match(
+                    pattern=r"([0-9]+)",
+                    string=label,
+                )
+            ] = value
 
         # Check, if the question type is 'Open Answer' or 'True of False'
-        elif question_type == [
+        elif question_type in [
             "open_answer",
             "true_or_false",
         ]:
@@ -153,7 +157,7 @@ class QuestionCreateForm(BaseCreateForm):
         else:
             # Log a warning message
             self.logger.warning(message=f"Unsuported question type '{question_type}'.")
-            
+
             # Return
             return
 
@@ -163,8 +167,7 @@ class QuestionCreateForm(BaseCreateForm):
         label: str,
         value: Any,
     ) -> None:
-        """
-        """
+        """ """
 
         # Call the parent class' '_on_field_change' method with the passed arguments
         super()._on_field_change(
@@ -196,14 +199,16 @@ class QuestionCreateForm(BaseCreateForm):
         self,
         question_type: str,
     ) -> None:
-        """
-        """
+        """ """
 
         # Clear the answers frame
         self._clear_answers_frame()
 
         # Clear the answers dictionary instance variable
-        self.answers.clear()
+        self.answer_widgets.clear()
+
+        # Remove the 'answers' key from the value dictionary instance variable
+        self.value_dict.pop("answers")
 
         # Convert the passed question type to a snake case represenation
         question_type = Miscellaneous.any_to_snake(string=question_type)
@@ -303,7 +308,7 @@ class QuestionCreateForm(BaseCreateForm):
         else:
             # Log a warning message
             self.logger.warning(message=f"Unsuported question type '{question_type}'.")
-            
+
             # Return
             return
 
@@ -311,8 +316,7 @@ class QuestionCreateForm(BaseCreateForm):
         self,
         message: str,
     ) -> bool:
-        """
-        """
+        """ """
 
         # Return True if the messge equals 'yes' otherwise False
         return message == "yes"
@@ -322,8 +326,7 @@ class QuestionCreateForm(BaseCreateForm):
         self,
         master: ScrolledFrame,
     ) -> None:
-        """
-        """
+        """ """
 
         # Configure the weight of the 0th column to 1
         master.grid_columnconfigure(
@@ -356,18 +359,33 @@ class QuestionCreateForm(BaseCreateForm):
         )
 
         # Dispatch the REQUEST_GET_ALL_STACKS event in the global namespace
-        notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+        stack_notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
             event=Events.REQUEST_GET_ALL_STACKS,
             namespace=Constants.GLOBAL_NAMESPACE,
         )
 
         # Check, if the notification exists
-        if not notification:
+        if not stack_notification:
             # Log a warning message
-            self.logger.warning(message=f"Failed to dispatch the REQUEST_GET_ALL_STACKS event in the global namespace.")
+            self.logger.warning(
+                message=f"Failed to dispatch the REQUEST_GET_ALL_STACKS event in the global namespace."
+            )
 
             # Return early
             return
+
+        # Obtain the ImmutableStack list from the DispatcherNotification's one and only result
+        stacks: Optional[Union[ImmutableStack, List[ImmutableStack]]] = (
+            stack_notification.get_one_and_only_result()
+        )
+
+        # Check if the ImmutableStack is an instance of ImmutableStack
+        if isinstance(
+            stacks,
+            ImmutableStack,
+        ):
+            # Set the ImmutableStack list to an ImmutableStack list
+            stacks = [stacks]
 
         # Create the 'stack' ComboboxField widget
         stack_field: ComboboxField = ComboboxField(
@@ -375,7 +393,7 @@ class QuestionCreateForm(BaseCreateForm):
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
-            values=[stack.name for stack in notification.get_one_and_only_result()],
+            values=[stack.get(name="name") for stack in stacks] if stacks else [],
         )
 
         # Place the 'stack' ComboboxField widget in the grid
@@ -528,7 +546,6 @@ class QuestionCreateForm(BaseCreateForm):
         self,
         master: ScrolledFrame,
     ) -> None:
-        """
-        """
+        """ """
 
         pass

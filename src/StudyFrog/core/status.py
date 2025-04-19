@@ -318,12 +318,12 @@ class StatusFactory:
 
 class StatusManager(BaseObjectManager):
     """
-    A manager class for managing statuss in the application.
+    A manager class for managing statuses in the application.
 
-    This class extends the BaseObjectManager class and provides CRUD (Create, Read, Update, Delete) methods for statuss.
+    This class extends the BaseObjectManager class and provides CRUD (Create, Read, Update, Delete) methods for statuses.
 
     Attributes:
-        cache: (List[Any]): The cache for storing statuss.
+        cache: (List[Any]): The cache for storing statuses.
         logger (Logger): The logger instance associated with the object.
     """
 
@@ -360,15 +360,15 @@ class StatusManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count_statuss(self) -> int:
+    def count_statuses(self) -> int:
         """
-        Returns the number of statuss in the database.
+        Returns the number of statuses in the database.
 
         Returns:
-            int: The number of statuss in the database.
+            int: The number of statuses in the database.
         """
         try:
-            # Count and return the number of statuss in the database
+            # Count and return the number of statuses in the database
             return asyncio.run(StatusModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -408,7 +408,7 @@ class StatusManager(BaseObjectManager):
             status.created_at = Miscellaneous.get_current_datetime()
 
             # Set the key of the status
-            status.key = f"STATUS_{self.count_statuss() + 1}"
+            status.key = f"STATUS_{self.count_statuses() + 1}"
 
             # Set the updated_at timestamp of the status
             status.updated_at = Miscellaneous.get_current_datetime()
@@ -506,29 +506,29 @@ class StatusManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_statuss(self) -> Optional[List[ImmutableStatus]]:
+    def get_all_statuses(self) -> Optional[List[ImmutableStatus]]:
         """
-        Returns a list of all statuss in the database.
+        Returns a list of all statuses in the database.
 
         Returns:
-            Optional[List[ImmutableStatus]]: A list of all statuss in the database if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableStatus]]: A list of all statuses in the database if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_statuss():
-                # Return the list of immutable statuss from the cache
+            if self.cache and len(self._cache) == self.count_statuses():
+                # Return the list of immutable statuses from the cache
                 return self.get_cache_values()
 
-            # Get all statuss from the database
+            # Get all statuses from the database
             models: List[StatusModel] = asyncio.run(
                 StatusModel.get_all(database=Constants.DATABASE_PATH)
             )
 
             # Convert the list of StatusModel objects to a list of ImmutableStatus objects
-            statuss: List[ImmutableStatus] = [
+            statuses: List[ImmutableStatus] = [
                 StatusFactory.create_status(
                     **model.to_dict(
                         exclude=[
@@ -540,16 +540,16 @@ class StatusManager(BaseObjectManager):
                 for model in models
             ]
 
-            # Iterate over the list of immutable statuss
-            for status in statuss:
+            # Iterate over the list of immutable statuses
+            for status in statuses:
                 # Add the immutable status to the cache
                 self.add_to_cache(
                     key=status.key,
                     value=status,
                 )
 
-            # Return the list of immutable statuss
-            return statuss
+            # Return the list of immutable statuses
+            return statuses
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -822,22 +822,34 @@ class StatusManager(BaseObjectManager):
 
     def search_statuses(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[Union[List[ImmutableStatus]]]:
         """
-        Searches for statuss in the database.
+        Searches for statuses in the database.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             **kwargs: Any additional keyword arguments to be passed to the search method of the StatusModel class.
 
         Returns:
-            Optional[Union[List[ImmutableStatus]]]: The found statuss if no exception occurs. Otherwise, None.
+            Optional[Union[List[ImmutableStatus]]]: The found statuses if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Search for statuss in the database
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Search the stack for the passed keyword arguments
+                cached_result: Optional[List[ImmutableStatus]] = self.search_cache(**kwargs)
+
+                # Check, if any cached results exist
+                if cached_result:
+                    # Return the cached results
+                    return cached_result
+
+            # Search for statuses in the database
             models: Optional[List[StatusModel]] = asyncio.run(
                 StatusModel.search(
                     database=Constants.DATABASE_PATH,
@@ -845,9 +857,9 @@ class StatusManager(BaseObjectManager):
                 )
             )
 
-            # Return the found statuss if any
+            # Return the found statuses if any
             if models is not None and len(models) > 0:
-                statuss: List[ImmutableStatus] = [
+                statuses: List[ImmutableStatus] = [
                     StatusFactory.create_status(
                         **model.to_dict(
                             exclude=[
@@ -859,18 +871,18 @@ class StatusManager(BaseObjectManager):
                     for model in models
                 ]
 
-                # Iterate over the found statuss
-                for status in statuss:
+                # Iterate over the found statuses
+                for status in statuses:
                     # Add the status to the cache
                     self.add_to_cache(
                         key=status.key,
                         value=status,
                     )
 
-                # Return the found statuss
-                return statuss
+                # Return the found statuses
+                return statuses
             else:
-                # Return None indicating that no statuss were found
+                # Return None indicating that no statuses were found
                 return None
         except Exception as e:
             # Log an error message indicating an exception has occurred

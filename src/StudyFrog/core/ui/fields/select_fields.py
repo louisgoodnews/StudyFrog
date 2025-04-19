@@ -2453,7 +2453,7 @@ class EntityComboboxField(BaseField):
         key: str = self._apply_display_callback(entity=value)
 
         # Check, if the value string is not already within the list of values
-        if key not in set(self.values.keys()):
+        if key not in self.values.keys():
             # Append the value string to the list of values
             self.values[key] = value
 

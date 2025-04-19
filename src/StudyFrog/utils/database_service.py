@@ -40,7 +40,7 @@ class DatabaseService:
         cls,
         sql: str,
         result: Any,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> None:
         """
         Adds a result to the cache with the given SQL query and parameters.
@@ -48,11 +48,11 @@ class DatabaseService:
         Args:
             sql (str): The SQL query used to retrieve the result.
             result (Any): The result to cache.
-            parameters (Optional[Tuple[..., Any]], optional): The parameters that were used to retrieve the result. Defaults to None.
+            parameters (Optional[Tuple[Any, ...]], optional): The parameters that were used to retrieve the result. Defaults to None.
         """
 
         # Check, if the cache is valid
-        if cls.is_cache_valid():
+        if not cls.is_cache_valid():
             # Flush the cache
             cls.flush_cache()
 
@@ -68,6 +68,9 @@ class DatabaseService:
             "parameters": parameters or (),
             "result": result,
         }
+
+        # Log the addition to the cache
+        cls.logger.info(message=f"Added to cache: '{sql}', {parameters or ()}")
 
     @classmethod
     def check_cache(
@@ -133,12 +136,15 @@ class DatabaseService:
         """
 
         # Check, if the cache is empty
-        if cls.cache.empty():
+        if len(cls.cache) == 0:
             # Return early
             return
 
         # Clear the cache
         cls.cache.clear()
+
+        # Log the clear
+        cls.logger.info(message="Cache cleared.")
 
         # Update the timestamp
         cls.timestamp = Miscellaneous.get_current_datetime()
@@ -148,14 +154,14 @@ class DatabaseService:
         cls,
         database: str,
         sql: str,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> Optional[int]:
         """
         Creates an entry in the database using a given SQL query.
 
         Args:
             database (str): The path to the database file.
-            parameters (Tuple[..., Any]): The parameters to pass to the SQL query.
+            parameters (Tuple[Any, ...]): The parameters to pass to the SQL query.
             sql (str): The SQL query to execute.
 
         Returns:
@@ -209,14 +215,14 @@ class DatabaseService:
         cls,
         database: str,
         sql: str,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> Optional[Dict[str, Any]]:
         """
         Deletes a row from the database using a given SQL query.
 
         Args:
             database (str): The path to the database file.
-            parameters (Tuple[..., Any]): The parameters to pass to the SQL query.
+            parameters (Tuple[Any, ...]): The parameters to pass to the SQL query.
             sql (str): The SQL query to execute.
 
         Returns:
@@ -232,7 +238,7 @@ class DatabaseService:
                 raise ValueError("SQL query must start with 'DELETE'.")
 
             # Initialize the result (optional) bool as None
-            result: Optinoal[Dict[str, Any]] = None
+            result: Optional[Dict[str, Any]] = None
 
             # Connect to the database
             async with aiosqlite.connect(database=database) as db:
@@ -281,14 +287,14 @@ class DatabaseService:
         cls,
         database: str,
         sql: str,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> Optional[Any]:
         """
         Executes a SQL query and returns the result.
 
         Args:
             database (str): The path to the database file.
-            parameters (Tuple[..., Any]): The parameters to pass to the SQL query.
+            parameters (Tuple[Any, ...]): The parameters to pass to the SQL query.
             sql (str): The SQL query to execute.
 
         Returns:
@@ -347,11 +353,15 @@ class DatabaseService:
             return None
 
     @classmethod
-    def flush_cache(cls) -> None:
+    def flush_cache(cls,
+        force: bool = False,) -> None:
         """
         Flushes the cache.
 
         Checks if the cache is empty. If it is, the timestamp is updated and the method returns early. Otherwise, the cache is cleared.
+
+        :param force: Whether to flush the cache no matter what.
+        :type force: bool
 
         :return: None
         :rtype: None
@@ -365,8 +375,18 @@ class DatabaseService:
             # Return early
             return
 
-        # Clear the cache
-        cls.clear_cache()
+        # Check if the cache is valid
+        if not cls.check_timestamp() or force:
+            # Flush the cache
+            cls.clear_cache()
+
+            # Update the timestamp
+            cls.timestamp = Miscellaneous.get_current_datetime()
+
+            # Log updating the timestamp
+            cls.logger.info(
+                message=f"Updated the timestamp to {Miscellaneous.datetime_to_string(datetime=cls.timestamp)}."
+            )
 
     @classmethod
     def get_cache_keys(cls) -> List[str]:
@@ -417,7 +437,7 @@ class DatabaseService:
             return
 
         # Return the value associated with the passed sql
-        return cls.cache[sql]
+        return cls.cache[key]
 
     @classmethod
     def is_cache_empty(cls) -> bool:
@@ -430,7 +450,7 @@ class DatabaseService:
             bool: True if the cache is empty, otherwise False.
         """
 
-        return cls.cache.empty()
+        return len(cls.cache) == 0
 
     @classmethod
     def is_cache_valid(cls) -> bool:
@@ -469,14 +489,14 @@ class DatabaseService:
         cls,
         database: str,
         sql: str,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> Optional[List[Dict[str, Any]]]:
         """
         Reads all rows from the database using a given SQL query.
 
         Args:
             database (str): The path to the database file.
-            parameters (Tuple[..., Any]): The parameters to pass to the SQL query.
+            parameters (Tuple[Any, ...]): The parameters to pass to the SQL query.
             sql (str): The SQL query to execute.
 
         Returns:
@@ -546,14 +566,14 @@ class DatabaseService:
         cls,
         database: str,
         sql: str,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> Dict[str, Any]:
         """
         Reads a single row from the database using a given SQL query.
 
         Args:
             database (str): The path to the database file.
-            parameters (Tuple[..., Any]): The parameters to pass to the SQL query.
+            parameters (Tuple[Any, ...]): The parameters to pass to the SQL query.
             sql (str): The SQL query to execute.
 
         Returns:
@@ -646,14 +666,14 @@ class DatabaseService:
         cls,
         database: str,
         sql: str,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> Optional[Dict[str, Any]]:
         """
         Updates a row in the database using a given SQL query.
 
         Args:
             database (str): The path to the database file.
-            parameters (Tuple[..., Any]): The parameters to pass to the SQL query.
+            parameters (Tuple[Any, ...]): The parameters to pass to the SQL query.
             sql (str): The SQL query to execute.
 
         Returns:
@@ -732,7 +752,7 @@ class DatabaseService:
         cls,
         sql: str,
         result: Any,
-        parameters: Optional[Tuple[..., Any]] = [],
+        parameters: Optional[Tuple[Any, ...]] = [],
     ) -> None:
         """
         Updates the cache with the given SQL query, result, and parameters.
@@ -742,7 +762,7 @@ class DatabaseService:
         Args:
             sql (str): The SQL query to associate with the result.
             result (Any): The result to store in the cache.
-            parameters (Optional[Tuple[..., Any]], optional): The parameters used with the query.
+            parameters (Optional[Tuple[Any, ...]], optional): The parameters used with the query.
         """
 
         # Add or update the result in the cache

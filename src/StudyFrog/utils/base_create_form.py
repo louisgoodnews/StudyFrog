@@ -159,7 +159,7 @@ class BaseCreateForm(tkinter.Frame):
         label = Miscellaneous.any_to_snake(string=label)
 
         # Check, if the passed label is not already contained in the value dictionary instance variable
-        if label not in set(self._value_dict.keys()):
+        if label not in self._value_dict.keys():
             # Add an empty dictionary to the value dictionary instance variable under the passed label
             self._value_dict[label] = {"value": None}
 
@@ -211,7 +211,7 @@ class BaseCreateForm(tkinter.Frame):
         label = Miscellaneous.any_to_snake(string=label.strip())
 
         # Check, if the passed label is already contained in the field dictionary instance variable
-        if label in set(self._field_dict.keys()):
+        if label in self._field_dict.keys():
             # Log a warning message
             self.logger.warning(
                 message=f"'{label}' '{field.__class__.__name__}' instance already registered in field dict. Aborting..."
@@ -240,7 +240,7 @@ class BaseCreateForm(tkinter.Frame):
         """
 
         # Iterate over the registered field widgets
-        for field in set(self._field_dict.values()):
+        for field in self._field_dict.values():
             # Call the field widget's 'clear' function
             field["widget"].clear(dispatch=False)
 
@@ -648,7 +648,7 @@ class BaseCreateForm(tkinter.Frame):
         """
 
         # Check, if the passed label is already contained in the field dictionary instance variable
-        if label not in set(self._field_dict.keys()):
+        if label not in self._field_dict.keys():
             # Log a warning message
             self.logger.warning(
                 message=f"'{label}' field is not registered in field dict. Aborting..."
@@ -768,13 +768,13 @@ class BaseCreateForm(tkinter.Frame):
             )
 
         # Update the 'result' key's value
-        result["result"] = all(set(result["fields"].values()))
+        result["result"] = all(result["fields"].values())
 
         # Check, if any required fields are missing
         if not result["result"]:
             # Log a warning message
             self.logger.warning(
-                message=f"Required fields ({", ".join(set([key for key, value, in result["fields"].items() if not value]))}) are missing"
+                message=f"Required fields ({", ".join([key for key, value, in result["fields"].items() if not value])}) are missing"
             )
 
         # Return the result dictionary

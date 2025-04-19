@@ -1379,12 +1379,14 @@ class FlashcardManager(BaseObjectManager):
 
     def search_flashcards(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[Union[List[ImmutableFlashcard]]]:
         """
         Searches for flashcards in the database.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             **kwargs: Any additional keyword arguments to be passed to the search method of the FlashcardModel class.
 
         Returns:
@@ -1394,6 +1396,16 @@ class FlashcardManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Search the stack for the passed keyword arguments
+                cached_result: Optional[List[ImmutableFlashcard]] = self.search_cache(**kwargs)
+
+                # Check, if any cached results exist
+                if cached_result:
+                    # Return the cached results
+                    return cached_result
+
             # Search for flashcards in the database
             models: Optional[List[FlashcardModel]] = asyncio.run(
                 FlashcardModel.search(

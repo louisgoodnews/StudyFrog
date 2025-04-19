@@ -1108,6 +1108,13 @@ class CreateUI(BaseUI):
                 # Return early
                 return
 
+            # Check, if the question type is 'True or False'
+            if kwargs["question_type"] == "true_or_false":
+                # Fetch the default answer ('True' or 'False') from the database that corresponds to the user's selection
+                pass
+
+            # Log the keywords for debugging
+            self.logger.debug(message=kwargs)
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

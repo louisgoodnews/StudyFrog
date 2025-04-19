@@ -52,7 +52,7 @@ class BaseObjectManager:
         self._time_limit: int = 3600
 
         # Store the timestamp in an instance variable
-        self._timestamp: datetime = datetime.now()
+        self._timestamp: datetime = Miscellaneous.get_current_datetime()
 
     @property
     def cache(self) -> Dict[str, Any]:
@@ -118,7 +118,7 @@ class BaseObjectManager:
         self.flush_cache()
 
         # Check if the key already exists
-        if key in set(self._cache.keys()):
+        if key in self._cache.keys():
             # Log a warning message
             self.logger.warning(message=f"Key '{key}' already exists. Overwriting...")
 
@@ -137,7 +137,9 @@ class BaseObjectManager:
         """
 
         # Return True if the cache needs to be cleared, False otherwise
-        return datetime.now() - self._timestamp >= timedelta(seconds=self._time_limit)
+        return Miscellaneous.get_current_datetime() - self._timestamp >= timedelta(
+            seconds=self._time_limit
+        )
 
     def clear_cache(self) -> None:
         """
@@ -147,6 +149,11 @@ class BaseObjectManager:
         :rtype: None
         """
 
+        # Check, if the cache is empty
+        if len(self.cache) == 0:
+            # Return early
+            return
+
         # Clear the cache
         self.cache.clear()
 
@@ -154,7 +161,7 @@ class BaseObjectManager:
         self.logger.info(message="Cache cleared.")
 
         # Update the timestamp
-        self._timestamp = datetime.now()
+        self._timestamp = Miscellaneous.get_current_datetime()
 
     def flush_cache(
         self,
@@ -178,7 +185,7 @@ class BaseObjectManager:
             self.cache.clear()
 
             # Update the timestamp
-            self._timestamp = datetime.now()
+            self._timestamp = Miscellaneous.get_current_datetime()
 
             # Log updating the timestamp
             self.logger.info(
@@ -222,7 +229,10 @@ class BaseObjectManager:
         """
 
         # Iterate over the keys and items in the cache
-        for key, item, in self._cache.items():
+        for (
+            key,
+            item,
+        ) in self._cache.items():
             # Check, if the current item and the passed value are equal
             if value != item:
                 # Skip the current iteration
@@ -249,7 +259,10 @@ class BaseObjectManager:
         """
 
         # Iterate over the items and values in the cache
-        for item, value, in self._cache.items():
+        for (
+            item,
+            value,
+        ) in self._cache.items():
             # Check, if the current item and the passed key are equal
             if key != item:
                 # Skip the current iteration
@@ -300,7 +313,7 @@ class BaseObjectManager:
         """
 
         # Return True if the key exists, False otherwise
-        return key in set(self._cache.keys())
+        return key in self._cache.keys()
 
     def is_value_in_cache(
         self,
@@ -317,7 +330,7 @@ class BaseObjectManager:
         """
 
         # Return True if the value exists, False otherwise
-        return value in set(self._cache.values())
+        return value in self._cache.values()
 
     def remove_from_cache(
         self,
@@ -334,7 +347,10 @@ class BaseObjectManager:
         """
 
         # Remove the item from the cache
-        self._cache.pop(key, None,)
+        self._cache.pop(
+            key,
+            None,
+        )
 
         # Log the removal
         self.logger.info(message=f"Removed key '{key}' from cache.")
@@ -361,7 +377,7 @@ class BaseObjectManager:
         result: List[Any] = []
 
         # Iterate over unique cache values (use set to avoid duplicates)
-        for cache_value in set(self._cache.values()):
+        for cache_value in self._cache.values():
             try:
                 # Check if all provided attributes match the current cache object
                 if all(
@@ -374,12 +390,16 @@ class BaseObjectManager:
                         key,
                     )
                     == value
-                    for key, value, in kwargs.items()
+                    for (
+                        key,
+                        value,
+                    ) in kwargs.items()
                 ):
                     result.append(cache_value)
             except Exception as e:
+                # Log an error message
                 self.logger.error(
-                    message=f"Exception during cache search on '{cache_value}': {e}"
+                    message=f"Caught an exception while attempting cache search on value '{cache_value}': {e}"
                 )
 
         # Return None if no matching entries were found
@@ -405,16 +425,7 @@ class BaseObjectManager:
         :raises KeyError: If the key does not exist.
         """
 
-        # Flush the cache, if needed
-        self.flush_cache()
-
-        # Check if the key already exists
-        if key in set(self._cache.keys()):
-            # Log a warning message
-            self.logger.warning(message=f"Key '{key}' already exists. Overwriting...")
-
-        # Add the key-value pair to the cache
-        self._cache[key] = value
-
-        # Log the addition to the cache
-        self.logger.info(message=f"Added to cache: {key}")
+        self.add_to_cache(
+            key=key,
+            value=value,
+        )
