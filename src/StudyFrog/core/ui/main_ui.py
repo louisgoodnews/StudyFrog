@@ -212,7 +212,7 @@ class MainUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        top_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             height=25,
             master=self,
@@ -247,7 +247,7 @@ class MainUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        self.center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        self.center_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -281,7 +281,7 @@ class MainUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             height=25,
             master=self,

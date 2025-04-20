@@ -67,6 +67,16 @@ class QuestionCreateForm(BaseCreateForm):
     def _on_add_answer_button_click(self) -> None:
         """ """
 
+        self.answers_frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        self.answers_frame.grid_rowconfigure(
+            index=len(self.answers_frame.winfo_children()),
+            weight=0,
+        )
+
         # Create a unique label text from the number of child widgets in the 'answers frame' frame widget
         label: str = f"Answer {len(self.answers_frame.winfo_children())}*: "
 
@@ -109,8 +119,16 @@ class QuestionCreateForm(BaseCreateForm):
             ),
         )
 
+        # Obtain the current question type from the 'value_dict' dictionary instance variable
+        question_type: str = Miscellaneous.any_to_snake(
+            string=self.value_dict["question_type"]["value"]
+        )
+
         # Add the MultiSelectAnswerField widget to the answers widget dictionary instance variable
-        self.answer_widgets["multi_select"][label] = multi_select_answer_field
+        self.answer_widgets[question_type][label] = multi_select_answer_field
+
+        # Update idle tasks in the 'answers frame' tkinter.Frame widget
+        self.answers_frame.update_idletasks()
 
     def _on_answer_change(
         self,
@@ -121,7 +139,7 @@ class QuestionCreateForm(BaseCreateForm):
 
         # Obtain the current question type from the 'value_dict' dictionary instance variable
         question_type: str = Miscellaneous.any_to_snake(
-            string=self.value_dict["question_type"]
+            string=self.value_dict["question_type"]["value"]
         )
 
         # Check, if the 'answers' key exists in the 'value_dict' dictionary instance variable
@@ -175,22 +193,37 @@ class QuestionCreateForm(BaseCreateForm):
             value=value,
         )
 
-        # Check, if the changed field is not 'question type'
-        if label != "question_type" or len(self.answer_widgets) == 0:
-            # Return early
-            return
-
-        # Prompt the user
-        answer: bool = ToplevelNotification.yes_no(
-            message="It seems as though you've already added answers. Switching the answer mode will remove any previous answers. Do you wish to proceed?",
-            on_click_callback=self._on_question_type_warning_yes_no,
-            title="",
+        # Normalite the passed label
+        label = Miscellaneous.any_to_snake(
+            string=label.strip()
+            .replace(
+                "*",
+                "",
+            )
+            .replace(
+                ":",
+                "",
+            )
         )
 
-        # Check, if the user answered with 'cancel'
-        if not answer:
+        # Check, if the changed field is not 'question type'
+        if label != "question_type":
             # Return early
             return
+
+        # Check, if any previous answers exist
+        if len(self.answer_widgets) > 0:
+            # Prompt the user
+            answer: bool = ToplevelNotification.yes_no(
+                message="It seems as though you've already added answers. Switching the answer mode will remove any previous answers. Do you wish to proceed?",
+                on_click_callback=self._on_question_type_warning_yes_no,
+                title="",
+            )
+
+            # Check, if the user answered with 'cancel'
+            if not answer:
+                # Return early
+                return
 
         # Process the 'question type' ComboboxField widget change
         self._on_question_type_change(question_type=value)
@@ -207,11 +240,13 @@ class QuestionCreateForm(BaseCreateForm):
         # Clear the answers dictionary instance variable
         self.answer_widgets.clear()
 
-        # Remove the 'answers' key from the value dictionary instance variable
-        self.value_dict.pop("answers")
+        # Check, if any previous answers exist
+        if "answers" in self._value_dict:
+            # Remove the 'answers' key from the value dictionary instance variable
+            self.value_dict.pop("answers")
 
         # Convert the passed question type to a snake case represenation
-        question_type = Miscellaneous.any_to_snake(string=question_type)
+        question_type = Miscellaneous.any_to_snake(string=question_type.strip())
 
         # Check, if the question type is 'Multiple Select' or 'Single Select'
         if question_type in [
@@ -311,6 +346,9 @@ class QuestionCreateForm(BaseCreateForm):
 
             # Return
             return
+
+        # Update idle tasks in the 'answers frame' tkinter.Frame widget
+        self.answers_frame.update_idletasks()
 
     def _on_question_type_warning_yes_no(
         self,
@@ -529,7 +567,7 @@ class QuestionCreateForm(BaseCreateForm):
         # Create the 'answers frame' tkinter.Frame widget
         self.answers_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
-            master=self,
+            master=master,
         )
 
         # Place the 'answers frame' tkinter.Frame widget in the grid
@@ -541,6 +579,9 @@ class QuestionCreateForm(BaseCreateForm):
             sticky=NSEW,
         )
 
+        # Update idle tasks
+        master.update_idletasks()
+
     @override
     def create_secondary_attribute_widgets(
         self,
@@ -548,4 +589,5 @@ class QuestionCreateForm(BaseCreateForm):
     ) -> None:
         """ """
 
-        pass
+        # Update idle tasks
+        master.update_idletasks()

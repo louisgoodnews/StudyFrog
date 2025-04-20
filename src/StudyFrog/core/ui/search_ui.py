@@ -190,7 +190,7 @@ class SearchUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -215,7 +215,7 @@ class SearchUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(
+        center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -240,7 +240,7 @@ class SearchUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+        bottom_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -315,7 +315,7 @@ class SearchUI(BaseUI):
         )
 
         # Create the "Previous" button widget
-        previous_button: tkinter.Button = UIBuilder.get_button(
+        previous_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_previous_button_click,
             font=(
@@ -337,7 +337,7 @@ class SearchUI(BaseUI):
         )
 
         # Create the "Next" button widget
-        next_button: tkinter.Button = UIBuilder.get_button(
+        next_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_next_button_click,
             font=(
@@ -399,7 +399,7 @@ class SearchUI(BaseUI):
         )
 
         # Create the label frame
-        label_frame: tkinter.Frame = UIBuilder.get_frame(
+        label_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -438,7 +438,7 @@ class SearchUI(BaseUI):
             )
 
             # Create the label widget
-            label: tkinter.Label = UIBuilder.get_label(
+            label: tkinter.Label = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -508,7 +508,7 @@ class SearchUI(BaseUI):
 
         try:
             # Create a tkinter.Frame widget
-            frame: tkinter.Frame = UIBuilder.get_frame(
+            frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self.content_frame,
             )
@@ -534,7 +534,7 @@ class SearchUI(BaseUI):
                 column,
             ) in enumerate(iterable=columns):
                 # Create a tkinter.Label widget
-                label: tkinter.Label = UIBuilder.get_label(
+                label: tkinter.Label = tkinter.Label(
                     background=Constants.BLUE_GREY["700"],
                     font=(
                         Constants.DEFAULT_FONT_FAMILY,
@@ -781,7 +781,7 @@ class SearchUI(BaseUI):
             }
 
             # Get the toplevel widget
-            toplevel: tkinter.Toplevel = UIBuilder.get_toplevel()
+            toplevel: tkinter.Toplevel = tkinter.Toplevel()
 
             # Set the geometry of the toplevel widget
             toplevel.wm_geometry(newGeometry="1080x720")

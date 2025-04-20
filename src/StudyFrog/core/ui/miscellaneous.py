@@ -4,8 +4,9 @@ Date: 2025-04-20
 """
 
 import tkinter
+import traceback
 
-from datetime import datetime
+from datetime import timedelta
 from tkinter.constants import *
 from typing import *
 
@@ -23,7 +24,13 @@ __all__: Final[List[str]] = [
 
 
 class ClockWidget(tkinter.Frame):
-    """ """
+    """
+    A live-updating clock widget displaying the current system time.
+
+    The ClockWidget updates automatically every 100 milliseconds and supports
+    configurable time formats. It can be embedded in any Tkinter-based UI and is 
+    designed for use in dashboards, toolbars, or standalone time displays.
+    """
 
     def __init__(
         self,
@@ -31,7 +38,18 @@ class ClockWidget(tkinter.Frame):
         time_format: str = Constants.DEFAULT_TIME_FORMAT,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Initializes the ClockWidget and starts the live time update loop.
+
+        Args:
+            master (tkinter.Misc): The parent Tkinter widget.
+            time_format (str, optional): Format string for displaying the current time.
+                Follows `datetime.strftime` syntax. Defaults to Constants.DEFAULT_TIME_FORMAT.
+            **kwargs: Additional keyword arguments forwarded to the tkinter.Frame constructor.
+
+        Returns:
+            None
+        """
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -59,18 +77,53 @@ class ClockWidget(tkinter.Frame):
 
     @property
     def label(self) -> tkinter.Label:
-        """ """
+        """
+        Returns the internal time label widget.
+
+        Useful for configuring or styling the label externally.
+
+        Returns:
+            tkinter.Label: The label widget displaying the current time.
+        """
 
         # Return the tkinter.Label widget
         return self._label
 
     def _update_clock(self) -> None:
-        """ """
+        """
+        Refreshes the displayed time and schedules the next update.
 
-        pass
+        Uses the current system time and the widget's configured time format to update
+        the label text every 100 milliseconds.
+
+        Returns:
+            None
+        """
+
+        # Update the tkinter.Label's text
+        self._label.configure(
+            text=Miscellaneous.datetime_to_string(
+                datetime=Miscellaneous.get_current_datetime(),
+                format=self.time_format,
+            ),
+        )
+
+        # Update the clock after 100 miliseconds
+        self.after(
+            100,
+            self._update_clock,
+        )
 
     def configure_grid(self) -> None:
-        """ """
+        """
+        Configures the internal grid layout of the ClockWidget.
+
+        The single column stretches with the window, while the row remains fixed.
+        This ensures proper alignment and scaling in different layouts.
+
+        Returns:
+            None
+        """
 
         # Set the weight of the 0th column to 1
         # This means that the column will stretch when the window is resized
@@ -86,15 +139,66 @@ class ClockWidget(tkinter.Frame):
             weight=0,
         )
 
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Dynamically configures the internal label widget using given keyword arguments.
+
+        This allows runtime customization of label appearance (e.g. font, background, padding).
+
+        Args:
+            **kwargs: Keyword arguments accepted by `tkinter.Label.configure()`.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If the configuration fails, the exception is logged and re-raised.
+        """
+        try:
+            # Attempt to configure the label widget
+            self._label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
     def create_widgets(self) -> None:
-        """ """
+        """
+        Creates and places the internal label widget.
 
-        pass
+        The label is initialized with the current time and added to the widget's grid.
 
-    def create_widgets(self) -> None:
-        """ """
+        Returns:
+            None
+        """
 
-        pass
+        # Create a tkinter.Label widget
+        self._label: tkinter.Label = tkinter.Label(
+            master=self,
+            text=Miscellaneous.datetime_to_string(
+                datetime=Miscellaneous.get_current_datetime(),
+                format=self.time_format,
+            ),
+        )
+
+        # Place the tkinter.Label widget in the grid
+        self._label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
 
 
 class CountdownWidget(tkinter.Frame):
@@ -128,6 +232,9 @@ class CountdownWidget(tkinter.Frame):
         # Store the passed time format string in an instance variable
         self.time_format: str = time_format
 
+        # Store the passed time in minutes int in an instance variable
+        self.time_in_minutes: int = time_in_minutes
+
         # Configure the grid
         self.configure_grid()
 
@@ -233,14 +340,32 @@ class CountdownWidget(tkinter.Frame):
             weight=0,
         )
 
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        try:
+            # Attempt to configure the label widget
+            self._label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
     def create_widgets(self) -> None:
         """ """
 
         pass
 
     def is_running(self) -> bool:
-        """
-        """
+        """ """
 
         # Return the 'is running' boolean flag instance variable
         return self._is_running
@@ -253,7 +378,6 @@ class CountupWidget(tkinter.Frame):
         self,
         dispatcher: Dispatcher,
         master: tkinter.Misc,
-        time_in_minutes: int,
         time_format: str = Constants.DEFAULT_TIME_FORMAT,
         **kwargs,
     ) -> None:
@@ -382,14 +506,32 @@ class CountupWidget(tkinter.Frame):
             weight=0,
         )
 
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        try:
+            # Attempt to configure the label widget
+            self._label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
     def create_widgets(self) -> None:
         """ """
 
         pass
 
     def is_running(self) -> bool:
-        """
-        """
+        """ """
 
         # Return the 'is running' boolean flag instance variable
         return self._is_running

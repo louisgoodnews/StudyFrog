@@ -153,7 +153,7 @@ class StackViewForm(tkinter.Frame):
         """
 
         # Create the top frame
-        top_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        top_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the top frame
         top_frame.configure(background=Constants.BLUE_GREY["700"])
@@ -178,7 +178,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the center frame
-        center_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        center_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the center frame
         center_frame.configure(background=Constants.BLUE_GREY["700"])
@@ -203,7 +203,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the bottom frame
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        bottom_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the bottom frame
         bottom_frame.configure(background=Constants.BLUE_GREY["700"])
@@ -386,7 +386,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the left frame
-        left_frame: tkinter.Frame = UIBuilder.get_frame(
+        left_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -438,7 +438,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the right frame
-        right_frame: tkinter.Frame = UIBuilder.get_frame(
+        right_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -501,7 +501,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the core attributes frame
-        core_attributes_frame: tkinter.Frame = UIBuilder.get_frame(
+        core_attributes_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=tabbed_view["center_frame"],
         )
@@ -834,7 +834,7 @@ class StackViewForm(tkinter.Frame):
 
         # Create a combobox select field for the difficulty
         self.difficulty_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_combobox_field(
+            ttk.Combobox_field(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
@@ -898,7 +898,7 @@ class StackViewForm(tkinter.Frame):
 
         # Create a combobox select field for the priority
         self.priority_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_combobox_field(
+            ttk.Combobox_field(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
@@ -1057,7 +1057,7 @@ class StackViewForm(tkinter.Frame):
             row: int = len(self.contents_frame.winfo_children())
 
             # Create a tkinter.Frame widget
-            frame: tkinter.Frame = UIBuilder.get_frame(master=self.contents_frame)
+            frame: tkinter.Frame = tkinter.Frame(master=self.contents_frame)
 
             # Configure the frame widget's 0th column to weight 0
             frame.grid_columnconfigure(
@@ -1090,7 +1090,7 @@ class StackViewForm(tkinter.Frame):
             )
 
             # Create a tkinter.Label widget to display the object's icon
-            icon_label: tkinter.Label = UIBuilder.get_label(
+            icon_label: tkinter.Label = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -1125,7 +1125,7 @@ class StackViewForm(tkinter.Frame):
             )
 
             # Create a tkinter.Label widget to display the object's key
-            key_label: tkinter.Label = UIBuilder.get_label(
+            key_label: tkinter.Label = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -1180,7 +1180,7 @@ class StackViewForm(tkinter.Frame):
                 text = "None"
 
             # Create a tkinter.Label widget to display the object's title
-            title_label: tkinter.Label = UIBuilder.get_label(
+            title_label: tkinter.Label = tkinter.Label(
                 anchor=W,
                 background=Constants.BLUE_GREY["700"],
                 font=(
@@ -1343,7 +1343,7 @@ class StackViewForm(tkinter.Frame):
             kwargs["direction"] = "forward"
 
             # Create the "Master" toplevel widget
-            kwargs["master"] = UIBuilder.get_toplevel()
+            kwargs["master"] = tkinter.Toplevel()
 
             # Configure the toplevel widget's 0th column to weight 1
             kwargs["master"].grid_columnconfigure(

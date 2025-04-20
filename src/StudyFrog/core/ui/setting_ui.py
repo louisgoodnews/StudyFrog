@@ -143,7 +143,7 @@ class SettingUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        top_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the "Top Frame" frame widget's 1st column to weight 1
         top_frame.grid_columnconfigure(
@@ -165,7 +165,7 @@ class SettingUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        center_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
         center_frame.grid_columnconfigure(
@@ -187,7 +187,7 @@ class SettingUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        bottom_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the "Bottom Frame" frame widget's 1st column to weight 1
         bottom_frame.grid_columnconfigure(

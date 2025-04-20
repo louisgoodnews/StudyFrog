@@ -356,7 +356,7 @@ class BaseCreateForm(tkinter.Frame):
         )
 
         # Style the 'primary attributes' ScrolledFrame widget's 'container frame'
-        primary_attributes_scrolled_frame.configure_container(
+        primary_attributes_scrolled_frame.configure_container_frame(
             background=Constants.BLUE_GREY["700"]
         )
 
@@ -394,7 +394,7 @@ class BaseCreateForm(tkinter.Frame):
         )
 
         # Style the 'secondary attributes' ScrolledFrame widget's 'container frame'
-        secondary_attributes_scrolled_frame.configure_container(
+        secondary_attributes_scrolled_frame.configure_container_frame(
             background=Constants.BLUE_GREY["700"]
         )
 
@@ -508,7 +508,7 @@ class BaseCreateForm(tkinter.Frame):
         )
 
         # Create the 'instruction label' tkinter.Label widget
-        instruction_label: tkinter.Label = UIBuilder.get_label(
+        instruction_label: tkinter.Label = tkinter.Label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -542,7 +542,7 @@ class BaseCreateForm(tkinter.Frame):
         """
 
         # Create the 'top frame' tkinter.Frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -555,7 +555,7 @@ class BaseCreateForm(tkinter.Frame):
         )
 
         # Create the 'center frame' tkinter.Frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(
+        center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )

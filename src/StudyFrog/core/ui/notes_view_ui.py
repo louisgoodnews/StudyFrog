@@ -146,7 +146,7 @@ class NotesViewUI(BaseUI):
         """
 
         # Attempt to create the "Top Frame" frame widget
-        top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        top_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -181,7 +181,7 @@ class NotesViewUI(BaseUI):
         )
 
         # Attempt to create the "Center Frame" frame widget
-        center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        center_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -216,7 +216,7 @@ class NotesViewUI(BaseUI):
         )
 
         # Attempt to create the "Bottom Frame" frame widget
-        bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )

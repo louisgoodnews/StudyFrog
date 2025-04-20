@@ -171,7 +171,7 @@ class DashboardUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -196,7 +196,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(
+        center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -221,7 +221,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+        bottom_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -308,7 +308,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create a left frame within the master frame
-        left_frame: tkinter.Frame = UIBuilder.get_frame(
+        left_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -337,12 +337,12 @@ class DashboardUI(BaseUI):
         )
 
         # Create a new button within the left frame
-        new_button: tkinter.Button = UIBuilder.get_button(
+        new_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=lambda: self.dispatcher.dispatch(
                 direction="forward",
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
-                master=UIBuilder.get_toplevel(),
+                master=tkinter.Toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
                 source="dashboard_ui",
                 target="create_ui",
@@ -367,12 +367,12 @@ class DashboardUI(BaseUI):
         )
 
         # Create a recent button within the left frame
-        recent_button: tkinter.Button = UIBuilder.get_button(
+        recent_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=lambda: self.dispatcher.dispatch(
                 direction="forward",
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
-                master=UIBuilder.get_toplevel(),
+                master=tkinter.Toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
                 source="dashboard_ui",
                 target="search_ui",
@@ -397,7 +397,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create a right frame within the master frame
-        right_frame: tkinter.Frame = UIBuilder.get_frame(
+        right_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -428,7 +428,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=right_frame,
         )
@@ -489,7 +489,7 @@ class DashboardUI(BaseUI):
         """
         try:
             # Create the "New Stacks" frame widget
-            new_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
+            new_stacks_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -513,7 +513,7 @@ class DashboardUI(BaseUI):
             )
 
             # Create the "Recently Viewed" frame widget
-            recently_viewed_frame: tkinter.Frame = UIBuilder.get_frame(
+            recently_viewed_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -537,7 +537,7 @@ class DashboardUI(BaseUI):
             )
 
             # Create the "Completed Stacks" frame widget
-            completed_stacks_frame: tkinter.Frame = UIBuilder.get_frame(
+            completed_stacks_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -615,7 +615,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create a tkinter.Frame widget
-        frame: tkinter.Frame = UIBuilder.get_frame(master=master)
+        frame: tkinter.Frame = tkinter.Frame(master=master)
 
         for (
             index,
@@ -638,7 +638,7 @@ class DashboardUI(BaseUI):
             )
 
             # Create a tkinter.Label widget
-            label: tkinter.Label = UIBuilder.get_label(
+            label: tkinter.Label = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -676,7 +676,7 @@ class DashboardUI(BaseUI):
 
         # Style the scrolled frame "Frame" widget
         # Set the background color to the main background color
-        self.new_stacks_frame.configure_container(background=Constants.BLUE_GREY["700"])
+        self.new_stacks_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
 
         # Place the scrolled frame widget in the main window
         self.new_stacks_frame.grid(
@@ -721,7 +721,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create a tkinter.Frame widget
-        frame: tkinter.Frame = UIBuilder.get_frame(master=master)
+        frame: tkinter.Frame = tkinter.Frame(master=master)
 
         for (
             index,
@@ -744,7 +744,7 @@ class DashboardUI(BaseUI):
             )
 
             # Create a tkinter.Label widget
-            label: tkinter.Label = UIBuilder.get_label(
+            label: tkinter.Label = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -786,7 +786,7 @@ class DashboardUI(BaseUI):
 
         # Style the scrolled frame "Frame" widget
         # Set the background color to the main background color
-        self.recently_viewed_stacks_frame.configure_container(
+        self.recently_viewed_stacks_frame.configure_container_frame(
             background=Constants.BLUE_GREY["700"]
         )
 
@@ -834,7 +834,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create a tkinter.Frame widget
-        frame: tkinter.Frame = UIBuilder.get_frame(master=master)
+        frame: tkinter.Frame = tkinter.Frame(master=master)
 
         for (
             index,
@@ -857,7 +857,7 @@ class DashboardUI(BaseUI):
             )
 
             # Create a tkinter.Label widget
-            label: tkinter.Label = UIBuilder.get_label(
+            label: tkinter.Label = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -897,7 +897,7 @@ class DashboardUI(BaseUI):
 
         # Style the scrolled frame "Frame" widget
         # Set the background color to the main background color
-        self.completed_stacks_frame.configure_container(
+        self.completed_stacks_frame.configure_container_frame(
             background=Constants.BLUE_GREY["700"]
         )
 
@@ -932,7 +932,7 @@ class DashboardUI(BaseUI):
         """
         try:
             # Create a tkinter.Frame widget for the stack item
-            frame: tkinter.Frame = UIBuilder.get_frame(
+            frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.GREY["default"],
                 master=master,
             )
@@ -1068,7 +1068,7 @@ class DashboardUI(BaseUI):
                     text = data[column]
 
                 # Create a tkinter.Label widget for each stack attribute
-                label: tkinter.Label = UIBuilder.get_label(
+                label: tkinter.Label = tkinter.Label(
                     background=Constants.BLUE_GREY["700"],
                     font=(
                         Constants.DEFAULT_FONT_FAMILY,
@@ -1152,7 +1152,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create a left frame within the top frame
-        left_frame: tkinter.Frame = UIBuilder.get_frame(
+        left_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -1200,7 +1200,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create a right frame within the top frame
-        right_frame: tkinter.Frame = UIBuilder.get_frame(
+        right_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -1225,7 +1225,7 @@ class DashboardUI(BaseUI):
         )
 
         # Create a continue label within the right frame
-        continue_label: tkinter.Label = UIBuilder.get_label(
+        continue_label: tkinter.Label = tkinter.Label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,

@@ -59,7 +59,7 @@ from core.ui.questions_view_ui import QuestionsViewUI
 from core.ui.report_ui import ReportUI
 from core.ui.search_ui import SearchUI
 from core.ui.setting_ui import SettingUI
-from core.ui.stack_selection_ui import StackSelectionUI
+from core.ui.learning_stack_selection_ui import LearningStackSelectionUI
 from core.ui.stacks_view_ui import StacksViewUI
 from core.ui.statistics_view_ui import StatisticsViewUI
 from core.ui.ui_registry import UIRegistry
@@ -1032,7 +1032,7 @@ class BootstrapService(ImmutableBaseObject):
                 "report_ui": ReportUI,
                 "search_ui": SearchUI,
                 "setting_ui": SettingUI,
-                "stack_selection_ui": StackSelectionUI,
+                "learning_stack_selection_ui": LearningStackSelectionUI,
                 "stacks_view_ui": StacksViewUI,
                 "statistics_view_ui": StatisticsViewUI,
                 "user_ui": UserUI,

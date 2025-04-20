@@ -148,7 +148,7 @@ class CalendarUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -173,7 +173,7 @@ class CalendarUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(
+        center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -198,7 +198,7 @@ class CalendarUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+        bottom_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )

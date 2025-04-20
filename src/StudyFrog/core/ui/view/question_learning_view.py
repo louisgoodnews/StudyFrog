@@ -294,7 +294,7 @@ class QuestionLearningView(tkinter.Frame):
         """
 
         # Create the top frame widget
-        top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        top_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -330,7 +330,7 @@ class QuestionLearningView(tkinter.Frame):
         )
 
         # Create the center frame widget
-        center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        center_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -366,7 +366,7 @@ class QuestionLearningView(tkinter.Frame):
         )
 
         # Create the bottom frame widget
-        bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )

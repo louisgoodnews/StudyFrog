@@ -153,20 +153,20 @@ class LearningDashboardUI(BaseUI):
         """
         try:
             # Create the top frame widget
-            top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            top_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
             )
 
             # Create the center frame widget
-            center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            center_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
 
             # Create the bottom frame widget
-            bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
@@ -371,7 +371,7 @@ class LearningDashboardUI(BaseUI):
             #   - implement visualization of last session data (with ability to continue last session if unfinished)
 
             # Create a tkinter.Frame widget within the passed master widget
-            frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -404,7 +404,7 @@ class LearningDashboardUI(BaseUI):
             )
 
             # Create a tkinter.Button widget within the frame widget
-            select_stacks_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            select_stacks_button: Optional[tkinter.Button] = tkinter.Button(
                 background=Constants.BLUE_GREY["700"],
                 command=self.on_select_stacks_button_click,
                 font=(
@@ -505,7 +505,7 @@ class LearningDashboardUI(BaseUI):
             #   - calendar for scheduling sessions, exams, and due dates
 
             # Create a tkinter.Frame widget within the passed master widget
-            frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -551,7 +551,7 @@ class LearningDashboardUI(BaseUI):
             #   - implement in-depth learning statistics and reporting
 
             # Create a tkinter.Frame widget within the passed master widget
-            frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -645,7 +645,7 @@ class LearningDashboardUI(BaseUI):
             )
 
             # Create a tkinter.Label widget within the passed master widget
-            label: Optional[tkinter.Label] = UIBuilder.get_label(
+            label: Optional[tkinter.Label] = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -687,7 +687,7 @@ class LearningDashboardUI(BaseUI):
         Handles the event when the 'Select Stacks' button is clicked.
 
         This function dispatches a navigation request to the global namespace
-        with the target 'stack_selection_ui' and the source 'learning_dashboard_ui'.
+        with the target 'learning_stack_selection_ui' and the source 'learning_dashboard_ui'.
 
         Returns:
             None
@@ -697,44 +697,13 @@ class LearningDashboardUI(BaseUI):
                 navigation request.
         """
         try:
-            # Create a tkinter.Toplevel widget
-            master: Optional[tkinter.Toplevel] = UIBuilder.get_toplevel()
-
-            if not master:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create toplevel in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
-
-            # Style the toplevel widget
-            master.configure(background=Constants.BLUE_GREY["700"])
-
-            # Configure the weight of the 0th column to 1.
-            master.grid_columnconfigure(
-                index=0,
-                weight=1,
-            )
-
-            # Configure the weight of the 0th row to 1.
-            master.grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
-
-            # Set the geometry of the toplevel window
-            master.wm_geometry(newGeometry=Constants.DEFAULT_GEOMETRY)
-
             # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the global namespace
             self.dispatcher.dispatch(
                 direction=Constants.FORWARD_DIRECTION,  # Set the navigation direction to 'forward'
                 event=Events.REQUEST_VALIDATE_NAVIGATION,  # The event to be dispatched
-                master=master,
                 namespace=Constants.GLOBAL_NAMESPACE,  # Specify the global namespace
                 source="learning_dashboard_ui",  # Source of the navigation request
-                target="stack_selection_ui",  # Target UI for navigation
+                target="learning_stack_selection_ui",  # Target UI for navigation
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred

@@ -145,7 +145,7 @@ class AnswerViewForm(tkinter.Frame):
         """
 
         # Create the top frame
-        top_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        top_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the top frame
         top_frame.configure(background=Constants.BLUE_GREY["700"])
@@ -170,7 +170,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create the center frame
-        center_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        center_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the center frame
         center_frame.configure(background=Constants.BLUE_GREY["700"])
@@ -195,7 +195,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create the bottom frame
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(master=self)
+        bottom_frame: tkinter.Frame = tkinter.Frame(master=self)
 
         # Configure the bottom frame
         bottom_frame.configure(background=Constants.BLUE_GREY["700"])
@@ -371,7 +371,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create the left frame
-        left_frame: tkinter.Frame = UIBuilder.get_frame(
+        left_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -423,7 +423,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create the right frame
-        right_frame: tkinter.Frame = UIBuilder.get_frame(
+        right_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -664,7 +664,7 @@ class AnswerViewForm(tkinter.Frame):
 
         # Create a combobox select field for the difficulty
         self.difficulty_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_combobox_field(
+            ttk.Combobox_field(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
@@ -728,7 +728,7 @@ class AnswerViewForm(tkinter.Frame):
 
         # Create a combobox select field for the priority
         self.priority_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_combobox_field(
+            ttk.Combobox_field(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,

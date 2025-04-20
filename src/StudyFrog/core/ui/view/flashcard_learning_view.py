@@ -242,7 +242,7 @@ class FlashcardLearningView(tkinter.Frame):
         """
         try:
             # Create the front frame widget
-            self.front_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            self.front_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
@@ -278,7 +278,7 @@ class FlashcardLearningView(tkinter.Frame):
             )
 
             # Create the front text label widget
-            self.front_text_label: Optional[tkinter.Label] = UIBuilder.get_label(
+            self.front_text_label: Optional[tkinter.Label] = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 disabledforeground=Constants.WHITE,
                 font=(
@@ -314,7 +314,7 @@ class FlashcardLearningView(tkinter.Frame):
             )
 
             # Create the back frame widget
-            self.back_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            self.back_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )

@@ -160,18 +160,18 @@ class CheckbuttonSelectField(BaseField):
         # Iterate over the keys and values of the fields dictionary instance variable
         for (
             key,
-            value,
+            field,
         ) in self.fields.items():
             # Check if the key and the passed display name are identical
             if key == display_name:
                 # Update the value of the corresponding checkbutton field with the passed value
-                value.set(
+                field.set(
                     dispatch=False,
                     value=value,
                 )
             else:
                 # Update the value of the non-corresponding checkbutton field with the opposite of the passed value
-                value.set(
+                field.set(
                     dispatch=False,
                     value=not value,
                 )
@@ -207,7 +207,7 @@ class CheckbuttonSelectField(BaseField):
             event=Events.CHECKBUTTON_SELECT_FIELD_CHANGED,
             label=self.display_name,
             namespace=self.namespace,
-            value=self.get(),
+            value=self.get(display_name=display_name),
         )
 
         # Check, if the 'on_change_callback' function exists
@@ -215,7 +215,10 @@ class CheckbuttonSelectField(BaseField):
             # Call the 'on_change_callback' function and pass the display name as well as the current selection to it
             self.on_change_callback(
                 self.display_name,
-                self.get(dispatch=False),
+                self.get(
+                    dispatch=False,
+                    display_name=display_name,
+                ),
             )
 
     @override
@@ -460,7 +463,12 @@ class CheckbuttonSelectField(BaseField):
             )
 
             # Place the checkbutton field widget within the grid
-            checkbutton_field.grid(column=0, padx=5, pady=5, row=row)
+            checkbutton_field.grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=row,
+            )
 
             # Add the checkbutton field widget to the fields dictionary instance variable
             self.fields[display_name] = checkbutton_field
@@ -3182,16 +3190,13 @@ class OptionSelectFieldItemFactory:
     ) -> Optional[OptionSelectFieldItem]:
         """ """
         try:
-            # Generate a new UUID code
-            uuid: str = str(uuid.uuid4())
-
             # Attempt to create an OptionSelectFieldItem instance
             option_select_field_item: OptionSelectFieldItem = OptionSelectFieldItem(
                 dispatcher=dispatcher,
                 id=cls.index,
                 master=master,
                 namespace=namespace,
-                uuid=uuid,
+                uuid=str(uuid.uuid4()),
                 value=value,
                 **kwargs,
             )
@@ -3383,9 +3388,9 @@ class MultiOptionSelectField(BaseField):
 
             # Attempt to create a OptionSelectFieldItem instance
             select_option_field_item: Optional[OptionSelectFieldItem] = (
-                OptionSelectFieldItemFactory.create_select_option_field_item(
+                OptionSelectFieldItemFactory.create_option_select_field_item(
                     dispatcher=self.dispatcher,
-                    master=self.container,
+                    master=self._container_frame,
                     namespace=self.internal_namespace,
                     value=value,
                 )
@@ -3534,7 +3539,7 @@ class MultiOptionSelectField(BaseField):
         # Bind the 'on_toplevel_destroy' to the toplevel widget via the 'WM_DESTROY' event
         self.toplevel.protocol(
             func=self._on_toplevel_destroy,
-            sequence="WM_DESTROY",
+            name="WM_DESTROY",
         )
 
         # Create a label widget
@@ -3623,17 +3628,8 @@ class MultiOptionSelectField(BaseField):
             sticky=NSEW,
         )
 
-        # Bind the 'on_entry_change' method to the listbox widget via the '<KeyRelease>' event
-        self.listbox.bind(
-            func=lambda entry, event: _on_entry_change(
-                entry=entry,
-                event=event,
-            ),
-            sequence="<KeyRelease>",
-        )
-
         # Update the value of the tkinter.StringVar instance variable
-        self.variable(value=dir(self.values))
+        self.variable.set(value=self.values)
 
         # Create a listbox widget and store it in the (optional) listbox instance variable
         self.listbox = tkinter.Listbox(
@@ -3655,6 +3651,15 @@ class MultiOptionSelectField(BaseField):
         self.listbox.bind(
             func=self._on_listbox_select,
             sequence="<<ListboxSelect>>",
+        )
+
+        # Bind the 'on_entry_change' method to the listbox widget via the '<KeyRelease>' event
+        self.listbox.bind(
+            func=lambda entry, event: _on_entry_change(
+                entry=entry,
+                event=event,
+            ),
+            sequence="<KeyRelease>",
         )
 
         # Create a button widget
@@ -3765,6 +3770,44 @@ class MultiOptionSelectField(BaseField):
                 value=[],
             )
 
+    def configure_clear_button(
+        self,
+        **kwargs,
+    ) -> None:
+        try:
+            # Attempt to configure the 'clear button' tkinter.Button widget
+            self._clear_button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_clear_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def configure_container_frame(
+        self,
+        **kwargs,
+    ) -> None:
+        try:
+            # Attempt to configure the 'container frame' tkinter.Frame widget
+            self._container_frame.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
     @override
     def configure_grid(self) -> None:
         """ """
@@ -3803,6 +3846,25 @@ class MultiOptionSelectField(BaseField):
             index=0,
             weight=0,
         )
+
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        try:
+            # Attempt to configure the label widget
+            self._label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
     def configure_option(
         self,
@@ -3868,6 +3930,25 @@ class MultiOptionSelectField(BaseField):
             # Log an error message indicating that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'configure_option' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def configure_select_button(
+        self,
+        **kwargs,
+    ) -> None:
+        try:
+            # Attempt to configure the 'select button' tkinter.Button widget
+            self._select_button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_select_button' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message
@@ -4030,9 +4111,9 @@ class MultiOptionSelectField(BaseField):
 
             # Attempt to create a OptionSelectFieldItem instance
             select_option_field_item: Optional[OptionSelectFieldItem] = (
-                OptionSelectFieldItemFactory.create_select_option_field_item(
+                OptionSelectFieldItemFactory.create_option_select_field_item(
                     dispatcher=self.dispatcher,
-                    master=self.container,
+                    master=self._container_frame,
                     namespace=self.internal_namespace,
                     value=value,
                 )
@@ -4758,9 +4839,9 @@ class SingleOptionSelectField(BaseField):
 
             # Attempt to create a OptionSelectFieldItem instance
             select_option_field_item: Optional[OptionSelectFieldItem] = (
-                OptionSelectFieldItemFactory.create_select_option_field_item(
+                OptionSelectFieldItemFactory.create_option_select_field_item(
                     dispatcher=self.dispatcher,
-                    master=self.container,
+                    master=self._container_frame,
                     namespace=self.internal_namespace,
                     value=value,
                 )
@@ -4950,7 +5031,7 @@ class SingleOptionSelectField(BaseField):
             if string_value == "":
 
                 # Update the value of the tkinter.StringVar instance variable
-                self.variable.set(value=dir(self.values))
+                self.variable.set(value=self.values)
 
                 # Return early
                 return
@@ -4992,7 +5073,7 @@ class SingleOptionSelectField(BaseField):
         )
 
         # Update the value of the tkinter.StringVar instance variable
-        self.variable(value=dir(self.values))
+        self.variable.set(value=dir(self.values))
 
         # Create a listbox widget and store it in the (optional) listbox instance variable
         self.listbox = tkinter.Listbox(
@@ -5394,7 +5475,7 @@ class SingleOptionSelectField(BaseField):
 
             # Attempt to create a OptionSelectFieldItem instance
             select_option_field_item: Optional[OptionSelectFieldItem] = (
-                OptionSelectFieldItemFactory.create_select_option_field_item(
+                OptionSelectFieldItemFactory.create_option_select_field_item(
                     dispatcher=self.dispatcher,
                     master=self._container,
                     namespace=self.internal_namespace,

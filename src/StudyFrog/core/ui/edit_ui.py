@@ -224,7 +224,7 @@ class EditUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -249,7 +249,7 @@ class EditUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        center_frame: tkinter.Frame = UIBuilder.get_frame(
+        center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -274,7 +274,7 @@ class EditUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+        bottom_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -346,7 +346,7 @@ class EditUI(BaseUI):
         )
 
         # Create the "Cancel button" button widget
-        cancel_button: tkinter.Button = UIBuilder.get_button(
+        cancel_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_cancel_button_click,
             font=(
@@ -369,7 +369,7 @@ class EditUI(BaseUI):
         )
 
         # Create the "Save button" button widget
-        save_button: tkinter.Button = UIBuilder.get_button(
+        save_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_save_button_click,
             font=(

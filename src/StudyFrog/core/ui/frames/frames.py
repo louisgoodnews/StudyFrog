@@ -289,7 +289,7 @@ class CollapsibleFrame(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def configure_container(
+    def configure_container_frame(
         self,
         **kwargs,
     ) -> None:
@@ -300,7 +300,7 @@ class CollapsibleFrame(tkinter.Frame):
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_container' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message
@@ -511,6 +511,12 @@ class ScrolledFrame(tkinter.Frame):
         # Update idle tasks
         self.update_idletasks()
 
+        # Bind the 'on_container_configure' method to the container widget via the '<Configure>' event
+        self._container.bind(
+            func=self._on_container_configure,
+            sequence="<Configure>",
+        )
+
         # Add this frame to the canvas widget
         self._canvas.create_window(
             *(
@@ -634,7 +640,7 @@ class ScrolledFrame(tkinter.Frame):
             # Configure the width of the container frame
             self._canvas.itemconfig(
                 tagOrId="window",
-                width=self._container.winfo_reqwidth(),
+                width=self._canvas.winfo_width(),
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
@@ -744,7 +750,7 @@ class ScrolledFrame(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def configure_container(
+    def configure_container_frame(
         self,
         **kwargs,
     ) -> None:
@@ -769,7 +775,7 @@ class ScrolledFrame(tkinter.Frame):
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_contaier' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message

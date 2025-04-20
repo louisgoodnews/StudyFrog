@@ -520,7 +520,7 @@ class MultiSelectAnswerField(BaseField):
         self.string_variable: tkinter.StringVar = tkinter.StringVar(value="")
 
         # Add a trace to the variable
-        self.variable.trace_add(
+        self.string_variable.trace_add(
             callback=lambda *args: self._on_variable_change(),
             mode="write",
         )
@@ -529,7 +529,7 @@ class MultiSelectAnswerField(BaseField):
         self._entry: tkinter.Entry = tkinter.Entry(
             master=self,
             textvariable=self.string_variable,
-            **kwargs(
+            **kwargs.get(
                 "entry",
                 {},
             ),
@@ -549,7 +549,7 @@ class MultiSelectAnswerField(BaseField):
             command=lambda: self.clear(dispatch=True),
             master=self,
             text="X",
-            **kwargs(
+            **kwargs.get(
                 "button",
                 {},
             ),

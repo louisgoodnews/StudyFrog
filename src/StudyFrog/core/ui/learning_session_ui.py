@@ -267,7 +267,7 @@ class LearningSessionUI(BaseUI):
         """
         try:
             # Create the top frame widget
-            top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            top_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
@@ -290,7 +290,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the center frame widget
-            self.center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            self.center_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
@@ -312,7 +312,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the bottom frame widget
-            bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
@@ -393,7 +393,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Left Frame" frame widget
-            left_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            left_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -427,7 +427,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Previous Button" button widget
-            self.previous_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            self.previous_button: Optional[tkinter.Button] = tkinter.Button(
                 background=Constants.BLUE_GREY["700"],
                 command=lambda: self.on_navigation_button_click(direction="previous"),
                 font=(
@@ -459,7 +459,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Center Frame" frame widget
-            center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            center_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -505,7 +505,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Easy Button" button widget
-            self.easy_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            self.easy_button: Optional[tkinter.Button] = tkinter.Button(
                 background=Constants.GREEN["700"],
                 command=lambda: self.on_difficulty_button_click(difficulty="easy"),
                 font=(
@@ -537,7 +537,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Medium Button" button widget
-            self.medium_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            self.medium_button: Optional[tkinter.Button] = tkinter.Button(
                 background=Constants.ORANGE["700"],
                 command=lambda: self.on_difficulty_button_click(difficulty="medium"),
                 font=(
@@ -569,7 +569,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Hard Button" button widget
-            self.hard_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            self.hard_button: Optional[tkinter.Button] = tkinter.Button(
                 background=Constants.RED["700"],
                 command=lambda: self.on_difficulty_button_click(difficulty="hard"),
                 font=(
@@ -601,7 +601,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Right Frame" frame widget
-            right_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+            right_frame: Optional[tkinter.Frame] = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -635,7 +635,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Next Button" button widget
-            self.next_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            self.next_button: Optional[tkinter.Button] = tkinter.Button(
                 background=Constants.BLUE_GREY["700"],
                 command=lambda: self.on_navigation_button_click(direction="next"),
                 font=(
@@ -734,7 +734,7 @@ class LearningSessionUI(BaseUI):
                 weight=1,
             )
 
-            self.title_label: Optional[tkinter.Label] = UIBuilder.get_label(
+            self.title_label: Optional[tkinter.Label] = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -826,7 +826,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Get the options button widget
-            options_button: Optional[tkinter.Button] = UIBuilder.get_button(
+            options_button: Optional[tkinter.Button] = tkinter.Button(
                 background=Constants.BLUE_GREY["700"],
                 command=self.on_options_button_click,
                 font=(
@@ -1336,7 +1336,7 @@ class LearningSessionUI(BaseUI):
 
     def on_options_button_click(self) -> None:
         try:
-            toplevel: Optional[tkinter.Toplevel] = UIBuilder.get_toplevel()
+            toplevel: Optional[tkinter.Toplevel] = tkinter.Toplevel()
 
             if not toplevel:
                 # Log a warning message

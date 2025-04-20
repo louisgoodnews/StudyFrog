@@ -167,22 +167,22 @@ class Events:
 
     # An event that indicates that a combobox field has changed
     COMBOBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox__field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:combobox_field:field:changed")
     )
 
     # An event that indicates that a combobox field has been cleared
     COMBOBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox__field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:combobox_field:field:cleared")
     )
 
     # An event that indicates that a combobox field's value has been retrieved
     COMBOBOX_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:combobox__field:field:get"
+        name="ui:combobox_field:field:get"
     )
 
     # An event that indicates that a combobox field has been set
     COMBOBOX_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:combobox__field:field:set"
+        name="ui:combobox_field:field:set"
     )
 
     # An event that indicates that a combobox field has changed
@@ -382,42 +382,42 @@ class Events:
 
     # An event that indicates that a multi option select field has changed
     MULTI_OPTION_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_option_select__field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:multi_option_select_field:field:changed")
     )
 
     # An event that indicates that a multi option select field has been cleared
     MULTI_OPTION_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_option_select__field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:multi_option_select_field:field:cleared")
     )
 
     # An event that indicates that a multi option select field has been retrieved
     MULTI_OPTION_SELECT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_option_select__field:field:get")
+        DispatcherEventFactory.create_event(name="ui:multi_option_select_field:field:get")
     )
 
     # An event that indicates that a multi option select field has been set
     MULTI_OPTION_SELECT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_option_select__field:field:set")
+        DispatcherEventFactory.create_event(name="ui:multi_option_select_field:field:set")
     )
 
     # An event that indicates that a multi select answer field has changed
     MULTI_SELECT_ANSWER_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_select_answer__field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:multi_select_answer_field:field:changed")
     )
 
     # An event that indicates that a multi select answer field has been cleared
     MULTI_SELECT_ANSWER_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_select_answer__field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:multi_select_answer_field:field:cleared")
     )
 
     # An event that indicates that a multi select answer field has been retrieved
     MULTI_SELECT_ANSWER_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_select_answer__field:field:get")
+        DispatcherEventFactory.create_event(name="ui:multi_select_answer_field:field:get")
     )
 
     # An event that indicates that a multi select answer field has been set
     MULTI_SELECT_ANSWER_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_select_answer__field:field:set")
+        DispatcherEventFactory.create_event(name="ui:multi_select_answer_field:field:set")
     )
 
     # An event that indicates that a navigate event has occurred
@@ -514,17 +514,17 @@ class Events:
 
     # An event that indicates that a password text field has changed
     PASSWORD_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:password_text__field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:password_text_field:field:changed")
     )
 
     # An event that indicates that a password text field has been retrieved
     PASSWORD_TEXT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:password_text__field:field:get")
+        DispatcherEventFactory.create_event(name="ui:password_text_field:field:get")
     )
 
     # An event that indicates that a password text field has been set
     PASSWORD_TEXT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:password_text__field:field:set")
+        DispatcherEventFactory.create_event(name="ui:password_text_field:field:set")
     )
 
     # An event that indicates that a priority has been created in the backend
@@ -569,97 +569,97 @@ class Events:
 
     # An event that indicates that a radiobutton field has been changed
     RADIOBUTTON_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:radiobutton__field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:radiobutton_field:field:changed")
     )
 
     # An event that indicates that a radiobutton field has been cleared
     RADIOBUTTON_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:radiobutton__field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:radiobutton_field:field:cleared")
     )
 
     # An event that indicates that a radiobutton field has been retrieved
     RADIOBUTTON_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:radiobutton__field:field:get"
+        name="ui:radiobutton_field:field:get"
     )
 
     # An event that indicates that a radiobutton field has been set
     RADIOBUTTON_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:radiobutton__field:field:set"
+        name="ui:radiobutton_field:field:set"
     )
 
     # An event that indicates that a radiobutton select field has been changed
     RADIOBUTTON_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:radiobutton_select__field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:radiobutton_select_field:field:changed")
     )
 
     # An event that indicates that a radiobutton select field has been cleared
     RADIOBUTTON_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:radiobutton_select__field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:radiobutton_select_field:field:cleared")
     )
 
     # An event that indicates that a radiobutton select field has been retrieved
     RADIOBUTTON_SELECT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:radiobutton_select__field:field:get")
+        DispatcherEventFactory.create_event(name="ui:radiobutton_select_field:field:get")
     )
 
     # An event that indicates that a radiobutton select field has been set
     RADIOBUTTON_SELECT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:radiobutton_select__field:field:set")
+        DispatcherEventFactory.create_event(name="ui:radiobutton_select_field:field:set")
     )
 
     # An event that indicates that a read-only field has been changed
     READONLY_MULTI_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:readonly:multi_line_text__field:field:changed"
+            name="ui:readonly:multi_line_text_field:field:changed"
         )
     )
 
     # An event that indicates that a read-only field has been cleared
     READONLY_MULTI_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:readonly:multi_line_text__field:field:cleared"
+            name="ui:readonly:multi_line_text_field:field:cleared"
         )
     )
 
     # An event that indicates that a read-only field has been retrieved
     READONLY_MULTI_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:readonly:multi_line_text__field:field:get"
+            name="ui:readonly:multi_line_text_field:field:get"
         )
     )
 
     # An event that indicates that a read-only field has been set
     READONLY_MULTI_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:readonly:multi_line_text__field:field:set"
+            name="ui:readonly:multi_line_text_field:field:set"
         )
     )
 
     # An event that indicates that a read-only field has been changed
     READONLY_SINGLE_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:readonly:single_line_text__field:field:changed"
+            name="ui:readonly:single_line_text_field:field:changed"
         )
     )
 
     # An event that indicates that a read-only field has been cleared
     READONLY_SINGLE_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:readonly:single_line_text__field:field:cleared"
+            name="ui:readonly:single_line_text_field:field:cleared"
         )
     )
 
     # An event that indicates that a read-only field has been retrieved
     READONLY_SINGLE_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:readonly:single_line_text__field:field:get"
+            name="ui:readonly:single_line_text_field:field:get"
         )
     )
 
     # An event that indicates that a read-only field has been set
     READONLY_SINGLE_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:readonly:single_line_text__field:field:set"
+            name="ui:readonly:single_line_text_field:field:set"
         )
     )
 
@@ -1525,25 +1525,25 @@ class Events:
     # An event that indicates that a single option select field has changed
     SINGLE_OPTION_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:single_option_select__field:field:changed"
+            name="ui:single_option_select_field:field:changed"
         )
     )
 
     # An event that indicates that a single option select field has been cleared
     SINGLE_OPTION_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
-            name="ui:single_option_select__field:field:cleared"
+            name="ui:single_option_select_field:field:cleared"
         )
     )
 
     # An event that indicates that a single option select field has been retrieved
     SINGLE_OPTION_SELECT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_option_select__field:field:get")
+        DispatcherEventFactory.create_event(name="ui:single_option_select_field:field:get")
     )
 
     # An event that indicates that a single option select field has been set
     SINGLE_OPTION_SELECT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_option_select__field:field:set")
+        DispatcherEventFactory.create_event(name="ui:single_option_select_field:field:set")
     )
 
     # An event that indicates that a stack has been created in the backend

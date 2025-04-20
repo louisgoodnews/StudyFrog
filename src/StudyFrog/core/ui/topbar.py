@@ -99,7 +99,7 @@ class TopBar(tkinter.Frame):
         self.configure(background=Constants.INDIGO["500"])
 
         # Create the "Left Frame" frame widget
-        left_frame: tkinter.Frame = UIBuilder.get_frame(
+        left_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.INDIGO["500"],
             master=self,
         )
@@ -124,12 +124,12 @@ class TopBar(tkinter.Frame):
         )
 
         # Create the "Menu Button" button widget
-        menu_button: tkinter.Button = UIBuilder.get_button(
+        menu_button: tkinter.Button = tkinter.Button(
             background=Constants.INDIGO["500"],
             command=lambda: self.dispatcher.dispatch(
                 direction="forward",
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
-                master=UIBuilder.get_toplevel(),
+                master=tkinter.Toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
                 source="topbar",
                 target="menu_ui",
@@ -165,7 +165,7 @@ class TopBar(tkinter.Frame):
         )
 
         #  Create the "Logo Label" label widget
-        logo_label: tkinter.Label = UIBuilder.get_label(
+        logo_label: tkinter.Label = tkinter.Label(
             background=Constants.INDIGO["500"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -226,7 +226,7 @@ class TopBar(tkinter.Frame):
             )
 
             # Create the "Button" button widget
-            button: ttk.Button = UIBuilder.get_button(
+            button: ttk.Button = tkinter.Button(
                 background=Constants.INDIGO["500"],
                 command=lambda event=value["event"], target=value[
                     "target"
@@ -271,12 +271,12 @@ class TopBar(tkinter.Frame):
             )
 
         # Create the "Create Button" button widget
-        create_button: tkinter.Button = UIBuilder.get_button(
+        create_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["500"],
             command=lambda: self.dispatcher.dispatch(
                 direction="forward",
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
-                master=UIBuilder.get_toplevel(),
+                master=tkinter.Toplevel(),
                 namespace=Constants.GLOBAL_NAMESPACE,
                 source="topbar",
                 target="create_ui",
@@ -311,7 +311,7 @@ class TopBar(tkinter.Frame):
         )
 
         # Create the "Right Frame" frame widget
-        right_frame: tkinter.Frame = UIBuilder.get_frame(
+        right_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.INDIGO["500"],
             master=self,
         )
@@ -413,12 +413,12 @@ class TopBar(tkinter.Frame):
             )
 
             # Create the button widget
-            button: tkinter.Button = UIBuilder.get_button(
+            button: tkinter.Button = tkinter.Button(
                 background=Constants.INDIGO["500"],
                 command=lambda: self.dispatcher.dispatch(
                     direction="forward",
                     event=Events.REQUEST_VALIDATE_NAVIGATION,
-                    master=UIBuilder.get_toplevel(),
+                    master=tkinter.Toplevel(),
                     namespace=Constants.GLOBAL_NAMESPACE,
                     source="topbar",
                     target=target,
@@ -468,7 +468,7 @@ class TopBar(tkinter.Frame):
         """
         try:
             # Get the root widget
-            root: tkinter.Toplevel = UIBuilder.get_toplevel()
+            root: tkinter.Toplevel = tkinter.Toplevel()
 
             # Configure the root toplevel widget's 0th column to weight 1
             root.grid_columnconfigure(

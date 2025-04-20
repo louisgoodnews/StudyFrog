@@ -453,7 +453,7 @@ class CreateUI(BaseUI):
         """
 
         # Create the "Top Frame" frame widget
-        top_frame: tkinter.Frame = UIBuilder.get_frame(
+        top_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -478,7 +478,7 @@ class CreateUI(BaseUI):
         )
 
         # Create the "Center Frame" frame widget
-        self.center_frame: tkinter.Frame = UIBuilder.get_frame(
+        self.center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -503,7 +503,7 @@ class CreateUI(BaseUI):
         )
 
         # Create the "Bottom Frame" frame widget
-        bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+        bottom_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -609,7 +609,7 @@ class CreateUI(BaseUI):
         )
 
         # Create a frame widget
-        frame: tkinter.Frame = UIBuilder.get_frame(
+        frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=master,
         )
@@ -637,7 +637,7 @@ class CreateUI(BaseUI):
         )
 
         # Create the "Left Frame" frame widget
-        left_frame: tkinter.Frame = UIBuilder.get_frame(
+        left_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=frame,
         )
@@ -701,7 +701,7 @@ class CreateUI(BaseUI):
         )
 
         # Create the "Right Frame" frame widget
-        right_frame: tkinter.Frame = UIBuilder.get_frame(
+        right_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=frame,
         )
@@ -735,7 +735,7 @@ class CreateUI(BaseUI):
         )
 
         # Create the "Cancel" button widget
-        cancel_button: tkinter.Button = UIBuilder.get_button(
+        cancel_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_cancel_button_click,
             font=(
@@ -758,7 +758,7 @@ class CreateUI(BaseUI):
         )
 
         # Create the "Create" button widget
-        create_button: tkinter.Button = UIBuilder.get_button(
+        create_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_create_button_click,
             font=(

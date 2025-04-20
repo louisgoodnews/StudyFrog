@@ -147,7 +147,7 @@ class MenuUI(BaseUI):
         """
 
         # Attempt to create the "Top Frame" frame widget
-        top_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        top_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -182,7 +182,7 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the "Center Frame" frame widget
-        center_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        center_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -217,7 +217,7 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the "Bottom Frame" frame widget
-        bottom_frame: Optional[tkinter.Frame] = UIBuilder.get_frame(
+        bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
@@ -302,7 +302,7 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the close button
-        close_button: Optional[tkinter.Button] = UIBuilder.get_button(
+        close_button: Optional[tkinter.Button] = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_close_button_clicked,
             font=(
@@ -405,7 +405,7 @@ class MenuUI(BaseUI):
             weight=1,
         )
 
-        home_button: Optional[tkinter.Button] = UIBuilder.get_button(
+        home_button: Optional[tkinter.Button] = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_home_button_clicked,
             font=(
@@ -436,7 +436,7 @@ class MenuUI(BaseUI):
             row=0,
         )
 
-        home_label: Optional[tkinter.Label] = UIBuilder.get_label(
+        home_label: Optional[tkinter.Label] = tkinter.Label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -507,7 +507,7 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the StudyFrog label
-        study_frog_label: Optional[tkinter.Label] = UIBuilder.get_label(
+        study_frog_label: Optional[tkinter.Label] = tkinter.Label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -536,7 +536,7 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the shutdown button
-        shutdown_button: Optional[tkinter.Button] = UIBuilder.get_button(
+        shutdown_button: Optional[tkinter.Button] = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_shutdown_button_clicked,
             font=(

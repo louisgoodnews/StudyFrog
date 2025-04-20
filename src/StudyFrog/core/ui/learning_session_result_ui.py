@@ -149,20 +149,20 @@ class LearningSessionResultUI(BaseUI):
         """
         try:
             # Create the top frame widget
-            top_frame: tkinter.Frame = UIBuilder.get_frame(
+            top_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
             )
 
             # Create the center frame widget
-            center_frame: tkinter.Frame = UIBuilder.get_frame(
+            center_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
 
             # Create the bottom frame widget
-            bottom_frame: tkinter.Frame = UIBuilder.get_frame(
+            bottom_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
