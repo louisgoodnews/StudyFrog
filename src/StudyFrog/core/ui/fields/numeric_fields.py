@@ -32,7 +32,7 @@ class FloatSpinboxField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         maximum: float = 100.0,
         minimum: float = -100.0,
@@ -59,7 +59,7 @@ class FloatSpinboxField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -656,7 +656,7 @@ class FloatSpinboxField(BaseField):
 
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -674,7 +674,12 @@ class FloatSpinboxField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=label, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget in the grid
@@ -694,7 +699,10 @@ class FloatSpinboxField(BaseField):
             command=self._on_decrement_button_click,
             master=self,
             text="-",
-            **kwargs.get("decrement_button", {}),
+            **kwargs.get(
+                "decrement_button",
+                {},
+            ),
         )
 
         # Place the 'decrement button' button widget in the grid
@@ -707,7 +715,12 @@ class FloatSpinboxField(BaseField):
 
         # Create an entry widget
         self._entry: tkinter.Entry = tkinter.Entry(
-            master=self, textvariable=self.variable, **kwargs.get("entry", {})
+            master=self,
+            textvariable=self.variable,
+            **kwargs.get(
+                "entry",
+                {},
+            ),
         )
 
         # Place the entry widget in the grid
@@ -730,7 +743,10 @@ class FloatSpinboxField(BaseField):
             command=self._on_increment_button_click,
             master=self,
             text="+",
-            **kwargs.get("increment_button", {}),
+            **kwargs.get(
+                "increment_button",
+                {},
+            ),
         )
 
         # Place the 'increment button' button widget in the grid
@@ -746,7 +762,10 @@ class FloatSpinboxField(BaseField):
             command=self._on_reset_button_click,
             master=self,
             text="X",
-            **kwargs.get("reset_button", {}),
+            **kwargs.get(
+                "reset_button",
+                {},
+            ),
         )
 
         # Place the 'reset button' button widget in the grid
@@ -766,7 +785,10 @@ class FloatSpinboxField(BaseField):
             foreground=Constants.RED["default"],
             master=self,
             text=f"{self.variable.get()}",
-            **kwargs.get("warning_label", {}),
+            **kwargs.get(
+                "warning_label",
+                {},
+            ),
         )
 
     def get(
@@ -861,7 +883,7 @@ class IntegerSpinboxField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         maximum: int = 100,
         minimum: int = -100,
@@ -888,7 +910,7 @@ class IntegerSpinboxField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -1485,7 +1507,7 @@ class IntegerSpinboxField(BaseField):
 
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -1503,7 +1525,12 @@ class IntegerSpinboxField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=label, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget in the grid
@@ -1523,7 +1550,10 @@ class IntegerSpinboxField(BaseField):
             command=self._on_decrement_button_click,
             master=self,
             text="-",
-            **kwargs.get("decrement_button", {}),
+            **kwargs.get(
+                "decrement_button",
+                {},
+            ),
         )
 
         # Place the 'decrement button' button widget in the grid
@@ -1536,7 +1566,12 @@ class IntegerSpinboxField(BaseField):
 
         # Create an entry widget
         self._entry: tkinter.Entry = tkinter.Entry(
-            master=self, textvariable=self.variable, **kwargs.get("entry", {})
+            master=self,
+            textvariable=self.variable,
+            **kwargs.get(
+                "entry",
+                {},
+            ),
         )
 
         # Place the entry widget in the grid
@@ -1559,7 +1594,10 @@ class IntegerSpinboxField(BaseField):
             command=self._on_increment_button_click,
             master=self,
             text="+",
-            **kwargs.get("increment_button", {}),
+            **kwargs.get(
+                "increment_button",
+                {},
+            ),
         )
 
         # Place the 'increment button' button widget in the grid
@@ -1575,7 +1613,10 @@ class IntegerSpinboxField(BaseField):
             command=self._on_reset_button_click,
             master=self,
             text="X",
-            **kwargs.get("reset_button", {}),
+            **kwargs.get(
+                "reset_button",
+                {},
+            ),
         )
 
         # Place the 'reset button' button widget in the grid
@@ -1595,7 +1636,10 @@ class IntegerSpinboxField(BaseField):
             foreground=Constants.RED["default"],
             master=self,
             text=f"{self.variable.get()}",
-            **kwargs.get("warning_label", {}),
+            **kwargs.get(
+                "warning_label",
+                {},
+            ),
         )
 
     def get(

@@ -77,7 +77,7 @@ class CheckbuttonSelectField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         labels: List[str],
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
@@ -92,8 +92,8 @@ class CheckbuttonSelectField(BaseField):
         CheckbuttonField instances in a centralized layout.
 
         Args:
-            label (str): The label text describing the group of checkbuttons.
-            labels (List[str]): A list of strings representing the options to display as checkbuttons.
+            display_name (str): The string to display for the field.
+            display_names (List[str]): A list of strings representing the options to display as checkbuttons.
             master (tkinter.Misc): The parent container in which this widget is placed.
             namespace (str, optional): The namespace identifier for event dispatching. Defaults to Constants.GLOBAL_NAMESPACE.
             on_change_callback (Optional[Callable[[str, Dict[str, bool]], None]], optional): Callback function invoked on any change in the selection.
@@ -113,7 +113,7 @@ class CheckbuttonSelectField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -135,7 +135,7 @@ class CheckbuttonSelectField(BaseField):
 
     def _enforce_selection_mode(
         self,
-        label: str,
+        display_name: str,
         value: bool,
     ) -> None:
         """
@@ -162,8 +162,8 @@ class CheckbuttonSelectField(BaseField):
             key,
             value,
         ) in self.fields.items():
-            # Check if the key and the passed label are identical
-            if key == label:
+            # Check if the key and the passed display name are identical
+            if key == display_name:
                 # Update the value of the corresponding checkbutton field with the passed value
                 value.set(
                     dispatch=False,
@@ -178,7 +178,7 @@ class CheckbuttonSelectField(BaseField):
 
     def _on_field_change(
         self,
-        label: str,
+        display_name: str,
         value: bool,
     ) -> None:
         """
@@ -197,7 +197,10 @@ class CheckbuttonSelectField(BaseField):
         """
 
         # Enforce the selection mode
-        self._enforce_selection_mode(label=label, value=value)
+        self._enforce_selection_mode(
+            display_name=display_name,
+            value=value,
+        )
 
         # Dispatch the CHECKBUTTON_SELECT_FIELD_CHANGED event
         self.dispatcher.dispatch(
@@ -284,7 +287,7 @@ class CheckbuttonSelectField(BaseField):
             if field not in self.fields.keys():
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Field with label '{field}' not found in 'fields' dictionary. This is likely due to a typo."
+                    message=f"Field with display name '{field}' not found in 'fields' dictionary. This is likely due to a typo."
                 )
 
                 # Return early
@@ -303,7 +306,7 @@ class CheckbuttonSelectField(BaseField):
             ):
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Field with label '{field}' does not have any 'configure_{attribute}' attribute. This is likely due the method not being implemented."
+                    message=f"Field with display name '{field}' does not have any 'configure_{attribute}' attribute. This is likely due the method not being implemented."
                 )
 
                 # Return early
@@ -403,7 +406,7 @@ class CheckbuttonSelectField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -413,7 +416,7 @@ class CheckbuttonSelectField(BaseField):
         Each checkbutton is placed in its own row within the widget's grid.
 
         Args:
-            label (str): The display label for the field.
+            display_name (str): The string to display for the field.
             options (List[str]): A list of option strings to create individual checkbuttons for.
             **kwargs: Additional keyword arguments for field customization.
 
@@ -423,7 +426,12 @@ class CheckbuttonSelectField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=label, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget within the grid
@@ -438,14 +446,14 @@ class CheckbuttonSelectField(BaseField):
         # Iterate over the labels in the keys of the fields dictionary instance variable
         for (
             row,
-            label,
+            display_name,
         ) in enumerate(
             iterable=self.fields.keys(),
             start=1,
         ):
             # Create a checkbutton field widget
             checkbutton_field: CheckbuttonField = CheckbuttonField(
-                label=label,
+                display_name=display_name,
                 master=self,
                 namespace=self.namespace,
                 on_change_callback=self._on_field_change,
@@ -455,7 +463,7 @@ class CheckbuttonSelectField(BaseField):
             checkbutton_field.grid(column=0, padx=5, pady=5, row=row)
 
             # Add the checkbutton field widget to the fields dictionary instance variable
-            self.fields[label] = checkbutton_field
+            self.fields[display_name] = checkbutton_field
 
         # Configure the grid
         self.configure_grid()
@@ -463,7 +471,7 @@ class CheckbuttonSelectField(BaseField):
     @override
     def get(
         self,
-        label: str,
+        display_name: str,
         dispatch: bool = False,
     ) -> Tuple[str, Dict[str, bool]]:
         """
@@ -473,17 +481,18 @@ class CheckbuttonSelectField(BaseField):
         and the selection mode. If dispatch is True, an event will be emitted.
 
         Args:
+            display_name (str): The string displayed in the label of the field.
             dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
 
         Returns:
             Tuple[str, Union[str, List[str]]]: A tuple containing the field label and the current selection.
         """
 
-        # Check, if the passed label is present within the keys of the 'fields' dictionary instance variable
-        if label not in self.fields.keys():
+        # Check, if the passed display name is present within the keys of the 'fields' dictionary instance variable
+        if display_name not in self.fields.keys():
             # Log a warning message
             self.logger.warning(
-                message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
+                message=f"Field with display name '{display_name}' not found in 'fields' dictionary. This is likely due to a typo."
             )
 
             # Return early
@@ -523,7 +532,7 @@ class CheckbuttonSelectField(BaseField):
     @override
     def set(
         self,
-        label: str,
+        display_name: str,
         value: bool,
         dispatch: bool = False,
     ) -> None:
@@ -534,22 +543,23 @@ class CheckbuttonSelectField(BaseField):
         a CHECKBUTTON_SELECT_FIELD_SET event will be emitted.
 
         Args:
+            display_name (str): The string display by the label of the field.
             value (Union[str, List[str]]): A single option or list of options to select.
             dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
         """
 
-        # Check, if the passed label is present within the keys of the 'fields' dictionary instance variable
-        if label not in self.fields.keys():
+        # Check, if the passed display name is present within the keys of the 'fields' dictionary instance variable
+        if display_name not in self.fields.keys():
             # Log a warning message
             self.logger.warning(
-                message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
+                message=f"Field with display name '{display_name}' not found in 'fields' dictionary. This is likely due to a typo."
             )
 
             # Return early
             return
 
         # Set the value of the corresponding checkbutton field
-        self.fields[label].set(value=value)
+        self.fields[display_name].set(value=value)
 
         # Check, if the dispatch flag is set to True
         if dispatch:
@@ -587,7 +597,7 @@ class ComboboxField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, str], None]] = None,
@@ -602,7 +612,7 @@ class ComboboxField(BaseField):
         the list of selectable values and optionally sets a default value.
 
         Args:
-            label (str): The label text displayed next to the field.
+            display_name (str): The string to display for the field.
             master (tkinter.Misc): The parent container in which this widget is placed.
             namespace (str, optional): The namespace identifier for event dispatching. Defaults to Constants.GLOBAL_NAMESPACE.
             on_change_callback (Optional[Callable[[str, str], None]], optional): Callback function called when the selected value changes.
@@ -619,7 +629,7 @@ class ComboboxField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -954,7 +964,7 @@ class ComboboxField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -976,7 +986,12 @@ class ComboboxField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=label, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget within the grid
@@ -1147,7 +1162,7 @@ class ComboboxSelectField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         labels: List[str],
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
@@ -1180,7 +1195,7 @@ class ComboboxSelectField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -1203,7 +1218,7 @@ class ComboboxSelectField(BaseField):
 
     def _on_field_change(
         self,
-        label: str,
+        display_name: str,
         value: str,
     ) -> None:
         """
@@ -1238,28 +1253,28 @@ class ComboboxSelectField(BaseField):
 
     def add_value(
         self,
-        label,
+        display_name: str,
         value: Union[List[str], str],
     ) -> None:
         """
         Adds new option(s) to a specified combobox field.
 
         This method supports both single string inputs and lists of strings. The values are added
-        to the dropdown list for the combobox matching the provided label.
+        to the dropdown list for the combobox matching the provided display name.
 
         Args:
-            label (str): The label of the combobox to update.
+            display_name (str): The display name of the combobox to update.
             value (Union[List[str], str]): One or more values to add to the dropdown list.
 
         Returns:
             None
         """
 
-        # Check, if the passed label is present within the keys of the 'fields' dictionary instance variable
-        if label not in self.fields.keys():
+        # Check, if the passed display name is present within the keys of the 'fields' dictionary instance variable
+        if display_name not in self.fields.keys():
             # Log a warning message
             self.logger.warning(
-                message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
+                message=f"Field with display name '{display_name}' not found in 'fields' dictionary. This is likely due to a typo."
             )
 
             # Return early
@@ -1273,7 +1288,7 @@ class ComboboxSelectField(BaseField):
             value = [value]
 
         # Extend the 'values' of the corresponding combobox field with the passed values
-        self.fields[label].cget("values").extend(value)
+        self.fields[display_name].cget("values").extend(value)
 
     @override
     def clear(
@@ -1308,7 +1323,7 @@ class ComboboxSelectField(BaseField):
         if dispatch:
             # Dispatch the COMBOBOXS_SELECT_FIELD_CLEARED event
             self.dispatcher.dispatch(
-                event=Events.COMBOBOXS_SELECT_FIELD_CLEARED,
+                event=Events.COMBOBOX_SELECT_FIELD_CLEARED,
                 label=self.display_name,
                 namespace=self.namespace,
                 value=self.get(dispatch=False),
@@ -1344,7 +1359,7 @@ class ComboboxSelectField(BaseField):
             if field not in self.fields.keys():
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Field with label '{field}' not found in 'fields' dictionary. This is likely due to a typo."
+                    message=f"Field with display name '{field}' not found in 'fields' dictionary. This is likely due to a typo."
                 )
 
                 # Return early
@@ -1363,7 +1378,7 @@ class ComboboxSelectField(BaseField):
             ):
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Field with label '{field}' does not have any 'configure_{attribute}' attribute. This is likely due the method not being implemented."
+                    message=f"Field with display name '{field}' does not have any 'configure_{attribute}' attribute. This is likely due the method not being implemented."
                 )
 
                 # Return early
@@ -1463,7 +1478,7 @@ class ComboboxSelectField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -1473,7 +1488,7 @@ class ComboboxSelectField(BaseField):
         Each combobox field is placed in its own row within the widget's grid.
 
         Args:
-            label (str): The display label for the field.
+            display_name (str): The display name for the field.
             **kwargs: Additional keyword arguments for field customization.
 
         Returns:
@@ -1482,7 +1497,12 @@ class ComboboxSelectField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=label, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget within the grid
@@ -1524,7 +1544,7 @@ class ComboboxSelectField(BaseField):
             combobox_field.grid(column=0, padx=5, pady=5, row=row)
 
             # Add the combobox field widget to the fields dictionary instance variable
-            self.fields[label] = combobox_field
+            self.fields[display_name] = combobox_field
 
         # Configure the grid
         self.configure_grid()
@@ -1532,7 +1552,7 @@ class ComboboxSelectField(BaseField):
     @override
     def get(
         self,
-        label: str,
+        display_name: str,
         dispatch: bool = False,
     ) -> Tuple[str, Dict[str, str]]:
         """
@@ -1542,6 +1562,7 @@ class ComboboxSelectField(BaseField):
         and the selection mode. If dispatch is True, an event will be emitted.
 
         Args:
+            display_name (str): The display name of the field.
             dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
 
         Returns:
@@ -1549,11 +1570,11 @@ class ComboboxSelectField(BaseField):
             and a dictionary containing the checkbutton fields labels and current values.
         """
 
-        # Check, if the passed label is present within the keys of the 'fields' dictionary instance variable
-        if label not in self.fields.keys():
+        # Check, if the passed display name is present within the keys of the 'fields' dictionary instance variable
+        if display_name not in self.fields.keys():
             # Log a warning message
             self.logger.warning(
-                message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
+                message=f"Field with display name '{display_name}' not found in 'fields' dictionary. This is likely due to a typo."
             )
 
             # Return early
@@ -1593,36 +1614,37 @@ class ComboboxSelectField(BaseField):
     @override
     def set(
         self,
-        label: str,
+        display_name: str,
         value: str,
         dispatch: bool = False,
     ) -> None:
         """
         Sets the value of the combobox fields based on the given value.
 
-        Updates the combobox field corresponding to the passed label with the passed value. If dispatch is True,
+        Updates the combobox field corresponding to the passed display name with the passed value. If dispatch is True,
         a COMBOBOX_SELECT_FIELD_SET event will be emitted.
 
         Args:
-            value (Union[str, List[str]]): A single option or list of options to select.
+            display_name (str): The display name of the field.
             dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
+            value (Union[str, List[str]]): A single option or list of options to select.
 
         Returns:
             None
         """
 
-        # Check, if the passed label is present within the keys of the 'fields' dictionary instance variable
-        if label not in self.fields.keys():
+        # Check, if the passed display name is present within the keys of the 'fields' dictionary instance variable
+        if display_name not in self.fields.keys():
             # Log a warning message
             self.logger.warning(
-                message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
+                message=f"Field with display name '{display_name}' not found in 'fields' dictionary. This is likely due to a typo."
             )
 
             # Return early
             return
 
         # Set the value of the corresponding checkbutton field
-        self.fields[label].set(value=value)
+        self.fields[display_name].set(value=value)
 
         # Check, if the dispatch flag is set to True
         if dispatch:
@@ -1664,9 +1686,9 @@ class EntityComboboxField(BaseField):
 
     def __init__(
         self,
+        display_name: str,
         entity_select_type: EntitySelectTypes,
-        label,
-        master,
+        master: tkinter.Misc,
         display_callback: Optional[Callable[[Any], str]] = None,
         filter_callback: Optional[Callable[[Any], bool]] = None,
         namespace: str = Constants.GLOBAL_NAMESPACE,
@@ -1683,8 +1705,8 @@ class EntityComboboxField(BaseField):
         through optional callbacks.
 
         Args:
+            display_name (str): The display name of the field.
             entity_select_type (EntitySelectTypes): The type of entity to be displayed and selected.
-            label (str): The label to display next to the combobox.
             master (tkinter.Misc): The parent widget for this field.
             display_callback (Optional[Callable[[Any], str]]): A function used to convert entities into display strings.
             filter_callback (Optional[Callable[[Any], bool]]): A function used to filter the list of available entities.
@@ -1705,7 +1727,7 @@ class EntityComboboxField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -2023,7 +2045,8 @@ class EntityComboboxField(BaseField):
 
         # Obtain the entity from the values dictionary instance variable based on the user's current selection
         entity: Optional[Any] = UnifiedObjectFactory.create_default(
-            factory=self.entity_select_type, **{"unspecified": self.variable.get()}
+            factory=self.entity_select_type,
+            **{"unspecified": self.variable.get()},
         )
 
         notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
@@ -2291,7 +2314,7 @@ class EntityComboboxField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -2314,7 +2337,7 @@ class EntityComboboxField(BaseField):
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
             master=self,
-            text=label,
+            text=display_name,
             **kwargs.get(
                 "label",
                 {},
@@ -2510,7 +2533,7 @@ class ListboxField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         values: List[str],
         namespace: str = Constants.GLOBAL_NAMESPACE,
@@ -2529,7 +2552,7 @@ class ListboxField(BaseField):
 
         # Call the parent clas constructor
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -2635,6 +2658,16 @@ class ListboxField(BaseField):
 
         # Clear the selection string list instace variable
         self.selection.clear()
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the LISTBOX_FIELD_CHANGED event
+            self.dispatcher.dispatch(
+                event=Events.LISTBOX_FIELD_CHANGED,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=self.selection,
+            )
 
     @override
     def configure_button(
@@ -2749,7 +2782,7 @@ class ListboxField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         selectmode: Literal["expanded", "single"] = "single",
         **kwargs,
     ) -> None:
@@ -2765,7 +2798,7 @@ class ListboxField(BaseField):
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
             master=self,
-            text=label,
+            text=display_name,
             **kwargs.get(
                 "label",
                 {},
@@ -2912,6 +2945,9 @@ class OptionSelectFieldItem(tkinter.Frame):
         **kwargs,
     ) -> None:
         """ """
+
+        # Call the parent class constructor
+        super().__init__(master=master)
 
         # Initialize the logger instance of this clas
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
@@ -3183,7 +3219,7 @@ class MultiOptionSelectField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, str], None]] = None,
@@ -3211,7 +3247,7 @@ class MultiOptionSelectField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -3843,14 +3879,19 @@ class MultiOptionSelectField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """ """
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=label, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget within the grid
@@ -3864,7 +3905,11 @@ class MultiOptionSelectField(BaseField):
 
         # Create a 'container frame' frame widget
         self._container_frame: tkinter.Frame = tkinter.Frame(
-            master=self, **kwargs.get("container_frame", {})
+            master=self,
+            **kwargs.get(
+                "container_frame",
+                {},
+            ),
         )
 
         # Place the 'container frame' frame widget within the grid
@@ -4050,7 +4095,7 @@ class RadiobuttonSelectField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         labels: List[str],
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
@@ -4080,7 +4125,7 @@ class RadiobuttonSelectField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -4102,7 +4147,7 @@ class RadiobuttonSelectField(BaseField):
 
     def _enforce_selection(
         self,
-        label: str,
+        display_name: str,
         value: bool,
     ) -> None:
         """
@@ -4124,8 +4169,8 @@ class RadiobuttonSelectField(BaseField):
             key,
             value,
         ) in self.fields.items():
-            # Radio if the key and the passed label are identical
-            if key == label:
+            # Radio if the key and the passed display name are identical
+            if key == display_name:
                 # Update the value of the corresponding radiobutton field with the passed value
                 value.set(
                     dispatch=False,
@@ -4140,7 +4185,7 @@ class RadiobuttonSelectField(BaseField):
 
     def _on_field_change(
         self,
-        label: str,
+        display_name: str,
         value: bool,
     ) -> None:
         """
@@ -4159,7 +4204,10 @@ class RadiobuttonSelectField(BaseField):
         """
 
         # Enforce the selection
-        self._enforce_selection(label=label, value=value)
+        self._enforce_selection(
+            display_name=display_name,
+            value=value,
+        )
 
         # Dispatch the RADIOBUTTON_SELECT_FIELD_CHANGED event
         self.dispatcher.dispatch(
@@ -4246,7 +4294,7 @@ class RadiobuttonSelectField(BaseField):
             if field not in self.fields.keys():
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Field with label '{field}' not found in 'fields' dictionary. This is likely due to a typo."
+                    message=f"Field with display name '{field}' not found in 'fields' dictionary. This is likely due to a typo."
                 )
 
                 # Return early
@@ -4265,7 +4313,7 @@ class RadiobuttonSelectField(BaseField):
             ):
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Field with label '{field}' does not have any 'configure_{attribute}' attribute. This is likely due the method not being implemented."
+                    message=f"Field with display name '{field}' does not have any 'configure_{attribute}' attribute. This is likely due the method not being implemented."
                 )
 
                 # Return early
@@ -4365,7 +4413,7 @@ class RadiobuttonSelectField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -4385,7 +4433,12 @@ class RadiobuttonSelectField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=label, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget within the grid
@@ -4417,7 +4470,7 @@ class RadiobuttonSelectField(BaseField):
             radiobutton_field.grid(column=0, padx=5, pady=5, row=row)
 
             # Add the radiobutton field widget to the fields dictionary instance variable
-            self.fields[label] = radiobutton_field
+            self.fields[display_name] = radiobutton_field
 
         # Configure the grid
         self.configure_grid()
@@ -4425,7 +4478,7 @@ class RadiobuttonSelectField(BaseField):
     @override
     def get(
         self,
-        label: str,
+        display_name: str,
         dispatch: bool = False,
     ) -> Tuple[str, Dict[str, bool]]:
         """
@@ -4436,16 +4489,17 @@ class RadiobuttonSelectField(BaseField):
 
         Args:
             dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
+            display_name (str): The display name of the field.
 
         Returns:
             Tuple[str, Union[str, List[str]]]: A tuple containing the field label and the current selection.
         """
 
-        # Check, if the passed label is present within the keys of the 'fields' dictionary instance variable
-        if label not in self.fields.keys():
+        # Check, if the passed display name is present within the keys of the 'fields' dictionary instance variable
+        if display_name not in self.fields.keys():
             # Log a warning message
             self.logger.warning(
-                message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
+                message=f"Field with display name '{display_name}' not found in 'fields' dictionary. This is likely due to a typo."
             )
 
             # Return early
@@ -4485,7 +4539,7 @@ class RadiobuttonSelectField(BaseField):
     @override
     def set(
         self,
-        label: str,
+        display_name: str,
         value: bool,
         dispatch: bool = False,
     ) -> None:
@@ -4500,18 +4554,18 @@ class RadiobuttonSelectField(BaseField):
             dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
         """
 
-        # Check, if the passed label is present within the keys of the 'fields' dictionary instance variable
-        if label not in self.fields.keys():
+        # Check, if the passed display name is present within the keys of the 'fields' dictionary instance variable
+        if display_name not in self.fields.keys():
             # Log a warning message
             self.logger.warning(
-                message=f"Field with label '{label}' not found in 'fields' dictionary. This is likely due to a typo."
+                message=f"Field with display name '{display_name}' not found in 'fields' dictionary. This is likely due to a typo."
             )
 
             # Return early
             return
 
         # Set the value of the corresponding radiobutton field
-        self.fields[label].set(value=value)
+        self.fields[display_name].set(value=value)
 
         # Check, if the dispatch flag is set to True
         if dispatch:
@@ -4529,7 +4583,7 @@ class SingleOptionSelectField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, str], None]] = None,
@@ -4559,7 +4613,7 @@ class SingleOptionSelectField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -5177,14 +5231,19 @@ class SingleOptionSelectField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """ """
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=label, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget within the grid
@@ -5198,7 +5257,11 @@ class SingleOptionSelectField(BaseField):
 
         # Create a 'container frame' frame widget
         self._container_frame: tkinter.Frame = tkinter.Frame(
-            master=self, **kwargs.get("container_frame", {})
+            master=self,
+            **kwargs.get(
+                "container_frame",
+                {},
+            ),
         )
 
         # Place the 'container frame' frame widget within the grid

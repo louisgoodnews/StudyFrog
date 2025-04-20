@@ -12,12 +12,12 @@ from typing import *
 from utils.base_field import BaseField
 from utils.constants import Constants
 from utils.events import Events
-from utils.miscellaneous import Miscellaneous
 
 
 __all__: Final[List[str]] = [
     "CheckbuttonField",
     "RadiobuttonField",
+    "ToggleButtonField",
 ]
 
 
@@ -42,7 +42,7 @@ class CheckbuttonField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, bool], None]] = None,
@@ -55,7 +55,7 @@ class CheckbuttonField(BaseField):
         and prepares the field for interaction and layout configuration.
 
         Args:
-            label (str): The label text displayed next to the checkbutton.
+            display_name (str): The string to display for the field.
             master (tkinter.Misc): The parent container in which this widget is placed.
             namespace (str, optional): The namespace identifier for event dispatching. Defaults to Constants.GLOBAL_NAMESPACE.
             on_change_callback (Optional[Callable[[str, bool], None]], optional): Callback function called when the boolean value changes.
@@ -67,7 +67,7 @@ class CheckbuttonField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -154,7 +154,7 @@ class CheckbuttonField(BaseField):
             None
         """
 
-        # Update the variable's value to an empty string
+        # Update the variable's value to False
         self.variable.set(value=False)
 
         # Update the text of the checkbutton widget
@@ -285,7 +285,7 @@ class CheckbuttonField(BaseField):
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -295,7 +295,7 @@ class CheckbuttonField(BaseField):
         and places the widgets in the grid layout.
 
         Args:
-            label (str): The label text to be displayed next to the checkbutton.
+            display_name (str): The string to display for the field.
             **kwargs: Additional keyword arguments passed to individual widget constructors.
 
         Returns:
@@ -304,15 +304,10 @@ class CheckbuttonField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=label,
-            **kwargs.get(
-                "label",
-               {}
-            )
+            master=self, text=display_name, **kwargs.get("label", {})
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -330,13 +325,10 @@ class CheckbuttonField(BaseField):
             master=self,
             text=f"{self.variable.get()}",
             variable=self.variable,
-            **kwargs.get(
-                "checkbutton",
-               {}
-            )
+            **kwargs.get("checkbutton", {}),
         )
 
-       # Place the checkbutton widget within the grid
+        # Place the checkbutton widget within the grid
         self._checkbutton.grid(
             column=1,
             padx=5,
@@ -376,7 +368,7 @@ class CheckbuttonField(BaseField):
             # Dispatch the CHECKBUTTON_FIELD_GET event
             self.dispatcher.dispatch(
                 event=Events.CHECKBUTTON_FIELD_GET,
-                label=label,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=value,
             )
@@ -422,6 +414,7 @@ class CheckbuttonField(BaseField):
                 value=self.variable.get(),
             )
 
+
 class RadiobuttonField(BaseField):
     """
     A boolean field using a radiobutton widget.
@@ -443,7 +436,7 @@ class RadiobuttonField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, bool], None]] = None,
@@ -468,25 +461,11 @@ class RadiobuttonField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
         )
-
-    @property
-    def radiobutton(self) -> tkinter.Radiobutton:
-        """
-        Returns the radiobutton widget associated with this field.
-
-        The radiobutton displays the name or description of the field.
-
-        Returns:
-            tkinter.Radiobutton: The radiobutton widget.
-        """
-
-        # Return the tkinter.Radiobutton radiobutton widget
-        return self._radiobutton
 
     @property
     def label(self) -> tkinter.Label:
@@ -501,6 +480,20 @@ class RadiobuttonField(BaseField):
 
         # Return the tkinter.Label label widget
         return self._label
+
+    @property
+    def radiobutton(self) -> tkinter.Radiobutton:
+        """
+        Returns the radiobutton widget associated with this field.
+
+        The radiobutton displays the name or description of the field.
+
+        Returns:
+            tkinter.Radiobutton: The radiobutton widget.
+        """
+
+        # Return the tkinter.Radiobutton radiobutton widget
+        return self._radiobutton
 
     def _on_radiobutton_change(
         self,
@@ -552,7 +545,7 @@ class RadiobuttonField(BaseField):
             None
         """
 
-        # Update the variable's value to an empty string
+        # Update the variable's value to False
         self.variable.set(value=False)
 
         # Check, if the dispatch flag is set to True
@@ -564,42 +557,6 @@ class RadiobuttonField(BaseField):
                 namespace=self.namespace,
                 value=self.variable.get(),
             )
-
-    def configure_radiobutton(
-        self,
-        **kwargs,
-    ) -> None:
-        """
-        Configures the radiobutton widget in this field.
-
-        This method configures the radiobutton widget in this field
-        using the provided keyword arguments.
-
-        Args:
-            **kwargs: The keyword arguments to be passed to the configure method
-                of the radiobutton widget.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an exception occurs while attempting to configure the
-                radiobutton widget.
-        """
-        try:
-            # Attempt to configure the radiobutton widget
-            self._radiobutton.configure(**kwargs)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_radiobutton' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
 
     @override
     def configure_grid(self) -> None:
@@ -677,10 +634,46 @@ class RadiobuttonField(BaseField):
             # Re-raise the exception to the caller
             raise e
 
+    def configure_radiobutton(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the radiobutton widget in this field.
+
+        This method configures the radiobutton widget in this field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the radiobutton widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                radiobutton widget.
+        """
+        try:
+            # Attempt to configure the radiobutton widget
+            self._radiobutton.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_radiobutton' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
     @override
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -690,7 +683,7 @@ class RadiobuttonField(BaseField):
         and places the widgets in the grid layout.
 
         Args:
-            label (str): The label text to be displayed next to the radiobutton.
+            display_name (str): The string to display for the field.
             **kwargs: Additional keyword arguments passed to individual widget constructors.
 
         Returns:
@@ -700,14 +693,14 @@ class RadiobuttonField(BaseField):
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
             master=self,
-            text=label,
+            text=display_name,
             **kwargs.get(
                 "label",
-               {}
-            )
+                {},
+            ),
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -725,13 +718,10 @@ class RadiobuttonField(BaseField):
             master=self,
             text=f"{self.variable.get()}",
             variable=self.variable,
-            **kwargs.get(
-                "radiobutton",
-               {}
-            )
+            **kwargs.get("radiobutton", {}),
         )
 
-       # Place the radiobutton widget within the grid
+        # Place the radiobutton widget within the grid
         self._radiobutton.grid(
             column=1,
             padx=5,
@@ -771,7 +761,7 @@ class RadiobuttonField(BaseField):
             # Dispatch the RADIOBUTTON_FIELD_GET event
             self.dispatcher.dispatch(
                 event=Events.RADIOBUTTON_FIELD_GET,
-                label=label,
+                label=self.display_name,
                 namespace=self.namespace,
                 value=value,
             )
@@ -809,6 +799,413 @@ class RadiobuttonField(BaseField):
             # Dispatch the RADIOBUTTON_FIELD_SET event
             self.dispatcher.dispatch(
                 event=Events.RADIOBUTTON_FIELD_SET,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=self.variable.get(),
+            )
+
+
+class ToggleButtonField(BaseField):
+    """
+    A custom boolean field represented as a toggle button.
+
+    ToggleButtonField uses a tkinter.Button to represent a binary on/off value.
+    When the button is clicked, it toggles between True and False, updates its display
+    (e.g., 🔘 / 🟢), dispatches a change event, and optionally calls a user-defined callback.
+
+    This widget is useful for compact binary choices with clear visual feedback.
+
+    Layout:
+        [ Label | Toggle Button ]
+
+    Inherits from:
+        BaseField
+    """
+
+    def __init__(
+        self,
+        display_name: str,
+        master: tkinter.Misc,
+        icons: Tuple[str, str] = ("🟢", "🔘"),
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[bool], None]] = None,
+        value: Optional[bool] = False,
+        **kwargs,
+    ) -> None:
+        """
+        Initializes the ToggleButtonField.
+
+        This method sets up the field context, including dispatcher, namespace,
+        change callback, and optional configuration parameters (e.g. label, default value, icons).
+
+        Args:
+            master (Optional[tk.Misc]): The parent widget.
+            dispatcher (Dispatcher): The event dispatcher for handling state changes.
+            namespace (Optional[str], optional): Namespace for event dispatching. Defaults to None.
+            on_change_callback (Optional[Callable], optional): A callback function that is triggered
+                when the toggle value changes. Defaults to None.
+            **kwargs: Additional field configuration parameters, including:
+                - label (str): Display label.
+                - default (bool): Initial toggle state.
+                - icons (Tuple[str, str]): Icons for (off, on) states.
+
+        Returns:
+            None
+        """
+
+        # Store the passed icon tuple as an instance variable
+        self.icons: Tuple[str, str,] = icons
+
+        # Call the parent class constructor with the passed arguments
+        super().__init__(
+            display_name=display_name,
+            master=master,
+            namespace=namespace,
+            on_change_callback=on_change_callback,
+            value=value,
+            **kwargs,
+        )
+
+    @property
+    def button(self) -> tkinter.Button:
+        """
+        Returns the button widget associated with this field.
+
+        The button displays the name or description of the field.
+
+        Returns:
+            tkinter.Button: The button widget.
+        """
+
+        # Return the tkinter.Button radiobutton widget
+        return self._button
+
+    @property
+    def label(self) -> tkinter.Label:
+        """
+        Returns the label widget associated with this field.
+
+        The label displays the name or description of the field.
+
+        Returns:
+            tkinter.Label: The label widget.
+        """
+
+        # Return the tkinter.Label label widget
+        return self._label
+
+    def _on_button_change(self) -> None:
+        """
+        Toggles the field value and updates the UI.
+
+        This method manually toggles the internal boolean state, updates the button label,
+        dispatches a change event using the dispatcher, and calls the provided
+        `on_change_callback` (if available).
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Toggle the value manually
+        self.variable.set(not self.variable.get())
+
+        # Update button text based on new state
+        self._button.configure(text=self.icons[0] if self.variable.get() else self.icons[1])
+
+        # Dispatch the TOGGLE_BUTTON_FIELD_CLEARED event
+        self.dispatcher.dispatch(
+            event=Events.TOGGLE_BUTTON_FIELD_CLEARED,
+            label=self.display_name,
+            namespace=self.namespace,
+            value=self.variable.get(),
+        )
+
+        # Check, if the 'on_change_callback' function exists
+        if self.on_change_callback:
+            # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
+            self.on_change_callback(
+                self.display_name,
+                self.variable.get(),
+            )
+
+    @override
+    def clear(
+        self,
+        dispatch: bool = False,
+    ) -> None:
+        """
+        Resets the toggle field to its default state (False).
+
+        This method also updates the button display and dispatches a change event.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Update the variable's value to False
+        self.variable.set(value=False)
+
+        # Update button text based on new state
+        self._button.configure(text=self.icons[0] if self.variable.get() else self.icons[1])
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the TOGGLE_BUTTON_FIELD_CLEARED event
+            self.dispatcher.dispatch(
+                event=Events.TOGGLE_BUTTON_FIELD_CLEARED,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=self.variable.get(),
+            )
+
+    def configure_button(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the button widget in this field.
+
+        This method configures the button widget in this field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the button widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                button widget.
+        """
+        try:
+            # Attempt to configure the button widget
+            self._button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @override
+    def configure_grid(self) -> None:
+        """
+        Configures the grid layout.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Set the weight of the 0th column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Set the weight of the 1st column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=1,
+            weight=0,
+        )
+
+        # Set the weight of the 0th row to 0
+        # This means that the row will not stretch when the window is resized
+        self.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the label widget in this field.
+
+        This method configures the label widget in this field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the label widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                label widget.
+        """
+        try:
+            # Attempt to configure the label widget
+            self._label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @override
+    def create_widgets(
+        self,
+        display_name: str,
+        **kwargs,
+    ) -> None:
+        """
+        Creates and places the label and toggle button widgets.
+
+        This method initializes the label and button, binds a `BooleanVar` to the field,
+        and sets the initial button icon based on the current boolean value.
+        All widgets are arranged in a grid layout.
+
+        Args:
+            display_name (str): The display label for the field.
+            **kwargs: Optional keyword arguments for widget configuration:
+                - 'label': config for the `tkinter.Label`
+                - 'button': config for the `tkinter.Button`
+
+        Returns:
+            None
+        """
+
+        # Create a tkinter.Label widget
+        self._label: tkinter.Label = tkinter.Label(
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
+        )
+
+        # Place the tkinter.Label widget within the grid
+        self._label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a string variable
+        self.variable: tkinter.BooleanVar = tkinter.BooleanVar(value=False)
+
+        # Create a tkinter.Button widget
+        self._button: tkinter.Button = tkinter.Button(
+            command=self._on_button_change,
+            master=self,
+            text=self.icons[0] if self.variable.get() else self.icons[1],
+            **kwargs.get(
+                "button",
+                {},
+            ),
+        )
+
+        # Place the tkinter.Button widget within the grid
+        self._button.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+    @override
+    def get(
+        self,
+        dispatch: bool = False,
+    ) -> Tuple[str, bool]:
+        """
+        Retrieves the current state of the toggle button.
+
+        Optionally dispatches a GET event for external listeners.
+
+        Args:
+            dispatch (bool, optional): Whether to dispatch a get event. Defaults to False.
+
+        Returns:
+            Tuple[str, bool]: A tuple containing the field's label and current boolean value.
+        """
+
+        # Obtain the label and value strings from the widgets
+        (
+            label,
+            value,
+        ) = (
+            self.display_name,
+            self.variable.get(),
+        )
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the TOGGLE_BUTTON_FIELD_GET event
+            self.dispatcher.dispatch(
+                event=Events.TOGGLE_BUTTON_FIELD_GET,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=value,
+            )
+
+        # Return the text of the label and the value of the text field
+        return (
+            label,
+            value,
+        )
+
+    @override
+    def set(
+        self,
+        value: bool,
+        dispatch: bool = False,
+    ) -> None:
+        """
+        Sets the state of the toggle button to the given value.
+
+        Updates the internal `BooleanVar`, adjusts the displayed icon,
+        and optionally dispatches a SET event.
+
+        Args:
+            value (bool): The new boolean value for the toggle.
+            dispatch (bool, optional): Whether to dispatch a set event. Defaults to False.
+
+        Returns:
+            None
+        """
+
+        # Update the variable with the passed value string
+        self.variable.set(value=value)
+
+        # Update button text based on new state
+        self._button.configure(text=self.icons[0] if self.variable.get() else self.icons[1])
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the TOGGLE_BUTTON_FIELD_SET event
+            self.dispatcher.dispatch(
+                event=Events.TOGGLE_BUTTON_FIELD_SET,
                 label=self.display_name,
                 namespace=self.namespace,
                 value=self.variable.get(),

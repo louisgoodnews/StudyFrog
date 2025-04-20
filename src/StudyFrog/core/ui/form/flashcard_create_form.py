@@ -245,7 +245,7 @@ class FlashcardCreateForm(BaseCreateForm):
 
         # Create the 'stack' ComboboxField widget
         stack_field: ComboboxField = ComboboxField(
-            label="Stack*: ",
+            display_name="Stack*: ",
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
@@ -292,7 +292,7 @@ class FlashcardCreateForm(BaseCreateForm):
 
         # Create the 'back text' MultiLineTextField widget
         back_text_field: MultiLineTextField = MultiLineTextField(
-            label="Back Text*: ",
+            display_name="Back Text*: ",
             master=master,
             on_change_callback=self._on_field_change,
         )
@@ -337,7 +337,7 @@ class FlashcardCreateForm(BaseCreateForm):
 
         # Create the 'front text' MultiLineTextField widget
         front_text_field: MultiLineTextField = MultiLineTextField(
-            label="Front Text*: ",
+            display_name="Front Text*: ",
             master=master,
             on_change_callback=self._on_field_change,
         )

@@ -26,7 +26,7 @@ class BaseField(tkinter.Frame):
     field changes.
 
     Attributes:
-        label (str): The label for the field.
+        display_name (str): The string to display for the field.
         master (tkinter.Misc): The master widget.
         namespace (str): The namespace for the field. Defaults to Constants.GLOBAL_NAMESPACE.
         on_change_callback (Optional[Callable[[str, Any], None]]): The callback function to be called when the value of the field changes. Defaults to None.
@@ -45,7 +45,7 @@ class BaseField(tkinter.Frame):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, Any], None]] = None,
@@ -56,7 +56,7 @@ class BaseField(tkinter.Frame):
         Initializes a new instance of the BaseField class.
 
         Args:
-            label (str): The label for the field.
+            display_name (str): The name to display for the field.
             master (tkinter.Misc): The master widget.
             namespace (str, optional): The namespace for the field. Defaults to Constants.GLOBAL_NAMESPACE.
             on_change_callback (Optional[Callable[[str, Any], None]], optional): The callback function to be called when the value of the field changes. Defaults to None.
@@ -77,7 +77,7 @@ class BaseField(tkinter.Frame):
         self.dispatcher: Dispatcher = Dispatcher()
 
         # Store the display name
-        self.display_name: str = label
+        self.display_name: str = display_name
 
         # Store the namespace
         self.namespace: str = namespace
@@ -92,7 +92,7 @@ class BaseField(tkinter.Frame):
 
         # Create the widgets
         self.create_widgets(
-            label=label,
+            display_name=display_name,
             **kwargs,
         )
 
@@ -142,18 +142,18 @@ class BaseField(tkinter.Frame):
 
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
         Creates and configures the widgets for the field.
 
         This method creates and configures the widgets for the field, such as
-        the label and the entry widget. It is called by the constructor of the
+        the name to display and the entry widget. It is called by the constructor of the
         BaseField class.
 
         Args:
-            label (str): The label for the field.
+            display_name (str): The name to display for the field.
             **kwargs: Additional keyword arguments for the widgets.
 
         Returns:

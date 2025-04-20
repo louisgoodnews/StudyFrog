@@ -72,7 +72,7 @@ class QuestionCreateForm(BaseCreateForm):
 
         # Create a MultiSelectAnswerField widget
         multi_select_answer_field: MultiSelectAnswerField = MultiSelectAnswerField(
-            label=label,
+            display_name=label,
             master=self.answers_frame,
             namespace=self.namespace,
             on_change_callback=self._on_answer_change,
@@ -248,7 +248,7 @@ class QuestionCreateForm(BaseCreateForm):
 
             # Create a MultiLineTextField widget
             multi_line_text_field: MultiLineTextField = MultiLineTextField(
-                label="Answer Text*: ",
+                display_name="Answer Text*: ",
                 master=self.answers_frame,
             )
 
@@ -291,7 +291,7 @@ class QuestionCreateForm(BaseCreateForm):
 
             # Create a CheckbuttonField widget
             checkbutton_field: CheckbuttonField = CheckbuttonField(
-                label="Is correct? ",
+                display_name="Is correct? ",
                 master=self.answers_frame,
             )
 
@@ -389,7 +389,7 @@ class QuestionCreateForm(BaseCreateForm):
 
         # Create the 'stack' ComboboxField widget
         stack_field: ComboboxField = ComboboxField(
-            label="Stack*: ",
+            display_name="Stack*: ",
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
@@ -436,7 +436,7 @@ class QuestionCreateForm(BaseCreateForm):
 
         # Create the 'question text' MultiLineTextField widget
         question_text_field: MultiLineTextField = MultiLineTextField(
-            label="Question Text*: ",
+            display_name="Question Text*: ",
             master=master,
             on_change_callback=self._on_field_change,
         )
@@ -481,7 +481,7 @@ class QuestionCreateForm(BaseCreateForm):
 
         # Create the 'question type' ComboboxField widget
         question_type_field: ComboboxField = ComboboxField(
-            label="Question Type*: ",
+            display_name="Question Type*: ",
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,

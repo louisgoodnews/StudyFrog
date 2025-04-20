@@ -178,7 +178,7 @@ class StackCreateForm(BaseCreateForm):
 
         # Create the 'name' SingleLineTextField widget
         name_field: SingleLineTextField = SingleLineTextField(
-            label="Name*: ",
+            display_name="Name*: ",
             master=master,
             on_change_callback=self._on_field_change,
         )
@@ -256,7 +256,7 @@ class StackCreateForm(BaseCreateForm):
 
         # Create the 'ancestor field' ComboboxField widget
         ancestor_field: ComboboxField = ComboboxField(
-            label="Ancestor: ",
+            display_name="Ancestor: ",
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
@@ -321,7 +321,7 @@ class StackCreateForm(BaseCreateForm):
 
         # Create the 'difficulty' ComboboxField widget
         difficulty_field: ComboboxField = ComboboxField(
-            label="Difficulty*: ",
+            display_name="Difficulty*: ",
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
@@ -389,7 +389,7 @@ class StackCreateForm(BaseCreateForm):
 
         # Create the 'priority' ComboboxField widget
         priority_field: ComboboxField = ComboboxField(
-            label="Priority*: ",
+            display_name="Priority*: ",
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
@@ -440,7 +440,7 @@ class StackCreateForm(BaseCreateForm):
         # Create the 'due by' DateSelectField widget
         due_by_field: DateSelectField = DateSelectField(
             date_format=Constants.DEFAULT_DATE_FORMAT,
-            label="Due By*: ",
+            display_name="Due By*: ",
             master=master,
             on_change_callback=self._on_field_change,
             value=Miscellaneous.get_date_increment(increment=45),
@@ -513,7 +513,7 @@ class StackCreateForm(BaseCreateForm):
 
         # Create the 'description' MultiLineTextField widget
         description_field: MultiLineTextField = MultiLineTextField(
-            label="Description: ",
+            display_name="Description: ",
             master=master,
             on_change_callback=self._on_field_change,
         )

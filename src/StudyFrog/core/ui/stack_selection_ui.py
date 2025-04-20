@@ -15,9 +15,11 @@ from core.priority import ImmutablePriority
 from core.setting import SettingService
 from core.stack import ImmutableStack
 
-from utils.base_ui import BaseUI
 from core.ui.ui_builder import UIBuilder
 
+from core.ui.fields.select_fields import ComboboxField, CheckbuttonSelectField
+
+from utils.base_ui import BaseUI
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
@@ -1298,6 +1300,11 @@ class StackSelectionUI(BaseUI):
 
             # Re-raise the exception to the caller
             raise e
+
+    def on_field_change(self, label: str, value: Optional[Any],) -> None:
+        """ """
+
+        pass
 
     def on_stack_item_checkbutton_click(
         self,

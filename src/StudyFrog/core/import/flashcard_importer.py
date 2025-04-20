@@ -283,7 +283,7 @@ class FlashcardImporter(ImmutableBaseObject):
 
         # Create the 'name' SingleLineTextField widget
         name_field: SingleLineTextField = SingleLineTextField(
-            label="Name*: ",
+            display_name="Name*: ",
             master=scrolled_frame.container,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
@@ -335,7 +335,7 @@ class FlashcardImporter(ImmutableBaseObject):
 
         # Create the 'difficulty' ComboboxField widget
         difficulty_field: ComboboxField = ComboboxField(
-            label="Difficulty*: ",
+            display_name="Difficulty*: ",
             master=scrolled_frame.container,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
@@ -390,7 +390,7 @@ class FlashcardImporter(ImmutableBaseObject):
 
         # Create the 'priority' ComboboxField widget
         priority_field: ComboboxField = ComboboxField(
-            label="Priority*: ",
+            display_name="Priority*: ",
             master=scrolled_frame.container,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
@@ -440,7 +440,7 @@ class FlashcardImporter(ImmutableBaseObject):
 
         # Create the 'due by' DateSelectField widget
         due_by_field: DateSelectField = DateSelectField(
-            label="Due By*: ",
+            display_name="Due By*: ",
             master=scrolled_frame.container,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
@@ -482,7 +482,7 @@ class FlashcardImporter(ImmutableBaseObject):
 
         # Create the 'description' MultiLineTextField widget
         description_field: MultiLineTextField = MultiLineTextField(
-            label="Description: ",
+            display_name="Description: ",
             master=scrolled_frame.container,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
@@ -715,7 +715,7 @@ class FlashcardImporter(ImmutableBaseObject):
 
         # Create the 'stack' ListboxField widget
         stack_field: ListboxField = ListboxField(
-            label="Stack*: ",
+            display_name="Stack*: ",
             master=toplevel,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,

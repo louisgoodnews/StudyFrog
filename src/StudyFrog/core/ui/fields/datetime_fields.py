@@ -31,7 +31,7 @@ class DateSelectField(BaseField):
 
     def __init__(
         self,
-        label: str,
+        display_name: str,
         master: tkinter.Misc,
         date_format: str = Constants.DEFAULT_DATE_FORMAT,
         namespace: str = Constants.GLOBAL_NAMESPACE,
@@ -69,7 +69,7 @@ class DateSelectField(BaseField):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            label=label,
+            display_name=display_name,
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
@@ -642,7 +642,7 @@ class DateSelectField(BaseField):
 
     def create_widgets(
         self,
-        label: str,
+        display_name: str,
         **kwargs,
     ) -> None:
         """
@@ -659,7 +659,7 @@ class DateSelectField(BaseField):
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
             master=self,
-            text=label,
+            text=display_name,
             **kwargs.get(
                 "label",
                {}

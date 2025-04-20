@@ -189,12 +189,12 @@ class Constants:
     DEFAULT_GEOMETRY: Final[str] = "1920x1080"
 
     DEFAULT_DATE_FORMAT: Final[str] = "%Y-%m-%d"
-    DEFAULT_TIME_FORMAT: Final[str] = "%Y-%m-%d - %H:%M:%S"
+    DEFAULT_TIME_FORMAT: Final[str] = "%H:%M:%S"
 
     DEFAULT_DATE_REGEX: Final[str] = r"^\d{4}-\d{2}-\d{2}$"
     DEFAULT_TIME_REGEX: Final[str] = r"^\d{2}:\d{2}:\d{2}$"
 
-    DEFAULT_DATETIME_FORMAT: Final[str] = f"{DEFAULT_DATE_FORMAT} {DEFAULT_TIME_FORMAT}"
+    DEFAULT_DATETIME_FORMAT: Final[str] = f"{DEFAULT_DATE_FORMAT} - {DEFAULT_TIME_FORMAT}"
 
     AMBER: Final[Dict[str, Any]] = {
         "default": "#FFC107",

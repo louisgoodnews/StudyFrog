@@ -663,7 +663,7 @@ class CreateUI(BaseUI):
 
         # Create the "Create Another" check button widget
         self.create_another: CheckbuttonField = CheckbuttonField(
-            label="Create another? ",
+            display_name="Create another? ",
             master=left_frame,
             namespace=self.namespace,
         )
@@ -825,7 +825,7 @@ class CreateUI(BaseUI):
         # Create the "Type" combobox field widget
         # This field allows the user to select the type of object to create
         self.type_field: ComboboxField = ComboboxField(
-            label="Type: ",
+            display_name="Type: ",
             master=master,
             namespace=self.namespace,
             on_change_callback=self.on_type_field_change,
