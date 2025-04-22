@@ -384,16 +384,8 @@ class DefaultManager(BaseObjectManager):
             int: The number of defaults in the database.
         """
         try:
-            # Count the number of defaults in the database
-            result: Any = asyncio.run(
-                DefaultModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.DEFAULTS};",
-                )
-            )
-
-            # Return the number of defaults in the database
-            return result[0][0] if result else 0
+            # Count and return the number of defaults in the database
+            return asyncio.run(DefaultModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

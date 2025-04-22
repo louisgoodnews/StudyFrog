@@ -302,6 +302,46 @@ class Events:
         name="backend:flashcard:updated"
     )
 
+    # An event that indicates that a float progressbar field has been changed
+    FLOAT_PROGRESSBAR_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:_field:field:changed")
+    )
+
+    # An event that indicates that a float progressbar field has been cleared
+    FLOAT_PROGRESSBAR_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:_field:field:cleared")
+    )
+
+    # An event that indicates that a float progressbar field has been retrieved
+    FLOAT_PROGRESSBAR_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:_field:field:get")
+    )
+
+    # An event that indicates that a float progressbar field has been set
+    FLOAT_PROGRESSBAR_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:_field:field:set")
+    )
+
+    # An event that indicates that a float scale field has been changed
+    FLOAT_SCALE_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_scale_field:_field:field:changed")
+    )
+
+    # An event that indicates that a float scale field has been cleared
+    FLOAT_SCALE_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_scale_field:_field:field:cleared")
+    )
+
+    # An event that indicates that a float scale field has been retrieved
+    FLOAT_SCALE_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_scale_field:_field:field:get")
+    )
+
+    # An event that indicates that a float scale field has been set
+    FLOAT_SCALE_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:float_scale_field:_field:field:set")
+    )
+
     # An event that indicates that a float spinbox field has been changed
     FLOAT_SPINBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="ui:float_spinbox_field:_field:field:changed")
@@ -329,6 +369,46 @@ class Events:
     # An event that indicates that a help button has been clicked
     HELP_BUTTON_CLICKED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="ui:help:button:clicked"
+    )
+
+    # An event that indicates that an int progressbar field has been changed
+    INT_PROGRESSBAR_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:_field:field:changed")
+    )
+
+    # An event that indicates that an int progressbar field has been cleared
+    INT_PROGRESSBAR_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:_field:field:cleared")
+    )
+
+    # An event that indicates that an int progressbar field has been retrieved
+    INT_PROGRESSBAR_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:_field:field:get")
+    )
+
+    # An event that indicates that an int progressbar field has been set
+    INT_PROGRESSBAR_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:_field:field:set")
+    )
+
+    # An event that indicates that an int scale field has been changed
+    INT_SCALE_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_scale_field:_field:field:changed")
+    )
+
+    # An event that indicates that an int scale field has been cleared
+    INT_SCALE_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_scale_field:_field:field:cleared")
+    )
+
+    # An event that indicates that an int scale field has been retrieved
+    INT_SCALE_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_scale_field:_field:field:get")
+    )
+
+    # An event that indicates that an int scale field has been set
+    INT_SCALE_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:int_scale_field:_field:field:set")
     )
 
     # An event that indicates that an int spinbox field has been changed
@@ -1646,6 +1726,26 @@ class Events:
         name="ui:toast:destroyed"
     )
 
+    # An event that indicates that a toggle button field has been changed
+    TOGGLE_BUTTON_FIELD_CHANGED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:toggle_button_field:changed"
+    )
+
+    # An event that indicates that a toggle button field has been cleared
+    TOGGLE_BUTTON_FIELD_CLEARED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:toggle_button_field:cleared"
+    )
+
+    # An event that indicates that a toggle button field has been get
+    TOGGLE_BUTTON_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:toggle_button_field:get"
+    )
+
+    # An event that indicates that a toggle button field has been set
+    TOGGLE_BUTTON_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:toggle_button_field:set"
+    )
+
     # An event that indicates that the timer has been started
     TIMER_STARTED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="ui:timer:started"
@@ -1952,6 +2052,36 @@ class Events:
         ]
 
     @classmethod
+    def get_float_progressbar_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all float progressbar field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all float progressbar field events in the Events class.
+        """
+        return [
+            cls.FLOAT_PROGRESSBAR_FIELD_CHANGED,
+            cls.FLOAT_PROGRESSBAR_FIELD_CLEARED,
+            cls.FLOAT_PROGRESSBAR_FIELD_GET,
+            cls.FLOAT_PROGRESSBAR_FIELD_SET,
+        ]
+
+    @classmethod
+    def get_float_scale_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all float scale field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all float scale field events in the Events class.
+        """
+        return [
+            cls.FLOAT_SCALE_FIELD_CHANGED,
+            cls.FLOAT_SCALE_FIELD_CLEARED,
+            cls.FLOAT_SCALE_FIELD_GET,
+            cls.FLOAT_SCALE_FIELD_SET,
+        ]
+
+    @classmethod
     def get_float_spinbox_field_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all float spinbox field events in the Events class.
@@ -1964,6 +2094,36 @@ class Events:
             cls.FLOAT_SPINBOX_FIELD_CLEARED,
             cls.FLOAT_SPINBOX_FIELD_GET,
             cls.FLOAT_SPINBOX_FIELD_SET,
+        ]
+
+    @classmethod
+    def get_int_progressbar_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all int progressbar field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all int progressbar field events in the Events class.
+        """
+        return [
+            cls.INT_PROGRESSBAR_FIELD_CHANGED,
+            cls.INT_PROGRESSBAR_FIELD_CLEARED,
+            cls.INT_PROGRESSBAR_FIELD_GET,
+            cls.INT_PROGRESSBAR_FIELD_SET,
+        ]
+
+    @classmethod
+    def get_int_scale_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all int scale field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all int scale field events in the Events class.
+        """
+        return [
+            cls.INT_SCALE_FIELD_CHANGED,
+            cls.INT_SCALE_FIELD_CLEARED,
+            cls.INT_SCALE_FIELD_GET,
+            cls.INT_SCALE_FIELD_SET,
         ]
 
     @classmethod
@@ -2380,6 +2540,21 @@ class Events:
             cls.REQUEST_TIMER_RESUME,
             cls.REQUEST_TIMER_START,
             cls.REQUEST_TIMER_STOP,
+        ]
+
+    @classmethod
+    def get_toggle_button_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all toggle button field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all toggle button field events in the Events class.
+        """
+        return [
+            cls.TOGGLE_BUTTON_FIELD_CHANGED,
+            cls.TOGGLE_BUTTON_FIELD_CLEARED,
+            cls.TOGGLE_BUTTON_FIELD_GET,
+            cls.TOGGLE_BUTTON_FIELD_SET,
         ]
 
     @classmethod

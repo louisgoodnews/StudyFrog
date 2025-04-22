@@ -383,16 +383,8 @@ class ChangeHistoryManager(BaseObjectManager):
             int: The number of change histories in the database.
         """
         try:
-            # Count the number of change histories in the database
-            result: Any = asyncio.run(
-                ChangeHistoryModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.CHANGE_HISTORIES};",
-                )
-            )
-
-            # Return the number of change histories in the database
-            return result[0][0] if result else 0
+            # Count and return the number of change histories in the database
+            return asyncio.run(ChangeHistoryModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1430,16 +1422,8 @@ class ChangeHistoryItemManager(BaseObjectManager):
             int: The number of change histories in the database.
         """
         try:
-            # Count the number of change histories in the database
-            result: Any = asyncio.run(
-                ChangeHistoryItemModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.CHANGE_HISTORIES};",
-                )
-            )
-
-            # Return the number of change histories in the database
-            return result[0][0] if result else 0
+            # Count and return the number of change history items in the database
+            return asyncio.run(ChangeHistoryItemModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

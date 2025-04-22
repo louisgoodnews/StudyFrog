@@ -207,7 +207,7 @@ class CheckbuttonSelectField(BaseField):
             event=Events.CHECKBUTTON_SELECT_FIELD_CHANGED,
             label=self.display_name,
             namespace=self.namespace,
-            value=self.get(display_name=display_name),
+            value=self.get(),
         )
 
         # Check, if the 'on_change_callback' function exists
@@ -215,10 +215,7 @@ class CheckbuttonSelectField(BaseField):
             # Call the 'on_change_callback' function and pass the display name as well as the current selection to it
             self.on_change_callback(
                 self.display_name,
-                self.get(
-                    dispatch=False,
-                    display_name=display_name,
-                ),
+                self.get(dispatch=False),
             )
 
     @override
@@ -479,7 +476,6 @@ class CheckbuttonSelectField(BaseField):
     @override
     def get(
         self,
-        display_name: str,
         dispatch: bool = False,
     ) -> Tuple[str, Dict[str, bool]]:
         """
@@ -489,22 +485,11 @@ class CheckbuttonSelectField(BaseField):
         and the selection mode. If dispatch is True, an event will be emitted.
 
         Args:
-            display_name (str): The string displayed in the label of the field.
             dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
 
         Returns:
             Tuple[str, Union[str, List[str]]]: A tuple containing the field label and the current selection.
         """
-
-        # Check, if the passed display name is present within the keys of the 'fields' dictionary instance variable
-        if display_name not in self.fields.keys():
-            # Log a warning message
-            self.logger.warning(
-                message=f"Field with display name '{display_name}' not found in 'fields' dictionary. This is likely due to a typo."
-            )
-
-            # Return early
-            return
 
         # Obtain the label of the field as well as the labels and values of the fields
         (
@@ -633,7 +618,7 @@ class ComboboxField(BaseField):
         """
 
         # Store the passed 'values' list or initialize it as an empty list
-        self.values: List[str] = values if values is not None else []
+        self.values: List[str] = values or []
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -3426,6 +3411,9 @@ class MultiOptionSelectField(BaseField):
             value=self.selection.keys(),
         )
 
+        # Update idletasks
+        self.update_idletasks()
+
     def _on_request_option_select_field_item_destroy(
         self,
         value: str,
@@ -3461,6 +3449,9 @@ class MultiOptionSelectField(BaseField):
                 namespace=self.namespace,
                 value=self.selection.keys(),
             )
+
+            # Update idletasks
+            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -3596,7 +3587,7 @@ class MultiOptionSelectField(BaseField):
             # Check, if the value is an empty string
             if string_value == "":
                 # Update the value of the tkinter.StringVar instance variable
-                self.variable.set(value=dir(self.values))
+                self.variable.set(value=self.values)
 
                 # Return early
                 return
@@ -3610,11 +3601,11 @@ class MultiOptionSelectField(BaseField):
                 if string_value.lower() not in string.lower():
                     continue
 
-            # Append the matching string to the list of string values
-            string_values.append(string)
+                # Append the matching string to the list of string values
+                string_values.append(string)
 
             # Update the value of the tkinter.StringVar instance variable
-            self.variable.set(value=dir(self.string_values))
+            self.variable.set(value=self.values)
 
         # Create a entry widget
         entry: tkinter.Entry = tkinter.Entry(master=frame)
@@ -5049,7 +5040,7 @@ class SingleOptionSelectField(BaseField):
             string_values.append(string)
 
             # Update the value of the tkinter.StringVar instance variable
-            self.variable.set(value=dir(self.string_values))
+            self.variable.set(value=self.values)
 
         # Create a entry widget
         entry: tkinter.Entry = tkinter.Entry(master=frame)
@@ -5073,7 +5064,7 @@ class SingleOptionSelectField(BaseField):
         )
 
         # Update the value of the tkinter.StringVar instance variable
-        self.variable.set(value=dir(self.values))
+        self.variable.set(value=self.values)
 
         # Create a listbox widget and store it in the (optional) listbox instance variable
         self.listbox = tkinter.Listbox(

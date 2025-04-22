@@ -998,16 +998,8 @@ class AssociationManager(BaseObjectManager):
             int: The number of associations in the database.
         """
         try:
-            # Count the number of associations in the database
-            result: Any = asyncio.run(
-                AssociationModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.ASSOCIATIONS};",
-                )
-            )
-
-            # Return the number of associations in the database
-            return result[0][0] if result else 0
+            # Count and return the number of associations in the database
+            return asyncio.run(AssociationModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

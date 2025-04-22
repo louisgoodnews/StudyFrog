@@ -1025,9 +1025,12 @@ class FlashcardManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_flashcards(self) -> Optional[List[ImmutableFlashcard]]:
+    def get_all_flashcards(self, force_refetch: bool = False,) -> Optional[List[ImmutableFlashcard]]:
         """
         Returns a list of all flashcards in the database.
+
+        Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
             Optional[List[ImmutableFlashcard]]: A list of all flashcards in the database if no exception occurs. Otherwise, None.
@@ -1036,10 +1039,12 @@ class FlashcardManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_flashcards():
-                # Return the list of immutable flashcards from the cache
-                return self.get_cache_values()
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if cache and table size are equal
+                if self.cache and len(self._cache) == self.count_flashcards():
+                    # Return the list of immutable flashcards from the cache
+                    return self.get_cache_values()
 
             # Get all flashcards from the database
             models: List[FlashcardModel] = asyncio.run(
@@ -1082,12 +1087,14 @@ class FlashcardManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableFlashcard]:
         """
         Retrieves a flashcard by the given field and value.
 
         Args:
             field (str): The field to search by.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             value (Any): The value to search for.
 
         Returns:
@@ -1097,10 +1104,12 @@ class FlashcardManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the flashcard is already in the cache
-            if self.is_key_in_cache(key=field):
-                # Return the flashcard from the cache
-                return self.get_value_from_cache(key=field)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the flashcard is already in the cache
+                if self.is_key_in_cache(key=field):
+                    # Return the flashcard from the cache
+                    return self.get_value_from_cache(key=field)
 
             # Get the flashcard with the given field and value from the database
             model: Optional[FlashcardModel] = asyncio.run(
@@ -1146,11 +1155,13 @@ class FlashcardManager(BaseObjectManager):
     def get_flashcard_by_id(
         self,
         id: int,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableFlashcard]:
         """
         Returns a flashcard with the given ID.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             id (int): The ID of the flashcard.
 
         Returns:
@@ -1160,10 +1171,12 @@ class FlashcardManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the flashcard is already in the cache
-            if self.is_key_in_cache(key=f"FLASHCARD_{id}"):
-                # Return the flashcard from the cache
-                return self.get_value_from_cache(key=f"FLASHCARD_{id}")
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the flashcard is already in the cache
+                if self.is_key_in_cache(key=f"FLASHCARD_{id}"):
+                    # Return the flashcard from the cache
+                    return self.get_value_from_cache(key=f"FLASHCARD_{id}")
 
             # Get the flashcard with the given ID from the database
             model: Optional[FlashcardModel] = asyncio.run(
@@ -1209,11 +1222,13 @@ class FlashcardManager(BaseObjectManager):
     def get_flashcard_by_key(
         self,
         key: str,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableFlashcard]:
         """
         Returns a flashcard with the given key.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             key (str): The key of the flashcard.
 
         Returns:
@@ -1223,10 +1238,12 @@ class FlashcardManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the flashcard is already in the cache
-            if self.is_key_in_cache(key=key):
-                # Return the flashcard from the cache
-                return self.get_value_from_cache(key=key)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the flashcard is already in the cache
+                if self.is_key_in_cache(key=key):
+                    # Return the flashcard from the cache
+                    return self.get_value_from_cache(key=key)
 
             # Get the flashcard with the given key from the database
             model: Optional[FlashcardModel] = asyncio.run(
@@ -1272,11 +1289,13 @@ class FlashcardManager(BaseObjectManager):
     def get_flashcard_by_uuid(
         self,
         uuid: str,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableFlashcard]:
         """
         Returns a flashcard with the given UUID.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             uuid (str): The UUID of the flashcard.
 
         Returns:
@@ -1286,10 +1305,12 @@ class FlashcardManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the flashcard is already in the cache
-            if self.is_key_in_cache(key=uuid):
-                # Return the flashcard from the cache
-                return self.get_value_from_cache(key=uuid)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the flashcard is already in the cache
+                if self.is_key_in_cache(key=uuid):
+                    # Return the flashcard from the cache
+                    return self.get_value_from_cache(key=uuid)
 
             # Get the flashcard with the given UUID from the database
             model: Optional[FlashcardModel] = asyncio.run(

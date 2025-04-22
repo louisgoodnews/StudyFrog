@@ -4,6 +4,7 @@ Date: 2025-03-29
 """
 
 import asyncio
+import json
 import traceback
 
 from datetime import datetime
@@ -2474,7 +2475,7 @@ class LearningSessionActionBuilder(BaseObjectBuilder):
         try:
             # Attempt to create and return a new instance of the ImmutableLearningSessionAction class from the dictionary representation of the MutableLearningSessionAction instance
             learning_session_action: Optional[ImmutableLearningSessionAction] = (
-                LearningSessionAction.create_learning_session_action(
+                LearningSessionActionFactory.create_learning_session_action(
                     **self.configuration
                 )
             )
@@ -2782,9 +2783,6 @@ class LearningSessionActionManager(BaseObjectManager):
             ):
                 # If it is, convert it to a mutable learning_session_action
                 learning_session_action = learning_session_action.to_mutable()
-
-            # Set the actions of the learning_session_action
-            learning_session_action.actions = [] or learning_session_action.actions
 
             # Set the created_at timestamp of the learning_session_action
             learning_session_action.created_at = Miscellaneous.get_current_datetime()
@@ -3676,6 +3674,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
         super().__init__(
             actions=actions,
             custom_field_values=custom_field_values,
+            created_at=created_at,
             duration=duration,
             end=end,
             id=id,
@@ -3777,6 +3776,25 @@ class MutableLearningSessionItem(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    def add_action(self, action: Any,) -> None:
+        """ """
+
+        # If the learning session item currently has no actions, create an empty list
+        if not self.actions:
+            # Initialize the actions list as an empty list
+            self.actions = []
+
+        # Check, if the learning session item's actions is an instance of string
+        if isinstance(
+            self.actions,
+            str,
+        ):
+            # Convert the actions string into a list
+            self.actions = json.loads(self.descendants)
+
+        # Append the key of the given object to the learning session item's actions
+        self.actions.append(action.get(name="key"))
 
     def to_immutable(self) -> Optional[ImmutableLearningSessionItem]:
         """
@@ -3904,7 +3922,7 @@ class LearningSessionItemFactory:
     @classmethod
     def create_learning_session_item(
         cls,
-        actrions: Optional[List[str]] = None,
+        actions: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         duration: Optional[float] = None,
@@ -3987,7 +4005,7 @@ class LearningSessionItemBuilder(BaseObjectBuilder):
         try:
             # Attempt to create and return a new instance of the ImmutableLearningSessionItem class from the dictionary representation of the MutableLearningSessionItem instance
             learning_session_item: Optional[ImmutableLearningSessionItem] = (
-                LearningSessionItem.create_learning_session_item(**self.configuration)
+                LearningSessionItemFactory.create_learning_session_item(**self.configuration)
             )
 
             if not learning_session_item:
@@ -4945,7 +4963,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="duration",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -4961,7 +4979,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="end",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,

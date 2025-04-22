@@ -358,6 +358,7 @@ class CreateUI(BaseUI):
             # Dispatch the passed event in the 'global' namespace along with the passed keyword arguments
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
                 event=event,
+                force_refetch=True,
                 namespace=Constants.GLOBAL_NAMESPACE,
                 **kwargs,
             )
@@ -961,6 +962,7 @@ class CreateUI(BaseUI):
             # Attempt to get the ImmutableStack object from the database
             stack: Optional[ImmutableStack] = self._request_entity(
                 event=Events.REQUEST_STACK_LOOKUP,
+                force_refetch=True,
                 id=kwargs.get("stack"),
             )
 
@@ -1223,6 +1225,39 @@ class CreateUI(BaseUI):
                 # Return early
                 return
 
+            # Check, if the stack has an ancestor
+            if stack.has_ancestor():
+                # Obtain the ancestor ImmutableStack from the database
+                ancestor: Optional[ImmutableStack] = self._request_entity(
+                    event=Events.REQUEST_STACK_LOOKUP,
+                    id=stack.ancestor,
+                )
+
+                # Check, if the ancestor exists
+                if not ancestor:
+                    # Log a warning message
+                    self.logger.warning(
+                        message=f"Failed to fetch ancestor ImmutableStack with ID '{stack.ancestor}'."
+                    )
+
+                    # Return early
+                    return
+
+                # Convert the ImmutableStack ancestor to a MutableStack object
+                ancestor = ancestor.to_mutable()
+
+                self.logger.debug(message=f"Ancestor {ancestor.id} descendants pre adding: {ancestor.descendants}")
+
+                # Add the created ImmutableStack object to the ancestor MutableStack's descendants
+                ancestor.add_to_descendants(descendant=stack)
+
+                # Dispatch the REQUEST_STACK_UPDATE event in the global namespace
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_STACK_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    stack=ancestor,
+                )
+
             # Dispatch the STACK_CREATED event in the global namespace
             self.dispatcher.dispatch(
                 event=Events.STACK_CREATED,
@@ -1325,7 +1360,7 @@ class CreateUI(BaseUI):
                     return
 
             # Clear the current form
-            self.form.clear()
+            self.form.clear(exclude=["ancestor", "stack", "type"])
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

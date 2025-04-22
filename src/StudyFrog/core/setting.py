@@ -374,16 +374,8 @@ class SettingManager(BaseObjectManager):
             int: The number of settings in the database.
         """
         try:
-            # Count the number of settings in the database
-            result: Any = asyncio.run(
-                SettingModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.SETTINGS};",
-                )
-            )
-
-            # Return the number of settings in the database
-            return result[0][0] if result else 0
+            # Count and return the number of settings in the database
+            return asyncio.run(SettingModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

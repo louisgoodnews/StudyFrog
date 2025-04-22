@@ -395,16 +395,8 @@ class CustomFieldManager(BaseObjectManager):
             int: The number of custom fields in the database.
         """
         try:
-            # Count the number of custom fields in the database
-            result: Any = asyncio.run(
-                CustomFieldModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.SETTINGS};",
-                )
-            )
-
-            # Return the number of custom fields in the database
-            return result[0][0] if result else 0
+            # Count and return the number of custom fields in the database
+            return asyncio.run(CustomFieldModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

@@ -28,7 +28,7 @@ class ClockWidget(tkinter.Frame):
     A live-updating clock widget displaying the current system time.
 
     The ClockWidget updates automatically every 100 milliseconds and supports
-    configurable time formats. It can be embedded in any Tkinter-based UI and is 
+    configurable time formats. It can be embedded in any Tkinter-based UI and is
     designed for use in dashboards, toolbars, or standalone time displays.
     """
 
@@ -208,8 +208,10 @@ class CountdownWidget(tkinter.Frame):
         self,
         dispatcher: Dispatcher,
         master: tkinter.Misc,
-        time_in_minutes: int,
-        time_format: str = Constants.DEFAULT_TIME_FORMAT,
+        hours: int = 1,
+        minutes: int = 30,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        seconds: int = 0,
         **kwargs,
     ) -> None:
         """ """
@@ -223,17 +225,23 @@ class CountdownWidget(tkinter.Frame):
         # Store the passed Dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
 
+        # Store the passed hours int as an instance variable
+        self.hours: int = hours
+
         # Initialize the 'is running' boolean flag as an instance variable
         self._is_running: bool = False
 
         # Initialize this class' Logger instance
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
-        # Store the passed time format string in an instance variable
-        self.time_format: str = time_format
+        # Store the passed minutes int as an instance variable
+        self.minutes: int = minutes
 
-        # Store the passed time in minutes int in an instance variable
-        self.time_in_minutes: int = time_in_minutes
+        # Store the passed namespace string as an instance variable
+        self.namespace: str = namespace
+
+        # Store the passed hours int as an instance variable
+        self.seconds: int = seconds
 
         # Configure the grid
         self.configure_grid()
@@ -307,14 +315,47 @@ class CountdownWidget(tkinter.Frame):
 
         # Update the clock after 100 miliseconds
         self.update_call: str = self.after(
-            100,
+            1000,
             self._update_clock,
         )
 
     def _update_clock(self) -> None:
         """ """
 
-        pass
+        # Check, if the countdown is running
+        if not self._is_running:
+            # Return early
+            return
+
+        # decrement the seconds int
+        self.seconds -= 1
+
+        # Check, if the seconds are less than or equal to 0
+        if self.seconds <= 0:
+
+            # Reset the seconds int to 59
+            self.seconds = 59
+
+            # decrement the minutes int
+            self.minutes -= 1
+
+            # Check, if the minutes are less than or equal to 0
+            if self.minutes <= 0:
+
+                # Reset the minutes int to 59
+                self.minutes = 59
+
+                # decrement the hours int
+                self.hours -= 1
+
+        # Update the tkinter.Label widget's text
+        self._label.configure(text=f"{self.hours} : {self.minutes} : {self.seconds}")
+
+        # Schedule the next call
+        self.after(
+            1000,
+            self._update_clock,
+        )
 
     def configure_grid(self) -> None:
         """ """
@@ -333,6 +374,13 @@ class CountdownWidget(tkinter.Frame):
             weight=0,
         )
 
+        # Set the weight of the 2nd column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=2,
+            weight=0,
+        )
+
         # Set the weight of the 0th row to 0
         # This means that the row will not stretch when the window is resized
         self.grid_rowconfigure(
@@ -344,6 +392,7 @@ class CountdownWidget(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
+        """ """
         try:
             # Attempt to configure the label widget
             self._label.configure(**kwargs)
@@ -359,10 +408,93 @@ class CountdownWidget(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
+    def configure_pause_button(
+        self,
+        **kwargs,
+    ) -> None:
+        """ """
+        try:
+            # Attempt to configure the label widget
+            self._pause_button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_pause_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def configure_resume_button(
+        self,
+        **kwargs,
+    ) -> None:
+        """ """
+        try:
+            # Attempt to configure the 'resume button' tkinter.Button widget
+            self._resume_button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_resume_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
     def create_widgets(self) -> None:
         """ """
 
-        pass
+        # Create a tkinter.Label widget
+        self._label: tkinter.Label = tkinter.Label(
+            master=self,
+            text=f"{self.hours} : {self.minutes} : {self.seconds}",
+        )
+
+        # Place the tkinter.Label widget in the grid
+        self._label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create the 'pause button' tkinter.Button widget
+        self._pause_button: tkinter.Button = tkinter.Button(
+            command=self._on_pause_button_click,
+            master=self,
+            text="⏸️",
+        )
+
+        # Place the 'pause button' tkinter.Button widget in the grid
+        self._pause_button.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+        # Create the 'resume button' tkinter.Button widget
+        self._resume_button: tkinter.Button = tkinter.Button(
+            command=self._on_resume_button_click,
+            master=self,
+            text="▶️",
+        )
+
+        # Place the 'resume button' tkinter.Button widget in the grid
+        self._resume_button.grid(
+            column=2,
+            padx=5,
+            pady=5,
+            row=0,
+        )
 
     def is_running(self) -> bool:
         """ """
@@ -378,7 +510,10 @@ class CountupWidget(tkinter.Frame):
         self,
         dispatcher: Dispatcher,
         master: tkinter.Misc,
-        time_format: str = Constants.DEFAULT_TIME_FORMAT,
+        hours: int = 0,
+        minutes: int = 0,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        seconds: int = 0,
         **kwargs,
     ) -> None:
         """ """
@@ -392,14 +527,23 @@ class CountupWidget(tkinter.Frame):
         # Store the passed Dispatcher instance in an instance variable
         self.dispatcher: Dispatcher = dispatcher
 
+        # Store the passed hours int as an instance variable
+        self.hours: int = hours
+
         # Initialize the 'is running' boolean flag as an instance variable
         self._is_running: bool = False
 
         # Initialize this class' Logger instance
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
-        # Store the passed time format string in an instance variable
-        self.time_format: str = time_format
+        # Store the passed minutes int as an instance variable
+        self.minutes: int = minutes
+
+        # Store the passed namespace string as an instance variable
+        self.namespace: str = namespace
+
+        # Store the passed hours int as an instance variable
+        self.seconds: int = seconds
 
         # Configure the grid
         self.configure_grid()
@@ -409,7 +553,7 @@ class CountupWidget(tkinter.Frame):
 
         # Update the clock after 100 miliseconds
         self.update_call: str = self.after(
-            100,
+            1000,
             self._update_clock,
         )
 
@@ -437,7 +581,7 @@ class CountupWidget(tkinter.Frame):
     def _on_pause_button_click(self) -> None:
         """ """
 
-        # Check, if the countdown is not running
+        # Check, if the countup is not running
         if not self._is_running:
             # Return early
             return
@@ -457,7 +601,7 @@ class CountupWidget(tkinter.Frame):
     def _on_resume_button_click(self) -> None:
         """ """
 
-        # Check, if the countdown is running
+        # Check, if the countup is not running
         if self._is_running:
             # Return early
             return
@@ -473,14 +617,47 @@ class CountupWidget(tkinter.Frame):
 
         # Update the clock after 100 miliseconds
         self.update_call: str = self.after(
-            100,
+            1000,
             self._update_clock,
         )
 
     def _update_clock(self) -> None:
         """ """
 
-        pass
+        # Check, if the countup is not running
+        if not self._is_running:
+            # Return early
+            return
+
+        # Increment the seconds int
+        self.seconds += 1
+
+        # Check, if the seconds are more than or equal to 60
+        if self.seconds >= 60:
+
+            # Reset the seconds int to 0
+            self.seconds = 0
+
+            # Increment the minutes int
+            self.minutes += 1
+
+            # Check, if the minutes are more than or equal to 60
+            if self.minutes == 60:
+
+                # Reset the minutes int to 0
+                self.minutes = 0
+
+                # Increment the hours int
+                self.hours += 1
+
+        # Update the tkinter.Label widget's text
+        self._label.configure(text=f"{self.hours} : {self.minutes} : {self.seconds}")
+
+        # Schedule the next call
+        self.after(
+            100,
+            self._update_clock,
+        )
 
     def configure_grid(self) -> None:
         """ """
@@ -510,6 +687,7 @@ class CountupWidget(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
+        """ """
         try:
             # Attempt to configure the label widget
             self._label.configure(**kwargs)
@@ -525,10 +703,93 @@ class CountupWidget(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
+    def configure_pause_button(
+        self,
+        **kwargs,
+    ) -> None:
+        """ """
+        try:
+            # Attempt to configure the label widget
+            self._pause_button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_pause_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def configure_resume_button(
+        self,
+        **kwargs,
+    ) -> None:
+        """ """
+        try:
+            # Attempt to configure the 'resume button' tkinter.Button widget
+            self._resume_button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_resume_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
     def create_widgets(self) -> None:
         """ """
 
-        pass
+        # Create a tkinter.Label widget
+        self._label: tkinter.Label = tkinter.Label(
+            master=self,
+            text=f"{self.hours} : {self.minutes} : {self.seconds}",
+        )
+
+        # Place the tkinter.Label widget in the grid
+        self._label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create the 'pause button' tkinter.Button widget
+        self._pause_button: tkinter.Button = tkinter.Button(
+            command=self._on_pause_button_click,
+            master=self,
+            text="⏸️",
+        )
+
+        # Place the 'pause button' tkinter.Button widget in the grid
+        self._pause_button.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+        # Create the 'resume button' tkinter.Button widget
+        self._resume_button: tkinter.Button = tkinter.Button(
+            command=self._on_resume_button_click,
+            master=self,
+            text="▶️",
+        )
+
+        # Place the 'resume button' tkinter.Button widget in the grid
+        self._resume_button.grid(
+            column=2,
+            padx=5,
+            pady=5,
+            row=0,
+        )
 
     def is_running(self) -> bool:
         """ """

@@ -19,12 +19,13 @@ from core.question import ImmutableQuestion
 from core.setting import SettingService
 from core.stack import ImmutableStack
 
-from utils.base_ui import BaseUI
-from core.ui.ui_builder import UIBuilder
+from core.ui.miscellaneous import CountdownWidget, CountupWidget
+
 from core.ui.view.flashcard_learning_view import FlashcardLearningView
 from core.ui.view.note_learning_view import NoteLearningView
 from core.ui.view.question_learning_view import QuestionLearningView
 
+from utils.base_ui import BaseUI
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
@@ -87,6 +88,9 @@ class LearningSessionUI(BaseUI):
             None
         """
 
+        # Store the passed settings dictionary in an instance variable
+        self.settings: Dict[str, Any] = settings
+
         # Call the parent class constructor
         super().__init__(
             dispatcher=dispatcher,
@@ -114,13 +118,15 @@ class LearningSessionUI(BaseUI):
         self.flashcard_learning_view: Optional[FlashcardLearningView] = None
 
         # Load the learning session runner and store it in a final instance variable
-        self.learning_session_runner: Final[LearningSessionRunner] = self.load_learning_session_runner(
-            difficulties=difficulties,
-            dispatcher=dispatcher,
-            mode=mode,
-            priorities=priorities,
-            settings=settings,
-            stacks=stacks,
+        self.learning_session_runner: Final[LearningSessionRunner] = (
+            self.load_learning_session_runner(
+                difficulties=difficulties,
+                dispatcher=dispatcher,
+                mode=mode,
+                priorities=priorities,
+                settings=settings,
+                stacks=stacks,
+            )
         )
 
         # Initialize the note learning view as an empty instance variable
@@ -131,6 +137,9 @@ class LearningSessionUI(BaseUI):
 
         # Bind the left and right arrow keys to the back and forward navigation methods
         self.bind_keys()
+
+        # Toggle the navigation buttons
+        self.toggle_navigation_buttons()
 
         # Update the title label
         self.update_title_label()
@@ -267,20 +276,11 @@ class LearningSessionUI(BaseUI):
         """
         try:
             # Create the top frame widget
-            top_frame: Optional[tkinter.Frame] = tkinter.Frame(
+            top_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
             )
-
-            if not top_frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create top frame in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
 
             # Place the top frame widget in the main window
             top_frame.grid(
@@ -290,19 +290,10 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the center frame widget
-            self.center_frame: Optional[tkinter.Frame] = tkinter.Frame(
+            self.center_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
-
-            if not self.center_frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create center frame in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
 
             # Place the center frame widget in the main window
             self.center_frame.grid(
@@ -312,20 +303,11 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the bottom frame widget
-            bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
+            bottom_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 height=25,
                 master=self,
             )
-
-            if not bottom_frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create bottom frame in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
 
             # Place the bottom frame widget in the main window
             bottom_frame.grid(
@@ -393,7 +375,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Left Frame" frame widget
-            left_frame: Optional[tkinter.Frame] = tkinter.Frame(
+            left_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -427,7 +409,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Previous Button" button widget
-            self.previous_button: Optional[tkinter.Button] = tkinter.Button(
+            self.previous_button: tkinter.Button = tkinter.Button(
                 background=Constants.BLUE_GREY["700"],
                 command=lambda: self.on_navigation_button_click(direction="previous"),
                 font=(
@@ -459,7 +441,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Center Frame" frame widget
-            center_frame: Optional[tkinter.Frame] = tkinter.Frame(
+            center_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -505,7 +487,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Easy Button" button widget
-            self.easy_button: Optional[tkinter.Button] = tkinter.Button(
+            self.easy_button: tkinter.Button = tkinter.Button(
                 background=Constants.GREEN["700"],
                 command=lambda: self.on_difficulty_button_click(difficulty="easy"),
                 font=(
@@ -537,7 +519,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Medium Button" button widget
-            self.medium_button: Optional[tkinter.Button] = tkinter.Button(
+            self.medium_button: tkinter.Button = tkinter.Button(
                 background=Constants.ORANGE["700"],
                 command=lambda: self.on_difficulty_button_click(difficulty="medium"),
                 font=(
@@ -569,7 +551,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Hard Button" button widget
-            self.hard_button: Optional[tkinter.Button] = tkinter.Button(
+            self.hard_button: tkinter.Button = tkinter.Button(
                 background=Constants.RED["700"],
                 command=lambda: self.on_difficulty_button_click(difficulty="hard"),
                 font=(
@@ -601,7 +583,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Right Frame" frame widget
-            right_frame: Optional[tkinter.Frame] = tkinter.Frame(
+            right_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=master,
             )
@@ -635,7 +617,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the "Next Button" button widget
-            self.next_button: Optional[tkinter.Button] = tkinter.Button(
+            self.next_button: tkinter.Button = tkinter.Button(
                 background=Constants.BLUE_GREY["700"],
                 command=lambda: self.on_navigation_button_click(direction="next"),
                 font=(
@@ -703,6 +685,7 @@ class LearningSessionUI(BaseUI):
         self,
         master: tkinter.Frame,
     ) -> None:
+        """ """
         try:
             # Configure the weight of the 0th column to 1.
             master.grid_columnconfigure(
@@ -734,7 +717,7 @@ class LearningSessionUI(BaseUI):
                 weight=1,
             )
 
-            self.title_label: Optional[tkinter.Label] = tkinter.Label(
+            self.title_label: tkinter.Label = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -745,45 +728,20 @@ class LearningSessionUI(BaseUI):
                 text="You are currently viewing item x of X.",
             )
 
-            if not self.title_label:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create label in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
-
             # Grid the label widget in the top frame
             self.title_label.grid(
                 column=0,
+                padx=5,
+                pady=5,
                 row=0,
                 sticky=NSEW,
             )
 
             # Create an IntVar to store the progress value
-            self.progress_var: Optional[tkinter.IntVar] = UIBuilder.get_int_variable()
-
-            if not self.progress_var:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create int variable in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
+            self.progress_var: tkinter.IntVar = tkinter.IntVar()
 
             # Get the style
-            style: Optional[ttk.Style] = UIBuilder.get_style(master=master)
-
-            if not style:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create style in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
+            style: ttk.Style = ttk.Style(master=master)
 
             # Use the clam theme
             style.theme_use(themename="clam")
@@ -800,21 +758,12 @@ class LearningSessionUI(BaseUI):
             )
 
             # Create the progressbar widget
-            self.progressbar: Optional[ttk.Progressbar] = UIBuilder.get_progressbar(
+            self.progressbar: ttk.Progressbar = ttk.Progressbar(
                 master=master,
                 orient=HORIZONTAL,
                 style="StudyFrog.Horizontal.TProgressbar",
                 variable=self.progress_var,
             )
-
-            if not self.progressbar:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create progressbar in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
 
             # Grid the progressbar widget in the top frame
             self.progressbar.grid(
@@ -825,8 +774,112 @@ class LearningSessionUI(BaseUI):
                 sticky=NSEW,
             )
 
+            # Check, if 'countdown' mode is enabled
+            if self.settings["enable_countdown"]:
+                # Create the CountdownWidget
+                countdown: CountdownWidget = CountdownWidget(
+                    dispatcher=self.dispatcher,
+                    master=master,
+                    namespace=Constants.LEARNING_SESSION_NAMESPACE,
+                )
+
+                # Place the CountdownWidget in the grid
+                countdown.grid(
+                    column=2,
+                    padx=5,
+                    pady=5,
+                    row=0,
+                )
+
+                # Configure the CountdownWidget
+                countdown.configure(background=Constants.BLUE_GREY["700"])
+
+                # Configure the CountdownWidget's label
+                countdown.configure_label(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.LARGE_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                )
+
+                # Configure the CountdownWidget's 'pause button' tkinter.Button widegt
+                countdown.configure_pause_button(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    relief=FLAT
+                )
+
+                # Configure the CountdownWidget's 'resuome button' tkinter.Button widegt
+                countdown.configure_resume_button(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    relief=FLAT
+                )
+
+            # Check, if 'countup' mode is enabled
+            elif self.settings["enable_countup"]:
+                # Create the CountupWidget
+                countup: CountupWidget = CountupWidget(
+                    dispatcher=self.dispatcher,
+                    master=master,
+                    namespace=Constants.LEARNING_SESSION_NAMESPACE,
+                )
+
+                # Place the CountupWidget in the grid
+                countup.grid(
+                    column=2,
+                    padx=5,
+                    pady=5,
+                    row=0,
+                )
+
+                # Configure the CountupWidget
+                countup.configure(background=Constants.BLUE_GREY["700"])
+
+                # Configure the CountupWidget's label
+                countup.configure_label(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.LARGE_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                )
+
+                # Configure the CountupWidget's 'pause button' tkinter.Button widegt
+                countup.configure_pause_button(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    relief=FLAT
+                )
+
+                # Configure the CountupWidget's 'resuome button' tkinter.Button widegt
+                countup.configure_resume_button(
+                    background=Constants.BLUE_GREY["700"],
+                    font=(
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    foreground=Constants.WHITE,
+                    relief=FLAT
+                )
+
             # Get the options button widget
-            options_button: Optional[tkinter.Button] = tkinter.Button(
+            options_button: tkinter.Button = tkinter.Button(
                 background=Constants.BLUE_GREY["700"],
                 command=self.on_options_button_click,
                 font=(
@@ -838,15 +891,6 @@ class LearningSessionUI(BaseUI):
                 relief=FLAT,
                 text="Options",
             )
-
-            if not options_button:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create options button in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
 
             # Grid the options button widget in the top frame
             options_button.grid(
@@ -953,9 +997,6 @@ class LearningSessionUI(BaseUI):
                 self.logger.warning(
                     message=f"Unsupported content type ({type(content)}) in '{self.__class__.__name__}'. This is likely due to a type not being implemented."
                 )
-
-            # Toggle the navigation buttons
-            self.toggle_navigation_buttons()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -1324,6 +1365,9 @@ class LearningSessionUI(BaseUI):
 
             # Handle the loaded content
             self.handle_loaded_content(content=content)
+
+            # Toggle the navigation buttons
+            self.toggle_navigation_buttons()
 
             # Update the title label
             self.update_title_label()

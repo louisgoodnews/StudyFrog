@@ -311,12 +311,15 @@ class Logger:
         :rtype: Logger
         """
 
-        # Return a new logger instance with the given name and level
-        return cls(
+        # Initialize a new logger instance with the given name and level
+        logger: Logger =  cls(
             colorisation=colorisation,
             level=level,
             name=name,
         )
+
+        # Return the new Logger instance to the caller
+        return logger
 
     def info(
         self,

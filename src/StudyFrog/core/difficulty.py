@@ -385,16 +385,8 @@ class DifficultyManager(BaseObjectManager):
             int: The number of difficulties in the database.
         """
         try:
-            # Count the number of difficulties in the database
-            result: Any = asyncio.run(
-                DifficultyModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.DIFFICULTIES};",
-                )
-            )
-
-            # Return the number of difficulties in the database
-            return result[0][0] if result else 0
+            # Count and return the number of difficulties in the database
+            return asyncio.run(DifficultyModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -536,9 +528,15 @@ class DifficultyManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_difficulties(self) -> Optional[List[ImmutableDifficulty]]:
+    def get_all_difficulties(
+        self,
+        force_refetch: bool = False,
+    ) -> Optional[List[ImmutableDifficulty]]:
         """
         Returns a list of all difficulties in the database.
+
+        Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
             Optional[List[ImmutableDifficulty]]: A list of all difficulties in the database if no exception occurs. Otherwise, None.
@@ -547,10 +545,12 @@ class DifficultyManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_difficulties():
-                # Return the list of immutable difficulties from the cache
-                return self.get_cache_values()
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if cache and table size are equal
+                if self.cache and len(self._cache) == self.count_difficulties():
+                    # Return the list of immutable difficulties from the cache
+                    return self.get_cache_values()
 
             # Get all difficulties from the database
             models: List[DifficultyModel] = asyncio.run(
@@ -687,12 +687,14 @@ class DifficultyManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableDifficulty]:
         """
         Retrieves a difficulty by the given field and value.
 
         Args:
             field (str): The field to search by.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             value (Any): The value to search for.
 
         Returns:
@@ -702,10 +704,12 @@ class DifficultyManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the difficulty is already in the cache
-            if self.is_key_in_cache(key=field):
-                # Return the difficulty from the cache
-                return self.get_value_from_cache(key=field)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the difficulty is already in the cache
+                if self.is_key_in_cache(key=field):
+                    # Return the difficulty from the cache
+                    return self.get_value_from_cache(key=field)
 
             # Get the difficulty with the given field and value from the database
             model: Optional[DifficultyModel] = asyncio.run(
@@ -742,11 +746,13 @@ class DifficultyManager(BaseObjectManager):
     def get_difficulty_by_id(
         self,
         id: int,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableDifficulty]:
         """
         Returns a difficulty with the given ID.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             id (int): The ID of the difficulty.
 
         Returns:
@@ -756,10 +762,12 @@ class DifficultyManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the difficulty is already in the cache
-            if self.is_key_in_cache(key=f"DIFFICULTY_{id}"):
-                # Return the difficulty from the cache
-                return self.get_value_from_cache(key=f"DIFFICULTY_{id}")
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the difficulty is already in the cache
+                if self.is_key_in_cache(key=f"DIFFICULTY_{id}"):
+                    # Return the difficulty from the cache
+                    return self.get_value_from_cache(key=f"DIFFICULTY_{id}")
 
             # Get the difficulty with the given ID from the database
             model: Optional[DifficultyModel] = asyncio.run(
@@ -793,14 +801,74 @@ class DifficultyManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def get_difficulty_by_id(
+        self,
+        key: str,
+        force_refetch: bool = False,
+    ) -> Optional[ImmutableDifficulty]:
+        """
+        Returns a difficulty with the given key.
+
+        Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
+            key (str): The ID of the difficulty.
+
+        Returns:
+            Optional[ImmutableDifficulty]: The difficulty with the given key if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the difficulty is already in the cache
+                if self.is_key_in_cache(key=key):
+                    # Return the difficulty from the cache
+                    return self.get_value_from_cache(key=key)
+
+            # Get the difficulty with the given ID from the database
+            model: Optional[DifficultyModel] = asyncio.run(
+                DifficultyModel.get_by(
+                    column="key",
+                    database=Constants.DATABASE_PATH,
+                    value=key,
+                )
+            )
+
+            # Return the difficulty if it exists
+            if model is not None:
+                # Convert the DifficultyModel object to an Difficulty object
+                return ImmutableDifficulty(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+            else:
+                # Return None indicating that the difficulty does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_key' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def get_difficulty_by_uuid(
         self,
         uuid: str,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableDifficulty]:
         """
         Returns a difficulty with the given UUID.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             uuid (str): The UUID of the difficulty.
 
         Returns:
@@ -810,10 +878,12 @@ class DifficultyManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the difficulty is already in the cache
-            if self.is_key_in_cache(key=uuid):
-                # Return the difficulty from the cache
-                return self.get_value_from_cache(key=uuid)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the difficulty is already in the cache
+                if self.is_key_in_cache(key=uuid):
+                    # Return the difficulty from the cache
+                    return self.get_value_from_cache(key=uuid)
 
             # Get the difficulty with the given UUID from the database
             model: Optional[DifficultyModel] = asyncio.run(
@@ -869,7 +939,9 @@ class DifficultyManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableDifficulty]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableDifficulty]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:

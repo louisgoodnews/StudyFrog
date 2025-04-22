@@ -452,33 +452,33 @@ class DashboardUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Create the "TabbedView" widget
-        tabbed_view: TabbedFrame = TabbedFrame(
+        # Create the "TabbedFrame" widget
+        tabbed_frame: TabbedFrame = TabbedFrame(
             column=0,
             master=right_frame,
             row=1,
         )
 
-        # Style the TabbedView's "Top Frame" widget
-        tabbed_view.configure(background=Constants.BLUE_GREY["700"])
+        # Style the TabbedFrame's "Top Frame" widget
+        tabbed_frame.configure(background=Constants.BLUE_GREY["700"])
 
-        # Style the TabbedView's "Container Frame" widget
-        tabbed_view.configure_container_frame(background=Constants.BLUE_GREY["700"])
+        # Style the TabbedFrame's "Container Frame" widget
+        tabbed_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
 
-        # Style the TabbedView's "Top Frame" widget
-        tabbed_view.configure_top_frame(background=Constants.BLUE_GREY["700"])
+        # Style the TabbedFrame's "Top Frame" widget
+        tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
 
-        # Create the "TabbedView" widgets
-        self.create_TabbedView_widgets(master=tabbed_view)
+        # Create the "TabbedFrame" widgets
+        self.create_tabbed_frame_widgets(master=tabbed_frame)
 
-    def create_TabbedView_widgets(
+    def create_tabbed_frame_widgets(
         self,
         master: TabbedFrame,
     ) -> None:
         """
-        Creates and configures the main widgets of the TabbedView.
+        Creates and configures the main widgets of the TabbedFrame.
 
-        This method initializes the main widgets of the TabbedView within the
+        This method initializes the main widgets of the TabbedFrame within the
         dashboard UI, setting their layout configuration.
 
         Args:
@@ -494,7 +494,7 @@ class DashboardUI(BaseUI):
                 master=master,
             )
 
-            # Add the "New Stacks" frame widget to the TabbedView
+            # Add the "New Stacks" frame widget to the TabbedFrame
             master.add(
                 label="My New Stacks",
                 widget=new_stacks_frame,
@@ -518,7 +518,7 @@ class DashboardUI(BaseUI):
                 master=master,
             )
 
-            # Add the "Recently Viewed" frame widget to the TabbedView
+            # Add the "Recently Viewed" frame widget to the TabbedFrame
             master.add(
                 label="Recently Viewed",
                 widget=recently_viewed_frame,
@@ -542,7 +542,7 @@ class DashboardUI(BaseUI):
                 master=master,
             )
 
-            # Add the "Completed Stacks" frame widget to the TabbedView
+            # Add the "Completed Stacks" frame widget to the TabbedFrame
             master.add(
                 label="Completed Stacks",
                 widget=completed_stacks_frame,
@@ -573,7 +573,7 @@ class DashboardUI(BaseUI):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_TabbedView_widgets' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run 'create_tabbed_frame_widgets' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Re-raise the exception to the caller
@@ -1104,7 +1104,7 @@ class DashboardUI(BaseUI):
                 column=0,
                 padx=5,
                 pady=10,
-                row=len(self.new_stacks_frame.winfo_children()),
+                row=len(master.winfo_children()),
                 sticky=NSEW,
             )
         except Exception as e:
@@ -1289,9 +1289,9 @@ class DashboardUI(BaseUI):
                 return
 
             # Check, if stacks list is instance of ImmutableStack
-            if isinstance(
+            if not isinstance(
                 stacks,
-                ImmutableStack,
+                list,
             ):
                 # Convert ImmutableStack instance to a list of ImmutableStack
                 stacks = [stacks]
@@ -1366,7 +1366,7 @@ class DashboardUI(BaseUI):
 
             # Obtain the ImmutableStack object list from the one and only result of the notification
             stacks: Optional[Union[ImmutableStack, List[ImmutableStack]]] = (
-                stacks_notification.get_one_and_only_result()
+                stacks_notification.get_result_by_key(key="on_request_stack_lookup")
             )
 
             # Check, if the stacks list is None
@@ -1380,9 +1380,9 @@ class DashboardUI(BaseUI):
                 return
 
             # Check, if stacks list is instance of ImmutableStack
-            if isinstance(
+            if not isinstance(
                 stacks,
-                ImmutableStack,
+                list,
             ):
                 # Convert ImmutableStack instance to a list of ImmutableStack
                 stacks = [stacks]
@@ -1438,7 +1438,7 @@ class DashboardUI(BaseUI):
 
             # Obtain the ImmutableStack object list from the one and only result of the notification
             stacks: Optional[List[ImmutableStack]] = (
-                notification.get_one_and_only_result()
+                notification.get_result_by_key(key="on_request_stack_lookup")
             )
 
             # Check, if the stacks list is None
@@ -1452,9 +1452,9 @@ class DashboardUI(BaseUI):
                 return
 
             # Check, if stacks list is instance of ImmutableStack
-            if isinstance(
+            if not isinstance(
                 stacks,
-                ImmutableStack,
+                list,
             ):
                 # Convert ImmutableStack instance to a list of ImmutableStack
                 stacks = [stacks]

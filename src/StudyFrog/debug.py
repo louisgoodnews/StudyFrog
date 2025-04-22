@@ -20,7 +20,7 @@ from core.comment import CommentModel
 from core.custom_field import CustomFieldModel
 from core.default import DefaultModel
 from core.difficulty import DifficultyModel
-from core.flashcard import FlashcardModel
+from core.flashcard import FlashcardManager, FlashcardModel
 from core.note import NoteModel
 from core.option import OptionModel
 from core.priority import PriorityModel
@@ -32,6 +32,7 @@ from core.tag import TagModel
 from core.user import UserModel
 
 from utils.constants import Constants
+from utils.database_service import DatabaseService
 from utils.logger import Logger
 from utils.model import ImmutableBaseModel
 

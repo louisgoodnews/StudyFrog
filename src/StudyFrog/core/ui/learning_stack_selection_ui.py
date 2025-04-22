@@ -14,6 +14,7 @@ from core.priority import ImmutablePriority
 from core.setting import SettingService
 from core.stack import ImmutableStack
 
+from core.ui.fields.boolean_fields import CheckbuttonField
 from core.ui.fields.select_fields import (
     CheckbuttonSelectField,
     ComboboxField,
@@ -51,7 +52,7 @@ class LearningStackSelectionUI(BaseUI):
         self.field_dict: Dict[str, Any] = {}
 
         # Initialize the value dictionary instance variable as an empty dictionary
-        self.value_dict: Dict[str, Any] = {}
+        self.value_dict: Dict[str, Any] = {"mode": {"value": "Default"}}
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -103,30 +104,71 @@ class LearningStackSelectionUI(BaseUI):
     def _get_difficulties(self) -> Optional[List[ImmutableDifficulty]]:
         """ """
 
+        # Get the ImmutableDifficulty objects from the database
+        difficulties: Optional[
+            Union[ImmutableDifficulty, List[ImmutableDifficulty]]
+        ] = self._dispatch_request_event(event=Events.REQUEST_GET_ALL_DIFFICULTIES)
+
+        # Check, if the database returned a list of or a singular ImmutableDifficulty
+        if isinstance(
+            difficulties,
+            ImmutableDifficulty,
+        ):
+            # Convert the singular ImmutableDifficulty into a list of ImmutableDifficulty objects
+            difficulties = [difficulties]
+
         # Return all ImmutableDifficulty objects from the database or an empty list
-        return (
-            self._dispatch_request_event(event=Events.REQUEST_GET_ALL_DIFFICULTIES)
-            or []
-        )
+        return difficulties or []
 
     def _get_priorities(self) -> Optional[List[ImmutablePriority]]:
         """ """
 
-        # Return all ImmutablePriority objects from the database or an empty list
-        return (
-            self._dispatch_request_event(event=Events.REQUEST_GET_ALL_PRIORITIES) or []
+        # Get the ImmutablePriority objects from the database
+        priorities: Optional[Union[ImmutablePriority, List[ImmutablePriority]]] = (
+            self._dispatch_request_event(event=Events.REQUEST_GET_ALL_PRIORITIES)
         )
+
+        # Check, if the database returned a list of or a singular ImmutablePriority
+        if isinstance(
+            priorities,
+            ImmutablePriority,
+        ):
+            # Convert the singular ImmutablePriority into a list of ImmutablePriority objects
+            priorities = [priorities]
+
+        # Return all ImmutablePriority objects from the database or an empty list
+        return priorities or []
 
     def _get_stacks(self) -> Optional[List[ImmutableStack]]:
         """ """
 
+        # Get the ImmutableStack objects from the database
+        stacks: Optional[Union[ImmutableStack, List[ImmutableStack]]] = (
+            self._dispatch_request_event(event=Events.REQUEST_GET_ALL_STACKS)
+        )
+
+        # Check, if the database returned a list of or a singular ImmutableStack
+        if isinstance(
+            stacks,
+            ImmutableStack,
+        ):
+            # Convert the singular ImmutableStack into a list of ImmutableStack objects
+            stacks = [stacks]
+
         # Return all ImmutableStack objects from the database or an empty list
-        return self._dispatch_request_event(event=Events.REQUEST_GET_ALL_STACKS) or []
+        return stacks or []
 
     def _on_cancel_button_click(self) -> None:
         """ """
 
-        pass
+        # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace
+        self.dispatcher.dispatch(
+            direction="forward",
+            event=Events.REQUEST_VALIDATE_NAVIGATION,
+            namespace=Constants.GLOBAL_NAMESPACE,
+            source="learning_stack_selection_ui",
+            target="learning_dashboard_ui",
+        )
 
     def _on_field_change(
         self,
@@ -145,6 +187,10 @@ class LearningStackSelectionUI(BaseUI):
             .replace(
                 "*",
                 "",
+            )
+            .replace(
+                "?",
+                "",
             ),
         )
 
@@ -154,23 +200,47 @@ class LearningStackSelectionUI(BaseUI):
             self.value_dict[label] = {"value": None}
 
         # Add the passed value to the value dictionary instance variable under the passed label
-        self.value_dict[label]["value"] = (
-            value
-            if not isinstance(
-                value,
-                (
-                    list,
-                    set,
-                    tuple,
-                ),
-            )
-            else value[0]
-        )
+        self.value_dict[label]["value"] = value
 
     def _on_start_button_click(self) -> None:
         """ """
 
-        self.logger.debug(message=self.value_dict)
+        # Get the completed form
+        form: Dict[str, Any] = self.get()
+
+        # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace
+        self.dispatcher.dispatch(
+            difficulties=[
+                difficulty
+                for difficulty in self._get_difficulties()
+                if difficulty.name.lower() in f"{form["difficulties"]["value"]}".lower()
+            ],
+            direction="forward",
+            event=Events.REQUEST_VALIDATE_NAVIGATION,
+            mode=form["mode"]["value"],
+            namespace=Constants.GLOBAL_NAMESPACE,
+            priorities=[
+                priority
+                for priority in self._get_priorities()
+                if priority.name.lower() in f"{form["priorities"]["value"]}".lower()
+            ],
+            settings={
+                "enable_countdown": form["timing_fields"]["value"][
+                    "Enable Countdown*? "
+                ][1],
+                "enable_countup": form["timing_fields"]["value"]["Enable Countup*? "][
+                    1
+                ],
+                "enable_randomsiation": form["enable_randomsiation"]["value"],
+            },
+            source="learning_stack_selection_ui",
+            stacks=[
+                stack
+                for stack in self._get_stacks()
+                if stack.name.lower() in f"{form["stacks"]["value"]}".lower()
+            ],
+            target="learning_session_ui",
+        )
 
     def _register_field(
         self,
@@ -189,6 +259,10 @@ class LearningStackSelectionUI(BaseUI):
             )
             .replace(
                 "*",
+                "",
+            )
+            .replace(
+                "?",
                 "",
             ),
         )
@@ -390,6 +464,12 @@ class LearningStackSelectionUI(BaseUI):
             weight=1,
         )
 
+        # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 5ft row to weight 1
+        scrolled_frame.container.grid_rowconfigure(
+            index=5,
+            weight=1,
+        )
+
         # Place the 'scrolled frame' ScrolledFrame widget in the grid
         scrolled_frame.grid(
             column=0,
@@ -400,27 +480,27 @@ class LearningStackSelectionUI(BaseUI):
         # Attempt to get all ImmutableStack objects from the database
         stacks: List[ImmutableStack] = self._get_stacks()
 
-        # Create the 'stacks field' ComboboxField widget
-        stacks_field: ComboboxField = ComboboxField(
+        # Create the 'stacks field' MultiOptionSelectField widget
+        stacks_field: MultiOptionSelectField = MultiOptionSelectField(
             display_name="Stacks*: ",
             master=scrolled_frame.container,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
-            readonly=True,
             values=[
                 stack.get(
                     default="",
                     name="name",
                 )
                 for stack in stacks
-            ],
+            ]
+            or [],
         )
 
-        # Configure the 'stacks field' ComboboxField widget
+        # Configure the 'stacks field' MultiOptionSelectField widget
         stacks_field.configure(background=Constants.BLUE_GREY["700"])
 
-        # Configure the 'stacks field' ComboboxField widget's 'button' tkinter.Button widget
-        stacks_field.configure_button(
+        # Configure the 'stacks field' MultiOptionSelectField widget's 'clear button' tkinter.Button widget
+        stacks_field.configure_clear_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -430,15 +510,10 @@ class LearningStackSelectionUI(BaseUI):
             relief=FLAT,
         )
 
-        # Configure the 'stacks field' ComboboxField widget's 'combobox' ttk.Combobox widget
-        stacks_field.configure_combobox(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-        )
+        # Configure the 'stacks field' MultiOptionSelectField widget's 'container frame' tkinter.Frame widget
+        stacks_field.configure_container_frame(background=Constants.BLUE_GREY["700"])
 
-        # Configure the 'stacks field' ComboboxField widget's 'label' tkinter.Label widget
+        # Configure the 'stacks field' MultiOptionSelectField widget's 'label' tkinter.Label widget
         stacks_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             font=(
@@ -446,10 +521,20 @@ class LearningStackSelectionUI(BaseUI):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
+        )
+
+        # Configure the 'stacks field' MultiOptionSelectField widget's 'select button' tkinter.Button widget
+        stacks_field.configure_select_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
             relief=FLAT,
         )
 
-        # Place the 'stacks field' ComboboxField widget in the grid
+        # Place the 'stacks field' MultiOptionSelectField widget in the grid
         stacks_field.grid(
             column=0,
             padx=5,
@@ -479,7 +564,8 @@ class LearningStackSelectionUI(BaseUI):
                     name="name",
                 )
                 for difficulty in difficulties
-            ],
+            ]
+            or [],
         )
 
         # Configure the 'difficulties field' MultiOptionSelectField widget
@@ -509,7 +595,6 @@ class LearningStackSelectionUI(BaseUI):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            relief=FLAT,
         )
 
         # Configure the 'difficulties field' MultiOptionSelectField widget's 'select button' tkinter.Button widget
@@ -553,7 +638,8 @@ class LearningStackSelectionUI(BaseUI):
                     name="name",
                 )
                 for priority in priorities
-            ],
+            ]
+            or [],
         )
 
         # Configure the 'priorities field' MultiOptionSelectField widget
@@ -583,7 +669,6 @@ class LearningStackSelectionUI(BaseUI):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            relief=FLAT,
         )
 
         # Configure the 'priorities field' MultiOptionSelectField widget's 'select button' tkinter.Button widget
@@ -654,7 +739,6 @@ class LearningStackSelectionUI(BaseUI):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            relief=FLAT,
         )
 
         # Place the 'mode field' ComboboxField widget in the grid
@@ -702,6 +786,53 @@ class LearningStackSelectionUI(BaseUI):
         self._register_field(
             field=timing_fields,
             label="Timing Fields*: ",
+            required=True,
+        )
+
+        # Create the 'enable randomisation' CheckbuttonField widget
+        randomisation_field: CheckbuttonField = CheckbuttonField(
+            display_name="Enable Randomsiation?",
+            master=scrolled_frame.container,
+            namespace=Constants.STACK_SELECTION_NAMESPACE,
+            on_change_callback=self._on_field_change,
+        )
+
+        # Configure the 'enable randomisation' CheckbuttonField widget
+        randomisation_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Configure the 'enable randomisation' CheckbuttonField widget's 'checkbutton' tkinter.Checkbutton widget
+        randomisation_field.configure_checkbutton(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Configure the 'enable randomisation' CheckbuttonField widget's 'label' tkinter.Label widget
+        randomisation_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Place the 'enable randomisation' CheckbuttonField widget in the grid
+        randomisation_field.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=5,
+            sticky=NSEW,
+        )
+
+        # Register the 'enable randomisation' CheckbuttonField widget
+        self._register_field(
+            field=randomisation_field,
+            label="Enable Randomsiation?",
             required=True,
         )
 
@@ -771,3 +902,41 @@ class LearningStackSelectionUI(BaseUI):
 
         # Update the idletasks
         self.update_idletasks()
+
+    def get(self) -> Dict[str, Any]:
+        """
+        Returns the current values of the form.
+
+        Args:
+            None
+
+        Returns:
+            Dict[str, Any]: A dictionary containing all field values by normalized label.
+        """
+
+        # Update the value dictionary instance variable
+        for (
+            key,
+            value,
+        ) in self.field_dict.items():
+            self.value_dict[
+                key.strip()
+                .replace(
+                    ":",
+                    "",
+                )
+                .replace(
+                    "*",
+                    "",
+                )
+                .replace(
+                    "?",
+                    "",
+                )
+            ] = {
+                "type": type(value["widget"].get()[1]),
+                "value": value["widget"].get()[1],
+            }
+
+        # Return a the value dictionary to the caller
+        return self.value_dict

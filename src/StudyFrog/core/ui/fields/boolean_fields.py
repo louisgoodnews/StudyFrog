@@ -913,11 +913,11 @@ class ToggleButtonField(BaseField):
         self.variable.set(not self.variable.get())
 
         # Update button text based on new state
-        self._button.configure(text=self.icons[0] if self.variable.get() else self.icons[1])
+        self._button.configure(text=f"{self.icons[0]} False" if self.variable.get() else f"{self.icons[1]} True")
 
-        # Dispatch the TOGGLE_BUTTON_FIELD_CLEARED event
+        # Dispatch the TOGGLE_BUTTON_FIELD_CHANGED event
         self.dispatcher.dispatch(
-            event=Events.TOGGLE_BUTTON_FIELD_CLEARED,
+            event=Events.TOGGLE_BUTTON_FIELD_CHANGED,
             label=self.display_name,
             namespace=self.namespace,
             value=self.variable.get(),
@@ -952,7 +952,7 @@ class ToggleButtonField(BaseField):
         self.variable.set(value=False)
 
         # Update button text based on new state
-        self._button.configure(text=self.icons[0] if self.variable.get() else self.icons[1])
+        self._button.configure(text=f"{self.icons[0]} False" if self.variable.get() else f"{self.icons[1]} True")
 
         # Check, if the dispatch flag is set to True
         if dispatch:
@@ -1118,7 +1118,7 @@ class ToggleButtonField(BaseField):
         self._button: tkinter.Button = tkinter.Button(
             command=self._on_button_change,
             master=self,
-            text=self.icons[0] if self.variable.get() else self.icons[1],
+            text=f"{self.icons[0]} False" if self.variable.get() else f"{self.icons[1]} False",
             **kwargs.get(
                 "button",
                 {},
@@ -1199,7 +1199,7 @@ class ToggleButtonField(BaseField):
         self.variable.set(value=value)
 
         # Update button text based on new state
-        self._button.configure(text=self.icons[0] if self.variable.get() else self.icons[1])
+        self._button.configure(text=f"{self.icons[0]} False" if self.variable.get() else f"{self.icons[1]} True")
 
         # Check, if the dispatch flag is set to True
         if dispatch:

@@ -67,6 +67,98 @@ class Miscellaneous:
         return string.strip().lower().replace(" ", "_")
 
     @classmethod
+    def calculate_continuous_grade(
+        cls,
+        score: float,
+        max_score: float,
+        mean_ratio: float = 0.6,
+        stddev_ratio: float = 0.15,
+        thresholds: List[Tuple[float, float]] = None,
+    ) -> float:
+        """
+        Calculates a smooth, continuous grade via linear interpolation over z-score thresholds.
+
+        Args:
+            score (float): Achieved score.
+            max_score (float): Maximum achievable score.
+            mean_ratio (float): Mean as ratio of max_score (default 60%).
+            stddev_ratio (float): Std dev as ratio of max_score (default 15%).
+            thresholds (List[Tuple[z_score, grade]]): Sorted descending by z_score.
+
+        Returns:
+            float: A continuous grade (e.g. 2.64) interpolated between defined grade levels.
+        """
+
+        # Check, if the max_score is valid (i.e. > 0)
+        if max_score <= 0:
+            # Log an error message indicating an invalid max_score value
+            cls.logger.error(
+                message=f"Invalid max_score value: {max_score} (must be greater than 0)"
+            )
+
+            # Raise a ValueError with a descriptive error message
+            raise ValueError("max_score must be greater than 0")
+
+        # Calculate mean
+        mu: float = mean_ratio * max_score
+
+        # Calculate standard deviation
+        sigma: float = stddev_ratio * max_score
+
+        # Calculate z-score
+        z: float = (score - mu) / sigma
+
+        # Check, if thresholds are provided
+        if thresholds is None:
+            # Default thresholds
+            thresholds = [
+                (+2.0, 1.0),
+                (+1.5, 1.3),
+                (+1.0, 1.7),
+                (+0.5, 2.0),
+                (0.0, 2.3),
+                (-0.5, 3.0),
+                (-1.0, 3.7),
+                (-1.5, 4.0),
+                (-2.0, 5.0),
+            ]
+
+        # Sort the thresholds in descending order
+        thresholds = sorted(thresholds, reverse=True)
+
+        # If z is greater than the highest threshold → best grade
+        if z >= thresholds[0][0]:
+            # Return the best grade
+            return thresholds[0][1]
+
+        # If z is less than the lowest threshold → worst grade
+        if z <= thresholds[-1][0]:
+            # Return the worst grade
+            return thresholds[-1][1]
+
+        # Interpolate between two thresholds
+        for i in range(1, len(thresholds)):
+            # Get the current threshold and grade
+            z1, grade1 = thresholds[i - 1]
+
+            # Get the next threshold and grade
+            z2, grade2 = thresholds[i]
+
+            # Check, if z is between the current threshold and the next threshold
+            if z1 >= z >= z2:
+                # Linear interpolation
+                ratio: float = (z - z2) / (z1 - z2)
+
+                # Interpolate the grade
+                interpolated: float = grade2 + ratio * (grade1 - grade2)
+
+                # Return the interpolated grade
+                return round(interpolated, 3)
+
+        # Fallback (should never happen)
+        return 5.0
+
+    @classmethod
     def camel_to_pascal(
         cls,
         string: str,
@@ -232,30 +324,30 @@ class Miscellaneous:
 
         # Mapping of strftime tokens to regex equivalents
         token_map: Dict[str, str] = {
-            "%d": r"\d{1,2}",             # Day of the month (1–31)
-            "%m": r"\d{1,2}",             # Month (1–12)
-            "%y": r"\d{2}",               # Two-digit year
-            "%Y": r"\d{4}",               # Four-digit year
-            "%H": r"\d{1,2}",             # Hour (0–23)
-            "%I": r"\d{1,2}",             # Hour (1–12)
-            "%M": r"\d{1,2}",             # Minute (0–59)
-            "%S": r"\d{1,2}",             # Second (0–59)
-            "%f": r"\d{1,6}",             # Microsecond
-            "%p": r"(AM|PM|am|pm)",       # AM/PM in various cases
-            "%b": r"[A-Za-z]{3}",         # Abbreviated month name
-            "%B": r"[A-Za-z]+",           # Full month name
-            "%a": r"[A-Za-z]{3}",         # Abbreviated weekday name
-            "%A": r"[A-Za-z]+",           # Full weekday name
-            "%j": r"\d{1,3}",             # Day of the year (1–366)
-            "%U": r"\d{1,2}",             # Week number (Sunday first)
-            "%W": r"\d{1,2}",             # Week number (Monday first)
-            "%w": r"\d",                  # Weekday as a digit (0–6)
-            "%z": r"[\+\-]\d{4}",         # UTC offset (e.g., +0200)
-            "%Z": r"[A-Za-z]+",           # Time zone abbreviation
-            "%c": r".+",                  # Locale-specific datetime representation
-            "%x": r".+",                  # Locale-specific date
-            "%X": r".+",                  # Locale-specific time
-            "%%": r"%"                    # Literal '%'
+            "%d": r"\d{1,2}",  # Day of the month (1–31)
+            "%m": r"\d{1,2}",  # Month (1–12)
+            "%y": r"\d{2}",  # Two-digit year
+            "%Y": r"\d{4}",  # Four-digit year
+            "%H": r"\d{1,2}",  # Hour (0–23)
+            "%I": r"\d{1,2}",  # Hour (1–12)
+            "%M": r"\d{1,2}",  # Minute (0–59)
+            "%S": r"\d{1,2}",  # Second (0–59)
+            "%f": r"\d{1,6}",  # Microsecond
+            "%p": r"(AM|PM|am|pm)",  # AM/PM in various cases
+            "%b": r"[A-Za-z]{3}",  # Abbreviated month name
+            "%B": r"[A-Za-z]+",  # Full month name
+            "%a": r"[A-Za-z]{3}",  # Abbreviated weekday name
+            "%A": r"[A-Za-z]+",  # Full weekday name
+            "%j": r"\d{1,3}",  # Day of the year (1–366)
+            "%U": r"\d{1,2}",  # Week number (Sunday first)
+            "%W": r"\d{1,2}",  # Week number (Monday first)
+            "%w": r"\d",  # Weekday as a digit (0–6)
+            "%z": r"[\+\-]\d{4}",  # UTC offset (e.g., +0200)
+            "%Z": r"[A-Za-z]+",  # Time zone abbreviation
+            "%c": r".+",  # Locale-specific datetime representation
+            "%x": r".+",  # Locale-specific date
+            "%X": r".+",  # Locale-specific time
+            "%%": r"%",  # Literal '%'
         }
 
         # Prepare the final regex string
@@ -267,7 +359,7 @@ class Miscellaneous:
         while i < len(date_format):
             # If a token begins with '%', try to match a known format token
             if date_format[i] == "%" and i + 1 < len(date_format):
-                token: str = date_format[i:i+2]
+                token: str = date_format[i : i + 2]
 
                 # If it's a recognized token, add its regex form
                 if token in token_map:
@@ -509,7 +601,10 @@ class Miscellaneous:
         """
 
         # Check, if the passed string argument is in fact a string object
-        if not isinstance(string, str,):
+        if not isinstance(
+            string,
+            str,
+        ):
             # Return False
             return False
 
@@ -519,19 +614,22 @@ class Miscellaneous:
         # A list of common date formats
         common_formats: List[str] = [
             "%Y-%m-%d %H:%M:%S",  # 2025-04-14 08:57:23
-            "%Y-%m-%d",           # 2025-04-14
-            "%d.%m.%Y",           # 14.04.2025
-            "%d.%m.%y",           # 14.04.25
-            "%m/%d/%Y",           # 04/14/2025
-            "%Y/%m/%d",           # 2025/04/14
-            "%d-%b-%Y",           # 14-Apr-2025
+            "%Y-%m-%d",  # 2025-04-14
+            "%d.%m.%Y",  # 14.04.2025
+            "%d.%m.%y",  # 14.04.25
+            "%m/%d/%Y",  # 04/14/2025
+            "%Y/%m/%d",  # 2025/04/14
+            "%d-%b-%Y",  # 14-Apr-2025
         ]
 
         # Iterate over the common date formats list
         for format in common_formats:
             try:
                 # Attempt to create a datetime object from the string with the format
-                datetime.strptime(stripped, format,)
+                datetime.strptime(
+                    stripped,
+                    format,
+                )
 
                 # Return True
                 return True

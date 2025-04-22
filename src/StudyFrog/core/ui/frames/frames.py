@@ -928,29 +928,29 @@ class TabbedFrame(tkinter.Frame):
         # Initialize the tabs dictionary instance variable as None
         self.tabs: Dict[str, tkinter.Misc] = {}
 
-        # Create the 'container' frame widget
-        self._container: tkinter.Frame = tkinter.Frame(
+        # Create the 'container frame' tkinter.Frame widget
+        self._container_frame: tkinter.Frame = tkinter.Frame(
             master=master,
             **kwargs,
         )
 
-        self._container.grid_columnconfigure(
+        self._container_frame.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        self._container.grid_rowconfigure(
+        self._container_frame.grid_rowconfigure(
             index=0,
             weight=0,
         )
 
-        self._container.grid_rowconfigure(
+        self._container_frame.grid_rowconfigure(
             index=1,
             weight=1,
         )
 
-        # Place the 'container' frame widget within the grid
-        self._container.grid(
+        # Place the 'container frame' tkinter.Frame widget within the grid
+        self._container_frame.grid(
             column=column,
             row=row,
             sticky=NSEW,
@@ -958,7 +958,7 @@ class TabbedFrame(tkinter.Frame):
 
         # Create the 'top frame' frame widget
         self._top_frame: tkinter.Frame = tkinter.Frame(
-            master=self._container,
+            master=self._container_frame,
             **kwargs,
         )
 
@@ -973,7 +973,7 @@ class TabbedFrame(tkinter.Frame):
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
-            master=self._container,
+            master=self._container_frame,
             **kwargs,
         )
 
@@ -995,16 +995,16 @@ class TabbedFrame(tkinter.Frame):
         )
 
     @property
-    def container(self) -> tkinter.Frame:
+    def container_frame(self) -> tkinter.Frame:
         """
-        Returns the container frame widget.
+        Returns the 'container frame' tkinter.Frame widget.
 
         Returns:
-            tkinter.Frame: The container frame widget.
+            tkinter.Frame: The 'container frame' tkinter.Frame widget.
         """
 
-        # Return the 'container' frame widget
-        return self._container
+        # Return the 'container frame' tkinter.Frame widget
+        return self._container_frame
 
     @property
     def top_frame(self) -> tkinter.Frame:
@@ -1087,7 +1087,7 @@ class TabbedFrame(tkinter.Frame):
         """
 
         # Convert the passed label to snake case
-        key: str = Miscellaneous.any_to_snake(string=label)
+        key: str = Miscellaneous.any_to_snake(string=label.strip())
 
         # Check, if the tab with the passed label already exists
         if key not in self.tabs:
@@ -1184,13 +1184,13 @@ class TabbedFrame(tkinter.Frame):
         **kwargs,
     ) -> None:
         """
-        Configures the container frame surrounding the canvas and scrollbars.
+        Configures the 'container frame' tkinter.Frame widget surrounding the canvas and scrollbars.
 
         This method allows external customization of the outer frame,
         such as padding, borders, or colors.
 
         Args:
-            **kwargs: Keyword arguments to pass to the container's configure method.
+            **kwargs: Keyword arguments to pass to the 'container frame' tkinter.Frame widget's configure method.
 
         Returns:
             None
@@ -1199,12 +1199,12 @@ class TabbedFrame(tkinter.Frame):
             Exception: Raises an exception if any errors occur while attempting configuration.
         """
         try:
-            # Attempt to configure the 'container' frame widget
-            self._container.configure(**kwargs)
+            # Attempt to configure the 'container frame' tkinter.Frame widget
+            self._container_frame.configure(**kwargs)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_contaier' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message

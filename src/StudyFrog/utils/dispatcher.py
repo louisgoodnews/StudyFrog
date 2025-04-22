@@ -729,6 +729,12 @@ class DispatcherEventSubscription(ImmutableBaseObject):
                     # Log the traceback
                     self.logger.error(message=traceback.format_exc())
 
+                    # Add the function to the result with a Nonetype value
+                    result.result(
+                        key=subscription["function"].__name__,
+                        value=None,
+                    )
+
                     # Add the error to the result indicating that an exception has occurred
                     result.errors(
                         exception=exception,
@@ -897,7 +903,7 @@ class Dispatcher(ImmutableBaseObject):
         """
 
         # Initialize the subscriptions dictionary as an empty dictionary
-        self.subscriptions: Final[Dict[str, DispatcherEventSubscription]] = {}
+        self.subscriptions: Dict[str, DispatcherEventSubscription] = {}
 
     def dispatch(
         self,

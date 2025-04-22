@@ -385,16 +385,8 @@ class PriorityManager(BaseObjectManager):
             int: The number of priorities in the database.
         """
         try:
-            # Count the number of priorities in the database
-            result: Any = asyncio.run(
-                PriorityModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.PRIORITIES};",
-                )
-            )
-
-            # Return the number of priorities in the database
-            return result[0][0] if result else 0
+            # Count and return the number of priorities in the database
+            return asyncio.run(PriorityModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

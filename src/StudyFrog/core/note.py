@@ -707,16 +707,8 @@ class NoteManager(BaseObjectManager):
             int: The number of notes in the database.
         """
         try:
-            # Count the number of notes in the database
-            result: Any = asyncio.run(
-                NoteModel.execute(
-                    database=Constants.DATABASE_PATH,
-                    sql=f"SELECT COUNT(*) FROM {Constants.NOTES};",
-                )
-            )
-
-            # Return the number of notes in the database
-            return result[0][0] if result else 0
+            # Count and return the number of notes in the database
+            return asyncio.run(NoteModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

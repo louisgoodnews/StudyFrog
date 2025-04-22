@@ -67,6 +67,7 @@ from core.ui.user_ui import UserUI
 
 
 from utils.constants import Constants
+from utils.database_service import DatabaseService
 from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.miscellaneous import Miscellaneous
@@ -149,14 +150,10 @@ class BootstrapService(ImmutableBaseObject):
         )
 
         # Initialize the unified object factory instance
-        self.unified_object_factory: UnifiedObjectFactory = (
-            UnifiedObjectFactory()
-        )
+        self.unified_object_factory: UnifiedObjectFactory = UnifiedObjectFactory()
 
         # Initialize the unified object manager instance
-        self.unified_object_manager: UnifiedObjectManager = (
-            UnifiedObjectManager()
-        )
+        self.unified_object_manager: UnifiedObjectManager = UnifiedObjectManager()
 
         # Initialize the unified object service instance
         self.unified_object_service: UnifiedObjectService = UnifiedObjectService(
@@ -409,9 +406,30 @@ class BootstrapService(ImmutableBaseObject):
             # Reraise the exception to the caller
             raise e
 
+    def initialize_database_service(self) -> None:
+        """
+        Initializes the database service.
+
+        This method is called when the shared instance of the BootstrapService is created,
+        and it initializes the database service by calling the `DatabaseService` class.
+
+        Returns:
+            None
+        """
+        try:
+            # Initialize the database service
+            DatabaseService()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to initialize database service: {e}"
+            )
+
+            # Reraise the exception to the caller
+            raise e
+
     def register_factories(self) -> None:
-        """
-        """
+        """ """
         try:
             factories: Dict[str, Type[Any]] = {
                 "answer_factory": AnswerFactory,
@@ -1129,6 +1147,9 @@ class BootstrapService(ImmutableBaseObject):
 
             # Log an info message about running startup tasks
             self.logger.info(message="Running startup tasks....")
+
+            # Initialize the database service
+            self.initialize_database_service()
 
             # Create the database tables
             self.create_tables()

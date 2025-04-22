@@ -3,6 +3,7 @@ Author: lodego
 Date: 2025-03-29
 """
 
+import json
 import traceback
 
 from datetime import datetime
@@ -37,7 +38,7 @@ from utils.miscellaneous import Miscellaneous
 from utils.text_analyzer import TextAnalyzer
 
 
-__all__: Final[List[str]] = ["LearningSessionRunner"]
+__all__: List[str] = ["LearningSessionRunner"]
 
 
 class LearningSessionRunner:
@@ -134,22 +135,22 @@ class LearningSessionRunner:
         """
 
         # Initialize the logger
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
+        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize an empty list to store the session's contents
-        self.contents: Final[List[str]] = []
+        self.contents: List[str] = []
 
         # Initialize the current content index
         self.content_index: int = -1
 
         # Store the passed difficulty list in an immutable instance variable
-        self.difficulties: Final[List[Union[ImmutableDifficulty]]] = difficulties
+        self.difficulties: List[Union[ImmutableDifficulty]] = difficulties
 
         # Store the passed dispatcher instance in an immutable instance variable
-        self.dispatcher: Final[Dispatcher] = dispatcher
+        self.dispatcher: Dispatcher = dispatcher
 
         # Initialize an empty list to store the session's items
-        self.items: Final[List[str]] = []
+        self.items: List[str] = []
 
         # Initialize the current item index
         self.item_index: int = -1
@@ -161,22 +162,22 @@ class LearningSessionRunner:
         self.learning_session_item: Optional[ImmutableLearningSessionItem] = None
 
         # Store the passed mode in an immutable instance variable
-        self.mode: Final[str] = mode
+        self.mode: str = mode
 
         # Store the passed namespace in an immutable instance variable
-        self.namespace: Final[str] = namespace
+        self.namespace: str = namespace
 
         # Store the passed priority list in an immutable instance variable
-        self.priorities: Final[List[Union[ImmutablePriority]]] = priorities
+        self.priorities: List[Union[ImmutablePriority]] = priorities
 
         # Store the passed settings dictionary in an immutable instance variable
-        self.settings: Final[Dict[str, Any]] = settings
+        self.settings: Dict[str, Any] = settings
 
         # Store the passed stack list in an immutable instance variable
-        self.stacks: Final[List[Union[ImmutableStack, MutableStack]]] = stacks
+        self.stacks: List[Union[ImmutableStack, MutableStack]] = stacks
 
         # Initialize an empty list to store the subscription UUIDs
-        self.subscriptions: Final[List[str]] = []
+        self.subscriptions: List[str] = []
 
         # Initialize the text analyzer
         self.text_analyzer: Optional[TextAnalyzer] = None
@@ -208,19 +209,78 @@ class LearningSessionRunner:
         """
         try:
             # Initialize an empty list to store the filtered contents
-            self.contents: Final[List[str]] = []
+            self.contents: List[str] = []
 
             # Get the keys of the stacks
             keys: List[str] = []
 
             for stack in self.stacks:
-                # Add the contents of the stack to the list
-                keys.extend(stack.contents)
+                # Check, if the stack has contents
+                if stack.has_contents():
+                    # Add the contents of the stack to the list
+                    keys.extend(
+                        json.loads(stack.contents)
+                        if not isinstance(stack.contents, list)
+                        else stack.contents
+                    )
 
-                # Check if the stack has descendants
-                if stack.has_descendants():
-                    # Add the descendants of the stack to the list
-                    keys.extend(stack.descendants)
+                # Check, if the stack has descendants
+                if not stack.has_descendants():
+                    # Skip the current iteration
+                    continue
+
+                # Obtain the stack's descendants
+                descendants: List[str] = (
+                    json.loads(stack.descendants)
+                    if not isinstance(stack.descendants, list)
+                    else stack.descendants
+                )
+
+                # Iterate over the descendants of the current stack
+                for key in descendants:
+                    # Dispatch the REQUEST_STACK_LOOKUP event in the 'global' namespace
+                    descendant_notification: Optional[DispatcherNotification] = (
+                        self.dispatcher.dispatch(
+                            event=Events.REQUEST_STACK_LOOKUP,
+                            key=key,
+                            namespace=Constants.GLOBAL_NAMESPACE,
+                        )
+                    )
+
+                    # Check, if the descendant notification exists or has errors
+                    if (
+                        not descendant_notification
+                        or descendant_notification.has_errors()
+                    ):
+                        # Log a warning message
+                        self.logger.warning(
+                            message=f"Failed to dispatch 'REQUEST_STACK_LOOKUP' in 'global' namespace. Skipping..."
+                        )
+
+                        # Skip the current iteration
+                        continue
+
+                    # Get the one and only result (the descendant stack) from the descendant notification
+                    descendant_stack: Optional[ImmutableStack] = (
+                        descendant_notification.get_one_and_only_result()
+                    )
+
+                    # Check, if the ImmutableStack descendant stack exists
+                    if not descendant_stack:
+                        # Log a warning message
+                        self.logger.warning(
+                            message=f"Failed to obtain ImmutableStack with key '{key}' from the database. Skipping..."
+                        )
+
+                        # Skip the current iteration
+                        continue
+
+                    # Add the contents of the descendant stack to the list
+                    keys.extend(
+                        json.loads(descendant_stack.contents)
+                        if not isinstance(descendant_stack.contents, list)
+                        else descendant_stack.contents
+                    )
 
             # Dispatch a request to get the contents of the stacks
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
@@ -240,7 +300,13 @@ class LearningSessionRunner:
 
             # Get the contents of the stacks
             contents: Optional[
-                List[Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion]]
+                List[
+                    Union[
+                        ImmutableFlashcard,
+                        ImmutableNote,
+                        ImmutableQuestion,
+                    ]
+                ]
             ] = notification.get_one_and_only_result()
 
             if not contents:
@@ -407,9 +473,29 @@ class LearningSessionRunner:
             # The settings are set to the settings of the learning session
             builder.settings(value=self.settings)
 
+            # Initialize an empty list for the stacks
+            stacks: List[str] = []
+
+            # Iterate over the stacks in this object
+            for stack in self.stacks:
+                # Append the stack's key to the stacks list
+                stacks.append(stack.key)
+
+                # Check, if the stack has descendants
+                if not stack.has_descendants():
+                    # Skip the current iteration
+                    continue
+
+                # Extend the stacks list with the descendants of the stack
+                stacks.extend(
+                    json.loads(stack.descendants)
+                    if not isinstance(stack.descendants, list)
+                    else stack.descendants
+                )
+
             # Set the stacks of the learning session
             # The stacks are set to the stacks of the learning session
-            builder.stacks(value=[stack.id for stack in self.stacks])
+            builder.stacks(value=stacks)
 
             # Set the start of the learning session
             # The start is set to the current datetime
@@ -469,15 +555,16 @@ class LearningSessionRunner:
 
                 # Set the end time of the learning session item
                 learning_session_item.set(
-                    name="end", value=Miscellaneous.get_current_datetime()
+                    name="end",
+                    value=Miscellaneous.get_current_datetime(),
                 )
 
                 # Set the duration of the learning session item
                 learning_session_item.set(
                     name="duration",
                     value=(
-                        self.learning_session_item.end
-                        - self.learning_session_item.start
+                        learning_session_item.end
+                        - learning_session_item.start
                     ).total_seconds(),
                 )
 
@@ -522,6 +609,9 @@ class LearningSessionRunner:
 
             # The learning session item is retrieved from the notification
             self.learning_session_item = create_notification.get_one_and_only_result()
+
+            # Convert the learning session into a mutable type
+            self.learning_session = self.learning_session.to_mutable()
 
             # Add the learning session item to the learning session
             self.learning_session.add_child(child=self.learning_session_item)
@@ -650,7 +740,12 @@ class LearningSessionRunner:
             builder.action_metadata(
                 value={
                     # The action number
-                    "action_number": len(self.learning_session_item.actions) + 1,
+                    "action_number": len(
+                        json.loads(self.learning_session_item.actions)
+                        if not isinstance(self.learning_session_item.actions, list)
+                        else self.learning_session_item.actions
+                    )
+                    + 1,
                     # The flashcard that was flipped
                     "flashcard": {
                         "id": flashcard.id,
@@ -710,23 +805,29 @@ class LearningSessionRunner:
                 return
 
             # The learning session action is retrieved from the notification
-            learning_session_action: ImmutableLearningSessionAction = (
+            learning_session_action: Optional[ImmutableLearningSessionAction] = (
                 create_notification.get_one_and_only_result()
             )
 
+            # Check, if the ImmutableLearningSessionAction object exists
+            if not learning_session_action:
+                # Log a warning message
+                self.logger.warning(message=f"ImmutableLearningSessionAction does not exist in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class.")
+
+                # Return early
+                return
+
             # Convert the learning session item to mutable
-            learning_session_item: MutableLearningSessionItem = (
-                self.learning_session_item.to_mutable()
-            )
+            self.learning_session_item = self.learning_session_item.to_mutable()
 
             # Append the key of the learning session action to the actions of the learning session item
-            learning_session_item.actions.append(learning_session_action.key)
+            self.learning_session_item.add_action(action=learning_session_action)
 
             update_notification: Optional[DispatcherNotification] = (
                 self.dispatcher.dispatch(
                     event=Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
                     namespace=Constants.GLOBAL_NAMESPACE,
-                    learning_session_item=learning_session_item,
+                    learning_session_item=self.learning_session_item,
                 )
             )
 
@@ -765,10 +866,10 @@ class LearningSessionRunner:
 
         Args:
             difficulty (Literal["easy", "medium", "hard"]): The difficulty level of the flashcard.
-        
+
         Returns:
             None
-        
+
         Raises:
             Exception: If an exception occurs while attempting to run the method.
         """
@@ -883,7 +984,12 @@ class LearningSessionRunner:
             builder.action_metadata(
                 value={
                     # The action number
-                    "action_number": len(self.learning_session_item.actions) + 1,
+                    "action_number": len(
+                        json.loads(self.learning_session_item.actions)
+                        if not isinstance(self.learning_session_item.actions, list)
+                        else self.learning_session_item.actions
+                    )
+                    + 1,
                     "difficulty": {
                         "from": {
                             "id": content_difficulty.id,

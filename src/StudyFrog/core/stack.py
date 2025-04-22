@@ -4,6 +4,7 @@ Date: 2025-02-05
 """
 
 import asyncio
+import json
 
 from datetime import datetime
 
@@ -389,9 +390,17 @@ class MutableStack(MutableBaseObject):
         """
 
         # If the stack currently has no contents, create an empty list
-        if not self.get(name="contents") or not isinstance(self.contents, list):
+        if not self.contents:
             # Initialize the contents list as an empty list
             self.contents = []
+
+        # Check, if the stack's contents is an instance of string
+        if isinstance(
+            self.contents,
+            str,
+        ):
+            # Convert the contents string into a list
+            self.contents = json.loads(self.contents)
 
         # Append the key of the given object to the stack's contents
         self.contents.append(content.get(name="key"))
@@ -408,12 +417,20 @@ class MutableStack(MutableBaseObject):
         """
 
         # If the stack currently has no descendants, create an empty list
-        if not self["descendants"]:
+        if not self.descendants:
             # Initialize the descendants list as an empty list
-            self["descendants"] = []
+            self.descendants = []
+
+        # Check, if the stack's descendants is an instance of string
+        if isinstance(
+            self.descendants,
+            str,
+        ):
+            # Convert the descendants string into a list
+            self.descendants = json.loads(self.descendants)
 
         # Append the key of the given object to the stack's descendants
-        self["descendants"].append(descendant.key)
+        self.descendants.append(descendant.get(name="key"))
 
     def get_content_grouped_by(
         self,
@@ -1035,9 +1052,12 @@ class StackManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_all_stacks(self) -> Optional[List[ImmutableStack]]:
+    def get_all_stacks(self, force_refetch: bool = False,) -> Optional[List[ImmutableStack]]:
         """
         Returns a list of all stacks in the database.
+
+        Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
             Optional[List[ImmutableStack]]: A list of all stacks in the database if no exception occurs. Otherwise, None.
@@ -1046,10 +1066,12 @@ class StackManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_stacks():
-                # Return the list of immutable stacks from the cache
-                return self.get_cache_values()
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if cache and table size are equal
+                if self.cache and len(self._cache) == self.count_stacks():
+                    # Return the list of immutable stacks from the cache
+                    return self.get_cache_values()
 
             # Get all stacks from the database
             models: List[StackModel] = asyncio.run(
@@ -1092,12 +1114,14 @@ class StackManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableStack]:
         """
         Retrieves a stack by the given field and value.
 
         Args:
             field (str): The field to search by.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             value (Any): The value to search for.
 
         Returns:
@@ -1107,10 +1131,12 @@ class StackManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the stack is already in the cache
-            if self.is_key_in_cache(key=field):
-                # Return the stack from the cache
-                return self.get_value_from_cache(key=field)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the stack is already in the cache
+                if self.is_key_in_cache(key=field):
+                    # Return the stack from the cache
+                    return self.get_value_from_cache(key=field)
 
             # Get the stack with the given field and value from the database
             model: Optional[StackModel] = asyncio.run(
@@ -1156,11 +1182,13 @@ class StackManager(BaseObjectManager):
     def get_stack_by_id(
         self,
         id: int,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableStack]:
         """
         Returns a stack with the given ID.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             id (int): The ID of the stack.
 
         Returns:
@@ -1170,10 +1198,12 @@ class StackManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the stack is already in the cache
-            if self.is_key_in_cache(key=f"STACK_{id}"):
-                # Return the stack from the cache
-                return self.get_value_from_cache(key=f"STACK_{id}")
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the stack is already in the cache
+                if self.is_key_in_cache(key=f"STACK_{id}"):
+                    # Return the stack from the cache
+                    return self.get_value_from_cache(key=f"STACK_{id}")
 
             # Get the stack with the given ID from the database
             model: Optional[StackModel] = asyncio.run(
@@ -1216,14 +1246,83 @@ class StackManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def get_stack_by_key(
+        self,
+        key: str,
+        force_refetch: bool = False,
+    ) -> Optional[ImmutableStack]:
+        """
+        Returns a stack with the given key.
+
+        Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
+            key (str): The key of the stack.
+
+        Returns:
+            Optional[ImmutableStack]: The stack with the given key if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the stack is already in the cache
+                if self.is_key_in_cache(key=key):
+                    # Return the stack from the cache
+                    return self.get_value_from_cache(key=key)
+
+            # Get the stack with the given ID from the database
+            model: Optional[StackModel] = asyncio.run(
+                StackModel.get_by(
+                    column="key",
+                    database=Constants.DATABASE_PATH,
+                    value=key,
+                )
+            )
+
+            # Return the stack if it exists
+            if model is not None:
+                # Convert the StackModel object to an ImmutableStack object
+                stack: ImmutableStack = StackFactory.create_stack(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+
+                # Add the stack to the cache
+                self.add_to_cache(
+                    key=stack.key,
+                    value=stack,
+                )
+
+                # Return the stack
+                return stack
+            else:
+                # Return None indicating that the stack does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_key' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def get_stack_by_uuid(
         self,
         uuid: str,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableStack]:
         """
         Returns a stack with the given UUID.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             uuid (str): The UUID of the stack.
 
         Returns:
@@ -1233,10 +1332,12 @@ class StackManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the stack is already in the cache
-            if self.is_key_in_cache(key=uuid):
-                # Return the stack from the cache
-                return self.get_value_from_cache(key=uuid)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the stack is already in the cache
+                if self.is_key_in_cache(key=uuid):
+                    # Return the stack from the cache
+                    return self.get_value_from_cache(key=uuid)
 
             # Get the stack with the given UUID from the database
             model: Optional[StackModel] = asyncio.run(
@@ -1301,7 +1402,9 @@ class StackManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableStack]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableStack]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:

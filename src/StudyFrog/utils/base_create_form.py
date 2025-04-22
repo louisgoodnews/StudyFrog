@@ -226,26 +226,44 @@ class BaseCreateForm(tkinter.Frame):
             "widget": field,
         }
 
-    def clear(self) -> None:
+    def clear(
+        self,
+        exclude: Optional[List[str]] = None,
+    ) -> None:
         """
         Clears all registered field values.
 
         This method resets all field widgets to their default state and clears the internal value dictionary.
 
         Args:
-            None
+            exclude (list, optional): An optional list of fields to exclude. Defaults to None
 
         Returns:
             None
         """
 
-        # Iterate over the registered field widgets
-        for field in self._field_dict.values():
+        # Iterate over the registered labels and field widgets
+        for (
+            label,
+            field,
+        ) in self._field_dict.items():
+            # Check, if the current label is contained within the exclude list (if it exists)
+            if exclude and label in exclude:
+                # Skip the current iterartion
+                continue
+
             # Call the field widget's 'clear' function
             field["widget"].clear(dispatch=False)
 
-        # Clear the value dictionary instance variable
-        self._value_dict.clear()
+        # Iterate over the keys in the value dictionary instance variable
+        for key in self._value_dict.keys():
+            # Check, if the current key is contained within the exclude list (if it exists)
+            if exclude and key in exclude:
+                # Skip the current iterartion
+                continue
+
+            # Set the value associated to the current key from the value dictionary instance variable to None
+            self._value_dict[key] = {"value": None}
 
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """

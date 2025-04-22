@@ -30,6 +30,8 @@ class ImmutableBaseModel(ImmutableBaseObject):
         logger (Logger): The logger instance associated with the object.
     """
 
+    database_service: DatabaseService = DatabaseService()
+
     logger: Final[Logger] = Logger.get_logger(name="ImmutableBaseModel")
 
     def __init__(
@@ -53,7 +55,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
     async def count(
         cls,
         database: str,
-    ) -> Optional[int]:
+    ) -> int:
         """
         Counts the number of entries in the database table.
 
@@ -61,25 +63,37 @@ class ImmutableBaseModel(ImmutableBaseObject):
             database (str): The path to the database.
 
         Returns:
-            Optional[int]: The number of entries in the database table, or None if the table does not exist.
+            int: The number of entries in the database table or 0 if an exception occurred.
         """
         try:
             # Count the number of entries in the database table
-            result: Optional[Any] = await DatabaseService.execute(
-                database=database,
-                sql=f"SELECT COUNT(*) FROM {cls.table};",
+            result: Union[bool, List[Dict[str, Any]]] = (
+                await cls.database_service.execute(
+                    database=database,
+                    sql=f"SELECT COUNT(*) FROM {cls.table};",
+                )
             )
 
-            # Return the number of entries in the database table
-            return result[0][0] if result else 0
+            # Check, if the execute operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Failed to count entries in table '{cls.table}' in the database."
+                )
+
+                # Return 0 indicating an exception occurred
+                return 0
+
+            # Return the number of entries in the database table or 0
+            return result["COUNT(*)"] or 0
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'count' method from '{cls.__name__}' class: {e}"
             )
 
-            # Return None indicating an exception occurred
-            return None
+            # Return 0 indicating an exception occurred
+            return 0
 
     async def create(
         self,
@@ -118,11 +132,29 @@ class ImmutableBaseModel(ImmutableBaseObject):
             sql = f"INSERT INTO {self.table} ({columns}) VALUES ({placeholders});"
 
             # Execute SQL command and return the last row ID
-            return await DatabaseService.create(
+            result: Union[bool, int] = await self.database_service.create(
                 database=database,
                 parameters=parameters,
                 sql=sql,
             )
+
+            # Check, if the create operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create entry in table '{self.table}' in the database."
+                )
+
+                # Return None indicating the operation was not successful
+                return None
+
+            # Log an info message
+            self.logger.info(
+                message=f"Created entry in table '{self.table}' in the database."
+            )
+
+            # Return the ID of the newly created entry
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -156,11 +188,23 @@ class ImmutableBaseModel(ImmutableBaseObject):
             )
 
             # Execute the SQL query
-            await DatabaseService.execute(
-                database=database,
-                parameters=(),
-                sql=sql,
+            result: Union[bool, List[Dict[str, Any]]] = (
+                await cls.database_service.execute(
+                    database=database,
+                    parameters=(),
+                    sql=sql,
+                )
             )
+
+            # Check, if the create operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Failed to create table '{cls.table}' in the database."
+                )
+
+                # Return False indicating the operation was not successful
+                return False
 
             # Log an info message
             cls.logger.info(message=f"Created table '{cls.table}' in the database.")
@@ -197,18 +241,34 @@ class ImmutableBaseModel(ImmutableBaseObject):
             sql: str = f"DELETE FROM {self.table} WHERE id = ?"
 
             # Execute the SQL query
-            return await DatabaseService.delete(
+            result: Union[bool, int] = await self.database_service.delete(
                 database=database,
                 parameters=(self.id,),
                 sql=sql,
             )
+
+            # Check, if the delete operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to delete model instance from the database."
+                )
+
+                # Return False indicating the operation was not successful
+                return False
+
+            # Log an info message
+            self.logger.info(message=f"Deleted model instance from the database.")
+
+            # Return True indicating the operation was successful
+            return True
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}' class: {e}"
             )
 
-            # Return False indicating the operation failed
+            # Return False indicating the operation failed (i.e., if a boolean was returned)
             return False
 
     @classmethod
@@ -233,11 +293,23 @@ class ImmutableBaseModel(ImmutableBaseObject):
             sql: str = f"DROP TABLE IF EXISTS {cls.table}"
 
             # Execute the SQL query
-            await DatabaseService.execute(
-                database=database,
-                parameters=(),
-                sql=sql,
+            result: Union[bool, List[Dict[str, Any]]] = (
+                await cls.database_service.execute(
+                    database=database,
+                    parameters=(),
+                    sql=sql,
+                )
             )
+
+            # Check, if the drop operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Failed to drop table '{cls.table}' from the database."
+                )
+
+                # Return False indicating the operation was not successful
+                return False
 
             # Log an info message
             cls.logger.info(message=f"Dropped table '{cls.table}' from the database.")
@@ -250,7 +322,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'drop_table' method from '{cls.__name__}' class: {e}"
             )
 
-            # Return False indicating the operation failed
+            # Return False indicating the operation failed (i.e., if a boolean was returned)
             return False
 
     @classmethod
@@ -273,11 +345,25 @@ class ImmutableBaseModel(ImmutableBaseObject):
         """
         try:
             # Execute the SQL query
-            return await DatabaseService.execute(
+            result: Union[bool, int] = await cls.database_service.execute(
                 database=database,
                 parameters=parameters,
                 sql=sql,
             )
+
+            # Check, if the execute operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(message=f"Failed to execute SQL query: {sql}")
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Log an info message
+            cls.logger.info(message=f"Executed SQL query: {sql}")
+
+            # Return the result of the query
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
@@ -291,7 +377,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
     async def get_all(
         cls,
         database: str,
-    ) -> List[T]:
+    ) -> List[Any]:
         """
         Retrieves all rows from the model's table.
 
@@ -299,7 +385,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             database (str): Path to the SQLite database file.
 
         Returns:
-            List[T]: List of model instances.
+            List[Any]: List of model instances.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -309,15 +395,27 @@ class ImmutableBaseModel(ImmutableBaseObject):
             sql: str = f"SELECT * FROM {cls.table}"
 
             # Execute the SQL query
-            rows: List[Dict[str, Any]] = await DatabaseService.read_all(
-                database=database,
-                parameters=(),
-                sql=sql,
+            result: Union[bool, List[Dict[str, Any]]] = (
+                await cls.database_service.read_all(
+                    database=database,
+                    parameters=(),
+                    sql=sql,
+                )
             )
+
+            # Check, if the read_all operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Failed to retrieve rows from table '{cls.table}' in the database."
+                )
+
+                # Return an empty list indicating an exception occurred
+                return []
 
             # Return the model instances
             return [
-                cls(**Miscellaneous.convert_from_db_format(data=row)) for row in rows
+                cls(**Miscellaneous.convert_from_db_format(data=row)) for row in result
             ]
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -330,11 +428,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
 
     @classmethod
     async def get_by(
-        cls: Type[T],
+        cls,
         database: str,
         column: str,
         value: Any,
-    ) -> Optional[Union[T, List[T]]]:
+    ) -> Optional[Union[Any, List[Any]]]:
         """
         Looks up models in the database by a column value.
 
@@ -344,33 +442,45 @@ class ImmutableBaseModel(ImmutableBaseObject):
             value (Any): Value to match.
 
         Returns:
-            Optional[Union[T, List[T]]]: The model instance if found, otherwise None.
+            Optional[Union[Any, List[Any]]]: The model instance if found, otherwise None.
         """
         try:
             # Build the SQL query to find entries where the specified column matches the given value
             sql: str = f"SELECT * FROM {cls.table} WHERE {column} LIKE ?"
 
             # Execute the SQL query and retrieve all matching rows
-            rows: List[Dict[str, Any]] = await DatabaseService.read_all(
-                database=database,
-                parameters=(value,),
-                sql=sql,
+            result: Union[bool, List[Dict[str, Any]]] = (
+                await cls.database_service.read_all(
+                    database=database,
+                    parameters=(value,),
+                    sql=sql,
+                )
             )
 
+            # Check, if the read_all operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Failed to retrieve rows from table '{cls.table}' in the database."
+                )
+
+                # Return None indicating an exception occurred
+                return None
+
             # Check if no rows were returned
-            if len(rows) == 0:
+            if len(result) == 0:
                 # Return None if no entries are found
                 return None
 
             # Check if only one row was returned
-            if len(rows) == 1:
+            if len(result) == 1:
                 # Convert the single row to a model instance and return it
-                return cls(**Miscellaneous.convert_from_db_format(data=rows[0]))
+                return cls(**Miscellaneous.convert_from_db_format(data=result[0]))
             else:
                 # Return a list of model instances for all matching rows
                 return [
                     cls(**Miscellaneous.convert_from_db_format(data=row))
-                    for row in rows
+                    for row in result
                 ]
         except Exception as e:
             # Log an error message indicating an exception occurred
@@ -386,7 +496,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
         cls,
         database: str,
         **kwargs,
-    ) -> Optional[List[T]]:
+    ) -> Optional[List[Any]]:
         """
         Searches for entries in the database using the provided keyword arguments.
 
@@ -395,7 +505,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             **kwargs: The keyword arguments to use as search conditions.
 
         Returns:
-            Optional[List[T]]: A list of model instances if multiple entries were found, or None if no entries were found in the database.
+            Optional[List[Any]]: A list of model instances if multiple entries were found, or None if no entries were found in the database.
         """
         try:
             # Initialize the conditions list as an empty list
@@ -419,30 +529,35 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 if field["type"] == "INTEGER":
                     # Add a condition to the SQL query to filter by the INTEGER field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "TEXT":
                     # Add a condition to the SQL query to filter by the TEXT field
                     conditions.append(f"{key} LIKE ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "VARCHAR":
                     # Add a condition to the SQL query to filter by the VARCHAR field
                     conditions.append(f"{key} LIKE ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "REAL":
                     # Add a condition to the SQL query to filter by the REAL field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "FLOAT":
                     # Add a condition to the SQL query to filter by the FLOAT field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
@@ -455,6 +570,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 elif field["type"] == "NUMERIC":
                     # Add a condition to the SQL query to filter by the NUMERIC field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
@@ -465,42 +581,56 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 elif field["type"] == "DATE":
                     # Add a condition to the SQL query to filter by the DATE field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "DATETIME":
                     # Add a condition to the SQL query to filter by the DATETIME field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "TIME":
                     # Add a condition to the SQL query to filter by the TIME field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "BLOB":
                     # Add a condition to the SQL query to filter by the BLOB field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "BOOLEAN":
                     # Add a condition to the SQL query to filter by the BOOLEAN field
                     conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "JSON":
                     # Add a condition to the SQL query to filter by the JSON field
                     conditions.append(f"JSON_CONTAINS({key}, ?)")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
                 elif field["type"] == "ARRAY":
                     # Add a condition to the SQL query to filter by the ARRAY field
                     conditions.append(f"JSON_CONTAINS({key}, ?)")
+
+                    # Add the value to the parameters list
+                    parameters.append(value)
+
+                elif field["type"] == "UUID":
+                    # Add a condition to the SQL query to filter by the UUID field
+                    conditions.append(f"{key} = ?")
+
                     # Add the value to the parameters list
                     parameters.append(value)
 
@@ -514,20 +644,32 @@ class ImmutableBaseModel(ImmutableBaseObject):
             sql: str = f"SELECT * FROM {cls.table} WHERE {' AND '.join(conditions)}"
 
             # Execute the SQL query and retrieve all matching rows
-            rows: List[Dict[str, Any]] = await DatabaseService.read_all(
-                database=database,
-                parameters=parameters,
-                sql=sql,
+            result: Union[bool, List[Dict[str, Any]]] = (
+                await cls.database_service.read_all(
+                    database=database,
+                    parameters=parameters,
+                    sql=sql,
+                )
             )
 
+            # Check, if the read operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Failed to search entries from table '{cls.table}' in the database. SQL: '{sql}' | Parameters: '{parameters}'."
+                )
+
+                # Return None indicating the operation was not successful
+                return None
+
             # Check, if the result list is empty
-            if len(rows) == 0:
+            if len(result) == 0:
                 # Return None indicating no entries were found in the database
                 return None
 
             # Return the list of model instances if multiple entries were found
             return [
-                cls(**Miscellaneous.convert_from_db_format(data=row)) for row in rows
+                cls(**Miscellaneous.convert_from_db_format(data=row)) for row in result
             ]
         except Exception as e:
             # Log an error message indicating an exception occurred
@@ -587,14 +729,32 @@ class ImmutableBaseModel(ImmutableBaseObject):
             sql: str = f"UPDATE {self.table} SET {updates} WHERE id = ?"
 
             # Execute the SQL query
-            return (
-                await DatabaseService.update(
+            result: Union[bool, int] = (
+                await self.database_service.update(
                     database=database,
                     parameters=parameters,
                     sql=sql,
                 )
-                > 0
+                is not None
             )
+
+            # Check, if the update operation failed (i.e., if a boolean was returned)
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to update entry in table '{self.table}' in the database."
+                )
+
+                # Return False indicating the operation was not successful
+                return False
+
+            # Log an info message
+            self.logger.info(
+                message=f"Updated entry in table '{self.table}' in the database."
+            )
+
+            # Return True indicating the operation was successful
+            return True
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -620,18 +780,40 @@ class ImmutableBaseModel(ImmutableBaseObject):
         """
         try:
             # Execute the CREATE TABLE statement
-            await DatabaseService.execute(
+            result: Union[bool, int] = await cls.database_service.execute(
                 database=database,
                 parameters=(),
                 sql=f"CREATE TABLE IF NOT EXISTS {cls.table} ({', '.join([value.to_sql_string() for value in cls.__dict__.values() if isinstance(value, Field)])})",
             )
 
+            # Check, if the table creation failed
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Failed to create table '{cls.table}' in the database."
+                )
+
+                # Return None indicating the operation was not successful
+                return None
+
             # Get the existing columns
-            existing_columns: List[Tuple[Any, ...]] = await DatabaseService.execute(
-                database=database,
-                parameters=(),
-                sql=f"PRAGMA table_info({cls.table});",
+            existing_columns: Union[bool, List[Dict[str, Any]]] = (
+                await cls.database_service.execute(
+                    database=database,
+                    parameters=(),
+                    sql=f"PRAGMA table_info({cls.table});",
+                )
             )
+
+            # Check, if the table information retrieval failed
+            if isinstance(result, bool) and not result:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Failed to retrieve table information for table '{cls.table}' in the database."
+                )
+
+                # Return None indicating the operation was not successful
+                return None
 
             # Add missing columns
             for (
@@ -642,7 +824,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
                     column[1] == field_name for column in existing_columns
                 ):
                     # Execute the ALTER TABLE statement
-                    await DatabaseService.execute(
+                    await cls.database_service.execute(
                         database=database,
                         parameters=(),  # Empty tuple
                         sql=f"ALTER TABLE {cls.table} ADD COLUMN {field.to_sql_string()};",
@@ -652,7 +834,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
             for column in existing_columns:
                 if column[1] not in cls.__dict__:
                     # Execute the ALTER TABLE statement
-                    await DatabaseService.execute(
+                    await cls.database_service.execute(
                         database=database,
                         parameters=(),  # Empty tuple
                         sql=f"ALTER TABLE {cls.table} DROP COLUMN {column[1]};",

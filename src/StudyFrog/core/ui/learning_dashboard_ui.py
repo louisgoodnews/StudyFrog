@@ -1,24 +1,22 @@
 """
 Author: lodego
-Date: 2025-03-15
+Date 2025-04-21
 """
 
 import tkinter
+import traceback
 
 from tkinter.constants import *
-
 from typing import *
 
 from core.setting import SettingService
 
-from utils.base_ui import BaseUI
-from core.ui.ui_builder import UIBuilder
+from core.ui.frames.frames import ScrolledFrame, TabbedFrame
 
+from utils.base_ui import BaseUI
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
-from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectManager
 
@@ -28,30 +26,29 @@ __all__: Final[List[str]] = ["LearningDashboardUI"]
 
 class LearningDashboardUI(BaseUI):
     """
-    A class representing the learning dashboard user interface (UI) of the application.
+    A class that represents the learning dashboard UI in the StudyFrog application.
 
-    This class is responsible for initializing and configuring the layout of the
-    learning dashboard UI, including setting up the main frames and populating them with
-    respective widgets. It extends the tkinter.Frame class and utilizes various
-    utility classes for managing navigation, logging, and other functionalities.
+    This class extends the BaseUI class and is responsible for creating and
+    managing the learning dashboard UI.
 
     Attributes:
         dispatcher (Dispatcher): The dispatcher instance.
         logger (Logger): The logger instance.
-        navigation_item (NavigationHistoryItem): The navigation history item instance.
+        master (tkinter.Misc): The parent widget.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
+        navigation_item (NavigationHistoryItem): The navigation history item instance.
     """
 
     def __init__(
         self,
         dispatcher: Dispatcher,
         master: tkinter.Misc,
-        navigation_item: NavigationHistoryItem,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
         unified_manager: UnifiedObjectManager,
+        navigation_item: Optional[NavigationHistoryItem] = None,
     ) -> None:
         """
         Initializes a new instance of the LearningDashboardUI class.
@@ -59,657 +56,503 @@ class LearningDashboardUI(BaseUI):
         Args:
             dispatcher (Dispatcher): The dispatcher instance.
             master (tkinter.Misc): The parent widget.
-            navigation_item (NavigationHistoryItem): The navigation history item instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
+            navigation_item (NavigationHistoryItem): The navigation history item instance.
 
         Returns:
             None
         """
 
-        # Call the parent class constructor
+        # Call the parent class constructor with the passed arguments
         super().__init__(
             dispatcher=dispatcher,
             master=master,
             name="learning_dashboard_ui",
-            navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
             unified_manager=unified_manager,
+            navigation_item=navigation_item,
         )
 
-    def collect_subscriptions(self) -> List[Dict[str, Any]]:
-        """
-        Collects and returns a list of subscriptions.
+        # Update idletasks
+        self.update_idletasks()
 
-        This method should be implemented by subclasses to provide
-        a list containing event subscriptions. Each subscription
-        is associated with specific events and their corresponding
-        handlers.
+    def _on_stack_select_button_click(self) -> None:
+        """
+        Handles the click event of the stack select button in the learning dashboard UI.
+
+        This method dispatches the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace
+        to request that the navigation service validate the navigation to the
+        'learning_stack_selection_ui' target.
 
         Returns:
-            List[Dict[str, Any]]: A list representing the subscriptions for events.
+            None
 
         Raises:
-            NotImplementedError: If the method is not implemented
-            by a subclass.
+            Exception: If an error occurs during dispatch or internal processing.
         """
+        try:
+            # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                direction=Constants.FORWARD_DIRECTION,
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                source="learning_dashboard_ui",
+                target="learning_stack_selection_ui",
+            )
 
-        subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
+            # Check, if the notification exists or has errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_VALIDATE_NAVIGATION' event in 'global' namespace in '{self.__class__.__name__}' class. Errors: {notification.get_errors() if notification else None}"
+                )
 
-        return subscriptions
+                # Return early
+                return
+        except Exception as e:
+            # Log an error message
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_on_stack_select_button_click' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
 
     @override
     def configure_grid(self) -> None:
         """
-        Configures the grid of the stack selection user interface.
+        Configures the grid of the LearningDashboardUI widget.
 
-        This method configures the grid of the stack selection user interface by setting the
-        weights of the columns and rows.
+        This method configures the grid of the LearningDashboardUI widget by setting
+        the weights of the columns and rows.
+
+        Args:
+            None
 
         Returns:
             None
         """
 
-        # Configure the weight of the 0th column to 1.
+        # Configure the LearningDashbardUI widget's 0th column to weight 1
         self.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the weight of the 0th row to 0.
+        # Configure the LearningDashbardUI widget's 0th row to weight 0
         self.grid_rowconfigure(
             index=0,
             weight=0,
         )
 
-        # Configure the weight of the 1st row to 1.
+        # Configure the LearningDashbardUI widget's 1st row to weight 1
         self.grid_rowconfigure(
             index=1,
             weight=1,
         )
 
-        # Configure the weight of the 2nd row to 0.
+        # Configure the LearningDashbardUI widget's 2nd row to weight 0
         self.grid_rowconfigure(
             index=2,
             weight=0,
         )
 
-    @override
-    def create_widgets(self) -> None:
-        """
-        Creates and configures the main widgets of the stack selection user interface.
-
-        This method creates and configures the main widgets of the stack selection user
-        interface, setting their layout configuration and invoking methods to populate
-        each frame with its respective widgets.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an exception occurs during the creation or configuration of the widgets.
-        """
-        try:
-            # Create the top frame widget
-            top_frame: Optional[tkinter.Frame] = tkinter.Frame(
-                background=Constants.BLUE_GREY["700"],
-                height=25,
-                master=self,
-            )
-
-            # Create the center frame widget
-            center_frame: Optional[tkinter.Frame] = tkinter.Frame(
-                background=Constants.BLUE_GREY["700"],
-                master=self,
-            )
-
-            # Create the bottom frame widget
-            bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
-                background=Constants.BLUE_GREY["700"],
-                height=25,
-                master=self,
-            )
-
-            # Check if all frames were created successfully
-            if not all(
-                [
-                    top_frame,
-                    center_frame,
-                    bottom_frame,
-                ]
-            ):
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create frames in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
-
-            # Place the top frame widget in the main window
-            top_frame.grid(
-                column=0,
-                row=0,
-                sticky=NSEW,
-            )
-
-            # Place the center frame widget in the main window
-            center_frame.grid(
-                column=0,
-                row=1,
-                sticky=NSEW,
-            )
-
-            # Place the bottom frame widget in the main window
-            bottom_frame.grid(
-                column=0,
-                row=2,
-                sticky=NSEW,
-            )
-
-            # Create and configure the top frame widgets
-            self.create_top_frame_widgets(master=top_frame)
-
-            # Create and configure the center frame widgets
-            self.create_center_frame_widgets(master=center_frame)
-
-            # Create and configure the bottom frame widgets
-            self.create_bottom_frame_widgets(master=bottom_frame)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_widgets' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
     def create_bottom_frame_widgets(
         self,
         master: tkinter.Frame,
     ) -> None:
-        try:
-            # Configure the weight of the 0th column to 1.
-            master.grid_columnconfigure(
-                index=0,
-                weight=1,
-            )
+        """ """
 
-            # Configure the weight of the 0th row to 1.
-            master.grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_bottom_frame_widgets' method from '{self.__class__.__name__}': {e}"
-            )
+        # Configure the passed master tkinter.Frame widget's 0th column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
 
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the passed master tkinter.Frame widget's 0th row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Update idletasks
+        self.update_idletasks()
 
     def create_center_frame_widgets(
         self,
         master: tkinter.Frame,
     ) -> None:
-        try:
-            # Configure the weight of the 0th column to 1.
-            master.grid_columnconfigure(
-                index=0,
-                weight=1,
-            )
+        """
+        Creates and configures the main widgets of the center frame.
 
-            # Configure the weight of the 0th row to 1.
-            master.grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
+        This method initializes the main widgets of the center frame within the
+        dashboard UI, setting their layout and configuration for different tabs
+        such as Planning, Overview, and Statistics.
 
-            # Create tabbed view widgets within the passed master widget
-            tabbed_view: Optional[Dict[str, Any]] = UIBuilder.get_tabbed_view(
-                master=master
-            )
+        Args:
+            master (tkinter.Frame): The parent frame for the center widgets.
 
-            if not tabbed_view:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create tabbed view widgets from '{self.__class__.__name__}'"
-                )
+        Returns:
+            None
+        """
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
 
-                # Return early
-                return
+        # Configure the passed master tkinter.Frame widget's 0th row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
 
-            # Style the tabbed view's center frame widget
-            tabbed_view["center_frame"].configure(background=Constants.BLUE_GREY["700"])
+        # Create a TabbedFrame widget
+        tabbed_frame: TabbedFrame = TabbedFrame(master=master)
 
-            # Style the tabbed view's root frame widget
-            tabbed_view["root"].configure(background=Constants.BLUE_GREY["700"])
+        # Place the TabbedFrame widget in the grid
+        tabbed_frame.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            sticky=NSEW,
+        )
 
-            # Style the tabbed view's top frame widget
-            tabbed_view["top_frame"].configure(background=Constants.BLUE_GREY["700"])
+        # Configure the TabbedFrame widget
+        tabbed_frame.configure(background=Constants.BLUE_GREY["700"])
 
-            # Place the tabbed view widget within the passed master widget
-            tabbed_view["root"].grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=0,
-                sticky=NSEW,
-            )
+        # Configure the TabbedFrame widget's 'container frame' tkinter.Frame widget
+        tabbed_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
 
-            # Create tabbed view widgets within the passed master widget
-            tabbed_view_widgets: Optional[Dict[str, tkinter.Frame]] = (
-                self.create_tabbed_view_widgets(master=tabbed_view["center_frame"])
-            )
+        # Configure the TabbedFrame widget's 'top frame' tkinter.Frame widget
+        tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
 
-            if not tabbed_view_widgets:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create tabbed view widgets from '{self.__class__.__name__}'"
-                )
+        # Create and add the 'planning' widgets to the TabbedFrame widget
+        planning_frame: ScrolledFrame = self.create_planning_widgets(
+            master=tabbed_frame,
+        )
 
-                # Return early
-                return
+        # Add the 'planning' widgets to the TabbedFrame widget
+        tabbed_frame.add(
+            label="Planning",
+            widget=planning_frame,
+        )
 
-            # Iterate over the tabbed view widgets dictionary's key-value pairs
-            for (
-                label,
-                widget,
-            ) in tabbed_view_widgets.items():
-                # Add the tab to the tabbed view
-                tabbed_view["adder"](
-                    label=label,
-                    state=NORMAL,
-                    sticky=NSEW,
-                    widget=widget,
-                )
+        # Configure the TabbedFrame widget's 'planning button' tkinter.Button widget
+        tabbed_frame.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            name="planning",
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
 
-                # Style the button widget corresponding to the label
-                tabbed_view[
-                    f"{Miscellaneous.any_to_snake(string=label)}_button"
-                ].configure(
-                    background=Constants.BLUE_GREY["700"],
-                    font=(
-                        Constants.DEFAULT_FONT_FAMILY,
-                        Constants.DEFAULT_FONT_SIZE,
-                    ),
-                    foreground=Constants.WHITE,
-                    relief=FLAT,
-                )
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_center_frame_widgets' method from '{self.__class__.__name__}': {e}"
-            )
+        # Create and add the 'overview' widgets to the TabbedFrame widget
+        overview_frame: ScrolledFrame = self.create_overview_widgets(
+            master=tabbed_frame,
+        )
 
-            # Re-raise the exception to the caller
-            raise e
+        # Add the 'overview' widgets to the TabbedFrame widget
+        tabbed_frame.add(
+            label="Overview",
+            widget=overview_frame,
+        )
 
-    def create_learning_overview_widgets(
+        # Configure the TabbedFrame widget's 'overview button' tkinter.Button widget
+        tabbed_frame.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            name="overview",
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Create and add the 'statistics' widgets to the TabbedFrame widget
+        statistics_frame: ScrolledFrame = self.create_statistics_widgets(
+            master=tabbed_frame,
+        )
+
+        # Add the 'statistics' widgets to the TabbedFrame widget
+        tabbed_frame.add(
+            label="Statistics",
+            widget=statistics_frame,
+        )
+
+        # Configure the TabbedFrame widget's 'statistics button' tkinter.Button widget
+        tabbed_frame.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            name="statistics",
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Update idletasks
+        self.update_idletasks()
+
+    def create_planning_widgets(
         self,
         master: tkinter.Frame,
-    ) -> Optional[tkinter.Frame]:
-        try:
-            # Configure the weight of the 0th column to 1.
-            master.grid_columnconfigure(
-                index=0,
-                weight=1,
-            )
+    ) -> ScrolledFrame:
+        """
+        Creates and configures the main widgets of the planning frame.
 
-            # Configure the weight of the 0th row to 1.
-            master.grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
+        This method initializes the main widgets of the planning frame
+        within the learning dashboard UI and sets their layout
+        configuration.
 
-            # TODO:
-            #   - implement basic statistics visualization
-            #   - implement visualization of learning progress
-            #   - implement visualization of last session data (with ability to continue last session if unfinished)
+        Args:
+            master (tkinter.Frame): The parent frame for the planning widgets.
 
-            # Create a tkinter.Frame widget within the passed master widget
-            frame: Optional[tkinter.Frame] = tkinter.Frame(
-                background=Constants.BLUE_GREY["700"],
-                master=master,
-            )
+        Returns:
+            ScrolledFrame: The created ScrolledFrame widget.
+        """
 
-            if not frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create frame in '{self.__class__.__name__}'. This is likely a bug."
-                )
+        # Create a ScrolledFrame widget
+        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
 
-                # Return early
-                return
+        # Place the ScrolledFrame widget in the grid
+        scrolled_frame.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            sticky=NSEW,
+        )
 
-            # Configure the weight of the 0th column to 1.
-            frame.grid_columnconfigure(
-                index=0,
-                weight=1,
-            )
+        # Configure the ScrolledFrame widget
+        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
 
-            # Configure the weight of the 0th row to 0.
-            frame.grid_rowconfigure(
-                index=0,
-                weight=0,
-            )
+        # Configure the ScrolledFrame widget's tkinter.Canvas widget
+        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
 
-            # Configure the weight of the 1st row to 1.
-            frame.grid_rowconfigure(
-                index=1,
-                weight=1,
-            )
+        # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
+        scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
 
-            # Create a tkinter.Button widget within the frame widget
-            select_stacks_button: Optional[tkinter.Button] = tkinter.Button(
-                background=Constants.BLUE_GREY["700"],
-                command=self.on_select_stacks_button_click,
-                font=(
-                    Constants.DEFAULT_FONT_FAMILY,
-                    Constants.DEFAULT_FONT_SIZE,
-                ),
-                foreground=Constants.WHITE,
-                master=frame,
-                relief=FLAT,
-                text="Select Stack(s) for run",
-            )
+        # Update idletasks
+        self.update_idletasks()
 
-            if not select_stacks_button:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create 'Select Stack(s) for run' button in '{self.__class__.__name__}'. This is likely a bug."
-                )
+        # Return the ScrolledFrame widget to the caller
+        return scrolled_frame
 
-                # Return early
-                return
-
-            # Place the button widget within the frame widget
-            select_stacks_button.grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=0,
-                sticky=E,
-            )
-
-            # Create scrolled frame widgets within the frame widget
-            scrolled_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
-                master=frame
-            )
-
-            if not scrolled_frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create scrolled frame in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Return early
-                return
-
-            # Style the scrolled frame's canvas widget
-            scrolled_frame["canvas"].configure(
-                background=Constants.BLUE_GREY["700"],
-            )
-
-            # Style the scrolled frame's scrollbar widget
-            scrolled_frame["frame"].configure(
-                background=Constants.BLUE_GREY["700"],
-            )
-
-            # Style the scrolled frame's root frame widget
-            scrolled_frame["root"].configure(
-                background=Constants.BLUE_GREY["700"],
-            )
-
-            # Place the scrolled frame's root frame widget within the frame widget
-            scrolled_frame["root"].grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=1,
-                sticky=NSEW,
-            )
-
-            # Return the frame widget
-            return frame
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_learning_overview_widgets' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
-    def create_learning_planning_widgets(
+    def create_overview_widgets(
         self,
         master: tkinter.Frame,
-    ) -> Optional[tkinter.Frame]:
-        try:
-            # Configure the weight of the 0th column to 1.
-            master.grid_columnconfigure(
-                index=0,
-                weight=1,
-            )
+    ) -> ScrolledFrame:
+        """
+        Creates and configures the main widgets of the overview frame.
 
-            # Configure the weight of the 0th row to 1.
-            master.grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
+        This method initializes the main widgets of the overview frame
+        within the learning dashboard UI and sets their layout
+        configuration.
 
-            # TODO:
-            #   - calendar for scheduling sessions, exams, and due dates
+        Args:
+            master (tkinter.Frame): The parent frame for the overview widgets.
 
-            # Create a tkinter.Frame widget within the passed master widget
-            frame: Optional[tkinter.Frame] = tkinter.Frame(
-                background=Constants.BLUE_GREY["700"],
-                master=master,
-            )
+        Returns:
+            ScrolledFrame: The created ScrolledFrame widget.
+        """
 
-            if not frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create frame from '{self.__class__.__name__}'"
-                )
+        # Create a ScrolledFrame widget
+        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
 
-                # Return early
-                return
+        # Place the ScrolledFrame widget in the grid
+        scrolled_frame.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            sticky=NSEW,
+        )
 
-            # Return the frame widget
-            return frame
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_learning_planning_widgets' method from '{self.__class__.__name__}': {e}"
-            )
+        # Configure the ScrolledFrame widget
+        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
 
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the ScrolledFrame widget's tkinter.Canvas widget
+        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
 
-    def create_learning_statistics_widgets(
+        # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
+        scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
+
+        # Update idletasks
+        self.update_idletasks()
+
+        # Return the ScrolledFrame widget to the caller
+        return scrolled_frame
+
+    def create_statistics_widgets(
         self,
         master: tkinter.Frame,
-    ) -> Optional[tkinter.Frame]:
-        try:
-            # Configure the weight of the 0th column to 1.
-            master.grid_columnconfigure(
-                index=0,
-                weight=1,
-            )
+    ) -> ScrolledFrame:
+        """
+        Creates and configures the main widgets of the statistics frame.
 
-            # Configure the weight of the 0th row to 1.
-            master.grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
+        This method initializes the main widgets of the statistics frame within the
+        learning dashboard UI, setting their layout configuration.
 
-            # TODO:
-            #   - implement in-depth learning statistics and reporting
+        Args:
+            master (tkinter.Frame): The parent widget.
 
-            # Create a tkinter.Frame widget within the passed master widget
-            frame: Optional[tkinter.Frame] = tkinter.Frame(
-                background=Constants.BLUE_GREY["700"],
-                master=master,
-            )
+        Returns:
+            ScrolledFrame: The created ScrolledFrame widget.
+        """
 
-            if not frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create frame from '{self.__class__.__name__}'"
-                )
+        # Create a ScrolledFrame widget
+        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
 
-                # Return early
-                return
+        # Place the ScrolledFrame widget in the grid
+        scrolled_frame.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            sticky=NSEW,
+        )
 
-            # Return the frame widget
-            return frame
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_learning_statistics_widgets' method from '{self.__class__.__name__}': {e}"
-            )
+        # Configure the ScrolledFrame widget
+        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
 
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the ScrolledFrame widget's tkinter.Canvas widget
+        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
 
-    def create_tabbed_view_widgets(
-        self,
-        master: tkinter.Frame,
-    ) -> Optional[Dict[str, tkinter.Frame]]:
-        try:
-            # Initialize the result dictionary as an empty dictionary
-            result: Dict[str, tkinter.Frame] = {}
+        # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
+        scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
 
-            # Create the learning overview widgets
-            result["Learning overview"] = self.create_learning_overview_widgets(
-                master=master,
-            )
+        # Update idletasks
+        self.update_idletasks()
 
-            # Create the learning planning widgets
-            result["Learning planning"] = self.create_learning_planning_widgets(
-                master=master,
-            )
-
-            # Create the learning statistics widgets
-            result["Learning statistics"] = self.create_learning_statistics_widgets(
-                master=master,
-            )
-
-            # Iterate over the result dictionary's key-value pairs
-            for (
-                key,
-                value,
-            ) in result.items():
-                # Check if the value is not None
-                if value:
-                    continue
-
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create '{key}' tab in '{self.__class__.__name__}'. This is likely a bug."
-                )
-
-                # Remove the key from the result dictionary
-                del result[key]
-
-            # Return the result dictionary
-            return result
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_tabbed_view_widgets' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Re-raise the exception to the caller
-            raise e
+        # Return the ScrolledFrame widget to the caller
+        return scrolled_frame
 
     def create_top_frame_widgets(
         self,
         master: tkinter.Frame,
     ) -> None:
-        try:
-            # Configure the weight of the 0th column to 1.
-            master.grid_columnconfigure(
-                index=0,
-                weight=1,
-            )
-
-            # Configure the weight of the 0th row to 1.
-            master.grid_rowconfigure(
-                index=0,
-                weight=1,
-            )
-
-            # Create a tkinter.Label widget within the passed master widget
-            label: Optional[tkinter.Label] = tkinter.Label(
-                background=Constants.BLUE_GREY["700"],
-                font=(
-                    Constants.DEFAULT_FONT_FAMILY,
-                    Constants.LARGE_FONT_SIZE,
-                ),
-                foreground=Constants.WHITE,
-                master=master,
-                text="Learning Dashboard",
-            )
-
-            if not label:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create label from '{self.__class__.__name__}'"
-                )
-
-                # Return early
-                return
-
-            # Place the label widget within the passed master widget
-            label.grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=0,
-                sticky=NSEW,
-            )
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_top_frame_widgets' method from '{self.__class__.__name__}': {e}"
-            )
-
-            # Re-raise the exception to the caller
-            raise e
-
-    def on_select_stacks_button_click(self) -> None:
         """
-        Handles the event when the 'Select Stacks' button is clicked.
+        Creates and configures the main widgets of the top frame.
 
-        This function dispatches a navigation request to the global namespace
-        with the target 'learning_stack_selection_ui' and the source 'learning_dashboard_ui'.
+        This method initializes the main widgets of the top frame within the
+        learning dashboard UI, setting their layout configuration.
+
+        Args:
+            master (tkinter.Frame): The parent widget.
 
         Returns:
             None
-
-        Raises:
-            Exception: If an exception occurs while attempting to dispatch the
-                navigation request.
         """
-        try:
-            # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the global namespace
-            self.dispatcher.dispatch(
-                direction=Constants.FORWARD_DIRECTION,  # Set the navigation direction to 'forward'
-                event=Events.REQUEST_VALIDATE_NAVIGATION,  # The event to be dispatched
-                namespace=Constants.GLOBAL_NAMESPACE,  # Specify the global namespace
-                source="learning_dashboard_ui",  # Source of the navigation request
-                target="learning_stack_selection_ui",  # Target UI for navigation
-            )
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'on_select_stacks_button_click' method from '{self.__class__.__name__}': {e}"
-            )
 
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the passed master tkinter.Frame widget's 0th column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the passed master tkinter.Frame widget's 0th row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Create the 'select stacks' tkinter.Button widget
+        select_stacks_button: tkinter.Button = tkinter.Button(
+            background=Constants.BLUE_GREY["700"],
+            command=self._on_stack_select_button_click,
+            foreground=Constants.WHITE,
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            master=master,
+            relief=FLAT,
+            text="Select Stacks",
+        )
+
+        # Place the 'select stacks' tkinter.Button widget in the grid
+        select_stacks_button.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=E,
+        )
+
+        # Update idletasks
+        self.update_idletasks()
+
+    @override
+    def create_widgets(self) -> None:
+        """
+        Creates and configures the main frames of the learning dashboard UI.
+
+        This method initializes the top, center, and bottom frames within the
+        learning dashboard UI, setting their layout configuration and invoking
+        methods to populate each frame with its respective widgets.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Create the 'bottom frame' tkinter.Frame widget
+        bottom_frame: tkinter.Frame = tkinter.Frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
+
+        # Place the 'bottom frame' tkinter.Frame widget in the grid
+        bottom_frame.grid(
+            column=0,
+            row=2,
+            sticky=NSEW,
+        )
+
+        # Create the 'bottom frame' widgets
+        self.create_bottom_frame_widgets(master=bottom_frame)
+
+        # Create the 'center frame' tkinter.Frame widget
+        center_frame: tkinter.Frame = tkinter.Frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
+
+        # Place the 'center frame' tkinter.Frame widget in the grid
+        center_frame.grid(
+            column=0,
+            row=1,
+            sticky=NSEW,
+        )
+
+        # Create the 'center frame' widgets
+        self.create_center_frame_widgets(master=center_frame)
+
+        # Create the 'top frame' tkinter.Frame widget
+        top_frame: tkinter.Frame = tkinter.Frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
+
+        # Place the 'top frame' tkinter.Frame widget in the grid
+        top_frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create the 'top frame' widgets
+        self.create_top_frame_widgets(master=top_frame)
+
+        # Update idletasks
+        self.update_idletasks()

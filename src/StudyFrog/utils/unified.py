@@ -92,7 +92,7 @@ class UnifiedObjectFactory(ImmutableBaseObject):
         super().__init__()
 
         # Initialize an empty dictionary for storing registered Factorys
-        self.factories: Final[Dict[str, Any]] = {}
+        self.factories: Dict[str, Any] = {}
 
     @override
     def __getattr__(
@@ -189,7 +189,10 @@ class UnifiedObjectFactory(ImmutableBaseObject):
             )
 
         # Get the Factory instance from the dictionary
-        Factory_instance: Optional[Any] = self.factories.get(factory, None,)
+        Factory_instance: Optional[Any] = self.factories.get(
+            factory,
+            None,
+        )
 
         # Check if the Factory instance is None
         if not Factory_instance:
@@ -270,7 +273,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
         super().__init__()
 
         # Initialize an empty dictionary for storing registered managers
-        self.managers: Final[Dict[str, Any]] = {}
+        self.managers: Dict[str, Any] = {}
 
     @override
     def __getattr__(
@@ -304,7 +307,10 @@ class UnifiedObjectManager(ImmutableBaseObject):
             f"'{self.__class__.__name__}' object has no attribute '{name}'"
         )
 
-    def get_all(self) -> Optional[
+    def get_all(
+        self,
+        force_refetch: bool = False,
+    ) -> Optional[
         List[
             Union[
                 ImmutableAssociation,
@@ -330,6 +336,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
 
         This method iterates over all registered managers, calls the get_all method of each manager,
         and combines their results into a single list.
+
+        Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
 
         Returns:
             Optional[List[Union[
@@ -372,7 +381,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
             ] = [
                 manager.__getattr__(
                     name=f"get_all{Miscellaneous.pluralize(string=name.replace('_manager', ''))}"
-                )
+                )(force_refetch=force_refetch)
                 for (
                     name,
                     manager,
@@ -395,6 +404,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
     def get_by_key(
         self,
         key: str,
+        force_refetch: bool = False,
     ) -> Optional[
         Union[
             ImmutableAssociation,
@@ -418,6 +428,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
         Retrieves an object by its key.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             key (str): The key of the object to be retrieved.
 
         Returns:
@@ -443,6 +454,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
 
             # Run the 'get_by_key' method of the corresponding manager
             return self.run(
+                force_refetch=force_refetch,
                 manager=f"{match.lower()}_manager",
                 method=f"get_{match.lower()}_by_key",
                 key=key,
@@ -459,6 +471,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
     def get_by_keys(
         self,
         keys: List[str],
+        force_refetch: bool = False,
     ) -> Optional[
         List[
             Optional[
@@ -486,6 +499,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
         Retrieves a list of objects by their keys.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             keys (List[str]): A list of keys for the objects to be retrieved.
 
         Returns:
@@ -521,7 +535,12 @@ class UnifiedObjectManager(ImmutableBaseObject):
             # Iterate over the list of keys
             for key in keys:
                 # Get the object by key and append it to the result list
-                result.append(self.get_by_key(key=key))
+                result.append(
+                    self.get_by_key(
+                        force_refetch=force_refetch,
+                        key=key,
+                    )
+                )
 
             # Return the list of retrieved objects
             return result
@@ -680,14 +699,16 @@ class UnifiedObjectManager(ImmutableBaseObject):
         try:
             # Attempt to find a match in the given key
             match: Optional[str] = Miscellaneous.find_match(
-                string=key,
+                string=update.__class__.__name__,
                 group=1,
                 pattern=r"([A-Za-z]+)",
             )
 
             if not match:
                 # Log an error message indicating that the key format is invalid
-                self.logger.error(message=f"Invalid key format: '{key}'")
+                self.logger.error(
+                    message=f"Invalid key format: '{update.__class__.__name__}'"
+                )
 
                 # Return early since the key is invalid
                 return
@@ -867,7 +888,7 @@ class UnifiedObjectService(ImmutableBaseObject):
         super().__init__()
 
         # Store the passed unified_manager instance in an instance variable
-        self.unified_manager: Final[UnifiedObjectManager] = unified_manager
+        self.unified_manager: UnifiedObjectManager = unified_manager
 
     def on_request_answer_create(
         self,
@@ -905,12 +926,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_answer_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableAnswer]]:
         """
         Handles the 'request_answer_load' event and loads answers from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be passed to the database query.
 
         Returns:
@@ -918,16 +941,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the answer and return it
-        return self.unified_manager.get_answer_by(**kwargs)
+        return self.unified_manager.get_answer_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_answer_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableAnswer]]:
         """
         Handles the 'request_answer_lookup' event and looks up answers in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the answers.
 
         Returns:
@@ -935,7 +963,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for answers using the provided keyword arguments and return them
-        return self.unified_manager.search_answers(**kwargs)
+        return self.unified_manager.search_answers(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_answer_update(
         self,
@@ -990,12 +1021,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_association_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableAssociation]]:
         """
         Handles the 'request_association_load' event and loads associations from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: Keyword arguments to be used for querying associations.
 
         Returns:
@@ -1003,16 +1036,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve associations using the provided keyword arguments
-        return self.unified_manager.get_association_by(**kwargs)
+        return self.unified_manager.get_association_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_association_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableAssociation]]:
         """
         Handles the 'request_association_lookup' event and looks up associations in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the associations.
 
         Returns:
@@ -1020,7 +1058,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for associations using the provided keyword arguments and return them
-        return self.unified_manager.search_associations(**kwargs)
+        return self.unified_manager.search_associations(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_association_update(
         self,
@@ -1075,12 +1116,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_change_history_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableChangeHistory]]:
         """
         Handles the 'request_change_history_load' event and loads change histories from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: Keyword arguments to be used for querying change histories.
 
         Returns:
@@ -1088,16 +1131,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve change histories using the provided keyword arguments
-        return self.unified_manager.get_change_history_by(**kwargs)
+        return self.unified_manager.get_change_history_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_change_history_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableChangeHistory]]:
         """
         Handles the 'request_change_history_lookup' event and looks up change histories in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the change histories.
 
         Returns:
@@ -1105,7 +1153,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for change histories using the provided keyword arguments and return them
-        return self.unified_manager.search_change_histories(**kwargs)
+        return self.unified_manager.search_change_histories(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_change_history_update(
         self,
@@ -1164,12 +1215,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_change_history_item_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableChangeHistoryItem]]:
         """
         Handles the 'request_change_history_item_load' event and retrieves a list of change history items from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for retrieving the change history items.
 
         Returns:
@@ -1177,16 +1230,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve change history items using the provided keyword arguments
-        return self.unified_manager.get_change_history_item_by(**kwargs)
+        return self.unified_manager.get_change_history_item_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_change_history_item_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableChangeHistoryItem]]:
         """
         Handles the 'request_change_history_item_lookup' event and looks up change history items in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the change history items.
 
         Returns:
@@ -1194,7 +1252,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for change history items using the provided keyword arguments and return them
-        return self.unified_manager.search_change_history_items(**kwargs)
+        return self.unified_manager.search_change_history_items(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_change_history_item_update(
         self,
@@ -1251,12 +1312,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_custom_field_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableCustomField]]:
         """
         Handles the 'request_custom_field_load' event and retrieves a list of custom fields from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for retrieving the custom fields.
 
         Returns:
@@ -1264,16 +1327,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve custom fields using the provided keyword arguments
-        return self.unified_manager.get_custom_field_by(**kwargs)
+        return self.unified_manager.get_custom_field_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_custom_field_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableCustomField]]:
         """
         Handles the 'request_custom_field_lookup' event and looks up custom fields in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the custom fields.
 
         Returns:
@@ -1281,7 +1349,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for custom fields using the provided keyword arguments and return them
-        return self.unified_manager.search_custom_fields(**kwargs)
+        return self.unified_manager.search_custom_fields(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_custom_field_update(
         self,
@@ -1336,12 +1407,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_difficulty_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableDifficulty]]:
         """
         Handles the 'request_difficulty_load' event and loads difficulties from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: Keyword arguments to be passed to the database query.
 
         Returns:
@@ -1349,10 +1422,14 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the difficulties from the database
-        return self.unified_manager.get_difficulty_by(**kwargs)
+        return self.unified_manager.get_difficulty_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_difficulty_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableDifficulty]]:
         """
@@ -1366,7 +1443,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the difficulty from the database and return the loaded immutable difficulty
-        return self.unified_manager.search_difficulties(**kwargs)
+        return self.unified_manager.search_difficulties(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_difficulty_update(
         self,
@@ -1421,12 +1501,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_flashcard_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableFlashcard]]:
         """
         Handles the 'request_flashcard_load' event and retrieves a list of flashcards from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be passed to the unified manager's get_flashcard_by method.
 
         Returns:
@@ -1434,16 +1516,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the flashcards from the database and return them
-        return self.unified_manager.get_flashcard_by(**kwargs)
+        return self.unified_manager.get_flashcard_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_flashcard_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableFlashcard]]:
         """
         Handles the 'request_flashcard_lookup' event and retrieves a list of flashcards from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be passed to the unified manager's search_flashcards method.
 
         Returns:
@@ -1451,7 +1538,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for flashcards in the database and return them
-        return self.unified_manager.search_flashcards(**kwargs)
+        return self.unified_manager.search_flashcards(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_flashcard_update(
         self,
@@ -1664,6 +1754,7 @@ class UnifiedObjectService(ImmutableBaseObject):
     def on_request_get_by_key(
         self,
         key: str,
+        force_refetch: bool = False,
     ) -> Optional[
         Union[
             ImmutableAssociation,
@@ -1687,6 +1778,7 @@ class UnifiedObjectService(ImmutableBaseObject):
         Retrieves an object by its key.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             key (str): The key of the object to be retrieved.
 
         Returns:
@@ -1695,11 +1787,15 @@ class UnifiedObjectService(ImmutableBaseObject):
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_key' method.
         """
-        return self.unified_manager.get_by_key(key=key)
+        return self.unified_manager.get_by_key(
+            force_refetch=force_refetch,
+            key=key,
+        )
 
     def on_request_get_by_keys(
         self,
         keys: List[str],
+        force_refetch: bool = False,
     ) -> Optional[
         List[
             Union[
@@ -1725,6 +1821,7 @@ class UnifiedObjectService(ImmutableBaseObject):
         Retrieves objects by their keys.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             keys (List[str]): The keys of the objects to be retrieved.
 
         Returns:
@@ -1733,7 +1830,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_keys' method.
         """
-        return self.unified_manager.get_by_keys(keys=keys)
+        return self.unified_manager.get_by_keys(
+            force_refetch=force_refetch,
+            keys=keys,
+        )
 
     def on_request_learning_session_create(
         self,
@@ -1775,12 +1875,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_learning_session_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[ImmutableLearningSession]:
         """
         Handles the 'request_learning_session_load' event and loads a learning session from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the learning session.
 
         Returns:
@@ -1788,16 +1890,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the learning session from the database and return the loaded immutable learning session
-        return self.unified_manager.get_learning_session_by(**kwargs)
+        return self.unified_manager.get_learning_session_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_learning_session_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[ImmutableLearningSession]:
         """
         Handles the 'request_learning_session_lookup' event and looks up a learning session in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the learning session.
 
         Returns:
@@ -1805,7 +1912,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Look up the learning session in the database and return the looked up immutable learning session
-        return self.unified_manager.search_learning_sessions(**kwargs)
+        return self.unified_manager.search_learning_sessions(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_learning_session_update(
         self,
@@ -1866,12 +1976,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_learning_session_action_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[ImmutableLearningSessionAction]:
         """
         Handles the 'request_learning_session_action_load' event and loads a learning session action from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the learning session action.
 
         Returns:
@@ -1879,16 +1991,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the learning session action from the database and return the loaded immutable learning session action
-        return self.unified_manager.get_learning_session_action_by(**kwargs)
+        return self.unified_manager.get_learning_session_action_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_learning_session_action_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[ImmutableLearningSessionAction]:
         """
         Handles the 'request_learning_session_action_lookup' event and looks up a learning session action in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the learning session action.
 
         Returns:
@@ -1896,7 +2013,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Look up the learning session action in the database and return the looked up immutable learning session action
-        return self.unified_manager.search_learning_session_actions(**kwargs)
+        return self.unified_manager.search_learning_session_actions(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_learning_session_action_update(
         self,
@@ -1957,12 +2077,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_learning_session_item_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[ImmutableLearningSessionItem]:
         """
         Handles the 'request_learning_session_item_load' event and loads a learning session item from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the learning session item.
 
         Returns:
@@ -1970,16 +2092,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the learning session item from the database and return the loaded immutable learning session item
-        return self.unified_manager.get_learning_session_item_by(**kwargs)
+        return self.unified_manager.get_learning_session_item_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_learning_session_item_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[ImmutableLearningSessionItem]:
         """
         Handles the 'request_learning_session_item_lookup' event and looks up a learning session item in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the learning session item.
 
         Returns:
@@ -1987,7 +2114,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Look up the learning session item in the database and return the looked up immutable learning session item
-        return self.unified_manager.search_learning_session_items(**kwargs)
+        return self.unified_manager.search_learning_session_items(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_learning_session_item_update(
         self,
@@ -2044,12 +2174,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_note_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[ImmutableNote]:
         """
         Handles the 'request_note_load' event and loads a note from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the note.
 
         Returns:
@@ -2057,16 +2189,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the note from the database and return the loaded immutable note
-        return self.unified_manager.get_note_by(**kwargs)
+        return self.unified_manager.get_note_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_note_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[ImmutableNote]:
         """
         Handles the 'request_note_lookup' event and looks up notes in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the note.
 
         Returns:
@@ -2074,7 +2211,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve notes using the provided keyword arguments
-        return self.unified_manager.search_notes(**kwargs)
+        return self.unified_manager.search_notes(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_note_update(
         self,
@@ -2129,27 +2269,34 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_option_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableOption]]:
         """
         Handles the 'request_option_load' event and loads options from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: Keyword arguments for filtering the options.
 
         Returns:
             Optional[List[ImmutableOption]]: A list of immutable options if found. None otherwise.
         """
-        return self.unified_manager.get_option_by(**kwargs)
+        return self.unified_manager.get_option_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_option_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableOption]]:
         """
         Handles the 'request_option_lookup' event and looks up options in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the option.
 
         Returns:
@@ -2157,7 +2304,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for options using the provided keyword arguments and return them
-        return self.unified_manager.search_options(**kwargs)
+        return self.unified_manager.search_options(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_option_update(
         self,
@@ -2212,12 +2362,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_priority_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutablePriority]]:
         """
         Handles the 'request_priority_load' event and loads a priority from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the priority.
 
         Returns:
@@ -2225,16 +2377,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the priority from the database and return the loaded immutable priority
-        return self.unified_manager.get_priority_by(**kwargs)
+        return self.unified_manager.get_priority_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_priority_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutablePriority]]:
         """
         Handles the 'request_priority_lookup' event and looks up priorities in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying the priority.
 
         Returns:
@@ -2242,7 +2399,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the priority from the database and return the loaded immutable priority
-        return self.unified_manager.search_priorities(**kwargs)
+        return self.unified_manager.search_priorities(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_priority_update(
         self,
@@ -2297,12 +2457,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_question_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableQuestion]]:
         """
         Handles the 'request_question_load' event and loads questions from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be passed to the database query.
 
         Returns:
@@ -2310,16 +2472,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the questions from the database using the provided keyword arguments
-        return self.unified_manager.get_question_by(**kwargs)
+        return self.unified_manager.get_question_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_question_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableQuestion]]:
         """
         Handles the 'request_question_lookup' event and searches for questions in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for searching questions.
 
         Returns:
@@ -2327,7 +2494,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for questions using the provided keyword arguments and return them
-        return self.unified_manager.search_questions(**kwargs)
+        return self.unified_manager.search_questions(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_question_update(
         self,
@@ -2382,12 +2552,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_setting_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableSetting]]:
         """
         Handles the 'request_setting_load' event and loads settings from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: Keyword arguments to be passed to the database query.
 
         Returns:
@@ -2395,16 +2567,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load the settings from the database and return them
-        return self.unified_manager.load_settings(**kwargs)
+        return self.unified_manager.load_settings(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_setting_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableSetting]]:
         """
         Handles the 'request_setting_lookup' event and searches for settings in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for searching settings.
 
         Returns:
@@ -2412,7 +2589,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for settings using the provided keyword arguments and return them
-        return self.unified_manager.search_settings(**kwargs)
+        return self.unified_manager.search_settings(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_setting_update(
         self,
@@ -2467,12 +2647,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_stack_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableStack]]:
         """
         Handles the 'request_stack_load' event and loads stacks from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying stacks.
 
         Returns:
@@ -2480,16 +2662,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load stacks using the provided keyword arguments and return them
-        return self.unified_manager.get_stack_by(**kwargs)
+        return self.unified_manager.get_stack_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_stack_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableStack]]:
         """
         Handles the 'request_stack_lookup' event and searches for stacks in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for searching stacks.
 
         Returns:
@@ -2497,7 +2684,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for stacks using the provided keyword arguments and return them
-        return self.unified_manager.search_stacks(**kwargs)
+        return self.unified_manager.search_stacks(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_stack_update(
         self,
@@ -2552,12 +2742,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_status_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableStatus]]:
         """
         Handles the 'request_status_load' event and loads statuses from the database.
 
-         Args:
+        Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for loading statuses.
 
         Returns:
@@ -2565,16 +2757,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Load statuses using the provided keyword arguments and return them
-        return self.unified_manager.get_status_by(**kwargs)
+        return self.unified_manager.get_status_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_status_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableStatus]]:
         """
         Handles the 'request_status_lookup' event and searches for statuses in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for searching statuses.
 
         Returns:
@@ -2582,7 +2779,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Search for statuses using the provided keyword arguments and return them
-        return self.unified_manager.search_statuses(**kwargs)
+        return self.unified_manager.search_statuses(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_status_update(
         self,
@@ -2637,12 +2837,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_tag_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableTag]]:
         """
         Handles the 'request_tag_load' event and loads tags from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying tags.
 
         Returns:
@@ -2650,16 +2852,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve tags using the provided keyword arguments
-        return self.unified_manager.get_tag_by(**kwargs)
+        return self.unified_manager.get_tag_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_tag_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableTag]]:
         """
         Handles the 'request_tag_lookup' event and looks up tags in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying tags.
 
         Returns:
@@ -2667,7 +2874,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve tags using the provided keyword arguments
-        return self.unified_manager.search_tags(**kwargs)
+        return self.unified_manager.search_tags(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_tag_update(
         self,
@@ -2824,12 +3034,14 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def on_request_user_load(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableUser]]:
         """
         Handles the 'request_user_load' event and loads users from the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying users.
 
         Returns:
@@ -2837,16 +3049,21 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve users using the provided keyword arguments
-        return self.unified_manager.get_user_by(**kwargs)
+        return self.unified_manager.get_user_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_user_lookup(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[List[ImmutableUser]]:
         """
         Handles the 'request_user_lookup' event and looks up users in the database.
 
         Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
             **kwargs: The keyword arguments to be used for querying users.
 
         Returns:
@@ -2854,7 +3071,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Retrieve users using the provided keyword arguments
-        return self.unified_manager.search_users(**kwargs)
+        return self.unified_manager.search_users(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
 
     def on_request_user_update(
         self,

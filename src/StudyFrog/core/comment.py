@@ -420,13 +420,8 @@ class CommentManager(BaseObjectManager):
             int: The number of comments in the database.
         """
         try:
-            # Count the number of comments in the database
-            result: Any = asyncio.run(
-                CommentModel.count(database=Constants.DATABASE_PATH)
-            )
-
-            # Return the number of comments in the database
-            return result[0][0] if result else 0
+            # Count and return the number of comments in the database
+            return asyncio.run(CommentModel.count(database=Constants.DATABASE_PATH))
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1131,7 +1126,7 @@ class CommentModel(ImmutableBaseModel):
 
     version: Field = Field(
         autoincrement=False,
-        default=None,
+        default=1,
         description="",
         foreign_key=None,
         index=False,
