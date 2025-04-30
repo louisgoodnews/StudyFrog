@@ -6,9 +6,9 @@ Date: 2025-02-08
 import asyncio
 
 from datetime import datetime
-
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -37,6 +37,7 @@ class ImmutableTag(ImmutableBaseObject):
         icon (str): The icon of the tag.
         id (int): The ID of the tag.
         key (str): The key of the tag.
+        metadata (Optional[Dict[str, Any]]): The metadata of the tag.
         updated_at (datetime): The timestamp when the tag was last updated.
         uuid (str): The UUID of the tag.
         value (str): The value of the tag.
@@ -49,6 +50,7 @@ class ImmutableTag(ImmutableBaseObject):
         icon: Optional[str] = "🔖",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -61,6 +63,7 @@ class ImmutableTag(ImmutableBaseObject):
             icon (Optional[str]): The icon of the tag. Defaults to "🔖".
             id (Optional[int]): The ID of the tag.
             key (Optional[str]): The key of the tag.
+            metadata (Optional[Dict[str, Any]]): The metadata of the tag.
             updated_at (Optional[datetime]): The timestamp when the tag was last updated.
             uuid (Optional[str]): The UUID of the tag.
 
@@ -74,6 +77,7 @@ class ImmutableTag(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             updated_at=updated_at,
             uuid=uuid,
             value=value,
@@ -110,6 +114,7 @@ class MutableTag(MutableBaseObject):
         icon (str): The icon of the tag.
         id (int): The ID of the tag.
         key (str): The key of the tag.
+        metadata (Optional[Dict[str, Any]]): The metadata of the tag.
         updated_at (datetime): The timestamp when the tag was last updated.
         uuid (str): The UUID of the tag.
         value (str): The value of the tag.
@@ -122,6 +127,7 @@ class MutableTag(MutableBaseObject):
         icon: Optional[str] = "🔖",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -134,6 +140,7 @@ class MutableTag(MutableBaseObject):
             icon (Optional[str]): The icon of the tag. Defaults to "🔖".
             id (Optional[int]): The ID of the tag.
             key (Optional[str]): The key of the tag.
+            metadata (Optional[Dict[str, Any]]): The metadata of the tag.
             updated_at (Optional[datetime]): The timestamp when the tag was last updated.
             uuid (Optional[str]): The UUID of the tag.
 
@@ -147,6 +154,7 @@ class MutableTag(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             updated_at=updated_at,
             uuid=uuid,
             value=value,
@@ -278,6 +286,7 @@ class TagFactory:
         icon: Optional[str] = "🔖",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableTag]:
@@ -290,6 +299,7 @@ class TagFactory:
             icon (Optional[str]): The icon of the tag. Defaults to "🔖".
             id (Optional[int]): The ID of the tag.
             key (Optional[str]): The key of the tag.
+            metadata (Optional[Dict[str, Any]]): The metadata of the tag.
             updated_at (Optional[datetime]): The timestamp when the tag was last updated.
             uuid (Optional[str]): The UUID of the tag.
 
@@ -306,6 +316,7 @@ class TagFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 updated_at=updated_at,
                 uuid=uuid,
                 value=value,
@@ -318,6 +329,13 @@ class TagFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class TagBuilder(BaseObjectBuilder):
+    """
+    """
+
+    pass
 
 
 class TagManager(BaseObjectManager):
@@ -896,6 +914,7 @@ class TagModel(ImmutableBaseModel):
         created_at (Field): The timestamp when the tag was created.
         icon (Field): The icon of the tag. Defaults to "🔖".
         key (Field): The key of the tag.
+        metadata (Field): The metadata of the tag.
         updated_at (Field): The timestamp when the tag was last updated.
         uuid (Field): The UUID of the tag.
         value (Field): The value of the tag.
@@ -967,6 +986,22 @@ class TagModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     updated_at: Field = Field(
         autoincrement=False,
         default=None,
@@ -1021,6 +1056,7 @@ class TagModel(ImmutableBaseModel):
         icon: Optional[str] = "🔖",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
         value: Optional[str] = None,
@@ -1033,6 +1069,7 @@ class TagModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the tag. Defaults to "🔖".
             id (Optional[int]): The ID of the tag.
             key (Optional[str]): The key of the tag.
+            metadata (Optional[Dict[str, Any]]): The metadata of the tag.
             updated_at (Optional[datetime]): The timestamp when the tag was last updated.
             uuid (Optional[str]): The UUID of the tag.
             value (Optional[str]): The value of the tag.
@@ -1047,6 +1084,7 @@ class TagModel(ImmutableBaseModel):
             icon="🔖",
             id=id,
             key=key,
+            metadata=metadata,
             table=Constants.TAGS,
             updated_at=updated_at,
             uuid=uuid,

@@ -40,7 +40,9 @@ from core.question import QuestionFactory, QuestionManager, QuestionModel
 from core.setting import SettingFactory, SettingManager, SettingModel, SettingService
 from core.stack import StackFactory, StackManager, StackModel
 from core.status import StatusFactory, StatusManager, StatusModel
+from core.subject import SubjectFactory, SubjectManager, SubjectModel
 from core.tag import TagFactory, TagManager, TagModel
+from core.teacher import TeacherFactory, TeacherManager, TeacherModel
 from core.user import UserFactory, UserManager, UserModel
 
 from core.ui.calendar_ui import CalendarUI
@@ -51,6 +53,7 @@ from core.ui.flashcards_view_ui import FlashcardsViewUI
 from core.ui.help_ui import HelpUI
 from core.ui.learning_dashboard_ui import LearningDashboardUI
 from core.ui.learning_session_ui import LearningSessionUI
+from core.ui.learning_session_recall_ui import LearningSessionRecallUI
 from core.ui.learning_session_result_ui import LearningSessionResultUI
 from core.ui.menu_ui import MenuUI
 from core.ui.notes_view_ui import NotesViewUI
@@ -387,7 +390,9 @@ class BootstrapService(ImmutableBaseObject):
                 SettingModel,
                 StackModel,
                 StatusModel,
+                SubjectModel,
                 TagModel,
+                TeacherModel,
                 UserModel,
             ]:
                 # Log an info message indicating that the table is being created
@@ -448,7 +453,9 @@ class BootstrapService(ImmutableBaseObject):
                 "setting_factory": SettingFactory,
                 "stack_factory": StackFactory,
                 "status_factory": StatusFactory,
+                "subject_factory": SubjectFactory,
                 "tag_factory": TagFactory,
+                "teacher_factory": TeacherFactory,
                 "user_factory": UserFactory,
             }
 
@@ -896,6 +903,26 @@ class BootstrapService(ImmutableBaseObject):
                     "function": self.unified_object_service.on_request_status_update,
                 },
                 {
+                    "event": Events.REQUEST_SUBJECT_CREATE,
+                    "function": self.unified_object_service.on_request_subject_create,
+                },
+                {
+                    "event": Events.REQUEST_SUBJECT_DELETE,
+                    "function": self.unified_object_service.on_request_subject_delete,
+                },
+                {
+                    "event": Events.REQUEST_SUBJECT_LOAD,
+                    "function": self.unified_object_service.on_request_subject_load,
+                },
+                {
+                    "event": Events.REQUEST_SUBJECT_LOOKUP,
+                    "function": self.unified_object_service.on_request_subject_lookup,
+                },
+                {
+                    "event": Events.REQUEST_SUBJECT_UPDATE,
+                    "function": self.unified_object_service.on_request_subject_update,
+                },
+                {
                     "event": Events.REQUEST_TAG_CREATE,
                     "function": self.unified_object_service.on_request_tag_create,
                 },
@@ -914,6 +941,26 @@ class BootstrapService(ImmutableBaseObject):
                 {
                     "event": Events.REQUEST_TAG_UPDATE,
                     "function": self.unified_object_service.on_request_tag_update,
+                },
+                {
+                    "event": Events.REQUEST_TEACHER_CREATE,
+                    "function": self.unified_object_service.on_request_teacher_create,
+                },
+                {
+                    "event": Events.REQUEST_TEACHER_DELETE,
+                    "function": self.unified_object_service.on_request_teacher_delete,
+                },
+                {
+                    "event": Events.REQUEST_TEACHER_LOAD,
+                    "function": self.unified_object_service.on_request_teacher_load,
+                },
+                {
+                    "event": Events.REQUEST_TEACHER_LOOKUP,
+                    "function": self.unified_object_service.on_request_teacher_lookup,
+                },
+                {
+                    "event": Events.REQUEST_TEACHER_UPDATE,
+                    "function": self.unified_object_service.on_request_teacher_update,
                 },
                 {
                     "event": Events.REQUEST_UPDATE,
@@ -998,7 +1045,9 @@ class BootstrapService(ImmutableBaseObject):
                 "setting_manager": SettingManager,
                 "stack_manager": StackManager,
                 "status_manager": StatusManager,
+                "subject_manager": SubjectManager,
                 "tag_manager": TagManager,
+                "teacher_manager": TeacherManager,
                 "user_manager": UserManager,
             }
 
@@ -1042,6 +1091,7 @@ class BootstrapService(ImmutableBaseObject):
                 "help_ui": HelpUI,
                 "learning_dashboard_ui": LearningDashboardUI,
                 "learning_session_ui": LearningSessionUI,
+                "learning_session_recall_ui": LearningSessionRecallUI,
                 "learning_session_result_ui": LearningSessionResultUI,
                 "menu_ui": MenuUI,
                 "notes_view_ui": NotesViewUI,

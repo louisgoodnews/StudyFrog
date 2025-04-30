@@ -25,7 +25,7 @@ from utils.dispatcher import Dispatcher
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["SearchUI"]
@@ -47,6 +47,7 @@ class SearchUI(BaseUI):
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
         type (Optional[str]): The type of the search.
+
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -57,6 +58,7 @@ class SearchUI(BaseUI):
         navigation_item: NavigationHistoryItem,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
+        unified_factory: UnifiedObjectFactory,
         unified_manager: UnifiedObjectManager,
         type: Optional[str] = None,
     ) -> None:
@@ -70,6 +72,7 @@ class SearchUI(BaseUI):
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
             type (Optional[str]): The type of the search.
+            unified_factory (UnifiedObjectFactory): The unified factory instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
         Returns:
@@ -84,6 +87,7 @@ class SearchUI(BaseUI):
             navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
+            unified_factory=unified_factory,
             unified_manager=unified_manager,
         )
 

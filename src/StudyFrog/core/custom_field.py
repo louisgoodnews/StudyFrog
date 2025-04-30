@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -36,6 +37,7 @@ class ImmutableCustomField(ImmutableBaseObject):
         created_at (Optional[datetime]): The timestamp when the custom field was created.
         id (Optional[int]): The ID of the custom field.
         key (Optional[str]): The key of the custom field.
+        metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
         updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
         uuid (Optional[str]): The UUID of the custom field.
     """
@@ -48,6 +50,7 @@ class ImmutableCustomField(ImmutableBaseObject):
         icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -61,6 +64,7 @@ class ImmutableCustomField(ImmutableBaseObject):
             icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
             id (Optional[int]): The ID of the custom field.
             key (Optional[str]): The key of the custom field.
+            metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
             updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
             uuid (Optional[str]): The UUID of the custom field.
 
@@ -74,6 +78,7 @@ class ImmutableCustomField(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             type=type,
             updated_at=updated_at,
@@ -119,6 +124,7 @@ class MutableCustomField(MutableBaseObject):
         created_at (Optional[datetime]): The timestamp when the custom field was created.
         id (Optional[int]): The ID of the custom field.
         key (Optional[str]): The key of the custom field.
+        metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
         updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
         uuid (Optional[str]): The UUID of the custom field.
     """
@@ -131,6 +137,7 @@ class MutableCustomField(MutableBaseObject):
         icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -144,6 +151,7 @@ class MutableCustomField(MutableBaseObject):
             icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
             id (Optional[int]): The ID of the custom field.
             key (Optional[str]): The key of the custom field.
+            metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
             updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
             uuid (Optional[str]): The UUID of the custom field.
 
@@ -157,6 +165,7 @@ class MutableCustomField(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             type=type,
             updated_at=updated_at,
@@ -275,6 +284,13 @@ class CustomFieldConverter:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class CustomFieldBuilder(BaseObjectBuilder):
+    """
+    """
+
+    pass
 
 
 class CustomFieldFactory:
@@ -900,6 +916,7 @@ class CustomFieldModel(ImmutableBaseModel):
         icon (str): The icon of the custom field. Defaults to "🎛️".
         id (int): The ID of the custom field.
         key (str): The key of the custom field.
+        metadata (Dict[str, Any]): The metadata of the custom field.
         name (str): The name of the custom field.
         type (str): The type of the custom field.
         updated_at (datetime): The timestamp when the custom field was last updated.
@@ -972,6 +989,22 @@ class CustomFieldModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     name: Field = Field(
         autoincrement=False,
         default=None,
@@ -1042,6 +1075,7 @@ class CustomFieldModel(ImmutableBaseModel):
         icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         name: Optional[str] = None,
         type: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -1055,6 +1089,7 @@ class CustomFieldModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
             id (Optional[int]): The ID of the custom field.
             key (Optional[str]): The key of the custom field.
+            metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
             name (Optional[str]): The name of the custom field.
             type (Optional[str]): The type of the custom field.
             updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
@@ -1070,6 +1105,7 @@ class CustomFieldModel(ImmutableBaseModel):
             icon="🎛️",
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             type=type,
             updated_at=updated_at,

@@ -45,6 +45,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         created_at (datetime): The timestamp when the flashcard was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         difficulty (int): The ID of the difficulty the flashcard is associated with.
+        due_by (datetime): The timestamp when the flashcard is due.
         familiarity (float): The familiarity of the flashcard.
         front_text (str): The front side of the flashcard.
         front_word_count (int): The word count of the front side of the flashcard.
@@ -53,6 +54,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         interval (Optional[int]): The repetition interval of the flashcard in days.
         key (str): The key of the flashcard.
         last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
+        metadata (Optional[Dict[str, Any]]): The metadata of the flashcard.
         priority (int): The ID of the priority the flashcard is associated with.
         status (int): The ID of the status the flashcard is associated with.
         tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
@@ -69,6 +71,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
         familiarity: Optional[float] = None,
         front_word_count: Optional[int] = None,
         icon: Optional[str] = "📇",
@@ -76,6 +79,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
         interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
@@ -92,6 +96,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             created_at (Optional[datetime]): The timestamp when the flashcard was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             difficulty (Optional[int]): The ID of the difficulty the flashcard is associated with.
+            due_by (Optional[datetime]): The timestamp when the flashcard is due.
             familiarity (Optional[float]): The familiarity of the flashcard.
             front_text (str): The front side of the flashcard.
             front_word_count (Optional[int]): The word count of the front side of the flashcard.
@@ -100,6 +105,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             interval (Optional[int]): The repetition interval of the flashcard in days.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the flashcard.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
             status (Optional[int]): The ID of the status the flashcard is associated with.
             tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
@@ -118,6 +124,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             created_at=created_at,
             custom_field_values=custom_field_values,
             difficulty=difficulty,
+            due_by=due_by,
             familiarity=familiarity,
             front_text=front_text,
             front_word_count=front_word_count,
@@ -125,6 +132,7 @@ class ImmutableFlashcard(ImmutableBaseObject):
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
+            metadata=metadata,
             priority=priority,
             status=status,
             tags=tags,
@@ -200,6 +208,7 @@ class MutableFlashcard(MutableBaseObject):
         created_at (datetime): The timestamp when the flashcard was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         difficulty (int): The ID of the difficulty the flashcard is associated with.
+        due_by (datetime): The timestamp when the flashcard is due.
         familiarity (float): The familiarity of the flashcard.
         front_text (str): The front side of the flashcard.
         front_word_count (int): The word count of the front side of the flashcard.
@@ -208,6 +217,7 @@ class MutableFlashcard(MutableBaseObject):
         interval (Optional[int]): The repetition interval of the flashcard in days.
         key (str): The key of the flashcard.
         last_viewed_at (datetime): The timestamp when the flashcard was last viewed.
+        metadata (Optional[Dict[str, Any]]): The metadata of the flashcard.
         priority (int): The ID of the priority the flashcard is associated with.
         status (int): The ID of the status the flashcard is associated with.
         tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
@@ -224,6 +234,7 @@ class MutableFlashcard(MutableBaseObject):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
         familiarity: Optional[float] = None,
         front_word_count: Optional[int] = None,
         icon: Optional[str] = "📇",
@@ -231,6 +242,7 @@ class MutableFlashcard(MutableBaseObject):
         interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
@@ -247,6 +259,7 @@ class MutableFlashcard(MutableBaseObject):
             created_at (Optional[datetime]): The timestamp when the flashcard was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             difficulty (Optional[int]): The ID of the difficulty the flashcard is associated with.
+            due_by (Optional[datetime]): The timestamp when the flashcard is due.
             familiarity (Optional[float]): The familiarity of the flashcard.
             front_text (str): The front side of the flashcard.
             front_word_count (Optional[int]): The word count of the front side of the flashcard.
@@ -255,6 +268,7 @@ class MutableFlashcard(MutableBaseObject):
             interval (Optional[int]): The repetition interval of the flashcard in days.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the flashcard.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
             status (Optional[int]): The ID of the status the flashcard is associated with.
             tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
@@ -273,6 +287,7 @@ class MutableFlashcard(MutableBaseObject):
             created_at=created_at,
             custom_field_values=custom_field_values,
             difficulty=difficulty,
+            due_by=due_by,
             familiarity=familiarity,
             front_text=front_text,
             front_word_count=front_word_count,
@@ -281,6 +296,7 @@ class MutableFlashcard(MutableBaseObject):
             interval=interval,
             key=key,
             last_viewed_at=last_viewed_at,
+            metadata=metadata,
             priority=priority,
             status=status,
             tags=tags,
@@ -518,6 +534,7 @@ class FlashcardFactory:
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
         familiarity: Optional[float] = None,
         front_word_count: Optional[int] = None,
         icon: Optional[str] = "📇",
@@ -525,6 +542,7 @@ class FlashcardFactory:
         interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
@@ -541,6 +559,7 @@ class FlashcardFactory:
             created_at (Optional[datetime]): The timestamp when the flashcard was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             difficulty (Optional[int]): The ID of the difficulty the flashcard is associated with.
+            due_by (Optional[datetime]): The timestamp when the flashcard is due.
             familiarity (Optional[float]): The familiarity of the flashcard.
             front_text (str): The front side of the flashcard.
             front_word_count (Optional[int]): The word count of the front side of the flashcard.
@@ -549,6 +568,7 @@ class FlashcardFactory:
             interval (Optional[int]): The repetition interval of the flashcard in days.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the flashcard.
             priority (Optional[int]): The ID of the priority the flashcard is associated with.
             status (Optional[int]): The ID of the status the flashcard is associated with.
             tags (Optional[List[str]]): The keys of the tags associated with the flashcard.
@@ -570,6 +590,7 @@ class FlashcardFactory:
                 created_at=created_at,
                 custom_field_values=custom_field_values,
                 difficulty=difficulty,
+                due_by=due_by,
                 familiarity=familiarity,
                 front_text=front_text,
                 front_word_count=front_word_count,
@@ -578,6 +599,7 @@ class FlashcardFactory:
                 interval=interval,
                 key=key,
                 last_viewed_at=last_viewed_at,
+                metadata=metadata,
                 priority=priority,
                 status=status,
                 tags=tags,
@@ -722,6 +744,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+    def due_by(
+        self,
+        value: Optional[datetime] = None,
+    ) -> Self:
+        # Set the due_by value in the configuration dictionary
+        self.configuration["due_by"] = value
+
+        # Return the builder instance
+        return self
+
     def familiarity(
         self,
         value: Optional[float] = None,
@@ -768,6 +800,30 @@ class FlashcardBuilder(BaseObjectBuilder):
     ) -> Self:
         # Set the last_viewed_at value in the configuration dictionary
         self.configuration["last_viewed_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata of the flashcard.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
 
         # Return the builder instance
         return self
@@ -1555,6 +1611,7 @@ class FlashcardModel(ImmutableBaseModel):
         created_at (Field): The timestamp when the flashcard was created.
         custom_field_values (Field): The custom field values of the flashcard.
         difficulty (Field): The difficulty of the flashcard.
+        due_by (Field): The timestamp when the flashcard is due.
         familiarity (Field): The familiarity of the flashcard.
         front_text (Field): The front side of the flashcard.
         front_word_count (Field): The word count of the front side of the flashcard.
@@ -1563,6 +1620,7 @@ class FlashcardModel(ImmutableBaseModel):
         interval (Field): The repetition interval of the flashcard in days.
         key (Field): The key of the flashcard.
         last_viewed_at (Field): The timestamp when the flashcard was last viewed.
+        metadata (Field): A dictionary of metadata.
         priority (Field): The priority of the flashcard.
         status (Field): The status of the flashcard.
         tags (Field): The tags of the flashcard.
@@ -1666,6 +1724,22 @@ class FlashcardModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="INTEGER",
+        unique=False,
+    )
+
+    due_by: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="due_by",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
         unique=False,
     )
 
@@ -1781,6 +1855,22 @@ class FlashcardModel(ImmutableBaseModel):
         unique=False,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     priority: Field = Field(
         autoincrement=False,
         default=None,
@@ -1820,7 +1910,7 @@ class FlashcardModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="tags",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1884,6 +1974,7 @@ class FlashcardModel(ImmutableBaseModel):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
         familiarity: Optional[float] = None,
         front_text: Optional[str] = None,
         front_word_count: Optional[int] = None,
@@ -1892,6 +1983,7 @@ class FlashcardModel(ImmutableBaseModel):
         interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
@@ -1908,6 +2000,7 @@ class FlashcardModel(ImmutableBaseModel):
             created_at (Optional[datetime]): The timestamp when the flashcard was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             difficulty (Optional[int]): The difficulty of the flashcard.
+            due_by (Optional[datetime]): The timestamp when the flashcard is due.
             familiarity (Optional[float]): The familiarity of the flashcard.
             front_text (Optional[str]): The front side of the flashcard.
             front_word_count (Optional[int]): The word count of the front side of the flashcard.
@@ -1916,6 +2009,7 @@ class FlashcardModel(ImmutableBaseModel):
             interval (Optional[int]): The repetition interval of the flashcard in days.
             key (Optional[str]): The key of the flashcard.
             last_viewed_at (Optional[datetime]): The timestamp when the flashcard was last viewed.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             priority (Optional[int]): The priority of the flashcard.
             status (Optional[int]): The status of the flashcard.
             tags (Optional[List[str]]): The tags of the flashcard.
@@ -1934,14 +2028,16 @@ class FlashcardModel(ImmutableBaseModel):
             created_at=created_at,
             custom_field_values=custom_field_values,
             difficulty=difficulty,
+            due_by=due_by,
             familiarity=familiarity,
             front_text=front_text,
             front_word_count=front_word_count,
             icon="📇",
             id=id,
             interval=interval,
-            key=key,
             last_viewed_at=last_viewed_at,
+            key=key,
+            metadata=metadata,
             priority=priority,
             status=status,
             tags=tags,

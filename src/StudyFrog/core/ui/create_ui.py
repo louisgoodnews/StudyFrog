@@ -61,6 +61,7 @@ class CreateUI(BaseUI):
         navigation_item (NavigationHistoryItem): The navigation history item instance.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
+        unified_factory (UnifiedObjectFactory): The unified factory instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -71,6 +72,7 @@ class CreateUI(BaseUI):
         navigation_item: NavigationHistoryItem,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
+        unified_factory: UnifiedObjectFactory,
         unified_manager: UnifiedObjectManager,
         type: Optional[str] = None,
     ) -> None:
@@ -83,7 +85,9 @@ class CreateUI(BaseUI):
             navigation_item (NavigationHistoryItem): The navigation history item instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
+            unified_factory (UnifiedObjectFactory): The unified factory instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
+            type (Optional[str]): The type of object to create.
 
         Returns:
             None
@@ -103,9 +107,11 @@ class CreateUI(BaseUI):
             navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
+            unified_factory=unified_factory,
             unified_manager=unified_manager,
         )
 
+        # Check, if the passed 'master' tkinter.Toplevel widget is an instance of tkinter.Toplevel
         if isinstance(
             master,
             tkinter.Toplevel,
@@ -123,6 +129,12 @@ class CreateUI(BaseUI):
             master.grid_rowconfigure(
                 index=0,
                 weight=1,
+            )
+
+            # Register the destroy event
+            master.protocol(
+                name="WM_DELETE_WINDOW",
+                func=self._on_master_destroy,
             )
 
         # Check, if a type string was passed
@@ -156,7 +168,19 @@ class CreateUI(BaseUI):
             ImmutableStack,
         ]
     ]:
-        """ """
+        """
+        Creates an entity based on the passed event.
+
+        Args:
+            entity (Union[ImmutableAnswer, ImmutableFlashcard, ImmutableQuestion, ImmutableStack]): The entity to create.
+            event (DispatcherEvent): The event to dispatch.
+
+        Returns:
+            Optional[Union[ImmutableAnswer, ImmutableFlashcard, ImmutableQuestion, ImmutableStack]]: The created entity or None.
+
+        Raises:
+            Exception: If an error occurs while creating the entity.
+        """
         try:
             # Dispatch the passed REQUEST_CREATE event in the global namespace
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
@@ -200,7 +224,18 @@ class CreateUI(BaseUI):
         self,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
-        """ """
+        """
+        Retrieves the difficulty value from the kwargs dictionary.
+
+        Args:
+            **kwargs: Keyword arguments.
+
+        Returns:
+            Optional[Dict[str, Any]]: The difficulty value or None.
+
+        Raises:
+            Exception: If an error occurs while attempting to call '_get_difficulty' method from '{self.__class__.__name__}' class.
+        """
         try:
             # Obtain the 'difficulty' value from the kwargs dictionary
             difficulty: Optional[Union[ImmutableDifficulty, int, str]] = kwargs.pop(
@@ -237,7 +272,18 @@ class CreateUI(BaseUI):
         self,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
-        """ """
+        """
+        Retrieves the priority value from the kwargs dictionary.
+
+        Args:
+            **kwargs: Keyword arguments.
+
+        Returns:
+            Optional[Dict[str, Any]]: The priority value or None.
+
+        Raises:
+            Exception: If an error occurs while attempting to call '_get_priority' method from '{self.__class__.__name__}' class.
+        """
         try:
             # Obtain the 'priority' value from the kwargs dictionary
             priority: Optional[Union[ImmutablePriority, int, str]] = kwargs.pop(
@@ -275,7 +321,19 @@ class CreateUI(BaseUI):
         field: str,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
-        """ """
+        """
+        Retrieves the stack value from the kwargs dictionary.
+
+        Args:
+            field (str): The field name.
+            **kwargs: Keyword arguments.
+
+        Returns:
+            Optional[Dict[str, Any]]: The stack value or None.
+
+        Raises:
+            Exception: If an error occurs while attempting to call '_get_stack' method from '{self.__class__.__name__}' class.
+        """
         try:
             # Obtain the 'field' value from the kwargs dictionary
             stack: Optional[Union[ImmutableStack, int, str]] = kwargs.get(
@@ -313,7 +371,19 @@ class CreateUI(BaseUI):
         status_name: str,
         **kwargs,
     ) -> Optional[Dict[str, Any]]:
-        """ """
+        """
+        Retrieves the status value from the kwargs dictionary.
+
+        Args:
+            status_name (str): The status name.
+            **kwargs: Keyword arguments.
+
+        Returns:
+            Optional[Dict[str, Any]]: The status value or None.
+
+        Raises:
+            Exception: If an error occurs while attempting to call '_get_status_by_name' method from '{self.__class__.__name__}' class.
+        """
         try:
             # Request the ImmutableStatus object from the database
             status: Optional[Union[ImmutableStatus, int, str]] = self._request_entity(
@@ -348,12 +418,89 @@ class CreateUI(BaseUI):
             # Re-raise the exception to the caller
             raise e
 
+    def _on_master_destroy(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
+        """
+        Handles the 'destroy' event of the master widget.
+
+        This method is called when the master widget is destroyed and prompts the user to cancel the form if it has not been saved.
+
+        Args:
+            event (Optional[tkinter.Event]): The event object.
+
+        Returns:
+            None
+        """
+
+        # Check, if the form exists and is saved
+        if self.form and not self.form.check_save():
+            # Prompt the user about cancelling
+            response: str = ToplevelNotification.okay_cancel(
+                cancel_button={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                frame={"background": Constants.BLUE_GREY["700"]},
+                message="It seems that the form has not been saved. Do you want to cancel?",
+                message_label={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                okay_button={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                title="Confirm cancel",
+                title_label={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+            )
+
+            # Check, if the response equals "cancel"
+            if response == "cancel":
+                # Return early
+                return
+
+        # Call the 'destroy' method of the 'master' tkinter.Toplevel widget
+        self.master.destroy()
+
     def _request_entity(
         self,
         event: DispatcherEvent,
         **kwargs,
     ) -> Optional[ImmutableDifficulty]:
-        """ """
+        """
+        Retrieves the entity from the database.
+
+        Args:
+            event (DispatcherEvent): The event to dispatch.
+            **kwargs: Keyword arguments.
+
+        Returns:
+            Optional[ImmutableDifficulty]: The entity or None.
+
+        Raises:
+            Exception: If an error occurs while attempting to call '_request_entity' method from '{self.__class__.__name__}' class.
+        """
         try:
             # Dispatch the passed event in the 'global' namespace along with the passed keyword arguments
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
@@ -411,6 +558,9 @@ class CreateUI(BaseUI):
 
         This method configures the grid of the create menu widget by setting the
         weights of the columns and rows.
+
+        Args:
+            None
 
         Returns:
             None
@@ -894,7 +1044,20 @@ class CreateUI(BaseUI):
         self,
         **kwargs,
     ) -> Optional[ImmutableAnswer]:
-        """ """
+        """
+        Handles the creation of an answer.
+
+        This method handles the creation of an answer and displays a notification to the user if the creation fails.
+
+        Args:
+            None
+
+        Returns:
+            Optional[ImmutableAnswer]: The created answer or None if the creation fails
+
+        Raises:
+            Exception: If an exception occurs
+        """
         try:
             # Obtain the type from the kwargs
             type: Optional[str] = kwargs.pop(
@@ -923,7 +1086,20 @@ class CreateUI(BaseUI):
         self,
         **kwargs,
     ) -> Optional[ImmutableFlashcard]:
-        """ """
+        """
+        Handles the creation of a flashcard.
+
+        This method handles the creation of a flashcard and displays a notification to the user if the creation fails.
+
+        Args:
+            None
+
+        Returns:
+            Optional[ImmutableFlashcard]: The created flashcard or None if the creation fails
+
+        Raises:
+            Exception: If an exception occurs
+        """
         try:
             # Obtain the type from the kwargs
             type: Optional[str] = kwargs.pop(
@@ -962,7 +1138,6 @@ class CreateUI(BaseUI):
             # Attempt to get the ImmutableStack object from the database
             stack: Optional[ImmutableStack] = self._request_entity(
                 event=Events.REQUEST_STACK_LOOKUP,
-                force_refetch=True,
                 id=kwargs.get("stack"),
             )
 
@@ -1097,7 +1272,17 @@ class CreateUI(BaseUI):
         self,
         **kwargs,
     ) -> Optional[ImmutableQuestion]:
-        """ """
+        """
+        Handles the creation of a question.
+
+        This method handles the creation of a question and displays a notification to the user if the creation fails.
+
+        Args:
+            None
+
+        Returns:
+            Optional[ImmutableQuestion]: The created question or None if the creation fails
+        """
         try:
             # Obtain the type from the kwargs
             type: Optional[str] = kwargs.pop(
@@ -1133,7 +1318,17 @@ class CreateUI(BaseUI):
         self,
         **kwargs,
     ) -> Optional[ImmutableStack]:
-        """ """
+        """
+        Handles the creation of a stack.
+
+        This method handles the creation of a stack and displays a notification to the user if the creation fails.
+
+        Args:
+            None
+
+        Returns:
+            Optional[ImmutableStack]: The created stack or None if the creation fails
+        """
         try:
             # Obtain the type from the kwargs
             type: Optional[str] = kwargs.pop(
@@ -1246,7 +1441,9 @@ class CreateUI(BaseUI):
                 # Convert the ImmutableStack ancestor to a MutableStack object
                 ancestor = ancestor.to_mutable()
 
-                self.logger.debug(message=f"Ancestor {ancestor.id} descendants pre adding: {ancestor.descendants}")
+                self.logger.debug(
+                    message=f"Ancestor {ancestor.id} descendants pre adding: {ancestor.descendants}"
+                )
 
                 # Add the created ImmutableStack object to the ancestor MutableStack's descendants
                 ancestor.add_to_descendants(descendant=stack)
@@ -1283,9 +1480,58 @@ class CreateUI(BaseUI):
         """
         Handles the click event of the "Cancel" button.
 
+        Args:
+            None
+
         Returns:
             None
         """
+
+        # Check, if the form exists and is saved
+        if self.form and not self.form.check_save():
+            # Prompt the user about cancelling
+            response: str = ToplevelNotification.okay_cancel(
+                cancel_button={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                frame={"background": Constants.BLUE_GREY["700"]},
+                message="It seems that the form has not been saved. Do you want to cancel?",
+                message_label={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                okay_button={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                title="Confirm cancel",
+                title_label={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+            )
+
+            # Check, if the response equals "cancel"
+            if response == "cancel":
+                # Return early
+                return
 
         # Check if the master widget is of type toplevel
         if isinstance(
@@ -1329,7 +1575,9 @@ class CreateUI(BaseUI):
             # Check, if the entity exists
             if not entity:
                 # Log a warning message
-                self.logger.warning(message=f"")
+                self.logger.warning(
+                    message=f"Failed to create '{type}' type entity. This is likely a serious issue that needs to be resolved."
+                )
 
                 # Notify the user
                 ToplevelToastNotification(
@@ -1372,6 +1620,59 @@ class CreateUI(BaseUI):
 
             # Re-raise the exception to the caller
             raise e
+
+    @override
+    def on_request_ui_validate_navigation(self) -> bool:
+        """ """
+
+        # Check, if the form exists and is saved
+        if self.form and not self.form.check_save():
+            # Prompt the user about cancelling
+            response: str = ToplevelNotification.okay_cancel(
+                cancel_button={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                frame={"background": Constants.BLUE_GREY["700"]},
+                message="It seems that the form has not been saved. Do you want to cancel?",
+                message_label={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                okay_button={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                title="Confirm cancel",
+                title_label={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+            )
+
+            # Check, if the response equals "cancel"
+            if response == "cancel":
+                # Return False
+                return False
+
+        # Return True
+        return True
 
     def on_type_field_change(
         self,
@@ -1429,7 +1730,17 @@ class CreateUI(BaseUI):
         )
 
     def validate_form(self) -> None:
-        """ """
+        """
+        Validates the form.
+
+        This method validates the form and displays a notification to the user if the validation fails.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Obtain a validation report from the form as a dictionary
         report: Dict[str, bool] = self.form.validate_form()
@@ -1441,8 +1752,33 @@ class CreateUI(BaseUI):
 
         # Display a notification to the user
         ToplevelNotification.okay(
+            frame={"background": Constants.BLUE_GREY["700"]},
+            okay_button={
+                "background": Constants.BLUE_GREY["700"],
+                "font": (
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                "foreground": Constants.WHITE,
+            },
+            message=f"It seems that at least one required field has no value.\n\nPlease review:\n\n\t* {"\n\t*".join([Miscellaneous.snake_to_pascal(string=key) for key in report["fields"].keys() if not report["fields"][key]])}",
+            message_label={
+                "background": Constants.BLUE_GREY["700"],
+                "font": (
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                "foreground": Constants.WHITE,
+            },
             title="Error during validation",
-            message=f"It seems that at least one required field has no value.\n\nPlease review:\n {"\n\t*".join([Miscellaneous.snake_to_pascal(string=key) for key in report["fields"].keys() if not report["fields"][key]])}",
+            title_label={
+                "background": Constants.BLUE_GREY["700"],
+                "font": (
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                "foreground": Constants.WHITE,
+            },
         )
 
         # Return False

@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -41,6 +42,7 @@ class ImmutableComment(ImmutableBaseObject):
         id (int): The ID of the comment.
         key (str): The key of the comment.
         last_edited_at (datetime): The timestamp when the comment was last edited.
+        metadata (Dict[str, Any]): The metadata of the comment.
         updated_at (datetime): The timestamp when the comment was last updated.
         uuid (str): The UUID of the comment.
         version (int): The version of the comment.
@@ -57,6 +59,7 @@ class ImmutableComment(ImmutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_edited_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
         version: Optional[int] = None,
@@ -74,6 +77,7 @@ class ImmutableComment(ImmutableBaseObject):
             id (Optional[int]): The ID of the comment.
             key (Optional[str]): The key of the comment.
             last_edited_at (Optional[datetime]): The timestamp when the comment was last edited.
+            metadata (Optional[Dict[str, Any]]): The metadata of the comment.
             updated_at (Optional[datetime]): The timestamp when the comment was last updated.
             uuid (Optional[str]): The UUID of the comment.
             version (Optional[int]): The version of the comment.
@@ -92,6 +96,7 @@ class ImmutableComment(ImmutableBaseObject):
             id=id,
             key=key,
             last_edited_at=last_edited_at,
+            metadata=metadata,
             parent=parent,
             updated_at=updated_at,
             uuid=uuid,
@@ -135,6 +140,7 @@ class MutableComment(MutableBaseObject):
         id (int): The ID of the comment.
         key (str): The key of the comment.
         last_edited_at (datetime): The timestamp when the comment was last edited.
+        metadata (Dict[str, Any]): The metadata of the comment.
         updated_at (datetime): The timestamp when the comment was last updated.
         uuid (str): The UUID of the comment.
         version (int): The version of the comment.
@@ -151,6 +157,7 @@ class MutableComment(MutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_edited_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
         version: Optional[int] = None,
@@ -168,6 +175,7 @@ class MutableComment(MutableBaseObject):
             id (Optional[int]): The ID of the comment.
             key (Optional[str]): The key of the comment.
             last_edited_at (Optional[datetime]): The timestamp when the comment was last edited.
+            metadata (Optional[Dict[str, Any]]): The metadata of the comment.
             updated_at (Optional[datetime]): The timestamp when the comment was last updated.
             uuid (Optional[str]): The UUID of the comment.
             version (Optional[int]): The version of the comment.
@@ -186,6 +194,7 @@ class MutableComment(MutableBaseObject):
             id=id,
             key=key,
             last_edited_at=last_edited_at,
+            metadata=metadata,
             parent=parent,
             updated_at=updated_at,
             uuid=uuid,
@@ -315,6 +324,7 @@ class CommentFactory:
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_edited_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
         version: Optional[int] = None,
@@ -332,6 +342,7 @@ class CommentFactory:
             id (Optional[int]): The ID of the comment.
             key (Optional[str]): The key of the comment.
             last_edited_at (Optional[datetime]): The last edited timestamp of the comment.
+            metadata (Optional[Dict[str, Any]]): The metadata of the comment.
             updated_at (Optional[datetime]): The update timestamp of the comment.
             uuid (Optional[str]): The UUID of the comment.
             version (Optional[int]): The version of the comment.
@@ -350,6 +361,7 @@ class CommentFactory:
                 id=id,
                 key=key,
                 last_edited_at=last_edited_at,
+                metadata=metadata,
                 parent=parent,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -363,6 +375,13 @@ class CommentFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class ComentBuilder(BaseObjectBuilder):
+    """
+    """
+
+    pass
 
 
 class CommentManager(BaseObjectManager):
@@ -955,7 +974,8 @@ class CommentModel(ImmutableBaseModel):
         icon (Optional[str]): The icon of the comment. Defaults to "💭".
         id (Optional[int]): The ID of the comment.
         key (Optional[str]): The key of the comment.
-        last_viewed_at (Optional[datetime]): The timestamp when the comment was last viewed.
+        last_edited_at (Optional[datetime]): The timestamp when the comment was last edited.
+        metadata (Optional[Dict[str, Any]]): The metadata of the comment.
         priority (Optional[int]): The priority of the comment.
         status (Optional[int]): The status of the comment.
         updated_at (Optional[datetime]): The timestamp when the comment was last updated.
@@ -1076,6 +1096,38 @@ class CommentModel(ImmutableBaseModel):
         unique=True,
     )
 
+    last_edited_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="last_edited_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     parent: Field = Field(
         autoincrement=False,
         default=None,
@@ -1149,6 +1201,7 @@ class CommentModel(ImmutableBaseModel):
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_edited_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         parent: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1165,6 +1218,7 @@ class CommentModel(ImmutableBaseModel):
             id (Optional[int]): The ID of the comment.
             key (Optional[str]): The key of the comment.
             last_edited_at (Optional[datetime]): The timestamp when the comment was last edited.
+            metadata (Optional[Dict[str, Any]]): The metadata of the comment.
             parent (Optional[int]): The key of the parent object.
             updated_at (Optional[datetime]): The timestamp when the comment was last updated.
             uuid (Optional[str]): The UUID of the comment.
@@ -1184,6 +1238,7 @@ class CommentModel(ImmutableBaseModel):
             id=id,
             key=key,
             last_edited_at=last_edited_at,
+            metadata=metadata,
             parent=parent,
             updated_at=updated_at,
             uuid=uuid,

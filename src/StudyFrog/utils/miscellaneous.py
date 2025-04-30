@@ -159,6 +159,36 @@ class Miscellaneous:
         return 5.0
 
     @classmethod
+    def calculate_duration(
+        cls,
+        end: datetime,
+        start: datetime,
+        as_: Literal["seconds", "minutes", "hours"] = "seconds",
+    ) -> float:
+        """
+        Calculates the duration between two datetime objects.
+
+        Args:
+            end (datetime): The end datetime.
+            start (datetime): The start datetime.
+            as_ (Literal["seconds", "minutes", "hours"]): The unit to return the duration in.
+
+        Returns:
+            float: The duration between the two datetime objects in the specified unit.
+        """
+
+        # Calculate the duration in seconds
+        duration: float = (end - start).total_seconds()
+
+        # Return the duration in the specified unit
+        if as_ == "seconds":
+            return duration
+        elif as_ == "minutes":
+            return duration / 60
+        elif as_ == "hours":
+            return duration / 3600
+
+    @classmethod
     def camel_to_pascal(
         cls,
         string: str,
@@ -536,6 +566,26 @@ class Miscellaneous:
             datetime: The incremented datetime.
         """
         return datetime.now() + timedelta(days=increment)
+
+    @classmethod
+    def get_random_bool(cls) -> bool:
+        """
+        Returns a random boolean value.
+
+        Returns:
+            bool: A random boolean value.
+        """
+        return random.choice(seq=[True, False])
+
+    @classmethod
+    def get_random_float(cls) -> float:
+        """
+        Returns a random float value.
+
+        Returns:
+            float: A random float value.
+        """
+        return random.random()
 
     @classmethod
     def get_random_int(

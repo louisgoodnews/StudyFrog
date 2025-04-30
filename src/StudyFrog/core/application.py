@@ -80,6 +80,7 @@ class Application:
             dispatcher=self.dispatcher,
             navigation_service=self.navigation_service,
             setting_service=self.setting_service,
+            unified_factory=self.unified_factory,
             unified_manager=self.unified_manager,
         )
 

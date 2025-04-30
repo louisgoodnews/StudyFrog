@@ -19,7 +19,7 @@ from utils.dispatcher import Dispatcher
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["ReportUI"]
@@ -40,6 +40,7 @@ class ReportUI(BaseUI):
         navigation_item (NavigationHistoryItem): The navigation history item instance.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
+        unified_factory (UnifiedObjectFactory): The unified factory instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -50,6 +51,7 @@ class ReportUI(BaseUI):
         navigation_item: NavigationHistoryItem,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
+        unified_factory: UnifiedObjectFactory,
         unified_manager: UnifiedObjectManager,
     ) -> None:
         """
@@ -61,6 +63,7 @@ class ReportUI(BaseUI):
             navigation_item (NavigationHistoryItem): The navigation history item instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
+            unified_factory (UnifiedObjectFactory): The unified factory instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
         Returns:
@@ -75,6 +78,7 @@ class ReportUI(BaseUI):
             navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
+            unified_factory=unified_factory,
             unified_manager=unified_manager,
         )
 

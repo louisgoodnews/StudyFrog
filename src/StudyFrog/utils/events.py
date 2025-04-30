@@ -127,42 +127,42 @@ class Events:
 
     # An event that indicates that a checkbox field has changed
     CHECKBUTTON_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:checkbox_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:checkbox_field:field:field:changed")
     )
 
     # An event that indicates that a checkbox field has been cleared
     CHECKBUTTON_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:checkbox_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:checkbox_field:field:field:cleared")
     )
 
     # An event that indicates that a checkbox field's value has been retrieved
     CHECKBUTTON_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:checkbox_field:_field:field:get"
+        name="ui:checkbox_field:field:field:get"
     )
 
     # An event that indicates that a checkbox field has been set
     CHECKBUTTON_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:checkbox_field:_field:field:set"
+        name="ui:checkbox_field:field:field:set"
     )
 
     # An event that indicates that a checkbox field has changed
     CHECKBUTTON_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:checkbox_select_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:checkbox_select_field:field:field:changed")
     )
 
     # An event that indicates that a checkbox field has been cleared
     CHECKBUTTON_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:checkbox_select_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:checkbox_select_field:field:field:cleared")
     )
 
     # An event that indicates that a checkbox field's value has been retrieved
     CHECKBUTTON_SELECT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:checkbox_select_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:checkbox_select_field:field:field:get")
     )
 
     # An event that indicates that a checkbox field has been set
     CHECKBUTTON_SELECT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:checkbox_select_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:checkbox_select_field:field:field:set")
     )
 
     # An event that indicates that a combobox field has changed
@@ -187,22 +187,22 @@ class Events:
 
     # An event that indicates that a combobox field has changed
     COMBOBOX_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox_select_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:combobox_select_field:field:field:changed")
     )
 
     # An event that indicates that a combobox field has been cleared
     COMBOBOX_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox_select_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:combobox_select_field:field:field:cleared")
     )
 
     # An event that indicates that a combobox field's value has been retrieved
     COMBOBOX_SELECT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox_select_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:combobox_select_field:field:field:get")
     )
 
     # An event that indicates that a combobox field has been set
     COMBOBOX_SELECT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox_select_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:combobox_select_field:field:field:set")
     )
 
     # An event that indicates that a create button has been clicked
@@ -212,27 +212,27 @@ class Events:
 
     # An event that indicates that a create form field has changed
     CREATE_FORM_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:create:form_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:create:form_field:field:field:changed")
     )
 
     # An event that indicates that a date select field has changed
     DATE_SELECT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox_select_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:combobox_select_field:field:field:changed")
     )
 
     # An event that indicates that a date select field has been cleared
     DATE_SELECT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:combobox_select_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:combobox_select_field:field:field:cleared")
     )
 
     # An event that indicates that a date select field's value has been retrieved
     DATE_SELECT_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:combobox_select_field:_field:field:get"
+        name="ui:combobox_select_field:field:field:get"
     )
 
     # An event that indicates that a date select field has been set
     DATE_SELECT_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:combobox_select_field:_field:field:set"
+        name="ui:combobox_select_field:field:field:set"
     )
 
     # An event that indicates that a difficulty has been created in the backend
@@ -257,22 +257,22 @@ class Events:
 
     # An event that indicates that an entity combobox field has changed
     ENTITY_COMBOBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:entity_combobox_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:entity_combobox_field:field:field:changed")
     )
 
     # An event that indicates that an entity combobox field has been cleared
     ENTITY_COMBOBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:entity_combobox_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:entity_combobox_field:field:field:cleared")
     )
 
     # An event that indicates that an entity combobox field has been retrieved
     ENTITY_COMBOBOX_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:entity_combobox_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:entity_combobox_field:field:field:get")
     )
 
     # An event that indicates that an entity combobox field has been set
     ENTITY_COMBOBOX_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:entity_combobox_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:entity_combobox_field:field:field:set")
     )
 
     # An event that indicates that a flashcard has been created in the backend
@@ -304,61 +304,61 @@ class Events:
 
     # An event that indicates that a float progressbar field has been changed
     FLOAT_PROGRESSBAR_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:field:field:changed")
     )
 
     # An event that indicates that a float progressbar field has been cleared
     FLOAT_PROGRESSBAR_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:field:field:cleared")
     )
 
     # An event that indicates that a float progressbar field has been retrieved
     FLOAT_PROGRESSBAR_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:field:field:get")
     )
 
     # An event that indicates that a float progressbar field has been set
     FLOAT_PROGRESSBAR_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:float_progressbar_field:field:field:set")
     )
 
     # An event that indicates that a float scale field has been changed
     FLOAT_SCALE_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_scale_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:float_scale_field:field:field:changed")
     )
 
     # An event that indicates that a float scale field has been cleared
     FLOAT_SCALE_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_scale_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:float_scale_field:field:field:cleared")
     )
 
     # An event that indicates that a float scale field has been retrieved
     FLOAT_SCALE_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_scale_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:float_scale_field:field:field:get")
     )
 
     # An event that indicates that a float scale field has been set
     FLOAT_SCALE_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_scale_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:float_scale_field:field:field:set")
     )
 
     # An event that indicates that a float spinbox field has been changed
     FLOAT_SPINBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_spinbox_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:float_spinbox_field:field:field:changed")
     )
     # An event that indicates that a float spinbox field has been cleared
     FLOAT_SPINBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_spinbox_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:float_spinbox_field:field:field:cleared")
     )
 
     # An event that indicates that a float spinbox field has been retrieved
     FLOAT_SPINBOX_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_spinbox_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:float_spinbox_field:field:field:get")
     )
 
     # An event that indicates that a float spinbox field has been set
     FLOAT_SPINBOX_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:float_spinbox_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:float_spinbox_field:field:field:set")
     )
 
     # An event that indicates that a generic event has occurred
@@ -373,66 +373,86 @@ class Events:
 
     # An event that indicates that an int progressbar field has been changed
     INT_PROGRESSBAR_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:field:field:changed")
     )
 
     # An event that indicates that an int progressbar field has been cleared
     INT_PROGRESSBAR_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:field:field:cleared")
     )
 
     # An event that indicates that an int progressbar field has been retrieved
     INT_PROGRESSBAR_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:field:field:get")
     )
 
     # An event that indicates that an int progressbar field has been set
     INT_PROGRESSBAR_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:int_progressbar_field:field:field:set")
     )
 
     # An event that indicates that an int scale field has been changed
     INT_SCALE_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_scale_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:int_scale_field:field:field:changed")
     )
 
     # An event that indicates that an int scale field has been cleared
     INT_SCALE_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_scale_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:int_scale_field:field:field:cleared")
     )
 
     # An event that indicates that an int scale field has been retrieved
     INT_SCALE_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_scale_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:int_scale_field:field:field:get")
     )
 
     # An event that indicates that an int scale field has been set
     INT_SCALE_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_scale_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:int_scale_field:field:field:set")
     )
 
     # An event that indicates that an int spinbox field has been changed
     INT_SPINBOX_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_spinbox_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:int_spinbox_field:field:field:changed")
     )
     # An event that indicates that an int spinbox field has been cleared
     INT_SPINBOX_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:int_spinbox_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:int_spinbox_field:field:field:cleared")
     )
 
     # An event that indicates that an int spinbox field has been retrieved
     INT_SPINBOX_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:int_spinbox_field:_field:field:get"
+        name="ui:int_spinbox_field:field:field:get"
     )
 
     # An event that indicates that an int spinbox field has been set
     INT_SPINBOX_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:int_spinbox_field:_field:field:set"
+        name="ui:int_spinbox_field:field:field:set"
     )
 
     # An event that indicates that a label has been clicked
     LABEL_CLICKED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="ui:label:clicked"
+    )
+
+    # An event that indicates that a markdown multi line text field has changed
+    MARKDOWN_MULTI_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:markdown_multi_line_text_field:field:field:changed")
+    )
+
+    # An event that indicates that a markdown multi line text field has been cleared
+    MARKDOWN_MULTI_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:markdown_multi_line_text_field:field:field:cleared")
+    )
+
+    # An event that indicates that a markdown multi line text field has been retrieved
+    MARKDOWN_MULTI_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:markdown_multi_line_text_field:field:field:get")
+    )
+
+    # An event that indicates that a markdown multi line text field has been set
+    MARKDOWN_MULTI_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:markdown_multi_line_text_field:field:field:set")
     )
 
     # An event that indicates that a menu button has been clicked
@@ -442,22 +462,22 @@ class Events:
 
     # An event that indicates that a multi line text field has changed
     MULTI_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_line_text_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:multi_line_text_field:field:field:changed")
     )
 
     # An event that indicates that a multi line text field has been cleared
     MULTI_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_line_text_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:multi_line_text_field:field:field:cleared")
     )
 
     # An event that indicates that a multi line text field has been retrieved
     MULTI_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_line_text_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:multi_line_text_field:field:field:get")
     )
 
     # An event that indicates that a multi line text field has been set
     MULTI_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:multi_line_text_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:multi_line_text_field:field:field:set")
     )
 
     # An event that indicates that a multi option select field has changed
@@ -549,6 +569,20 @@ class Events:
     NOTIFY_LEARNING_SESSION_DIFFICULTY_BUTTON_CLICKED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(
             name="ui:notify:state:learning_session:difficulty:button:clicked"
+        )
+    )
+
+    # An event that indicates that a learning session recall has been cancelled
+    NOTIFY_LEARNING_SESSION_RECALL_UI_RECALL_CANCELLED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:notify:state:learning_session_recall_ui:recall:cancelled"
+        )
+    )
+
+    # An event that indicates that a learning session recall has been completed
+    NOTIFY_LEARNING_SESSION_RECALL_UI_RECALL_COMPLETED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:notify:state:learning_session_recall_ui:recall:completed"
         )
     )
 
@@ -1554,22 +1588,22 @@ class Events:
 
     # An event that indicates that a scale field has been changed
     SCALE_FIELD_CHANGED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:scale_field:_field:field:changed"
+        name="ui:scale_field:field:field:changed"
     )
 
     # An event that indicates that a scale field has been cleared
     SCALE_FIELD_CLEARED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:scale_field:_field:field:cleared"
+        name="ui:scale_field:field:field:cleared"
     )
 
     # An event that indicates that a scale field has been retrieved
     SCALE_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:scale_field:_field:field:get"
+        name="ui:scale_field:field:field:get"
     )
 
     # An event that indicates that a scale field has been set
     SCALE_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
-        name="ui:scale_field:_field:field:set"
+        name="ui:scale_field:field:field:set"
     )
 
     # An event that indicates that the settings button has been clicked
@@ -1584,22 +1618,22 @@ class Events:
 
     # An event that indicates that a single line text field has been changed
     SINGLE_LINE_TEXT_FIELD_CHANGED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_line_text_field:_field:field:changed")
+        DispatcherEventFactory.create_event(name="ui:single_line_text_field:field:field:changed")
     )
 
     # An event that indicates that a single line text field has been cleared
     SINGLE_LINE_TEXT_FIELD_CLEARED: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_line_text_field:_field:field:cleared")
+        DispatcherEventFactory.create_event(name="ui:single_line_text_field:field:field:cleared")
     )
 
     # An event that indicates that a single line text field has been retrieved
     SINGLE_LINE_TEXT_FIELD_GET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_line_text_field:_field:field:get")
+        DispatcherEventFactory.create_event(name="ui:single_line_text_field:field:field:get")
     )
 
     # An event that indicates that a single line text field has been set
     SINGLE_LINE_TEXT_FIELD_SET: Final[DispatcherEvent] = (
-        DispatcherEventFactory.create_event(name="ui:single_line_text_field:_field:field:set")
+        DispatcherEventFactory.create_event(name="ui:single_line_text_field:field:field:set")
     )
 
     # An event that indicates that a single option select field has changed
@@ -1714,6 +1748,71 @@ class Events:
     # An event that indicates that a text analysis has been started
     TEXT_ANALYZER_ANALYSIS_STARTED: Final[DispatcherEvent] = (
         DispatcherEventFactory.create_event(name="text_analyzer:analysis:started")
+    )
+
+    # An event that indicates that the align center button has been clicked
+    TEXT_EDITOR_FIELD_ALIGN_CENTER_BUTTON_CLICKED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:align_center_button:clicked")
+    )
+
+    # An event that indicates that the align left button has been clicked
+    TEXT_EDITOR_FIELD_ALIGN_LEFT_BUTTON_CLICKED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:align_left_button:clicked")
+    )
+
+    # An event that indicates that the align right button has been clicked
+    TEXT_EDITOR_FIELD_ALIGN_RIGHT_BUTTON_CLICKED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:align_right_button:clicked")
+    )
+
+    # An event that indicates that the bold button has been clicked
+    TEXT_EDITOR_FIELD_BOLD_BUTTON_CLICKED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:bold_button:clicked")
+    )
+
+    # An event that indicates that the text editor field has changed
+    TEXT_EDITOR_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:changed")
+    )
+
+    # An event that indicates that the text editor field has been cleared
+    TEXT_EDITOR_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:cleared")
+    )
+
+    # An event that indicates that the font family combobox has been selected
+    TEXT_EDITOR_FIELD_FONT_FAMILY_COMBOX_SELECT: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:font_family_combobox:select")
+    )
+
+    # An event that indicates that the font size combobox has been selected
+    TEXT_EDITOR_FIELD_FONT_SIZE_COMBOX_SELECT: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:font_size_combobox:select")
+    )
+
+    # An event that indicates that the text editor field has been got
+    TEXT_EDITOR_FIELD_GET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:get")
+    )
+
+    # An event that indicates that the italic button has been clicked
+    TEXT_EDITOR_FIELD_ITALIC_BUTTON_CLICKED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:italic_button:clicked")
+    )
+
+    # An event that indicates that the overstrike button has been clicked
+    TEXT_EDITOR_FIELD_OVERSTRIKE_BUTTON_CLICKED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:overstrike_button:clicked")
+    )
+
+    # An event that indicates that the text editor field has been set
+    TEXT_EDITOR_FIELD_SET: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:set")
+    )
+
+    # An event that indicates that the underline button has been clicked
+    TEXT_EDITOR_FIELD_UNDERLINE_BUTTON_CLICKED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="text_editor_field:underline_button:clicked")
     )
 
     # An event that indicates that a toast has been clicked
@@ -2190,6 +2289,21 @@ class Events:
         ]
 
     @classmethod
+    def get_markdown_multi_line_text_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all markdown multi line text field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all markdown multi line text field events in the Events class.
+        """
+        return [
+            cls.MARKDOWN_MULTI_LINE_TEXT_FIELD_CHANGED,
+            cls.MARKDOWN_MULTI_LINE_TEXT_FIELD_CLEARED,
+            cls.MARKDOWN_MULTI_LINE_TEXT_FIELD_GET,
+            cls.MARKDOWN_MULTI_LINE_TEXT_FIELD_SET,
+        ]
+
+    @classmethod
     def get_multi_line_text_field_events(cls) -> List[DispatcherEvent]:
         """
         Returns a list of all multi line text field events in the Events class.
@@ -2525,6 +2639,30 @@ class Events:
             cls.REQUEST_TEACHER_LOAD,
             cls.REQUEST_TEACHER_LOOKUP,
             cls.REQUEST_TEACHER_UPDATE,
+        ]
+
+    @classmethod
+    def get_text_editor_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all text editor field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all text editor field events in the Events class.
+        """
+        return [
+            cls.TEXT_EDITOR_FIELD_ALIGN_CENTER_BUTTON_CLICKED,
+            cls.TEXT_EDITOR_FIELD_ALIGN_LEFT_BUTTON_CLICKED,
+            cls.TEXT_EDITOR_FIELD_ALIGN_RIGHT_BUTTON_CLICKED,
+            cls.TEXT_EDITOR_FIELD_BOLD_BUTTON_CLICKED,
+            cls.TEXT_EDITOR_FIELD_CHANGED,
+            cls.TEXT_EDITOR_FIELD_CLEARED,
+            cls.TEXT_EDITOR_FIELD_FONT_FAMILY_COMBOX_SELECT,
+            cls.TEXT_EDITOR_FIELD_FONT_SIZE_COMBOX_SELECT,
+            cls.TEXT_EDITOR_FIELD_GET,
+            cls.TEXT_EDITOR_FIELD_ITALIC_BUTTON_CLICKED,
+            cls.TEXT_EDITOR_FIELD_OVERSTRIKE_BUTTON_CLICKED,
+            cls.TEXT_EDITOR_FIELD_SET,
+            cls.TEXT_EDITOR_FIELD_UNDERLINE_BUTTON_CLICKED,
         ]
 
     @classmethod

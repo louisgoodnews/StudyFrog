@@ -26,7 +26,7 @@ from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["FlashcardViewForm"]

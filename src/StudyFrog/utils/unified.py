@@ -27,7 +27,9 @@ from core.question import ImmutableQuestion
 from core.setting import ImmutableSetting
 from core.stack import ImmutableStack
 from core.status import ImmutableStatus
+from core.subject import ImmutableSubject
 from core.tag import ImmutableTag
+from core.teacher import ImmutableTeacher
 from core.user import ImmutableUser
 
 from utils.logger import Logger
@@ -325,6 +327,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 ImmutablePriority,
                 ImmutableDifficulty,
                 ImmutableSetting,
+                ImmutableSubject,
+                ImmutableTeacher,
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
@@ -354,6 +358,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 ImmutablePriority,
                 ImmutableDifficulty,
                 ImmutableSetting,
+                ImmutableSubject,
+                ImmutableTeacher,
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
@@ -374,6 +380,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutablePriority,
                     ImmutableDifficulty,
                     ImmutableSetting,
+                    ImmutableSubject,
+                    ImmutableTeacher,
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
@@ -419,6 +427,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
             ImmutablePriority,
             ImmutableDifficulty,
             ImmutableSetting,
+            ImmutableSubject,
+            ImmutableTeacher,
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
@@ -432,7 +442,27 @@ class UnifiedObjectManager(ImmutableBaseObject):
             key (str): The key of the object to be retrieved.
 
         Returns:
-            Optional[Union[ImmutableAssociation, ImmutableCustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]: The retrieved object if the key exists, otherwise None.
+            Optional[
+                Union[
+                    ImmutableAssociation,
+                    ImmutableCustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableSubject,
+                    ImmutableTeacher,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                ]
+            ]: The retrieved object if the key exists, otherwise None.
 
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_key' method.
@@ -488,6 +518,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutablePriority,
                     ImmutableDifficulty,
                     ImmutableSetting,
+                    ImmutableSubject,
+                    ImmutableTeacher,
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
@@ -503,7 +535,31 @@ class UnifiedObjectManager(ImmutableBaseObject):
             keys (List[str]): A list of keys for the objects to be retrieved.
 
         Returns:
-            Optional[List[Union[ImmutableAssociation, ImmutableCustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]]: The list of retrieved objects if no exception occurs. Otherwise, None.
+            Optional[
+                List[
+                    Optional[
+                        Union[
+                            ImmutableAssociation,
+                            ImmutableCustomField,
+                            ImmutableStack,
+                            ImmutableFlashcard,
+                            ImmutableQuestion,
+                            ImmutableAnswer,
+                            ImmutableOption,
+                            ImmutableTag,
+                            ImmutableStatus,
+                            ImmutablePriority,
+                            ImmutableDifficulty,
+                            ImmutableSetting,
+                            ImmutableSubject,
+                            ImmutableTeacher,
+                            ImmutableNote,
+                            ImmutableUser,
+                            ImmutableDefault,
+                        ]
+                    ]
+                ]
+            ]: The list of retrieved objects if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_keys' method.
@@ -525,6 +581,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                         ImmutablePriority,
                         ImmutableDifficulty,
                         ImmutableSetting,
+                        ImmutableSubject,
+                        ImmutableTeacher,
                         ImmutableNote,
                         ImmutableUser,
                         ImmutableDefault,
@@ -661,6 +719,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
             ImmutablePriority,
             ImmutableDifficulty,
             ImmutableSetting,
+            ImmutableSubject,
+            ImmutableTeacher,
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
@@ -679,6 +739,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
             ImmutablePriority,
             ImmutableDifficulty,
             ImmutableSetting,
+            ImmutableSubject,
+            ImmutableTeacher,
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
@@ -688,10 +750,50 @@ class UnifiedObjectManager(ImmutableBaseObject):
         Updates a unified object with the given key.
 
         Args:
-            update (Union[ImmutableAssociation, ...]): The unified object to update.
+            update (
+                Union[
+                    ImmutableAssociation,
+                    ImmutableCustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableSubject,
+                    ImmutableTeacher,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                ]
+            ): The unified object to update.
 
         Returns:
-            Optional[Union[ImmutableAssociation, ...]]: The updated unified object if no exception occurs. Otherwise, None.
+            Optional[
+                Union[
+                    ImmutableAssociation,
+                    ImmutableCustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableSubject,
+                    ImmutableTeacher,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                ]
+            ]: The updated unified object if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -699,7 +801,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
         try:
             # Attempt to find a match in the given key
             match: Optional[str] = Miscellaneous.find_match(
-                string=update.__class__.__name__,
+                string=update.__class__.__name__.strip().replace("Mutable", "").replace("Immutable", ""),
                 group=1,
                 pattern=r"([A-Za-z]+)",
             )
@@ -747,6 +849,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 ImmutablePriority,
                 ImmutableDifficulty,
                 ImmutableSetting,
+                ImmutableSubject,
+                ImmutableTeacher,
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
@@ -767,6 +871,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 ImmutablePriority,
                 ImmutableDifficulty,
                 ImmutableSetting,
+                ImmutableSubject,
+                ImmutableTeacher,
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
@@ -777,10 +883,54 @@ class UnifiedObjectManager(ImmutableBaseObject):
         Updates multiple unified objects in bulk.
 
         Args:
-            updates (List[Union[...]]): A list of unified objects to update.
+            updates (
+                List[
+                    Union[
+                        ImmutableAssociation,
+                        ImmutableCustomField,
+                        ImmutableStack,
+                        ImmutableFlashcard,
+                        ImmutableQuestion,
+                        ImmutableAnswer,
+                        ImmutableOption,
+                        ImmutableTag,
+                        ImmutableStatus,
+                        ImmutablePriority,
+                        ImmutableDifficulty,
+                        ImmutableSetting,
+                        ImmutableSubject,
+                        ImmutableTeacher,
+                        ImmutableNote,
+                        ImmutableUser,
+                        ImmutableDefault,
+                    ]
+                ]
+            ): A list of unified objects to update.
 
         Returns:
-            Optional[List[Union[...]]]: The updated unified objects if no exception occurs. Otherwise, None.
+            Optional[
+                List[
+                    Union[
+                        ImmutableAssociation,
+                        ImmutableCustomField,
+                        ImmutableStack,
+                        ImmutableFlashcard,
+                        ImmutableQuestion,
+                        ImmutableAnswer,
+                        ImmutableOption,
+                        ImmutableTag,
+                        ImmutableStatus,
+                        ImmutablePriority,
+                        ImmutableDifficulty,
+                        ImmutableSetting,
+                        ImmutableSubject,
+                        ImmutableTeacher,
+                        ImmutableNote,
+                        ImmutableUser,
+                        ImmutableDefault,
+                    ]
+                ]
+            ]: The updated unified objects if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -801,6 +951,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutablePriority,
                     ImmutableDifficulty,
                     ImmutableSetting,
+                    ImmutableSubject,
+                    ImmutableTeacher,
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
@@ -1729,6 +1881,17 @@ class UnifiedObjectService(ImmutableBaseObject):
         # Get all statuses from the database and return them
         return self.unified_manager.get_all_statuses()
 
+    def on_request_get_all_subjects(self) -> Optional[List[ImmutableSubject]]:
+        """
+        Handles the 'request_get_all_subjects' event and gets all subjects from the database.
+
+        Returns:
+            Optional[List[ImmutableSubject]]: A list of all subjects if no exception occurs. Otherwise, None.
+        """
+
+        # Get all subjects from the database and return them
+        return self.unified_manager.get_all_subjects()
+
     def on_request_get_all_tags(self) -> Optional[List[ImmutableTag]]:
         """
         Handles the 'request_get_all_tags' event and gets all tags from the database.
@@ -1739,6 +1902,17 @@ class UnifiedObjectService(ImmutableBaseObject):
 
         # Get all tags from the database and return them
         return self.unified_manager.get_all_tags()
+
+    def on_request_get_all_teachers(self) -> Optional[List[ImmutableTeacher]]:
+        """
+        Handles the 'request_get_all_teachers' event and gets all teachers from the database.
+
+        Returns:
+            Optional[List[ImmutableTeacher]]: A list of all teachers if no exception occurs. Otherwise, None.
+        """
+
+        # Get all teachers from the database and return them
+        return self.unified_manager.get_all_teachers()
 
     def on_request_get_all_users(self) -> Optional[List[ImmutableUser]]:
         """
@@ -1769,6 +1943,8 @@ class UnifiedObjectService(ImmutableBaseObject):
             ImmutablePriority,
             ImmutableDifficulty,
             ImmutableSetting,
+            ImmutableSubject,
+            ImmutableTeacher,
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
@@ -1782,7 +1958,27 @@ class UnifiedObjectService(ImmutableBaseObject):
             key (str): The key of the object to be retrieved.
 
         Returns:
-            Optional[Union[ImmutableAssociation, ImmutableCustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]: The retrieved object if no exception occurs. Otherwise, None.
+            Optional[
+                Union[
+                    ImmutableAssociation,
+                    ImmutableCustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableSubject,
+                    ImmutableTeacher,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                ]
+            ]: The retrieved object if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_key' method.
@@ -1811,6 +2007,8 @@ class UnifiedObjectService(ImmutableBaseObject):
                 ImmutablePriority,
                 ImmutableDifficulty,
                 ImmutableSetting,
+                ImmutableSubject,
+                ImmutableTeacher,
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
@@ -1825,7 +2023,29 @@ class UnifiedObjectService(ImmutableBaseObject):
             keys (List[str]): The keys of the objects to be retrieved.
 
         Returns:
-            Optional[List[Union[ImmutableAssociation, ImmutableCustomField, ImmutableStack, ImmutableFlashcard, ImmutableQuestion, ImmutableAnswer, ImmutableOption, ImmutableTag, ImmutableStatus, ImmutablePriority, ImmutableDifficulty, ImmutableSetting, ImmutableNote, ImmutableUser, ImmutableDefault]]]: The retrieved objects if no exception occurs. Otherwise, None.
+            Optional[
+                List[
+                    Union[
+                        ImmutableAssociation,
+                        ImmutableCustomField,
+                        ImmutableStack,
+                        ImmutableFlashcard,
+                        ImmutableQuestion,
+                        ImmutableAnswer,
+                        ImmutableOption,
+                        ImmutableTag,
+                        ImmutableStatus,
+                        ImmutablePriority,
+                        ImmutableDifficulty,
+                        ImmutableSetting,
+                        ImmutableSubject,
+                        ImmutableTeacher,
+                        ImmutableNote,
+                        ImmutableUser,
+                        ImmutableDefault,
+                    ]
+                ]
+            ]: The retrieved objects if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to run the 'get_by_keys' method.
@@ -2801,6 +3021,101 @@ class UnifiedObjectService(ImmutableBaseObject):
         # Update the status in the database and return the result of the update
         return self.unified_manager.update_status(status=status)
 
+    def on_request_subject_create(
+        self,
+        subject: ImmutableSubject,
+    ) -> Optional[ImmutableSubject]:
+        """
+        Handles the 'request_subject_create' event and creates a new subject in the database.
+
+        Args:
+            subject (ImmutableSubject): The subject to be created.
+
+        Returns:
+            Optional[ImmutableSubject]: The created immutable subject if no exception occurs. Otherwise, None.
+        """
+
+        # Create the subject in the database and return the result of the creation
+        return self.unified_manager.create_subject(subject=subject)
+
+    def on_request_subject_delete(
+        self,
+        subject: ImmutableSubject,
+    ) -> bool:
+        """
+        Handles the 'request_subject_delete' event and deletes a subject from the database.
+
+        Args:
+            subject (ImmutableSubject): The subject to be deleted.
+
+        Returns:
+            bool: True if the subject is deleted successfully, False otherwise.
+        """
+
+        # Delete the subject from the database and return the result of the deletion
+        return self.unified_manager.delete_subject(subject=subject)
+
+    def on_request_subject_load(
+        self,
+        force_refetch: bool = False,
+        **kwargs,
+    ) -> Optional[List[ImmutableSubject]]:
+        """
+        Handles the 'request_subject_load' event and loads subjects from the database.
+
+        Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
+            **kwargs: The keyword arguments to be used for loading subjects.
+
+        Returns:
+            Optional[List[ImmutableSubject]]: A list of loaded subjects if no exception occurs. Otherwise, None.
+        """
+
+        # Load subjects using the provided keyword arguments and return them
+        return self.unified_manager.get_subject_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
+
+    def on_request_subject_lookup(
+        self,
+        force_refetch: bool = False,
+        **kwargs,
+    ) -> Optional[List[ImmutableSubject]]:
+        """
+        Handles the 'request_subject_lookup' event and searches for subjects in the database.
+
+        Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
+            **kwargs: The keyword arguments to be used for searching subjects.
+
+        Returns:
+            Optional[List[ImmutableSubject]]: A list of found subjects if no exception occurs. Otherwise, None.
+        """
+
+        # Search for subjects using the provided keyword arguments and return them
+        return self.unified_manager.search_subjects(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
+
+    def on_request_subject_update(
+        self,
+        subject: ImmutableSubject,
+    ) -> Optional[ImmutableSubject]:
+        """
+        Handles the 'request_subject_update' event and updates a subject in the database.
+
+        Args:
+            subject (ImmutableSubject): The subject to be updated.
+
+        Returns:
+            Optional[ImmutableSubject]: The updated immutable subject if no exception occurs. Otherwise, None.
+        """
+
+        # Update the subject in the database and return the result of the update
+        return self.unified_manager.update_subject(subject=subject)
+
     def on_request_tag_create(
         self,
         tag: ImmutableTag,
@@ -2896,6 +3211,101 @@ class UnifiedObjectService(ImmutableBaseObject):
         # Update the tag in the database and return the result of the update
         return self.unified_manager.update_tag(tag=tag)
 
+    def on_request_teacher_create(
+        self,
+        teacher: ImmutableTeacher,
+    ) -> Optional[ImmutableTeacher]:
+        """
+        Handles the 'request_teacher_create' event and creates a new teacher in the database.
+
+        Args:
+            teacher (ImmutableTeacher): The teacher to be created.
+
+        Returns:
+            Optional[ImmutableTeacher]: The created immutable teacher if no exception occurs. Otherwise, None.
+        """
+
+        # Create the teacher in the database and return the result of the creation
+        return self.unified_manager.create_teacher(teacher=teacher)
+
+    def on_request_teacher_delete(
+        self,
+        teacher: ImmutableTeacher,
+    ) -> bool:
+        """
+        Handles the 'request_teacher_delete' event and deletes a teacher from the database.
+
+        Args:
+            teacher (ImmutableTeacher): The teacher to be deleted.
+
+        Returns:
+            bool: True if the teacher was deleted successfully. False otherwise.
+        """
+
+        # Delete the teacher in the database and return the result of the deletion
+        return self.unified_manager.delete_teacher(teacher=teacher)
+
+    def on_request_teacher_load(
+        self,
+        force_refetch: bool = False,
+        **kwargs,
+    ) -> Optional[List[ImmutableTeacher]]:
+        """
+        Handles the 'request_teacher_load' event and loads teachers from the database.
+
+        Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
+            **kwargs: The keyword arguments to be used for querying teachers.
+
+        Returns:
+            Optional[List[ImmutableTeacher]]: A list of loaded teachers if no exception occurs. Otherwise, None.
+        """
+
+        # Retrieve teachers using the provided keyword arguments
+        return self.unified_manager.get_teacher_by(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
+
+    def on_request_teacher_lookup(
+        self,
+        force_refetch: bool = False,
+        **kwargs,
+    ) -> Optional[List[ImmutableTeacher]]:
+        """
+        Handles the 'request_teacher_lookup' event and looks up teachers in the database.
+
+        Args:
+            force_refetch (bool): Forces the manager to refetch from the database. Defaults to False.
+            **kwargs: The keyword arguments to be used for querying teachers.
+
+        Returns:
+            Optional[List[ImmutableTeacher]]: A list of loaded teachers if no exception occurs. Otherwise, None.
+        """
+
+        # Retrieve teachers using the provided keyword arguments
+        return self.unified_manager.search_teachers(
+            force_refetch=force_refetch,
+            **kwargs,
+        )
+
+    def on_request_teacher_update(
+        self,
+        teacher: ImmutableTeacher,
+    ) -> Optional[ImmutableTeacher]:
+        """
+        Handles the 'request_teacher_update' event and updates a teacher in the database.
+
+        Args:
+            teacher (ImmutableTeacher): The teacher to be updated.
+
+        Returns:
+            Optional[ImmutableTeacher]: The updated immutable teacher if no exception occurs. Otherwise, None.
+        """
+
+        # Update the teacher in the database and return the result of the update
+        return self.unified_manager.update_teacher(teacher=teacher)
+
     def on_request_update(
         self,
         update: Union[
@@ -2914,6 +3324,8 @@ class UnifiedObjectService(ImmutableBaseObject):
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
+            ImmutableTeacher,
+            ImmutableSubject,
         ],
     ) -> Union[
         ImmutableAssociation,
@@ -2931,15 +3343,55 @@ class UnifiedObjectService(ImmutableBaseObject):
         ImmutableNote,
         ImmutableUser,
         ImmutableDefault,
+        ImmutableTeacher,
+        ImmutableSubject,
     ]:
         """
         Handles the 'request_update' event and updates an existing object in the database.
 
         Args:
-            update (Union[ImmutableAssociation, ...]): The object to be updated.
+            update (
+                Union[
+                    ImmutableAssociation,
+                    ImmutableCustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                    ImmutableTeacher,
+                    ImmutableSubject,
+                ]
+            ): The object to be updated.
 
         Returns:
-            Union[ImmutableAssociation, ...]: The updated object if no exception occurs. Otherwise, None.
+            Union[
+                ImmutableAssociation,
+                ImmutableCustomField,
+                ImmutableStack,
+                ImmutableFlashcard,
+                ImmutableQuestion,
+                ImmutableAnswer,
+                ImmutableOption,
+                ImmutableTag,
+                ImmutableStatus,
+                ImmutablePriority,
+                ImmutableDifficulty,
+                ImmutableSetting,
+                ImmutableNote,
+                ImmutableUser,
+                ImmutableDefault,
+                ImmutableTeacher,
+                ImmutableSubject,
+            ]: The updated object if no exception occurs. Otherwise, None.
         """
 
         # Update the object in the database and return the result of the update
@@ -2964,6 +3416,8 @@ class UnifiedObjectService(ImmutableBaseObject):
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
+                ImmutableTeacher,
+                ImmutableSubject,
             ]
         ],
     ) -> List[
@@ -2983,16 +3437,60 @@ class UnifiedObjectService(ImmutableBaseObject):
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
+            ImmutableTeacher,
+            ImmutableSubject,
         ]
     ]:
         """
         Handles the 'request_update_in_bulk' event and updates a existing objecta in the database.
 
         Args:
-            updates (List[Union[ImmutableAssociation, ...]]): The objects to be updated.
+            updates (
+                List[
+                    Union[
+                        ImmutableAssociation,
+                        ImmutableCustomField,
+                        ImmutableStack,
+                        ImmutableFlashcard,
+                        ImmutableQuestion,
+                        ImmutableAnswer,
+                        ImmutableOption,
+                        ImmutableTag,
+                        ImmutableStatus,
+                        ImmutablePriority,
+                        ImmutableDifficulty,
+                        ImmutableSetting,
+                        ImmutableNote,
+                        ImmutableUser,
+                        ImmutableDefault,
+                        ImmutableTeacher,
+                        ImmutableSubject,
+                    ]
+                ]
+            ): The objects to be updated.
 
         Returns:
-            List[Union[ImmutableAssociation, ...]]: The updated objects if no exception occurs. Otherwise, None.
+            List[
+                Union[
+                    ImmutableAssociation,
+                    ImmutableCustomField,
+                    ImmutableStack,
+                    ImmutableFlashcard,
+                    ImmutableQuestion,
+                    ImmutableAnswer,
+                    ImmutableOption,
+                    ImmutableTag,
+                    ImmutableStatus,
+                    ImmutablePriority,
+                    ImmutableDifficulty,
+                    ImmutableSetting,
+                    ImmutableNote,
+                    ImmutableUser,
+                    ImmutableDefault,
+                    ImmutableTeacher,
+                    ImmutableSubject,
+                ]
+            ]: The updated objects if no exception occurs. Otherwise, None.
         """
 
         # Update the object in the database and return the result of the update

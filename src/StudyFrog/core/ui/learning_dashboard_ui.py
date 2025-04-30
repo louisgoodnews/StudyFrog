@@ -18,7 +18,7 @@ from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["LearningDashboardUI"]
@@ -37,6 +37,7 @@ class LearningDashboardUI(BaseUI):
         master (tkinter.Misc): The parent widget.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
+        unified_factory (UnifiedObjectFactory): The unified factory instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
         navigation_item (NavigationHistoryItem): The navigation history item instance.
     """
@@ -48,6 +49,7 @@ class LearningDashboardUI(BaseUI):
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
         unified_manager: UnifiedObjectManager,
+        unified_factory: UnifiedObjectFactory,
         navigation_item: Optional[NavigationHistoryItem] = None,
     ) -> None:
         """
@@ -59,6 +61,7 @@ class LearningDashboardUI(BaseUI):
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
+            unified_factory (UnifiedObjectFactory): The unified factory instance.
             navigation_item (NavigationHistoryItem): The navigation history item instance.
 
         Returns:
@@ -70,10 +73,11 @@ class LearningDashboardUI(BaseUI):
             dispatcher=dispatcher,
             master=master,
             name="learning_dashboard_ui",
+            navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
+            unified_factory=unified_factory,
             unified_manager=unified_manager,
-            navigation_item=navigation_item,
         )
 
         # Update idletasks

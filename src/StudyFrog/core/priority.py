@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -41,6 +42,7 @@ class ImmutablePriority(ImmutableBaseObject):
         icon (str): The icon of the priority.
         id (int): The ID of the priority.
         key (str): The key of the priority.
+        metadata (Optional[Dict[str, Any]]): The metadata of the priority.
         updated_at (datetime): The timestamp when the priority was last updated.
         uuid (str): The UUID of the priority.
     """
@@ -54,6 +56,7 @@ class ImmutablePriority(ImmutableBaseObject):
         icon: Optional[str] = "🔥",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -68,6 +71,7 @@ class ImmutablePriority(ImmutableBaseObject):
             icon (Optional[str]): The icon of the priority. Defaults to "🔥".
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
+            metadata (Optional[Dict[str, Any]]): The metadata of the priority.
             updated_at (Optional[datetime]): The timestamp when the priority was last updated.
             uuid (Optional[str]): The UUID of the priority.
 
@@ -82,6 +86,7 @@ class ImmutablePriority(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -120,6 +125,7 @@ class MutablePriority(MutableBaseObject):
         icon (str): The icon of the priority.
         id (int): The ID of the priority.
         key (str): The key of the priority.
+        metadata (Optional[Dict[str, Any]]): The metadata of the priority.
         updated_at (datetime): The timestamp when the priority was last updated.
         uuid (str): The UUID of the priority.
     """
@@ -133,6 +139,7 @@ class MutablePriority(MutableBaseObject):
         icon: Optional[str] = "🔥",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -147,6 +154,7 @@ class MutablePriority(MutableBaseObject):
             icon (Optional[str]): The icon of the priority.
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
+            metadata (Optional[Dict[str, Any]]): The metadata of the priority.
             updated_at (Optional[datetime]): The timestamp when the priority was last updated.
             uuid (Optional[str]): The UUID of the priority.
 
@@ -161,6 +169,7 @@ class MutablePriority(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -290,6 +299,7 @@ class PriorityFactory:
         icon: Optional[str] = "🔥",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutablePriority]:
@@ -302,6 +312,7 @@ class PriorityFactory:
             icon (Optional[str]): The icon of the priority. Defaults to "🔥".
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
+            metadata (Optional[Dict[str, Any]]): The metadata of the priority.
             name (str): The name of the priority.
             updated_at (Optional[datetime]): The timestamp when the priority was last updated.
             uuid (Optional[str]): The UUID of the priority.
@@ -318,6 +329,7 @@ class PriorityFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 name=name,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -331,6 +343,12 @@ class PriorityFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class PriorityBuilder(BaseObjectBuilder):
+    """ """
+
+    pass
 
 
 class PriorityManager(BaseObjectManager):
@@ -873,7 +891,9 @@ class PriorityManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutablePriority]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutablePriority]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -998,6 +1018,7 @@ class PriorityModel(ImmutableBaseModel):
         emoji (str): The emoji of the priority.
         icon (str): The icon of the priority. Defaults to "🔥".
         key (str): The key of the priority.
+        metadata (Dict[str, Any]): The metadata of the priority.
         name (str): The name of the priority.
         updated_at (datetime): The timestamp when the priority was last updated.
         uuid (str): The UUID of the priority.
@@ -1082,6 +1103,21 @@ class PriorityModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     name: Field = Field(
         autoincrement=False,
         default=None,
@@ -1149,6 +1185,7 @@ class PriorityModel(ImmutableBaseModel):
         icon: Optional[str] = "🔥",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         name: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1163,6 +1200,7 @@ class PriorityModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the priority. Defaults to "🔥".
             id (Optional[int]): The ID of the priority.
             key (Optional[str]): The key of the priority.
+            metadata (Optional[Dict[str, Any]]): The metadata of the priority.
             name (Optional[str]): The name of the priority.
             updated_at (Optional[datetime]): The timestamp when the priority was last updated.
             uuid (Optional[str]): The UUID of the priority.
@@ -1179,6 +1217,7 @@ class PriorityModel(ImmutableBaseModel):
             icon="🔥",
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             table=Constants.PRIORITIES,
             updated_at=updated_at,

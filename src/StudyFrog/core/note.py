@@ -43,9 +43,13 @@ class ImmutableNote(ImmutableBaseObject):
         body_text (str): The body of the Note.
         created_at (datetime): The timestamp when the Note was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+        due_by (datetime): The due date of the Note.
         icon (str): The icon of the Note.
         id (int): The ID of the Note.
+        interval (float): The review interval of the Note.
         key (str): The key of the Note.
+        last_viewed_at (datetime): The timestamp when the Note was last viewed.
+        metadata (Optional[Dict[str, Any]]): The metadata of the Note.
         tags (Optional[List[str]]): The key of the tags associated with the Note.
         title_text (str): The title of the Note.
         updated_at (datetime): The timestamp when the Note was last updated.
@@ -58,9 +62,13 @@ class ImmutableNote(ImmutableBaseObject):
         title_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        due_by: Optional[datetime] = None,
         icon: Optional[str] = "📝",
         id: Optional[int] = None,
+        interval: Optional[float] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -72,9 +80,13 @@ class ImmutableNote(ImmutableBaseObject):
             body_text (str): The body of the Note.
             created_at (datetime): The timestamp when the Note was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            due_by (datetime): The due date of the Note.
             icon (str): The icon of the Note. Defaults to "📝".
             id (int): The ID of the Note.
+            interval (float): The review interval of the Note.
             key (str): The key of the Note.
+            last_viewed_at (datetime): The timestamp when the Note was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the Note.
             tags (Optional[List[str]]): The key of the tags associated with the Note.
             title_text (str): The title of the Note.
             updated_at (datetime): The timestamp when the Note was last updated.
@@ -89,9 +101,13 @@ class ImmutableNote(ImmutableBaseObject):
             body_text=body_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            due_by=due_by,
             icon=icon,
             id=id,
+            interval=interval,
             key=key,
+            last_viewed_at=last_viewed_at,
+            metadata=metadata,
             tags=tags,
             title_text=title_text,
             updated_at=updated_at,
@@ -116,8 +132,10 @@ class ImmutableNote(ImmutableBaseObject):
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
-            self.logger.error(message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}")
-            
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
+            )
+
             # Return None indicating that an exception has occurred
             return None
 
@@ -132,9 +150,13 @@ class MutableNote(MutableBaseObject):
         body_text (str): The body of the Note.
         created_at (datetime): The timestamp when the Note was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+        due_by (datetime): The due date of the Note.
         icon (str): The icon of the Note.
         id (int): The ID of the Note.
+        interval (float): The review interval of the Note.
         key (str): The key of the Note.
+        last_viewed_at (datetime): The timestamp when the Note was last viewed.
+        metadata (Optional[Dict[str, Any]]): The metadata of the Note.
         tags (Optional[List[str]]): The key of the tags associated with the Note.
         title_text (str): The title of the Note.
         updated_at (datetime): The timestamp when the Note was last updated.
@@ -148,9 +170,13 @@ class MutableNote(MutableBaseObject):
         ancestor: Optional[int] = None,
         children: Optional[List[int]] = None,
         created_at: Optional[datetime] = None,
+        due_by: Optional[datetime] = None,
         icon: Optional[str] = "📝",
         id: Optional[int] = None,
+        interval: Optional[float] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -163,9 +189,13 @@ class MutableNote(MutableBaseObject):
             ancestor (int): The ID of the ancestor Note.
             children (List[int]): The IDs of the children Notes.
             created_at (datetime): The timestamp when the Note was created.
+            due_by (datetime): The due date of the Note.
             icon (str): The icon of the Note. Defaults to "📝".
             id (int): The ID of the Note.
+            interval (float): The review interval of the Note.
             key (str): The key of the Note.
+            last_viewed_at (datetime): The timestamp when the Note was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the Note.
             tags (Optional[List[str]]): The key of the tags associated with the Note.
             title_text (str): The title of the Note.
             updated_at (datetime): The timestamp when the Note was last updated.
@@ -181,9 +211,13 @@ class MutableNote(MutableBaseObject):
             ancestor=ancestor,
             children=children,
             created_at=created_at,
+            due_by=due_by,
             icon=icon,
             id=id,
+            interval=interval,
             key=key,
+            last_viewed_at=last_viewed_at,
+            metadata=metadata,
             tags=tags,
             title_text=title_text,
             updated_at=updated_at,
@@ -318,8 +352,10 @@ class MutableNote(MutableBaseObject):
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
-            self.logger.error(message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}")
-            
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
+            )
+
             # Return None indicating that an exception has occurred
             return None
 
@@ -426,9 +462,13 @@ class NoteFactory:
         title_text: str,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        due_by: Optional[datetime] = None,
         icon: Optional[str] = "📝",
         id: Optional[int] = None,
+        interval: Optional[float] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -441,9 +481,13 @@ class NoteFactory:
             title_text (str): The title of the Note.
             created_at (Optional[datetime]): The timestamp when the Note was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
+            due_by (Optional[datetime]): The due date of the Note.
             icon (Optional[str]): The icon of the Note. Defaults to "📝".
             id (Optional[int]): The ID of the Note.
+            interval (Optional[float]): The review interval of the Note.
             key (Optional[str]): The key of the Note.
+            last_viewed_at (Optional[datetime]): The timestamp when the Note was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the Note.
             tags (Optional[List[str]]): The key of the tags associated with the Note.
             updated_at (Optional[datetime]): The timestamp when the Note was last updated.
             uuid (Optional[str]): The UUID of the Note.
@@ -460,9 +504,13 @@ class NoteFactory:
                 body_text=body_text,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
+                due_by=due_by,
                 icon=icon,
                 id=id,
+                interval=interval,
                 key=key,
+                last_viewed_at=last_viewed_at,
+                metadata=metadata,
                 tags=tags,
                 title_text=title_text,
                 updated_at=updated_at,
@@ -558,58 +606,79 @@ class NoteBuilder(BaseObjectBuilder):
         self,
         value: str,
     ) -> Self:
+        """
+        Sets the body text of the note.
+
+        Args:
+            value (str): The body text of the note.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the body_text value in the configuration dictionary
         self.configuration["body_text"] = value
 
         # Return the builder instance
         return self
 
-    def created_at(
-        self,
-        value: datetime,
-    ) -> Self:
-        # Set the created_at value in the configuration dictionary
-        self.configuration["created_at"] = value
-
-        # Return the builder instance
-        return self
-
     def custom_field_values(
         self,
-        value: List[Dict[str, Any]],
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
     ) -> Self:
-        # Set the custom_field_values value in the configuration dictionary
-        self.configuration["custom_field_values"] = value
+        """
+        Sets the custom field values for the builder.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The custom field values to set.
+
+        Returns:
+            Self: The builder instance with the custom field values set.
+        """
+
+        # Check, if the 'custom field values' key exists in the Builder instance's configuration dictionary
+        if "custom_field_values" not in self.configuration:
+            # Initialize the 'custom field values' key with an empty list
+            self.configuration["custom_field_values"] = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Convert the dictionary to a list of dictionaries
+            value = [value]
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Update the 'custom field values' list with the new values
+            self.configuration["custom_field_values"] = value
 
         # Return the builder instance
         return self
 
-    def icon(
+    def metadata(
         self,
-        value: str,
+        value: Dict[str, Any],
     ) -> Self:
-        # Set the icon value in the configuration dictionary
-        self.configuration["icon"] = value
+        """
+        Sets the metadata of the note.
 
-        # Return the builder instance
-        return self
+        Args:
+            value (Dict[str, Any]): The metadata of the note.
 
-    def id(
-        self,
-        value: int,
-    ) -> Self:
-        # Set the id value in the configuration dictionary
-        self.configuration["id"] = value
+        Returns:
+            Self: The builder instance.
+        """
 
-        # Return the builder instance
-        return self
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
 
-    def key(
-        self,
-        value: str,
-    ) -> Self:
-        # Set the key value in the configuration dictionary
-        self.configuration["key"] = value
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
 
         # Return the builder instance
         return self
@@ -618,28 +687,18 @@ class NoteBuilder(BaseObjectBuilder):
         self,
         value: List[str],
     ) -> Self:
+        """
+        Sets the tags of the note.
+
+        Args:
+            value (List[str]): The tags of the note.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the tags value in the configuration dictionary
         self.configuration["tags"] = value
-
-        # Return the builder instance
-        return self
-
-    def updated_at(
-        self,
-        value: datetime,
-    ) -> Self:
-        # Set the updated_at value in the configuration dictionary
-        self.configuration["updated_at"] = value
-
-        # Return the builder instance
-        return self
-
-    def uuid(
-        self,
-        value: str,
-    ) -> Self:
-        # Set the uuid value in the configuration dictionary
-        self.configuration["uuid"] = value
 
         # Return the builder instance
         return self
@@ -648,6 +707,16 @@ class NoteBuilder(BaseObjectBuilder):
         self,
         value: str,
     ) -> Self:
+        """
+        Sets the title text of the note.
+
+        Args:
+            value (str): The title text of the note.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the title_text value in the configuration dictionary
         self.configuration["title_text"] = value
 
@@ -1145,7 +1214,9 @@ class NoteManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableNote]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableNote]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -1266,9 +1337,13 @@ class NoteModel(ImmutableBaseModel):
         body_text (Optional[str]): The body of the Note.
         created_at (Optional[datetime]): The timestamp when the Note was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): The custom fields of the Note.
+        due_by (Optional[datetime]): The due date of the Note.
         icon (Optional[str]): The icon of the Note. Defaults to "📝".
         id (Optional[int]): The ID of the Note.
+        interval (Optional[float]): The review interval of the Note.
         key (Optional[str]): The key of the Note.
+        last_viewed_at (Optional[datetime]): The timestamp when the Note was last viewed.
+        metadata (Optional[Dict[str, Any]]): The metadata of the Note.
         tags (Optional[List[str]]): The tags associated with the Note.
         title_text (Optional[str]): The title of the Note.
         updated_at (Optional[datetime]): The timestamp when the Note was last updated.
@@ -1341,6 +1416,22 @@ class NoteModel(ImmutableBaseModel):
         unique=False,
     )
 
+    due_by: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="due_by",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
     icon: Field = Field(
         autoincrement=False,
         default="📝",
@@ -1354,6 +1445,22 @@ class NoteModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
+        unique=False,
+    )
+
+    interval: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="interval",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="FLOAT",
         unique=False,
     )
 
@@ -1373,6 +1480,38 @@ class NoteModel(ImmutableBaseModel):
         unique=True,
     )
 
+    last_viewed_at: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="last_viewed_at",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     tags: Field = Field(
         autoincrement=False,
         default=None,
@@ -1380,7 +1519,7 @@ class NoteModel(ImmutableBaseModel):
         foreign_key=None,
         index=False,
         name="tags",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1442,9 +1581,13 @@ class NoteModel(ImmutableBaseModel):
         body_text: Optional[str] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
+        due_by: Optional[datetime] = None,
         icon: Optional[str] = "📝",
         id: Optional[int] = None,
+        interval: Optional[float] = None,
         key: Optional[str] = None,
+        last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         title_text: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -1457,9 +1600,13 @@ class NoteModel(ImmutableBaseModel):
             body_text (Optional[str]): The body of the Note.
             created_at (Optional[datetime]): The timestamp when the Note was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The custom fields of the Note.
+            due_by (Optional[datetime]): The due date of the Note.
             icon (Optional[str]): The icon of the Note. Defaults to "📝".
             id (Optional[int]): The ID of the Note.
+            interval (Optional[float]): The review interval of the Note.
             key (Optional[str]): The key of the Note.
+            last_viewed_at (Optional[datetime]): The timestamp when the Note was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the Note.
             tags (Optional[List[str]]): The tags associated with the Note.
             title_text (Optional[str]): The title of the Note.
             updated_at (Optional[datetime]): The timestamp when the Note was last updated.
@@ -1474,9 +1621,13 @@ class NoteModel(ImmutableBaseModel):
             body_text=body_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            due_by=due_by,
             icon="📝",
             id=id,
+            interval=interval,
             key=key,
+            last_viewed_at=last_viewed_at,
+            metadata=metadata,
             table=Constants.NOTES,
             tags=tags,
             title_text=title_text,

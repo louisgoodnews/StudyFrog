@@ -290,51 +290,6 @@ class FlashcardCreateForm(BaseCreateForm):
             required=True,
         )
 
-        # Create the 'back text' MultiLineTextField widget
-        back_text_field: MultiLineTextField = MultiLineTextField(
-            display_name="Back Text*: ",
-            master=master,
-            on_change_callback=self._on_field_change,
-        )
-
-        # Place the 'back text' MultiLineTextField widget in the grid
-        back_text_field.grid(
-            column=0,
-            padx=10,
-            pady=10,
-            row=1,
-            sticky=NSEW,
-        )
-
-        # Style the 'back text' MultiLineTextField widget
-        back_text_field.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the 'back text' MultiLineTextField widget's button
-        back_text_field.configure_button(
-            background=Constants.BLUE_GREY["700"],
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-            foreground=Constants.WHITE,
-            relief=FLAT,
-        )
-
-        # Style the 'back text' MultiLineTextField widget's text
-        back_text_field.configure_text(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.DEFAULT_FONT_SIZE,
-            ),
-        )
-
-        # Register the 'back text' MultiLineTextField widget
-        self._register_field(
-            label="Back Text*: ",
-            field=back_text_field,
-            required=True,
-        )
-
         # Create the 'front text' MultiLineTextField widget
         front_text_field: MultiLineTextField = MultiLineTextField(
             display_name="Front Text*: ",
@@ -347,7 +302,7 @@ class FlashcardCreateForm(BaseCreateForm):
             column=0,
             padx=10,
             pady=10,
-            row=2,
+            row=1,
             sticky=NSEW,
         )
 
@@ -371,12 +326,59 @@ class FlashcardCreateForm(BaseCreateForm):
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
+            height=10,
         )
 
         # Register the 'front text' MultiLineTextField widget
         self._register_field(
             label="Front Text*: ",
             field=front_text_field,
+            required=True,
+        )
+
+        # Create the 'back text' MultiLineTextField widget
+        back_text_field: MultiLineTextField = MultiLineTextField(
+            display_name="Back Text*: ",
+            master=master,
+            on_change_callback=self._on_field_change,
+        )
+
+        # Place the 'back text' MultiLineTextField widget in the grid
+        back_text_field.grid(
+            column=0,
+            padx=10,
+            pady=10,
+            row=2,
+            sticky=NSEW,
+        )
+
+        # Style the 'back text' MultiLineTextField widget
+        back_text_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the 'back text' MultiLineTextField widget's button
+        back_text_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the 'back text' MultiLineTextField widget's text
+        back_text_field.configure_text(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            height=15,
+        )
+
+        # Register the 'back text' MultiLineTextField widget
+        self._register_field(
+            label="Back Text*: ",
+            field=back_text_field,
             required=True,
         )
 

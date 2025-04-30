@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -39,6 +40,7 @@ class ImmutableDefault(ImmutableBaseObject):
         icon (str): The icon of the default.
         id (int): The ID of the default.
         key (str): The key of the default.
+        metadata (Dict[str, Any]): The metadata of the default.
         updated_at (datetime): The timestamp when the default was last updated.
         uuid (str): The UUID of the default.
     """
@@ -52,6 +54,7 @@ class ImmutableDefault(ImmutableBaseObject):
         icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -66,6 +69,7 @@ class ImmutableDefault(ImmutableBaseObject):
             icon (Optional[str]): The icon of the default. Defaults to "⚙️".
             id (Optional[int]): The ID of the default.
             key (Optional[str]): The key of the default.
+            metadata (Optional[Dict[str, Any]]): The metadata of the default.
             updated_at (Optional[datetime]): The timestamp when the default was last updated.
             uuid (Optional[str]): The UUID of the default.
 
@@ -79,6 +83,7 @@ class ImmutableDefault(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             type=type,
             updated_at=updated_at,
@@ -116,6 +121,7 @@ class MutableDefault(MutableBaseObject):
         icon (str): The icon of the default.
         id (int): The ID of the default.
         key (str): The key of the default.
+        metadata (Dict[str, Any]): The metadata of the default.
         updated_at (datetime): The timestamp when the default was last updated.
         uuid (str): The UUID of the default.
     """
@@ -129,6 +135,7 @@ class MutableDefault(MutableBaseObject):
         icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -143,6 +150,7 @@ class MutableDefault(MutableBaseObject):
             icon (Optional[str]): The icon of the default. Defaults to "⚙️".
             id (Optional[int]): The ID of the default.
             key (Optional[str]): The key of the default.
+            metadata (Optional[Dict[str, Any]]): The metadata of the default.
             updated_at (Optional[datetime]): The timestamp when the default was last updated.
             uuid (Optional[str]): The UUID of the default.
 
@@ -156,6 +164,7 @@ class MutableDefault(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             type=type,
             updated_at=updated_at,
@@ -286,6 +295,7 @@ class DefaultFactory:
         icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableDefault]:
@@ -300,6 +310,7 @@ class DefaultFactory:
             icon (Optional[str]): The icon of the default. Defaults to "⚙️".
             id (Optional[int]): The ID of the default.
             key (Optional[str]): The key of the default.
+            metadata (Optional[Dict[str, Any]]): The metadata of the default.
             updated_at (Optional[datetime]): The timestamp when the default was last updated.
             uuid (Optional[str]): The UUID of the default.
 
@@ -319,6 +330,7 @@ class DefaultFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -330,6 +342,12 @@ class DefaultFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class DefaultBuilder(BaseObjectBuilder):
+    """ """
+
+    pass
 
 
 class DefaultManager(BaseObjectManager):
@@ -790,7 +808,9 @@ class DefaultManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableDefault]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableDefault]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -912,6 +932,7 @@ class DefaultModel(ImmutableBaseModel):
         icon (Optional[str]): The icon of the default. Defaults to "⚙️".
         id (Optional[int]): The ID of the default.
         key (Optional[str]): The key of the default.
+        metadata (Optional[Dict[str, Any]]): The metadata of the default.
         name (Optional[str]): The name of the default.
         type (Optional[str]): The type of the default.
         updated_at (Optional[datetime]): The timestamp when the default was last updated.
@@ -983,6 +1004,22 @@ class DefaultModel(ImmutableBaseModel):
         size=255,
         type="VARCHAR",
         unique=True,
+    )
+
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
     )
 
     name: Field = Field(
@@ -1071,6 +1108,7 @@ class DefaultModel(ImmutableBaseModel):
         icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         name: Optional[str] = None,
         type: Optional[str] = None,
         updated_at: Optional[datetime] = None,
@@ -1085,6 +1123,7 @@ class DefaultModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the default. Defaults to "⚙️".
             id (Optional[int]): The ID of the default.
             key (Optional[str]): The key of the default.
+            metadata (Optional[Dict[str, Any]]): The metadata of the default.
             name (Optional[str]): The name of the default.
             type (Optional[str]): The type of the default.
             updated_at (Optional[datetime]): The timestamp when the default was last updated.
@@ -1101,6 +1140,7 @@ class DefaultModel(ImmutableBaseModel):
             icon="⚙️",
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             table=Constants.DEFAULTS,
             type=type,

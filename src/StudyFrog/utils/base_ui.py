@@ -16,7 +16,7 @@ from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["BaseUI"]
@@ -37,6 +37,7 @@ class BaseUI(tkinter.Frame):
         navigation_item (NavigationHistoryItem): The navigation history item instance.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
+        unified_factory (UnifiedObjectFactory): The unified factory instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -47,6 +48,7 @@ class BaseUI(tkinter.Frame):
         name: str,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
+        unified_factory: UnifiedObjectFactory,
         unified_manager: UnifiedObjectManager,
         navigation_item: Optional[NavigationHistoryItem] = None,
     ) -> None:
@@ -64,6 +66,7 @@ class BaseUI(tkinter.Frame):
             navigation_item (NavigationHistoryItem): The navigation history item instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
+            unified_factory (UnifiedObjectFactory): The unified factory instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
         Returns:
@@ -106,6 +109,9 @@ class BaseUI(tkinter.Frame):
         # Initialize the list of subscription UUIDs as an empty list
         self.subscriptions: Final[List[str]] = []
 
+        # Store the passed unified factory instance in an instance variable
+        self.unified_factory: Final[UnifiedObjectFactory] = unified_factory
+
         # Store the passed unified manager instance in an instance variable
         self.unified_manager: Final[UnifiedObjectManager] = unified_manager
 
@@ -121,12 +127,47 @@ class BaseUI(tkinter.Frame):
         # Subscribe to events
         self.subscribe_to_events()
 
+        # Update idletasks
+        self.update_idletasks()
+
         # Grid the BaseUI instance
         self.grid(
             column=0,
             row=0,
             sticky=NSEW,
         )
+
+    def _apply_default_frame_layout_configuration(
+        self,
+        frame: tkinter.Frame,
+        weight: int = 1,
+    ) -> None:
+        """
+        Applies default layout configuration to the passed tkinter.Frame widget.
+
+        Args:
+            frame (tkinter.Frame): The tkinter.Frame widget to apply the configuration to.
+            weight (int): The weight of the row.
+
+        Returns:
+            None
+        """
+
+        # Obtain the child widgets of the passed 'frame' tkinter.Frame widget
+        children: Optional[List[tkinter.Misc]] = frame.winfo_children()
+
+        # Check, if any children exist
+        if not children:
+            # Return early
+            return
+
+        # Iterate over the child widgets
+        for index in range(len(children)):
+            # Configure the row
+            frame.grid_rowconfigure(
+                index=index,
+                weight=weight,
+            )
 
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """

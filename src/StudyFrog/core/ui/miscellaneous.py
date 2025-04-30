@@ -229,7 +229,7 @@ class CountdownWidget(tkinter.Frame):
         self.hours: int = hours
 
         # Initialize the 'is running' boolean flag as an instance variable
-        self._is_running: bool = False
+        self._is_running: bool = True
 
         # Initialize this class' Logger instance
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
@@ -485,6 +485,7 @@ class CountdownWidget(tkinter.Frame):
         self._resume_button: tkinter.Button = tkinter.Button(
             command=self._on_resume_button_click,
             master=self,
+            state=DISABLED,
             text="▶️",
         )
 
@@ -531,7 +532,7 @@ class CountupWidget(tkinter.Frame):
         self.hours: int = hours
 
         # Initialize the 'is running' boolean flag as an instance variable
-        self._is_running: bool = False
+        self._is_running: bool = True
 
         # Initialize this class' Logger instance
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
@@ -655,7 +656,7 @@ class CountupWidget(tkinter.Frame):
 
         # Schedule the next call
         self.after(
-            100,
+            1000,
             self._update_clock,
         )
 
@@ -780,6 +781,7 @@ class CountupWidget(tkinter.Frame):
         self._resume_button: tkinter.Button = tkinter.Button(
             command=self._on_resume_button_click,
             master=self,
+            state=DISABLED,
             text="▶️",
         )
 

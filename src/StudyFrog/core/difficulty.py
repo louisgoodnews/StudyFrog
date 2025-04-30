@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -41,6 +42,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
         icon (str): The icon of the difficulty.
         id (int): The ID of the difficulty.
         key (str): The key of the difficulty.
+        metadata (Dict[str, Any]): The metadata of the difficulty.
         updated_at (datetime): The timestamp when the difficulty was last updated.
         uuid (str): The UUID of the difficulty.
     """
@@ -54,6 +56,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
         icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -68,6 +71,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
             icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
+            metadata (Optional[Dict[str, Any]]): The metadata of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
             uuid (Optional[str]): The UUID of the difficulty.
 
@@ -82,6 +86,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -120,6 +125,7 @@ class MutableDifficulty(MutableBaseObject):
         icon (str): The icon of the difficulty.
         id (int): The ID of the difficulty.
         key (str): The key of the difficulty.
+        metadata (Dict[str, Any]): The metadata of the difficulty.
         updated_at (datetime): The timestamp when the difficulty was last updated.
         uuid (str): The UUID of the difficulty.
     """
@@ -133,6 +139,7 @@ class MutableDifficulty(MutableBaseObject):
         icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -147,6 +154,7 @@ class MutableDifficulty(MutableBaseObject):
             icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
+            metadata (Optional[Dict[str, Any]]): The metadata of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
             uuid (Optional[str]): The UUID of the difficulty.
 
@@ -161,6 +169,7 @@ class MutableDifficulty(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -290,6 +299,7 @@ class DifficultyFactory:
         icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableDifficulty]:
@@ -304,6 +314,7 @@ class DifficultyFactory:
             icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
+            metadata (Optional[Dict[str, Any]]): The metadata of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
             uuid (Optional[str]): The UUID of the difficulty.
 
@@ -318,6 +329,7 @@ class DifficultyFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 name=name,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -331,6 +343,12 @@ class DifficultyFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class DifficultyBuilder(BaseObjectBuilder):
+    """ """
+
+    pass
 
 
 class DifficultyManager(BaseObjectManager):
@@ -1066,6 +1084,7 @@ class DifficultyModel(ImmutableBaseModel):
         emoji (str): The emoji of the difficulty.
         icon (str): The icon of the difficulty. Defaults to "⭐".
         key (str): The key of the difficulty.
+        metadata (Dict[str, Any]): The metadata of the difficulty.
         name (str): The name of the difficulty.
         value (float): The value of the difficulty.
         updated_at (datetime): The timestamp when the difficulty was last updated.
@@ -1151,6 +1170,21 @@ class DifficultyModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     name: Field = Field(
         autoincrement=False,
         default=None,
@@ -1218,6 +1252,7 @@ class DifficultyModel(ImmutableBaseModel):
         icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         name: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1232,6 +1267,7 @@ class DifficultyModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
+            metadata (Optional[Dict[str, Any]]): The metadata of the difficulty.
             name (Optional[str]): The name of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
             uuid (Optional[str]): The UUID of the difficulty.
@@ -1248,6 +1284,7 @@ class DifficultyModel(ImmutableBaseModel):
             icon="⭐",
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             table=Constants.DIFFICULTIES,
             updated_at=updated_at,

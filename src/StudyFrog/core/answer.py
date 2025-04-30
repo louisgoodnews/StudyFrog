@@ -4,10 +4,12 @@ Date: 2025-02-05
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -40,6 +42,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         icon (str): The icon of the answer.
         id (int): The ID of the answer.
         key (str): The key of the answer.
+        metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
         tags (List[str]): The keys of the tags associated with the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
         uuid (str): The UUID of the answer.
@@ -53,6 +56,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -67,6 +71,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             tags (List[str]): The keys of the tags associated with the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
@@ -83,6 +88,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             tags=tags,
             updated_at=updated_at,
             uuid=uuid,
@@ -125,6 +131,7 @@ class MutableAnswer(MutableBaseObject):
         icon (str): The icon of the answer.
         id (int): The ID of the answer.
         key (str): The key of the answer.
+        metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
         tags (List[str]): The keys of the tags associated with the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
         uuid (str): The UUID of the answer.
@@ -138,6 +145,7 @@ class MutableAnswer(MutableBaseObject):
         icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -152,6 +160,7 @@ class MutableAnswer(MutableBaseObject):
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             tags (List[str]): The keys of the tags associated with the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
@@ -168,6 +177,7 @@ class MutableAnswer(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             tags=tags,
             updated_at=updated_at,
             uuid=uuid,
@@ -303,6 +313,7 @@ class AnswerFactory:
         icon: Optional[str] = "💬",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -317,6 +328,7 @@ class AnswerFactory:
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             tags (List[str]): The keys of the tags associated with the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
@@ -336,6 +348,7 @@ class AnswerFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 tags=tags,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -348,6 +361,162 @@ class AnswerFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class AnswerBuilder(BaseObjectBuilder):
+    """ """
+
+    def __init__(self) -> None:
+        """ """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(self) -> Optional[ImmutableAnswer]:
+        """
+        Builds and returns an instance of ImmutableAnswer class using the configuration dictionary.
+
+        This method attempts to create an instance of the ImmutableAnswer class using the configuration dictionary passed to the constructor.
+        If an exception occurs while creating the instance, this method will log an error message and return None.
+
+        Returns:
+            Optional[ImmutableAnswer]: The created ImmutableAnswer instance if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to run 'build' method from '{self.__name__}'.
+        """
+        try:
+            # Attempt to create and return an ImmutableAnswer instance
+            return AnswerFactory.create_answer(**self.configuration)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def answer_text(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the answer text for the builder.
+
+        Args:
+            value (str): The answer text to set.
+
+        Returns:
+            Self: The builder instance with the answer text set.
+        """
+
+        # Set the answer text
+        self.configuration["answer_text"] = value
+
+        # Return the builder instance
+        return self
+
+    def custom_field_values(
+        self,
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
+    ) -> Self:
+        """
+        Sets the custom field values for the builder.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The custom field values to set.
+
+        Returns:
+            Self: The builder instance with the custom field values set.
+        """
+
+        # Check, if the 'custom_field_values' key exists in the 'configuration' dictionary
+        if "custom_field_values" not in self.configuration:
+            # Initialize the 'custom_field_values' key with an empty list
+            self.configuration["custom_field_values"] = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Convert the dictionary to a list of dictionaries
+            value = [value]
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Set the custom field values
+            self.configuration["custom_field_values"] = value
+
+        # Return the builder instance
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata of the answer.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the answer.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
+
+        # Return the builder instance
+        return self
+
+    def tags(
+        self,
+        value: Union[List[str], str],
+    ) -> Self:
+        """
+        Sets the tags of the answer.
+
+        Args:
+            value (Union[List[str], str]): The tags of the answer.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'tags' key exists in the 'configuration' dictionary
+        if "tags" not in self.configuration:
+            self.configuration["tags"] = []
+
+        # Check, if the passed value is a list
+        if isinstance(
+            value,
+            list,
+        ):
+            # Set the tags
+            self.configuration["tags"] = value
+        # Check, if the passed value is a string
+        elif isinstance(
+            value,
+            str,
+        ):
+            # Add the tag to the list
+            self.configuration["tags"].append(value)
+
+        # Return the builder instance
+        return self
 
 
 class AnswerManager(BaseObjectManager):
@@ -915,7 +1084,9 @@ class AnswerManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableAnswer]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableAnswer]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -1047,9 +1218,11 @@ class AnswerModel(ImmutableBaseModel):
     Attributes:
         answer_text (Optional[str]): The text of the answer.
         created_at (Optional[datetime]): The timestamp when the answer was created.
+        custom_field_values (List[Dict[str, Any]]): The custom field values of the answer.
         icon (Optional[str]): The icon of the answer. Defaults to "💬".
         id (Optional[int]): The ID of the answer.
         key (Optional[str]): The key of the answer.
+        metadata (Dict[str, Any]): The metadata of the answer.
         table (str): The table name of the answer model.
         tags (List[str]): The keys of the tags associated with the answer.
         updated_at (Optional[datetime]): The timestamp when the answer was last updated.
@@ -1154,6 +1327,22 @@ class AnswerModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     tags: Field = Field(
         autoincrement=False,
         default=None,
@@ -1210,6 +1399,7 @@ class AnswerModel(ImmutableBaseModel):
         icon: Optional[str] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1224,6 +1414,7 @@ class AnswerModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the answer.
             id (Optional[int]): The ID of the answer.
             key (Optional[str]): The key of the answer.
+            metadata (Optional[Dict[str, Any]]): The metadata of the answer.
             tags (Optional[List[str]]): The keys of the tags associated with the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
@@ -1239,6 +1430,7 @@ class AnswerModel(ImmutableBaseModel):
             icon="💬",
             id=id,
             key=key,
+            metadata=metadata,
             table=Constants.ANSWERS,
             tags=tags,
             updated_at=updated_at,

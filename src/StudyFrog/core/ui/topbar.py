@@ -18,7 +18,6 @@ from utils.dispatcher import Dispatcher
 from utils.events import Events
 from utils.logger import Logger
 from utils.navigation import NavigationHistoryService
-from utils.unified import UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["TopBar"]
@@ -41,7 +40,6 @@ class TopBar(tkinter.Frame):
         dispatcher: Dispatcher,
         master: tkinter.Misc,
         navigation_service: NavigationHistoryService,
-        unified_manager: UnifiedObjectManager,
     ) -> None:
         """
         Initializes a new instance of the TopBar class.
@@ -50,7 +48,6 @@ class TopBar(tkinter.Frame):
             dispatcher (Dispatcher): The dispatcher instance.
             master (tkinter.Misc): The parent widget.
             navigation_service (NavigationHistoryService): The navigation history service instance.
-            unified_manager (UnifiedObjectManager): The unified object manager instance.
 
         Returns:
             None
@@ -67,9 +64,6 @@ class TopBar(tkinter.Frame):
 
         # Store the passed navigation service instance in an instance variable
         self.navigation_service: NavigationHistoryService = navigation_service
-
-        # Store the passed unified object manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
 
         # Configure the top bar widget's 1st column to weight 1
         self.grid_columnconfigure(

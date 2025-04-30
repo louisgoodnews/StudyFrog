@@ -25,7 +25,7 @@ from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["DashboardUI"]
@@ -41,6 +41,7 @@ class DashboardUI(BaseUI):
         navigation_item (NavigationHistoryItem): The navigation history item instance.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
+        unified_factory (UnifiedObjectFactory): The unified factory instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -51,6 +52,7 @@ class DashboardUI(BaseUI):
         navigation_item: NavigationHistoryItem,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
+        unified_factory: UnifiedObjectFactory,
         unified_manager: UnifiedObjectManager,
         **kwargs,
     ) -> None:
@@ -63,6 +65,7 @@ class DashboardUI(BaseUI):
             navigation_item (NavigationHistoryItem): The navigation history item instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
+            unified_factory (UnifiedObjectFactory): The unified factory instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
             **kwargs: Any additional keyword arguments.
 
@@ -78,6 +81,7 @@ class DashboardUI(BaseUI):
             navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
+            unified_factory=unified_factory,
             unified_manager=unified_manager,
         )
 
@@ -254,6 +258,9 @@ class DashboardUI(BaseUI):
         # Create the "Top Frame" frame widgets
         self.create_top_frame_widgets(master=top_frame)
 
+        # Update idletasks
+        self.update_idletasks()
+
     def create_bottom_frame_widgets(
         self,
         master: tkinter.Misc,
@@ -270,7 +277,10 @@ class DashboardUI(BaseUI):
         Returns:
             None
         """
-        pass
+
+        # Update idletasks
+        self.update_idletasks()
+
 
     def create_center_frame_widgets(
         self,
@@ -471,6 +481,9 @@ class DashboardUI(BaseUI):
         # Create the "TabbedFrame" widgets
         self.create_tabbed_frame_widgets(master=tabbed_frame)
 
+        # Update idletasks
+        self.update_idletasks()
+
     def create_tabbed_frame_widgets(
         self,
         master: TabbedFrame,
@@ -570,6 +583,9 @@ class DashboardUI(BaseUI):
 
             # Create the "Completed Stacks" frame widgets
             self.create_completed_stacks_frame_widgets(master=completed_stacks_frame)
+
+            # Update idletasks
+            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -685,6 +701,9 @@ class DashboardUI(BaseUI):
             sticky=NSEW,
         )
 
+        # Update idletasks
+        self.update_idletasks()
+
     def create_recently_viewed_stacks_frame_widgets(
         self,
         master: tkinter.Misc,
@@ -797,6 +816,9 @@ class DashboardUI(BaseUI):
             sticky=NSEW,
         )
 
+        # Update idletasks
+        self.update_idletasks()
+
     def create_completed_stacks_frame_widgets(
         self,
         master: tkinter.Misc,
@@ -907,6 +929,9 @@ class DashboardUI(BaseUI):
             row=1,
             sticky=NSEW,
         )
+
+        # Update idletasks
+        self.update_idletasks()
 
     def create_stack_item_widgets(
         self,
@@ -1107,6 +1132,9 @@ class DashboardUI(BaseUI):
                 row=len(master.winfo_children()),
                 sticky=NSEW,
             )
+
+            # Update idletasks
+            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1244,6 +1272,9 @@ class DashboardUI(BaseUI):
             row=0,
             sticky=EW,
         )
+
+        # Update idletasks
+        self.update_idletasks()
 
     def lookup_completed_stacks(self) -> None:
         """

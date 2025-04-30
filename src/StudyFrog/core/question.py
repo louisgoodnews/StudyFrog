@@ -46,6 +46,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         id (int): The ID of the question.
         key (str): The key of the question.
         last_viewed_at (datetime): The timestamp when the question was last viewed.
+        metadata (Optional[Dict[str, Any]]): The metadata of the question.
         priority (int): The priority of the question.
         status (int): The status of the question.
         question_text (str): The text of the question.
@@ -69,6 +70,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
@@ -90,6 +92,7 @@ class ImmutableQuestion(ImmutableBaseObject):
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the question.
             priority (Optional[int]): The priority of the question.
             status (Optional[int]): The status of the question.
             tags (Optional[List[str]]): The tags associated with the question.
@@ -111,6 +114,7 @@ class ImmutableQuestion(ImmutableBaseObject):
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
+            metadata=metadata,
             priority=priority,
             question_text=question_text,
             question_type=question_type,
@@ -138,8 +142,10 @@ class ImmutableQuestion(ImmutableBaseObject):
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
-            self.logger.error(message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}")
-            
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
+            )
+
             # Return None indicating an exception has occurred
             return None
 
@@ -158,6 +164,7 @@ class MutableQuestion(MutableBaseObject):
         id (int): The ID of the question.
         key (str): The key of the question.
         last_viewed_at (datetime): The timestamp when the question was last viewed.
+        metadata (Optional[Dict[str, Any]]): The metadata of the question.
         priority (int): The priority of the question.
         status (int): The status of the question.
         question_text (str): The text of the question.
@@ -181,6 +188,7 @@ class MutableQuestion(MutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
@@ -202,6 +210,7 @@ class MutableQuestion(MutableBaseObject):
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the question.
             priority (Optional[int]): The priority of the question.
             status (Optional[int]): The status of the question.
             tags (Optional[List[str]]): The tags associated with the question.
@@ -223,6 +232,7 @@ class MutableQuestion(MutableBaseObject):
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
+            metadata=metadata,
             priority=priority,
             question_text=question_text,
             question_type=question_type,
@@ -475,6 +485,7 @@ class QuestionFactory:
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
@@ -496,6 +507,7 @@ class QuestionFactory:
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the question.
             priority (Optional[int]): The priority of the question.
             status (Optional[int]): The status of the question.
             tags (Optional[List[str]]): The tags associated with the question.
@@ -517,6 +529,7 @@ class QuestionFactory:
                 id=id,
                 key=key,
                 last_viewed_at=last_viewed_at,
+                metadata=metadata,
                 priority=priority,
                 question_text=question_text,
                 question_type=question_type,
@@ -536,6 +549,16 @@ class QuestionFactory:
 
 
 class QuestionBuilder(BaseObjectBuilder):
+    """
+    A builder class for creating question objects.
+
+    This class extends the BaseObjectBuilder class and provides a builder pattern
+    for creating question objects.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the QuestionBuilder class.
+    """
+
     def __init__(self) -> None:
         """
         Initializes a new instance of the QuestionBuilder class.
@@ -605,6 +628,16 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: List[str],
     ) -> Self:
+        """
+        Sets the answers for the builder.
+
+        Args:
+            value (List[str]): The answers to set.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the answers value in the configuration dictionary
         self.configuration["answers"] = value
 
@@ -615,28 +648,55 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: List[str],
     ) -> Self:
+        """
+        Sets the correct answers for the builder.
+
+        Args:
+            value (List[str]): The correct answers to set.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the correct_answers value in the configuration dictionary
         self.configuration["correct_answers"] = value
 
         # Return the builder instance
         return self
 
-    def created_at(
-        self,
-        value: datetime,
-    ) -> Self:
-        # Set the created_at value in the configuration dictionary
-        self.configuration["created_at"] = value
-
-        # Return the builder instance
-        return self
-
     def custom_field_values(
         self,
-        value: Optional[List[Dict[str, Any]]] = None,
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
     ) -> Self:
-        # Set the custom_field_values value in the configuration dictionary
-        self.configuration["custom_field_values"] = value
+        """
+        Sets the custom field values for the builder.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The custom field values to set.
+
+        Returns:
+            Self: The builder instance with the custom field values set.
+        """
+
+        # Check, if the 'custom field values' key exists in the Builder instance's configuration dictionary
+        if "custom_field_values" not in self.configuration:
+            # Initialize the 'custom field values' key with an empty list
+            self.configuration["custom_field_values"] = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Convert the dictionary to a list of dictionaries
+            value = [value]
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Update the 'custom field values' list with the new values
+            self.configuration["custom_field_values"] = value
 
         # Return the builder instance
         return self
@@ -645,38 +705,18 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: Optional[int] = None,
     ) -> Self:
+        """
+        Sets the difficulty of the flashcard.
+
+        Args:
+            value (Optional[int]): The difficulty of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the difficulty value in the configuration dictionary
         self.configuration["difficulty"] = value
-
-        # Return the builder instance
-        return self
-
-    def icon(
-        self,
-        value: Optional[str] = None,
-    ) -> Self:
-        # Set the icon value in the configuration dictionary
-        self.configuration["icon"] = value
-
-        # Return the builder instance
-        return self
-
-    def id(
-        self,
-        value: Optional[int] = None,
-    ) -> Self:
-        # Set the id value in the configuration dictionary
-        self.configuration["id"] = value
-
-        # Return the builder instance
-        return self
-
-    def key(
-        self,
-        value: Optional[str] = None,
-    ) -> Self:
-        # Set the key value in the configuration dictionary
-        self.configuration["key"] = value
 
         # Return the builder instance
         return self
@@ -685,8 +725,42 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: Optional[datetime] = None,
     ) -> Self:
+        """
+        Sets the last viewed at timestamp of the flashcard.
+
+        Args:
+            value (Optional[datetime]): The last viewed at timestamp of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the last_viewed_at value in the configuration dictionary
         self.configuration["last_viewed_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata of the flashcard.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
 
         # Return the builder instance
         return self
@@ -695,6 +769,16 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: Optional[int] = None,
     ) -> Self:
+        """
+        Sets the priority of the flashcard.
+
+        Args:
+            value (Optional[int]): The priority of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the priority value in the configuration dictionary
         self.configuration["priority"] = value
 
@@ -705,6 +789,16 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: str,
     ) -> Self:
+        """
+        Sets the question text of the flashcard.
+
+        Args:
+            value (str): The question text of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the question_text value in the configuration dictionary
         self.configuration["question_text"] = value
 
@@ -715,6 +809,16 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
     ) -> Self:
+        """
+        Sets the question type of the flashcard.
+
+        Args:
+            value (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]: The question type of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the question_type value in the configuration dictionary
         self.configuration["question_type"] = value
 
@@ -725,6 +829,16 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: Optional[int] = None,
     ) -> Self:
+        """
+        Sets the status of the flashcard.
+
+        Args:
+            value (Optional[int]): The status of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the status value in the configuration dictionary
         self.configuration["status"] = value
 
@@ -735,28 +849,18 @@ class QuestionBuilder(BaseObjectBuilder):
         self,
         value: Optional[List[str]] = None,
     ) -> Self:
+        """
+        Sets the tags of the flashcard.
+
+        Args:
+            value (Optional[List[str]]): The tags of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the tags value in the configuration dictionary
         self.configuration["tags"] = value
-
-        # Return the builder instance
-        return self
-
-    def updated_at(
-        self,
-        value: Optional[datetime] = None,
-    ) -> Self:
-        # Set the updated_at value in the configuration dictionary
-        self.configuration["updated_at"] = value
-
-        # Return the builder instance
-        return self
-
-    def uuid(
-        self,
-        value: Optional[str] = None,
-    ) -> Self:
-        # Set the uuid value in the configuration dictionary
-        self.configuration["uuid"] = value
 
         # Return the builder instance
         return self
@@ -1278,7 +1382,9 @@ class QuestionManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableQuestion]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableQuestion]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -1413,7 +1519,9 @@ class QuestionModel(ImmutableBaseModel):
         correct_answers (Field): The correct answers of the question.
         created_at (Field): The timestamp when the question was created.
         difficulty (Field): The difficulty of the question.
+        due_by (Field): The due date of the question.
         icon (Field): The icon of the question. Defaults to "❓".
+        interval (Field): The interval of the question.
         key (Field): The key of the question.
         last_viewed_at (Field): The timestamp when the question was last viewed.
         priority (Field): The priority of the question.
@@ -1523,6 +1631,22 @@ class QuestionModel(ImmutableBaseModel):
         unique=False,
     )
 
+    due_by: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="due_by",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="DATETIME",
+        unique=False,
+    )
+
     icon: Field = Field(
         autoincrement=False,
         default="❓",
@@ -1536,6 +1660,22 @@ class QuestionModel(ImmutableBaseModel):
         primary_key=False,
         size=255,
         type="VARCHAR",
+        unique=False,
+    )
+
+    interval: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="interval",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
         unique=False,
     )
 

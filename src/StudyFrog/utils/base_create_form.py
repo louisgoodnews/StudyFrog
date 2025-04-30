@@ -61,11 +61,14 @@ class BaseCreateForm(tkinter.Frame):
         # Store the passed Dispatcher instance in a constant instance variable
         self.dispatcher: Final[Dispatcher] = dispatcher
 
-        # Initialize this class' Logger instance as a constant instance variable
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
-
         # Initialize the field dictionary instance variable as an empty dictionary
         self._field_dict: Dict[str, Dict[str, Union[bool, tkinter.Misc]]] = {}
+
+        # Initialize the 'is saved' bool instance variable as False
+        self._is_saved: bool = False
+
+        # Initialize this class' Logger instance as a constant instance variable
+        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Store the passed namespace string in a constant instance variable
         self.namespace: Final[str] = namespace
@@ -89,6 +92,9 @@ class BaseCreateForm(tkinter.Frame):
         # Create the widgets
         self.create_widgets()
 
+        # Update idletasks
+        self.update_idletasks()
+
         # Subscribe to events
         self.subscribe_to_events()
 
@@ -107,6 +113,36 @@ class BaseCreateForm(tkinter.Frame):
 
         # Return a the field dictionary to the caller
         return self._field_dict
+
+    @property
+    def is_saved(self) -> bool:
+        """
+        Returns the 'is saved' bool instance variable.
+
+        Returns:
+            bool: The 'is saved' bool instance variable.
+        """
+
+        # Return the 'is saved' bool instance variable to the caller
+        return self._is_saved
+
+    @is_saved.setter
+    def is_saved(
+        self,
+        value: bool,
+    ) -> None:
+        """
+        Sets the 'is saved' bool instance variable.
+
+        Args:
+            value (bool): The new value for the 'is saved' bool instance variable.
+
+        Returns:
+            None
+        """
+
+        # Set the 'is saved' bool instance variable to the passed value
+        self._is_saved = value
 
     @property
     def value_dict(self) -> Dict[str, Any]:
@@ -168,6 +204,9 @@ class BaseCreateForm(tkinter.Frame):
             value if not isinstance(value, (list, set, tuple)) else value[0]
         )
 
+        # Update the 'is saved' bool instance variable
+        self._is_saved = False
+
         # Dispatch the CREATE_FORM_FIELD_CHANGED event
         self.dispatcher.dispatch(
             event=Events.CREATE_FORM_FIELD_CHANGED,
@@ -226,6 +265,20 @@ class BaseCreateForm(tkinter.Frame):
             "widget": field,
         }
 
+    def check_save(self) -> bool:
+        """
+        Checks if the form has already been saved.
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the form has already been saved, False otherwise.
+        """
+
+        # Return the 'is saved' bool instance variable to the caller
+        return self._is_saved
+
     def clear(
         self,
         exclude: Optional[List[str]] = None,
@@ -264,6 +317,9 @@ class BaseCreateForm(tkinter.Frame):
 
             # Set the value associated to the current key from the value dictionary instance variable to None
             self._value_dict[key] = {"value": None}
+
+        # Update the 'is saved' bool instance variable
+        self._is_saved = True
 
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
@@ -745,6 +801,23 @@ class BaseCreateForm(tkinter.Frame):
 
             # Re-raise the exception to the caller
             raise e
+
+    def update_save(
+        self,
+        value: bool,
+    ) -> None:
+        """
+        Updates the 'is saved' bool instance variable.
+
+        Args:
+            value (bool): The new value for the 'is saved' bool instance variable.
+
+        Returns:
+            None
+        """
+
+        # Set the 'is saved' bool instance variable to the passed value
+        self.is_saved = value
 
     def validate_form(self) -> Dict[str, Any]:
         """

@@ -5,11 +5,12 @@ Date: 2025-02-05
 
 import asyncio
 import json
+import traceback
 
 from datetime import datetime
-
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -24,6 +25,7 @@ __all__: Final[List[str]] = [
     "MutableStack",
     "StackConverter",
     "StackFactory",
+    "StackBuilder",
     "StackManager",
     "StackModel",
 ]
@@ -48,9 +50,11 @@ class ImmutableStack(ImmutableBaseObject):
         id (int): The ID of the stack.
         key (str): The key of the stack.
         last_viewed_at (datetime): The timestamp when the stack was last viewed.
+        metadata (Dict[str, Any]): The metadata of the stack.
         name (str): The name of the stack.
         priority (int): The priority of the stack.
         status (int): The status of the stack.
+        subject (int): The ID of the subject the stack is associated with.
         tags (List[str]): The keys of the tags associated with the stack.
         updated_at (datetime): The timestamp when the stack was last updated.
         uuid (str): The UUID of the stack.
@@ -71,8 +75,10 @@ class ImmutableStack(ImmutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        subject: Optional[int] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -94,8 +100,10 @@ class ImmutableStack(ImmutableBaseObject):
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the stack.
             priority (Optional[int]): The ID of the priority associated with the stack.
             status (Optional[int]): The ID of the status associated with the stack.
+            subject (Optional[int]): The ID of the subject the stack is associated with.
             tags (Optional[List[str]]): The keys of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
@@ -115,9 +123,11 @@ class ImmutableStack(ImmutableBaseObject):
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
+            metadata=metadata,
             name=name,
             priority=priority,
             status=status,
+            subject=subject,
             tags=tags,
             updated_at=updated_at,
             uuid=uuid,
@@ -300,9 +310,11 @@ class MutableStack(MutableBaseObject):
         id (int): The ID of the stack.
         key (str): The key of the stack.
         last_viewed_at (datetime): The timestamp when the stack was last viewed.
+        metadata (Dict[str, Any]): The metadata of the stack.
         name (str): The name of the stack.
         priority (int): The priority of the stack.
         status (int): The status of the stack.
+        subject (int): The ID of the subject the stack is associated with.
         tags (List[int]): The IDs of the tags associated with the stack.
         updated_at (datetime): The timestamp when the stack was last updated.
         uuid (str): The UUID of the stack.
@@ -323,8 +335,10 @@ class MutableStack(MutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        subject: Optional[int] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -345,9 +359,11 @@ class MutableStack(MutableBaseObject):
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the stack.
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
             status (Optional[int]): The status of the stack.
+            subject (Optional[int]): The ID of the subject the stack is associated with.
             tags (Optional[List[str]]): The keys of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
@@ -370,9 +386,11 @@ class MutableStack(MutableBaseObject):
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
+            metadata=metadata,
             name=name,
             priority=priority,
             status=status,
+            subject=subject,
             tags=tags,
             updated_at=updated_at,
             uuid=uuid,
@@ -739,8 +757,10 @@ class StackFactory:
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         status: Optional[int] = None,
+        subject: Optional[int] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -761,9 +781,11 @@ class StackFactory:
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the stack.
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
             status (Optional[int]): The status of the stack.
+            subject (Optional[int]): The ID of the subject the stack is associated with.
             tags (Optional[List[str]]): The keys of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
@@ -789,9 +811,11 @@ class StackFactory:
                 id=id,
                 key=key,
                 last_viewed_at=last_viewed_at,
+                metadata=metadata,
                 name=name,
                 priority=priority,
                 status=status,
+                subject=subject,
                 tags=tags,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -804,6 +828,402 @@ class StackFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class StackBuilder(BaseObjectBuilder):
+    """
+    A builder class for creating ImmutableStack instances.
+
+    This class extends the BaseObjectBuilder class and is used to create
+    new instances of the ImmutableStack class.
+
+    Attributes:
+        configuration (Dict[str, Any]): The configuration dictionary for the ImmutableStack instance.
+        logger (Logger): The logger for the StackBuilder class.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the StackBuilder class.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(self) -> Optional[ImmutableStack]:
+        """
+        Builds an ImmutableStack instance based on the configuration.
+
+        Args:
+            None
+
+        Returns:
+            Optional[ImmutableStack]: The built ImmutableStack instance if successful, otherwise None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to build the ImmutableStack instance.
+        """
+        try:
+            # Attmept to create and return a new ImmutableStack instance
+            return StackFactory.create_stack(**self.configuration)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def ancestor(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the ancestor value in the configuration.
+
+        Args:
+            value (int): The ancestor value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the ancestor value in the configuration
+        self.configuration["ancestor"] = value
+
+        # Return self
+        return self
+
+    def contents(
+        self,
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
+    ) -> Self:
+        """
+        Sets the contents value in the configuration.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The contents value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'contents' key exists in the 'configuration' dictionary
+        if "contents" not in self.configuration:
+            # Initialize the 'contents' key with an empty list
+            self.configuration["contents"] = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the dictionary to the 'contents' list
+            self.configuration["contents"].append(value)
+
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Set the contents value in the configuration
+            self.configuration["contents"] = value
+
+        # Return self
+        return self
+
+    def custom_field_values(
+        self,
+        value: Union[
+            Dict[str, Any],
+            List[Dict[str, Any]],
+        ],
+    ) -> Self:
+        """
+        Sets the custom_field_values value in the configuration.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The custom_field_values value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'custom_field_values' key exists in the 'configuration' dictionary
+        if "custom_field_values" not in self.configuration:
+            # Initialize the 'custom_field_values' key with an empty list
+            self.configuration["custom_field_values"] = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the dictionary to the 'custom_field_values' list
+            self.configuration["custom_field_values"].append(value)
+
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Set the custom_field_values value in the configuration
+            self.configuration["custom_field_values"] = value
+
+        # Return self
+        return self
+
+    def descendants(
+        self,
+        value: Union[List[str], str],
+    ) -> Self:
+        """
+        Sets the descendants value in the configuration.
+
+        Args:
+            value (Union[List[str], str]): The descendants value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'descendants' key exists in the 'configuration' dictionary
+        if "descendants" not in self.configuration:
+            # Initialize the 'descendants' key with an empty list
+            self.configuration["descendants"] = []
+
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the string to the 'descendants' list
+            self.configuration["descendants"].append(value)
+
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Set the descendants value in the configuration
+            self.configuration["descendants"] = value
+
+        # Return self
+        return self
+
+    def description(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the description value in the configuration.
+
+        Args:
+            value (str): The description value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the description value in the configuration
+        self.configuration["description"] = value
+
+        # Return self
+        return self
+
+    def difficulty(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the difficulty value in the configuration.
+
+        Args:
+            value (int): The difficulty value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the difficulty value in the configuration
+        self.configuration["difficulty"] = value
+
+        # Return self
+        return self
+
+    def due_by(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the due_by value in the configuration.
+
+        Args:
+            value (datetime): The due_by value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the due_by value in the configuration
+        self.configuration["due_by"] = value
+
+        # Return self
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata value in the configuration.
+
+        Args:
+            value (Dict[str, Any]): The metadata value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            # Initialize the 'metadata' key with an empty dictionary
+            self.configuration["metadata"] = {}
+        else:
+            # Update the 'metadata' key with the new value
+            self.configuration["metadata"].update(**value)
+
+        # Return self
+        return self
+
+    def name(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the name value in the configuration.
+
+        Args:
+            value (str): The name value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the name value in the configuration
+        self.configuration["name"] = value
+
+        # Return self
+        return self
+
+    def priority(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the priority value in the configuration.
+
+        Args:
+            value (int): The priority value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the priority value in the configuration
+        self.configuration["priority"] = value
+
+        # Return self
+        return self
+
+    def status(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the status value in the configuration.
+
+        Args:
+            value (int): The status value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the status value in the configuration
+        self.configuration["status"] = value
+
+        # Return self
+        return self
+
+    def subject(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the subject value in the configuration.
+
+        Args:
+            value (int): The subject value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the subject value in the configuration
+        self.configuration["subject"] = value
+
+        # Return self
+        return self
+
+    def tags(
+        self,
+        value: Union[List[str], str],
+    ) -> Self:
+        """
+        Sets the tags value in the configuration.
+
+        Args:
+            value (Union[List[str], str]): The tags value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'tags' key exists in the 'configuration' dictionary
+        if "tags" not in self.configuration:
+            # Initialize the 'tags' key with an empty list
+            self.configuration["tags"] = []
+
+        # Check, if the passed value is a list
+        if isinstance(
+            value,
+            list,
+        ):
+            # Extend the 'tags' list with the new values
+            self.configuration["tags"].extend(value)
+
+        # Check, if the passed value is a string
+        elif isinstance(
+            value,
+            str,
+        ):
+            # Append the string to the 'tags' list
+            self.configuration["tags"].append(value)
+
+        # Return self
+        return self
 
 
 class StackManager(BaseObjectManager):
@@ -1052,7 +1472,10 @@ class StackManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_all_stacks(self, force_refetch: bool = False,) -> Optional[List[ImmutableStack]]:
+    def get_all_stacks(
+        self,
+        force_refetch: bool = False,
+    ) -> Optional[List[ImmutableStack]]:
         """
         Returns a list of all stacks in the database.
 
@@ -1544,9 +1967,11 @@ class StackModel(ImmutableBaseModel):
         id (Optional[int]): The ID of the stack.
         key (Optional[str]): The key of the stack.
         last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
+        metadata (Optional[Dict[str, Any]]): The metadata of the stack.
         name (Optional[str]): The name of the stack.
         priority (Optional[int]): The priority of the stack.
         status (Optional[int]): The status of the stack.
+        subject (Optional[int]): The ID of the subject the stack is associated with.
         tags (Optional[List[str]]): The tags of the stack.
         updated_at (Optional[datetime]): The timestamp when the stack was last updated.
         uuid (Optional[str]): The UUID of the stack.
@@ -1746,6 +2171,22 @@ class StackModel(ImmutableBaseModel):
         unique=False,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     name: Field = Field(
         autoincrement=False,
         default=None,
@@ -1786,6 +2227,22 @@ class StackModel(ImmutableBaseModel):
         index=False,
         name="status",
         nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
+    subject: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.SUBJECTS}(id)",
+        index=False,
+        name="subject",
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,
@@ -1855,10 +2312,12 @@ class StackModel(ImmutableBaseModel):
         icon: Optional[str] = "📚",
         id: Optional[int] = None,
         key: Optional[str] = None,
-        name: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        name: Optional[str] = None,
         priority: Optional[int] = None,
         status: Optional[Literal["New", "Learning", "Review", "Completed"]] = None,
+        subject: Optional[int] = None,
         tags: Optional[List[str]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1879,9 +2338,11 @@ class StackModel(ImmutableBaseModel):
             id (Optional[int]): The ID of the stack.
             key (Optional[str]): The key of the stack.
             last_viewed_at (Optional[datetime]): The timestamp when the stack was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the stack.
             name (Optional[str]): The name of the stack.
             priority (Optional[int]): The priority of the stack.
             status (Optional[int]): The ID of the status of the stack.
+            subject (Optional[int]): The ID of the subject the stack is associated with.
             tags (Optional[List[str]]): The keys of the tags associated with the stack.
             updated_at (Optional[datetime]): The timestamp when the stack was last updated.
             uuid (Optional[str]): The UUID of the stack.
@@ -1904,9 +2365,11 @@ class StackModel(ImmutableBaseModel):
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
+            metadata=metadata,
             name=name,
             priority=priority,
             status=status,
+            subject=subject,
             tags=tags,
             table=Constants.STACKS,
             updated_at=updated_at,

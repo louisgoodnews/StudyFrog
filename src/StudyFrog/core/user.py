@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -37,6 +38,7 @@ class ImmutableUser(ImmutableBaseObject):
         icon (Optional[str]): The icon of the user.
         id (Optional[int]): The ID of the user.
         key (Optional[str]): The key of the user.
+        metadata (Optional[Dict[str, Any]]): The metadata of the user.
         updated_at (Optional[datetime]): The timestamp when the user was last updated.
         uuid (Optional[str]): The UUID of the user.
     """
@@ -48,6 +50,7 @@ class ImmutableUser(ImmutableBaseObject):
         icon: Optional[str] = "👤",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -60,6 +63,7 @@ class ImmutableUser(ImmutableBaseObject):
             icon (Optional[str]): The icon of the user. Defaults to "👤".
             id (Optional[int]): The ID of the user.
             key (Optional[str]): The key of the user.
+            metadata (Optional[Dict[str, Any]]): The metadata of the user.
             updated_at (Optional[datetime]): The timestamp when the user was last updated.
             uuid (Optional[str]): The UUID of the user.
 
@@ -72,6 +76,7 @@ class ImmutableUser(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -103,6 +108,7 @@ class MutableUser(MutableBaseObject):
         icon (Optional[str]): The icon of the user.
         id (Optional[int]): The ID of the user.
         key (Optional[str]): The key of the user.
+        metadata (Optional[Dict[str, Any]]): The metadata of the user.
         updated_at (Optional[datetime]): The timestamp when the user was last updated.
         uuid (Optional[str]): The UUID of the user.
     """
@@ -114,6 +120,7 @@ class MutableUser(MutableBaseObject):
         icon: Optional[str] = "👤",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -126,6 +133,7 @@ class MutableUser(MutableBaseObject):
             icon (Optional[str]): The icon of the user. Defaults to "👤".
             id (Optional[int]): The ID of the user.
             key (Optional[str]): The key of the user.
+            metadata (Optional[Dict[str, Any]]): The metadata of the user.
             updated_at (Optional[datetime]): The timestamp when the user was last updated.
             uuid (Optional[str]): The UUID of the user.
 
@@ -138,6 +146,7 @@ class MutableUser(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -262,6 +271,7 @@ class UserFactory:
         icon: Optional[str] = "👤",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableUser]:
@@ -274,6 +284,7 @@ class UserFactory:
             icon (Optional[str]): The icon of the user. Defaults to "👤".
             id (Optional[int]): The ID of the user.
             key (Optional[str]): The key of the user.
+            metadata (Optional[Dict[str, Any]]): The metadata of the user.
             updated_at (Optional[datetime]): The timestamp when the user was last updated.
             uuid (Optional[str]): The UUID of the user.
 
@@ -290,6 +301,7 @@ class UserFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 name=name,
                 updated_at=updated_at,
                 uuid=uuid,
@@ -302,6 +314,12 @@ class UserFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class UserBuilder(BaseObjectBuilder):
+    """ """
+
+    pass
 
 
 class UserManager(BaseObjectManager):
@@ -736,7 +754,9 @@ class UserManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableUser]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableUser]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -858,6 +878,7 @@ class UserModel(ImmutableBaseModel):
         id (Field): The ID of the user.
         icon (Field): The icon of the user. Defaults to "👤".
         key (Field): The key of the user.
+        metadata (Field): The metadata of the user.
         name (Field): The name of the user.
         table (str): The table name of the user model.
         updated_at (Field): The timestamp when the user was last updated.
@@ -930,6 +951,22 @@ class UserModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     name: Field = Field(
         autoincrement=False,
         default=None,
@@ -984,6 +1021,7 @@ class UserModel(ImmutableBaseModel):
         icon: Optional[str] = "👤",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[dict] = None,
         name: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -996,6 +1034,7 @@ class UserModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the user. Defaults to "👤".
             id (Optional[int]): The ID of the user.
             key (Optional[str]): The key of the user.
+            metadata (Optional[dict]): The metadata of the user.
             name (Optional[str]): The name of the user.
             updated_at (Optional[datetime]): The timestamp when the user was last updated.
             uuid (Optional[str]): The UUID of the user.
@@ -1010,6 +1049,7 @@ class UserModel(ImmutableBaseModel):
             icon="👤",
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             table=Constants.USERS,
             updated_at=updated_at,

@@ -169,7 +169,9 @@ class Constants:
     SETTINGS: Final[str] = "settings"
     STACKS: Final[str] = "stacks"
     STATUSES: Final[str] = "statuses"
+    SUBJECTS: Final[str] = "subjects"
     TAGS: Final[str] = "tags"
+    TEACHERS: Final[str] = "teachers"
     USERS: Final[str] = "users"
 
     DEFAULT_FONT_FAMILY: Final[str] = "Helvetica"
@@ -194,7 +196,9 @@ class Constants:
     DEFAULT_DATE_REGEX: Final[str] = r"^\d{4}-\d{2}-\d{2}$"
     DEFAULT_TIME_REGEX: Final[str] = r"^\d{2}:\d{2}:\d{2}$"
 
-    DEFAULT_DATETIME_FORMAT: Final[str] = f"{DEFAULT_DATE_FORMAT} - {DEFAULT_TIME_FORMAT}"
+    DEFAULT_DATETIME_FORMAT: Final[str] = (
+        f"{DEFAULT_DATE_FORMAT} - {DEFAULT_TIME_FORMAT}"
+    )
 
     AMBER: Final[Dict[str, Any]] = {
         "default": "#FFC107",
@@ -634,6 +638,15 @@ class Constants:
         "users": [],
     }
 
+    # The repetition base interval in days
+    BASE_REPETITION_INTERVAL_DAYS: Final[int] = 1
+
+    # The repetition base interval in minutes
+    BASE_REPETITION_INTERVAL_MINUTES: Final[int] = 2
+
+    # The repetition base interval in seconds
+    BASE_REPETITION_INTERVAL_SECONDS: Final[int] = 120
+
     @classmethod
     def get_base_id(cls) -> int:
         """
@@ -646,6 +659,53 @@ class Constants:
         """
         # Copy the base ID to prevent external modification
         return copy.deepcopy(cls.BASE_ID)
+
+    @classmethod
+    def get_base_repetition_interval(
+        cls,
+        what: Literal[
+            "days",
+            "minutes",
+            "seconds",
+        ] = "days",
+    ) -> int:
+        """
+        Returns the base repetition interval in the specified unit.
+
+        The base repetition interval is used to calculate the interval for flashcards.
+
+        Args:
+            what (Literal["days", "minutes", "seconds"]): The unit of the base repetition interval. Defaults to "days".
+
+        Returns:
+            int: The base repetition interval.
+        """
+
+        # Check, if the passed what parameter is "days"
+        if what == "days":
+            # Return the base repetition interval in days
+            return copy.deepcopy(cls.BASE_REPETITION_INTERVAL_DAYS)
+
+        # Check, if the passed what parameter is "minutes"
+        if what == "minutes":
+            # Return the base repetition interval in minutes
+            return copy.deepcopy(cls.BASE_REPETITION_INTERVAL_MINUTES)
+
+        # Return the base repetition interval in seconds
+        return copy.deepcopy(cls.BASE_REPETITION_INTERVAL_SECONDS)
+
+    @classmethod
+    def get_base_repetition_interval_seconds(cls) -> int:
+        """
+        Returns the base repetition interval in seconds.
+
+        The base repetition interval is used to calculate the interval for flashcards.
+
+        Returns:
+            int: The base repetition interval.
+        """
+        # Copy the base repetition interval to prevent external modification
+        return copy.deepcopy(cls.BASE_REPETITION_INTERVAL_SECONDS)
 
     @classmethod
     def get_colors(

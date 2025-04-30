@@ -9,7 +9,12 @@ from typing import *
 
 from core.answer import AnswerFactory, AnswerManager
 from core.association import AssociationFactory, AssociationManager
-from core.change_history import ChangeHistoryFactory, ChangeHistoryManager, ChangeHistoryItemFactory, ChangeHistoryItemManager
+from core.change_history import (
+    ChangeHistoryFactory,
+    ChangeHistoryManager,
+    ChangeHistoryItemFactory,
+    ChangeHistoryItemManager,
+)
 from core.comment import CommentFactory, CommentManager
 from core.custom_field import CustomFieldFactory, CustomFieldManager
 from core.default import DefaultFactory, DefaultManager
@@ -21,7 +26,9 @@ from core.question import QuestionFactory, QuestionManager
 from core.setting import SettingFactory, SettingManager
 from core.stack import StackFactory, StackManager
 from core.status import StatusFactory, StatusManager
+from core.subject import SubjectFactory, SubjectManager
 from core.tag import TagFactory, TagManager
+from core.teacher import TeacherFactory, TeacherManager
 from core.user import UserFactory, UserManager
 
 from utils.dispatcher import Dispatcher
@@ -53,7 +60,9 @@ class ComponentAccessor:
         setting_manager (SettingManager): The setting manager instance.
         stack_manager (StackManager): The stack manager instance.
         status_manager (StatusManager): The status manager instance.
+        subject_manager (SubjectManager): The subject manager instance.
         tag_manager (TagManager): The tag manager instance.
+        teacher_manager (TeacherManager): The teacher manager instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
         user_manager (UserManager): The user manager instance.
         dispatcher (Dispatcher): The dispatcher instance.
@@ -77,7 +86,9 @@ class ComponentAccessor:
         get_setting_manager(): Returns the setting manager instance.
         get_stack_manager(): Returns the stack manager instance.
         get_status_manager(): Returns the status manager instance.
+        get_subject_manager(): Returns the subject manager instance.
         get_tag_manager(): Returns the tag manager instance.
+        get_teacher_manager(): Returns the teacher manager instance.
         get_unified_factory(): Returns the unified factory instance.
         get_unified_manager(): Returns the unified manager instance.
         get_user_manager(): Returns the user manager instance.
@@ -101,7 +112,9 @@ class ComponentAccessor:
     setting_manager: SettingManager = SettingManager()
     stack_manager: StackManager = StackManager()
     status_manager: StatusManager = StatusManager()
+    subject_manager: SubjectManager = SubjectManager()
     tag_manager: TagManager = TagManager()
+    teacher_manager: TeacherManager = TeacherManager()
     unified_factory: UnifiedObjectFactory = UnifiedObjectFactory()
     unified_manager: UnifiedObjectManager = UnifiedObjectManager()
     user_manager: UserManager = UserManager()
@@ -326,6 +339,16 @@ class ComponentAccessor:
         return StatusManager()
 
     @classmethod
+    def get_subject_manager(cls) -> SubjectManager:
+        """
+        Returns the subject manager instance.
+
+        Returns:
+            SubjectManager: The subject manager instance.
+        """
+        return SubjectManager()
+
+    @classmethod
     def get_tag_manager(cls) -> TagManager:
         """
         Returns the tag manager instance.
@@ -334,6 +357,16 @@ class ComponentAccessor:
             TagManager: The tag manager instance.
         """
         return TagManager()
+
+    @classmethod
+    def get_teacher_manager(cls) -> TeacherManager:
+        """
+        Returns the teacher manager instance.
+
+        Returns:
+            TeacherManager: The teacher manager instance.
+        """
+        return TeacherManager()
 
     @classmethod
     def get_unified_factory(cls) -> UnifiedObjectFactory:
@@ -437,10 +470,22 @@ class ComponentAccessor:
                 manager=StatusFactory,
             )
 
+            # Register the subject factory
+            factory.register_factory(
+                name="subject_factory",
+                manager=SubjectFactory,
+            )
+
             # Register the tag factory
             factory.register_factory(
                 name="tag_factory",
                 manager=TagFactory,
+            )
+
+            # Register the teacher factory
+            factory.register_factory(
+                name="teacher_factory",
+                manager=TeacherFactory,
             )
 
             # Register the user factory
@@ -565,10 +610,22 @@ class ComponentAccessor:
                 manager=StatusManager,
             )
 
+            # Register the subject manager
+            manager.register_manager(
+                name="subject_manager",
+                manager=SubjectManager,
+            )
+
             # Register the tag manager
             manager.register_manager(
                 name="tag_manager",
                 manager=TagManager,
+            )
+
+            # Register the teacher manager
+            manager.register_manager(
+                name="teacher_manager",
+                manager=TeacherManager,
             )
 
             # Register the user manager

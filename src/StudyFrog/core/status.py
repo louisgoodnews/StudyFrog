@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -38,6 +39,7 @@ class ImmutableStatus(ImmutableBaseObject):
         icon (Optional[str]): The icon of the status.
         id (Optional[int]): The ID of the status.
         key (Optional[str]): The key of the status.
+        metadata (Optional[Dict[str, Any]]): The metadata of the status.
         name (str): The name of the status.
         updated_at (Optional[datetime]): The timestamp when the status was last updated.
         uuid (Optional[str]): The UUID of the status.
@@ -52,6 +54,7 @@ class ImmutableStatus(ImmutableBaseObject):
         icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -66,6 +69,7 @@ class ImmutableStatus(ImmutableBaseObject):
             icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
+            metadata (Optional[Dict[str, Any]]): The metadata of the status.
             updated_at (Optional[datetime]): The timestamp when the status was last updated.
             uuid (Optional[str]): The UUID of the status.
         """
@@ -78,6 +82,7 @@ class ImmutableStatus(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -112,6 +117,7 @@ class MutableStatus(MutableBaseObject):
         icon (Optional[str]): The icon of the status.
         id (Optional[int]): The ID of the status.
         key (Optional[str]): The key of the status.
+        metadata (Optional[Dict[str, Any]]): The metadata of the status.
         name (str): The name of the status.
         updated_at (Optional[datetime]): The timestamp when the status was last updated.
         uuid (Optional[str]): The UUID of the status.
@@ -126,6 +132,7 @@ class MutableStatus(MutableBaseObject):
         icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -140,6 +147,7 @@ class MutableStatus(MutableBaseObject):
             icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
+            metadata (Optional[Dict[str, Any]]): The metadata of the status.
             updated_at (Optional[datetime]): The timestamp when the status was last updated.
             uuid (Optional[str]): The UUID of the status.
         """
@@ -152,6 +160,7 @@ class MutableStatus(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -273,6 +282,7 @@ class StatusFactory:
         icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> ImmutableStatus:
@@ -287,6 +297,7 @@ class StatusFactory:
             icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
+            metadata (Optional[Dict[str, Any]]): The metadata of the status.
             updated_at (Optional[datetime]): The timestamp when the status was last updated.
             uuid (Optional[str]): The UUID of the status.
 
@@ -303,6 +314,7 @@ class StatusFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -314,6 +326,12 @@ class StatusFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class StatusBuilder(BaseObjectBuilder):
+    """ """
+
+    pass
 
 
 class StatusManager(BaseObjectManager):
@@ -842,7 +860,9 @@ class StatusManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableStatus]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableStatus]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -978,6 +998,7 @@ class StatusModel(ImmutableBaseModel):
         icon (str): The icon of the status. Defaults to "🏷️".
         id (int): The ID of the status.
         key (str): The key of the status.
+        metadata (Dict[str, Any]): The metadata of the status.
         name (str): The name of the status.
         updated_at (datetime): The timestamp when the status was last updated.
         uuid (str): The UUID of the status.
@@ -1081,6 +1102,22 @@ class StatusModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=False,
+    )
+
     name: Field = Field(
         autoincrement=False,
         default=None,
@@ -1137,6 +1174,7 @@ class StatusModel(ImmutableBaseModel):
         icon: Optional[str] = "🏷️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         name: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1151,6 +1189,7 @@ class StatusModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the status. Defaults to "🏷️".
             id (Optional[int]): The ID of the status.
             key (Optional[str]): The key of the status.
+            metadata (Optional[Dict[str, Any]]): The metadata of the status.
             name (Optional[str]): The name of the status.
             updated_at (Optional[datetime]): The timestamp when the status was last updated.
             uuid (Optional[str]): The UUID of the status.
@@ -1167,6 +1206,7 @@ class StatusModel(ImmutableBaseModel):
             icon="🏷️",
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             table=Constants.STATUSES,
             updated_at=updated_at,

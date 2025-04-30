@@ -32,7 +32,9 @@ class ToplevelPositions(Enum):
 
 
 class ToplevelNotification:
-    """ """
+    """
+    
+    """
 
     # Initialize this class' logger instance in a class variable
     logger: Final[Logger] = Logger.get_logger(name="ToplevelNotification")
@@ -45,7 +47,22 @@ class ToplevelNotification:
         on_click_callback: Optional[Callable[[str], None]] = None,
         **kwargs,
     ) -> Optional[str]:
-        """ """
+        """
+        Creates a toplevel widget with a cancel button.
+
+        This method creates a toplevel widget with a cancel button and a message label.
+        It also sets up the geometry of the widget and places the widgets within the grid.
+
+        Args:
+            message (str): The message to display in the message label
+            title (str): The title of the toplevel widget
+            on_click_callback (Optional[Callable[[str], None]]): The callback to execute when the cancel button is clicked
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Toplevel constructor
+
+        Returns:
+            Optional[str]: The result of the callback function
+        """
         try:
             # Initialize the result variable as 'cancel'
             result: str = "cancel"
@@ -124,7 +141,18 @@ class ToplevelNotification:
             )
 
             def _on_button_click(string: str) -> None:
-                """ """
+                """
+                Handles the button click event.
+
+                This method is called when the button is clicked. It sets the result variable to the passed string and calls the on_click_callback callable if it is not None.
+                Finally, it destroys the toplevel widget.
+
+                Args:
+                    string (str): The string to set the result variable to
+
+                Returns:
+                    None
+                """
 
                 # Declare a nonlocal variable
                 nonlocal result
@@ -184,7 +212,22 @@ class ToplevelNotification:
         on_click_callback: Optional[Callable[[str], None]] = None,
         **kwargs,
     ) -> Optional[str]:
-        """ """
+        """
+        Creates a toplevel widget with an okay button.
+
+        This method creates a toplevel widget with an okay button and a message label.
+        It also sets up the geometry of the widget and places the widgets within the grid.
+
+        Args:
+            title (str): The title of the toplevel widget
+            message (str): The message to display in the message label
+            on_click_callback (Optional[Callable[[str], None]]): The callback to execute when the okay button is clicked
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Toplevel constructor
+
+        Returns:
+            Optional[str]: The result of the callback function
+        """
         try:
             # Initialize the result variable as 'okay'
             result: str = "okay"
@@ -263,7 +306,18 @@ class ToplevelNotification:
             )
 
             def _on_button_click(string: str) -> None:
-                """ """
+                """
+                Handles the button click event.
+
+                This method is called when the button is clicked. It sets the result variable to the passed string and calls the on_click_callback callable if it is not None.
+                Finally, it destroys the toplevel widget.
+
+                Args:
+                    string (str): The string to set the result variable to
+
+                Returns:
+                    None
+                """
 
                 # Declare a non-local variable
                 nonlocal result
@@ -323,8 +377,22 @@ class ToplevelNotification:
         on_click_callback: Optional[Callable[[str], None]] = None,
         **kwargs,
     ) -> Optional[str]:
-        """ """
+        """
+        Creates a toplevel widget with an okay and cancel button.
 
+        This method creates a toplevel widget with an okay and cancel button and a message label.
+        It also sets up the geometry of the widget and places the widgets within the grid.
+
+        Args:
+            title (str): The title of the toplevel widget
+            message (str): The message to display in the message label
+            on_click_callback (Optional[Callable[[str], None]]): The callback to execute when the okay or cancel button is clicked
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Toplevel constructor
+
+        Returns:
+            Optional[str]: The result of the callback function
+        """
         try:
             # Initialize the result variable as 'cancel'
             result: str = "cancel"
@@ -403,7 +471,20 @@ class ToplevelNotification:
             )
 
             def _on_button_click(string: str) -> None:
-                # Create a nonlocal variable
+                """
+                Handles the button click event.
+
+                This method is called when the button is clicked. It sets the result variable to the passed string and calls the on_click_callback callable if it is not None.
+                Finally, it destroys the toplevel widget.
+
+                Args:
+                    string (str): The string to set the result variable to
+
+                Returns:
+                    None
+                """
+
+                # Declare a nonlocal variable
                 nonlocal result
 
                 # Update the result variable with the passed string argument
@@ -510,7 +591,22 @@ class ToplevelNotification:
         on_click_callback: Optional[Callable[[str], None]] = None,
         **kwargs,
     ) -> Optional[str]:
-        """ """
+        """
+        Creates a toplevel widget with a retry button.
+
+        This method creates a toplevel widget with a retry button and a message label.
+        It also sets up the geometry of the widget and places the widgets within the grid.
+
+        Args:
+            title (str): The title of the toplevel widget
+            message (str): The message to display in the message label
+            on_click_callback (Optional[Callable[[str], None]]): The callback to execute when the retry button is clicked
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Toplevel constructor
+
+        Returns:
+            Optional[str]: The result of the callback function
+        """
         try:
             # Initialize the result variable as 'retry'
             result: str = "retry"
@@ -589,7 +685,18 @@ class ToplevelNotification:
             )
 
             def _on_button_click(string: str) -> None:
-                """ """
+                """
+                Handles the button click event.
+
+                This method is called when the button is clicked. It sets the result variable to the passed string and calls the on_click_callback callable if it is not None.
+                Finally, it destroys the toplevel widget.
+
+                Args:
+                    string (str): The string to set the result variable to
+
+                Returns:
+                    None
+                """
 
                 # Declare a non-local variable
                 nonlocal result
@@ -649,7 +756,22 @@ class ToplevelNotification:
         on_click_callback: Optional[Callable[[str], None]] = None,
         **kwargs,
     ) -> Optional[str]:
-        """ """
+        """
+        Creates a toplevel widget with a retry and cancel button.
+
+        This method creates a toplevel widget with a retry and cancel button and a message label.
+        It also sets up the geometry of the widget and places the widgets within the grid.
+
+        Args:
+            title (str): The title of the toplevel widget
+            message (str): The message to display in the message label
+            on_click_callback (Optional[Callable[[str], None]]): The callback to execute when the retry or cancel button is clicked
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Toplevel constructor
+
+        Returns:
+            Optional[str]: The result of the callback function
+        """
 
         try:
             # Initialize the result variable as 'cancel'
@@ -729,7 +851,20 @@ class ToplevelNotification:
             )
 
             def _on_button_click(string: str) -> None:
-                # Create a nonlocal variable
+                """
+                Handles the button click event.
+
+                This method is called when the button is clicked. It sets the result variable to the passed string and calls the on_click_callback callable if it is not None.
+                Finally, it destroys the toplevel widget.
+
+                Args:
+                    string (str): The string to set the result variable to
+
+                Returns:
+                    None
+                """
+
+                # Declare a nonlocal variable
                 nonlocal result
 
                 # Update the result variable with the passed string argument
@@ -836,7 +971,22 @@ class ToplevelNotification:
         on_click_callback: Optional[Callable[[str], None]] = None,
         **kwargs,
     ) -> Optional[str]:
-        """ """
+        """
+        Creates a toplevel widget with a yes and no button.
+
+        This method creates a toplevel widget with a yes and no button and a message label.
+        It also sets up the geometry of the widget and places the widgets within the grid.
+
+        Args:
+            title (str): The title of the toplevel widget
+            message (str): The message to display in the message label
+            on_click_callback (Optional[Callable[[str], None]]): The callback to execute when the yes or no button is clicked
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Toplevel constructor
+
+        Returns:
+            Optional[str]: The result of the callback function
+        """
 
         try:
             # Initialize the result variable as 'no'
@@ -916,7 +1066,20 @@ class ToplevelNotification:
             )
 
             def _on_button_click(string: str) -> None:
-                # Create a nonlocal variable
+                """
+                Handles the button click event.
+
+                This method is called when the button is clicked. It sets the result variable to the passed string and calls the on_click_callback callable if it is not None.
+                Finally, it destroys the toplevel widget.
+
+                Args:
+                    string (str): The string to set the result variable to
+
+                Returns:
+                    None
+                """
+
+                # Declare a nonlocal variable
                 nonlocal result
 
                 # Update the result variable with the passed string argument
@@ -1023,7 +1186,22 @@ class ToplevelNotification:
         on_click_callback: Optional[Callable[[str], None]] = None,
         **kwargs,
     ) -> Optional[str]:
-        """ """
+        """
+        Creates a toplevel widget with a yes, no and cancel button.
+
+        This method creates a toplevel widget with a yes, no and cancel button and a message label.
+        It also sets up the geometry of the widget and places the widgets within the grid.
+
+        Args:
+            title (str): The title of the toplevel widget
+            message (str): The message to display in the message label
+            on_click_callback (Optional[Callable[[str], None]]): The callback to execute when the yes, no or cancel button is clicked
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Toplevel constructor
+
+        Returns:
+            Optional[str]: The result of the callback function
+        """
 
         try:
             # Initialize the result variable as 'no'
@@ -1103,6 +1281,19 @@ class ToplevelNotification:
             )
 
             def _on_button_click(string: str) -> None:
+                """
+                Handles the button click event.
+
+                This method is called when the button is clicked. It sets the result variable to the passed string and calls the on_click_callback callable if it is not None.
+                Finally, it destroys the toplevel widget.
+
+                Args:
+                    string (str): The string to set the result variable to
+
+                Returns:
+                    None
+                """
+
                 # Create a nonlocal variable
                 nonlocal result
 
@@ -1230,7 +1421,23 @@ class ToplevelNotification:
 
 
 class ToplevelToastNotification(tkinter.Toplevel):
-    """ """
+    """
+    A class representing a toast notification.
+
+    This class extends the tkinter.Toplevel class and provides a toast notification with a fade-in and fade-out animation.
+
+    Attributes:
+        fade_after: int
+            The duration of the fade animation in milliseconds
+        fade_after_id: Optional[str]
+            The ID of the fade animation
+        fade_duration: int
+            The duration of the fade animation in milliseconds
+        on_click_callback: Optional[Callable[[], None]]
+            The callback to execute when the notification is clicked
+        position: Union[ToplevelPositions, str]
+            The position of the notification on the screen
+    """
 
     def __init__(
         self,
@@ -1242,7 +1449,28 @@ class ToplevelToastNotification(tkinter.Toplevel):
         master: Optional[tkinter.Misc] = None,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Initializes a new instance of the ToplevelToastNotification class.
+
+        Args:
+            message: str
+                The message to display in the notification
+            title: str
+                The title of the notification
+            fade_duration: int
+                The duration of the fade animation in milliseconds
+            on_click_callback: Optional[Callable[[], None]]
+                The callback to execute when the notification is clicked
+            position: Union[ToplevelPositions, str]
+                The position of the notification on the screen
+            master: Optional[tkinter.Misc]
+                The parent widget
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Toplevel constructor
+
+        Returns:
+            None
+        """
 
         # Initialize this class' logger instance in an instance variable
         self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
@@ -1257,6 +1485,9 @@ class ToplevelToastNotification(tkinter.Toplevel):
         # Store the passed fade duration int in an instance variable
         # Notice: This is the total amount of time it takes to fade out
         self.fade_duration: int = fade_duration
+
+        # Store the passed 'on click callback' callable in an instance variable
+        self.on_click_callback: Optional[Callable[[], None]] = on_click_callback
 
         # Store the passed position (union) string, ToplevelPositions in an instance variable
         self.position: Union[ToplevelPositions, str] = position
@@ -1322,7 +1553,10 @@ class ToplevelToastNotification(tkinter.Toplevel):
         self._title_label: tkinter.Label = tkinter.Label(
             master=self,
             text=title,
-            **kwargs,
+            **kwargs.get(
+                "title_label",
+                {},
+            ),
         )
 
         # Place the 'title label' label widget within the grid
@@ -1336,7 +1570,7 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Bind the 'on_click' method to the 'title label' label widget via the '<ButtonRelease-1>' event
         self._title_label.bind(
-            func=lambda: self._on_click(on_click_callback=on_click_callback),
+            func=self._on_click,
             sequence="<ButtonRelease-1>",
         )
 
@@ -1344,7 +1578,10 @@ class ToplevelToastNotification(tkinter.Toplevel):
         self._message_label: tkinter.Label = tkinter.Label(
             master=self,
             text=message,
-            **kwargs,
+            **kwargs.get(
+                "message_label",
+                {},
+            ),
         )
 
         # Place the 'message label' label widget within the grid
@@ -1358,7 +1595,7 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
         # Bind the 'on_click' method to the 'message label' label widget via the '<ButtonRelease-1>' event
         self._message_label.bind(
-            func=lambda: self._on_click(on_click_callback=on_click_callback),
+            func=self._on_click,
             sequence="<ButtonRelease-1>",
         )
 
@@ -1386,14 +1623,24 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
     @property
     def message_label(self) -> tkinter.Label:
-        """ """
+        """
+        Returns the 'message label' label widget.
+
+        Returns:
+            tkinter.Label: The 'message label' label widget
+        """
 
         # Return the 'message label' label widget
         return self._message_label
 
     @property
     def title_label(self) -> tkinter.Label:
-        """ """
+        """
+        Returns the 'title label' label widget.
+
+        Returns:
+            tkinter.Label: The 'title label' label widget
+        """
 
         # Return the 'title label' label widget
         return self._title_label
@@ -1402,7 +1649,18 @@ class ToplevelToastNotification(tkinter.Toplevel):
         self,
         alpha: float,
     ) -> None:
-        """ """
+        """
+        Fades in the window.
+
+        This method is called when the window needs to be faded in. It sets the opacity of the window to the passed alpha and schedules the next fade step.
+
+        Parameters:
+            alpha: float
+                The alpha value to set for the window
+
+        Returns:
+            None
+        """
 
         # Check, if the passed alpha is greater than or equal to 1.0
         if alpha >= 1.0:
@@ -1439,7 +1697,18 @@ class ToplevelToastNotification(tkinter.Toplevel):
         self,
         alpha: float,
     ) -> None:
-        """ """
+        """
+        Fades out the window.
+
+        This method is called when the window needs to be faded out. It sets the opacity of the window to the passed alpha and schedules the next fade step.
+
+        Parameters:
+            alpha: float
+                The alpha value to set for the window
+
+        Returns:
+            None
+        """
 
         # Check, if the passed alpha is less than or equal to 0
         if alpha <= 0:
@@ -1465,35 +1734,56 @@ class ToplevelToastNotification(tkinter.Toplevel):
     def _on_click(
         self,
         event: Optional[tkinter.Event] = None,
-        on_click_callback: Optional[Callable[[], None]] = None,
     ) -> None:
-        """ """
+        """
+        Handles the click event of the window.
+
+        This method is called when the window is clicked. It calls the passed on_click_callback callable if it is not None.
+        If an exception occurs while executing the on_click_callback callable, it is logged and the exception is re-raised.
+        Finally, the ToplevelToastNotification is destroyed.
+
+        Args:
+            event (Optional[tkinter.Event]): The event object.
+
+        Returns:
+            None
+        """
 
         # Check, if an on_click_callback callable has been passed
-        if not on_click_callback:
-            # Return early
-            return
+        if self.on_click_callback:
+            try:
+                # Call the on_click_callback callable
+                self.on_click_callback()
+            except Exception as e:
+                # Log an error message indicating that an exception has occurred
+                self.logger.error(
+                    message=f"Caught an exception while attempting to execute 'on_click_callback' in '_on_click' method from '{self.__class__.__name__}': {e}"
+                )
 
-        try:
-            # Call the on_click_callback callable
-            on_click_callback()
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to execute 'on_click_callback' in '_on_click' method from '{self.__class__.__name__}': {e}"
-            )
+                # Log the traceback
+                self.logger.error(message=traceback.format_exc())
 
-            # Log the traceback
-            self.logger.error(message=traceback.format_exc())
+                # Re-raise the exception to the caller
+                raise e
 
-            # Re-raise the exception to the caller
-            raise e
+        # Destroy the ToplevelToastNotification
+        self.destroy()
 
     def _on_enter(
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
-        """ """
+        """
+        Handles the enter event of the window.
+
+        This method is called when the mouse enters the window. It cancels the fade out animation and schedules the fade in animation.
+
+        Args:
+            event (Optional[tkinter.Event]): The event object.
+
+        Returns:
+            None
+        """
 
         # Check, if a fade after id has been scheduled
         if self.fade_after_id:
@@ -1520,7 +1810,17 @@ class ToplevelToastNotification(tkinter.Toplevel):
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
-        """ """
+        """
+        Handles the leave event of the window.
+
+        This method is called when the mouse leaves the window. It schedules the fade out animation.
+
+        Args:
+            event (Optional[tkinter.Event]): The event object.
+
+        Returns:
+            None
+        """
 
         # Schedule the fade out
         self.fade_after_id = self.after(
@@ -1533,7 +1833,17 @@ class ToplevelToastNotification(tkinter.Toplevel):
         self,
         position: Union[ToplevelPositions, str],
     ) -> None:
-        """ """
+        """
+        Places the toast notification on the screen.
+
+        This method is called when the toast notification needs to be placed on the screen. It updates the window's idletasks and calculates the position of the toast notification based on the passed position.
+
+        Args:
+            position (Union[ToplevelPositions, str]): The position of the toast notification on the screen
+
+        Returns:
+            None
+        """
         try:
             # Update the window's idletasks
             self.update_idletasks()
@@ -1602,7 +1912,18 @@ class ToplevelToastNotification(tkinter.Toplevel):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Configures the 'message label' label widget.
+
+        This method is called when the 'message label' label widget needs to be configured. It configures the 'message label' label widget with the passed keyword arguments.
+
+        Args:
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Label constructor
+
+        Returns:
+            None
+        """
         try:
             # Configure the 'message label' label widget
             self._message_label.configure(**kwargs)
@@ -1622,7 +1943,18 @@ class ToplevelToastNotification(tkinter.Toplevel):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Configures the 'title label' label widget.
+
+        This method is called when the 'title label' label widget needs to be configured. It configures the 'title label' label widget with the passed keyword arguments.
+
+        Args:
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Label constructor
+
+        Returns:
+            None
+        """
         try:
             # Configure the 'title label' label widget
             self._title_label.configure(**kwargs)

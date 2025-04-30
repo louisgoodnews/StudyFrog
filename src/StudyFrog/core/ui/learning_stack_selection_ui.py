@@ -29,7 +29,7 @@ from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 __all__: Final[List[str]] = ["LearningStackSelectionUI"]
 
@@ -43,6 +43,7 @@ class LearningStackSelectionUI(BaseUI):
         master: tkinter.Misc,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
+        unified_factory: UnifiedObjectFactory,
         unified_manager: UnifiedObjectManager,
         navigation_item: Optional[NavigationHistoryItem] = None,
     ) -> None:
@@ -62,6 +63,7 @@ class LearningStackSelectionUI(BaseUI):
             navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
+            unified_factory=unified_factory,
             unified_manager=unified_manager,
         )
 
@@ -232,6 +234,7 @@ class LearningStackSelectionUI(BaseUI):
                     1
                 ],
                 "enable_randomsiation": form["enable_randomsiation"]["value"],
+                "enable_spaced_repetition": form["enable_spaced_repetition"]["value"],
             },
             source="learning_stack_selection_ui",
             stacks=[
@@ -467,6 +470,12 @@ class LearningStackSelectionUI(BaseUI):
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 5ft row to weight 1
         scrolled_frame.container.grid_rowconfigure(
             index=5,
+            weight=1,
+        )
+
+        # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 6th row to weight 1
+        scrolled_frame.container.grid_rowconfigure(
+            index=6,
             weight=1,
         )
 
@@ -833,6 +842,54 @@ class LearningStackSelectionUI(BaseUI):
         self._register_field(
             field=randomisation_field,
             label="Enable Randomsiation?",
+            required=True,
+        )
+
+        # Create the 'enable spaced repetition' CheckbuttonField widget
+        spaced_repetition_field: CheckbuttonField = CheckbuttonField(
+            display_name="Enable Spaced Repetition?",
+            master=scrolled_frame.container,
+            namespace=Constants.STACK_SELECTION_NAMESPACE,
+            on_change_callback=self._on_field_change,
+            value=True,
+        )
+
+        # Configure the 'enable spaced repetition' CheckbuttonField widget
+        spaced_repetition_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Configure the 'enable spaced repetition' CheckbuttonField widget's 'checkbutton' tkinter.Checkbutton widget
+        spaced_repetition_field.configure_checkbutton(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Configure the 'enable spaced repetition' CheckbuttonField widget's 'label' tkinter.Label widget
+        spaced_repetition_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Place the 'enable spaced repetition' CheckbuttonField widget in the grid
+        spaced_repetition_field.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=6,
+            sticky=NSEW,
+        )
+
+        # Register the 'enable spaced repetition' CheckbuttonField widget
+        self._register_field(
+            field=spaced_repetition_field,
+            label="Enable Spaced Repetition?",
             required=True,
         )
 

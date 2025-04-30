@@ -62,6 +62,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
         filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
         id (Optional[int]): The ID of the learning session.
         key (Optional[str]): The key of the learning session.
+        metadata (Optional[Dict[str, Any]]): The metadata of the learning session.
         mode (Optional[str]): The mode of the learning session.
         result (Optional[int]): The result of the learning session.
         settings (Optional[Dict[str, Any]]): The settings of the learning session.
@@ -83,6 +84,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
         filters: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         mode: Optional[str] = None,
         result: Optional[int] = None,
         settings: Optional[Dict[str, Any]] = None,
@@ -105,6 +107,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
             filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
+            metadata (Optional[Dict[str, Any]]): The metadata of the learning session.
             mode (Optional[str]): The mode of the learning session.
             result (Optional[int]): The result of the learning session.
             settings (Optional[Dict[str, Any]]): The settings of the learning session.
@@ -129,6 +132,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
             filters=filters,
             id=id,
             key=key,
+            metadata=metadata,
             mode=mode,
             result=result,
             settings=settings,
@@ -231,6 +235,7 @@ class MutableLearningSession(MutableBaseObject):
         filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
         id (Optional[int]): The ID of the learning session.
         key (Optional[str]): The key of the learning session.
+        metadata (Optional[Dict[str, Any]]): The metadata of the learning session.
         mode (Optional[str]): The mode of the learning session.
         result (Optional[int]): The result of the learning session.
         settings (Optional[Dict[str, Any]]): The settings of the learning session.
@@ -252,6 +257,7 @@ class MutableLearningSession(MutableBaseObject):
         filters: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         mode: Optional[str] = None,
         result: Optional[int] = None,
         settings: Optional[Dict[str, Any]] = None,
@@ -274,6 +280,7 @@ class MutableLearningSession(MutableBaseObject):
             filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
+            metadata (Optional[Dict[str, Any]]): The metadata of the learning session.
             mode (Optional[str]): The mode of the learning session.
             result (Optional[int]): The result of the learning session.
             settings (Optional[Dict[str, Any]]): The settings of the learning session.
@@ -298,6 +305,7 @@ class MutableLearningSession(MutableBaseObject):
             filters=filters,
             id=id,
             key=key,
+            metadata=metadata,
             mode=mode,
             result=result,
             settings=settings,
@@ -607,6 +615,7 @@ class LearningSessionFactory:
         filters: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         mode: Optional[str] = None,
         result: Optional[int] = None,
         settings: Optional[List[Dict[str, Any]]] = None,
@@ -629,6 +638,7 @@ class LearningSessionFactory:
             filters (Optional[List[Dict[str, Any]]], optional): The filters applied to the learning session. Defaults to None.
             id (Optional[int], optional): The ID of the learning session. Defaults to None.
             key (Optional[str], optional): The key of the learning session. Defaults to None.
+            metadata (Optional[Dict[str, Any]], optional): The metadata of the learning session. Defaults to None.
             mode (Optional[str], optional): The mode of the learning session. Defaults to None.
             result (Optional[int], optional): The result of the learning session. Defaults to None.
             settings (Optional[List[Dict[str, Any]]], optional): The settings of the learning session. Defaults to None.
@@ -656,6 +666,7 @@ class LearningSessionFactory:
                 filters=filters,
                 id=id,
                 key=key,
+                metadata=metadata,
                 mode=mode,
                 result=result,
                 settings=settings,
@@ -901,6 +912,30 @@ class LearningSessionBuilder(BaseObjectBuilder):
             Self: The builder instance with the key attribute set.
         """
         self.configuration["key"] = value
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata of the learning session.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the learning session.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
+
+        # Return the builder instance
         return self
 
     def mode(
@@ -1716,6 +1751,7 @@ class LearningSessionModel(ImmutableBaseModel):
         filters (Field): The filters applied to the learning session.
         id (Field): The ID of the learning session.
         key (Field): The key of the learning session.
+        metadata (Field): The metadata of the learning session.
         mode (Field): The mode of the learning session.
         result (Field): The result of the learning session.
         settings (Field): The settings of the learning session.
@@ -1726,7 +1762,7 @@ class LearningSessionModel(ImmutableBaseModel):
         uuid (Field): The UUID of the learning session.
     """
 
-    table: str = Constants.LEARNING_SESSIONS
+    table: Final[str] = Constants.LEARNING_SESSIONS
 
     id: Field = Field(
         autoincrement=True,
@@ -1888,6 +1924,22 @@ class LearningSessionModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     mode: Field = Field(
         autoincrement=False,
         default=None,
@@ -2027,6 +2079,7 @@ class LearningSessionModel(ImmutableBaseModel):
         filters: Optional[List[Dict[str, Any]]] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         mode: Optional[str] = None,
         result: Optional[int] = None,
         settings: Optional[Dict[str, Any]] = None,
@@ -2049,6 +2102,7 @@ class LearningSessionModel(ImmutableBaseModel):
             filters (Optional[List[Dict[str, Any]]]): The filters applied to the learning session.
             id (Optional[int]): The ID of the learning session.
             key (Optional[str]): The key of the learning session.
+            metadata (Optional[Dict[str, Any]]): The metadata of the learning session.
             mode (Optional[str]): The mode of the learning session.
             result (Optional[int]): The result of the learning session.
             settings (Optional[Dict[str, Any]]): The settings of the learning session.
@@ -2070,6 +2124,7 @@ class LearningSessionModel(ImmutableBaseModel):
             filters=filters,
             id=id,
             key=key,
+            metadata=metadata,
             mode=mode,
             result=result,
             settings=settings,
@@ -2098,6 +2153,7 @@ class ImmutableLearningSessionAction(ImmutableBaseObject):
         end (Optional[datetime]): The end time of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
+        metadata (Optional[Dict[str, Any]]): The metadata of the item.
         reference (Optional[str]): The reference of the item.
         start (Optional[datetime]): The start time of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -2114,6 +2170,7 @@ class ImmutableLearningSessionAction(ImmutableBaseObject):
         end: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         reference: Optional[str] = None,
         start: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -2131,6 +2188,7 @@ class ImmutableLearningSessionAction(ImmutableBaseObject):
         end (Optional[datetime]): The end time of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
+        metadata (Optional[Dict[str, Any]]): The metadata of the item.
         reference (Optional[str]): The reference of the item.
         start (Optional[datetime]): The start time of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -2147,6 +2205,7 @@ class ImmutableLearningSessionAction(ImmutableBaseObject):
             end=end,
             id=id,
             key=key,
+            metadata=metadata,
             reference=reference,
             start=start,
             updated_at=updated_at,
@@ -2201,6 +2260,7 @@ class MutableLearningSessionAction(MutableBaseObject):
         end (Optional[datetime]): The end time of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
+        metadata (Optional[Dict[str, Any]]): The metadata of the item.
         reference (Optional[str]): The reference of the item.
         start (Optional[datetime]): The start time of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -2217,6 +2277,7 @@ class MutableLearningSessionAction(MutableBaseObject):
         end: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         reference: Optional[str] = None,
         start: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -2234,6 +2295,7 @@ class MutableLearningSessionAction(MutableBaseObject):
         end (Optional[datetime]): The end time of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
+        metadata (Optional[Dict[str, Any]]): The metadata of the item.
         reference (Optional[str]): The reference of the item.
         start (Optional[datetime]): The start time of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -2250,6 +2312,7 @@ class MutableLearningSessionAction(MutableBaseObject):
             end=end,
             id=id,
             key=key,
+            metadata=metadata,
             reference=reference,
             start=start,
             updated_at=updated_at,
@@ -2397,6 +2460,7 @@ class LearningSessionActionFactory:
         end: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         reference: Optional[str] = None,
         start: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -2414,6 +2478,7 @@ class LearningSessionActionFactory:
             end (Optional[datetime]): The end time of the action.
             id (Optional[int]): The ID of the action.
             key (Optional[str]): The key of the action.
+            metadata (Optional[Dict[str, Any]]): The metadata of the action.
             reference (Optional[str]): The reference of the action.
             start (Optional[datetime]): The start time of the action.
             updated_at (Optional[datetime]): The timestamp when the action was last updated.
@@ -2433,6 +2498,7 @@ class LearningSessionActionFactory:
                 end=end,
                 id=id,
                 key=key,
+                metadata=metadata,
                 reference=reference,
                 start=start,
                 updated_at=updated_at,
@@ -2627,6 +2693,30 @@ class LearningSessionActionBuilder(BaseObjectBuilder):
 
         # Set the end value in the configuration dictionary
         self.configuration["end"] = value
+
+        # Return the builder instance
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata of the learning session action.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the learning session action.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
 
         # Return the builder instance
         return self
@@ -3368,6 +3458,7 @@ class LearningSessionActionModel(ImmutableBaseModel):
         duration (Field): The duration of the action.
         end (Field): The end time of the action.
         key (Field): The key of the action.
+        metadata (Field): A dictionary of metadata.
         reference (Field): The reference of the action.
         start (Field): The start time of the action.
         updated_at (Field): The timestamp when the action was last updated.
@@ -3504,6 +3595,22 @@ class LearningSessionActionModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     reference: Field = Field(
         autoincrement=False,
         default=None,
@@ -3578,6 +3685,7 @@ class LearningSessionActionModel(ImmutableBaseModel):
         end: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         reference: Optional[str] = None,
         start: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -3595,6 +3703,7 @@ class LearningSessionActionModel(ImmutableBaseModel):
             end (Optional[datetime]): The end time of the action.
             id (Optional[int]): The ID of the action.
             key (Optional[str]): The key of the action.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             reference (Optional[str]): The reference of the action.
             start (Optional[datetime]): The start time of the action.
             updated_at (Optional[datetime]): The timestamp when the action was last updated.
@@ -3611,6 +3720,7 @@ class LearningSessionActionModel(ImmutableBaseModel):
             end=end,
             id=id,
             key=key,
+            metadata=metadata,
             reference=reference,
             start=start,
             table=Constants.LEARNING_SESSION_ACTIONS,
@@ -3634,6 +3744,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
         end (Optional[datetime]): The end time of the learning session item.
         id (Optional[int]): The ID of the learning session item.
         key (Optional[str]): The key of the learning session item.
+        metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
         reference (Optional[str]): The reference of the learning session item.
         start (Optional[datetime]): The start time of the learning session item.
         updated_at (Optional[datetime]): The timestamp when the learning session item was last updated.
@@ -3649,6 +3760,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
         end: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         reference: Optional[str] = None,
         start: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -3664,6 +3776,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
             end (Optional[datetime]): The end time of the learning session item.
             id (Optional[int]): The ID of the learning session item.
             key (Optional[str]): The key of the learning session item.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             reference (Optional[str]): The reference of the learning session item.
             start (Optional[datetime]): The start time of the learning session item.
             updated_at (Optional[datetime]): The timestamp when the learning session item was last updated.
@@ -3679,6 +3792,7 @@ class ImmutableLearningSessionItem(ImmutableBaseObject):
             end=end,
             id=id,
             key=key,
+            metadata=metadata,
             reference=reference,
             start=start,
             updated_at=updated_at,
@@ -3725,6 +3839,7 @@ class MutableLearningSessionItem(MutableBaseObject):
         end (Optional[datetime]): The end time of the learning session item.
         id (Optional[int]): The ID of the learning session item.
         key (Optional[str]): The key of the learning session item.
+        metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
         reference (Optional[str]): The reference of the learning session item.
         start (Optional[datetime]): The start time of the learning session item.
         updated_at (Optional[datetime]): The timestamp when the learning session item was last updated.
@@ -3740,6 +3855,7 @@ class MutableLearningSessionItem(MutableBaseObject):
         end: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         reference: Optional[str] = None,
         start: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -3756,6 +3872,7 @@ class MutableLearningSessionItem(MutableBaseObject):
             end (Optional[datetime]): The end time of the item.
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             reference (Optional[str]): The reference of the item.
             start (Optional[datetime]): The start time of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -3771,6 +3888,7 @@ class MutableLearningSessionItem(MutableBaseObject):
             end=end,
             id=id,
             key=key,
+            metadata=metadata,
             reference=reference,
             start=start,
             updated_at=updated_at,
@@ -3929,6 +4047,7 @@ class LearningSessionItemFactory:
         end: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         reference: Optional[str] = None,
         start: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -3945,6 +4064,7 @@ class LearningSessionItemFactory:
             end (Optional[datetime]): The end time of the item.
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             reference (Optional[str]): The reference of the item.
             start (Optional[datetime]): The start time of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -3963,6 +4083,7 @@ class LearningSessionItemFactory:
                 end=end,
                 id=id,
                 key=key,
+                metadata=metadata,
                 reference=reference,
                 start=start,
                 updated_at=updated_at,
@@ -4141,6 +4262,30 @@ class LearningSessionItemBuilder(BaseObjectBuilder):
 
         # Set the end value in the configuration dictionary
         self.configuration["end"] = value
+
+        # Return the builder instance
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata of the learning session item.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the learning session item.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
 
         # Return the builder instance
         return self
@@ -4884,6 +5029,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
         duration (Field): The duration of the item.
         end (Field): The end time of the item.
         key (Field): The key of the item.
+        metadata (Field): A dictionary of metadata.
         reference (Field): The reference of the item.
         start (Field): The start time of the item.
         updated_at (Field): The timestamp when the item was last updated.
@@ -5004,6 +5150,22 @@ class LearningSessionItemModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     reference: Field = Field(
         autoincrement=False,
         default=None,
@@ -5077,6 +5239,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
         end: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         reference: Optional[str] = None,
         start: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -5093,6 +5256,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
             end (Optional[datetime]): The end time of the item.
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
+            metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             reference (Optional[str]): The reference of the item.
             start (Optional[datetime]): The start time of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -5108,6 +5272,7 @@ class LearningSessionItemModel(ImmutableBaseModel):
             end=end,
             id=id,
             key=key,
+            metadata=metadata,
             reference=reference,
             start=start,
             table=Constants.LEARNING_SESSION_ITEMS,

@@ -20,7 +20,7 @@ from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
 from utils.navigation import NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["MainUI"]
@@ -35,6 +35,7 @@ class MainUI(BaseUI):
         logger (Logger): The logger instance.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
+        unified_factory (UnifiedObjectFactory): The unified factory instance.
         unified_manager (UnifiedObjectManager): The unified object manager instance.
     """
 
@@ -43,6 +44,7 @@ class MainUI(BaseUI):
         dispatcher: Dispatcher,
         navigation_service: NavigationHistoryService,
         setting_service: SettingService,
+        unified_factory: UnifiedObjectFactory,
         unified_manager: UnifiedObjectManager,
     ) -> None:
         """
@@ -52,6 +54,7 @@ class MainUI(BaseUI):
             dispatcher (Dispatcher): The dispatcher instance.
             navigation_service (NavigationHistoryService): The navigation history service instance.
             setting_service (SettingService): The setting service instance.
+            unified_factory (UnifiedObjectFactory): The unified factory instance.
             unified_manager (UnifiedObjectManager): The unified object manager instance.
 
         Returns:
@@ -101,6 +104,7 @@ class MainUI(BaseUI):
             name="main_ui",
             navigation_service=navigation_service,
             setting_service=setting_service,
+            unified_factory=unified_factory,
             unified_manager=unified_manager,
         )
 
@@ -335,7 +339,6 @@ class MainUI(BaseUI):
             dispatcher=self.dispatcher,
             master=master,
             navigation_service=self.navigation_service,
-            unified_manager=self.unified_manager,
         )
 
         # Grid the "TopBar" widget in the "Top Frame" frame widget
@@ -456,6 +459,7 @@ class MainUI(BaseUI):
                 navigation_service=self.navigation_service,
                 source=source,
                 target=target,
+                unified_factory=self.unified_factory,
                 unified_manager=self.unified_manager,
                 **kwargs,
             )
@@ -466,6 +470,7 @@ class MainUI(BaseUI):
                 master=master,
                 navigation_service=self.navigation_service,
                 setting_service=self.setting_service,
+                unified_factory=self.unified_factory,
                 unified_manager=self.unified_manager,
                 navigation_item=list(response["result"].values())[0],
                 **kwargs,

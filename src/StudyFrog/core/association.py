@@ -46,7 +46,9 @@ class ImmutableAssociation(ImmutableBaseObject):
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
         learning_session (Optional[int]): The ID of the learning session that is being associated with.
+        learning_session_action (Optional[int]): The ID of the learning session action that is being associated with.
         learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+        metadata (Optional[Dict[str, Any]]): The metadata of the association.
         note (Optional[int]): The ID of the note that is being associated with.
         option (Optional[int]): The ID of the option that is being associated with.
         priority (Optional[int]): The ID of the priority that is being associated with.
@@ -81,7 +83,9 @@ class ImmutableAssociation(ImmutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         learning_session: Optional[int] = None,
+        learning_session_action: Optional[int] = None,
         learning_session_item: Optional[int] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -111,7 +115,9 @@ class ImmutableAssociation(ImmutableBaseObject):
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
             learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_action (Optional[int]): The ID of the learning session action that is being associated with.
             learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+            metadata (Optional[Dict[str, Any]]): The metadata of the association.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -143,7 +149,9 @@ class ImmutableAssociation(ImmutableBaseObject):
             id=id,
             key=key,
             learning_session=learning_session,
+            learning_session_action=learning_session_action,
             learning_session_item=learning_session_item,
+            metadata=metadata,
             note=note,
             option=option,
             priority=priority,
@@ -205,7 +213,9 @@ class MutableAssociation(MutableBaseObject):
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
         learning_session (Optional[int]): The ID of the learning session that is being associated with.
+        learning_session_action (Optional[int]): The ID of the learning session action that is being associated with.
         learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+        metadata (Optional[Dict[str, Any]]): The metadata of the association.
         note (Optional[int]): The ID of the note that is being associated with.
         option (Optional[int]): The ID of the option that is being associated with.
         priority (Optional[int]): The ID of the priority that is being associated with.
@@ -240,7 +250,9 @@ class MutableAssociation(MutableBaseObject):
         id: Optional[int] = None,
         key: Optional[str] = None,
         learning_session: Optional[int] = None,
+        learning_session_action: Optional[int] = None,
         learning_session_item: Optional[int] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -270,7 +282,9 @@ class MutableAssociation(MutableBaseObject):
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
             learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_action (Optional[int]): The ID of the learning session action that is being associated with.
             learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+            metadata (Optional[Dict[str, Any]]): The metadata of the association.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -302,7 +316,9 @@ class MutableAssociation(MutableBaseObject):
             id=id,
             key=key,
             learning_session=learning_session,
+            learning_session_action=learning_session_action,
             learning_session_item=learning_session_item,
+            metadata=metadata,
             note=note,
             option=option,
             priority=priority,
@@ -463,7 +479,9 @@ class AssociationFactory:
         id: Optional[int] = None,
         key: Optional[str] = None,
         learning_session: Optional[int] = None,
+        learning_session_action: Optional[int] = None,
         learning_session_item: Optional[int] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -493,7 +511,9 @@ class AssociationFactory:
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
             learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_action (Optional[int]): The ID of the learning session action that is being associated with.
             learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+            metadata (Optional[Dict[str, Any]]): The metadata of the association.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -528,7 +548,9 @@ class AssociationFactory:
                 id=id,
                 key=key,
                 learning_session=learning_session,
+                learning_session_action=learning_session_action,
                 learning_session_item=learning_session_item,
+                metadata=metadata,
                 note=note,
                 option=option,
                 priority=priority,
@@ -733,6 +755,78 @@ class AssociationBuilder(BaseObjectBuilder):
         self.configuration["flashcard"] = value
         return self
 
+    def learning_session(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the learning session for the association.
+
+        Args:
+            value (int): The ID of the learning session to be set.
+
+        Returns:
+            Self: The builder object with the learning session set.
+        """
+        self.configuration["learning_session"] = value
+        return self
+
+    def learning_session_action(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the learning session action for the association.
+
+        Args:
+            value (int): The ID of the learning session action to be set.
+
+        Returns:
+            Self: The builder object with the learning session action set.
+        """
+        self.configuration["learning_session_action"] = value
+        return self
+
+    def learning_session_item(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the learning session item for the association.
+
+        Args:
+            value (int): The ID of the learning session item to be set.
+
+        Returns:
+            Self: The builder object with the learning session item set.
+        """
+        self.configuration["learning_session_item"] = value
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata of the association.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the association.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
+
+        # Return the builder instance
+        return self
+
     def note(
         self,
         value: int,
@@ -910,7 +1004,9 @@ class AssociationManager(BaseObjectManager):
         difficulty: Optional[int] = None,
         flashcard: Optional[int] = None,
         learning_session: Optional[int] = None,
+        learning_session_action: Optional[int] = None,
         learning_session_item: Optional[int] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -934,7 +1030,9 @@ class AssociationManager(BaseObjectManager):
             difficulty (Optional[int]): The ID of the difficulty that is being associated with.
             flashcard (Optional[int]): The ID of the flashcard that is being associated with.
             learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_action (Optional[int]): The ID of the learning session action that is being associated with.
             learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+            metadata (Optional[Dict[str, Any]]): The metadata of the association.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -964,7 +1062,9 @@ class AssociationManager(BaseObjectManager):
                 difficulty=difficulty,
                 flashcard=flashcard,
                 learning_session=learning_session,
+                learning_session_action=learning_session_action,
                 learning_session_item=learning_session_item,
+                metadata=metadata,
                 note=note,
                 option=option,
                 priority=priority,
@@ -1381,7 +1481,9 @@ class AssociationManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableAssociation]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableAssociation]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -1512,7 +1614,9 @@ class AssociationModel(ImmutableBaseModel):
         id (Optional[int]): The ID of the association.
         key (Optional[str]): The key of the association.
         learning_session (Optional[int]): The ID of the learning session that is being associated with.
+        learning_session_action (Optional[int]): The ID of the learning session action that is being associated with.
         learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+        metadata (Optional[Dict[str, Any]]): The metadata of the association.
         note (Optional[int]): The ID of the note that is being associated with.
         option (Optional[int]): The ID of the option that is being associated with.
         priority (Optional[int]): The ID of the priority that is being associated with.
@@ -1736,6 +1840,22 @@ class AssociationModel(ImmutableBaseModel):
         unique=False,
     )
 
+    learning_session_action: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=f"{Constants.LEARNING_SESSION_ACTIONS}(id)",
+        index=False,
+        name="learning_session_action",
+        nullable=False,
+        on_delete="CASCADE",
+        on_update="CASCADE",
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     learning_session_item: Field = Field(
         autoincrement=False,
         default=None,
@@ -1749,6 +1869,22 @@ class AssociationModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="INTEGER",
+        unique=False,
+    )
+
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
         unique=False,
     )
 
@@ -1951,7 +2087,9 @@ class AssociationModel(ImmutableBaseModel):
         id: Optional[int] = None,
         key: Optional[str] = None,
         learning_session: Optional[int] = None,
+        learning_session_action: Optional[int] = None,
         learning_session_item: Optional[int] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         note: Optional[int] = None,
         option: Optional[int] = None,
         priority: Optional[int] = None,
@@ -1981,7 +2119,9 @@ class AssociationModel(ImmutableBaseModel):
             id (Optional[int]): The ID of the association.
             key (Optional[str]): The key of the association.
             learning_session (Optional[int]): The ID of the learning session that is being associated with.
+            learning_session_action (Optional[int]): The ID of the learning session action that is being associated with.
             learning_session_item (Optional[int]): The ID of the learning session item that is being associated with.
+            metadata (Optional[Dict[str, Any]]): The metadata of the association.
             note (Optional[int]): The ID of the note that is being associated with.
             option (Optional[int]): The ID of the option that is being associated with.
             priority (Optional[int]): The ID of the priority that is being associated with.
@@ -2012,7 +2152,9 @@ class AssociationModel(ImmutableBaseModel):
             id=id,
             key=key,
             learning_session=learning_session,
+            learning_session_action=learning_session_action,
             learning_session_item=learning_session_item,
+            metadata=metadata,
             note=note,
             option=option,
             priority=priority,

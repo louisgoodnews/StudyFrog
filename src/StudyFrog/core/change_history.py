@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -45,6 +46,7 @@ class ImmutableChangeHistory(ImmutableBaseObject):
         icon (Optional[str]): The icon of the change history.
         id (Optional[int]): The ID of the change history.
         key (Optional[str]): The key of the change history.
+        metadata (Optional[Dict[str, Any]]): The metadata of the change history.
         updated_at (Optional[datetime]): The timestamp when the change history was last updated.
         uuid (Optional[str]): The UUID of the change_history.
     """
@@ -56,6 +58,7 @@ class ImmutableChangeHistory(ImmutableBaseObject):
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -68,6 +71,7 @@ class ImmutableChangeHistory(ImmutableBaseObject):
             icon (Optional[str]): The icon of the change history. Defaults to "🕒".
             id (Optional[int]): The ID of the change history.
             key (Optional[str]): The key of the change history.
+            metadata (Optional[Dict[str, Any]]): The metadata of the change history.
             updated_at (Optional[datetime]): The timestamp when the change history was last updated.
             uuid (Optional[str]): The UUID of the change_history.
 
@@ -81,6 +85,7 @@ class ImmutableChangeHistory(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             source=source,
             updated_at=updated_at,
             uuid=uuid,
@@ -124,6 +129,7 @@ class MutableChangeHistory(MutableBaseObject):
         icon (Optional[str]): The icon of the change history.
         id (Optional[int]): The ID of the change history.
         key (Optional[str]): The key of the change history.
+        metadata (Optional[Dict[str, Any]]): The metadata of the change history.
         updated_at (Optional[datetime]): The timestamp when the change history was last updated.
         uuid (Optional[str]): The UUID of the change_history.
     """
@@ -135,6 +141,7 @@ class MutableChangeHistory(MutableBaseObject):
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -147,6 +154,7 @@ class MutableChangeHistory(MutableBaseObject):
             icon (Optional[str]): The icon of the change history. Defaults to "🕒".
             id (Optional[int]): The ID of the change history.
             key (Optional[str]): The key of the change history.
+            metadata (Optional[Dict[str, Any]]): The metadata of the change history.
             updated_at (Optional[datetime]): The timestamp when the change history was last updated.
             uuid (Optional[str]): The UUID of the change_history.
 
@@ -160,6 +168,7 @@ class MutableChangeHistory(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             source=source,
             updated_at=updated_at,
             uuid=uuid,
@@ -287,6 +296,7 @@ class ChangeHistoryFactory:
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableChangeHistory]:
@@ -299,6 +309,7 @@ class ChangeHistoryFactory:
             icon (Optional[str]): The icon of the change_history. Defaults to "🕒".
             id (Optional[int]): The ID of the change_history.
             key (Optional[str]): The key of the change_history.
+            metadata (Optional[Dict[str, Any]]): The metadata of the change history.
             updated_at (Optional[datetime]): The timestamp when the change history was last updated.
             uuid (Optional[str]): The UUID of the change_history.
 
@@ -309,12 +320,13 @@ class ChangeHistoryFactory:
             Exception: If an exception occurs while creating the change_history.
         """
         try:
-            return Immutable(
+            return ImmutableChangeHistory(
                 source=source,
                 created_at=created_at,
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -326,6 +338,13 @@ class ChangeHistoryFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class ChangeHirstoryBuilder(BaseObjectBuilder):
+    """
+    """
+
+    pass
 
 
 class ChangeHistoryManager(BaseObjectManager):
@@ -898,6 +917,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
         created_at (Field): The timestamp when the change history was created.
         icon (Field): The icon of the change_history. Defaults to "🕒".
         key (Field): The key of the change_history.
+        metadata (Field): The metadata of the change_history.
         source (Field): The source of the change_history.
         updated_at (Field): The timestamp when the change history was last updated.
         uuid (Field): The UUID of the change_history.
@@ -969,6 +989,22 @@ class ChangeHistoryModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     source: Field = Field(
         autoincrement=False,
         default=None,
@@ -1023,6 +1059,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         source: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1035,6 +1072,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the change_history. Defaults to "🕒".
             id (Optional[int]): The ID of the change_history.
             key (Optional[str]): The key of the change_history.
+            metadata (Optional[Dict[str, Any]]): The metadata of the change_history.
             source (Optional[Dict[str, Any]]): The source of the change_history.
             updated_at (Optional[datetime]): The timestamp when the change history was last updated.
             uuid (Optional[str]): The UUID of the change_history.
@@ -1049,6 +1087,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
             icon="🕒",
             id=id,
             key=key,
+            metadata=metadata,
             source=source,
             table=Constants.CHANGE_HISTORIES,
             updated_at=updated_at,
@@ -1069,6 +1108,7 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
         icon (Optional[str]): The icon of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
+        metadata (Optional[Dict[str, Any]]): The metadata of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
         uuid (Optional[str]): The UUID of the item.
     """
@@ -1081,6 +1121,7 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1094,6 +1135,7 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
             icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
+            metadata (Optional[Dict[str, Any]]): The metadata of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
             uuid (Optional[str]): The UUID of the item.
 
@@ -1108,6 +1150,7 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             to=to,
             updated_at=updated_at,
             uuid=uuid,
@@ -1152,6 +1195,7 @@ class MutableChangeHistoryItem(MutableBaseObject):
         icon (Optional[str]): The icon of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
+        metadata (Optional[Dict[str, Any]]): The metadata of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
         uuid (Optional[str]): The UUID of the item.
     """
@@ -1164,6 +1208,7 @@ class MutableChangeHistoryItem(MutableBaseObject):
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1177,6 +1222,7 @@ class MutableChangeHistoryItem(MutableBaseObject):
             icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
+            metadata (Optional[Dict[str, Any]]): The metadata of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
             uuid (Optional[str]): The UUID of the item.
 
@@ -1191,6 +1237,7 @@ class MutableChangeHistoryItem(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             to=to,
             updated_at=updated_at,
             uuid=uuid,
@@ -1325,6 +1372,7 @@ class ChangeHistoryItemFactory:
         created_at: Optional[datetime] = None,
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableChangeHistoryItem]:
@@ -1337,6 +1385,7 @@ class ChangeHistoryItemFactory:
             created_at (Optional[datetime]): The timestamp when the item was created.
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
+            metadata (Optional[Dict[str, Any]]): The metadata of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
             uuid (Optional[str]): The UUID of the item.
 
@@ -1354,6 +1403,7 @@ class ChangeHistoryItemFactory:
                 created_at=created_at,
                 id=id,
                 key=key,
+                metadata=metadata,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -1365,6 +1415,14 @@ class ChangeHistoryItemFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+
+class ChangeHistoryItemBuilder(BaseObjectBuilder):
+    """
+    """
+
+    pass
 
 
 class ChangeHistoryItemManager(BaseObjectManager):
@@ -1931,6 +1989,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         icon (Optional[str]): The icon of the item. Defaults to "🕒".
         id (Optional[int]): The ID of the item.
         key (Optional[Any]): The key of the item.
+        metadata (Optional[Dict[str, Any]]): The metadata of the item.
         source (Optional[Dict[str, Any]]): The source of the item.
         to (Optional[Any]): The new value of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
@@ -2019,6 +2078,22 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     source: Field = Field(
         autoincrement=False,
         default=None,
@@ -2090,6 +2165,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[Any] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         source: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -2103,6 +2179,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
             key (Optional[Any]): The key of the item.
+            metadata (Optional[Dict[str, Any]]): The metadata of the item.
             source (Optional[Dict[str, Any]]): The source of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
             uuid (Optional[str]): The UUID of the item.
@@ -2118,6 +2195,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
             icon="🕒",
             id=id,
             key=key,
+            metadata=metadata,
             source=source,
             table=Constants.CHANGE_HISTORY_ITEMS,
             updated_at=updated_at,

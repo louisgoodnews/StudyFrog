@@ -4,31 +4,34 @@ Date: 2025-03-29
 """
 
 import json
+import random
+import tkinter
 import traceback
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import *
+
+from core.answer import ImmutableAnswer
+from core.difficulty import ImmutableDifficulty
+from core.flashcard import ImmutableFlashcard
+from core.note import ImmutableNote
+from core.priority import ImmutablePriority
+from core.question import ImmutableQuestion
+from core.stack import ImmutableStack, MutableStack
+from core.status import ImmutableStatus
 
 from core.learning.learning_session import (
     ImmutableLearningSession,
     MutableLearningSession,
     LearningSessionBuilder,
     ImmutableLearningSessionAction,
-    MutableLearningSessionAction,
     LearningSessionActionBuilder,
     ImmutableLearningSessionItem,
     MutableLearningSessionItem,
     LearningSessionItemBuilder,
 )
 
-from core.answer import ImmutableAnswer, MutableAnswer
-from core.difficulty import ImmutableDifficulty
-from core.flashcard import ImmutableFlashcard, MutableFlashcard
-from core.note import ImmutableNote, MutableNote
-from core.priority import ImmutablePriority
-from core.question import ImmutableQuestion, MutableQuestion
-from core.stack import ImmutableStack, MutableStack
-from core.status import ImmutableStatus
+from core.ui.notifications.notifications import ToplevelNotification
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
@@ -149,6 +152,9 @@ class LearningSessionRunner:
         # Store the passed dispatcher instance in an immutable instance variable
         self.dispatcher: Dispatcher = dispatcher
 
+        # Initialize an empty list to store the intrasession review queue
+        self.intrasession_review_queue: List[Tuple[datetime, str]] = []
+
         # Initialize an empty list to store the session's items
         self.items: List[str] = []
 
@@ -196,6 +202,79 @@ class LearningSessionRunner:
             event=Events.NOTIFY_LEARNING_SESSION_RUNNER_LOADED,
             namespace=self.namespace,
         )
+
+    def _calculate_adaptive_interval(
+        self,
+        difficulty: ImmutableDifficulty,
+        priority: int,
+        what: Literal["days", "seconds"] = "seconds",
+    ) -> Union[int, float]:
+        """
+        Calculates a new interval based on difficulty and priority.
+
+        Args:
+            difficulty (ImmutableDifficulty): The rated difficulty.
+            priority (int): The priority ID.
+            what (Literal["days", "seconds"], optional): Output format. Defaults to "seconds".
+
+        Returns:
+            int|float: The calculated interval.
+        """
+
+        try:
+            # Dispatch the "REQUEST_PRIORITY_LOAD" event in the 'global' namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_PRIORITY_LOAD,
+                field="id",
+                namespace=Constants.GLOBAL_NAMESPACE,
+                value=priority,
+            )
+
+            # Check, if the notification exists or has errors
+            if not notification or notification.has_errors():
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_PRIORITY_LOAD' event in 'global' namespace: {notification.get_errors() if notification else 'Unknown error'}"
+                )
+
+                # Return early
+                return
+
+            # Get the priority object from the notification
+            priority: Optional[ImmutablePriority] = (
+                notification.get_one_and_only_result()
+            )
+
+            # Check, if the priority object exists
+            if not priority:
+                # Log a warning message indicating that the priority object does not exist
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_PRIORITY_LOAD' event in 'global' namespace: Priority object does not exist"
+                )
+
+                # Return early
+                return
+
+            # Calculate the interval
+            interval: float = (
+                Constants.get_base_repetition_interval(what=what)
+                * (1 + difficulty.value)
+                * (1 - priority.value)
+            )
+
+            # Return the interval in the specified format
+            return max(
+                interval,
+                Constants.get_base_repetition_interval(what=what),
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'calculate_adaptive_interval' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Raise the exception to the caller
+            raise e
 
     def apply_filters(self) -> None:
         """
@@ -281,6 +360,14 @@ class LearningSessionRunner:
                         if not isinstance(descendant_stack.contents, list)
                         else descendant_stack.contents
                     )
+
+            # Check, if randomisation is enabled in the settings
+            if self.settings.get(
+                "enable_randomisation",
+                False,
+            ):
+                # Shuffle the keys
+                random.shuffle(keys)
 
             # Dispatch a request to get the contents of the stacks
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
@@ -563,8 +650,7 @@ class LearningSessionRunner:
                 learning_session_item.set(
                     name="duration",
                     value=(
-                        learning_session_item.end
-                        - learning_session_item.start
+                        learning_session_item.end - learning_session_item.start
                     ).total_seconds(),
                 )
 
@@ -644,6 +730,173 @@ class LearningSessionRunner:
 
             # Log the traceback of the exception
             self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def handle_end_of_run(
+        self,
+        mode: Literal[
+            "default",
+            "recall",
+            "recall_at_random",
+            "speed_test",
+            "spaced_repetition",
+        ],
+    ) -> None:
+        """ """
+        try:
+            # Check, if the passed mode is not 'default'
+            if mode != "default":
+                pass
+
+            # Prompt the user to end the run
+            response: str = ToplevelNotification.yes_no(
+                message="Congratulations! You have completed the run. Do you wish to end the run?",
+                title="End of run reached",
+            )
+
+            # Check, if the user has chosen to end the run (i.e. if the response equals 'yes')
+            if response != "yes":
+                # Return early
+                return
+
+            # Check, if the learning session instance variable is mutable
+            if not isinstance(
+                self.learning_session,
+                MutableLearningSession,
+            ):
+                # Convert the learning session object into a mutable version
+                self.learning_session = self.learning_session.to_mutable()
+
+            # Set the end timestamp of the learning session
+            self.learning_session.end = Miscellaneous.get_current_datetime()
+
+            # Calculate and set the duration of the learning session
+            self.learning_session.duration = Miscellaneous.calculate_duration(
+                as_="seconds",
+                end=self.learning_session.end,
+                start=self.learning_session.start,
+            )
+
+            # Dispatch the REQUEST_LEARNING_SESSION_UPDATE event in the 'global' namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_LEARNING_SESSION_UPDATE,
+                learning_session=self.learning_session,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Check, if the notification exists or has errors()
+            if not notification or notification.has_errors():
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch REQUEST_LEARNING_SESSION_UPDATE event in 'global' namespace: {notification.get_errors() if notification else 'Unknown error'}"
+                )
+
+                # Return early
+                return
+
+            # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace
+            self.dispatcher.dispatch(
+                direction="forward",
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
+                learning_session=notification.get_one_and_only_result(),
+                namespace=Constants.GLOBAL_NAMESPACE,
+                source="learning_session_ui",
+                target="learning_session_result_ui",
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while atttempting to run 'handle_end_of_run' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=traceback.format_exc())
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def handle_mode(self) -> None:
+        """
+        Handles the learning mode of the learning session runner.
+
+        Determines the learning mode and dispatches the appropriate event to load the learning view.
+
+        Currently supported modes are:
+            - Default
+            - Recall
+            - Recall (at random)
+
+        If the mode is not supported, a warning message is logged.
+
+        Raises:
+            Exception: If an exception occurs while attempting to handle the learning mode.
+        """
+        try:
+            # Check, if the mode is set to "Default"
+            if self.mode == "Default":
+                # Return early
+                return
+
+            if self.mode not in ["Recall", "Recall (at random)"]:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Got unsupported mode in 'handle_mode' method from '{self.__class__.__name__}' class: '{self.mode}'. Aborting..."
+                )
+
+                # Return early
+                return
+
+            if (
+                self.mode == "Recall (at random)"
+                and not Miscellaneous.get_random_bool()
+            ):
+                # Return early
+                return
+
+            # Dispatch a request to lookup the item by key
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_BY_KEY,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                key=self.contents[self.content_index],
+            )
+
+            # Check if the notification is None
+            if not notification:
+                # Log a warning message about the failed lookup
+                self.logger.warning(
+                    message=f"Failed to lookup item with key '{self.contents[self.content_index]}' in database in {self.__class__.__name__}. This is likely a bug."
+                )
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Check, if the 'text_analyzer' instance variable has been initialized
+            if not self.text_analyzer:
+                # Initialize the 'text_analyzer' instance variable
+                self.text_analyzer = TextAnalyzer()
+
+            # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace
+            self.dispatcher.dispatch(
+                direction="forward",
+                entity=notification.get_one_and_only_result(),
+                event=Events.REQUEST_VALIDATE_NAVIGATION,
+                learning_session=self.learning_session,
+                master=tkinter.Toplevel(),
+                namespace=Constants.GLOBAL_NAMESPACE,
+                source="learning_session_ui",
+                target="learning_session_recall_ui",
+                text_analyzer=self.text_analyzer,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while atttempting to run 'handle_mode' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
@@ -812,7 +1065,9 @@ class LearningSessionRunner:
             # Check, if the ImmutableLearningSessionAction object exists
             if not learning_session_action:
                 # Log a warning message
-                self.logger.warning(message=f"ImmutableLearningSessionAction does not exist in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class.")
+                self.logger.warning(
+                    message=f"ImmutableLearningSessionAction does not exist in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class."
+                )
 
                 # Return early
                 return
@@ -946,9 +1201,7 @@ class LearningSessionRunner:
             self.dispatcher.dispatch(
                 event=Events.REQUEST_UPDATE,
                 namespace=Constants.GLOBAL_NAMESPACE,
-                **{
-                    Miscellaneous.find_match(string=content.key).lower(): content,
-                },
+                update=content,
             )
 
             # Check if the notification is None
@@ -1093,6 +1346,28 @@ class LearningSessionRunner:
 
             # Convert the learning session item back to immutable
             self.learning_session_item = update_notification.get_one_and_only_result()
+
+            # Schedule due by
+            self.schedule_due_by(key=self.contents[self.content_index])
+
+            # Check, if the content's difficulty is 'medium' or 'hard'
+            if content_difficulty.name not in (
+                "medium",
+                "hard",
+            ):
+                # Return early
+                return
+
+            # Check, if spaced review is enabled
+            if not self.settings["enable_spaced_reivew"]:
+                # Return early
+                return
+
+            # Schedule for intrasession review
+            self.schedule_intrasession_review(
+                difficulty=content_difficulty,
+                entity=content,
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1152,8 +1427,26 @@ class LearningSessionRunner:
                 # Reset the content index to the last valid index
                 self.content_index = len(self.contents) - 1
 
+                # Handle case 'end of run'
+                self.handle_end_of_run(
+                    mode=Miscellaneous.any_to_snake(
+                        string=self.learning_session.mode.strip()
+                        .replace(
+                            "(",
+                            "",
+                        )
+                        .replace(
+                            ")",
+                            "",
+                        )
+                    )
+                )
+
                 # Return None indicating an exception occurred
                 return None
+
+            # Schedule due by
+            self.schedule_due_by(key=self.contents[self.content_index])
 
             # Dispatch a request to lookup the item by key
             notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
@@ -1175,20 +1468,68 @@ class LearningSessionRunner:
             # Create a learning session item
             self.create_learning_session_item()
 
-            # Check if the learning session is in recall mode
-            if self.mode == "Recall":
-                # TODO:
-                #   - dispatch event to request recall view to be loaded
-                pass
-            elif self.mode == "Recall (at random)":
-                # TODO:
-                #   - implement random check for a random int to then determine, if recall with be dispatched or not
-                #   - dispatch event to request recall random view to be loaded
-                if Miscellaneous.get_random_int(1, 4) == 1:
-                    pass
+            # Handle mode
+            self.handle_mode()
+
+            # Get the one an only result from the notification
+            item: Union[
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+            ] = notification.get_one_and_only_result()
+
+            # Convert the item to mutable
+            item = item.to_mutable()
+
+            # Update the 'last viewed at' field
+            item.last_viewed_at = datetime.now()
+
+            # Dispatch the REQUEST_UPDATE event in the 'global' namespace
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_UPDATE,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                update=item,
+            )
+
+            # Convert the item to immutable
+            item = item.to_immutable()
+
+            # Check, if the item is a flashcard or note
+            if isinstance(
+                item,
+                (
+                    ImmutableFlashcard,
+                    ImmutableNote,
+                ),
+            ):
+                # Return the item
+                return item
+
+            # Dispatch a request to get the question's answers by key
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_BY_KEY,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                key=item.answers,
+            )
+
+            # Check if the notification is None
+            if not notification:
+                # Log a warning message about the failed lookup
+                self.logger.warning(
+                    message=f"Failed to lookup answers with key '{item.answers}' in database in {self.__class__.__name__}. This is likely a bug."
+                )
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Get the one an only result from the notification
+            answers: List[ImmutableAnswer] = notification.get_one_and_only_result()
 
             # Return the item
-            return notification.get_one_and_only_result()
+            return (
+                item,
+                answers,
+            )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -1253,8 +1594,43 @@ class LearningSessionRunner:
             # Create a learning session item
             self.create_learning_session_item()
 
+            # Get the one an only result from the notification
+            item: Union[
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+            ] = notification.get_one_and_only_result()
+
+            # Check, if the item is a flashcard or note
+            if isinstance(item, (ImmutableFlashcard, ImmutableNote)):
+                # Return the item
+                return item
+
+            # Dispatch a request to get the question's answers by key
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_BY_KEY,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                key=item.answers,
+            )
+
+            # Check if the notification is None
+            if not notification:
+                # Log a warning message about the failed lookup
+                self.logger.warning(
+                    message=f"Failed to lookup answers with key '{item.answers}' in database in {self.__class__.__name__}. This is likely a bug."
+                )
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Get the one an only result from the notification
+            answers: List[ImmutableAnswer] = notification.get_one_and_only_result()
+
             # Return the item
-            return notification.get_one_and_only_result()
+            return (
+                item,
+                answers,
+            )
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -1263,6 +1639,119 @@ class LearningSessionRunner:
 
             # Return None indicating an exception occurred
             return None
+
+    def schedule_due_by(
+        self,
+        key: str,
+    ) -> None:
+        """
+        Schedules the item with the given key for spaced repetition.
+
+        This method dispatches a request to lookup the item by key and
+        updates its due datetime according to the SuperMemo 2 algorithm.
+        The item is then updated in the database.
+
+        Args:
+            key (str): The key of the item to schedule for spaced repetition.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs while attempting to run the method.
+        """
+
+        # Dispatch a request to lookup the item by key
+        content_notification: Optional[DispatcherNotification] = (
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_BY_KEY,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                key=key,
+            )
+        )
+
+        # Check if the notification is None or has errors
+        if not content_notification or content_notification.has_errors():
+            # Log a warning message about the failed lookup
+            self.logger.warning(
+                message=f"Failed to lookup item with key '{key}' in database in {self.__class__.__name__}. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Get the content from the notification
+        content: Union[
+            ImmutableFlashcard,
+            ImmutableNote,
+            ImmutableQuestion,
+        ] = content_notification.get_one_and_only_result()
+
+        # Update the content to a mutable version
+        content = content.to_mutable()
+
+        # Dispatch a request to lookup the difficulty
+        difficulty_notification: Optional[DispatcherNotification] = (
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_DIFFICULTY_LOAD,
+                field="id",
+                namespace=Constants.GLOBAL_NAMESPACE,
+                value=content.difficulty,
+            )
+        )
+
+        # Check if the notification is None or has errors
+        if not difficulty_notification or difficulty_notification.has_errors():
+            # Log a warning message about the failed lookup
+            self.logger.warning(
+                message=f"Failed to lookup difficulty with id '{content.difficulty}' in database in {self.__class__.__name__}. This is likely a bug."
+            )
+
+            # Return early
+            return
+
+        # Get the difficulty from the notification
+        difficulty: ImmutableDifficulty = (
+            difficulty_notification.get_one_and_only_result()
+        )
+
+        # Get the current datetime
+        now: datetime = Miscellaneous.get_current_datetime()
+
+        # Update last viewed timestamp
+        content.last_viewed_at = now
+
+        # Calculate the interval
+        interval: float = self._calculate_adaptive_interval(
+            difficulty=difficulty,
+            priority=content.priority,
+        )
+
+        # Set the content's interval attribute
+        content.interval = interval
+
+        # Calculate due datetime
+        content.due_by = now + timedelta(days=interval)
+
+        # Update the content
+        self.dispatcher.dispatch(
+            event=Events.REQUEST_UPDATE,
+            namespace=Constants.GLOBAL_NAMESPACE,
+            update=content,
+        )
+
+    def schedule_intrasession_review(
+        self,
+        difficulty: ImmutableDifficulty,
+        entity: Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion],
+    ) -> None:
+        """ """
+
+        # TODO:
+        #   - calculate the interval
+        #   - append a datetime object and the entity's key to the intrasession review queue
+
+        pass
 
     def subscribe_to_events(self) -> None:
         """

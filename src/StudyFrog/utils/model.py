@@ -821,7 +821,7 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 field,
             ) in cls.__dict__.items():
                 if isinstance(field, Field) and not any(
-                    column[1] == field_name for column in existing_columns
+                    column["name"] == field_name for column in existing_columns
                 ):
                     # Execute the ALTER TABLE statement
                     await cls.database_service.execute(
@@ -830,15 +830,30 @@ class ImmutableBaseModel(ImmutableBaseObject):
                         sql=f"ALTER TABLE {cls.table} ADD COLUMN {field.to_sql_string()};",
                     )
 
+                    # Log an info message
+                    cls.logger.info(
+                        message=f"Added column '{field_name}' to table '{cls.table}' in the database."
+                    )
+
             # Remove extra columns
             for column in existing_columns:
-                if column[1] not in cls.__dict__:
+                if column["name"] not in cls.__dict__:
                     # Execute the ALTER TABLE statement
                     await cls.database_service.execute(
                         database=database,
                         parameters=(),  # Empty tuple
-                        sql=f"ALTER TABLE {cls.table} DROP COLUMN {column[1]};",
+                        sql=f"ALTER TABLE {cls.table} DROP COLUMN {column['name']};",
                     )
+
+                    # Log an info message
+                    cls.logger.info(
+                        message=f"Removed column '{column['name']}' from table '{cls.table}' in the database."
+                    )
+
+            # Log an info message
+            cls.logger.info(
+                message=f"Successfully updated table '{cls.table}' in the database."
+            )
         except Exception as e:
             # Log an error message indicating an exception occurred
             cls.logger.error(

@@ -71,6 +71,7 @@ class CheckbuttonField(BaseField):
             master=master,
             namespace=namespace,
             on_change_callback=on_change_callback,
+            value=value,
         )
 
     @property
@@ -286,6 +287,7 @@ class CheckbuttonField(BaseField):
     def create_widgets(
         self,
         display_name: str,
+        value: bool = False,
         **kwargs,
     ) -> None:
         """
@@ -296,6 +298,7 @@ class CheckbuttonField(BaseField):
 
         Args:
             display_name (str): The string to display for the field.
+            value (bool, optional): The initial boolean state of the checkbutton. Defaults to False.
             **kwargs: Additional keyword arguments passed to individual widget constructors.
 
         Returns:
@@ -304,7 +307,12 @@ class CheckbuttonField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self, text=display_name, **kwargs.get("label", {})
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
         )
 
         # Place the label widget within the grid
@@ -317,7 +325,7 @@ class CheckbuttonField(BaseField):
         )
 
         # Create a string variable
-        self.variable: tkinter.BooleanVar = tkinter.BooleanVar(value=False)
+        self.variable: tkinter.BooleanVar = tkinter.BooleanVar(value=value)
 
         # Create a checkbutton widget
         self._checkbutton: tkinter.Checkbutton = tkinter.Checkbutton(
@@ -325,7 +333,10 @@ class CheckbuttonField(BaseField):
             master=self,
             text=f"{self.variable.get()}",
             variable=self.variable,
-            **kwargs.get("checkbutton", {}),
+            **kwargs.get(
+                "checkbutton",
+                {},
+            ),
         )
 
         # Place the checkbutton widget within the grid
@@ -854,7 +865,10 @@ class ToggleButtonField(BaseField):
         """
 
         # Store the passed icon tuple as an instance variable
-        self.icons: Tuple[str, str,] = icons
+        self.icons: Tuple[
+            str,
+            str,
+        ] = icons
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -913,7 +927,13 @@ class ToggleButtonField(BaseField):
         self.variable.set(not self.variable.get())
 
         # Update button text based on new state
-        self._button.configure(text=f"{self.icons[0]} False" if self.variable.get() else f"{self.icons[1]} True")
+        self._button.configure(
+            text=(
+                f"{self.icons[0]} False"
+                if self.variable.get()
+                else f"{self.icons[1]} True"
+            )
+        )
 
         # Dispatch the TOGGLE_BUTTON_FIELD_CHANGED event
         self.dispatcher.dispatch(
@@ -952,7 +972,13 @@ class ToggleButtonField(BaseField):
         self.variable.set(value=False)
 
         # Update button text based on new state
-        self._button.configure(text=f"{self.icons[0]} False" if self.variable.get() else f"{self.icons[1]} True")
+        self._button.configure(
+            text=(
+                f"{self.icons[0]} False"
+                if self.variable.get()
+                else f"{self.icons[1]} True"
+            )
+        )
 
         # Check, if the dispatch flag is set to True
         if dispatch:
@@ -1118,7 +1144,11 @@ class ToggleButtonField(BaseField):
         self._button: tkinter.Button = tkinter.Button(
             command=self._on_button_change,
             master=self,
-            text=f"{self.icons[0]} False" if self.variable.get() else f"{self.icons[1]} False",
+            text=(
+                f"{self.icons[0]} False"
+                if self.variable.get()
+                else f"{self.icons[1]} False"
+            ),
             **kwargs.get(
                 "button",
                 {},
@@ -1199,7 +1229,13 @@ class ToggleButtonField(BaseField):
         self.variable.set(value=value)
 
         # Update button text based on new state
-        self._button.configure(text=f"{self.icons[0]} False" if self.variable.get() else f"{self.icons[1]} True")
+        self._button.configure(
+            text=(
+                f"{self.icons[0]} False"
+                if self.variable.get()
+                else f"{self.icons[1]} True"
+            )
+        )
 
         # Check, if the dispatch flag is set to True
         if dispatch:

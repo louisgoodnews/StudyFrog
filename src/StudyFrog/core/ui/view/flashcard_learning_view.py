@@ -11,7 +11,7 @@ from typing import *
 from core.flashcard import ImmutableFlashcard
 from core.setting import SettingService
 
-from core.ui.ui_builder import UIBuilder
+from core.ui.fields.string_fields import MultiLineTextField
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -143,7 +143,7 @@ class FlashcardLearningView(tkinter.Frame):
         # Bind the space key to the flip method
         self.bindings.append(
             self.bind_all(
-                func=lambda event: self.flip(),
+                func=self.flip,
                 sequence="<space>",
             )
         )
@@ -241,20 +241,11 @@ class FlashcardLearningView(tkinter.Frame):
             None
         """
         try:
-            # Create the front frame widget
-            self.front_frame: Optional[tkinter.Frame] = tkinter.Frame(
+            # Create the 'front frame' tkinter.Frame widget
+            self.front_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
-
-            # Check if the front frame was created successfully
-            if not self.front_frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create front frame in '{self.__class__.__name__}'. This is likely a bug."
-                )
-                # Return early if creation failed
-                return
 
             # Configure the front frame widget's 0th column to weight 1.
             # This means that the 0th column will stretch when the window is resized.
@@ -270,15 +261,15 @@ class FlashcardLearningView(tkinter.Frame):
                 weight=1,
             )
 
-            # Place the front frame in the grid
+            # Place the 'front frame' tkinter.Frame widget in the grid
             self.front_frame.grid(
                 column=0,
                 row=0,
                 sticky=NSEW,
             )
 
-            # Create the front text label widget
-            self.front_text_label: Optional[tkinter.Label] = tkinter.Label(
+            # Create the 'front text label' tkinter.Label widget
+            self.front_text_label: tkinter.Label = tkinter.Label(
                 background=Constants.BLUE_GREY["700"],
                 disabledforeground=Constants.WHITE,
                 font=(
@@ -288,45 +279,28 @@ class FlashcardLearningView(tkinter.Frame):
                 foreground=Constants.WHITE,
                 justify=CENTER,
                 master=self.front_frame,
+                relief=RAISED,
                 text=self.flashcard.front_text,
             )
 
-            # Check if the front text label was created successfully
-            if not self.front_text_label:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create front text label widget in '{self.__class__.__name__}'. This is likely a bug."
-                )
-                # Return early if creation failed
-                return
-
-            # Bind the front text label to the flip method
+            # Bind the 'front text label' tkinter.Label to the flip method
             self.front_text_label.bind(
                 func=lambda event: self.flip(),
                 sequence="<ButtonRelease-1>",
             )
 
-            # Place the front text label in the grid
+            # Place the 'front text label' tkinter.Label in the grid
             self.front_text_label.grid(
                 column=0,
                 row=0,
                 sticky=NSEW,
             )
 
-            # Create the back frame widget
-            self.back_frame: Optional[tkinter.Frame] = tkinter.Frame(
+            # Create the 'back frame' tkinter.Frame widget
+            self.back_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
                 master=self,
             )
-
-            # Check if the back frame was created successfully
-            if not self.back_frame:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create back frame in '{self.__class__.__name__}'. This is likely a bug."
-                )
-                # Return early if creation failed
-                return
 
             # Configure the back frame widget's 0th column to weight 1.
             # This means that the 0th column will stretch when the window is resized.
@@ -335,72 +309,97 @@ class FlashcardLearningView(tkinter.Frame):
                 weight=1,
             )
 
-            # Configure the back frame widget's 0th row to weight 1.
-            # This means that the 0th row will stretch when the window is resized.
+            # Configure the back frame widget's 0th row to weight 0.
+            # This means that the 0th row will not stretch when the window is resized.
             self.back_frame.grid_rowconfigure(
                 index=0,
+                weight=0,
+            )
+
+            # Configure the back frame widget's 1st row to weight 1.
+            # This means that the 0th row will stretch when the window is resized.
+            self.back_frame.grid_rowconfigure(
+                index=1,
                 weight=1,
             )
 
-            # Place the back frame in the grid
+            # Place the 'back frame' tkinter.Frame in the grid
             self.back_frame.grid(
                 column=0,
                 row=0,
                 sticky=NSEW,
             )
 
-            scrolled_text: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_text(
+            # Create the 'back text label' tkinter.Label widget
+            self.back_text_label: tkinter.Label = tkinter.Label(
+                background=Constants.BLUE_GREY["700"],
+                disabledforeground=Constants.WHITE,
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.LARGE_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+                justify=CENTER,
+                master=self.back_frame,
+                relief=FLAT,
+                text=self.flashcard.front_text,
+            )
+
+            # Place the 'back text label' tkinter.Label in the grid
+            self.back_text_label.grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NSEW,
+            )
+
+            # Create the 'back text field' MultiLineTextField widget
+            self.back_text_field: MultiLineTextField = MultiLineTextField(
+                display_name="Back Text: ",
+                master=self.back_frame,
+                value=self.flashcard.back_text,
+            )
+
+            # Configure the 'back text field' MultiLineTextField widget
+            self.back_text_field.configure(background=Constants.BLUE_GREY["700"])
+
+            # Hide the 'back text field' MultiLineTextField widget's tkinter.Button widget
+            self.back_text_field.button.grid_forget()
+
+            # Configure the 'back text field' MultiLineTextField widget's tkinter.Label widget
+            self.back_text_field.configure_label(
+                background=Constants.BLUE_GREY["700"],
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.DEFAULT_FONT_SIZE,
+                ),
+                foreground=Constants.WHITE,
+            )
+
+            # Configure the 'back text field' MultiLineTextField widget's tkinter.Text widget
+            self.back_text_field.configure_text(
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=self.back_frame,
-                relief=FLAT,
+                relief=SUNKEN,
+                state=DISABLED,
                 wrap=WORD,
             )
 
-            # Check if the scrolled text was created successfully
-            if not scrolled_text:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create scrolled text in '{self.__class__.__name__}'. This is likely a bug."
-                )
-                # Return early if creation failed
-                return
-
-            # Create the back text widget
-            self.back_text_text: Optional[tkinter.Text] = scrolled_text["text"]
-
-            # Check if the back text widget was created successfully
-            if not self.back_text_text:
-                # Log a warning message
-                self.logger.warning(
-                    message=f"Failed to create back text text widget in '{self.__class__.__name__}'. This is likely a bug."
-                )
-                # Return early if creation failed
-                return
-
-            # Bind the back text widget to the flip method
-            self.back_text_text.bind(
+            # Bind the 'flip' method to the 'back text field' MultiLineTextField widget via the '<ButtonRelease-1>' event
+            self.back_text_field.text.bind(
                 func=lambda event: self.flip(),
                 sequence="<ButtonRelease-1>",
             )
 
-            # Insert the back text into the text widget
-            self.back_text_text.insert(
-                chars=self.flashcard.back_text,
-                index="1.0",
-            )
-
-            # Disable the back text widget
-            self.back_text_text.configure(state=DISABLED)
-
             # Place the back text widget in the grid
-            scrolled_text["root"].grid(
+            self.back_text_field.grid(
                 column=0,
-                row=0,
+                row=1,
                 sticky=NSEW,
             )
 
@@ -410,6 +409,9 @@ class FlashcardLearningView(tkinter.Frame):
             else:
                 # Hide the back frame
                 self.back_frame.grid_forget()
+
+            # Update idletasks
+            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -459,6 +461,7 @@ class FlashcardLearningView(tkinter.Frame):
     def flip(
         self,
         dispatch: bool = True,
+        event: Optional[tkinter.Event] = None,
     ) -> None:
         """
         Flips the flashcard in the learning view.
@@ -469,10 +472,22 @@ class FlashcardLearningView(tkinter.Frame):
 
         Args:
             dispatch (bool): Boolean-flag, determines, if the FLASHCARD_LEARNING_VIEW_FLASHCARD_FLIPPED event is dispatched if true.
+            event (Optional[tkinter.Event]): The event that triggered the flip action.
 
         Returns:
             None
         """
+
+        # Check, if the event is not None and the side is back
+        if event and self.side == "back":
+            # Dispatch the REQUEST_LEARNING_SESSION_RUNNER_LOAD_NEXT_ITEM event
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_LEARNING_SESSION_RUNNER_LOAD_NEXT_ITEM,
+                namespace=self.namespace,
+            )
+
+            # Return early
+            return
 
         # Toggle the 'side' instance variable between 'front' and 'back'
         self.side = "front" if self.side == "back" else "back"
@@ -507,6 +522,9 @@ class FlashcardLearningView(tkinter.Frame):
                 namespace=self.namespace,
             )
 
+            # Update idletasks
+            self.update_idletasks()
+
     def forget_widgets(self) -> None:
         """
         Hides the current visible frame of the flashcard learning view.
@@ -525,6 +543,9 @@ class FlashcardLearningView(tkinter.Frame):
         else:
             # Hide the front frame by removing it from the grid
             self.front_frame.grid_forget()
+
+        # Update idletasks
+        self.update_idletasks()
 
     def on_request_flashcard_learning_view_flip_flashcard(
         self,
@@ -685,24 +706,23 @@ class FlashcardLearningView(tkinter.Frame):
         self.update_idletasks()
 
         # Disable the back text widget
-        self.back_text_text.configure(state=NORMAL)
+        self.back_text_field.configure_text(state=NORMAL)
 
-        # Clear the back text widget
-        self.back_text_text.delete(
-            index1="1.0",
-            index2=END,
-        )
-
-        # Insert the current flashcard's back text into the back text widget
-        self.back_text_text.insert(
-            chars=self.flashcard.back_text,
-            index="1.0",
-        )
+        # Update the 'back text field' ReadOnlyMultineLineTextField widget's value
+        self.back_text_field.set(value=self.flashcard.back_text)
 
         # Disable the back text widget
-        self.back_text_text.configure(state=DISABLED)
+        self.back_text_field.configure_text(state=DISABLED)
+
+        # Update the back text label with the current flashcard's front text
+        self.back_text_label.configure(
+            text=self.flashcard.front_text,
+        )
 
         # Update the front text label with the current flashcard's front text
         self.front_text_label.configure(
             text=self.flashcard.front_text,
         )
+
+        # Update idletasks
+        self.update_idletasks()

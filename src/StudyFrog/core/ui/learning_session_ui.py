@@ -31,7 +31,7 @@ from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.learning_session_runner import LearningSessionRunner
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
-from utils.unified import UnifiedObjectManager
+from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
 __all__: Final[List[str]] = ["LearningSessionUI"]
@@ -52,6 +52,7 @@ class LearningSessionUI(BaseUI):
         navigation_item (NavigationHistoryItem): The navigation history item instance.
         navigation_service (NavigationHistoryService): The navigation history service instance.
         setting_service (SettingService): The setting service instance.
+        unified_factory (UnifiedObjectFactory): The unified factory instance.
         unified_manager (UnifiedObjectManager): The unified manager instance.
     """
 
@@ -65,6 +66,7 @@ class LearningSessionUI(BaseUI):
         setting_service: SettingService,
         settings: Dict[str, Any],
         stacks: List[ImmutableStack],
+        unified_factory: UnifiedObjectFactory,
         unified_manager: UnifiedObjectManager,
         difficulties: Optional[List[ImmutableDifficulty]] = None,
         priorities: Optional[List[ImmutablePriority]] = None,
@@ -82,6 +84,7 @@ class LearningSessionUI(BaseUI):
             setting_service (SettingService): The setting service instance.
             settings (Dict[str, Any]): The settings dictionary.
             stacks (List[ImmutableStack]): The stacks instance.
+            unified_factory (UnifiedObjectFactory): The unified factory instance.
             unified_manager (UnifiedObjectManager): The unified manager instance.
 
         Returns:
@@ -99,6 +102,7 @@ class LearningSessionUI(BaseUI):
             navigation_item=navigation_item,
             navigation_service=navigation_service,
             setting_service=setting_service,
+            unified_factory=unified_factory,
             unified_manager=unified_manager,
         )
 
@@ -718,6 +722,7 @@ class LearningSessionUI(BaseUI):
             )
 
             self.title_label: tkinter.Label = tkinter.Label(
+                anchor=W,
                 background=Constants.BLUE_GREY["700"],
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
@@ -997,6 +1002,9 @@ class LearningSessionUI(BaseUI):
                 self.logger.warning(
                     message=f"Unsupported content type ({type(content)}) in '{self.__class__.__name__}'. This is likely due to a type not being implemented."
                 )
+
+            # Update the title label
+            self.update_title_label()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -1244,6 +1252,9 @@ class LearningSessionUI(BaseUI):
                 event=Events.NOTIFY_LEARNING_SESSION_DIFFICULTY_BUTTON_CLICKED,
                 namespace=Constants.LEARNING_SESSION_NAMESPACE,
             )
+
+            # Force navigation to the next item
+            self.on_navigation_button_click(direction="next")
         except Exception as e:
             # Log an error message if an exception occurs
             self.logger.error(
@@ -1498,7 +1509,7 @@ class LearningSessionUI(BaseUI):
                 # Enable the previous button if the index is not 0
                 self.previous_button.configure(state=NORMAL)
 
-            if index == limit - 1:
+            if index == limit:
                 # Disable the next button if the index is equal to the limit
                 self.next_button.configure(state=DISABLED)
             else:

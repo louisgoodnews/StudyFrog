@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import *
 
 from core.default import ImmutableDefault, DefaultManager
-
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -39,6 +39,8 @@ class ImmutableSetting(ImmutableBaseObject):
         created_at (datetime): The timestamp when the setting was created.
         icon (str): The icon of the setting.
         id (int): The ID of the setting.
+        key (str): The key of the setting.
+        metadata (Dict[str, Any]): The metadata of the setting.
         updated_at (datetime): The timestamp when the setting was last updated.
         uuid (str): The UUID of the setting.
     """
@@ -51,6 +53,7 @@ class ImmutableSetting(ImmutableBaseObject):
         icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -64,6 +67,7 @@ class ImmutableSetting(ImmutableBaseObject):
             icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
             id (Optional[int]): The ID of the setting.
             key (Optional[str]): The key of the setting.
+            metadata (Optional[Dict[str, Any]]): The metadata of the setting.
             updated_at (Optional[datetime]): The timestamp when the setting was last updated.
             uuid (Optional[str]): The UUID of the setting.
 
@@ -77,6 +81,7 @@ class ImmutableSetting(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -112,6 +117,7 @@ class Mutable(MutableBaseObject):
         icon (Optional[str]): The icon of the setting.
         id (Optional[int]): The ID of the setting.
         key (Optional[str]): The key of the setting.
+        metadata (Optional[Dict[str, Any]]): The metadata of the setting.
         updated_at (Optional[datetime]): The timestamp when the setting was last updated.
         uuid (Optional[str]): The UUID of the setting.
     """
@@ -124,6 +130,7 @@ class Mutable(MutableBaseObject):
         icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -137,6 +144,7 @@ class Mutable(MutableBaseObject):
             icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
             id (Optional[int]): The ID of the setting.
             key (Optional[str]): The key of the setting.
+            metadata (Optional[Dict[str, Any]]): The metadata of the setting.
             updated_at (Optional[datetime]): The timestamp when the setting was last updated.
             uuid (Optional[str]): The UUID of the setting.
 
@@ -150,6 +158,7 @@ class Mutable(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             updated_at=updated_at,
             uuid=uuid,
@@ -278,6 +287,7 @@ class SettingFactory:
         icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableSetting]:
@@ -291,6 +301,7 @@ class SettingFactory:
             icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
             id (Optional[int]): The ID of the setting.
             key (Optional[str]): The key of the setting.
+            metadata (Optional[Dict[str, Any]]): The metadata of the setting.
             updated_at (Optional[datetime]): The timestamp when the setting was last updated.
             uuid (Optional[str]): The UUID of the setting.
 
@@ -309,6 +320,7 @@ class SettingFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -320,6 +332,13 @@ class SettingFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class SettingBuilder(BaseObjectBuilder):
+    """
+    """
+
+    pass
 
 
 class SettingManager(BaseObjectManager):
@@ -869,6 +888,7 @@ class SettingModel(ImmutableBaseModel):
         icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
         id (Optional[int]): The ID of the setting.
         key (Optional[str]): The key of the setting.
+        metadata (Optional[Dict[str, Any]]): The metadata of the setting.
         name (Optional[str]): The name of the setting.
         updated_at (Optional[datetime]): The timestamp when the setting was last updated.
         uuid (Optional[str]): The UUID of the setting.
@@ -941,6 +961,22 @@ class SettingModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     name: Field = Field(
         autoincrement=False,
         default=None,
@@ -1011,6 +1047,7 @@ class SettingModel(ImmutableBaseModel):
         icon: Optional[str] = "⚙️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         name: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
@@ -1024,6 +1061,7 @@ class SettingModel(ImmutableBaseModel):
             icon (Optional[str]): The icon of the setting. Defaults to "⚙️".
             id (Optional[int]): The ID of the setting.
             key (Optional[str]): The key of the setting.
+            metadata (Optional[Dict[str, Any]]): The metadata of the setting.
             name (Optional[str]): The name of the setting.
             updated_at (Optional[datetime]): The timestamp when the setting was last updated.
             uuid (Optional[str]): The UUID of the setting.
@@ -1039,6 +1077,7 @@ class SettingModel(ImmutableBaseModel):
             icon="⚙️",
             id=id,
             key=key,
+            metadata=metadata,
             name=name,
             table=Constants.SETTINGS,
             updated_at=updated_at,

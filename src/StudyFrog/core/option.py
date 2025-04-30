@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 from typing import *
 
+from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
 from utils.logger import Logger
@@ -36,6 +37,7 @@ class ImmutableOption(ImmutableBaseObject):
         icon (Optional[str]): The icon of the Option.
         id (Optional[int]): The ID of the Option.
         key (Optional[str]): The key of the Option.
+        metadata (Optional[Dict[str, Any]]): The metadata of the Option.
         updated_at (Optional[datetime]): The timestamp when the Option was last updated.
         uuid (Optional[str]): The UUID of the Option.
         value (str): The value of the Option.
@@ -48,6 +50,7 @@ class ImmutableOption(ImmutableBaseObject):
         icon: Optional[str] = "🎚️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -60,6 +63,7 @@ class ImmutableOption(ImmutableBaseObject):
             icon (Optional[str]): The icon of the instance. Defaults to "🎚️".
             id (Optional[int]): The ID of the instance.
             key (Optional[str]): The key of the instance.
+            metadata (Optional[Dict[str, Any]]): The metadata of the instance.
             updated_at (Optional[datetime]): The timestamp when the instance was last updated.
             uuid (Optional[str]): The UUID of the instance.
 
@@ -73,6 +77,7 @@ class ImmutableOption(ImmutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             updated_at=updated_at,
             uuid=uuid,
             value=value,
@@ -105,6 +110,7 @@ class MutableOption(MutableBaseObject):
         icon (Optional[str]): The icon of the Option.
         id (Optional[int]): The ID of the Option.
         key (Optional[str]): The key of the Option.
+        metadata (Optional[Dict[str, Any]]): The metadata of the Option.
         updated_at (Optional[datetime]): The timestamp when the Option was last updated.
         uuid (Optional[str]): The UUID of the Option.
         value (str): The value of the Option.
@@ -117,6 +123,7 @@ class MutableOption(MutableBaseObject):
         icon: Optional[str] = "🎚️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -129,6 +136,7 @@ class MutableOption(MutableBaseObject):
             icon (Optional[str]): The icon of the instance. Defaults to "🎚️".
             id (Optional[int]): The ID of the instance.
             key (Optional[str]): The key of the instance.
+            metadata (Optional[Dict[str, Any]]): The metadata of the instance.
             updated_at (Optional[datetime]): The timestamp when the instance was last updated.
             uuid (Optional[str]): The UUID of the instance.
 
@@ -142,6 +150,7 @@ class MutableOption(MutableBaseObject):
             icon=icon,
             id=id,
             key=key,
+            metadata=metadata,
             updated_at=updated_at,
             uuid=uuid,
             value=value,
@@ -268,6 +277,7 @@ class OptionFactory:
         icon: Optional[str] = "🎚️",
         id: Optional[int] = None,
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableOption]:
@@ -280,6 +290,7 @@ class OptionFactory:
             icon (Optional[str]): The icon of the Option. Defaults to "🎚️".
             id (Optional[int]): The ID of the Option.
             key (Optional[str]): The key of the Option.
+            metadata (Optional[Dict[str, Any]]): The metadata of the Option.
             updated_at (Optional[datetime]): The timestamp when the Option was last updated.
             uuid (Optional[str]): The UUID of the Option.
 
@@ -297,6 +308,7 @@ class OptionFactory:
                 icon=icon,
                 id=id,
                 key=key,
+                metadata=metadata,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -308,6 +320,12 @@ class OptionFactory:
 
             # Return None indicating an exception has occurred
             return None
+
+
+class OptionBuilder(BaseObjectBuilder):
+    """ """
+
+    pass
 
 
 class OptionManager(BaseObjectManager):
@@ -749,7 +767,9 @@ class OptionManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableOption]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableOption]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -871,6 +891,7 @@ class OptionModel(ImmutableBaseModel):
         icon (Optional[str]): The icon of the option. Defaults to "🎚️".
         id (Optional[int]): The ID of the option.
         key (Optional[str]): The key of the option.
+        metadata (Optional[Dict[str, Any]]): The metadata of the option.
         updated_at (Optional[datetime]): The timestamp when the option was last updated.
         uuid (Optional[str]): The UUID of the option.
         value (Optional[str]): The value of the option.
@@ -942,6 +963,22 @@ class OptionModel(ImmutableBaseModel):
         unique=True,
     )
 
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
+        unique=False,
+    )
+
     updated_at: Field = Field(
         autoincrement=False,
         default=None,
@@ -996,6 +1033,7 @@ class OptionModel(ImmutableBaseModel):
         created_at: Optional[datetime] = None,
         icon: Optional[str] = "🎚️",
         key: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
         value: Optional[str] = None,
@@ -1008,6 +1046,7 @@ class OptionModel(ImmutableBaseModel):
             created_at (Optional[datetime]): The timestamp when the option was created.
             icon (Optional[str]): The icon of the option. Defaults to "🎚️".
             key (Optional[str]): The key of the option.
+            metadata (Optional[Dict[str, Any]]): The metadata of the option.
             updated_at (Optional[datetime]): The timestamp when the option was last updated.
             uuid (Optional[str]): The UUID of the option.
             value (Optional[str]): The value of the option.
@@ -1022,6 +1061,7 @@ class OptionModel(ImmutableBaseModel):
             icon="🎚️",
             id=id,
             key=key,
+            metadata=metadata,
             updated_at=updated_at,
             uuid=uuid,
             value=value,
