@@ -218,12 +218,12 @@ class ImmutablePriority(ImmutableBaseObject):
         # Return the value of the priority
         return self._value
 
-    def to_mutable(self) -> "MutablePriority":
+    def to_mutable(self) -> Optional["MutablePriority"]:
         """
         Returns a MutablePriority instance corresponding to the current ImmutablePriority instance.
 
         Returns:
-            MutablePriority: A MutablePriority instance corresponding to the current ImmutablePriority instance.
+            Optional[MutablePriority]: A MutablePriority instance corresponding to the current ImmutablePriority instance.
         """
         try:
             # Return a MutablePriority instance corresponding to the current ImmutablePriority instance
@@ -617,12 +617,12 @@ class MutablePriority(MutableBaseObject):
         # Set the value of the priority
         self._value = value
 
-    def to_immutable(self) -> ImmutablePriority:
+    def to_immutable(self) -> Optional[ImmutablePriority]:
         """
         Returns an ImmutablePriority instance corresponding to the current MutablePriority instance.
 
         Returns:
-            ImmutablePriority: An ImmutablePriority instance corresponding to the current MutablePriority instance.
+            Optional[ImmutablePriority]: An ImmutablePriority instance corresponding to the current MutablePriority instance.
         """
         try:
             # Return a MutablePriority instance corresponding to the current ImmutablePriority instance
@@ -1879,7 +1879,7 @@ class PriorityModel(ImmutableBaseModel):
         description="",
         index=False,
         name="description",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,

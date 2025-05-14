@@ -80,7 +80,7 @@ def clear_database() -> bool:
         UserModel,
     }
 
-    # Iterate an drop and create the tables
+    # Iterate and drop and create the tables
     for model_class in model_classes:
 
         try:

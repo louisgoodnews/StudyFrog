@@ -914,6 +914,92 @@ class Miscellaneous:
             return string + "s"
 
     @classmethod
+    def run_async_in_thread(
+        cls,
+        func: Callable[..., Any],
+        *args,
+        **kwargs,
+    ) -> Optional[Any]:
+        """
+        Runs a function asynchronously in a separate thread.
+
+        Args:
+            func (Callable[..., Any]): The function to be run asynchronously.
+            *args: Additional positional arguments to be passed to the function.
+            **kwargs: Additional keyword arguments to be passed to the function.
+
+        Returns:
+            Optional[Any]: The return value of the function or None if an exception occurs.
+
+        Raises:
+            Exception: If an exception occurs while running the function.
+        """
+        try:
+
+            def wrapper(
+                func: Callable[..., Any],
+                *args,
+                **kwargs,
+            ) -> Optional[Any]:
+                """
+                A wrapper function to run the given function asynchronously.
+
+                Args:
+                    func (Callable[..., Any]): The function to be run asynchronously.
+                    *args: Additional positional arguments to be passed to the function.
+                    **kwargs: Additional keyword arguments to be passed to the function.
+
+                Returns:
+                    Optional[Any]: The return value of the function or None if an exception occurs.
+                """
+                try:
+                    # Run the function and return the result
+                    return asyncio.run(
+                        main=func(
+                            *args,
+                            **kwargs,
+                        )
+                    )
+                except Exception as e:
+                    # Log an error message indicating an exception has occurred
+                    cls.logger.error(
+                        message=f"Caught an exception while attempting to run 'wrapper' method from '{cls.__name__}': {e}"
+                    )
+
+                    # Log the traceback
+                    cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+                    # Return None indicating an exception has occurred
+                    return None
+
+            # Create a thread to run the function asynchronously
+            thread: threading.Thread = threading.Thread(
+                target=wrapper,
+                args=args,
+                kwargs=kwargs,
+            )
+
+            # Start the thread
+            thread.start()
+
+            # Wait for the thread to finish
+            thread.join()
+
+            # Return the result of the function
+            return thread.result()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'run_async_in_thread' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
     def run_asynchronously(
         cls,
         func: Callable[..., Any],

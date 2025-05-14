@@ -92,6 +92,7 @@ class FileService:
         cls,
         path: str,
         content: Optional[Union[bytes, str]] = None,
+        encoding: str = "utf-8",
         name: Optional[str] = None,
     ) -> Optional[str]:
         """
@@ -102,9 +103,10 @@ class FileService:
         If content is provided, it is written to the file immediately.
 
         Args:
-            path (str): The full path to the file or the directory path if `name` is given.
-            name (Optional[str]): The name of the file to be created (optional).
             content (Optional[Union[bytes, str]]): The content to write to the file (optional).
+            encoding (str, optional): The encoding to use for writing string content. Defaults to 'utf-8'.
+            name (Optional[str]): The name of the file to be created (optional).
+            path (str): The full path to the file or the directory path if `name` is given.
 
         Returns:
             Optional[str]: The full path to the created file or None if an error occurred.
@@ -142,8 +144,9 @@ class FileService:
             if content is not None:
                 # Write initial content if provided
                 await cls.write(
-                    path=str(file_path),
+                    encoding=encoding,
                     content=content,
+                    path=str(file_path),
                 )
 
             # Return the full file path

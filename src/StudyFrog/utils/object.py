@@ -3,6 +3,8 @@ Author: lodego
 Date: 2024-01-24
 """
 
+import json
+
 from typing import *
 
 from utils.logger import Logger
@@ -524,6 +526,26 @@ class MutableBaseObject:
 
         # Return the result dictionary
         return result
+
+    def to_json(
+        self,
+        exclude: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Returns a JSON string representation of the object.
+
+        :param exclude: An optional list of attribute names to exclude from the JSON string.
+        :type exclude: Optional[List[str]]
+
+        :return: A JSON string representation of the object.
+        :rtype: str
+        """
+
+        # Return the JSON string representation of the object
+        return json.dumps(
+            self.to_dict(exclude=exclude),
+            indent=4,
+        )
 
     def update(
         self,

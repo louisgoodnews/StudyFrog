@@ -36,9 +36,9 @@ class ImmutableDifficulty(ImmutableBaseObject):
     A difficulty has a value between 0 and 1 that represents the importance of an object.
 
     Attributes:
-        emoji (str): The emoji of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
         description (Optional[str]): The description of the difficulty.
+        emoji (str): The emoji of the difficulty.
         icon (str): The icon of the difficulty.
         id (int): The ID of the difficulty.
         key (str): The key of the difficulty.
@@ -267,17 +267,17 @@ class MutableDifficulty(MutableBaseObject):
     A difficulty has a value between 0 and 1 that represents the importance of an object.
 
     Attributes:
-        emoji (str): The emoji of the difficulty.
-        name (str): The name of the difficulty.
-        value (float): The value of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
         description (Optional[str]): The description of the difficulty.
+        emoji (str): The emoji of the difficulty.
         icon (str): The icon of the difficulty.
         id (int): The ID of the difficulty.
         key (str): The key of the difficulty.
         metadata (Dict[str, Any]): The metadata of the difficulty.
+        name (str): The name of the difficulty.
         updated_at (datetime): The timestamp when the difficulty was last updated.
         uuid (str): The UUID of the difficulty.
+        value (float): The value of the difficulty.
     """
 
     def __init__(
@@ -286,6 +286,7 @@ class MutableDifficulty(MutableBaseObject):
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -1568,7 +1569,7 @@ class DifficultyManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
-    def get_difficulty_by_id(
+    def get_difficulty_by_key(
         self,
         key: str,
         force_refetch: bool = False,
@@ -1909,7 +1910,7 @@ class DifficultyModel(ImmutableBaseModel):
         description="",
         index=False,
         name="description",
-        nullable=False,
+        nullable=True,
         on_delete=None,
         on_update=None,
         primary_key=False,

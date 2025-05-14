@@ -217,9 +217,9 @@ class DispatcherNotification(ImmutableBaseObject):
         event: DispatcherEvent,
         id: int,
         namespace: str,
-        result: Dict[str, Any],
         start: datetime,
         errors: Optional[List[Dict[str, Any]]] = None,
+        result: Optional[Dict[str, Any]] = None,
     ) -> None:
         """
         Initializes a new instance of the DispatcherNotification class.
@@ -478,9 +478,9 @@ class DispatcherNotificationFactory:
         end: datetime,
         event: DispatcherEvent,
         namespace: str,
-        result: Any,
         start: datetime,
         errors: Optional[List[Dict[str, Any]]] = None,
+        result: Optional[Dict[str, Any]] = None,
     ) -> Optional[DispatcherNotification]:
         """
         Creates a new instance of the DispatcherNotification class.
@@ -952,6 +952,13 @@ class DispatcherEventSubscription(ImmutableBaseObject):
                         traceback=traceback.format_exc(),
                     )
 
+        else:
+            # Add the 'NaN' key with a None type value to the result to indicate an empty notification
+            result.result(
+                key="NaN",
+                value=None,
+            )
+
         # Iterate over the non-persistent subscriptions
         for uuid in non_persistents:
             # Remove the subscription from the dispatcher
@@ -965,9 +972,11 @@ class DispatcherEventSubscription(ImmutableBaseObject):
 
         # Calculate the duration of the notification
         result.duration(
-            value=(
-                end - start
-            ).total_seconds()
+            value=Miscellaneous.calculate_duration(
+                as_="seconds",
+                end=end,
+                start=start,
+            )
         )
 
         # Build the notification and return it

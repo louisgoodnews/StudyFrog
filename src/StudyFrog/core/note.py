@@ -319,12 +319,12 @@ class ImmutableNote(ImmutableBaseObject):
         # Return the ImmutableNote instance's uuid attribute
         return self._uuid
 
-    def to_mutable(self) -> "MutableNote":
+    def to_mutable(self) -> Optional["MutableNote"]:
         """
         Returns a mutable copy of the ImmutableNote instance.
 
         Returns:
-            MutableNote: A mutable copy of the ImmutableNote instance.
+            Optional[MutableNote]: A mutable copy of the ImmutableNote instance.
         """
         try:
             # Create a new MutableNote instance from the dictionary representation of the ImmutableNote instance
@@ -1058,12 +1058,12 @@ class MutableNote(MutableBaseObject):
         # Set the priority of the Note
         self.priority = priority.id
 
-    def to_immutable(self) -> ImmutableNote:
+    def to_immutable(self) -> Optional[ImmutableNote]:
         """
         Returns an immutable copy of the MutableNote instance.
 
         Returns:
-            ImmutableNote: An immutable copy of the MutableNote instance.
+            Optional[ImmutableNote]: An immutable copy of the MutableNote instance.
         """
         try:
             # Create a new ImmutableNote instance from the dictionary representation of the MutableNote instance
