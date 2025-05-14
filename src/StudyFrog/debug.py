@@ -5,6 +5,9 @@ Date: 2025-02-05
 
 from typing import *
 
+from scripts.clear_database import clear_database
+from scripts.upsert_database import upsert_database
+
 from utils.logger import Logger
 
 

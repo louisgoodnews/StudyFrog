@@ -382,116 +382,116 @@ class ComponentAccessor:
 
             # Register the answer factory
             factory.register_factory(
+                factory=AnswerFactory,
                 name="answer_factory",
-                manager=AnswerFactory,
             )
 
             # Register the association factory
             factory.register_factory(
+                factory=AssociationFactory,
                 name="association_factory",
-                manager=AssociationFactory,
             )
 
             # Register the change history factory
             factory.register_factory(
+                factory=ChangeHistoryFactory,
                 name="change_history_factory",
-                manager=ChangeHistoryFactory,
             )
 
             # Register the change history item factory
             factory.register_factory(
+                factory=ChangeHistoryItemFactory,
                 name="change_history_item_factory",
-                manager=ChangeHistoryItemFactory,
             )
 
             # Register the comment factory
             factory.register_factory(
+                factory=CommentFactory,
                 name="comment_factory",
-                manager=CommentFactory,
             )
 
             # Register the custom field factory
             factory.register_factory(
+                factory=CustomFieldFactory,
                 name="custom_field_factory",
-                manager=CustomFieldFactory,
             )
 
             # Register the default factory
             factory.register_factory(
+                factory=DefaultFactory,
                 name="default_factory",
-                manager=DefaultFactory,
             )
 
             # Register the difficulty factory
             factory.register_factory(
+                factory=DifficultyFactory,
                 name="difficulty_factory",
-                manager=DifficultyFactory,
             )
 
             # Register the flashcard factory
             factory.register_factory(
+                factory=FlashcardManager,
                 name="flashcard_manager",
-                manager=FlashcardManager,
             )
 
             # Register the note factory
             factory.register_factory(
+                factory=NoteFactory,
                 name="note_factory",
-                manager=NoteFactory,
             )
 
             # Register the priority factory
             factory.register_factory(
+                factory=PriorityFactory,
                 name="priority_factory",
-                manager=PriorityFactory,
             )
 
             # Register the question factory
             factory.register_factory(
+                factory=QuestionFactory,
                 name="question_factory",
-                manager=QuestionFactory,
             )
 
             # Register the setting factory
             factory.register_factory(
+                factory=SettingFactory,
                 name="setting_factory",
-                manager=SettingFactory,
             )
 
             # Register the stack factory
             factory.register_factory(
+                factory=StackFactory,
                 name="stack_factory",
-                manager=StackFactory,
             )
 
             # Register the status factory
             factory.register_factory(
+                factory=StatusFactory,
                 name="status_factory",
-                manager=StatusFactory,
             )
 
             # Register the subject factory
             factory.register_factory(
+                factory=SubjectFactory,
                 name="subject_factory",
-                manager=SubjectFactory,
             )
 
             # Register the tag factory
             factory.register_factory(
+                factory=TagFactory,
                 name="tag_factory",
-                manager=TagFactory,
             )
 
             # Register the teacher factory
             factory.register_factory(
+                factory=TeacherFactory,
                 name="teacher_factory",
-                manager=TeacherFactory,
             )
 
             # Register the user factory
             factory.register_factory(
+                factory=UserFactory,
                 name="user_factory",
-                manager=UserFactory,
             )
 
             # Return the factory instance

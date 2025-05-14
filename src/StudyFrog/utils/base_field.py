@@ -185,6 +185,20 @@ class BaseField(tkinter.Frame):
             f"Subclasses of 'BaseField' must implement the 'get' method."
         )
 
+    def grab_focus(self) -> None:
+        """
+        Grabs the focus of the field widget.
+
+        This method grabs the focus of the field widget, which is used to
+        focus the widget when it is created.
+
+        Returns:
+            None
+        """
+        raise NotImplementedError(
+            f"Subclasses of 'BaseField' must implement the 'grab_focus' method."
+        )
+
     def set(
         self,
         value: Any,

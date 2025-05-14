@@ -53,8 +53,8 @@ class ImmutableLearningSession(ImmutableBaseObject):
     This class is responsible for encapsulating the properties of an immutable learning session.
 
     Attributes:
-        children (Optional[List[str]]): A list of child learning sessions.
-        contents (Optional[List[str]]): A list of contents.
+        children (Optional[List[str]]): A list of child learning session item keys.
+        contents (Optional[List[str]]): A list of content keys.
         created_at (Optional[datetime]): The timestamp when the learning session was created.
         custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
         duration (Optional[float]): The duration of the learning session.
@@ -98,7 +98,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
         Initializes a new instance of the ImmutableLearningSession class.
 
         Args:
-            children (Optional[List[str]]): A list of child learning session keys.
+            children (Optional[List[str]]): A list of child learning session item keys.
             contents (Optional[List[str]]): A list of content keys.
             created_at (Optional[datetime]): The timestamp when the learning session was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
@@ -130,6 +130,7 @@ class ImmutableLearningSession(ImmutableBaseObject):
             duration=duration,
             end=end,
             filters=filters,
+            hide_attributes=True,
             id=id,
             key=key,
             metadata=metadata,
@@ -142,6 +143,200 @@ class ImmutableLearningSession(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def children(self) -> List[str]:
+        """
+        Returns the children of the learning session.
+
+        Returns:
+            List[str]: The children of the learning session.
+        """
+        return self._children
+
+    @property
+    def contents(self) -> List[str]:
+        """
+        Returns the contents of the learning session.
+
+        Returns:
+            List[str]: The contents of the learning session.
+        """
+        return self._contents
+
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """
+        Returns the created_at of the learning session.
+
+        Returns:
+            Optional[datetime]: The created_at of the learning session.
+        """
+        return self._created_at
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Returns the custom_field_values of the learning session.
+
+        Returns:
+            List[Dict[str, Any]]: The custom_field_values of the learning session.
+        """
+        return self._custom_field_values
+
+    @property
+    def duration(self) -> float:
+        """
+        Returns the duration of the learning session.
+
+        Returns:
+            float: The duration of the learning session.
+        """
+
+        return self._duration
+
+    @property
+    def end(self) -> Optional[datetime]:
+        """
+        Returns the end of the learning session.
+
+        Returns:
+            Optional[datetime]: The end of the learning session.
+        """
+
+        return self._end
+
+    @property
+    def filters(self) -> List[Dict[str, Any]]:
+        """
+        Returns the filters of the learning session.
+
+        Returns:
+            List[Dict[str, Any]]: The filters of the learning session.
+        """
+
+        return self._filters
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the id of the learning session.
+
+        Returns:
+            int: The id of the learning session.
+        """
+
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the learning session.
+
+        Returns:
+            str: The key of the learning session.
+        """
+
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the learning session.
+
+        Returns:
+            Dict[str, Any]: The metadata of the learning session.
+        """
+
+        return self._metadata
+
+    @property
+    def mode(self) -> str:
+        """
+        Returns the mode of the learning session.
+
+        Returns:
+            str: The mode of the learning session.
+        """
+
+        return self._mode
+
+    @property
+    def result(self) -> Optional[int]:
+        """
+        Returns the result of the learning session.
+
+        Returns:
+            Optional[int]: The result of the learning session.
+        """
+
+        return self._result
+
+    @property
+    def settings(self) -> Dict[str, Any]:
+        """
+        Returns the settings of the learning session.
+
+        Returns:
+            Dict[str, Any]: The settings of the learning session.
+        """
+
+        return self._settings
+
+    @property
+    def stacks(self) -> List[str]:
+        """
+        Returns the stacks of the learning session.
+
+        Returns:
+            List[str]: The stacks of the learning session.
+        """
+
+        return self._stacks
+
+    @property
+    def start(self) -> Optional[datetime]:
+        """
+        Returns the start of the learning session.
+
+        Returns:
+            Optional[datetime]: The start of the learning session.
+        """
+
+        return self._start
+
+    @property
+    def status(self) -> Optional[int]:
+        """
+        Returns the status of the learning session.
+
+        Returns:
+            Optional[int]: The status of the learning session.
+        """
+
+        return self._status
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        """
+        Returns the updated_at of the learning session.
+
+        Returns:
+            Optional[datetime]: The updated_at of the learning session.
+        """
+
+        return self._updated_at
+
+    @property
+    def uuid(self) -> Optional[str]:
+        """
+        Returns the uuid of the learning session.
+
+        Returns:
+            Optional[str]: The uuid of the learning session.
+        """
+
+        return self._uuid
 
     def get_custom_field_value(
         self,
@@ -303,6 +498,7 @@ class MutableLearningSession(MutableBaseObject):
             duration=duration,
             end=end,
             filters=filters,
+            hide_attributes=True,
             id=id,
             key=key,
             metadata=metadata,
@@ -315,6 +511,618 @@ class MutableLearningSession(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def children(self) -> List[str]:
+        """
+        Returns the children of the learning session.
+
+        Returns:
+            List[str]: The children of the learning session.
+        """
+        return self._children
+
+    @children.setter
+    def children(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the children of the learning session.
+
+        Args:
+            value (Union[List[str], str]): The new children of the learning session.
+
+        Returns:
+            None
+        """
+
+        # Check, if the children list exists
+        if not self.get(
+            default=None,
+            name="children",
+        ):
+            # Set the children of the learning session to an empty list
+            self._children = []
+
+        # Check, if the passed value is a list
+        if isinstance(
+            value,
+            list,
+        ):
+            # Set the children of the learning session
+            self._children = value
+        # Check, if the passed value is a string
+        elif isinstance(
+            value,
+            str,
+        ):
+            # Set the children of the learning session
+            self._children = [value]
+
+    @property
+    def contents(self) -> List[str]:
+        """
+        Returns the contents of the learning session.
+
+        Returns:
+            List[str]: The contents of the learning session.
+        """
+        return self._contents
+
+    @contents.setter
+    def contents(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the contents of the learning session.
+
+        Args:
+            value (Union[List[str], str]): The new contents of the learning session.
+
+        Returns:
+            None
+        """
+
+        # Check, if the contents list exists
+        if not self.get(
+            default=None,
+            name="contents",
+        ):
+            # Set the contents of the learning session to an empty list
+            self._contents = []
+
+        # Check, if the passed value is a list
+        if isinstance(
+            value,
+            list,
+        ):
+            # Set the contents of the learning session
+            self._contents = value
+        # Check, if the passed value is a string
+        elif isinstance(
+            value,
+            str,
+        ):
+            # Set the contents of the learning session
+            self._contents = [value]
+
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """
+        Returns the created_at of the learning session.
+
+        Returns:
+            Optional[datetime]: The created_at of the learning session.
+        """
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the created_at of the learning session.
+
+        Args:
+            value (datetime): The new created_at of the learning session.
+
+        Returns:
+            None
+        """
+        self._created_at = value
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Returns the custom_field_values of the learning session.
+
+        Returns:
+            List[Dict[str, Any]]: The custom_field_values of the learning session.
+        """
+        return self._custom_field_values
+
+    @custom_field_values.setter
+    def custom_field_values(
+        self,
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
+    ) -> None:
+        """
+        Sets the custom field values of the learning session.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]): The new custom field values of the learning session.
+
+        Returns:
+            None
+        """
+
+        # Check, if the custom field values list exists
+        if not self.get(
+            default=None,
+            name="custom_field_values",
+        ):
+            # Set the custom field values of the learning session to an empty list
+            self._custom_field_values = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the passed value to the list
+            self._custom_field_values.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._custom_field_values.extend(value)
+
+    @property
+    def duration(self) -> float:
+        """
+        Returns the duration of the learning session.
+
+        Returns:
+            float: The duration of the learning session.
+        """
+
+        return self._duration
+
+    @duration.setter
+    def duration(
+        self,
+        value: float,
+    ) -> None:
+        """
+        Sets the duration of the learning session.
+
+        Args:
+            value (float): The new duration of the learning session.
+
+        Returns:
+            None
+        """
+        self._duration = value
+
+    @property
+    def end(self) -> Optional[datetime]:
+        """
+        Returns the end of the learning session.
+
+        Returns:
+            Optional[datetime]: The end of the learning session.
+        """
+
+        return self._end
+
+    @end.setter
+    def end(
+        self,
+        value: Optional[datetime],
+    ) -> None:
+        """
+        Sets the end of the learning session.
+
+        Args:
+            value (Optional[datetime]): The new end of the learning session.
+
+        Returns:
+            None
+        """
+        self._end = value
+
+    @property
+    def filters(self) -> List[Dict[str, Any]]:
+        """
+        Returns the filters of the learning session.
+
+        Returns:
+            List[Dict[str, Any]]: The filters of the learning session.
+        """
+
+        return self._filters
+
+    @filters.setter
+    def filters(
+        self,
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
+    ) -> None:
+        """
+        Sets the filters of the learning session.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The new filters of the learning session.
+
+        Returns:
+            None
+        """
+
+        # Check, if the filters list exists
+        if not self.get(
+            default=None,
+            name="filters",
+        ):
+            # Set the filters of the learning session to an empty list
+            self._filters = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the passed value to the list
+            self._filters.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._filters.extend(value)
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the id of the learning session.
+
+        Returns:
+            int: The id of the learning session.
+        """
+
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the id of the learning session.
+
+        Args:
+            value (int): The new id of the learning session.
+
+        Returns:
+            None
+        """
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the learning session.
+
+        Returns:
+            str: The key of the learning session.
+        """
+
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the learning session.
+
+        Args:
+            value (str): The new key of the learning session.
+
+        Returns:
+            None
+        """
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the learning session.
+
+        Returns:
+            Dict[str, Any]: The metadata of the learning session.
+        """
+
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the learning session.
+
+        Args:
+            **kwargs (Dict[str, Any]): The new metadata of the learning session.
+
+        Returns:
+            None
+        """
+
+        # Check, if the metadata dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Set the metadata of the learning session to an empty dictionary
+            self._metadata = {}
+
+        # Update the metadata of the learning session
+        self._metadata.update(**kwargs)
+
+    @property
+    def mode(self) -> str:
+        """
+        Returns the mode of the learning session.
+
+        Returns:
+            str: The mode of the learning session.
+        """
+
+        return self._mode
+
+    @mode.setter
+    def mode(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the mode of the learning session.
+
+        Args:
+            value (str): The new mode of the learning session.
+
+        Returns:
+            None
+        """
+        self._mode = value
+
+    @property
+    def result(self) -> Optional[int]:
+        """
+        Returns the result of the learning session.
+
+        Returns:
+            Optional[int]: The result of the learning session.
+        """
+
+        return self._result
+
+    @result.setter
+    def result(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the result of the learning session.
+
+        Args:
+            value (int): The new result of the learning session.
+
+        Returns:
+            None
+        """
+        self._result = value
+
+    @property
+    def settings(self) -> Dict[str, Any]:
+        """
+        Returns the settings of the learning session.
+
+        Returns:
+            Dict[str, Any]: The settings of the learning session.
+        """
+
+        return self._settings
+
+    @settings.setter
+    def settings(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the settings of the learning session.
+
+        Args:
+            **kwargs (Dict[str, Any]): The new settings of the learning session.
+
+        Returns:
+            None
+        """
+
+        # Check, if the settings dictionary exists
+        if not self.get(
+            default=None,
+            name="settings",
+        ):
+            # Set the settings of the learning session to an empty dictionary
+            self._settings = {}
+
+        # Update the settings of the learning session
+        self._settings.update(**kwargs)
+
+    @property
+    def stacks(self) -> List[str]:
+        """
+        Returns the stacks of the learning session.
+
+        Returns:
+            List[str]: The stacks of the learning session.
+        """
+
+        return self._stacks
+
+    @stacks.setter
+    def stacks(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the stacks of the learning session.
+
+        Args:
+            value (Union[List[str], str]): The new stacks of the learning session.
+
+        Returns:
+            None
+        """
+
+        # Check, if the stacks list exists
+        if not self.get(
+            default=None,
+            name="stacks",
+        ):
+            # Set the stacks of the learning session to an empty list
+            self._stacks = []
+
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the passed value to the list
+            self._stacks.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._stacks.extend(value)
+
+    @property
+    def start(self) -> Optional[datetime]:
+        """
+        Returns the start of the learning session.
+
+        Returns:
+            Optional[datetime]: The start of the learning session.
+        """
+
+        return self._start
+
+    @start.setter
+    def start(
+        self,
+        value: Optional[datetime],
+    ) -> None:
+        """
+        Sets the start of the learning session.
+
+        Args:
+            value (Optional[datetime]): The new start of the learning session.
+
+        Returns:
+            None
+        """
+        self._start = value
+
+    @property
+    def status(self) -> Optional[int]:
+        """
+        Returns the status of the learning session.
+
+        Returns:
+            Optional[int]: The status of the learning session.
+        """
+
+        return self._status
+
+    @status.setter
+    def status(
+        self,
+        value: Optional[int],
+    ) -> None:
+        """
+        Sets the status of the learning session.
+
+        Args:
+            value (Optional[int]): The new status of the learning session.
+
+        Returns:
+            None
+        """
+        self._status = value
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        """
+        Returns the updated_at of the learning session.
+
+        Returns:
+            Optional[datetime]: The updated_at of the learning session.
+        """
+
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: Optional[datetime],
+    ) -> None:
+        """
+        Sets the updated_at of the learning session.
+
+        Args:
+            value (Optional[datetime]): The new updated_at of the learning session.
+
+        Returns:
+            None
+        """
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> Optional[str]:
+        """
+        Returns the uuid of the learning session.
+
+        Returns:
+            Optional[str]: The uuid of the learning session.
+        """
+
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: Optional[str],
+    ) -> None:
+        """
+        Sets the uuid of the learning session.
+
+        Args:
+            value (Optional[str]): The new uuid of the learning session.
+
+        Returns:
+            None
+        """
+        self._uuid = value
 
     def add_child(
         self,
@@ -1128,7 +1936,54 @@ class LearningSessionManager(BaseObjectManager):
         Returns:
             None
         """
-        pass
+
+        # Call the parent class constructor
+        super().__init__()
+
+    def _run_pre_create_tasks(
+        self,
+        learning_session: Union[
+            ImmutableLearningSession,
+            MutableLearningSession,
+        ],
+    ) -> MutableLearningSession:
+        """
+        Runs pre-create tasks for the learning_session.
+
+        Args:
+            learning_session (Union[ImmutableLearningSession, MutableLearningSession]): The learning_session to run pre-create tasks for.
+
+        Returns:
+            MutableLearningSession: The learning_session with pre-create tasks run.
+        """
+
+        # Check if the learning_session object is immutable
+        if not learning_session.is_mutable():
+            # If it is, convert it to a mutable learning_session
+            learning_session = learning_session.to_mutable()
+
+        # Set the created_at timestamp of the learning_session
+        learning_session.created_at = Miscellaneous.get_current_datetime()
+
+        # Set the custom_field_values of the learning_session
+        learning_session.custom_field_values = (
+            learning_session.custom_field_values or []
+        )
+
+        # Set the key of the learning_session
+        learning_session.key = f"LEARNING_SESSION_{self.count_learning_sessions() + 1}"
+
+        # Set the metadata of the learning_session
+        learning_session.metadata = learning_session.metadata or {}
+
+        # Set the updated_at timestamp of the learning_session
+        learning_session.updated_at = Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the learning_session
+        learning_session.uuid = Miscellaneous.get_uuid()
+
+        # Return the learning_session to the caller
+        return learning_session
 
     def count_learning_sessions(self) -> int:
         """
@@ -1168,32 +2023,14 @@ class LearningSessionManager(BaseObjectManager):
             Exception: If an exception occurs while creating the learning_session.
         """
         try:
-            # Check if the learning_session object is immutable
-            if isinstance(
-                learning_session,
-                ImmutableLearningSession,
-            ):
-                # If it is, convert it to a mutable learning_session
-                learning_session = learning_session.to_mutable()
+            
+            # Initialize the result (optional) ImmutableLearningSession to none
+            result: Optional[ImmutableLearningSession] = None
 
-            # Set the created_at timestamp of the learning_session
-            learning_session.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the custom_field_values of the learning_session
-            learning_session.custom_field_values = (
-                [] or learning_session.custom_field_values
+            # Run pre-create tasks
+            learning_session: MutableLearningSession = self._run_pre_create_tasks(
+                learning_session=learning_session,
             )
-
-            # Set the key of the learning_session
-            learning_session.key = (
-                f"LEARNING_SESSION_{self.count_learning_sessions() + 1}"
-            )
-
-            # Set the updated_at timestamp of the learning_session
-            learning_session.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the learning_session
-            learning_session.uuid = Miscellaneous.get_uuid()
 
             # Convert the learning_session object to a LearningSessionModel object
             model: LearningSessionModel = LearningSessionConverter.object_to_model(
@@ -1205,35 +2042,47 @@ class LearningSessionManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the learning_session
-                learning_session.id = id
-
-                # Convert the learning_session to an immutable learning_session
-                learning_session = LearningSessionFactory.create_learning_session(
-                    **learning_session.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a learning_session ({learning_session.__repr__()}) in the database."
                 )
 
-                # Add the learning_session to the cache
-                self.add_to_cache(
-                    key=learning_session.key,
-                    value=learning_session,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable learning_session
-                return learning_session
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a learning_session ({learning_session}) in the database."
+            # Convert the learning_session to a dictionary
+            kwargs: Dict[str, Any] = learning_session.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the learning_session
+            kwargs["id"] = id
+
+            # Create a new ImmutableLearningSession object
+            result = LearningSessionFactory.create_learning_session(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableLearningSession from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the learning_session to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created immutable learning_session
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -3895,7 +4744,10 @@ class MutableLearningSessionItem(MutableBaseObject):
             uuid=uuid,
         )
 
-    def add_action(self, action: Any,) -> None:
+    def add_action(
+        self,
+        action: Any,
+    ) -> None:
         """ """
 
         # If the learning session item currently has no actions, create an empty list
@@ -4126,7 +4978,9 @@ class LearningSessionItemBuilder(BaseObjectBuilder):
         try:
             # Attempt to create and return a new instance of the ImmutableLearningSessionItem class from the dictionary representation of the MutableLearningSessionItem instance
             learning_session_item: Optional[ImmutableLearningSessionItem] = (
-                LearningSessionItemFactory.create_learning_session_item(**self.configuration)
+                LearningSessionItemFactory.create_learning_session_item(
+                    **self.configuration
+                )
             )
 
             if not learning_session_item:

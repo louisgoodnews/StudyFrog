@@ -249,7 +249,7 @@ class FlashcardCreateForm(BaseCreateForm):
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
-            values=[stack.get(name="name") for stack in stacks] if stacks else [],
+            values=[stack.name for stack in stacks] if stacks else [],
         )
 
         # Place the 'stack' ComboboxField widget in the grid

@@ -33,7 +33,22 @@ class BaseObjectBuilder(ImmutableBaseObject):
         """
 
         # Call the parent class constructor
-        super().__init__(configuration={})
+        super().__init__(
+            configuration={},
+            hide_attributes=True,
+        )
+
+    @property
+    def configuration(self) -> Dict[str, Any]:
+        """
+        Gets the configuration dictionary for the builder.
+
+        Returns:
+            Dict[str, Any]: The configuration dictionary for the builder.
+        """
+
+        # Return the configuration dictionary
+        return self._configuration
 
     def build(self) -> Any:
         """

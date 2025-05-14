@@ -524,9 +524,12 @@ class StatusManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_statuses(self) -> Optional[List[ImmutableStatus]]:
+    def get_all_statuses(self, force_refetch: bool = False,) -> Optional[List[ImmutableStatus]]:
         """
         Returns a list of all statuses in the database.
+
+        Args:
+            force_refetch (bool): Whether to force a refetch of the statuses from the database. Defaults to False.
 
         Returns:
             Optional[List[ImmutableStatus]]: A list of all statuses in the database if no exception occurs. Otherwise, None.
@@ -535,10 +538,12 @@ class StatusManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_statuses():
-                # Return the list of immutable statuses from the cache
-                return self.get_cache_values()
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if cache and table size are equal
+                if self.cache and len(self._cache) == self.count_statuses():
+                    # Return the list of immutable statuses from the cache
+                    return self.get_cache_values()
 
             # Get all statuses from the database
             models: List[StatusModel] = asyncio.run(
@@ -558,13 +563,11 @@ class StatusManager(BaseObjectManager):
                 for model in models
             ]
 
-            # Iterate over the list of immutable statuses
-            for status in statuses:
-                # Add the immutable status to the cache
-                self.add_to_cache(
-                    key=status.key,
-                    value=status,
-                )
+            # Add the immutable statuses to the cache
+            self.add_to_cache(
+                key=[status.key for status in statuses],
+                value=statuses,
+            )
 
             # Return the list of immutable statuses
             return statuses
@@ -660,12 +663,14 @@ class StatusManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableStatus]:
         """
         Retrieves a status by the given field and value.
 
         Args:
             field (str): The field to search by.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             value (Any): The value to search for.
 
         Returns:
@@ -675,10 +680,12 @@ class StatusManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the status is already in the cache
-            if self.is_key_in_cache(key=field):
-                # Return the status from the cache
-                return self.get_value_from_cache(key=field)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the status is already in the cache
+                if self.is_key_in_cache(key=field):
+                    # Return the status from the cache
+                    return self.get_value_from_cache(key=field)
 
             # Get the status with the given field and value from the database
             model: Optional[StatusModel] = asyncio.run(
@@ -724,11 +731,13 @@ class StatusManager(BaseObjectManager):
     def get_status_by_id(
         self,
         id: int,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableStatus]:
         """
         Returns a status with the given ID.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             id (int): The ID of the status.
 
         Returns:
@@ -738,10 +747,12 @@ class StatusManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the status is already in the cache
-            if self.is_key_in_cache(key=f"STATUS_{id}"):
-                # Return the status from the cache
-                return self.get_value_from_cache(key=f"STATUS_{id}")
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the status is already in the cache
+                if self.is_key_in_cache(key=f"STATUS_{id}"):
+                    # Return the status from the cache
+                    return self.get_value_from_cache(key=f"STATUS_{id}")
 
             # Get the status with the given ID from the database
             model: Optional[StatusModel] = asyncio.run(
@@ -784,14 +795,83 @@ class StatusManager(BaseObjectManager):
             # Return None indicating an exception has occurred
             return None
 
+    def get_status_by_key(
+        self,
+        key: str,
+        force_refetch: bool = False,
+    ) -> Optional[ImmutableStatus]:
+        """
+        Returns a status with the given key.
+
+        Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
+            key (str): The key of the status.
+
+        Returns:
+            Optional[ImmutableStatus]: The status with the given ID if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the status is already in the cache
+                if self.is_key_in_cache(key=key):
+                    # Return the status from the cache
+                    return self.get_value_from_cache(key=key)
+
+            # Get the status with the given key from the database
+            model: Optional[StatusModel] = asyncio.run(
+                StatusModel.get_by(
+                    column="key",
+                    database=Constants.DATABASE_PATH,
+                    value=key,
+                )
+            )
+
+            # Return the status if it exists
+            if model is not None:
+                # Convert the StatusModel object to an ImmutableStatus object
+                status: ImmutableStatus = StatusFactory.create_status(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+
+                # Add the status to the cache
+                self.add_to_cache(
+                    key=status.key,
+                    value=status,
+                )
+
+                # Return the status
+                return status
+            else:
+                # Return None indicating that the status does not exist
+                return None
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'get_by_key' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
     def get_status_by_uuid(
         self,
         uuid: str,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableStatus]:
         """
         Returns a status with the given UUID.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             uuid (str): The UUID of the status.
 
         Returns:
@@ -801,10 +881,12 @@ class StatusManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the status is already in the cache
-            if self.is_key_in_cache(key=uuid):
-                # Return the status from the cache
-                return self.get_value_from_cache(key=uuid)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the status is already in the cache
+                if self.is_key_in_cache(key=uuid):
+                    # Return the status from the cache
+                    return self.get_value_from_cache(key=uuid)
 
             # Get the status with the given UUID from the database
             model: Optional[StatusModel] = asyncio.run(
@@ -891,13 +973,11 @@ class StatusManager(BaseObjectManager):
                     for model in models
                 ]
 
-                # Iterate over the found statuses
-                for status in statuses:
-                    # Add the status to the cache
-                    self.add_to_cache(
-                        key=status.key,
-                        value=status,
-                    )
+                # Add the statuses to the cache
+                self.add_to_cache(
+                    key=[status.key for status in statuses],
+                    value=statuses,
+                )
 
                 # Return the found statuses
                 return statuses

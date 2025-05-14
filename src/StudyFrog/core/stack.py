@@ -119,6 +119,7 @@ class ImmutableStack(ImmutableBaseObject):
             description=description,
             difficulty=difficulty,
             due_by=due_by,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -132,6 +133,215 @@ class ImmutableStack(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def ancestor(self) -> int:
+        """
+        Returns the ancestor of the stack.
+
+        Returns:
+            int: The ancestor of the stack.
+        """
+
+        return self._ancestor
+
+    @property
+    def contents(self) -> List[str]:
+        """
+        Returns the contents of the stack.
+
+        Returns:
+            List[str]: The contents of the stack.
+        """
+
+        return self._contents
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Returns the custom field values of the stack.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the stack.
+        """
+
+        return self._custom_field_values
+
+    @property
+    def descendants(self) -> List[str]:
+        """
+        Returns the descendants of the stack.
+
+        Returns:
+            List[str]: The descendants of the stack.
+        """
+
+        return self._descendants
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description of the stack.
+
+        Returns:
+            str: The description of the stack.
+        """
+
+        return self._description
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Returns the ID of the difficulty associated with the stack.
+
+        Returns:
+            int: The ID of the difficulty associated with the stack.
+        """
+
+        return self._difficulty
+
+    @property
+    def due_by(self) -> datetime:
+        """
+        Returns the due_by of the stack.
+
+        Returns:
+            datetime: The due_by of the stack.
+        """
+
+        return self._due_by
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the stack.
+
+        Returns:
+            str: The icon of the stack.
+        """
+
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the stack.
+
+        Returns:
+            int: The ID of the stack.
+        """
+
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the stack.
+
+        Returns:
+            str: The key of the stack.
+        """
+
+        return self._key
+
+    @property
+    def last_viewed_at(self) -> datetime:
+        """
+        Returns the last viewed date of the stack.
+
+        Returns:
+            datetime: The last viewed date of the stack.
+        """
+
+        return self._last_viewed_date
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the stack.
+
+        Returns:
+            Dict[str, Any]: The metadata of the stack.
+        """
+
+        return self._metadata
+
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the stack.
+
+        Returns:
+            str: The name of the stack.
+        """
+
+        return self._name
+
+    @property
+    def priority(self) -> int:
+        """
+        Returns the ID of the priority associated with the stack.
+
+        Returns:
+            int: The ID of the priority associated with the stack.
+        """
+
+        return self._priority
+
+    @property
+    def status(self) -> int:
+        """
+        Returns the ID of the status associated with the stack.
+
+        Returns:
+            int: The ID of the status associated with the stack.
+        """
+
+        return self._status
+
+    @property
+    def subject(self) -> int:
+        """
+        Returns the ID of the subject the stack is associated with.
+
+        Returns:
+            int: The ID of the subject the stack is associated with.
+        """
+
+        return self._subject
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Returns the keys of the tags associated with the stack.
+
+        Returns:
+            List[str]: The keys of the tags associated with the stack.
+        """
+
+        return self._tags
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the updated_at of the stack.
+
+        Returns:
+            datetime: The updated_at of the stack.
+        """
+
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the stack.
+
+        Returns:
+            str: The UUID of the stack.
+        """
+
+        return self._uuid
 
     def get_content_grouped_by(
         self,
@@ -382,6 +592,7 @@ class MutableStack(MutableBaseObject):
             description=description,
             difficulty=difficulty,
             due_by=due_by,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -396,6 +607,627 @@ class MutableStack(MutableBaseObject):
             uuid=uuid,
         )
 
+    @property
+    def ancestor(self) -> int:
+        """
+        Returns the ancestor of the stack.
+
+        Returns:
+            int: The ancestor of the stack.
+        """
+
+        return self._ancestor
+
+    @ancestor.setter
+    def ancestor(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ancestor of the stack.
+
+        Args:
+            value (int): The new ancestor of the stack.
+
+        Returns:
+            None
+        """
+
+        self._ancestor = value
+
+    @property
+    def contents(self) -> List[str]:
+        """
+        Returns the contents of the stack.
+
+        Returns:
+            List[str]: The contents of the stack.
+        """
+
+        return self._contents
+
+    @contents.setter
+    def contents(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the contents of the stack.
+
+        Args:
+            value (Union[List[str], str]): The new contents of the stack.
+
+        Returns:
+            None
+        """
+
+        # Check, if the contents list exists
+        if not self.get(
+            default=None,
+            name="contents",
+        ):
+            # Initialize the contents list as an empty list
+            self._contents = []
+
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the passed value to the list
+            self._contents.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._contents.extend(value)
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Returns the custom field values of the stack.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the stack.
+        """
+
+        return self._custom_field_values
+
+    @custom_field_values.setter
+    def custom_field_values(
+        self,
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
+    ) -> None:
+        """
+        Sets the custom field values of the stack.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]): The new custom field values of the stack.
+
+        Returns:
+            None
+        """
+
+        # Check, if the custom_field_values list exists
+        if not self.get(
+            default=None,
+            name="custom_field_values",
+        ):
+            # Initialize the custom_field_values list as an empty list
+            self._custom_field_values = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the passed value to the list
+            self._custom_field_values.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._custom_field_values.extend(value)
+
+    @property
+    def descendants(self) -> List[str]:
+        """
+        Returns the descendants of the stack.
+
+        Returns:
+            List[str]: The descendants of the stack.
+        """
+
+        return self._descendants
+
+    @descendants.setter
+    def descendants(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the descendants of the stack.
+
+        Args:
+            value (Union[List[str], str]): The new descendants of the stack.
+
+        Returns:
+            None
+        """
+
+        # Check, if the descendants list exists
+        if not self.get(
+            default=None,
+            name="descendants",
+        ):
+            # Initialize the descendants list as an empty list
+            self._descendants = []
+
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the passed value to the list
+            self._descendants.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._descendants.extend(value)
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description of the stack.
+
+        Returns:
+            str: The description of the stack.
+        """
+
+        return self._description
+
+    @description.setter
+    def description(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the description of the stack.
+
+        Args:
+            value (str): The new description of the stack.
+
+        Returns:
+            None
+        """
+
+        self._description = value
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Returns the ID of the difficulty associated with the stack.
+
+        Returns:
+            int: The ID of the difficulty associated with the stack.
+        """
+
+        return self._difficulty
+
+    @difficulty.setter
+    def difficulty(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the difficulty associated with the stack.
+
+        Args:
+            value (int): The new ID of the difficulty associated with the stack.
+
+        Returns:
+            None
+        """
+
+        self._difficulty = value
+
+    @property
+    def due_by(self) -> datetime:
+        """
+        Returns the due_by of the stack.
+
+        Returns:
+            datetime: The due_by of the stack.
+        """
+
+        return self._due_by
+
+    @due_by.setter
+    def due_by(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the due_by of the stack.
+
+        Args:
+            value (datetime): The new due_by of the stack.
+
+        Returns:
+            None
+        """
+
+        self._due_by = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the stack.
+
+        Returns:
+            str: The icon of the stack.
+        """
+
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the stack.
+
+        Args:
+            value (str): The new icon of the stack.
+
+        Returns:
+            None
+        """
+
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the stack.
+
+        Returns:
+            int: The ID of the stack.
+        """
+
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the stack.
+
+        Args:
+            value (int): The new ID of the stack.
+
+        Returns:
+            None
+        """
+
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the stack.
+
+        Returns:
+            str: The key of the stack.
+        """
+
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the stack.
+
+        Args:
+            value (str): The new key of the stack.
+
+        Returns:
+            None
+        """
+
+        self._key = value
+
+    @property
+    def last_viewed_at(self) -> datetime:
+        """
+        Returns the last viewed date of the stack.
+
+        Returns:
+            datetime: The last viewed date of the stack.
+        """
+
+        return self._last_viewed_date
+
+    @last_viewed_at.setter
+    def last_viewed_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the last viewed date of the stack.
+
+        Args:
+            value (datetime): The new last viewed date of the stack.
+
+        Returns:
+            None
+        """
+
+        self._last_viewed_date = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the stack.
+
+        Returns:
+            Dict[str, Any]: The metadata of the stack.
+        """
+
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the stack.
+
+        Args:
+            value (Dict[str, Any]): The new metadata of the stack.
+
+        Returns:
+            None
+        """
+
+        # Check, if the metadata dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Initialize the metadata dictionary as an empty dictionary
+            self._metadata = {}
+
+        # Update the metadata dictionary with the passed keyword arguments
+        self._metadata.update(**kwargs)
+
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the stack.
+
+        Returns:
+            str: The name of the stack.
+        """
+
+        return self._name
+
+    @name.setter
+    def name(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the name of the stack.
+
+        Args:
+            value (str): The new name of the stack.
+
+        Returns:
+            None
+        """
+
+        self._name = value
+
+    @property
+    def priority(self) -> int:
+        """
+        Returns the ID of the priority associated with the stack.
+
+        Returns:
+            int: The ID of the priority associated with the stack.
+        """
+
+        return self._priority
+
+    @priority.setter
+    def priority(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the priority associated with the stack.
+
+        Args:
+            value (int): The new ID of the priority associated with the stack.
+
+        Returns:
+            None
+        """
+
+        self._priority = value
+
+    @property
+    def status(self) -> int:
+        """
+        Returns the ID of the status associated with the stack.
+
+        Returns:
+            int: The ID of the status associated with the stack.
+        """
+
+        return self._status
+
+    @status.setter
+    def status(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the status associated with the stack.
+
+        Args:
+            value (int): The new ID of the status associated with the stack.
+
+        Returns:
+            None
+        """
+
+        self._status = value
+
+    @property
+    def subject(self) -> int:
+        """
+        Returns the ID of the subject the stack is associated with.
+
+        Returns:
+            int: The ID of the subject the stack is associated with.
+        """
+
+        return self._subject
+
+    @subject.setter
+    def subject(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the subject the stack is associated with.
+
+        Args:
+            value (int): The new ID of the subject the stack is associated with.
+
+        Returns:
+            None
+        """
+
+        self._subject = value
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Returns the keys of the tags associated with the stack.
+
+        Returns:
+            List[str]: The keys of the tags associated with the stack.
+        """
+
+        return self._tags
+
+    @tags.setter
+    def tags(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the keys of the tags associated with the stack.
+
+        Args:
+            value (Union[List[str], str]): The new keys of the tags associated with the stack.
+
+        Returns:
+            None
+        """
+
+        # Check, if the tags list exists
+        if not self.get(
+            default=None,
+            name="tags",
+        ):
+            # Initialize the tags list as an empty list
+            self._tags = []
+
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Convert the string into a list
+            value = json.loads(value)
+
+        # Extend the list with the passed value
+        self._tags.extend(value)
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the updated_at of the stack.
+
+        Returns:
+            datetime: The updated_at of the stack.
+        """
+
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the updated_at of the stack.
+
+        Args:
+            value (datetime): The new updated_at of the stack.
+
+        Returns:
+            None
+        """
+
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the stack.
+
+        Returns:
+            str: The UUID of the stack.
+        """
+
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the stack.
+
+        Args:
+            value (str): The new UUID of the stack.
+
+        Returns:
+            None
+        """
+
+        self._uuid = value
+
     def add_to_contents(
         self,
         content: Any,
@@ -408,7 +1240,10 @@ class MutableStack(MutableBaseObject):
         """
 
         # If the stack currently has no contents, create an empty list
-        if not self.contents:
+        if not self.get(
+            default=None,
+            name="contents",
+        ):
             # Initialize the contents list as an empty list
             self.contents = []
 
@@ -421,7 +1256,7 @@ class MutableStack(MutableBaseObject):
             self.contents = json.loads(self.contents)
 
         # Append the key of the given object to the stack's contents
-        self.contents.append(content.get(name="key"))
+        self.contents.append(content.key)
 
     def add_to_descendants(
         self,
@@ -435,7 +1270,10 @@ class MutableStack(MutableBaseObject):
         """
 
         # If the stack currently has no descendants, create an empty list
-        if not self.descendants:
+        if not self.get(
+            default=None,
+            name="descendants",
+        ):
             # Initialize the descendants list as an empty list
             self.descendants = []
 
@@ -448,7 +1286,7 @@ class MutableStack(MutableBaseObject):
             self.descendants = json.loads(self.descendants)
 
         # Append the key of the given object to the stack's descendants
-        self.descendants.append(descendant.get(name="key"))
+        self.descendants.append(descendant.key)
 
     def get_content_grouped_by(
         self,
@@ -594,7 +1432,10 @@ class MutableStack(MutableBaseObject):
         """
 
         # If the stack currently has no contents, return
-        if not self["contents"]:
+        if not self.get(
+            default=None,
+            name="contents",
+        ):
             # Return early
             return
 
@@ -613,7 +1454,10 @@ class MutableStack(MutableBaseObject):
         """
 
         # If the stack currently has no descendants, return
-        if not self["descendants"]:
+        if not self.get(
+            default=None,
+            name="descendants",
+        ):
             # Return early
             return
 
@@ -1270,7 +2114,60 @@ class StackManager(BaseObjectManager):
         Returns:
             None
         """
-        pass
+
+        # Call the parent class constructor
+        super().__init__()
+
+    def _run_pre_create_tasks(
+        self,
+        stack: Union[
+            ImmutableStack,
+            MutableStack,
+        ],
+    ) -> MutableStack:
+        """
+        Runs pre-create tasks for the stack.
+
+        Args:
+            stack (Union[ImmutableStack, MutableStack]): The stack to run pre-create tasks on.
+
+        Returns:
+            MutableStack: The stack with pre-create tasks run.
+        """
+
+        # Check if the stack object is immutable
+        if not stack.is_mutable():
+            # If it is, convert it to a mutable stack
+            stack = stack.to_mutable()
+
+        # Set the created_at timestamp of the stack
+        stack.created_at = Miscellaneous.get_current_datetime()
+
+        # Set the custom_field_values of the stack
+        stack.custom_field_values = stack.custom_field_values or []
+
+        # Set the due_by timestamp of the stack
+        stack.due_by = stack.due_by or Miscellaneous.get_date_increment(
+            days=stack.interval or Constants.BASE_REPETITION_INTERVAL_DAYS
+        )
+
+        # Set the key of the stack
+        stack.key = f"STACK_{self.count_stacks() + 1}"
+
+        # Set the metadata of the stack
+        stack.metadata = stack.metadata or {}
+
+        # Set the tags of the stack
+        stack.tags = stack.tags or []
+
+        # Set the updated_at timestamp of the stack
+        stack.updated_at = Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the stack
+        stack.uuid = Miscellaneous.get_uuid()
+
+        # Return the stack to the caller
+        return stack
 
     def count_stacks(self) -> int:
         """
@@ -1308,34 +2205,13 @@ class StackManager(BaseObjectManager):
             Exception: If an exception occurs while creating the stack.
         """
         try:
-            # Check if the stack object is immutable
-            if isinstance(
-                stack,
-                ImmutableStack,
-            ):
-                # If it is, convert it to a mutable stack
-                stack = stack.to_mutable()
+            # Initialize the result (optional) ImmutableStack to none
+            result: Optional[ImmutableStack] = None
 
-            # Set the created_at timestamp of the stack
-            stack.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the custom_field_values of the stack
-            stack.custom_field_values = [] or stack.custom_field_values
-
-            # Set the key of the stack
-            stack.key = f"STACK_{self.count_stacks() + 1}"
-
-            # Set the last_viewed_at timestamp of the stack
-            stack.last_viewed_at = Miscellaneous.get_current_datetime()
-
-            # Set the tags of the stack
-            stack.tags = [] or stack.tags
-
-            # Set the updated_at timestamp of the stack
-            stack.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the stack
-            stack.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            stack: MutableStack = self._run_pre_create_tasks(
+                stack=stack
+            )
 
             # Convert the stack object to a StackModel object
             model: StackModel = StackConverter.object_to_model(object=stack)
@@ -1345,35 +2221,47 @@ class StackManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the stack
-                stack.id = id
-
-                # Convert the stack to an immutable stack
-                stack = StackFactory.create_stack(
-                    **stack.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a stack ({stack.__repr__()}) in the database."
                 )
 
-                # Add the stack to the cache
-                self.add_to_cache(
-                    key=stack.key,
-                    value=stack,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable stack
-                return stack
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a stack ({stack}) in the database."
+            # Convert the stack to a dictionary
+            kwargs: Dict[str, Any] = stack.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the stack
+            kwargs["id"] = id
+
+            # Create a new ImmutableStack object
+            result = StackFactory.create_stack(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableStack from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the stack to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created immutable stack
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

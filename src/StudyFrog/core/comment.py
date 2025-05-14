@@ -4,6 +4,7 @@ Date: 2025-03-02
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 from typing import *
@@ -92,6 +93,7 @@ class ImmutableComment(ImmutableBaseObject):
             comment_text=comment_text,
             created_at=created_at,
             descendants=descendants,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -102,6 +104,150 @@ class ImmutableComment(ImmutableBaseObject):
             uuid=uuid,
             version=version,
         )
+
+    @property
+    def ancestor(self) -> int:
+        """
+        Returns the ID of the ancestor comment.
+
+        Returns:
+            int: The ID of the ancestor comment.
+        """
+
+        # Return the ancestor comment ID
+        return self._ancestor
+
+    @property
+    def comment_text(self) -> str:
+        """
+        Returns the text of the comment.
+
+        Returns:
+            str: The text of the comment.
+        """
+
+        # Return the comment text
+        return self._comment_text
+
+    @property
+    def descendants(self) -> List[str]:
+        """
+        Returns the IDs of the descendant comments.
+
+        Returns:
+            List[str]: The IDs of the descendant comments.
+        """
+
+        # Return the list of descendant comment IDs
+        return self._descendants
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the comment.
+
+        Returns:
+            str: The icon of the comment.
+        """
+
+        # Return the comment icon
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the comment.
+
+        Returns:
+            int: The ID of the comment.
+        """
+
+        # Return the comment ID
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the comment.
+
+        Returns:
+            str: The key of the comment.
+        """
+
+        # Return the comment key
+        return self._key
+
+    @property
+    def last_edited_at(self) -> datetime:
+        """
+        Returns the timestamp when the comment was last edited.
+
+        Returns:
+            datetime: The timestamp when the comment was last edited.
+        """
+
+        # Return the timestamp when the comment was last edited
+        return self._last_edited_at
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the comment.
+
+        Returns:
+            Dict[str, Any]: The metadata of the comment.
+        """
+
+        # Return the comment metadata
+        return self._metadata
+
+    @property
+    def parent(self) -> str:
+        """
+        Returns the key of the parent object.
+
+        Returns:
+            str: The key of the parent object.
+        """
+
+        # Return the parent object key
+        return self._parent
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the comment was last updated.
+
+        Returns:
+            datetime: The timestamp when the comment was last updated.
+        """
+
+        # Return the timestamp when the comment was last updated
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the comment.
+
+        Returns:
+            str: The UUID of the comment.
+        """
+
+        # Return the comment UUID
+        return self._uuid
+
+    @property
+    def version(self) -> int:
+        """
+        Returns the version of the comment.
+
+        Returns:
+            int: The version of the comment.
+        """
+
+        # Return the comment version
+        return self._version
 
     def to_mutable(self) -> Optional["MutableComment"]:
         """
@@ -121,6 +267,9 @@ class ImmutableComment(ImmutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'to_mutable' method from {self.__class__.__name__}: {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -190,6 +339,7 @@ class MutableComment(MutableBaseObject):
             comment_text=comment_text,
             created_at=created_at,
             descendants=descendants,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -200,6 +350,390 @@ class MutableComment(MutableBaseObject):
             uuid=uuid,
             version=version,
         )
+
+    @property
+    def ancestor(self) -> int:
+        """
+        Returns the ID of the ancestor comment.
+
+        Returns:
+            int: The ID of the ancestor comment.
+        """
+
+        # Return the ancestor comment ID
+        return self._ancestor
+
+    @ancestor.setter
+    def ancestor(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the ancestor comment.
+
+        Args:
+            value (int): The ID of the ancestor comment.
+
+        Returns:
+            None
+        """
+
+        # Set the ancestor comment ID
+        self._ancestor = value
+
+    @property
+    def comment_text(self) -> str:
+        """
+        Returns the text of the comment.
+
+        Returns:
+            str: The text of the comment.
+        """
+
+        # Return the comment text
+        return self._comment_text
+
+    @comment_text.setter
+    def comment_text(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the text of the comment.
+
+        Args:
+            value (str): The text of the comment.
+
+        Returns:
+            None
+        """
+
+        # Set the comment text
+        self._comment_text = value
+
+    @property
+    def descendants(self) -> List[str]:
+        """
+        Returns the IDs of the descendant comments.
+
+        Returns:
+            List[str]: The IDs of the descendant comments.
+        """
+
+        # Return the list of descendant comment IDs
+        return self._descendants
+
+    @descendants.setter
+    def descendants(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the IDs of the descendant comments.
+
+        Args:
+            value (Union[List[str], str]): The IDs of the descendant comments.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'descendants' list exists
+        if not self.get(
+            default=None,
+            name="descendants",
+        ):
+            # Initialize the 'descendants' list
+            self._descendants = []
+
+        # Check, if the value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the string to the 'descendants' list
+            self._descendants.append(value)
+        else:
+            # Extend the 'descendants' list with the list of strings
+            self._descendants.extend(value)
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the comment.
+
+        Returns:
+            str: The icon of the comment.
+        """
+
+        # Return the comment icon
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the comment.
+
+        Args:
+            value (str): The icon of the comment.
+
+        Returns:
+            None
+        """
+
+        # Set the comment icon
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the comment.
+
+        Returns:
+            int: The ID of the comment.
+        """
+
+        # Return the comment ID
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the comment.
+
+        Args:
+            value (int): The ID of the comment.
+
+        Returns:
+            None
+        """
+
+        # Set the comment ID
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the comment.
+
+        Returns:
+            str: The key of the comment.
+        """
+
+        # Return the comment key
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the comment.
+
+        Args:
+            value (str): The key of the comment.
+
+        Returns:
+            None
+        """
+
+        # Set the comment key
+        self._key = value
+
+    @property
+    def last_edited_at(self) -> datetime:
+        """
+        Returns the timestamp when the comment was last edited.
+
+        Returns:
+            datetime: The timestamp when the comment was last edited.
+        """
+
+        # Return the timestamp when the comment was last edited
+        return self._last_edited_at
+
+    @last_edited_at.setter
+    def last_edited_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the comment was last edited.
+
+        Args:
+            value (datetime): The timestamp when the comment was last edited.
+
+        Returns:
+            None
+        """
+
+        # Set the timestamp when the comment was last edited
+        self._last_edited_at = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the comment.
+
+        Returns:
+            Dict[str, Any]: The metadata of the comment.
+        """
+
+        # Return the comment metadata
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the comment.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the comment.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'metadata' dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Initialize the 'metadata' dictionary
+            self._metadata = {}
+
+        # Update the comment metadata
+        self._metadata.update(**kwargs)
+
+    @property
+    def parent(self) -> str:
+        """
+        Returns the key of the parent object.
+
+        Returns:
+            str: The key of the parent object.
+        """
+
+        # Return the parent object key
+        return self._parent
+
+    @parent.setter
+    def parent(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the parent object.
+
+        Args:
+            value (str): The key of the parent object.
+
+        Returns:
+            None
+        """
+
+        # Set the parent object key
+        self._parent = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the comment was last updated.
+
+        Returns:
+            datetime: The timestamp when the comment was last updated.
+        """
+
+        # Return the timestamp when the comment was last updated
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the comment was last updated.
+
+        Args:
+            value (datetime): The timestamp when the comment was last updated.
+
+        Returns:
+            None
+        """
+
+        # Set the timestamp when the comment was last updated
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the comment.
+
+        Returns:
+            str: The UUID of the comment.
+        """
+
+        # Return the comment UUID
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the comment.
+
+        Args:
+            value (str): The UUID of the comment.
+
+        Returns:
+            None
+        """
+
+        # Set the comment UUID
+        self._uuid = value
+
+    @property
+    def version(self) -> int:
+        """
+        Returns the version of the comment.
+
+        Returns:
+            int: The version of the comment.
+        """
+
+        # Return the comment version
+        return self._version
+
+    @version.setter
+    def version(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the version of the comment.
+
+        Args:
+            value (int): The version of the comment.
+
+        Returns:
+            None
+        """
+
+        # Set the comment version
+        self._version = value
 
     def to_immutable(self) -> Optional[ImmutableComment]:
         """
@@ -219,6 +753,9 @@ class MutableComment(MutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'to_immutable' method from {self.__class__.__name__}: {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -270,6 +807,9 @@ class CommentConverter:
                 message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -305,11 +845,23 @@ class CommentConverter:
                 message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
 
 class CommentFactory:
+    """
+    A factory class for creating CommentModel instances.
+
+    This class extends the BaseObjectFactory class and provides a method to create CommentModel instances.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the CommentFactory class.
+    """
+
     logger: Final[Logger] = Logger.get_logger(name="CommentFactory")
 
     @classmethod
@@ -373,15 +925,239 @@ class CommentFactory:
                 message=f"Caught an exception while attempting to run 'create_comment' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
 
 class ComentBuilder(BaseObjectBuilder):
-    """
-    """
+    """ """
 
-    pass
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the ComentBuilder class.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableComment,
+            MutableComment,
+        ]
+    ]:
+        """
+        Builds a new instance of the ImmutableComment class.
+
+        Args:
+            as_mutable (bool): A flag indicating whether to return the comment as a MutableComment instance.
+
+        Returns:
+            Optional[Union[ImmutableComment, MutableComment]]: The built ImmutableComment instance if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to build the ImmutableComment instance.
+        """
+        try:
+            # Attempt to create a new ImmutableComment instance
+            comment: Optional[ImmutableComment] = CommentFactory.create_comment(
+                **self.configuration
+            )
+
+            # Check, if the comment exists
+            if not comment:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create a new comment from '{self.configuration}'"
+                )
+
+                # Return early
+                return
+
+            # Check, if the 'as_mutable' attribute is True
+            if as_mutable:
+                # Return the comment as a MutableComment instance
+                return comment.to_mutable()
+
+            # Return the comment as an ImmutableComment instance
+            return comment
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def ancestor(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the 'ancestor' attribute of the builder.
+
+        Args:
+            value (int): The value to set for the 'ancestor' attribute.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the 'ancestor' attribute
+        self.configuration["ancestor"] = value
+
+        # Return the builder instance
+        return self
+
+    def comment_text(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the 'comment_text' attribute of the builder.
+
+        Args:
+            value (str): The value to set for the 'comment_text' attribute.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the 'comment_text' attribute
+        self.configuration["comment_text"] = value
+
+        # Return the builder instance
+        return self
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the 'created_at' attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the 'created_at' attribute.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the 'created_at' attribute
+        self.configuration["created_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def descendants(
+        self,
+        value: Union[List[str], str],
+    ) -> Self:
+        """
+        Sets the 'descendants' attribute of the builder.
+
+        Args:
+            value (Union[List[str], str]): The value to set for the 'descendants' attribute.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'descendants' key exists in the configuration dictionary
+        if "descendants" not in self.configuration:
+            # Set the 'descendants' key to an empty list
+            self.configuration["descendants"] = []
+
+        # Check, if the value is a list
+        if isinstance(
+            value,
+            list,
+        ):
+            # Extend the 'descendants' list with the new values
+            self.configuration["descendants"].extend(value)
+        else:
+            # Append the new value to the 'descendants' list
+            self.configuration["descendants"].append(value)
+
+        # Return the builder instance
+        return self
+
+    def parent(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the 'parent' attribute of the builder.
+
+        Args:
+            value (str): The value to set for the 'parent' attribute.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the 'parent' attribute
+        self.configuration["parent"] = value
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the 'updated_at' attribute of the builder.
+
+        Args:
+            value (datetime): The value to set for the 'updated_at' attribute.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the 'updated_at' attribute
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def version(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the 'version' attribute of the builder.
+
+        Args:
+            value (int): The value to set for the 'version' attribute.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the 'version' attribute
+        self.configuration["version"] = value
+
+        # Return the builder instance
+        return self
 
 
 class CommentManager(BaseObjectManager):
@@ -431,6 +1207,40 @@ class CommentManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(self, comment: Union[ImmutableComment, MutableComment,],) -> MutableComment:
+        """
+        Runs pre-create tasks for the comment.
+
+        Args:
+            comment (Union[ImmutableComment, MutableComment]): The comment to run pre-create tasks for.
+
+        Returns:
+            MutableComment: The comment with pre-create tasks run.
+        """
+
+        # Check, if the comment is not mutable
+        if not comment.is_mutable():
+            # Convert the comment to a MutableComment
+            comment: MutableComment = comment.to_mutable()
+
+        # Set the created_at timestamp of the comment
+        comment.created_at = comment.created_at or Miscellaneous.get_current_datetime()
+
+        # Set the custom_field_values of the comment
+        comment.custom_field_values = [] or comment.custom_field_values
+
+        # Set the key of the comment
+        comment.key = f"COMMENT_{self.count_comments() + 1}"
+
+        # Set the updated_at timestamp of the comment
+        comment.updated_at = comment.updated_at or Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the comment
+        comment.uuid = Miscellaneous.get_uuid()
+
+        # Return the comment
+        return comment
+
     def count_comments(self) -> int:
         """
         Returns the number of comments in the database.
@@ -467,28 +1277,13 @@ class CommentManager(BaseObjectManager):
             Exception: If an exception occurs while creating the comment.
         """
         try:
-            # Check if the comment object is immutable
-            if isinstance(
-                comment,
-                ImmutableComment,
-            ):
-                # If it is, convert it to a mutable comment
-                comment = comment.to_mutable()
+            # Initialize the result (optional) ImmutableComment to none
+            result: Optional[ImmutableComment] = None
 
-            # Set the created_at timestamp of the comment
-            comment.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the custom_field_values of the comment
-            comment.custom_field_values = [] or comment.custom_field_values
-
-            # Set the key of the comment
-            comment.key = f"COMMENT_{self.count_comments() + 1}"
-
-            # Set the updated_at timestamp of the comment
-            comment.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the comment
-            comment.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            comment: MutableComment = self._run_pre_create_tasks(
+                comment=comment
+            )
 
             # Convert the comment object to a CommentModel object
             model: CommentModel = CommentConverter.object_to_model(object=comment)
@@ -498,35 +1293,47 @@ class CommentManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the comment
-                comment.id = id
-
-                # Convert the comment to an immutable comment
-                comment = CommentFactory.create_comment(
-                    **comment.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a comment ({comment.__repr__()}) in the database."
                 )
 
-                # Add the comment to the cache
-                self.add_to_cache(
-                    key=comment.key,
-                    value=comment,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable comment
-                return comment
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a comment ({comment}) in the database."
+            # Convert the comment to a dictionary
+            kwargs: Dict[str, Any] = comment.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the comment
+            kwargs["id"] = id
+
+            # Create a new ImmutableComment object
+            result = CommentFactory.create_comment(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableComment from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the comment to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableComment instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -837,7 +1644,9 @@ class CommentManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableComment]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableComment]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:

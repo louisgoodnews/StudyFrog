@@ -100,6 +100,7 @@ class ImmutableTeacher(ImmutableBaseObject):
             custom_field_values=custom_field_values,
             description=description,
             difficulty=difficulty,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -111,6 +112,174 @@ class ImmutableTeacher(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the creation date and time of the teacher.
+
+        Returns:
+            datetime: The creation date and time of the teacher.
+        """
+
+        # Return the creation date and time of the teacher
+        return self._created_at
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Returns the custom field values of the teacher.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the teacher.
+        """
+
+        # Return the custom field values of the teacher
+        return self._custom_field_values
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description of the teacher.
+
+        Returns:
+            str: The description of the teacher.
+        """
+
+        # Return the description of the teacher
+        return self._description
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Returns the difficulty of the teacher.
+
+        Returns:
+            int: The difficulty of the teacher.
+        """
+
+        # Return the difficulty of the teacher
+        return self._difficulty
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the teacher.
+
+        Returns:
+            str: The icon of the teacher.
+        """
+
+        # Return the icon of the teacher
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the teacher.
+
+        Returns:
+            int: The ID of the teacher.
+        """
+
+        # Return the ID of the teacher
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the teacher.
+
+        Returns:
+            str: The key of the teacher.
+        """
+
+        # Return the key of the teacher
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the teacher.
+
+        Returns:
+            Dict[str, Any]: The metadata of the teacher.
+        """
+
+        # Return the metadata of the teacher
+        return self._metadata
+
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the teacher.
+
+        Returns:
+            str: The name of the teacher.
+        """
+
+        # Return the name of the teacher
+        return self._name
+
+    @property
+    def priority(self) -> int:
+        """
+        Returns the priority of the teacher.
+
+        Returns:
+            int: The priority of the teacher.
+        """
+
+        # Return the priority of the teacher
+        return self._priority
+
+    @property
+    def subjects(self) -> List[str]:
+        """
+        Returns the subjects of the teacher.
+
+        Returns:
+            List[str]: The subjects of the teacher.
+        """
+
+        # Return the subjects of the teacher
+        return self._subjects
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Returns the tags of the teacher.
+
+        Returns:
+            List[str]: The tags of the teacher.
+        """
+
+        # Return the tags of the teacher
+        return self._tags
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the last update date and time of the teacher.
+
+        Returns:
+            datetime: The last update date and time of the teacher.
+        """
+
+        # Return the last update date and time of the teacher
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the unique identifier of the teacher.
+
+        Returns:
+            str: The unique identifier of the teacher.
+        """
+
+        # Return the unique identifier of the teacher
+        return self._uuid
 
     def has_subject(
         self,
@@ -267,6 +436,7 @@ class MutableTeacher(MutableBaseObject):
             custom_field_values=custom_field_values,
             description=description,
             difficulty=difficulty,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -278,6 +448,507 @@ class MutableTeacher(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the creation date and time of the teacher.
+
+        Returns:
+            datetime: The creation date and time of the teacher.
+        """
+
+        # Return the creation date and time of the teacher
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the creation date and time of the teacher.
+
+        Args:
+            value (datetime): The creation date and time of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the creation date and time of the teacher
+        self._created_at = value
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Returns the custom field values of the teacher.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the teacher.
+        """
+
+        # Return the custom field values of the teacher
+        return self._custom_field_values
+
+    @custom_field_values.setter
+    def custom_field_values(
+        self,
+        value: Union[
+            Dict[str, Any],
+            List[Dict[str, Any]],
+        ],
+    ) -> None:
+        """
+        Sets the custom field values of the teacher.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The custom field values of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'custom_field_values' list exists
+        if not self.get(
+            default=None,
+            name="custom_field_values",
+        ):
+            # Initialize the 'custom_field_values' list
+            self._custom_field_values = []
+
+        # Check, if the value is a list
+        if isinstance(
+            value,
+            list,
+        ):
+            # Extend the custom field values list with the value
+            self._custom_field_values.extend(value)
+
+        # Check, if the value (assuming a dictionary) is already in the list
+        if value not in self._custom_field_values:
+            # Append the value to the custom field values list
+            self._custom_field_values.append(value)
+
+        else:
+            # Replace the value in the custom field values list
+            self._custom_field_values[self._custom_field_values.index(value)] = value
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description of the teacher.
+
+        Returns:
+            str: The description of the teacher.
+        """
+
+        # Return the description of the teacher
+        return self._description
+
+    @description.setter
+    def description(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the description of the teacher.
+
+        Args:
+            value (str): The description of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the description of the teacher
+        self._description = value
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Returns the difficulty of the teacher.
+
+        Returns:
+            int: The difficulty of the teacher.
+        """
+
+        # Return the difficulty of the teacher
+        return self._difficulty
+
+    @difficulty.setter
+    def difficulty(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the difficulty of the teacher.
+
+        Args:
+            value (int): The difficulty of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the difficulty of the teacher
+        self._difficulty = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the teacher.
+
+        Returns:
+            str: The icon of the teacher.
+        """
+
+        # Return the icon of the teacher
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the teacher.
+
+        Args:
+            value (str): The icon of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the icon of the teacher
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the teacher.
+
+        Returns:
+            int: The ID of the teacher.
+        """
+
+        # Return the ID of the teacher
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the teacher.
+
+        Args:
+            value (int): The ID of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the ID of the teacher
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the teacher.
+
+        Returns:
+            str: The key of the teacher.
+        """
+
+        # Return the key of the teacher
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the teacher.
+
+        Args:
+            value (str): The key of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the key of the teacher
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the teacher.
+
+        Returns:
+            Dict[str, Any]: The metadata of the teacher.
+        """
+
+        # Return the metadata of the teacher
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the teacher.
+
+        Args:
+            **kwargs (Dict[str, Any]): The metadata of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'metadata' dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Initialize the 'metadata' dictionary
+            self._metadata = {}
+
+        # Set the metadata of the teacher
+        self._metadata.update(kwargs)
+
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the teacher.
+
+        Returns:
+            str: The name of the teacher.
+        """
+
+        # Return the name of the teacher
+        return self._name
+
+    @name.setter
+    def name(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the name of the teacher.
+
+        Args:
+            value (str): The name of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the name of the teacher
+        self._name = value
+
+    @property
+    def priority(self) -> int:
+        """
+        Returns the priority of the teacher.
+
+        Returns:
+            int: The priority of the teacher.
+        """
+
+        # Return the priority of the teacher
+        return self._priority
+
+    @priority.setter
+    def priority(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the priority of the teacher.
+
+        Args:
+            value (int): The priority of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the priority of the teacher
+        self._priority = value
+
+    @property
+    def subjects(self) -> List[str]:
+        """
+        Returns the subjects of the teacher.
+
+        Returns:
+            List[str]: The subjects of the teacher.
+        """
+
+        # Return the subjects of the teacher
+        return self._subjects
+
+    @subjects.setter
+    def subjects(
+        self,
+        value: Union[
+            List[str],
+            str,
+        ],
+    ) -> None:
+        """
+        Sets the subjects of the teacher.
+
+        Args:
+            value (Union[List[str], str]): The subjects of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'subjects' list exists
+        if not self.get(
+            default=None,
+            name="subjects",
+        ):
+            # Initialize the 'subjects' list
+            self._subjects = []
+
+        # Check, if the value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the value to the subjects list
+            self._subjects.append(value)
+
+        # Check, if the value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the subjects list with the value
+            self._subjects.extend(value)
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Returns the tags of the teacher.
+
+        Returns:
+            List[str]: The tags of the teacher.
+        """
+
+        # Return the tags of the teacher
+        return self._tags
+
+    @tags.setter
+    def tags(
+        self,
+        value: Union[
+            List[str],
+            str,
+        ],
+    ) -> None:
+        """
+        Sets the tags of the teacher.
+
+        Args:
+            value (Union[List[str], str]): The tags of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'tags' list exists
+        if not self.get(
+            default=None,
+            name="tags",
+        ):
+            # Initialize the 'tags' list
+            self._tags = []
+
+        # Check, if the value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the value to the tags list
+            self._tags.append(value)
+
+        # Check, if the value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the tags list with the value
+            self._tags.extend(value)
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the last update date and time of the teacher.
+
+        Returns:
+            datetime: The last update date and time of the teacher.
+        """
+
+        # Return the last update date and time of the teacher
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the last update date and time of the teacher.
+
+        Args:
+            value (datetime): The last update date and time of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the last update date and time of the teacher
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the unique identifier of the teacher.
+
+        Returns:
+            str: The unique identifier of the teacher.
+        """
+
+        # Return the unique identifier of the teacher
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the unique identifier of the teacher.
+
+        Args:
+            value (str): The unique identifier of the teacher.
+
+        Returns:
+            None
+        """
+
+        # Set the unique identifier of the teacher
+        self._uuid = value
 
     def add_subject(
         self,
@@ -522,6 +1193,9 @@ class TeacherConverter:
                 message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -556,6 +1230,9 @@ class TeacherConverter:
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
             )
+
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -674,22 +1351,53 @@ class TeacherBuilder(BaseObjectBuilder):
         super().__init__()
 
     @override
-    def build(self) -> Optional[ImmutableTeacher]:
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableTeacher,
+            MutableTeacher,
+        ]
+    ]:
         """
         Builds and returns an instance of the ImmutableTeacher class using the configuration dictionary.
 
         This method attempts to create an instance of the ImmutableTeacher class using the configuration dictionary passed to the constructor.
         If an exception occurs while creating the instance, this method will log an error message and return None.
 
+        Args:
+            as_mutable (bool, optional): A flag indicating whether to return the teacher as a mutable instance. Defaults to False.
+
         Returns:
-            Optional[ImmutableTeacher]: The created teacher object if no exception occurs. Otherwise, None.
+            Optional[Union[ImmutableTeacher, MutableTeacher]]: The created teacher object if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while attempting to run 'build' method from '{self.__class__.__name__}'
         """
         try:
             # Attempt to create and return a new ImmutableTeacher instance
-            return TeacherFactory.create_teacher(**self.configuration)
+            teacher: Optional[ImmutableTeacher] = TeacherFactory.create_teacher(
+                **self.configuration
+            )
+
+            # Check, if the teacher exists
+            if not teacher:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create teacher from configuration: {self.configuration}"
+                )
+
+                # Return early
+                return
+
+            # Check, if the 'as_mutable' flag is set
+            if as_mutable:
+                # Return the teacher as a mutable instance
+                return teacher.to_mutable()
+
+            # Return the teacher as an immutable instance
+            return teacher
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -929,6 +1637,43 @@ class TeacherManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        teacher: Union[
+            ImmutableTeacher,
+            MutableTeacher,
+        ],
+    ) -> MutableTeacher:
+        """
+        Runs pre-create tasks for the teacher.
+
+        Args:
+            teacher (Union[ImmutableTeacher, MutableTeacher]): The teacher to run pre-create tasks for.
+
+        Returns:
+            MutableTeacher: The teacher with pre-create tasks run.
+        """
+
+        # Check, if the teacher is not mutable
+        if not teacher.is_mutable():
+            # Convert the teacher to mutable
+            teacher: MutableTeacher = teacher.to_mutable()
+
+        # Set the created_at timestamp of the teacher
+        teacher.created_at = teacher.created_at or Miscellaneous.get_current_datetime()
+
+        # Set the key of the teacher
+        teacher.key = f"TEACHER_{self.count_teachers() + 1}"
+
+        # Set the updated_at timestamp of the teacher
+        teacher.updated_at = teacher.updated_at or Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the teacher
+        teacher.uuid = Miscellaneous.get_uuid()
+
+        # Return the teacher
+        return teacher
+
     def count_teachers(self) -> int:
         """
         Returns the number of teachers in the database.
@@ -965,31 +1710,13 @@ class TeacherManager(BaseObjectManager):
             Exception: If an exception occurs while creating the teacher.
         """
         try:
-            # Check if the teacher object is immutable
-            if isinstance(
-                teacher,
-                ImmutableTeacher,
-            ):
-                # If it is, convert it to a mutable teacher
-                teacher = MutableTeacher(
-                    **teacher.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
-                )
+            # Initialize the result (optional) ImmutableTeacher to none
+            result: Optional[ImmutableTeacher] = None
 
-            # Set the created_at timestamp of the teacher
-            teacher.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the key of the teacher
-            teacher.key = f"TEACHER_{self.count_teachers() + 1}"
-
-            # Set the updated_at timestamp of the teacher
-            teacher.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the teacher
-            teacher.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            teacher: MutableTeacher = self._run_pre_create_tasks(
+                teacher=teacher
+            )
 
             # Convert the teacher object to a TeacherModel object
             model: TeacherModel = TeacherConverter.object_to_model(object=teacher)
@@ -999,35 +1726,47 @@ class TeacherManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the teacher
-                teacher.id = id
-
-                # Convert the teacher to an immutable teacher
-                teacher = ImmutableTeacher(
-                    **teacher.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a teacher ({teacher.__repr__()}) in the database."
                 )
 
-                # Add the teacher to the cache
-                self.add_to_cache(
-                    key=teacher.key,
-                    value=teacher,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable teacher
-                return teacher
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a difficulty ({teacher}) in the database."
+            # Convert the teacher to a dictionary
+            kwargs: Dict[str, Any] = teacher.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the teacher
+            kwargs["id"] = id
+
+            # Create a new ImmutableTeacher object
+            result = TeacherFactory.create_teacher(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableTeacher from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the teacher to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableTeacher instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

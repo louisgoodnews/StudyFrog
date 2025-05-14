@@ -4,6 +4,7 @@ Date: 2025-02-09
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 from typing import *
@@ -73,6 +74,7 @@ class ImmutableUser(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -82,6 +84,102 @@ class ImmutableUser(ImmutableBaseObject):
             uuid=uuid,
         )
 
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the created_at timestamp of the user.
+
+        Returns:
+            datetime: The created_at timestamp of the user.
+        """
+
+        # Return the created_at timestamp of the user
+        return self._created_at
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the user.
+
+        Returns:
+            str: The icon of the user.
+        """
+
+        # Return the icon of the user
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the user.
+
+        Returns:
+            int: The ID of the user.
+        """
+
+        # Return the ID of the user
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the user.
+
+        Returns:
+            str: The key of the user.
+        """
+
+        # Return the key of the user
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the user.
+
+        Returns:
+            Dict[str, Any]: The metadata of the user.
+        """
+
+        # Return the metadata of the user
+        return self._metadata
+
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the user.
+
+        Returns:
+            str: The name of the user.
+        """
+
+        # Return the name of the user
+        return self._name
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the updated_at timestamp of the user.
+
+        Returns:
+            datetime: The updated_at timestamp of the user.
+        """
+
+        # Return the updated_at timestamp of the user
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the user.
+
+        Returns:
+            str: The UUID of the user.
+        """
+
+        # Return the UUID of the user
+        return self._uuid
+
     def to_mutable(self) -> "MutableUser":
         """
         Converts the immutable user to a mutable user.
@@ -89,13 +187,25 @@ class ImmutableUser(ImmutableBaseObject):
         Returns:
             MutableUser: The mutable user.
         """
-        return MutableUser(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            return MutableUser(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class MutableUser(MutableBaseObject):
@@ -143,6 +253,7 @@ class MutableUser(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -152,6 +263,254 @@ class MutableUser(MutableBaseObject):
             uuid=uuid,
         )
 
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the created_at timestamp of the user.
+
+        Returns:
+            datetime: The created_at timestamp of the user.
+        """
+
+        # Return the created_at timestamp of the user
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the created_at timestamp of the user.
+
+        Args:
+            value (datetime): The created_at timestamp of the user.
+
+        Returns:
+            None
+        """
+
+        # Set the created_at timestamp of the user
+        self._created_at = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the user.
+
+        Returns:
+            str: The icon of the user.
+        """
+
+        # Return the icon of the user
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the user.
+
+        Args:
+            value (str): The icon of the user.
+
+        Returns:
+            None
+        """
+
+        # Set the icon of the user
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the user.
+
+        Returns:
+            int: The ID of the user.
+        """
+
+        # Return the ID of the user
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the user.
+
+        Args:
+            value (int): The ID of the user.
+
+        Returns:
+            None
+        """
+
+        # Set the ID of the user
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the user.
+
+        Returns:
+            str: The key of the user.
+        """
+
+        # Return the key of the user
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the user.
+
+        Args:
+            value (str): The key of the user.
+
+        Returns:
+            None
+        """
+
+        # Set the key of the user
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the user.
+
+        Returns:
+            Dict[str, Any]: The metadata of the user.
+        """
+
+        # Return the metadata of the user
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the user.
+
+        Args:
+            metadata (Dict[str, Any]): The metadata of the user.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'metadata' dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Initialize the 'metadata' dictionary
+            self._metadata = {}
+
+        # Update the metadata of the user
+        self._metadata.update(**kwargs)
+
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the user.
+
+        Returns:
+            str: The name of the user.
+        """
+
+        # Return the name of the user
+        return self._name
+
+    @name.setter
+    def name(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the name of the user.
+
+        Args:
+            value (str): The name of the user.
+
+        Returns:
+            None
+        """
+
+        # Set the name of the user
+        self._name = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the updated_at timestamp of the user.
+
+        Returns:
+            datetime: The updated_at timestamp of the user.
+        """
+
+        # Return the updated_at timestamp of the user
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the updated_at timestamp of the user.
+
+        Args:
+            value (datetime): The updated_at timestamp of the user.
+
+        Returns:
+            None
+        """
+
+        # Set the updated_at timestamp of the user
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the user.
+
+        Returns:
+            str: The UUID of the user.
+        """
+
+        # Return the UUID of the user
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the user.
+
+        Args:
+            value (str): The UUID of the user.
+
+        Returns:
+            None
+        """
+
+        # Set the UUID of the user
+        self._uuid = value
+
     def to_immutable(self) -> ImmutableUser:
         """
         Converts the mutable user to an immutable user.
@@ -159,13 +518,27 @@ class MutableUser(MutableBaseObject):
         Returns:
             ImmutableUser: The immutable user.
         """
-        return ImmutableUser(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            return ImmutableUser(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log a warning message indicating an error has occurred
+            self.logger.warning(
+                message=f"It seems that an error has occured while attempting to convert a mutable user ({self}) to an immutable user."
+            )
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class UserConverter:
@@ -214,6 +587,9 @@ class UserConverter:
                 message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -248,6 +624,9 @@ class UserConverter:
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -312,6 +691,9 @@ class UserFactory:
                 message=f"Caught an exception while attempting to run 'create_user' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -366,6 +748,43 @@ class UserManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        user: Union[
+            ImmutableUser,
+            MutableUser,
+        ],
+    ) -> MutableUser:
+        """
+        Runs pre-create tasks for the user.
+
+        Args:
+            user (Union[ImmutableUser, MutableUser]): The user to be created.
+
+        Returns:
+            MutableUser: The mutable user after running pre-create tasks.
+        """
+
+        # Check, if the user is not mutable
+        if not user.is_mutable():
+            # Convert the user to a mutable user
+            user: MutableUser = user.to_mutable()
+
+        # Set the created_at timestamp of the user
+        user.created_at = user.created_at or Miscellaneous.get_current_datetime()
+
+        # Set the key of the user
+        user.key = f"USER_{self.count_users() + 1}"
+
+        # Set the updated_at timestamp of the user
+        user.updated_at = user.updated_at or Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the user
+        user.uuid = Miscellaneous.get_uuid()
+
+        # Return the mutable user
+        return user
+
     def count_users(self) -> int:
         """
         Returns the number of users in the database.
@@ -402,31 +821,13 @@ class UserManager(BaseObjectManager):
             Exception: If an exception occurs while creating the user.
         """
         try:
-            # Check if the user object is immutable
-            if isinstance(
-                user,
-                ImmutableUser,
-            ):
-                # If it is, convert it to a mutable user
-                user = MutableUser(
-                    **user.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
-                )
+            # Initialize the result (optional) ImmutableUser to none
+            result: Optional[ImmutableUser] = None
 
-            # Set the created_at timestamp of the user
-            user.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the key of the user
-            user.key = f"USER_{self.count_users() + 1}"
-
-            # Set the updated_at timestamp of the user
-            user.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the user
-            user.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            user: MutableUser = self._run_pre_create_tasks(
+                user=user
+            )
 
             # Convert the user object to a UserModel object
             model: UserModel = UserConverter.object_to_model(object=user)
@@ -436,35 +837,47 @@ class UserManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the user
-                user.id = id
-
-                # Convert the user to an immutable user
-                user = ImmutableUser(
-                    **user.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a user ({user.__repr__()}) in the database."
                 )
 
-                # Add the user to the cache
-                self.add_to_cache(
-                    key=user.key,
-                    value=user,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable user
-                return user
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a user ({user}) in the database."
+            # Convert the user to a dictionary
+            kwargs: Dict[str, Any] = user.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the user
+            kwargs["id"] = id
+
+            # Create a new ImmutableUser object
+            result = UserFactory.create_user(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableUser from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the user to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableUser instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

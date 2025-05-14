@@ -96,6 +96,7 @@ class ImmutableSubject(ImmutableBaseObject):
             custom_field_values=custom_field_values,
             description=description,
             difficulty=difficulty,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -106,6 +107,149 @@ class ImmutableSubject(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the creation date and time of the subject.
+
+        Returns:
+            datetime: The creation date and time of the subject
+        """
+
+        return self._created_at
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Gets the custom field values of the subject.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the subject
+        """
+
+        return self._custom_field_values
+
+    @property
+    def description(self) -> str:
+        """
+        Gets the description of the subject.
+
+        Returns:
+            str: The description of the subject
+        """
+
+        return self._description
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Gets the difficulty level of the subject.
+
+        Returns:
+            int: The difficulty level of the subject.
+        """
+
+        return self._difficulty
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the subject.
+
+        Returns:
+            str: The icon of the subject
+        """
+
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the subject.
+
+        Returns:
+            int: The ID of the subject
+        """
+
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the subject.
+
+        Returns:
+            str: The key of the subject
+        """
+
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the subject.
+
+        Returns:
+            Dict[str, Any]: The metadata of the subject
+        """
+
+        return self._metadata
+
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the subject.
+
+        Returns:
+            str: The name of the subject
+        """
+
+        return self._name
+
+    @property
+    def priority(self) -> int:
+        """
+        Gets the priority of the subject.
+
+        Returns:
+            int: The priority of the subject
+        """
+
+        return self._priority
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Gets the tags of the subject.
+
+        Returns:
+            List[str]: The tags of the subject
+        """
+
+        return self._tags
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the subject was last updated.
+
+        Returns:
+            datetime: The timestamp when the subject was last updated.
+        """
+
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the subject.
+
+        Returns:
+            str: The UUID of the subject
+        """
+
+        return self._uuid
 
     def to_mutable(self) -> "MutableSubject":
         """
@@ -203,12 +347,14 @@ class MutableSubject(MutableBaseObject):
         Returns:
             None
         """
+
         # Call the parent class constructor with the passed arguments
         super().__init__(
             created_at=created_at,
             custom_field_values=custom_field_values,
             description=description,
             difficulty=difficulty,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -219,6 +365,367 @@ class MutableSubject(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the creation date and time of the subject.
+
+        Returns:
+            datetime: The creation date and time of the subject
+        """
+
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the creation date and time of the subject.
+
+        Args:
+            value (datetime): The new creation date and time of the subject.
+
+        Returns:
+            None
+        """
+
+        self._created_at = value
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Gets the custom field values of the subject.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the subject
+        """
+
+        return self._custom_field_values
+
+    @custom_field_values.setter
+    def custom_field_values(
+        self,
+        value: Union[
+            Dict[str, Any],
+            List[Dict[str, Any]],
+        ],
+    ) -> None:
+        """
+        Sets the custom field values of the subject.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The new custom field values of the scubject.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'custom_field_values' attribute exists
+        if not self._custom_field_values:
+            # Initialize the 'custom_field_values' attribute as an empty list
+            self._custom_field_values = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the passed value to the 'custom_field_values' list attribute
+            self._custom_field_values.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Update the 'custom_field_values' attribute list with the passed value list
+            self._custom_field_values = value
+
+    @property
+    def description(self) -> str:
+        """
+        Gets the description of the subject.
+
+        Returns:
+            str: The description of the subject
+        """
+
+        return self._description
+
+    @description.setter
+    def description(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the description of the subject.
+
+        Args:
+            value (str): The description of the subject.
+
+        Returns:
+            None
+        """
+
+        self._description = value
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Gets the difficulty level of the subject.
+
+        Returns:
+            int: The difficulty level of the subject.
+        """
+
+        return self._difficulty
+
+    @difficulty.setter
+    def difficulty(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the difficulty level of the subject.
+
+        Args:
+            value (int): The new difficulty level to be set.
+
+        Returns:
+            None
+        """
+
+        self._difficulty = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the subject.
+
+        Returns:
+            str: The icon of the subject
+        """
+
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the subject.
+
+        Returns:
+            int: The ID of the subject
+        """
+
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the subject.
+
+        Returns:
+            str: The key of the subject
+        """
+
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the subject.
+
+        Returns:
+            Dict[str, Any]: The metadata of the subject
+        """
+
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the subject.
+
+        Args:
+            **kwargs: The keyword arguments representing the metadata key-value pairs.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'metadata' attribute exists
+        if not self._metadata:
+            # Initialize the 'metadata' attribute as an empty dictionary
+            self._metadata = {}
+
+        # Update the 'metadata' attribute with the passed keyword arguments
+        self._metadata.update(**kwargs)
+
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the subject.
+
+        Returns:
+            str: The name of the subject
+        """
+
+        return self._name
+
+    @name.setter
+    def name(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the name of the subject.
+
+        Args:
+            value (str): The new name of the subject.
+
+        Returns:
+            None
+        """
+
+        self._name = value
+
+    @property
+    def priority(self) -> int:
+        """
+        Gets the priority of the subject.
+
+        Returns:
+            int: The priority of the subject
+        """
+
+        return self._priority
+
+    @priority.setter
+    def priority(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the priority of the subject.
+
+        Args:
+            value (int): The new priority of the subject.
+
+        Returns:
+            None
+        """
+
+        self._priority = value
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Gets the tags of the subject.
+
+        Returns:
+            List[str]: The tags of the subject
+        """
+
+        return self._tags
+
+    @tags.setter
+    def tags(
+        self,
+        value: Union[
+            List[str],
+            str,
+        ],
+    ) -> None:
+        """
+        Sets the tags of the subject.
+
+        Args:
+            value (Union[List[str], str]): The tags of the subject.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'tags' attribute exists
+        if not self._tags:
+            # Initialize the 'tags' attribute as an empty list
+            self._tags = []
+
+        # Check, if the passed value is a list
+        if isinstance(
+            value,
+            list,
+        ):
+            # Update the 'tags' attribute list with the passed value list
+            self._tags = value
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the passed value to the 'tags' list attribute
+            self._tags.append(value)
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the subject was last updated.
+
+        Returns:
+            datetime: The timestamp when the subject was last updated.
+        """
+
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the subject was last updated.
+
+        Args:
+            value (datetime): The new timestamp when the subject was last updated.
+
+        Returns:
+            None
+        """
+
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the subject.
+
+        Returns:
+            str: The UUID of the subject
+        """
+
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the subject.
+
+        Args:
+            value (str): The new UUID of the subject.
+
+        Returns:
+            None
+        """
+
+        self._uuid = value
 
     def to_immutable(self) -> ImmutableSubject:
         """
@@ -416,6 +923,70 @@ class SubjectFactory:
             # Log an error message indicating that an exception has occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'create_subject' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @classmethod
+    def create_default_subject(
+        cls,
+        name: str,
+    ) -> Optional[ImmutableSubject]:
+        """
+        Creates and returns a new instance of the ImmutableSubject class with default values.
+
+        Args:
+            name (str): The name of the subject.
+
+        Returns:
+            Optional[ImmutableSubject]: The created subject object if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the subject.
+        """
+        try:
+            # Import the DifficultyManager locally
+            from core.difficulty import DifficultyManager
+
+            # Import the PriorityManager locally
+            from core.priority import PriorityManager
+
+            # Attempt to create and return a subject with (most) default attributes
+            return ImmutableSubject(
+                created_at=Miscellaneous.get_current_datetime(),
+                custom_field_values=[],
+                description=f"Default subject '{name}' created at {Miscellaneous.datetime_to_string(datetime=Miscellaneous.get_current_datetime())}",
+                difficulty=DifficultyManager()
+                .get_difficulty_by(
+                    field="name",
+                    value="Medium",
+                )
+                .get(
+                    default=None,
+                    name="id",
+                ),
+                icon="🧑‍🏫",
+                metadata={},
+                name=name,
+                priority=PriorityManager()
+                .get_priority_by(
+                    field="name",
+                    value="Medium",
+                )
+                .get(
+                    default=None,
+                    name="id",
+                ),
+                tags=[],
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default_subject' method from '{cls.__name__}': {e}"
             )
 
             # Log the traceback

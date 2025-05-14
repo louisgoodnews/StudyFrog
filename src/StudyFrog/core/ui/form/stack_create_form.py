@@ -260,7 +260,7 @@ class StackCreateForm(BaseCreateForm):
             master=master,
             on_change_callback=self._on_field_change,
             readonly=True,
-            values=[stack.get(name="name") for stack in stacks] if stacks else [],
+            values=[stack.name for stack in stacks] if stacks else [],
         )
 
         # Place the 'ancestor field' ComboboxField widget in the grid
@@ -443,7 +443,7 @@ class StackCreateForm(BaseCreateForm):
             display_name="Due By*: ",
             master=master,
             on_change_callback=self._on_field_change,
-            value=Miscellaneous.get_date_increment(increment=45),
+            value=Miscellaneous.get_date_increment(days=45),
         )
 
         # Place the 'due by' DateSelectField widget in the grid

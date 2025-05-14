@@ -26,10 +26,14 @@ class MutableBaseObject:
 
     def __init__(
         self,
+        hide_attributes: bool = False,
         **kwargs,
     ) -> None:
         """
         Initializes a new instance of the MutableBaseObject class.
+
+        :param hide_attributes: Whether to hide attributes
+        :type hide_attributes: bool
 
         :param kwargs: keyword arguments
         :type kwargs: Dict[str, Any]
@@ -50,8 +54,10 @@ class MutableBaseObject:
             key,
             value,
         ) in kwargs.items():
-            # Format the key
-            # key = f"_{key}" if not key.strip().startswith("_") else key
+            # Check, if hide_attributes is True
+            if hide_attributes:
+                # Format the key
+                key = f"_{key}" if not key.strip().startswith("_") else key
 
             # Set the attribute of the object
             object.__setattr__(
@@ -80,11 +86,11 @@ class MutableBaseObject:
         This method compares all attributes of the current object with another object
         of the same class and prints/logs differences field by field.
 
-        Args:
-            other (MutableBaseObject): The other object to compare with.
+        :param other: The other object to compare with.
+        :type other: MutableBaseObject
 
-        Returns:
-            bool: True if all attributes are equal, False otherwise.
+        :return: True if all attributes are equal, False otherwise.
+        :rtype: bool
         """
 
         # Check if both objects are of the same type
@@ -92,7 +98,7 @@ class MutableBaseObject:
             other,
             self.__class__,
         ):
-        # Log a warning message
+            # Log a warning message
             self.logger.warning(
                 message=f"[DEEP_EQ] Type mismatch: {type(self)} != {type(other)}"
             )
@@ -113,7 +119,7 @@ class MutableBaseObject:
         for key in self.__dict__.keys():
             # Obtain the value associated with the current key from the object's dictionary
             self_val: Optional[Any] = self.__dict__.get(key)
-            
+
             # Obtain the value associated with the current key from the other object's dictionary
             other_val: Optional[Any] = other.__dict__.get(key)
 
@@ -139,13 +145,14 @@ class MutableBaseObject:
                 self.logger.info(
                     message=f" - {key}: self={self_val} | other={other_val}"
                 )
-            
+
             # Return False
             return False
 
         # Return True
         return True
 
+    @override
     def __delattr__(
         self,
         name: str,
@@ -170,6 +177,7 @@ class MutableBaseObject:
         # Delete the attribute
         del self.__dict__[name]
 
+    @override
     def __eq__(
         self,
         other: "MutableBaseObject",
@@ -187,6 +195,7 @@ class MutableBaseObject:
         # Check if the objects are equal
         return isinstance(other, MutableBaseObject) and self.__dict__ == other.__dict__
 
+    @override
     def __getattr__(
         self,
         name: str,
@@ -212,6 +221,7 @@ class MutableBaseObject:
         # Return the value of the attribute
         return self.__dict__[name]
 
+    @override
     def __getitem__(
         self,
         name: str,
@@ -227,16 +237,20 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
-            # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+        if f"_{name}" in self.__dict__:
+            # Return the value of the attribute
+            return self.__dict__[f"_{name}"]
+        elif name in self.__dict__:
+            # Return the value of the attribute
+            return self.__dict__[name]
 
-            # Return early since the attribute is not present
-            return
+        # Log a warning message if the attribute does not exist
+        self.logger.warning(message=f"Attribute '{name}' does not exist.")
 
-        # Return the value of the attribute
-        return self.__dict__[name]
+        # Return None
+        return None
 
+    @override
     def __repr__(
         self,
     ) -> str:
@@ -250,6 +264,7 @@ class MutableBaseObject:
         # Return a string representation of the object
         return f"<{self.__class__.__name__}({", ".join([f'{key}={value}' for (key, value,) in self.to_dict().items()])})>"
 
+    @override
     def __setattr__(
         self,
         name: str,
@@ -271,6 +286,7 @@ class MutableBaseObject:
         # Set the value of the attribute with the given name
         self.__dict__[name] = value
 
+    @override
     def __setitem__(
         self,
         name: str,
@@ -292,6 +308,7 @@ class MutableBaseObject:
         # Set the value of the attribute with the given name
         self.__dict__[name] = value
 
+    @override
     def __str__(
         self,
     ) -> str:
@@ -391,7 +408,7 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
+        if name not in self.__dict__ and f"_{name}" not in self.__dict__:
             # Log a warning message if the attribute does not exist
             self.logger.warning(message=f"Attribute '{name}' does not exist.")
 
@@ -420,7 +437,7 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
+        if name not in self.__dict__ and f"_{name}" not in self.__dict__:
             # Log a warning message if the attribute does not exist
             self.logger.warning(message=f"Attribute '{name}' does not exist.")
 
@@ -430,8 +447,22 @@ class MutableBaseObject:
         # Return the value of the attribute
         return self.__dict__.get(
             name,
-            default,
+            self.__dict__.get(
+                f"_{name}",
+                default,
+            ),
         )
+
+    def is_mutable(self) -> bool:
+        """
+        Returns True if the object is mutable, False otherwise.
+
+        Returns:
+            bool: True if the object is mutable, False otherwise.
+        """
+
+        # Return True if the object is mutable
+        return True
 
     def set(
         self,
@@ -456,13 +487,13 @@ class MutableBaseObject:
 
     def to_dict(
         self,
-        exclude: Iterable[str] = None,
+        exclude: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
         Returns a dictionary representation of the object.
 
-        :param exclude: A list of attribute names to exclude from the dictionary.
-        :type exclude: Iterable[str]
+        :param exclude: An optional list of attribute names to exclude from the dictionary.
+        :type exclude: Optional[List[str]]
 
         :return: A dictionary representation of the object.
         :rtype: Dict[str, Any]
@@ -478,12 +509,21 @@ class MutableBaseObject:
             # Add "_logger" to the exclude list
             exclude.append("_logger")
 
-        # Return a dictionary representation of the object
-        return {
-            key: self.__dict__[key]
-            for key in sorted(self.__dict__.keys())
-            if key not in exclude
-        }
+        # Initialize the result dictionary as an empty dictionary
+        result: Dict[str, Any] = {}
+
+        # Iterate over the attributes of the object
+        for key in sorted(self.__dict__.keys()):
+            # Check, if the attribute should be excluded
+            if key in exclude:
+                # Skip the attribute
+                continue
+
+            # Add the attribute to the result dictionary
+            result[key.strip("_")] = self.__dict__[key]
+
+        # Return the result dictionary
+        return result
 
     def update(
         self,
@@ -521,10 +561,14 @@ class ImmutableBaseObject(MutableBaseObject):
 
     def __init__(
         self,
+        hide_attributes: bool = False,
         **kwargs,
     ) -> None:
         """
         Initializes a new instance of the ImmutableBaseObject class.
+
+        :param hide_attributes: Whether to hide attributes
+        :type hide_attributes: bool
 
         :param kwargs: Keyword arguments to be passed to the parent class constructor.
         :type kwargs: Dict[str, Any]
@@ -532,6 +576,13 @@ class ImmutableBaseObject(MutableBaseObject):
         :return: None
         :rtyoe: None
         """
+
+        # Update kwargs with the 'hide_attributes' argument
+        kwargs.update(
+            {
+                "hide_attributes": hide_attributes,
+            }
+        )
 
         # Call the parent class constructor
         super().__init__(**kwargs)
@@ -688,6 +739,18 @@ class ImmutableBaseObject(MutableBaseObject):
         raise AttributeError(
             f"Cannot delete attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
         )
+
+    @override
+    def is_mutable(self) -> bool:
+        """
+        Returns True if the object is mutable, False otherwise.
+
+        Returns:
+            bool: True if the object is mutable, False otherwise.
+        """
+
+        # Return False if the object is immutable
+        return False
 
     @override
     def set(

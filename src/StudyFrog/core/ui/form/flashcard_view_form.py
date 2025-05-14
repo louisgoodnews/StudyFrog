@@ -97,6 +97,9 @@ class FlashcardViewForm(tkinter.Frame):
         # Create the widgets of the stack view form
         self.create_widgets()
 
+        # Update idletasks
+        self.update_idletasks()
+
     def configure_grid(self) -> None:
         """
         Configures the grid of the stack view form widget.
@@ -264,7 +267,7 @@ class FlashcardViewForm(tkinter.Frame):
 
         # Create the single line text field for the stack name
         self.front_text_field: MultiLineTextField = MultiLineTextField(
-            label="Front Text*: ",
+            display_name="Front Text*: ",
             master=master,
         )
 

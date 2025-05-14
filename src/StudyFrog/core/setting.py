@@ -4,6 +4,7 @@ Date 2025-02-09
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 from typing import *
@@ -21,6 +22,7 @@ from utils.object import MutableBaseObject, ImmutableBaseObject
 
 __all__: Final[List[str]] = [
     "ImmutableSetting",
+    "MutableSetting",
     "SettingConverter",
     "SettingFactory",
     "SettingManager",
@@ -78,6 +80,7 @@ class ImmutableSetting(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -88,25 +91,144 @@ class ImmutableSetting(ImmutableBaseObject):
             value=value,
         )
 
-    def to_mutable(self) -> "Mutable":
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the setting was created.
+
+        Returns:
+            datetime: The timestamp when the setting was created.
+        """
+
+        # Return the created_at timestamp of the setting
+        return self._created_at
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the setting.
+
+        Returns:
+            str: The icon of the setting.
+        """
+
+        # Return the icon of the setting
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the setting.
+
+        Returns:
+            int: The ID of the setting.
+        """
+
+        # Return the ID of the setting
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the setting.
+
+        Returns:
+            str: The key of the setting.
+        """
+
+        # Return the key of the setting
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the setting.
+
+        Returns:
+            Dict[str, Any]: The metadata of the setting.
+        """
+
+        # Return the metadata of the setting
+        return self._metadata
+
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the setting.
+
+        Returns:
+            str: The name of the setting.
+        """
+
+        # Return the name of the setting
+        return self._name
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the setting was last updated.
+
+        Returns:
+            datetime: The timestamp when the setting was last updated.
+        """
+
+        # Return the updated_at timestamp of the setting
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the setting.
+
+        Returns:
+            str: The UUID of the setting.
+        """
+
+        # Return the UUID of the setting
+        return self._uuid
+
+    @property
+    def value(self) -> str:
+        """
+        Returns the value of the setting.
+
+        Returns:
+            str: The value of the setting.
+        """
+
+        # Return the value of the setting
+        return self._value
+
+    def to_mutable(self) -> "MutableSetting":
         """
         Converts the immutable setting to a mutable setting.
 
         Returns:
-            Mutable: The mutable setting.
+            MutableSetting: The mutable setting.
         """
-
-        # Convert the immutable setting to a mutable setting
-        return Mutable(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Convert the immutable setting to a mutable setting
+            return MutableSetting(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
 
 
-class Mutable(MutableBaseObject):
+class MutableSetting(MutableBaseObject):
     """
     A mutable class representing a setting.
 
@@ -155,6 +277,7 @@ class Mutable(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -165,22 +288,314 @@ class Mutable(MutableBaseObject):
             value=value,
         )
 
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the setting was created.
+
+        Returns:
+            datetime: The timestamp when the setting was created.
+        """
+
+        # Return the created_at timestamp of the setting
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the setting was created.
+
+        Args:
+            value (datetime): The timestamp when the setting was created.
+
+        Returns:
+            None
+        """
+
+        # Set the created_at timestamp of the setting
+        self._created_at = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the setting.
+
+        Returns:
+            str: The icon of the setting.
+        """
+
+        # Return the icon of the setting
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the setting.
+
+        Args:
+            value (str): The icon of the setting.
+
+        Returns:
+            None
+        """
+
+        # Set the icon of the setting
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the setting.
+
+        Returns:
+            int: The ID of the setting.
+        """
+
+        # Return the ID of the setting
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the setting.
+
+        Args:
+            value (int): The ID of the setting.
+
+        Returns:
+            None
+        """
+
+        # Set the ID of the setting
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the setting.
+
+        Returns:
+            str: The key of the setting.
+        """
+
+        # Return the key of the setting
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the setting.
+
+        Args:
+            value (str): The key of the setting.
+
+        Returns:
+            None
+        """
+
+        # Set the key of the setting
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the setting.
+
+        Returns:
+            Dict[str, Any]: The metadata of the setting.
+        """
+
+        # Return the metadata of the setting
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Updates the metadata of the setting.
+
+        Args:
+            **kwargs (Dict[str, Any]): The new metadata of the setting.
+
+        Returns:
+            None
+        """
+
+        # Check, if the metadata dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Set the metadata of the setting to an empty dictionary
+            self._metadata = {}
+
+        # Update the metadata of the setting
+        self._metadata.update(**kwargs)
+
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the setting.
+
+        Returns:
+            str: The name of the setting.
+        """
+
+        # Return the name of the setting
+        return self._name
+
+    @name.setter
+    def name(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the name of the setting.
+
+        Args:
+            value (str): The name of the setting.
+
+        Returns:
+            None
+        """
+
+        # Set the name of the setting
+        self._name = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the setting was last updated.
+
+        Returns:
+            datetime: The timestamp when the setting was last updated.
+        """
+
+        # Return the updated_at timestamp of the setting
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the setting was last updated.
+
+        Args:
+            value (datetime): The timestamp when the setting was last updated.
+
+        Returns:
+            None
+        """
+
+        # Set the updated_at timestamp of the setting
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the setting.
+
+        Returns:
+            str: The UUID of the setting.
+        """
+
+        # Return the UUID of the setting
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the setting.
+
+        Args:
+            value (str): The UUID of the setting.
+
+        Returns:
+            None
+        """
+
+        # Set the UUID of the setting
+        self._uuid = value
+
+    @property
+    def value(self) -> str:
+        """
+        Returns the value of the setting.
+
+        Returns:
+            str: The value of the setting.
+        """
+
+        # Return the value of the setting
+        return self._value
+
+    @value.setter
+    def value(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the value of the setting.
+
+        Args:
+            value (str): The value of the setting.
+
+        Returns:
+            None
+        """
+
+        # Set the value of the setting
+        self._value = value
+
     def to_immutable(self) -> ImmutableSetting:
         """
         Converts the mutable setting to an immutable setting.
 
         Returns:
             ImmutableSetting: The immutable setting.
-        """
 
-        # Convert the mutable setting to an immutable setting
-        return ImmutableSetting(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        Raises:
+            Exception: If an exception occurs while converting the mutable setting to an immutable setting.
+        """
+        try:
+            # Convert the mutable setting to an immutable setting
+            return ImmutableSetting(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class SettingConverter:
@@ -336,9 +751,180 @@ class SettingFactory:
 
 class SettingBuilder(BaseObjectBuilder):
     """
+    A builder class for creating instances of the ImmutableSetting class.
+
+    This class extends the BaseObjectBuilder class and provides a builder pattern for creating instances of the ImmutableSetting class.
     """
 
-    pass
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the SettingBuilder class.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableSetting,
+            MutableSetting,
+        ]
+    ]:
+        """
+        Builds an instance of the ImmutableSetting or MutableSetting class
+
+        Args:
+            as_mutable (bool): A flag indicating whether the setting should be mutable.
+
+        Returns:
+            Optional[Union[ImmutableSetting, MutableSetting]]: An instance of the ImmutableSetting or MutableSetting class if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to build the setting.
+        """
+        try:
+            # Attemp to create a new ImmutableSetting instance
+            setting: Optional[ImmutableSetting] = SettingFactory.create_setting(
+                **self.configuration
+            )
+
+            # Check, if the setting exists
+            if not setting:
+                # Log a warning message
+                self.logger.warning(message=f"")
+
+                # Return early
+                return
+
+            # Check, if the setting should be mutable
+            if as_mutable:
+                # Return a mutable copy of the setting
+                return setting.to_mutable()
+
+            # Return the instance of the ImmutableSetting class
+            return setting
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the created_at timestamp of the setting.
+
+        Args:
+            value (datetime): The created_at timestamp of the setting.
+
+        Returns:
+            Self: The instance of the SettingBuilder class.
+        """
+
+        # Set the created_at timestamp of the setting
+        self.configuration["created_at"] = value
+
+        # Return the instance of the SettingBuilder class
+        return self
+
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the metadata of the setting.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the setting.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' key exists in the 'configuration' dictionary
+        if "metadata" not in self.configuration:
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' dictionary with the new values
+        self.configuration["metadata"].update(value)
+
+        # Return the builder instance
+        return self
+
+    def name(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the name of the setting.
+
+        Args:
+            value (str): The name of the setting.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the name of the setting
+        self.configuration["name"] = value
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the updated_at timestamp of the setting.
+
+        Args:
+            value (datetime): The updated_at timestamp of the setting.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the updated_at timestamp of the setting
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def value(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the value of the setting.
+
+        Args:
+            value (str): The value of the setting.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the value of the setting
+        self.configuration["value"] = value
+
+        # Return the builder instance
+        return self
 
 
 class SettingManager(BaseObjectManager):
@@ -385,6 +971,46 @@ class SettingManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        setting: Union[
+            ImmutableSetting,
+            MutableSetting,
+        ],
+    ) -> MutableSetting:
+        """
+        Runs pre-create tasks for the setting.
+
+        Args:
+            setting (Union[ImmutableSetting, MutableSetting]): The setting to be created.
+
+        Returns:
+            MutableSetting: The setting with pre-create tasks run.
+        """
+
+        # Check, if the setting is immutable
+        if not setting.is_mutable():
+            # Convert the setting to mutable
+            setting: MutableSetting = setting.to_mutable()
+
+        # Set the created_at timestamp of the setting
+        setting.created_at = setting.created_at or Miscellaneous.get_current_datetime()
+
+        # Set the key of the setting
+        setting.key = f"SETTING_{self.count_settings() + 1}"
+
+        # Set the metadata of the setting
+        setting.metadata = {} or setting.metadata
+
+        # Set the updated_at timestamp of the setting
+        setting.updated_at = setting.updated_at or Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the setting
+        setting.uuid = Miscellaneous.get_uuid()
+
+        # Return the setting
+        return setting
+
     def count_settings(self) -> int:
         """
         Returns the number of settings in the database.
@@ -406,13 +1032,16 @@ class SettingManager(BaseObjectManager):
 
     def create_setting(
         self,
-        setting: Union[ImmutableSetting, Mutable],
+        setting: Union[
+            ImmutableSetting,
+            MutableSetting,
+        ],
     ) -> Optional[ImmutableSetting]:
         """
         Creates a new setting in the database.
 
         Args:
-            setting (Union[ImmutableSetting, Mutable]): The setting to be created.
+            setting (Union[ImmutableSetting, MutableSetting]): The setting to be created.
 
         Returns:
             Optional[ImmutableSetting]: The newly created immutable setting if no exception occurs. Otherwise, None.
@@ -421,17 +1050,11 @@ class SettingManager(BaseObjectManager):
             Exception: If an exception occurs while creating the setting.
         """
         try:
-            # Set the created_at timestamp of the setting
-            setting.created_at = Miscellaneous.get_current_datetime()
+            # Initialize the result (optional) ImmutableSetting to none
+            result: Optional[ImmutableSetting] = None
 
-            # Set the key of the setting
-            setting.key = f"SETTING_{self.count_settings() + 1}"
-
-            # Set the updated_at timestamp of the setting
-            setting.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the setting
-            setting.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            setting: MutableSetting = self._run_pre_create_tasks(setting=setting)
 
             # Convert the setting object to a SettingModel object
             model: SettingModel = SettingConverter.object_to_model(object=setting)
@@ -441,35 +1064,47 @@ class SettingManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the setting
-                setting.id = id
-
-                # Convert the setting to an immutable setting
-                setting = ImmutableSetting(
-                    **setting.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a setting ({setting.__repr__()}) in the database."
                 )
 
-                # Add the setting to the cache
-                self.add_to_cache(
-                    key=setting.key,
-                    value=setting,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable setting
-                return setting
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a setting ({setting}) in the database."
+            # Convert the setting to a dictionary
+            kwargs: Dict[str, Any] = setting.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the setting
+            kwargs["id"] = id
+
+            # Create a new ImmutableSetting object
+            result = SettingFactory.create_setting(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableSetting from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the setting to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableSetting instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -481,13 +1116,16 @@ class SettingManager(BaseObjectManager):
 
     def delete_setting(
         self,
-        setting: Union[ImmutableSetting, Mutable],
+        setting: Union[
+            ImmutableSetting,
+            MutableSetting,
+        ],
     ) -> bool:
         """
         Deletes a setting from the database.
 
         Args:
-            setting (Union[ImmutableSetting, Mutable]): The setting to be deleted.
+            setting (Union[ImmutableSetting, MutableSetting]): The setting to be deleted.
 
         Returns:
             bool: True if the setting was deleted successfully. False otherwise.
@@ -766,7 +1404,9 @@ class SettingManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableSetting]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableSetting]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -808,13 +1448,16 @@ class SettingManager(BaseObjectManager):
 
     def update_setting(
         self,
-        setting: Union[ImmutableSetting, Mutable],
+        setting: Union[
+            ImmutableSetting,
+            MutableSetting,
+        ],
     ) -> Optional[ImmutableSetting]:
         """
         Updates a setting with the given ID.
 
         Args:
-            setting (Union[ImmutableSetting, Mutable]): The setting to update.
+            setting (Union[ImmutableSetting, MutableSetting]): The setting to update.
 
         Returns:
             Optional[ImmutableSetting]: The updated setting if no exception occurs. Otherwise, None.
@@ -1265,13 +1908,16 @@ class SettingService:
 
     def update_setting(
         self,
-        setting: Union[ImmutableSetting, Mutable],
+        setting: Union[
+            ImmutableSetting,
+            MutableSetting,
+        ],
     ) -> Optional[ImmutableSetting]:
         """
         Updates a given setting in the database.
 
         Args:
-            setting (Union[ImmutableSetting, Mutable]): The setting to update.
+            setting (Union[ImmutableSetting, MutableSetting]): The setting to update.
 
         Returns:
             Optional[ImmutableSetting]: The updated immutable setting if no exception occurs. Otherwise, None.

@@ -98,17 +98,17 @@ class BaseObjectManager:
 
     def add_to_cache(
         self,
-        key: str,
-        value: Any,
+        key: Union[str, List[str]],
+        value: Union[Any, List[Any]],
     ) -> None:
         """
         Adds an item to the cache.
 
         :param key: The key of the item.
-        :type key: str
+        :type key: Union[str, List[str]]
 
         :param value: The value of the item.
-        :type value: Any
+        :type value: Union[Any, List[Any]]
 
         :return: None
         :rtype: None
@@ -116,6 +116,41 @@ class BaseObjectManager:
 
         # Flush the cache, if needed
         self.flush_cache()
+
+        # Check, if both key and value are lists of the same size
+        if isinstance(
+            key,
+            list,
+        ) and isinstance(
+            value,
+            list,
+        ):
+            # Check if the lists have the same length
+            if len(key) != len(value):
+                # Log an error message
+                self.logger.error(
+                    message="Both key and value must be lists of the same size."
+                )
+
+                # Return early
+                return
+
+            # Add each key-value pair to the cache
+            for (
+                k,
+                v,
+            ) in zip(
+                key,
+                value,
+            ):
+                # Add the key-value pair to the cache
+                self.add_to_cache(
+                    key=k,
+                    value=v,
+                )
+
+            # Return early
+            return
 
         # Check if the key already exists
         if key in self._cache.keys():

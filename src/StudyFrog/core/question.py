@@ -4,6 +4,7 @@ Date: 2025-02-05
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 
@@ -42,8 +43,11 @@ class ImmutableQuestion(ImmutableBaseObject):
         created_at (datetime): The timestamp when the question was created.
         custom_field_values (List[Dict[str, Any]]): The values of the custom fields.
         difficulty (int): The difficulty of the question.
+        due_by (datetime): The timestamp when the question is due.
+        familiarity (float): The familiarity of the question.
         icon (str): The icon of the question.
         id (int): The ID of the question.
+        interval (Optional[int]): The interval of the question.
         key (str): The key of the question.
         last_viewed_at (datetime): The timestamp when the question was last viewed.
         metadata (Optional[Dict[str, Any]]): The metadata of the question.
@@ -60,14 +64,21 @@ class ImmutableQuestion(ImmutableBaseObject):
     def __init__(
         self,
         question_text: str,
-        question_type: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
+        question_type: Literal[
+            "MULTIPLE_CHOICE",
+            "OPEN_ANSWER",
+            "TRUE_FALSE",
+        ],
         answers: Optional[List[str]] = None,
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
+        familiarity: Optional[float] = None,
         icon: Optional[str] = "❓",
         id: Optional[int] = None,
+        interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         metadata: Optional[Dict[str, Any]] = None,
@@ -88,8 +99,11 @@ class ImmutableQuestion(ImmutableBaseObject):
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             difficulty (Optional[int]): The difficulty of the question.
+            due_by (Optional[datetime]): The timestamp when the question is due.
+            familiarity (Optional[float]): The familiarity of the question.
             icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
+            interval (Optional[int]): The interval of the question.
             key (Optional[str]): The key of the question.
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
             metadata (Optional[Dict[str, Any]]): The metadata of the question.
@@ -110,8 +124,12 @@ class ImmutableQuestion(ImmutableBaseObject):
             created_at=created_at,
             custom_field_values=custom_field_values,
             difficulty=difficulty,
+            due_by=due_by,
+            familiarity=familiarity,
+            hide_attributes=True,
             icon=icon,
             id=id,
+            interval=interval,
             key=key,
             last_viewed_at=last_viewed_at,
             metadata=metadata,
@@ -123,6 +141,226 @@ class ImmutableQuestion(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the created_at timestamp of the question.
+
+        Returns:
+            datetime: The created_at timestamp of the question.
+        """
+
+        # Return the created_at timestamp of the question
+        return self._created_at
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Gets the custom field values of the question.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the question.
+        """
+
+        # Return the custom field values of the question
+        return self._custom_field_values
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Gets the difficulty of the question.
+
+        Returns:
+            int: The difficulty of the question.
+        """
+
+        # Return the difficulty of the question
+        return self._difficulty
+
+    @property
+    def due_by(self) -> datetime:
+        """
+        Gets the due_by timestamp of the question.
+
+        Returns:
+            datetime: The due_by timestamp of the question.
+        """
+
+        # Return the due_by timestamp of the question
+        return self._due_by
+
+    @property
+    def familiarity(self) -> float:
+        """
+        Gets the familiarity of the question.
+
+        Returns:
+            float: The familiarity of the question.
+        """
+
+        # Return the familiarity of the question
+        return self._familiarity
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the question
+
+        Returns:
+            str: The icon of the question
+        """
+
+        # Return the icon of the question
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the question.
+
+        Returns:
+            int: The ID of the question.
+        """
+
+        # Return the ID of the question
+        return self._id
+
+    @property
+    def interval(self) -> int:
+        """
+        Gets the interval of the question.
+
+        Returns:
+            int: The interval of the question.
+        """
+
+        # Return the interval of the question
+        return self._interval
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the question.
+
+        Returns:
+            str: The key of the question.
+        """
+
+        # Return the key of the question
+        return self._key
+
+    @property
+    def last_viewed_at(self) -> datetime:
+        """
+        Gets the last_viewed_at timestamp of the question.
+
+        Returns:
+            datetime: The last_viewed_at timestamp of the question.
+        """
+
+        # Return the last_viewed_at timestamp of the question
+        return self._last_viewed_at
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the question.
+
+        Returns:
+            Dict[str, Any]: The metadata of the question.
+        """
+
+        # Return the metadata of the question
+        return self._metadata
+
+    @property
+    def priority(self) -> int:
+        """
+        Gets the priority of the question.
+
+        Returns:
+            int: The priority of the question.
+        """
+
+        # Return the priority of the question
+        return self._priority
+
+    @property
+    def question_text(self) -> str:
+        """
+        Gets the text of the question.
+
+        Returns:
+            str: The text of the question.
+        """
+
+        # Return the text of the question
+        return self._question_text
+
+    @property
+    def question_type(self) -> Literal[
+        "MULTIPLE_CHOICE",
+        "OPEN_ANSWER",
+        "TRUE_FALSE",
+    ]:
+        """
+        Gets the type of the question.
+
+        Returns:
+            Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]: The type of the question.
+        """
+
+        # Return the type of the question
+        return self._question_type
+
+    @property
+    def status(self) -> int:
+        """
+        Gets the status of the question.
+
+        Returns:
+            int: The status of the question.
+        """
+
+        # Return the status of the question
+        return self._status
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Gets the tags of the question.
+
+        Returns:
+            List[str]: The tags of the question.
+        """
+
+        # Return the tags of the question
+        return self._tags
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the updated_at timestamp of the question.
+
+        Returns:
+            datetime: The updated_at timestamp of the question.
+        """
+
+        # Return the updated_at timestamp of the question
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the question.
+
+        Returns:
+            str: The UUID of the question.
+        """
+
+        # Return the UUID of the question
+        return self._uuid
 
     def to_mutable(self) -> "MutableQuestion":
         """
@@ -146,6 +384,9 @@ class ImmutableQuestion(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -160,8 +401,11 @@ class MutableQuestion(MutableBaseObject):
         created_at (datetime): The timestamp when the question was created.
         custom_field_values (List[Dict[str, Any]]): The values of the custom fields.
         difficulty (int): The difficulty of the question.
+        due_by (datetime): The timestamp when the question is due.
+        familiarity (float): The familiarity of the question.
         icon (str): The icon of the question.
         id (int): The ID of the question.
+        interval (Optional[int]): The repetition interval of the question in days.
         key (str): The key of the question.
         last_viewed_at (datetime): The timestamp when the question was last viewed.
         metadata (Optional[Dict[str, Any]]): The metadata of the question.
@@ -184,8 +428,11 @@ class MutableQuestion(MutableBaseObject):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
+        familiarity: Optional[float] = None,
         icon: Optional[str] = "❓",
         id: Optional[int] = None,
+        interval: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
         metadata: Optional[Dict[str, Any]] = None,
@@ -206,8 +453,11 @@ class MutableQuestion(MutableBaseObject):
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             difficulty (Optional[int]): The difficulty of the question.
+            due_by (Optional[datetime]): The timestamp when the question is due.
+            familiarity (Optional[float]): The familiarity of the question.
             icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
+            interval (Optional[int]): The repetition interval of the question in days.
             key (Optional[str]): The key of the question.
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
             metadata (Optional[Dict[str, Any]]): The metadata of the question.
@@ -228,8 +478,12 @@ class MutableQuestion(MutableBaseObject):
             created_at=created_at,
             custom_field_values=custom_field_values,
             difficulty=difficulty,
+            due_by=due_by,
+            familiarity=familiarity,
+            hide_attributes=True,
             icon=icon,
             id=id,
+            interval=interval,
             key=key,
             last_viewed_at=last_viewed_at,
             metadata=metadata,
@@ -241,6 +495,593 @@ class MutableQuestion(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the created_at timestamp of the question.
+
+        Returns:
+            datetime: The created_at timestamp of the question.
+        """
+
+        # Return the created_at timestamp of the question
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the created_at timestamp of the question.
+
+        Args:
+            value (datetime): The new created_at timestamp of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the created_at timestamp of the question
+        self._created_at = value
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Gets the custom field values of the question.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the question.
+        """
+
+        # Return the custom field values of the question
+        return self._custom_field_values
+
+    @custom_field_values.setter
+    def custom_field_values(
+        self,
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
+    ) -> None:
+        """
+        Sets the custom field values of the flashcard.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]): The new custom field values of the flashcard.
+
+        Returns:
+            None
+        """
+
+        # Check, if the custom_field_values list exists
+        if not self.get(
+            default=None,
+            name="custom_field_values",
+        ):
+            # Initialize the custom_field_values list as an empty list
+            self._custom_field_values = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the passed value to the list
+            self._custom_field_values.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._custom_field_values.extend(value)
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Gets the difficulty of the question.
+
+        Returns:
+            int: The difficulty of the question.
+        """
+
+        # Return the difficulty of the question
+        return self._difficulty
+
+    @difficulty.setter
+    def difficulty(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the difficulty of the question.
+
+        Args:
+            value (int): The new difficulty of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the difficulty of the question
+        self._difficulty = value
+
+    @property
+    def due_by(self) -> datetime:
+        """
+        Gets the due_by timestamp of the question.
+
+        Returns:
+            datetime: The due_by timestamp of the question.
+        """
+
+        # Return the due_by timestamp of the question
+        return self._due_by
+
+    @due_by.setter
+    def due_by(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the due_by timestamp of the question.
+
+        Args:
+            value (datetime): The new due_by timestamp of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the due_by timestamp of the question
+        self._due_by = value
+
+    @property
+    def familiarity(self) -> float:
+        """
+        Gets the familiarity of the question.
+
+        Returns:
+            float: The familiarity of the question.
+        """
+
+        # Return the familiarity of the question
+        return self._familiarity
+
+    @familiarity.setter
+    def familiarity(
+        self,
+        value: float,
+    ) -> None:
+        """
+        Sets the familiarity of the question.
+
+        Args:
+            value (float): The new familiarity of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the familiarity of the question
+        self._familiarity = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the question
+
+        Returns:
+            str: The icon of the question
+        """
+
+        # Return the icon of the question
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the question.
+
+        Args:
+            value (str): The new icon of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the icon of the question
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the question.
+
+        Returns:
+            int: The ID of the question.
+        """
+
+        # Return the ID of the question
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the question.
+
+        Args:
+            value (int): The new ID of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the ID of the question
+        self._id = value
+
+    @property
+    def interval(self) -> int:
+        """
+        Gets the interval of the question.
+
+        Returns:
+            int: The interval of the question.
+        """
+
+        # Return the interval of the question
+        return self._interval
+
+    @interval.setter
+    def interval(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the interval of the question.
+
+        Args:
+            value (int): The new interval of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the interval of the question
+        self._interval = value
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the question.
+
+        Returns:
+            str: The key of the question.
+        """
+
+        # Return the key of the question
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the question.
+
+        Args:
+            value (str): The new key of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the key of the question
+        self._key = value
+
+    @property
+    def last_viewed_at(self) -> datetime:
+        """
+        Gets the last_viewed_at timestamp of the question.
+
+        Returns:
+            datetime: The last_viewed_at timestamp of the question.
+        """
+
+        # Return the last_viewed_at timestamp of the question
+        return self._last_viewed_at
+
+    @last_viewed_at.setter
+    def last_viewed_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the last_viewed_at timestamp of the question.
+
+        Args:
+            value (datetime): The new last_viewed_at timestamp of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the last_viewed_at timestamp of the question
+        self._last_viewed_at = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the question.
+
+        Returns:
+            Dict[str, Any]: The metadata of the question.
+        """
+
+        # Return the metadata of the question
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Updates the metadata of the question.
+
+        Args:
+            **kwargs (Dict[str, Any]): The new metadata of the question.
+
+        Returns:
+            None
+        """
+
+        # Check, if the metadata dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Set the metadata of the learning session to an empty dictionary
+            self._metadata = {}
+
+        # Update the metadata of the learning session
+        self._metadata.update(**kwargs)
+
+    @property
+    def priority(self) -> int:
+        """
+        Gets the priority of the question.
+
+        Returns:
+            int: The priority of the question.
+        """
+
+        # Return the priority of the question
+        return self._priority
+
+    @priority.setter
+    def priority(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the priority of the question.
+
+        Args:
+            value (int): The new priority of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the priority of the question
+        self._priority = value
+
+    @property
+    def question_text(self) -> str:
+        """
+        Gets the text of the question.
+
+        Returns:
+            str: The text of the question.
+        """
+
+        # Return the text of the question
+        return self._question_text
+
+    @question_text.setter
+    def question_text(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the text of the question.
+
+        Args:
+            value (str): The new text of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the text of the question
+        self._question_text = value
+
+    @property
+    def question_type(self) -> Literal[
+        "MULTIPLE_CHOICE",
+        "OPEN_ANSWER",
+        "TRUE_FALSE",
+    ]:
+        """
+        Gets the type of the question.
+
+        Returns:
+            Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]: The type of the question.
+        """
+
+        # Return the type of the question
+        return self._question_type
+
+    @question_type.setter
+    def question_type(
+        self,
+        value: Literal[
+            "MULTIPLE_CHOICE",
+            "OPEN_ANSWER",
+            "TRUE_FALSE",
+        ],
+    ) -> None:
+        """
+        Sets the type of the question.
+
+        Args:
+            value (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]: The new type of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the type of the question
+        self._question_type = value
+
+    @property
+    def status(self) -> int:
+        """
+        Gets the status of the question.
+
+        Returns:
+            int: The status of the question.
+        """
+
+        # Return the status of the question
+        return self._status
+
+    @status.setter
+    def status(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the status of the question.
+
+        Args:
+            value (int): The new status of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the status of the question
+        self._status = value
+
+    @property
+    def tags(self) -> Optional[List[str]]:
+        """
+        Gets the tags of the question.
+
+        Returns:
+            Optional[List[str]]: The tags of the question.
+        """
+
+        # Return the tags of the question
+        return self._tags
+
+    @tags.setter
+    def tags(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the tags of the question.
+
+        Args:
+            value (Union[List[str], str]): The new tags of the question.
+
+        Returns:
+            None
+        """
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the passed value to the list
+            self._tags.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._tags.extend(value)
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the updated_at timestamp of the question.
+
+        Returns:
+            datetime: The updated_at timestamp of the question.
+        """
+
+        # Return the updated_at timestamp of the question
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the updated_at timestamp of the question.
+
+        Args:
+            value (datetime): The new updated_at timestamp of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the updated_at timestamp of the question
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the question.
+
+        Returns:
+            str: The UUID of the question.
+        """
+
+        # Return the UUID of the question
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the question.
+
+        Args:
+            value (str): The new UUID of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the UUID of the question
+        self._uuid = value
 
     def add_to_answers(
         self,
@@ -254,12 +1095,15 @@ class MutableQuestion(MutableBaseObject):
         """
 
         # Check, if the answers list exists
-        if not self["answers"]:
+        if not self.get(
+            default=None,
+            name="answers",
+        ):
             # Initialize the answers list as an empty list
-            self["answers"] = []
+            self.answers = []
 
         # Append the answer key to the list of answers
-        self["answers"].append(answer["key"])
+        self.answers.append(answer["key"])
 
     def add_to_correct_answers(
         self,
@@ -273,12 +1117,15 @@ class MutableQuestion(MutableBaseObject):
         """
 
         # Check if the correct_answers list exists
-        if not self["correct_answers"]:
+        if not self.get(
+            default=None,
+            name="correct_answers",
+        ):
             # Initialize the correct_answers list as an empty list
-            self["correct_answers"] = []
+            self.correct_answers = []
 
         # Append the correct answer key to the list of correct answers
-        self["correct_answers"].append(answer["key"])
+        self.correct_answers.append(answer["key"])
 
     def remove_from_answers(
         self,
@@ -292,12 +1139,15 @@ class MutableQuestion(MutableBaseObject):
         """
 
         # Check if the answers list is empty
-        if not self["answers"]:
+        if not self.get(
+            default=None,
+            name="answers",
+        ):
             # Return early if there are no answers to remove
             return
 
         # Remove the answer key from the list of answers
-        self["answers"].remove(answer["key"])
+        self.answers.remove(answer["key"])
 
     def remove_from_correct_answers(
         self,
@@ -311,12 +1161,15 @@ class MutableQuestion(MutableBaseObject):
         """
 
         # Check if the correct_answers list is empty
-        if not self["correct_answers"]:
+        if not self.get(
+            default=None,
+            name="correct_answers",
+        ):
             # Return early if there are no correct answers to remove
             return
 
         # Remove the correct answer key from the list of correct answers
-        self["correct_answers"].remove(answer["key"])
+        self.correct_answers.remove(answer["key"])
 
     def set_difficulty(
         self,
@@ -365,15 +1218,26 @@ class MutableQuestion(MutableBaseObject):
         Returns:
             ImmutableQuestion: The immutable version of the mutable question.
         """
-
-        # Create a new ImmutableQuestion instance from the dictionary representation of the MutableQuestion instance
-        return ImmutableQuestion(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Create a new ImmutableQuestion instance from the dictionary representation of the MutableQuestion instance
+            return ImmutableQuestion(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class QuestionConverter:
@@ -475,7 +1339,11 @@ class QuestionFactory:
     def create_question(
         cls,
         question_text: str,
-        question_type: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
+        question_type: Literal[
+            "MULTIPLE_CHOICE",
+            "OPEN_ANSWER",
+            "TRUE_FALSE",
+        ],
         answers: Optional[List[str]] = None,
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
@@ -544,6 +1412,9 @@ class QuestionFactory:
                 message=f"Caught an exception while attempting to run 'create_question' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -590,6 +1461,9 @@ class QuestionBuilder(BaseObjectBuilder):
         Returns:
             Optional[Union[ImmutableQuestion, MutableQuestion]]: An instance of the
             ImmutableQuestion or MutableQuestion class if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to build the question.
         """
         try:
             # Attempt to create an ImmutableQuestion using the configuration dictionary
@@ -603,10 +1477,8 @@ class QuestionBuilder(BaseObjectBuilder):
                     message=f"Failed to build an instance of the ImmutableQuestion or MutableQuestion class from '{self.__class__.__name__}'"
                 )
 
-                # Raise an exception
-                raise Exception(
-                    f"Failed to build an instance of the ImmutableQuestion or MutableQuestion class from '{self.__class__.__name__}'"
-                )
+                # Return early
+                return
 
             # Check if the question should be mutable
             if as_mutable:
@@ -626,40 +1498,74 @@ class QuestionBuilder(BaseObjectBuilder):
 
     def answers(
         self,
-        value: List[str],
+        value: Union[List[str], str],
     ) -> Self:
         """
         Sets the answers for the builder.
 
         Args:
-            value (List[str]): The answers to set.
+            value (Union[List[str], str]): The answers to set.
 
         Returns:
             Self: The builder instance.
         """
 
-        # Set the answers value in the configuration dictionary
-        self.configuration["answers"] = value
+        # Check, if the 'answers' key exists in the configuration dictionary
+        if "answers" not in self.configuration:
+            # Set the 'answers' key in the configuration dictionary
+            self.configuration["answers"] = []
+
+        # Check, if the value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the value to the 'answers' list
+            self.configuration["answers"].append(value)
+        # Check, if the value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the 'answers' list with the new values
+            self.configuration["answers"].extend(value)
 
         # Return the builder instance
         return self
 
     def correct_answers(
         self,
-        value: List[str],
+        value: Union[List[str], str],
     ) -> Self:
         """
         Sets the correct answers for the builder.
 
         Args:
-            value (List[str]): The correct answers to set.
+            value (Union[List[str], str]): The correct answers to set.
 
         Returns:
             Self: The builder instance.
         """
 
-        # Set the correct_answers value in the configuration dictionary
-        self.configuration["correct_answers"] = value
+        # Check, if the 'correct answers' key exists in the configuration dictionary
+        if "correct_answers" not in self.configuration:
+            # Set the 'correct answers' key in the configuration dictionary
+            self.configuration["correct_answers"] = []
+
+        # Check, if the value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the value to the 'correct answers' list
+            self.configuration["correct_answers"].append(value)
+        # Check, if the value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the 'correct answers' list with the new values
+            self.configuration["correct_answers"].extend(value)
 
         # Return the builder instance
         return self
@@ -695,21 +1601,21 @@ class QuestionBuilder(BaseObjectBuilder):
             value,
             list,
         ):
-            # Update the 'custom field values' list with the new values
-            self.configuration["custom_field_values"] = value
+            # Extend the 'custom field values' list with the new values
+            self.configuration["custom_field_values"].extend(value)
 
         # Return the builder instance
         return self
 
     def difficulty(
         self,
-        value: Optional[int] = None,
+        value: int,
     ) -> Self:
         """
         Sets the difficulty of the flashcard.
 
         Args:
-            value (Optional[int]): The difficulty of the flashcard.
+            value (int): The difficulty of the flashcard.
 
         Returns:
             Self: The builder instance.
@@ -723,13 +1629,13 @@ class QuestionBuilder(BaseObjectBuilder):
 
     def last_viewed_at(
         self,
-        value: Optional[datetime] = None,
+        value: datetime,
     ) -> Self:
         """
         Sets the last viewed at timestamp of the flashcard.
 
         Args:
-            value (Optional[datetime]): The last viewed at timestamp of the flashcard.
+            value (datetime): The last viewed at timestamp of the flashcard.
 
         Returns:
             Self: The builder instance.
@@ -743,7 +1649,7 @@ class QuestionBuilder(BaseObjectBuilder):
 
     def metadata(
         self,
-        value: Dict[str, Any],
+        **kwargs,
     ) -> Self:
         """
         Sets the metadata of the flashcard.
@@ -760,20 +1666,20 @@ class QuestionBuilder(BaseObjectBuilder):
             self.configuration["metadata"] = {}
 
         # Update the 'metadata' dictionary with the new values
-        self.configuration["metadata"].update(value)
+        self.configuration["metadata"].update(kwargs)
 
         # Return the builder instance
         return self
 
     def priority(
         self,
-        value: Optional[int] = None,
+        value: int,
     ) -> Self:
         """
         Sets the priority of the flashcard.
 
         Args:
-            value (Optional[int]): The priority of the flashcard.
+            value (int): The priority of the flashcard.
 
         Returns:
             Self: The builder instance.
@@ -827,13 +1733,13 @@ class QuestionBuilder(BaseObjectBuilder):
 
     def status(
         self,
-        value: Optional[int] = None,
+        value: int,
     ) -> Self:
         """
         Sets the status of the flashcard.
 
         Args:
-            value (Optional[int]): The status of the flashcard.
+            value (int): The status of the flashcard.
 
         Returns:
             Self: The builder instance.
@@ -847,20 +1753,37 @@ class QuestionBuilder(BaseObjectBuilder):
 
     def tags(
         self,
-        value: Optional[List[str]] = None,
+        value: Union[List[str], str],
     ) -> Self:
         """
         Sets the tags of the flashcard.
 
         Args:
-            value (Optional[List[str]]): The tags of the flashcard.
+            value (Union[List[str], str]): The tags of the flashcard.
 
         Returns:
             Self: The builder instance.
         """
 
-        # Set the tags value in the configuration dictionary
-        self.configuration["tags"] = value
+        # Check, if the 'tags' key exists in the configuration dictionary
+        if "tags" not in self.configuration:
+            # Set the 'tags' key in the configuration dictionary
+            self.configuration["tags"] = []
+
+        # Check, if the value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the value to the 'tags' list
+            self.configuration["tags"].append(value)
+        # Check, if the value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the 'tags' list with the new values
+            self.configuration["tags"].extend(value)
 
         # Return the builder instance
         return self
@@ -910,6 +1833,52 @@ class QuestionManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        question: Union[
+            ImmutableQuestion,
+            MutableQuestion,
+        ],
+    ) -> MutableQuestion:
+        """
+        Runs pre-create tasks for the question.
+
+        Args:
+            question (Union[ImmutableQuestion, MutableQuestion]): The question to run pre-create tasks for.
+
+        Returns:
+            MutableQuestion: The question with pre-create tasks run.
+        """
+
+        # Check if the question object is immutable
+        if not question.is_mutable():
+            # If it is, convert it to a mutable question
+            question = question.to_mutable()
+
+        # Set the created_at timestamp of the question
+        question.created_at = Miscellaneous.get_current_datetime()
+
+        # Set the custom_field_values of the question
+        question.custom_field_values = [] or question.custom_field_values
+
+        # Set the key of the question
+        question.key = f"QUESTION_{self.count_questions() + 1}"
+
+        # Set the metadata of the question
+        question.metadata = {} or question.metadata
+
+        # Set the tags of the question
+        question.tags = [] or question.tags
+
+        # Set the updated_at timestamp of the question
+        question.updated_at = Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the question
+        question.uuid = Miscellaneous.get_uuid()
+
+        # Return the mutable question
+        return question
+
     def count_questions(self) -> int:
         """
         Returns the number of questions in the database.
@@ -946,31 +1915,11 @@ class QuestionManager(BaseObjectManager):
             Exception: If an exception occurs while creating the question.
         """
         try:
-            # Check if the question object is immutable
-            if isinstance(
-                question,
-                ImmutableQuestion,
-            ):
-                # If it is, convert it to a mutable question
-                question = question.to_mutable()
+            # Initialize the result (optional) ImmutableQuestion to none
+            result: Optional[ImmutableQuestion] = None
 
-            # Set the created_at timestamp of the question
-            question.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the custom_field_values of the question
-            question.custom_field_values = [] or question.custom_field_values
-
-            # Set the key of the question
-            question.key = f"QUESTION_{self.count_questions() + 1}"
-
-            # Set the tags of the question
-            question.tags = [] or question.tags
-
-            # Set the updated_at timestamp of the question
-            question.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the question
-            question.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            question: MutableQuestion = self._run_pre_create_tasks(question=question)
 
             # Convert the question object to a QuestionModel object
             model: QuestionModel = QuestionConverter.object_to_model(object=question)
@@ -980,35 +1929,47 @@ class QuestionManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the question
-                question.id = id
-
-                # Convert the question to an immutable question
-                question = QuestionFactory.create_question(
-                    **question.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a question ({question.__repr__()}) in the database."
                 )
 
-                # Add the question to the cache
-                self.add_to_cache(
-                    key=question.key,
-                    value=question,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable question
-                return question
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a question ({question}) in the database."
+            # Convert the question to a dictionary
+            kwargs: Dict[str, Any] = question.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the question
+            kwargs["id"] = id
+
+            # Create a new ImmutableQuestion object
+            result = QuestionFactory.create_question(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableQuestion from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the question to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableQuestion instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1520,6 +2481,7 @@ class QuestionModel(ImmutableBaseModel):
         created_at (Field): The timestamp when the question was created.
         difficulty (Field): The difficulty of the question.
         due_by (Field): The due date of the question.
+        familiarity (Field): The familiarity of the question.
         icon (Field): The icon of the question. Defaults to "❓".
         interval (Field): The interval of the question.
         key (Field): The key of the question.
@@ -1647,6 +2609,22 @@ class QuestionModel(ImmutableBaseModel):
         unique=False,
     )
 
+    familiarity: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="familiarity",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="FLOAT",
+        unique=False,
+    )
+
     icon: Field = Field(
         autoincrement=False,
         default="❓",
@@ -1708,6 +2686,22 @@ class QuestionModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    metadata: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="metadata",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="JSON",
         unique=False,
     )
 
@@ -1830,14 +2824,21 @@ class QuestionModel(ImmutableBaseModel):
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[Dict[str, Any]] = None,
         difficulty: Optional[int] = None,
+        due_by: Optional[datetime] = None,
+        familiarity: Optional[float] = None,
         icon: Optional[str] = "❓",
         id: Optional[int] = None,
         key: Optional[str] = None,
         last_viewed_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         question_text: Optional[str] = None,
         question_type: Optional[
-            Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]
+            Literal[
+                "MULTIPLE_CHOICE",
+                "OPEN_ANSWER",
+                "TRUE_FALSE",
+            ]
         ] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
@@ -1853,10 +2854,13 @@ class QuestionModel(ImmutableBaseModel):
             created_at (Optional[datetime]): The timestamp when the question was created.
             custom_field_values (Optional[Dict[str, Any]]): The values of the custom fields.
             difficulty (Optional[int]): The difficulty of the question.
+            due_by (Optional[datetime]): The due date of the question.
+            familiarity (Optional[float]): The familiarity of the question.
             icon (Optional[str]): The icon of the question. Defaults to "❓".
             id (Optional[int]): The ID of the question.
             key (Optional[str]): The key of the question.
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
+            metadata (Optional[Dict[str, Any]]): The metadata of the question.
             priority (Optional[int]): The priority of the question.
             question_text (Optional[str]): The text of the question.
             question_type (Optional[Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]]): The type of the question.
@@ -1876,10 +2880,13 @@ class QuestionModel(ImmutableBaseModel):
             created_at=created_at,
             custom_field_values=custom_field_values,
             difficulty=difficulty,
+            due_by=due_by,
+            familiarity=familiarity,
             icon="❓",
             id=id,
             key=key,
             last_viewed_at=last_viewed_at,
+            metadata=metadata,
             priority=priority,
             question_text=question_text,
             question_type=question_type,

@@ -472,7 +472,7 @@ class MainUI(BaseUI):
                 setting_service=self.setting_service,
                 unified_factory=self.unified_factory,
                 unified_manager=self.unified_manager,
-                navigation_item=list(response["result"].values())[0],
+                navigation_item=list(response.result.values())[0],
                 **kwargs,
             )
 

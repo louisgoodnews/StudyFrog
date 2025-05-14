@@ -782,6 +782,39 @@ class LearningStackSelectionUI(BaseUI):
         # Configure the 'timing fields' CheckbuttonSelectField widget
         timing_fields.configure(background=Constants.BLUE_GREY["700"])
 
+        # Configure the 'timing fields' CheckbuttonSelectField widget's 'checkbutton' tkinter.Checkbutton widgets
+        timing_fields.configure_checkbuttons(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Configure the 'timing fields' CheckbuttonSelectField widget's CheckbuttonField widgets
+        timing_fields.configure_fields(background=Constants.BLUE_GREY["700"])
+
+        # Configure the 'timing fields' CheckbuttonSelectField widget's 'label' tkinter.Label widget
+        timing_fields.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Configure the 'timing fields' CheckbuttonSelectField widget's 'label' tkinter.Label widgets
+        timing_fields.configure_labels(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
         # Place the 'timing fields' CheckbuttonSelectField widget in the grid
         timing_fields.grid(
             column=0,

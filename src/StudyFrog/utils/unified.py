@@ -482,11 +482,14 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 # Return early since the key is invalid
                 return
 
+            # Update the match to a snake case representation
+            match = Miscellaneous.pascal_to_snake(string=match)
+
             # Run the 'get_by_key' method of the corresponding manager
             return self.run(
                 force_refetch=force_refetch,
-                manager=f"{match.lower()}_manager",
-                method=f"get_{match.lower()}_by_key",
+                manager=f"{match}_manager",
+                method=f"get_{match}_by_key",
                 key=key,
             )
         except Exception as e:
@@ -815,11 +818,14 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 # Return early since the key is invalid
                 return
 
+            # Update the match to a snake case representation
+            match = Miscellaneous.pascal_to_snake(string=match)
+
             # Run the 'update' method of the corresponding manager
             return self.run(
-                manager=f"{match.lower()}_manager",
-                method=f"update_{match.lower()}",
-                **{match.lower(): update},
+                manager=f"{match}_manager",
+                method=f"update_{match}",
+                **{match: update},
             )
         except Exception as e:
             # Log an error message indicating that an exception has occurred

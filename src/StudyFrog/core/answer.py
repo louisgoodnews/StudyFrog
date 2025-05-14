@@ -85,6 +85,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             answer_text=answer_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -93,6 +94,116 @@ class ImmutableAnswer(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def answer_text(self) -> str:
+        """
+        Gets the text of the answer.
+
+        Returns:
+            str: The text of the answer.
+        """
+
+        return self._answer_text
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the timestamp when the answer was created.
+
+        Returns:
+            datetime: The timestamp when the answer was created.
+        """
+
+        return self._created_at
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Gets the custom field values of the answer.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the answer.
+        """
+
+        return self._custom_field_values
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the answer.
+
+        Returns:
+            str: The icon of the answer.
+        """
+
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the answer.
+
+        Returns:
+            int: The ID of the answer.
+        """
+
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the answer.
+
+        Returns:
+            str: The key of the answer.
+        """
+
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the answer.
+
+        Returns:
+            Dict[str, Any]: The metadata of the answer.
+        """
+
+        return self._metadata
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Gets the tags of the answer.
+
+        Returns:
+            List[str]: The tags associated with the answer.
+        """
+
+        return self._tags
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the answer was last updated.
+
+        Returns:
+            datetime: The timestamp when the answer was last updated.
+        """
+
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the answer.
+
+        Returns:
+            str: The UUID of the answer.
+        """
+
+        return self._uuid
 
     def to_mutable(self) -> "MutableAnswer":
         """
@@ -174,6 +285,7 @@ class MutableAnswer(MutableBaseObject):
             answer_text=answer_text,
             created_at=created_at,
             custom_field_values=custom_field_values,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -182,6 +294,266 @@ class MutableAnswer(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def answer_text(self) -> str:
+        """
+        Gets the text of the answer.
+
+        Returns:
+            str: The text of the answer.
+        """
+
+        return self._answer_text
+
+    @answer_text.setter
+    def answer_text(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the text of the answer.
+
+        Args:
+            value (str): The new text of the answer.
+
+        Returns:
+            None
+        """
+
+        self._answer_text = value
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the timestamp when the answer was created.
+
+        Returns:
+            datetime: The timestamp when the answer was created.
+        """
+
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the answer was created.
+
+        Args:
+            value (datetime): The new timestamp when the answer was created.
+
+        Returns:
+            None
+        """
+
+        self._created_at = value
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Gets the custom field values of the answer.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the answer.
+        """
+
+        return self._custom_field_values
+
+    @custom_field_values.setter
+    def custom_field_values(
+        self,
+        value: Union[
+            Dict[str, Any],
+            List[Dict[str, Any]],
+        ],
+    ) -> None:
+        """
+        Sets the custom field values of the answer.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]]): The new custom field values of the answer.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'custom_field_values' attribute exists
+        if not self._custom_field_values:
+            # Initialize the 'custom_field_values' attribute as an empty list
+            self._custom_field_values = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the passed value to the 'custom_field_values' list attribute
+            self._custom_field_values.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Update the 'custom_field_values' attribute list with the passed value list
+            self._custom_field_values = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the answer.
+
+        Returns:
+            str: The icon of the answer.
+        """
+
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the answer.
+
+        Returns:
+            int: The ID of the answer.
+        """
+
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the answer.
+
+        Returns:
+            str: The key of the answer.
+        """
+
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the answer.
+
+        Returns:
+            Dict[str, Any]: The metadata of the answer.
+        """
+
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the answer.
+
+        Args:
+            **kwargs: The keyword arguments representing the metadata key-value pairs.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'metadata' attribute exists
+        if not self._metadata:
+            # Initialize the 'metadata' attribute as an empty dictionary
+            self._metadata = {}
+
+        # Update the 'metadata' attribute with the passed keyword arguments
+        self._metadata.update(**kwargs)
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Gets the tags of the answer.
+
+        Returns:
+            List[str]: The tags associated with the answer.
+        """
+
+        return self._tags
+
+    @tags.setter
+    def tags(
+        self,
+        value: Union[
+            List[str],
+            str,
+        ],
+    ) -> None:
+        """
+        Sets the tags of the answer.
+
+        Args:
+            value (Union[List[str], str]): The tags of the answer.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'tags' attribute exists
+        if not self._tags:
+            # Initialize the 'tags' attribute as an empty list
+            self._tags = []
+
+        # Check, if the passed value is a list
+        if isinstance(
+            value,
+            list,
+        ):
+            # Update the 'tags' attribute list with the passed value list
+            self._tags = value
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the passed value to the 'tags' list attribute
+            self._tags.append(value)
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the answer was last updated.
+
+        Returns:
+            datetime: The timestamp when the answer was last updated.
+        """
+
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the answer was last updated.
+
+        Args:
+            value (datetime): The new timestamp when the answer was last updated.
+
+        Returns:
+            None
+        """
+
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the answer.
+
+        Returns:
+            str: The UUID of the answer.
+        """
+
+        return self._uuid
 
     def to_immutable(self) -> "ImmutableAnswer":
         """
@@ -602,11 +974,11 @@ class AnswerManager(BaseObjectManager):
             Exception: If an exception occurs while creating the answer.
         """
         try:
+            # Initialize the result (optional) ImmutableAnswer to None
+            result: Optional[ImmutableAnswer] = None
+
             # Check if the answer object is immutable
-            if isinstance(
-                answer,
-                ImmutableAnswer,
-            ):
+            if not answer.is_mutable():
                 # If it is, convert it to a mutable answer
                 answer = answer.to_mutable()
 
@@ -614,13 +986,16 @@ class AnswerManager(BaseObjectManager):
             answer.created_at = Miscellaneous.get_current_datetime()
 
             # Set the custom_field_values of the answer
-            answer.custom_field_values = [] or answer.custom_field_values
+            answer.custom_field_values = answer.custom_field_values or []
 
             # Set the key of the answer
             answer.key = f"ANSWER_{self.count_answers() + 1}"
 
+            # Set the metadata of the answer
+            answer.metadata = answer.metadata or {}
+
             # Set the tags of the answer
-            answer.tags = [] or answer.tags
+            answer.tags = answer.tags or []
 
             # Set the updated_at timestamp of the answer
             answer.updated_at = Miscellaneous.get_current_datetime()
@@ -636,35 +1011,48 @@ class AnswerManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the answer
-                answer.id = id
-
-                # Convert the answer to an immutable answer
-                answer = AnswerFactory.create_answer(
-                    **answer.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a answer ({answer.__repr__()}) in the database."
                 )
 
-                # Add the answer to the cache
-                self.add_to_cache(
-                    key=answer.key,
-                    value=answer,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable answer
-                return answer
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a answer ({answer}) in the database."
+            kwargs: Dict[str, Any] = answer.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the answer
+            kwargs["id"] = id
+
+            # Convert the answer to an immutable answer
+            result = AnswerFactory.create_answer(
+                **kwargs
+            )
+
+            # Check, if the result is not None
+            if not result:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that there was an error while attempting to create an ImmutableAnswer from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the answer to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created immutable answer
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -977,8 +1365,8 @@ class AnswerManager(BaseObjectManager):
                     value=f"answer:{answer}",
                 )
                 for answer in [
-                    Constants.FALSE,
-                    Constants.TRUE,
+                    Constants.INCORRECT,
+                    Constants.CORRECT,
                 ]
             ]
 

@@ -4,6 +4,7 @@ Date: 2025-02-05
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 
@@ -128,8 +129,10 @@ class ImmutableFlashcard(ImmutableBaseObject):
             familiarity=familiarity,
             front_text=front_text,
             front_word_count=front_word_count,
+            hide_attributes=True,
             icon="📇",
             id=id,
+            interval=interval,
             key=key,
             last_viewed_at=last_viewed_at,
             metadata=metadata,
@@ -141,31 +144,244 @@ class ImmutableFlashcard(ImmutableBaseObject):
             uuid=uuid,
         )
 
+    @property
+    def back_text(self) -> str:
+        """
+        Gets the back side of the flashcard.
+
+        Returns:
+            str: The back side of the flashcard.
+        """
+        return self._back_text
+
+    @property
+    def back_word_count(self) -> int:
+        """
+        Gets the word count of the back side of the flashcard.
+
+        Returns:
+            int: The word count of the back side of the flashcard.
+        """
+        return self._back_word_count
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the timestamp when the flashcard was created.
+
+        Returns:
+            datetime: The timestamp when the flashcard was created.
+        """
+        return self._created_at
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Gets the custom field values of the flashcard.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the flashcard.
+        """
+        return self._custom_field_values
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Gets the difficulty of the flashcard.
+
+        Returns:
+            int: The difficulty of the flashcard.
+        """
+        return self._difficulty
+
+    @property
+    def due_by(self) -> datetime:
+        """
+        Gets the due date of the flashcard.
+
+        Returns:
+            datetime: The due date of the flashcard.
+        """
+        return self._due_by
+
+    @property
+    def familiarity(self) -> float:
+        """
+        Gets the familiarity of the flashcard.
+
+        Returns:
+            float: The familiarity of the flashcard.
+        """
+        return self._familiarity
+
+    @property
+    def front_text(self) -> str:
+        """
+        Gets the front side of the flashcard.
+
+        Returns:
+            str: The front side of the flashcard.
+        """
+        return self._front_text
+
+    @property
+    def front_word_count(self) -> int:
+        """
+        Gets the word count of the front side of the flashcard.
+
+        Returns:
+            int: The word count of the front side of the flashcard.
+        """
+        return self._front_word_count
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the flashcard.
+
+        Returns:
+            str: The icon of the flashcard.
+        """
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the flashcard.
+
+        Returns:
+            int: The ID of the flashcard.
+        """
+        return self._id
+
+    @property
+    def interval(self) -> int:
+        """
+        Gets the interval of the flashcard.
+
+        Returns:
+            int: The interval of the flashcard.
+        """
+        return self._interval
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the flashcard.
+
+        Returns:
+            str: The key of the flashcard.
+        """
+        return self._key
+
+    @property
+    def last_viewed_at(self) -> datetime:
+        """
+        Gets the timestamp when the flashcard was last viewed.
+
+        Returns:
+            datetime: The timestamp when the flashcard was last viewed.
+        """
+        return self._last_viewed_at
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the flashcard.
+
+        Returns:
+            Dict[str, Any]: The metadata of the flashcard.
+        """
+        return self._metadata
+
+    @property
+    def priority(self) -> int:
+        """
+        Gets the priority of the flashcard.
+
+        Returns:
+            int: The priority of the flashcard.
+        """
+        return self._priority
+
+    @property
+    def status(self) -> int:
+        """
+        Gets the status of the flashcard.
+
+        Returns:
+            int: The status of the flashcard.
+        """
+        return self._status
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Gets the tags of the flashcard.
+
+        Returns:
+            List[str]: The tags of the flashcard.
+        """
+        return self._tags
+
+    @property
+    def total_word_count(self) -> int:
+        """
+        Gets the total word count of the flashcard.
+
+        Returns:
+            int: The total word count of the flashcard.
+        """
+        return self._total_word_count
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the flashcard was last updated.
+
+        Returns:
+            datetime: The timestamp when the flashcard was last updated.
+        """
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the flashcard.
+
+        Returns:
+            str: The UUID of the flashcard.
+        """
+        return self._uuid
+
     def get_custom_field_value(
         self,
-        customfield_id: str,
+        custom_field_id: str,
     ) -> Optional[Any]:
         """
         Retrieves the value of a custom field by its ID.
 
         Args:
-            customfield_id (str): The ID of the custom field to retrieve.
+            custom_field_id (str): The ID of the custom field to retrieve.
 
         Returns:
             Optional[Any]: The value of the custom field if found, otherwise None.
         """
         try:
-            # Iterate over the custom field values and return the value for the matching customfield_id
+            # Iterate over the custom field values and return the value for the matching custom_field_id
             return next(
                 item["value"]
                 for item in self.custom_field_values
-                if item["customfield_id"] == customfield_id
+                if item["custom_field_id"] == custom_field_id
             )
         except StopIteration as e:
             # Log an error message to indicate that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_custom_field_value' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -191,6 +407,9 @@ class ImmutableFlashcard(ImmutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -291,6 +510,7 @@ class MutableFlashcard(MutableBaseObject):
             familiarity=familiarity,
             front_text=front_text,
             front_word_count=front_word_count,
+            hide_attributes=True,
             icon="📇",
             id=id,
             interval=interval,
@@ -305,25 +525,616 @@ class MutableFlashcard(MutableBaseObject):
             uuid=uuid,
         )
 
+    @property
+    def back_text(self) -> str:
+        """
+        Gets the back side of the flashcard.
+
+        Returns:
+            str: The back side of the flashcard.
+        """
+        return self._back_text
+
+    @back_text.setter
+    def back_text(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the back side of the flashcard.
+
+        Args:
+            value (str): The new back side of the flashcard.
+
+        Returns:
+            None
+        """
+        self._back_text = value
+
+    @property
+    def back_word_count(self) -> int:
+        """
+        Gets the word count of the back side of the flashcard.
+
+        Returns:
+            int: The word count of the back side of the flashcard.
+        """
+        return self._back_word_count
+
+    @back_word_count.setter
+    def back_word_count(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the word count of the back side of the flashcard.
+
+        Args:
+            value (int): The new word count of the back side of the flashcard.
+
+        Returns:
+            None
+        """
+        self._back_word_count = value
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the timestamp when the flashcard was created.
+
+        Returns:
+            datetime: The timestamp when the flashcard was created.
+        """
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the flashcard was created.
+
+        Args:
+            value (datetime): The new timestamp when the flashcard was created.
+
+        Returns:
+            None
+        """
+        self._created_at = value
+
+    @property
+    def custom_field_values(self) -> List[Dict[str, Any]]:
+        """
+        Gets the custom field values of the flashcard.
+
+        Returns:
+            List[Dict[str, Any]]: The custom field values of the flashcard.
+        """
+        return self._custom_field_values
+
+    @custom_field_values.setter
+    def custom_field_values(
+        self,
+        value: Union[Dict[str, Any], List[Dict[str, Any]]],
+    ) -> None:
+        """
+        Sets the custom field values of the flashcard.
+
+        Args:
+            value (Union[Dict[str, Any], List[Dict[str, Any]]): The new custom field values of the flashcard.
+
+        Returns:
+            None
+        """
+
+        # Check, if the custom_field_values list exists
+        if not self.get(
+            default=None,
+            name="custom_field_values",
+        ):
+            # Initialize the custom_field_values list as an empty list
+            self._custom_field_values = []
+
+        # Check, if the passed value is a dictionary
+        if isinstance(
+            value,
+            dict,
+        ):
+            # Append the passed value to the list
+            self._custom_field_values.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._custom_field_values.extend(value)
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Gets the difficulty of the flashcard.
+
+        Returns:
+            int: The difficulty of the flashcard.
+        """
+        return self._difficulty
+
+    @difficulty.setter
+    def difficulty(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the difficulty of the flashcard.
+
+        Args:
+            value (int): The new difficulty of the flashcard.
+
+        Returns:
+            None
+        """
+        self._difficulty = value
+
+    @property
+    def due_by(self) -> datetime:
+        """
+        Gets the due date of the flashcard.
+
+        Returns:
+            datetime: The due date of the flashcard.
+        """
+        return self._due_by
+
+    @due_by.setter
+    def due_by(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the due date of the flashcard.
+
+        Args:
+            value (datetime): The new due date of the flashcard.
+
+        Returns:
+            None
+        """
+        self._due_by = value
+
+    @property
+    def familiarity(self) -> float:
+        """
+        Gets the familiarity of the flashcard.
+
+        Returns:
+            float: The familiarity of the flashcard.
+        """
+        return self._familiarity
+
+    @familiarity.setter
+    def familiarity(
+        self,
+        value: float,
+    ) -> None:
+        """
+        Sets the familiarity of the flashcard.
+
+        Args:
+            value (float): The new familiarity of the flashcard.
+
+        Returns:
+            None
+        """
+        self._familiarity = value
+
+    @property
+    def front_text(self) -> str:
+        """
+        Gets the front side of the flashcard.
+
+        Returns:
+            str: The front side of the flashcard.
+        """
+        return self._front_text
+
+    @front_text.setter
+    def front_text(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the front side of the flashcard.
+
+        Args:
+            value (str): The new front side of the flashcard.
+
+        Returns:
+            None
+        """
+        self._front_text = value
+
+    @property
+    def front_word_count(self) -> int:
+        """
+        Gets the word count of the front side of the flashcard.
+
+        Returns:
+            int: The word count of the front side of the flashcard.
+        """
+        return self._front_word_count
+
+    @front_word_count.setter
+    def front_word_count(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the word count of the front side of the flashcard.
+
+        Args:
+            value (int): The new word count of the front side of the flashcard.
+
+        Returns:
+            None
+        """
+        self._front_word_count = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the flashcard.
+
+        Returns:
+            str: The icon of the flashcard.
+        """
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the flashcard.
+
+        Args:
+            value (str): The new icon of the flashcard.
+
+        Returns:
+            None
+        """
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the flashcard.
+
+        Returns:
+            int: The ID of the flashcard.
+        """
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the flashcard.
+
+        Args:
+            value (int): The new ID of the flashcard.
+
+        Returns:
+            None
+        """
+        self._id = value
+
+    @property
+    def interval(self) -> int:
+        """
+        Gets the interval of the flashcard.
+
+        Returns:
+            int: The interval of the flashcard.
+        """
+        return self._interval
+
+    @interval.setter
+    def interval(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the interval of the flashcard.
+
+        Args:
+            value (int): The new interval of the flashcard.
+
+        Returns:
+            None
+        """
+        self._interval = value
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the flashcard.
+
+        Returns:
+            str: The key of the flashcard.
+        """
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the flashcard.
+
+        Args:
+            value (str): The new key of the flashcard.
+
+        Returns:
+            None
+        """
+        self._key = value
+
+    @property
+    def last_viewed_at(self) -> datetime:
+        """
+        Gets the timestamp when the flashcard was last viewed.
+
+        Returns:
+            datetime: The timestamp when the flashcard was last viewed.
+        """
+        return self._last_viewed_at
+
+    @last_viewed_at.setter
+    def last_viewed_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the flashcard was last viewed.
+
+        Args:
+            value (datetime): The new timestamp when the flashcard was last viewed.
+
+        Returns:
+            None
+        """
+        self._last_viewed_at = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the flashcard.
+
+        Returns:
+            Dict[str, Any]: The metadata of the flashcard.
+        """
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Updates the metadata of the flashcard.
+
+        Args:
+            **kwargs (Dict[str, Any]): The new metadata of the flashcard.
+
+        Returns:
+            None
+        """
+
+        # Check, if the metadata dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Set the metadata of the flashcard to an empty dictionary
+            self._metadata = {}
+
+        # Update the metadata of the flashcard
+        self._metadata.update(**kwargs)
+
+    @property
+    def priority(self) -> int:
+        """
+        Gets the priority of the flashcard.
+
+        Returns:
+            int: The priority of the flashcard.
+        """
+        return self._priority
+
+    @priority.setter
+    def priority(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the priority of the flashcard.
+
+        Args:
+            value (int): The new priority of the flashcard.
+
+        Returns:
+            None
+        """
+        self._priority = value
+
+    @property
+    def status(self) -> int:
+        """
+        Gets the status of the flashcard.
+
+        Returns:
+            int: The status of the flashcard.
+        """
+        return self._status
+
+    @status.setter
+    def status(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the status of the flashcard.
+
+        Args:
+            value (int): The new status of the flashcard.
+
+        Returns:
+            None
+        """
+        self._status = value
+
+    @property
+    def tags(self) -> List[str]:
+        """
+        Gets the tags of the flashcard.
+
+        Returns:
+            List[str]: The tags of the flashcard.
+        """
+        return self._tags
+
+    @tags.setter
+    def tags(
+        self,
+        value: Union[List[str], str],
+    ) -> None:
+        """
+        Sets the tags of the flashcard.
+
+        Args:
+            value (Union[List[str], str]): The new tags of the flashcard.
+
+        Returns:
+            None
+        """
+        # Check, if the passed value is a string
+        if isinstance(
+            value,
+            str,
+        ):
+            # Append the passed value to the list
+            self._tags.append(value)
+        # Check, if the passed value is a list
+        elif isinstance(
+            value,
+            list,
+        ):
+            # Extend the list with the passed value
+            self._tags.extend(value)
+
+    @property
+    def total_word_count(self) -> int:
+        """
+        Gets the total word count of the flashcard.
+
+        Returns:
+            int: The total word count of the flashcard.
+        """
+        return self._total_word_count
+
+    @total_word_count.setter
+    def total_word_count(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the total word count of the flashcard.
+
+        Args:
+            value (int): The new total word count of the flashcard.
+
+        Returns:
+            None
+        """
+        self._total_word_count = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the flashcard was last updated.
+
+        Returns:
+            datetime: The timestamp when the flashcard was last updated.
+        """
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the flashcard was last updated.
+
+        Args:
+            value (datetime): The new timestamp when the flashcard was last updated.
+
+        Returns:
+            None
+        """
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the flashcard.
+
+        Returns:
+            str: The UUID of the flashcard.
+        """
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the flashcard.
+
+        Args:
+            value (str): The new UUID of the flashcard.
+
+        Returns:
+            None
+        """
+        self._uuid = value
+
     def get_custom_field_value(
         self,
-        customfield_id: str,
+        custom_field_id: str,
     ) -> Optional[Any]:
         """
         Retrieves the value of a custom field by its ID.
 
         Args:
-            customfield_id (str): The ID of the custom field to retrieve.
+            custom_field_id (str): The ID of the custom field to retrieve.
 
         Returns:
             Optional[Any]: The value of the custom field if found, otherwise None.
         """
         try:
-            # Iterate over the custom field values and return the value for the matching customfield_id
+            # Iterate over the custom field values and return the value for the matching custom_field_id
             return next(
                 item["value"]
                 for item in self.custom_field_values
-                if item["customfield_id"] == customfield_id
+                if item["custom_field_id"] == custom_field_id
             )
         except StopIteration as e:
             # Log an error message to indicate that an exception has occurred
@@ -331,35 +1142,99 @@ class MutableFlashcard(MutableBaseObject):
                 message=f"Caught an exception while attempting to run 'get_custom_field_value' method from '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
+    def remove_custom_field_value(
+        self,
+        custom_field_id: str,
+    ) -> None:
+        """
+        Removes a custom field value by its ID.
+
+        Args:
+            custom_field_id (str): The ID of the custom field to remove.
+
+        Returns:
+            None
+        """
+        try:
+            # Iterate over the custom field values and remove the value for the matching custom_field_id
+            self.custom_field_values = [
+                item
+                for item in self.custom_field_values
+                if item["custom_field_id"] != custom_field_id
+            ]
+
+            # Return indicating success
+            return
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'remove_custom_field_value' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return indicating an error has occurred
+            return
+
     def set_custom_field_value(
         self,
-        customfield_id: str,
+        custom_field_id: str,
         value: Any,
     ) -> None:
         """
         Sets the value of a custom field by its ID.
 
         Args:
-            customfield_id (str): The ID of the custom field to set.
+            custom_field_id (str): The ID of the custom field to set.
             value (Any): The value to set for the custom field.
 
         Returns:
             None
         """
         try:
-            # Iterate over the custom field values and update the value for the matching customfield_id
-            for item in self.custom_field_values:
-                if item["customfield_id"] == customfield_id:
-                    item["value"] = value
-                    return
+            # Get the custom field value by its ID
+            entry: Optional[Dict[str, Any]] = next(
+                (
+                    item
+                    for item in self.custom_field_values
+                    if item["custom_field_id"] == custom_field_id
+                ),
+                None,
+            )
+
+            # Check, if the item is None
+            if entry is None:
+                # Append the new custom field value to the list
+                self.custom_field_values.append(
+                    {
+                        "custom_field_id": custom_field_id,
+                        "value": value,
+                    }
+                )
+
+                # Return early
+                return
+
+            # Update the value of the custom field
+            entry["value"] = value
+
+            # Return indicating success
+            return
         except Exception as e:
             # Log an error message to indicate that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'set_custom_field_value' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return indicating an error has occurred
             return
@@ -425,6 +1300,9 @@ class MutableFlashcard(MutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -668,8 +1546,8 @@ class FlashcardBuilder(BaseObjectBuilder):
             )
 
             if not flashcard:
-                # Log an error message indicating an exception has occurred
-                self.logger.error(
+                # Log a warning message indicating an exception has occurred
+                self.logger.warning(
                     message=f"Failed to build an instance of the ImmutableFlashcard or MutableFlashcard class from '{self.__class__.__name__}'"
                 )
 
@@ -710,16 +1588,6 @@ class FlashcardBuilder(BaseObjectBuilder):
     ) -> Self:
         # Set the back_word_count value in the configuration dictionary
         self.configuration["back_word_count"] = value
-
-        # Return the builder instance
-        return self
-
-    def created_at(
-        self,
-        value: Optional[datetime] = None,
-    ) -> Self:
-        # Set the created_at value in the configuration dictionary
-        self.configuration["created_at"] = value
 
         # Return the builder instance
         return self
@@ -868,16 +1736,6 @@ class FlashcardBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
-    def updated_at(
-        self,
-        value: Optional[datetime] = None,
-    ) -> Self:
-        # Set the updated_at value in the configuration dictionary
-        self.configuration["updated_at"] = value
-
-        # Return the builder instance
-        return self
-
 
 class FlashcardManager(BaseObjectManager):
     """
@@ -904,14 +1762,14 @@ class FlashcardManager(BaseObjectManager):
         Returns:
             FlashcardManager: The created or existing instance of FlashcardManager class.
         """
-        
+
         # Check if the shared instance does not exist
         if cls._shared_instance is None:
             # Create a new instance by calling the parent class constructor
             cls._shared_instance = super(FlashcardManager, cls).__new__(cls)
             # Initialize the instance
             cls._shared_instance.init()
-        
+
         # Return the shared instance
         return cls._shared_instance
 
@@ -925,6 +1783,65 @@ class FlashcardManager(BaseObjectManager):
 
         # Call the parent class constructor
         super().__init__()
+
+    def _run_pre_create_tasks(
+        self,
+        flashcard: Union[
+            ImmutableFlashcard,
+            MutableFlashcard,
+        ],
+    ) -> MutableFlashcard:
+        """
+        Runs pre-create tasks for the flashcard.
+
+        Args:
+            flashcard (Union[ImmutableFlashcard, MutableFlashcard]): The flashcard to run pre-create tasks on.
+
+        Returns:
+            MutableFlashcard: The flashcard with pre-create tasks run.
+        """
+
+        # Check if the flashcard object is immutable
+        if not flashcard.is_mutable():
+            # If it is, convert it to a mutable flashcard
+            flashcard = flashcard.to_mutable()
+
+        # Set the created_at timestamp of the flashcard
+        flashcard.created_at = Miscellaneous.get_current_datetime()
+
+        # Set the custom_field_values of the flashcard
+        flashcard.custom_field_values = flashcard.custom_field_values or []
+
+        # Set the due_by timestamp of the flashcard
+        flashcard.due_by = flashcard.due_by or Miscellaneous.get_date_increment(
+            days=flashcard.interval or Constants.BASE_REPETITION_INTERVAL_DAYS
+        )
+
+        # Set the familiarity of the flashcard
+        flashcard.familiarity = flashcard.familiarity or 0.0
+
+        # Set the repetition interval (in days) of the flashcard
+        flashcard.interval = (
+            flashcard.interval or Constants.BASE_REPETITION_INTERVAL_DAYS
+        )
+
+        # Set the key of the flashcard
+        flashcard.key = f"FLASHCARD_{self.count_flashcards() + 1}"
+
+        # Set the metadata of the flashcard
+        flashcard.metadata = flashcard.metadata or {}
+
+        # Set the tags of the flashcard
+        flashcard.tags = flashcard.tags or []
+
+        # Set the updated_at timestamp of the flashcard
+        flashcard.updated_at = Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the flashcard
+        flashcard.uuid = Miscellaneous.get_uuid()
+
+        # Return the flashcard to the caller
+        return flashcard
 
     def count_flashcards(self) -> int:
         """
@@ -962,34 +1879,13 @@ class FlashcardManager(BaseObjectManager):
             Exception: If an exception occurs while creating the flashcard.
         """
         try:
-            # Check if the flashcard object is immutable
-            if isinstance(
-                flashcard,
-                ImmutableFlashcard,
-            ):
-                # If it is, convert it to a mutable flashcard
-                flashcard = flashcard.to_mutable()
+            # Initialize the result (optional) ImmutableFlashcard to none
+            result: Optional[ImmutableFlashcard] = None
 
-            # Set the created_at timestamp of the flashcard
-            flashcard.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the custom_field_values of the flashcard
-            flashcard.custom_field_values = flashcard.custom_field_values if flashcard.custom_field_values else []
-
-            # Set the familiarity of the flashcard
-            flashcard.familiarity = flashcard.familiarity if flashcard.familiarity else 0.0
-
-            # Set the key of the flashcard
-            flashcard.key = f"FLASHCARD_{self.count_flashcards() + 1}"
-
-            # Set the tags of the flashcard
-            flashcard.tags = flashcard.tags if flashcard.tags else []
-
-            # Set the updated_at timestamp of the flashcard
-            flashcard.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the flashcard
-            flashcard.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            flashcard: MutableFlashcard = self._run_pre_create_tasks(
+                flashcard=flashcard
+            )
 
             # Convert the flashcard object to a FlashcardModel object
             model: FlashcardModel = FlashcardConverter.object_to_model(object=flashcard)
@@ -999,35 +1895,47 @@ class FlashcardManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the flashcard
-                flashcard.id = id
-
-                # Convert the flashcard to an immutable flashcard
-                flashcard = FlashcardFactory.create_flashcard(
-                    **flashcard.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a flashcard ({flashcard.__repr__()}) in the database."
                 )
 
-                # Add the flashcard to the cache
-                self.add_to_cache(
-                    key=flashcard.key,
-                    value=flashcard,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable flashcard
-                return flashcard
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a flashcard ({flashcard}) in the database."
+            # Convert the flashcard to a dictionary
+            kwargs: Dict[str, Any] = flashcard.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the flashcard
+            kwargs["id"] = id
+
+            # Create a new ImmutableFlashcard object
+            result = FlashcardFactory.create_flashcard(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableFlashcard from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the flashcard to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableFlashcard instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1081,7 +1989,10 @@ class FlashcardManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_flashcards(self, force_refetch: bool = False,) -> Optional[List[ImmutableFlashcard]]:
+    def get_all_flashcards(
+        self,
+        force_refetch: bool = False,
+    ) -> Optional[List[ImmutableFlashcard]]:
         """
         Returns a list of all flashcards in the database.
 
@@ -1476,7 +2387,9 @@ class FlashcardManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableFlashcard]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableFlashcard]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -1505,13 +2418,11 @@ class FlashcardManager(BaseObjectManager):
                     for model in models
                 ]
 
-                # Iterate over the found flashcards
-                for flashcard in flashcards:
-                    # Add the flashcard to the cache
-                    self.add_to_cache(
-                        key=flashcard.key,
-                        value=flashcard,
-                    )
+                # Add the flashcards to the cache
+                self.add_to_cache(
+                    key=[flashcard.key for flashcard in flashcards],
+                    value=flashcards,
+                )
 
                 # Return the found flashcards
                 return flashcards
@@ -1545,10 +2456,7 @@ class FlashcardManager(BaseObjectManager):
         """
         try:
             # Check if the flashcard object is immutable
-            if isinstance(
-                flashcard,
-                ImmutableFlashcard,
-            ):
+            if not flashcard.is_mutable():
                 # If it is, convert it to a mutable flashcard
                 flashcard = flashcard.to_mutable()
 

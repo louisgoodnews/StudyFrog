@@ -4,6 +4,7 @@ Date: 2025-02-09
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 from typing import *
@@ -32,12 +33,13 @@ class ImmutableCustomField(ImmutableBaseObject):
     An immutable class representing a custom field.
 
     Attributes:
-        name (str): The name of the custom field.
-        type (str): The type of the custom field.
         created_at (Optional[datetime]): The timestamp when the custom field was created.
+        description (Optional[str]): The description of the custom field.
         id (Optional[int]): The ID of the custom field.
         key (Optional[str]): The key of the custom field.
         metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
+        name (str): The name of the custom field.
+        type (str): The type of the custom field.
         updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
         uuid (Optional[str]): The UUID of the custom field.
     """
@@ -47,6 +49,7 @@ class ImmutableCustomField(ImmutableBaseObject):
         name: str,
         type: str,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -58,13 +61,14 @@ class ImmutableCustomField(ImmutableBaseObject):
         Initializes a new instance of the CustomField class.
 
         Args:
-            name (str): The name of the custom field.
-            type (str): The type of the custom field.
             created_at (Optional[datetime]): The timestamp when the custom field was created.
+            description (Optional[str]): The description of the custom field.
             icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
             id (Optional[int]): The ID of the custom field.
             key (Optional[str]): The key of the custom field.
             metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
+            name (str): The name of the custom field.
+            type (str): The type of the custom field.
             updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
             uuid (Optional[str]): The UUID of the custom field.
 
@@ -75,6 +79,8 @@ class ImmutableCustomField(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -84,6 +90,126 @@ class ImmutableCustomField(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the timestamp when the custom field was created.
+
+        Returns:
+            datetime: The timestamp when the custom field was created.
+        """
+
+        # Return the created_at attribute
+        return self._created_at
+
+    @property
+    def description(self) -> str:
+        """
+        Gets the description of the custom field.
+
+        Returns:
+            str: The description of the custom field.
+        """
+
+        # Return the description attribute
+        return self._description
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the custom field.
+
+        Returns:
+            str: The icon of the custom field.
+        """
+
+        # Return the icon attribute
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the custom field.
+
+        Returns:
+            int: The ID of the custom field.
+        """
+
+        # Return the id attribute
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the custom field.
+
+        Returns:
+            str: The key of the custom field.
+        """
+
+        # Return the key attribute
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the custom field.
+
+        Returns:
+            Dict[str, Any]: The metadata of the custom field.
+        """
+
+        # Return the metadata attribute
+        return self._metadata
+
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the custom field.
+
+        Returns:
+            str: The name of the custom field.
+        """
+
+        # Return the name attribute
+        return self._name
+
+    @property
+    def type(self) -> str:
+        """
+        Gets the type of the custom field.
+
+        Returns:
+            str: The type of the custom field.
+        """
+
+        # Return the type attribute
+        return self._type
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the custom field was last updated.
+
+        Returns:
+            datetime: The timestamp when the custom field was last updated.
+        """
+
+        # Return the updated_at attribute
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the custom field.
+
+        Returns:
+            str: The UUID of the custom field.
+        """
+
+        # Return the uuid attribute
+        return self._uuid
 
     def to_mutable(self) -> Optional["MutableCustomField"]:
         """
@@ -106,9 +232,12 @@ class ImmutableCustomField(ImmutableBaseObject):
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
-            cls.logger.error(
-                message=f"Caught an exception while attempting to run 'to_mutable' method from '{cls.__name__}': {e}"
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -119,12 +248,13 @@ class MutableCustomField(MutableBaseObject):
     A mutable class representing a custom field.
 
     Attributes:
-        name (str): The name of the custom field.
-        type (str): The type of the custom field.
         created_at (Optional[datetime]): The timestamp when the custom field was created.
+        description (Optional[str]): The description of the custom field.
         id (Optional[int]): The ID of the custom field.
         key (Optional[str]): The key of the custom field.
         metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
+        name (str): The name of the custom field.
+        type (str): The type of the custom field.
         updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
         uuid (Optional[str]): The UUID of the custom field.
     """
@@ -134,6 +264,7 @@ class MutableCustomField(MutableBaseObject):
         name: str,
         type: str,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -145,13 +276,14 @@ class MutableCustomField(MutableBaseObject):
         Initializes a new instance of the MutableCustomField class.
 
         Args:
-            name (str): The name of the custom field.
-            type (str): The type of the custom field.
             created_at (Optional[datetime]): The timestamp when the custom field was created.
+            description (Optional[str]): The description of the custom field.
             icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
             id (Optional[int]): The ID of the custom field.
             key (Optional[str]): The key of the custom field.
             metadata (Optional[Dict[str, Any]]): The metadata of the custom field.
+            name (str): The name of the custom field.
+            type (str): The type of the custom field.
             updated_at (Optional[datetime]): The timestamp when the custom field was last updated.
             uuid (Optional[str]): The UUID of the custom field.
 
@@ -162,6 +294,8 @@ class MutableCustomField(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -171,6 +305,314 @@ class MutableCustomField(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the timestamp when the custom field was created.
+
+        Returns:
+            datetime: The timestamp when the custom field was created.
+        """
+
+        # Return the created_at attribute
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the custom field was created.
+
+        Args:
+            value (datetime): The timestamp when the custom field was created.
+
+        Returns:
+            None
+        """
+
+        # Set the created_at attribute
+        self._created_at = value
+
+    @property
+    def description(self) -> str:
+        """
+        Gets the description of the custom field.
+
+        Returns:
+            str: The description of the custom field.
+        """
+
+        # Return the description attribute
+        return self._description
+
+    @description.setter
+    def description(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the description of the custom field.
+
+        Args:
+            value (str): The description of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Set the description attribute
+        self._description = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the custom field.
+
+        Returns:
+            str: The icon of the custom field.
+        """
+
+        # Return the icon attribute
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the custom field.
+
+        Args:
+            value (str): The icon of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Set the icon attribute
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the custom field.
+
+        Returns:
+            int: The ID of the custom field.
+        """
+
+        # Return the id attribute
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the custom field.
+
+        Args:
+            value (int): The ID of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Set the id attribute
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the custom field.
+
+        Returns:
+            str: The key of the custom field.
+        """
+
+        # Return the key attribute
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the custom field.
+
+        Args:
+            value (str): The key of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Set the key attribute
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the custom field.
+
+        Returns:
+            Dict[str, Any]: The metadata of the custom field.
+        """
+
+        # Return the metadata attribute
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the custom field.
+
+        Args:
+            **kwargs (Dict[str, Any]): The metadata of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Check if the 'metadata' dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Initialize the 'metadata' dictionary
+            self.metadata = {}
+
+        # Update the 'metadata' dictionary with the provided keyword arguments
+        self.metadata.update(**kwargs)
+
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the custom field.
+
+        Returns:
+            str: The name of the custom field.
+        """
+
+        # Return the name attribute
+        return self._name
+
+    @name.setter
+    def name(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the name of the custom field.
+
+        Args:
+            value (str): The name of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Set the name attribute
+        self._name = value
+
+    @property
+    def type(self) -> str:
+        """
+        Gets the type of the custom field.
+
+        Returns:
+            str: The type of the custom field.
+        """
+
+        # Return the type attribute
+        return self._type
+
+    @type.setter
+    def type(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the type of the custom field.
+
+        Args:
+            value (str): The type of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Set the type attribute
+        self._type = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the custom field was last updated.
+
+        Returns:
+            datetime: The timestamp when the custom field was last updated.
+        """
+
+        # Return the updated_at attribute
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the custom field was last updated.
+
+        Args:
+            value (datetime): The timestamp when the custom field was last updated.
+
+        Returns:
+            None
+        """
+
+        # Set the updated_at attribute
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the custom field.
+
+        Returns:
+            str: The UUID of the custom field.
+        """
+
+        # Return the uuid attribute
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the custom field.
+
+        Args:
+            value (str): The UUID of the custom field.
+
+        Returns:
+            None
+        """
+
+        # Set the uuid attribute
+        self._uuid = value
 
     def to_immutable(self) -> Optional[ImmutableCustomField]:
         """
@@ -193,9 +635,12 @@ class MutableCustomField(MutableBaseObject):
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
-            cls.logger.error(
-                message=f"Caught an exception while attempting to run 'to_immutable' method from '{cls.__name__}': {e}"
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -247,6 +692,9 @@ class CustomFieldConverter:
                 message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -282,15 +730,11 @@ class CustomFieldConverter:
                 message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
-
-
-class CustomFieldBuilder(BaseObjectBuilder):
-    """
-    """
-
-    pass
 
 
 class CustomFieldFactory:
@@ -356,6 +800,161 @@ class CustomFieldFactory:
             return None
 
 
+class CustomFieldBuilder(BaseObjectBuilder):
+    """ """
+
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the CustomFieldBuilder class.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableCustomField,
+            MutableCustomField,
+        ]
+    ]:
+        """
+        Builds a new instance of the CustomField class.
+
+        Args:
+            as_mutable (bool): A flag indicating whether to return a mutable instance of the CustomField class. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableCustomField, MutableCustomField]]: The newly created CustomField instance if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while attempting to build the CustomField instance.
+        """
+        try:
+            # Attempt to create a new ImmutableCustomField instance
+            custom_field: Optional[ImmutableCustomField] = (
+                CustomFieldFactory.create_custom_field(**self.configuration)
+            )
+
+            # Check, if the custom field exists
+            if not custom_field:
+                # Log a warning message indicating an exception has occurred
+                self.logger.warning(
+                    message=f"Failed to build an instance of the ImmutableCustomField or MutableCustomField class from '{self.__class__.__name__}'"
+                )
+
+                # Return early
+                return
+
+            # Check, if the 'as_mutable' flag has been set to True
+            if as_mutable:
+                # Convert the custom field into a MutableCustomField instance and return it
+                return custom_field.to_mutable()
+
+            # Return the custom field
+            return custom_field
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the created_at value.
+
+        Args:
+            value (datetime): The created_at value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the created_at value
+        self.configuration["created_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def name(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the name value.
+
+        Args:
+            value (str): The name value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the name value
+        self.configuration["name"] = value
+
+        # Return the builder instance
+        return self
+
+    def type(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the type value.
+
+        Args:
+            value (str): The type value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the type value
+        self.configuration["type"] = value
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the updated_at value.
+
+        Args:
+            value (datetime): The updated_at value.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the updated_at value
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
+
+
 class CustomFieldManager(BaseObjectManager):
     """
     A manager class for managing custom fields in the application.
@@ -403,6 +1002,47 @@ class CustomFieldManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        custom_field: Union[
+            ImmutableCustomField,
+            MutableCustomField,
+        ],
+    ) -> MutableCustomField:
+        """
+        Runs pre-create tasks for the custom field.
+
+        Args:
+            custom_field (Union[ImmutableCustomField, MutableCustomField]): The custom field to run pre-create tasks for.
+
+        Returns:
+            MutableCustomField: The custom field with pre-create tasks run.
+        """
+
+        # Check, if the custom field is not mutable
+        if not custom_field.is_mutable():
+            # Convert the custom field into a mutable custom field
+            custom_field: MutableCustomField = custom_field.to_mutable()
+
+        # Set the created_at timestamp of the custom field
+        custom_field.created_at = (
+            custom_field.created_at or Miscellaneous.get_current_datetime()
+        )
+
+        # Set the key of the custom field
+        custom_field.key = f"CUSTOM_FIELD_{self.count_custom_fields() + 1}"
+
+        # Set the updated_at timestamp of the custom field
+        custom_field.updated_at = (
+            custom_field.updated_at or Miscellaneous.get_current_datetime()
+        )
+
+        # Set the uuid of the custom field
+        custom_field.uuid = Miscellaneous.get_uuid()
+
+        # Return the custom field
+        return custom_field
+
     def count_custom_fields(self) -> int:
         """
         Returns the number of custom fields in the database.
@@ -418,6 +1058,9 @@ class CustomFieldManager(BaseObjectManager):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'count' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return 0 indicating an exception has occurred
             return 0
@@ -439,29 +1082,17 @@ class CustomFieldManager(BaseObjectManager):
             Exception: If an exception occurs while creating the custom field.
         """
         try:
-            # Check if the custom field object is immutable
-            if isinstance(
-                custom_field,
-                ImmutableCustomField,
-            ):
-                # If it is, convert it to a mutable custom field
-                custom_field = custom_field.to_mutable()
+            # Initialize the result (optional) ImmutableCustomField to none
+            result: Optional[ImmutableCustomField] = None
 
-            # Set the created_at timestamp of the custom field
-            custom_field.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the key of the custom field
-            custom_field.key = f"CUSTOM_FIELD_{self.count_custom_fields() + 1}"
-
-            # Set the updated_at timestamp of the custom field
-            custom_field.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the custom field
-            custom_field.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            custom_field: MutableCustomField = self._run_pre_create_tasks(
+                custom_field=custom_field
+            )
 
             # Convert the custom field object to a CustomFieldModel object
             model: CustomFieldModel = CustomFieldConverter.object_to_model(
-                object=setting
+                object=custom_field
             )
 
             # Create a new custom field in the database
@@ -469,40 +1100,55 @@ class CustomFieldManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the custom field
-                custom_field.id = id
-
-                # Convert the custom field to an immutable custom field
-                custom_field = ImmutableCustomField(
-                    **custom_field.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a custom field ({custom_field.__repr__()}) in the database."
                 )
 
-                # Add the custom field to the cache
-                self.add_to_cache(
-                    key=custom_field.key,
-                    value=setting,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable custom field
-                return custom_field
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a custom field ({setting}) in the database."
+            # Convert the custom field to a dictionary
+            kwargs: Dict[str, Any] = custom_field.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the custom field
+            kwargs["id"] = id
+
+            # Create a new ImmutableCustomField object
+            result = CustomFieldFactory.create_custom_field(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableCustomField from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the custom field to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableCustomField instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_setting' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'create_custom_field' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -542,8 +1188,11 @@ class CustomFieldManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'delete_custom_field' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return False indicating an exception has occurred
             return False
@@ -588,13 +1237,13 @@ class CustomFieldManager(BaseObjectManager):
                     # Add the immutable custom field to the cache
                     self.add_to_cache(
                         key=custom_field.key,
-                        value=setting,
+                        value=custom_field,
                     )
                 else:
                     # Update the immutable custom field in the cache
                     self.update_in_cache(
                         key=custom_field.key,
-                        value=setting,
+                        value=custom_field,
                     )
 
             # Return the list of immutable custom fields
@@ -602,8 +1251,11 @@ class CustomFieldManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_all_custom_fields' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -658,8 +1310,11 @@ class CustomFieldManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_custom_field_by' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -712,8 +1367,11 @@ class CustomFieldManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by_id' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_custom_field_by_id' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -766,8 +1424,11 @@ class CustomFieldManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by_uuid' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_custom_field_by_uuid' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -794,7 +1455,9 @@ class CustomFieldManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableCustomField]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableCustomField]] = self.search_cache(
+                    **kwargs
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -828,8 +1491,11 @@ class CustomFieldManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'search_custom_fields' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -900,8 +1566,11 @@ class CustomFieldManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'update_custom_field' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -913,6 +1582,7 @@ class CustomFieldModel(ImmutableBaseModel):
 
     Attributes:
         created_at (datetime): The timestamp when the custom field was created.
+        description (Optional[str]): The description of the custom field.
         icon (str): The icon of the custom field. Defaults to "🎛️".
         id (int): The ID of the custom field.
         key (str): The key of the custom field.
@@ -954,6 +1624,22 @@ class CustomFieldModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    description: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="description",
+        nullable=True,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -1072,6 +1758,7 @@ class CustomFieldModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         icon: Optional[str] = "🎛️",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -1086,6 +1773,7 @@ class CustomFieldModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the custom field was created.
+            description (Optional[str]): The description of the custom field.
             icon (Optional[str]): The icon of the custom field. Defaults to "🎛️".
             id (Optional[int]): The ID of the custom field.
             key (Optional[str]): The key of the custom field.
@@ -1102,6 +1790,7 @@ class CustomFieldModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
             icon="🎛️",
             id=id,
             key=key,

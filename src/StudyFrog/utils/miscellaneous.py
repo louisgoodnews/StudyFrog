@@ -218,9 +218,22 @@ class Miscellaneous:
         Returns:
             str: The snake_case version of the input string.
         """
-        return "".join(["_" + i.lower() if i.isupper() else i for i in string]).strip(
-            "_"
-        )
+
+        # Initialize an empty string to store the result
+        result: str = ""
+
+        # Iterate over each character in the string
+        for char in string:
+            # Check if the character is uppercase
+            if char.isupper():
+                # Append an underscore and the lowercase version of the character
+                result += "_" + char.lower()
+            else:
+                # Append the character as is
+                result += char
+
+        # Return the result, stripped of leading/trailing underscores
+        return result.strip("_")
 
     @classmethod
     def convert_from_db_format(
@@ -245,18 +258,32 @@ class Miscellaneous:
                 key,
                 value,
             ) in data.items():
+                # Add the value to the result dictionary
+                result[key] = value
+
+                # Check, if the current value is not a string
+                if not isinstance(
+                    value,
+                    str,
+                ):
+                    # Skip to the next iteration
+                    continue
+
                 # Check, if the current value is a JSON string
-                if isinstance(value, str) and cls.is_json_string(string=value):
+                if cls.is_json_string(string=value):
                     # Convert the JSON string into a JSON object
                     result[key] = json.loads(value)
+
+                    # Skip to the next iteration
+                    continue
 
                 # Check, if the current value is a datetime string
                 if cls.is_datetime_string(string=value):
                     # Convert the datetime string into a datetime object
                     result[key] = cls.string_to_datetime(date_string=value)
 
-                # Keep unchanged if no conversion applied
-                result[key] = value
+                    # Skip to the next iteration
+                    continue
 
             # Return the converted dictionary
             return result
@@ -265,6 +292,9 @@ class Miscellaneous:
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'convert_from_db_format' method from '{cls.__name__}': {e}"
             )
+
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -321,6 +351,9 @@ class Miscellaneous:
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'convert_to_db_format' method from '{cls.__name__}': {e}"
             )
+
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -477,6 +510,9 @@ class Miscellaneous:
         # Log a warning message
         cls.logger.warning(f"Could not detect date format for input: {date_input}")
 
+        # Log the traceback
+        cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
         # Return None
         return None
 
@@ -538,34 +574,68 @@ class Miscellaneous:
     @classmethod
     def get_date_decrement(
         cls,
-        decrement: int,
+        days: Optional[Union[float, int]] = None,
+        hours: Optional[Union[float, int]] = None,
+        microseconds: Optional[Union[float, int]] = None,
+        milliseconds: Optional[Union[float, int]] = None,
+        minutes: Optional[Union[float, int]] = None,
+        seconds: Optional[Union[float, int]] = None,
     ) -> datetime:
         """
         Returns the current datetime decremented by a given amount.
 
         Args:
-            decrement (int): The amount to decrement the datetime by.
+            days (Optional[Union[float, int]]): The amount of days to decrement the datetime by.
+            hours (Optional[Union[float, int]]): The amount of hours to decrement the datetime by.
+            microseconds (Optional[Union[float, int]]): The amount of microseconds to decrement the datetime by.
+            milliseconds (Optional[Union[float, int]]): The amount of milliseconds to decrement the datetime by.
+            minutes (Optional[Union[float, int]]): The amount of minutes to decrement the datetime by.
+            seconds (Optional[Union[float, int]]): The amount of seconds to decrement the datetime by.
 
         Returns:
             datetime: The decremented datetime.
         """
-        return cls.get_current_datetime() - timedelta(days=decrement)
+        return cls.get_current_datetime() - timedelta(
+            days=days or 0,
+            hours=hours or 0,
+            microseconds=microseconds or 0,
+            milliseconds=milliseconds or 0,
+            minutes=minutes or 0,
+            seconds=seconds or 0,
+        )
 
     @classmethod
     def get_date_increment(
         cls,
-        increment: int,
+        days: Optional[Union[float, int]] = None,
+        hours: Optional[Union[float, int]] = None,
+        microseconds: Optional[Union[float, int]] = None,
+        milliseconds: Optional[Union[float, int]] = None,
+        minutes: Optional[Union[float, int]] = None,
+        seconds: Optional[Union[float, int]] = None,
     ) -> datetime:
         """
         Returns the current datetime incremented by a given amount.
 
         Args:
-            increment (int): The amount to increment the datetime by.
+            days (Optional[Union[float, int]]): The amount of days to increment the datetime by.
+            hours (Optional[Union[float, int]]): The amount of hours to increment the datetime by.
+            microseconds (Optional[Union[float, int]]): The amount of microseconds to increment the datetime by.
+            milliseconds (Optional[Union[float, int]]): The amount of milliseconds to increment the datetime by.
+            minutes (Optional[Union[float, int]]): The amount of minutes to increment the datetime by.
+            seconds (Optional[Union[float, int]]): The amount of seconds to increment the datetime by.
 
         Returns:
             datetime: The incremented datetime.
         """
-        return datetime.now() + timedelta(days=increment)
+        return datetime.now() + timedelta(
+            days=days or 0,
+            hours=hours or 0,
+            microseconds=microseconds or 0,
+            milliseconds=milliseconds or 0,
+            minutes=minutes or 0,
+            seconds=seconds or 0,
+        )
 
     @classmethod
     def get_random_bool(cls) -> bool:
@@ -609,18 +679,19 @@ class Miscellaneous:
         )
 
     @classmethod
-    def get_range(cls, min: int, max: int) -> Tuple[int, ...]:
+    def get_range(cls, min: int, max: int, step: int = 1) -> Tuple[int, ...]:
         """
         Returns a range of integers between min and max (inclusive).
 
         Args:
             min (int): The minimum value of the range.
             max (int): The maximum value of the range.
+            step (int): The step size of the range. Defaults to 1.
 
         Returns:
             range: A range of integers between min and max (inclusive).
         """
-        return tuple(range(min, max + 1))
+        return tuple(range(min, max + 1, step))
 
     @classmethod
     def get_uuid(cls) -> str:
@@ -779,6 +850,49 @@ class Miscellaneous:
         return cls.is_float_number(string=string) or cls.is_int_number(string=string)
 
     @classmethod
+    def pascal_to_snake(
+        cls,
+        string: str,
+    ) -> str:
+        """
+        Converts a PascalCase string to snake_case.
+
+        Args:
+            string (str): The PascalCase string to be converted.
+
+        Returns:
+            str: The snake_case version of the input string.
+        """
+
+        # Initialize an empty string to store the result
+        result: str = ""
+
+        # Check, if the entire string is lowercase or uppercase
+        if string.islower() or string.isupper():
+            # Return the lowercase version of the string
+            return string.lower() if string.isupper() else string
+
+        # Iterate over each character in the string
+        for (
+            index,
+            char,
+        ) in enumerate(iterable=string):
+            # Check if the character is uppercase and the first character
+            if char.isupper() and index == 0:
+                # Append the lowercase version of the character
+                result += char.lower()
+            # Check if the character is uppercase and not the first character
+            elif char.isupper() and index > 0:
+                # Append an underscore and the lowercase version of the character
+                result += "_" + char.lower()
+            else:
+                # Append the character as is
+                result += char
+
+        # Return the result, stripped of leading/trailing underscores
+        return result.strip("_")
+
+    @classmethod
     def pluralize(
         cls,
         string: str,
@@ -833,6 +947,9 @@ class Miscellaneous:
                 message=f"Caught an exception while attempting to run 'run_asynchronously' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -870,6 +987,9 @@ class Miscellaneous:
                 message=f"Caught an exception while attempting to run 'run_in_thread' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -892,7 +1012,10 @@ class Miscellaneous:
         return random.choice(seq=iterable)
 
     @classmethod
-    def shuffle(iterable: Iterable[Any]) -> None:
+    def shuffle(
+        cls,
+        iterable: Iterable[Any],
+    ) -> None:
         """
         Shuffles an iterable.
 

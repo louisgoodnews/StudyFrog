@@ -817,7 +817,7 @@ class LearningSessionUI(BaseUI):
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
-                    relief=FLAT
+                    relief=FLAT,
                 )
 
                 # Configure the CountdownWidget's 'resuome button' tkinter.Button widegt
@@ -828,7 +828,7 @@ class LearningSessionUI(BaseUI):
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
-                    relief=FLAT
+                    relief=FLAT,
                 )
 
             # Check, if 'countup' mode is enabled
@@ -869,7 +869,7 @@ class LearningSessionUI(BaseUI):
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
-                    relief=FLAT
+                    relief=FLAT,
                 )
 
                 # Configure the CountupWidget's 'resuome button' tkinter.Button widegt
@@ -880,7 +880,7 @@ class LearningSessionUI(BaseUI):
                         Constants.DEFAULT_FONT_SIZE,
                     ),
                     foreground=Constants.WHITE,
-                    relief=FLAT
+                    relief=FLAT,
                 )
 
             # Get the options button widget
@@ -1002,9 +1002,6 @@ class LearningSessionUI(BaseUI):
                 self.logger.warning(
                     message=f"Unsupported content type ({type(content)}) in '{self.__class__.__name__}'. This is likely due to a type not being implemented."
                 )
-
-            # Update the title label
-            self.update_title_label()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -1070,19 +1067,33 @@ class LearningSessionUI(BaseUI):
                     message=f"Failed to load difficulty in '{self.__class__.__name__}'. This is likely a bug."
                 )
 
-                # Toggle(reset) the difficulty buttons
-                self.toggle_difficulty_buttons()
-            else:
-                # Toggle(reset) the difficulty buttons
-                self.toggle_difficulty_buttons(
-                    difficulty=difficulty_notification.get_one_and_only_result().name.lower(),
-                )
+                # Return early
+                return
 
-            # Update the widgets in the learning session ui
-            self.update_idletasks()
+            # Get the difficulty
+            difficulty: Optional[
+                Literal[
+                    "easy",
+                    "medium",
+                    "hard",
+                ]
+            ] = (
+                difficulty_notification.get_one_and_only_result().name.lower()
+                if not difficulty_notification or difficulty_notification.has_errors()
+                else None
+            )
+
+            # Toggle(reset) the difficulty buttons
+            self.toggle_difficulty_buttons(difficulty=difficulty)
+
+            # Toggle the navigation buttons
+            self.toggle_navigation_buttons()
+
+            # Update the title label
+            self.update_title_label()
 
             # Determine the event to dispatch based on the specified name
-            event: DispatcherEvent
+            event: Optional[DispatcherEvent] = Events.GENERIC_EVENT
 
             # Dispatch the event to load the content into the learning view
             if name == "flashcard":
@@ -1164,6 +1175,9 @@ class LearningSessionUI(BaseUI):
 
             # Set the current learning view
             self.current_learning_view = name
+
+            # Update the widgets in the learning session ui
+            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1376,12 +1390,6 @@ class LearningSessionUI(BaseUI):
 
             # Handle the loaded content
             self.handle_loaded_content(content=content)
-
-            # Toggle the navigation buttons
-            self.toggle_navigation_buttons()
-
-            # Update the title label
-            self.update_title_label()
         except Exception as e:
             # Log an error message if an exception occurs
             self.logger.error(
@@ -1423,7 +1431,7 @@ class LearningSessionUI(BaseUI):
 
     def toggle_difficulty_buttons(
         self,
-        difficulty: Optional[Literal["easy", "medium", "hard"]] = None,
+        difficulty: Optional[Literal["easy", "medium", "hard",]] = None,
     ) -> None:
         """
         Handles the event when the difficulty buttons are clicked.
@@ -1500,7 +1508,7 @@ class LearningSessionUI(BaseUI):
             )
 
             # Set the progress variable
-            self.progress_var.set(index)
+            self.progress_var.set(value=index)
 
             if index == 0:
                 # Disable the previous button if the index is 0

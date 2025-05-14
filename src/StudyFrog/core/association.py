@@ -57,6 +57,7 @@ class ImmutableAssociation(ImmutableBaseObject):
         stack (Optional[int]): The ID of the stack that is being associated with.
         status (Optional[int]): The ID of the status that is being associated with.
         tag (Optional[int]): The ID of the tag that is being associated with.
+        teacher (Optional[int]): The ID of the teacher that is being associated with.
         updated_at (Optional[datetime]): The timestamp when the association was last updated.
         user (Optional[int]): The ID of the user that is being associated with.
         uuid (Optional[str]): The UUID of the association.
@@ -94,6 +95,7 @@ class ImmutableAssociation(ImmutableBaseObject):
         stack: Optional[int] = None,
         status: Optional[int] = None,
         tag: Optional[int] = None,
+        teacher: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         user: Optional[int] = None,
         uuid: Optional[str] = None,
@@ -126,6 +128,7 @@ class ImmutableAssociation(ImmutableBaseObject):
             stack (Optional[int]): The ID of the stack that is being associated with.
             status (Optional[int]): The ID of the status that is being associated with.
             tag (Optional[int]): The ID of the tag that is being associated with.
+            teacher (Optional[int]): The ID of the teacher that is being associated with.
             updated_at (Optional[datetime]): The timestamp when the association was last updated.
             user (Optional[int]): The ID of the user that is being associated with.
             uuid (Optional[str]): The UUID of the association.
@@ -145,6 +148,7 @@ class ImmutableAssociation(ImmutableBaseObject):
             default=default,
             difficulty=difficulty,
             flashcard=flashcard,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -160,10 +164,325 @@ class ImmutableAssociation(ImmutableBaseObject):
             stack=stack,
             status=status,
             tag=tag,
+            teacher=teacher,
             updated_at=updated_at,
             user=user,
             uuid=uuid,
         )
+
+    @property
+    def answer(self) -> int:
+        """
+        Returns the ID of the answer that is being associated with.
+
+        Returns:
+            int: The ID of the answer that is being associated with.
+        """
+
+        return self._answer
+
+    @property
+    def association_type(self) -> Literal[
+        "ancestor",
+        "dependant",
+        "depends_on",
+        "descendant",
+        "tagged_with",
+    ]:
+        """
+        Returns the type of the association.
+
+        Returns:
+            Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]: The type of the association.
+        """
+
+        return self._association_type
+
+    @property
+    def change_history(self) -> int:
+        """
+        Returns the ID of the change history that is being associated with.
+
+        Returns:
+            int: The ID of the change history that is being associated with.
+        """
+
+        return self._change_history
+
+    @property
+    def change_history_item(self) -> int:
+        """
+        Returns the ID of the change history item that is being associated with.
+
+        Returns:
+            int: The ID of the change history item that is being associated with.
+        """
+
+        return self._change_history_item
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the association was created.
+
+        Returns:
+            datetime: The timestamp when the association was created.
+        """
+
+        return self._created_at
+
+    @property
+    def custom_field(self) -> int:
+        """
+        Returns the ID of the custom field that is being associated with.
+
+        Returns:
+            int: The ID of the custom field that is being associated with.
+        """
+
+        return self._custom_field
+
+    @property
+    def default(self) -> int:
+        """
+        Returns the ID of the default that is being associated with.
+
+        Returns:
+            int: The ID of the default that is being associated with.
+        """
+
+        return self._default
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Returns the ID of the difficulty that is being associated with.
+
+        Returns:
+            int: The ID of the difficulty that is being associated with.
+        """
+
+        return self._difficulty
+
+    @property
+    def flashcard(self) -> int:
+        """
+        Returns the ID of the flashcard that is being associated with.
+
+        Returns:
+            int: The ID of the flashcard that is being associated with.
+        """
+
+        return self._flashcard
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the association.
+
+        Returns:
+            str: The icon of the association.
+        """
+
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the association.
+
+        Returns:
+            int: The ID of the association.
+        """
+
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the association.
+
+        Returns:
+            str: The key of the association.
+        """
+
+        return self._key
+
+    @property
+    def learning_session(self) -> int:
+        """
+        Returns the ID of the learning session that is being associated with.
+
+        Returns:
+            int: The ID of the learning session that is being associated with.
+        """
+
+        return self._learning_session
+
+    @property
+    def learning_session_action(self) -> int:
+        """
+        Returns the ID of the learning session action that is being associated with.
+
+        Returns:
+            int: The ID of the learning session action that is being associated with.
+        """
+
+        return self._learning_session_action
+
+    @property
+    def learning_session_item(self) -> int:
+        """
+        Returns the ID of the learning session item that is being associated with.
+
+        Returns:
+            int: The ID of the learning session item that is being associated with.
+        """
+
+        return self._learning_session_item
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the association.
+
+        Returns:
+            Dict[str, Any]: The metadata of the association.
+        """
+
+        return self._metadata
+
+    @property
+    def note(self) -> int:
+        """
+        Returns the ID of the note that is being associated with.
+
+        Returns:
+            int: The ID of the note that is being associated with.
+        """
+
+        return self._note
+
+    @property
+    def option(self) -> int:
+        """
+        Returns the ID of the option that is being associated with.
+
+        Returns:
+            int: The ID of the option that is being associated with.
+        """
+
+        return self._option
+
+    @property
+    def priority(self) -> int:
+        """
+        Returns the ID of the priority that is being associated with.
+
+        Returns:
+            int: The ID of the priority that is being associated with.
+        """
+
+        return self._priority
+
+    @property
+    def question(self) -> int:
+        """
+        Returns the ID of the question that is being associated with.
+
+        Returns:
+            int: The ID of the question that is being associated with.
+        """
+
+        return self._question
+
+    @property
+    def setting(self) -> int:
+        """
+        Returns the ID of the setting that is being associated with.
+
+        Returns:
+            int: The ID of the setting that is being associated with.
+        """
+
+        return self._setting
+
+    @property
+    def stack(self) -> int:
+        """
+        Returns the ID of the stack that is being associated with.
+
+        Returns:
+            int: The ID of the stack that is being associated with.
+        """
+
+        return self._stack
+
+    @property
+    def status(self) -> int:
+        """
+        Returns the ID of the status that is being associated with.
+
+        Returns:
+            int: The ID of the status that is being associated with.
+        """
+
+        return self._status
+
+    @property
+    def tag(self) -> int:
+        """
+        Returns the ID of the tag that is being associated with.
+
+        Returns:
+            int: The ID of the tag that is being associated with.
+        """
+
+        return self._tag
+
+    @property
+    def teacher(self) -> int:
+        """
+        Returns the ID of the teacher that is being associated with.
+
+        Returns:
+            int: The ID of the teacher that is being associated with.
+        """
+
+        return self._teacher
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the association was last updated.
+
+        Returns:
+            datetime: The timestamp when the association was last updated.
+        """
+
+        return self._updated_at
+
+    @property
+    def user(self) -> int:
+        """
+        Returns the ID of the user that is being associated with.
+
+        Returns:
+            int: The ID of the user that is being associated with.
+        """
+
+        return self._user
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the association.
+
+        Returns:
+            str: The UUID of the association.
+        """
+
+        return self._uuid
 
     def to_mutable(self) -> Optional["MutableAssociation"]:
         """
@@ -224,6 +543,7 @@ class MutableAssociation(MutableBaseObject):
         stack (Optional[int]): The ID of the stack that is being associated with.
         status (Optional[int]): The ID of the status that is being associated with.
         tag (Optional[int]): The ID of the tag that is being associated with.
+        teacher (Optional[int]): The ID of the teacher that is being associated with.
         updated_at (Optional[datetime]): The timestamp when the association was last updated.
         user (Optional[int]): The ID of the user that is being associated with.
         uuid (Optional[str]): The UUID of the association.
@@ -261,6 +581,7 @@ class MutableAssociation(MutableBaseObject):
         stack: Optional[int] = None,
         status: Optional[int] = None,
         tag: Optional[int] = None,
+        teacher: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         user: Optional[int] = None,
         uuid: Optional[str] = None,
@@ -293,6 +614,7 @@ class MutableAssociation(MutableBaseObject):
             stack (Optional[int]): The ID of the stack that is being associated with.
             status (Optional[int]): The ID of the status that is being associated with.
             tag (Optional[int]): The ID of the tag that is being associated with.
+            teacher (Optional[int]): The ID of the teacher that is being associated with.
             updated_at (Optional[datetime]): The timestamp when the association was last updated.
             user (Optional[int]): The ID of the user that is being associated with.
             uuid (Optional[str]): The UUID of the association.
@@ -312,6 +634,7 @@ class MutableAssociation(MutableBaseObject):
             default=default,
             difficulty=difficulty,
             flashcard=flashcard,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -327,10 +650,807 @@ class MutableAssociation(MutableBaseObject):
             stack=stack,
             status=status,
             tag=tag,
+            teacher=teacher,
             updated_at=updated_at,
             user=user,
             uuid=uuid,
         )
+
+    @property
+    def answer(self) -> int:
+        """
+        Returns the ID of the answer that is being associated with.
+
+        Returns:
+            int: The ID of the answer that is being associated with.
+        """
+
+        return self._answer
+
+    @answer.setter
+    def answer(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the answer that is being associated with.
+
+        Args:
+            value (int): The ID of the answer that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._answer = value
+
+    @property
+    def association_type(self) -> Literal[
+        "ancestor",
+        "dependant",
+        "depends_on",
+        "descendant",
+        "tagged_with",
+    ]:
+        """
+        Returns the type of the association.
+
+        Returns:
+            Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]: The type of the association.
+        """
+
+        return self._association_type
+
+    @association_type.setter
+    def association_type(
+        self,
+        value: Literal[
+            "ancestor",
+            "dependant",
+            "depends_on",
+            "descendant",
+            "tagged_with",
+        ],
+    ) -> None:
+        """
+        Sets the type of the association.
+
+        Args:
+            value (Literal["ancestor", "dependant", "depends_on", "descendant", "tagged_with"]: The type of the association.
+
+        Returns:
+            None
+        """
+
+        self._association_type = value
+
+    @property
+    def change_history(self) -> int:
+        """
+        Returns the ID of the change history that is being associated with.
+
+        Returns:
+            int: The ID of the change history that is being associated with.
+        """
+
+        return self._change_history
+
+    @change_history.setter
+    def change_history(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the change history that is being associated with.
+
+        Args:
+            value (int): The ID of the change history that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._change_history = value
+
+    @property
+    def change_history_item(self) -> int:
+        """
+        Returns the ID of the change history item that is being associated with.
+
+        Returns:
+            int: The ID of the change history item that is being associated with.
+        """
+
+        return self._change_history_item
+
+    @change_history_item.setter
+    def change_history_item(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the change history item that is being associated with.
+
+        Args:
+            value (int): The ID of the change history item that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._change_history_item = value
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the association was created.
+
+        Returns:
+            datetime: The timestamp when the association was created.
+        """
+
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the association was created.
+
+        Args:
+            value (datetime): The timestamp when the association was created.
+
+        Returns:
+            None
+        """
+
+        self._created_at = value
+
+    @property
+    def custom_field(self) -> int:
+        """
+        Returns the ID of the custom field that is being associated with.
+
+        Returns:
+            int: The ID of the custom field that is being associated with.
+        """
+
+        return self._custom_field
+
+    @custom_field.setter
+    def custom_field(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the custom field that is being associated with.
+
+        Args:
+            value (int): The ID of the custom field that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._custom_field = value
+
+    @property
+    def default(self) -> int:
+        """
+        Returns the ID of the default that is being associated with.
+
+        Returns:
+            int: The ID of the default that is being associated with.
+        """
+
+        return self._default
+
+    @default.setter
+    def default(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the default that is being associated with.
+
+        Args:
+            value (int): The ID of the default that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._default = value
+
+    @property
+    def difficulty(self) -> int:
+        """
+        Returns the ID of the difficulty that is being associated with.
+
+        Returns:
+            int: The ID of the difficulty that is being associated with.
+        """
+
+        return self._difficulty
+
+    @difficulty.setter
+    def difficulty(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the difficulty that is being associated with.
+
+        Args:
+            value (int): The ID of the difficulty that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._difficulty = value
+
+    @property
+    def flashcard(self) -> int:
+        """
+        Returns the ID of the flashcard that is being associated with.
+
+        Returns:
+            int: The ID of the flashcard that is being associated with.
+        """
+
+        return self._flashcard
+
+    @flashcard.setter
+    def flashcard(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the flashcard that is being associated with.
+
+        Args:
+            value (int): The ID of the flashcard that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._flashcard = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the association.
+
+        Returns:
+            str: The icon of the association.
+        """
+
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the association.
+
+        Args:
+            value (str): The icon of the association.
+
+        Returns:
+            None
+        """
+
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the association.
+
+        Returns:
+            int: The ID of the association.
+        """
+
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the association.
+
+        Args:
+            value (int): The ID of the association.
+
+        Returns:
+            None
+        """
+
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the association.
+
+        Returns:
+            str: The key of the association.
+        """
+
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the association.
+
+        Args:
+            value (str): The key of the association.
+
+        Returns:
+            None
+        """
+
+        self._key = value
+
+    @property
+    def learning_session(self) -> int:
+        """
+        Returns the ID of the learning session that is being associated with.
+
+        Returns:
+            int: The ID of the learning session that is being associated with.
+        """
+
+        return self._learning_session
+
+    @learning_session.setter
+    def learning_session(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the learning session that is being associated with.
+
+        Args:
+            value (int): The ID of the learning session that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._learning_session = value
+
+    @property
+    def learning_session_action(self) -> int:
+        """
+        Returns the ID of the learning session action that is being associated with.
+
+        Returns:
+            int: The ID of the learning session action that is being associated with.
+        """
+
+        return self._learning_session_action
+
+    @learning_session_action.setter
+    def learning_session_action(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the learning session action that is being associated with.
+
+        Args:
+            value (int): The ID of the learning session action that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._learning_session_action = value
+
+    @property
+    def learning_session_item(self) -> int:
+        """
+        Returns the ID of the learning session item that is being associated with.
+
+        Returns:
+            int: The ID of the learning session item that is being associated with.
+        """
+
+        return self._learning_session_item
+
+    @learning_session_item.setter
+    def learning_session_item(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the learning session item that is being associated with.
+
+        Args:
+            value (int): The ID of the learning session item that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._learning_session_item = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the association.
+
+        Returns:
+            Dict[str, Any]: The metadata of the association.
+        """
+
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> None:
+        """
+        Sets the metadata of the association.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the association.
+
+        Returns:
+            None
+        """
+
+        self._metadata = value
+
+    @property
+    def note(self) -> int:
+        """
+        Returns the ID of the note that is being associated with.
+
+        Returns:
+            int: The ID of the note that is being associated with.
+        """
+
+        return self._note
+
+    @note.setter
+    def note(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the note that is being associated with.
+
+        Args:
+            value (int): The ID of the note that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._note = value
+
+    @property
+    def option(self) -> int:
+        """
+        Returns the ID of the option that is being associated with.
+
+        Returns:
+            int: The ID of the option that is being associated with.
+        """
+
+        return self._option
+
+    @option.setter
+    def option(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the option that is being associated with.
+
+        Args:
+            value (int): The ID of the option that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._option = value
+
+    @property
+    def priority(self) -> int:
+        """
+        Returns the ID of the priority that is being associated with.
+
+        Returns:
+            int: The ID of the priority that is being associated with.
+        """
+
+        return self._priority
+
+    @priority.setter
+    def priority(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the priority that is being associated with.
+
+        Args:
+            value (int): The ID of the priority that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._priority = value
+
+    @property
+    def question(self) -> int:
+        """
+        Returns the ID of the question that is being associated with.
+
+        Returns:
+            int: The ID of the question that is being associated with.
+        """
+
+        return self._question
+
+    @question.setter
+    def question(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the question that is being associated with.
+
+        Args:
+            value (int): The ID of the question that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._question = value
+
+    @property
+    def setting(self) -> int:
+        """
+        Returns the ID of the setting that is being associated with.
+
+        Returns:
+            int: The ID of the setting that is being associated with.
+        """
+
+        return self._setting
+
+    @setting.setter
+    def setting(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the setting that is being associated with.
+
+        Args:
+            value (int): The ID of the setting that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._setting = value
+
+    @property
+    def stack(self) -> int:
+        """
+        Returns the ID of the stack that is being associated with.
+
+        Returns:
+            int: The ID of the stack that is being associated with.
+        """
+
+        return self._stack
+
+    @stack.setter
+    def stack(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the stack that is being associated with.
+
+        Args:
+            value (int): The ID of the stack that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._stack = value
+
+    @property
+    def status(self) -> int:
+        """
+        Returns the ID of the status that is being associated with.
+
+        Returns:
+            int: The ID of the status that is being associated with.
+        """
+
+        return self._status
+
+    @status.setter
+    def status(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the status that is being associated with.
+
+        Args:
+            value (int): The ID of the status that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._status = value
+
+    @property
+    def tag(self) -> int:
+        """
+        Returns the ID of the tag that is being associated with.
+
+        Returns:
+            int: The ID of the tag that is being associated with.
+        """
+
+        return self._tag
+
+    @tag.setter
+    def tag(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the tag that is being associated with.
+
+        Args:
+            value (int): The ID of the tag that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._tag = value
+
+    @property
+    def teacher(self) -> int:
+        """
+        Returns the ID of the teacher that is being associated with.
+
+        Returns:
+            int: The ID of the teacher that is being associated with.
+        """
+
+        return self._teacher
+
+    @teacher.setter
+    def teacher(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the teacher that is being associated with.
+
+        Args:
+            value (int): The ID of the teacher that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._teacher = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the association was last updated.
+
+        Returns:
+            datetime: The timestamp when the association was last updated.
+        """
+
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the association was last updated.
+
+        Args:
+            value (datetime): The timestamp when the association was last updated.
+
+        Returns:
+            None
+        """
+
+        self._updated_at = value
+
+    @property
+    def user(self) -> int:
+        """
+        Returns the ID of the user that is being associated with.
+
+        Returns:
+            int: The ID of the user that is being associated with.
+        """
+
+        return self._user
+
+    @user.setter
+    def user(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the user that is being associated with.
+
+        Args:
+            value (int): The ID of the user that is being associated with.
+
+        Returns:
+            None
+        """
+
+        self._user = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the association.
+
+        Returns:
+            str: The UUID of the association.
+        """
+
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the association.
+
+        Args:
+            value (str): The UUID of the association.
+
+        Returns:
+            None
+        """
+
+        self._uuid = value
 
     def to_immutable(self) -> Optional["ImmutableAssociation"]:
         """
@@ -987,6 +2107,46 @@ class AssociationManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        association: Union[
+            ImmutableAssociation,
+            MutableAssociation,
+        ],
+    ) -> MutableAssociation:
+        """
+        Runs pre-create tasks for the association.
+
+        Args:
+            association (Union[ImmutableAssociation, MutableAssociation]): The association to run pre-create tasks for.
+
+        Returns:
+            MutableAssociation: The association with pre-create tasks run.
+        """
+
+        # Check if the association object is immutable
+        if isinstance(
+            association,
+            ImmutableAssociation,
+        ):
+            # If it is, convert it to a mutable association
+            association = association.to_mutable()
+
+        # Set the created_at timestamp of the association
+        association.created_at = Miscellaneous.get_current_datetime()
+
+        # Set the key of the association
+        association.key = f"ASSOCIATION_{self.count_associations() + 1}"
+
+        # Set the updated_at timestamp of the association
+        association.updated_at = Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the association
+        association.uuid = Miscellaneous.get_uuid()
+
+        # Return the association object
+        return association
+
     def associate(
         self,
         association_type: Literal[
@@ -1126,65 +2286,63 @@ class AssociationManager(BaseObjectManager):
             Exception: If an exception occurs while creating the association.
         """
         try:
-            # Check if the association object is immutable
-            if isinstance(
-                association,
-                ImmutableAssociation,
-            ):
-                # If it is, convert it to a mutable association
-                association = association.to_mutable()
+            # Initialize the result (optional) ImmutableAssociation to none
+            result: Optional[ImmutableAssociation] = None
 
-            # Set the created_at timestamp of the association
-            association.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the key of the association
-            association.key = f"ASSOCIATION_{self.count_associations() + 1}"
-
-            # Set the updated_at timestamp of the association
-            association.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the association
-            association.uuid = Miscellaneous.get_uuid()
-
-            # Convert the association object to a AssociationModel object
-            model: AssociationModel = AssociationConverter.object_to_model(
-                object=association
+            # Run pre-create tasks
+            association: MutableAssociation = self._run_pre_create_tasks(
+                association=association
             )
 
-            # Create a new association in the database
+            # Convert the association object to a AssociationModel object
+            model: AssociationModel = AssociationConverter.object_to_model(object=association)
+
+            # Create a new flashcard in the database
             id: Optional[int] = asyncio.run(
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the association
-                association.id = id
-
-                # Convert the association to an immutable association
-                association = ImmutableAssociation(
-                    **association.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a association ({association.__repr__()}) in the database."
                 )
 
-                # Add the association to the cache
-                self.add_to_cache(
-                    key=association.key,
-                    value=association,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable association
-                return association
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a association ({association}) in the database."
+            # Convert the association to a dictionary
+            kwargs: Dict[str, Any] = association.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the association
+            kwargs["id"] = id
+
+            # Create a new ImmutableAssociation object
+            result = AssociationFactory.create_association(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableAssociation from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the association to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created immutable association
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

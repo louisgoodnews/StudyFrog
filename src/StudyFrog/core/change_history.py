@@ -4,6 +4,7 @@ Date: 2025-02-06
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 from typing import *
@@ -41,7 +42,7 @@ class ImmutableChangeHistory(ImmutableBaseObject):
     An immutable change history represents a log of the changes made to a mutable object.
 
     Attributes:
-        source (Dict[str, Any]): The source of the change history.
+        source (str): The source of the change history.
         created_at (Optional[datetime]): The timestamp when the change history was created.
         icon (Optional[str]): The icon of the change history.
         id (Optional[int]): The ID of the change history.
@@ -53,7 +54,7 @@ class ImmutableChangeHistory(ImmutableBaseObject):
 
     def __init__(
         self,
-        source: Dict[str, Any],
+        source: str,
         created_at: Optional[datetime] = None,
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
@@ -66,7 +67,7 @@ class ImmutableChangeHistory(ImmutableBaseObject):
         Initializes a new instance of the ImmutableChangeHistory class.
 
         Args:
-            source (Dict[str, Any]): The source of the change history.
+            source (str): The source of the change history.
             created_at (Optional[datetime]): The timestamp when the change history was created.
             icon (Optional[str]): The icon of the change history. Defaults to "🕒".
             id (Optional[int]): The ID of the change history.
@@ -82,6 +83,7 @@ class ImmutableChangeHistory(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -90,7 +92,103 @@ class ImmutableChangeHistory(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
-    
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the change history was created.
+
+        Returns:
+            datetime: The timestamp when the change history was created.
+        """
+
+        # Return the created_at attribute
+        return self._created_at
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the change history.
+
+        Returns:
+            str: The icon of the change history.
+        """
+
+        # Return the icon attribute
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the change history.
+
+        Returns:
+            int: The ID of the change history.
+        """
+
+        # Return the id attribute
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the change history.
+
+        Returns:
+            str: The key of the change history.
+        """
+
+        # Return the key attribute
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the change history.
+
+        Returns:
+            Dict[str, Any]: The metadata of the change history.
+        """
+
+        # Return the metadata attribute
+        return self._metadata
+
+    @property
+    def source(self) -> str:
+        """
+        Returns the source of the change history.
+
+        Returns:
+            str: The source of the change history.
+        """
+
+        # Return the source attribute
+        return self._source
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the change history was last updated.
+
+        Returns:
+            datetime: The timestamp when the change history was last updated.
+        """
+
+        # Return the updated_at attribute
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the change history.
+
+        Returns:
+            str: The UUID of the change history.
+        """
+
+        # Return the uuid attribute
+        return self._uuid
+
     def to_mutable(self) -> Optional["MutableChangeHistory"]:
         """
         Converts the immutable change history to a mutable change history.
@@ -113,6 +211,9 @@ class ImmutableChangeHistory(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -124,7 +225,7 @@ class MutableChangeHistory(MutableBaseObject):
     A mutable change history represents a log of the changes made to a mutable object.
 
     Attributes:
-        source (Dict[str, Any]): The source of the change history.
+        source (str): The source of the change history.
         created_at (Optional[datetime]): The timestamp when the change history was created.
         icon (Optional[str]): The icon of the change history.
         id (Optional[int]): The ID of the change history.
@@ -136,7 +237,7 @@ class MutableChangeHistory(MutableBaseObject):
 
     def __init__(
         self,
-        source: Dict[str, Any],
+        source: str,
         created_at: Optional[datetime] = None,
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
@@ -149,7 +250,7 @@ class MutableChangeHistory(MutableBaseObject):
         Initializes a new instance of the MutableChangeHistory class.
 
         Args:
-            source (Dict[str, Any]): The source of the change history.
+            source (str): The source of the change history.
             created_at (Optional[datetime]): The timestamp when the change history was created.
             icon (Optional[str]): The icon of the change history. Defaults to "🕒".
             id (Optional[int]): The ID of the change history.
@@ -165,6 +266,7 @@ class MutableChangeHistory(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -173,7 +275,255 @@ class MutableChangeHistory(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
-    
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the change history was created.
+
+        Returns:
+            datetime: The timestamp when the change history was created.
+        """
+
+        # Return the created_at attribute
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the change history was created.
+
+        Args:
+            value (datetime): The timestamp when the change history was created.
+
+        Returns:
+            None
+        """
+
+        # Set the created_at attribute
+        self._created_at = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the change history.
+
+        Returns:
+            str: The icon of the change history.
+        """
+
+        # Return the icon attribute
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the change history.
+
+        Args:
+            value (str): The icon of the change history.
+
+        Returns:
+            None
+        """
+
+        # Set the icon attribute
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the change history.
+
+        Returns:
+            int: The ID of the change history.
+        """
+
+        # Return the id attribute
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the change history.
+
+        Args:
+            value (int): The ID of the change history.
+
+        Returns:
+            None
+        """
+
+        # Set the id attribute
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the change history.
+
+        Returns:
+            str: The key of the change history.
+        """
+
+        # Return the key attribute
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the change history.
+
+        Args:
+            value (str): The key of the change history.
+
+        Returns:
+            None
+        """
+
+        # Set the key attribute
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the change history.
+
+        Returns:
+            Dict[str, Any]: The metadata of the change history.
+        """
+
+        # Return the metadata attribute
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the change history.
+
+        Args:
+            **kwargs (Dict[str, Any]): The metadata of the change history.
+
+        Returns:
+            None
+        """
+
+        # Check if the 'metadata' dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Initialize the 'metadata' dictionary
+            self._metadata = {}
+
+        # Update the 'metadata' dictionary with the provided keyword arguments
+        self._metadata.update(kwargs)
+
+    @property
+    def source(self) -> str:
+        """
+        Returns the source of the change history.
+
+        Returns:
+            str: The source of the change history.
+        """
+
+        # Return the source attribute
+        return self._source
+
+    @source.setter
+    def source(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the source of the change history.
+
+        Args:
+            value (str): The source of the change history.
+
+        Returns:
+            None
+        """
+
+        # Set the source attribute
+        self._source = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the change history was last updated.
+
+        Returns:
+            datetime: The timestamp when the change history was last updated.
+        """
+
+        # Return the updated_at attribute
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the change history was last updated.
+
+        Args:
+            value (datetime): The timestamp when the change history was last updated.
+
+        Returns:
+            None
+        """
+
+        # Set the updated_at attribute
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the change history.
+
+        Returns:
+            str: The UUID of the change history.
+        """
+
+        # Return the uuid attribute
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the change history.
+
+        Args:
+            value (str): The UUID of the change history.
+
+        Returns:
+            None
+        """
+
+        # Set the uuid attribute
+        self._uuid = value
+
     def to_immutable(self) -> Optional[ImmutableChangeHistory]:
         """
         Converts the mutable change history to an immutable change history.
@@ -195,6 +545,9 @@ class MutableChangeHistory(MutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -232,7 +585,7 @@ class ChangeHistoryConverter:
         """
         try:
             # Attempt to create and return a new instance of the ChangeHistory class from the dictionary representation of the ChangeHistoryModel instance
-            return Immutable(
+            return ImmutableChangeHistory(
                 **model.to_dict(
                     exclude=[
                         "_logger",
@@ -245,6 +598,9 @@ class ChangeHistoryConverter:
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
             )
+
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -281,11 +637,23 @@ class ChangeHistoryConverter:
                 message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
 
 class ChangeHistoryFactory:
+    """
+    A factory class for creating ChangeHistory instances.
+
+    This class provides methods to create and return a new instance of the ChangeHistory class.
+
+    Attributes:
+        logger (Logger): The logger instance associated with the ChangeHistoryFactory class.
+    """
+
     logger: Final[Logger] = Logger.get_logger(name="ChangeHistoryFactory")
 
     @classmethod
@@ -321,12 +689,12 @@ class ChangeHistoryFactory:
         """
         try:
             return ImmutableChangeHistory(
-                source=source,
                 created_at=created_at,
                 icon=icon,
                 id=id,
                 key=key,
                 metadata=metadata,
+                source=source,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -336,15 +704,155 @@ class ChangeHistoryFactory:
                 message=f"Caught an exception while attempting to run 'create_change_history' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
 
-class ChangeHirstoryBuilder(BaseObjectBuilder):
+class ChangeHistoryBuilder(BaseObjectBuilder):
     """
+    A builder class for creating ChangeHistory instances.
+
+    This class extends the BaseObjectBuilder class and provides methods to create and return a new instance of the ChangeHistory class.
     """
 
-    pass
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the ChangeHistoryBuilder class.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableChangeHistory,
+            MutableChangeHistory,
+        ]
+    ]:
+        """
+        Creates and returns a new instance of the ChangeHistory class.
+
+        Args:
+            as_mutable (bool): A flag indicating whether to create a mutable instance of the ChangeHistory class. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableChangeHistory, MutableChangeHistory]]: The created change history object if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the change history.
+        """
+        try:
+            # Attempt to create a new ImmutableChangeHistory instance
+            change_history: Optional[ImmutableChangeHistory] = (
+                ChangeHistoryFactory.create_change_history(**self.configuration)
+            )
+
+            # Check, if the change history exists
+            if not change_history:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create change history from configuration: {self.configuration}"
+                )
+
+                # Return early
+                return
+
+            # Check, if the as_mutable flag is set to True
+            if as_mutable:
+                # Convert the ImmutableChangeHistory instance to a MutableChangeHistory instance
+                change_history = change_history.to_mutable()
+
+            # Return the created change history instance
+            return change_history
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the created_at attribute of the ChangeHistoryBuilder instance.
+
+        Args:
+            value (datetime): The value to set for the created_at attribute.
+
+        Returns:
+            Self: The ChangeHistoryBuilder instance with the created_at attribute set.
+        """
+
+        # Set the created_at attribute
+        self.configuration["created_at"] = value
+
+        # Return self
+        return self
+
+    def metadata(
+        self,
+        **kwargs,
+    ) -> Self:
+        """
+        Sets the metadata attribute of the ChangeHistoryBuilder instance.
+
+        Args:
+            **kwargs: The keyword arguments to set for the metadata attribute.
+
+        Returns:
+            Self: The ChangeHistoryBuilder instance with the metadata attribute set.
+        """
+
+        # Check, if the 'metadata' key exists in the configuration dictionary
+        if "metadata" not in self.configuration:
+            # Set the 'metadata' key to an empty dictionary
+            self.configuration["metadata"] = {}
+
+        # Update the 'metadata' key with the provided keyword arguments
+        self.configuration["metadata"].update(kwargs)
+
+        # Return self
+        return self
+
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the updated_at attribute of the ChangeHistoryBuilder instance.
+
+        Args:
+            value (datetime): The value to set for the updated_at attribute.
+
+        Returns:
+            Self: The ChangeHistoryBuilder instance with the updated_at attribute set.
+        """
+
+        # Set the updated_at attribute
+        self.configuration["updated_at"] = value
+
+        # Return self
+        return self
 
 
 class ChangeHistoryManager(BaseObjectManager):
@@ -372,14 +880,14 @@ class ChangeHistoryManager(BaseObjectManager):
         Returns:
             ChangeHistoryManager: The created or existing instance of ChangeHistoryManager class.
         """
-        
+
         # Check if the shared instance does not exist
         if cls._shared_instance is None:
             # Create a new instance by calling the parent class constructor
             cls._shared_instance = super(ChangeHistoryManager, cls).__new__(cls)
             # Initialize the instance
             cls._shared_instance.init()
-        
+
         # Return the shared instance
         return cls._shared_instance
 
@@ -394,7 +902,48 @@ class ChangeHistoryManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
-    def count_change_history_items(self) -> int:
+    def _run_pre_create_tasks(
+        self,
+        change_history: Union[
+            ImmutableChangeHistory,
+            MutableChangeHistory,
+        ],
+    ) -> MutableChangeHistory:
+        """
+        Runs pre-create tasks for the change history.
+
+        Args:
+            change_history (Union[ImmutableChangeHistory, MutableChangeHistory]): The change history to run pre-create tasks for.
+
+        Returns:
+            MutableChangeHistory: The change history with pre-create tasks run.
+        """
+
+        # Check, if the change history is not mutable
+        if not change_history.is_mutable():
+            # Convert the change history to mutable
+            change_history: MutableChangeHistory = change_history.to_mutable()
+
+        # Set the created_at timestamp of the change history
+        change_history.created_at = (
+            change_history.created_at or Miscellaneous.get_current_datetime()
+        )
+
+        # Set the key of the change history
+        change_history.key = f"CHANGE_HISTORY_{self.count_change_histories() + 1}"
+
+        # Set the updated_at timestamp of the change history
+        change_history.updated_at = (
+            change_history.updated_at or Miscellaneous.get_current_datetime()
+        )
+
+        # Set the uuid of the change history
+        change_history.uuid = Miscellaneous.get_uuid()
+
+        # Return the change history
+        return change_history
+
+    def count_change_histories(self) -> int:
         """
         Returns the number of change histories in the database.
 
@@ -403,7 +952,9 @@ class ChangeHistoryManager(BaseObjectManager):
         """
         try:
             # Count and return the number of change histories in the database
-            return asyncio.run(ChangeHistoryModel.count(database=Constants.DATABASE_PATH))
+            return asyncio.run(
+                ChangeHistoryModel.count(database=Constants.DATABASE_PATH)
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -413,7 +964,7 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return 0 indicating an exception has occurred
             return 0
 
-    def create_change_history_item(
+    def create_change_history(
         self,
         change_history: Union[ImmutableChangeHistory, MutableChangeHistory],
     ) -> Optional[ImmutableChangeHistory]:
@@ -430,33 +981,13 @@ class ChangeHistoryManager(BaseObjectManager):
             Exception: If an exception occurs while creating the change_history.
         """
         try:
-            # Check if the change history object is immutable
-            if isinstance(
-                change_history,
-                ImmutableChangeHistory,
-            ):
-                # If it is, convert it to a mutable change history
-                change_history = change_history.to_mutable(
-                    **change_history.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
-                )
+            # Initialize the result (optional) ImmutableChangeHistory to none
+            result: Optional[ImmutableChangeHistory] = None
 
-            # Set the created_at timestamp of the change history
-            change_history.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the key of the change history
-            change_history.key = (
-                f"CHANGE_HISTORY_{self.count_change_history_items() + 1}"
+            # Run pre-create tasks
+            change_history: MutableChangeHistory = self._run_pre_create_tasks(
+                change_history=change_history
             )
-
-            # Set the updated_at timestamp of the change history
-            change_history.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the change history
-            change_history.uuid = Miscellaneous.get_uuid()
 
             # Convert the change history object to a ChangeHistoryModel object
             model: ChangeHistoryModel = ChangeHistoryConverter.object_to_model(
@@ -468,39 +999,51 @@ class ChangeHistoryManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the change history
-                change_history.id = id
-
-                # Convert the change history to an immutable change history
-                change_history = Immutable(
-                    **change_history.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a change history ({change_history.__repr__()}) in the database."
                 )
 
-                # Add the change history to the cache
-                self.add_to_cache(
-                    key=change_history.key,
-                    value=change_history,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable change history
-                return change_history
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a change history ({change_history}) in the database."
+            # Convert the change history to a dictionary
+            kwargs: Dict[str, Any] = change_history.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the change history
+            kwargs["id"] = id
+
+            # Create a new ImmutableChangeHistory object
+            result = ChangeHistoryFactory.create_change_history(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableChangeHistory from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the change history to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableChangeHistory instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_change history' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'create_change_history' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -541,13 +1084,13 @@ class ChangeHistoryManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'delete_change_history' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_change_history_items(self) -> Optional[List[ImmutableChangeHistory]]:
+    def get_all_change_histories(self) -> Optional[List[ImmutableChangeHistory]]:
         """
         Returns a list of all change histories in the database.
 
@@ -559,7 +1102,7 @@ class ChangeHistoryManager(BaseObjectManager):
         """
         try:
             # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_change_history_items():
+            if self.cache and len(self._cache) == self.count_change_histories():
                 # Return the list of immutable change histories from the cache
                 return self.get_cache_values()
 
@@ -601,7 +1144,7 @@ class ChangeHistoryManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_all_change_histories' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -643,7 +1186,7 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return the change history if it exists
             if model is not None:
                 # Convert the ChangeHistoryModel object to an ChangeHistory object
-                return Immutable(
+                return ImmutableChangeHistory(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -657,7 +1200,7 @@ class ChangeHistoryManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_change_history_by' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -697,7 +1240,7 @@ class ChangeHistoryManager(BaseObjectManager):
             # Return the change history if it exists
             if model is not None:
                 # Convert the ChangeHistoryModel object to an ChangeHistory object
-                return ChangeHistory(
+                return ImmutableChangeHistory(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -711,7 +1254,7 @@ class ChangeHistoryManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by_id' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_change_history_by_id' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -765,7 +1308,7 @@ class ChangeHistoryManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by_uuid' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_change_history_by_uuid' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -793,7 +1336,9 @@ class ChangeHistoryManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableChangeHistory]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableChangeHistory]] = (
+                    self.search_cache(**kwargs)
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -827,7 +1372,7 @@ class ChangeHistoryManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'search_change_histories' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -899,7 +1444,7 @@ class ChangeHistoryManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'update_change_history' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1016,8 +1561,8 @@ class ChangeHistoryModel(ImmutableBaseModel):
         on_delete=None,
         on_update=None,
         primary_key=False,
-        size=None,
-        type="JSON",
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -1060,7 +1605,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
         id: Optional[int] = None,
         key: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        source: Optional[Dict[str, Any]] = None,
+        source: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1073,7 +1618,7 @@ class ChangeHistoryModel(ImmutableBaseModel):
             id (Optional[int]): The ID of the change_history.
             key (Optional[str]): The key of the change_history.
             metadata (Optional[Dict[str, Any]]): The metadata of the change_history.
-            source (Optional[Dict[str, Any]]): The source of the change_history.
+            source (Optional[str]): The source of the change_history.
             updated_at (Optional[datetime]): The timestamp when the change history was last updated.
             uuid (Optional[str]): The UUID of the change_history.
 
@@ -1102,13 +1647,14 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
     A change history item represents a change made to a mutable object.
 
     Attributes:
-        from_ (Any): The original value of the item.
-        to (Any): The new value of the item.
         created_at (Optional[datetime]): The timestamp when the item was created.
+        description (Optional[str]): The description of the item.
+        from_ (Any): The original value of the item.
         icon (Optional[str]): The icon of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
         metadata (Optional[Dict[str, Any]]): The metadata of the item.
+        to (Any): The new value of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
         uuid (Optional[str]): The UUID of the item.
     """
@@ -1118,6 +1664,7 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
         from_: Any,
         to: Any,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -1129,13 +1676,14 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
         Initializes a new instance of the ImmutableChangeHistoryItem class.
 
         Args:
-            from_ (Any): The original value of the item.
-            to (Any): The new value of the item.
             created_at (Optional[datetime]): The timestamp when the item was created.
+            description (Optional[str]): The description of the item.
+            from_ (Any): The original value of the item.
             icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
             metadata (Optional[Dict[str, Any]]): The metadata of the item.
+            to (Any): The new value of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
             uuid (Optional[str]): The UUID of the item.
 
@@ -1146,7 +1694,9 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
             from_=from_,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -1155,7 +1705,127 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
-    
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the timestamp when the item was created.
+
+        Returns:
+            datetime: The timestamp when the item was created.
+        """
+
+        # Return the timestamp when the item was created
+        return self._created_at
+
+    @property
+    def description(self) -> str:
+        """
+        Gets the description of the item.
+
+        Returns:
+            str: The description of the item.
+        """
+
+        # Return the description of the item
+        return self._description
+
+    @property
+    def from_(self) -> Any:
+        """
+        Gets the original value of the item.
+
+        Returns:
+            Any: The original value of the item.
+        """
+
+        # Return the original value of the item
+        return self._from_
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the item.
+
+        Returns:
+            str: The icon of the item.
+        """
+
+        # Return the icon of the item
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the item.
+
+        Returns:
+            int: The ID of the item.
+        """
+
+        # Return the ID of the item
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the item.
+
+        Returns:
+            str: The key of the item.
+        """
+
+        # Return the key of the item
+        return self._key
+
+    @property
+    def metadata(self) -> Optional[Dict[str, Any]]:
+        """
+        Gets the metadata of the item.
+
+        Returns:
+            Optional[Dict[str, Any]]: The metadata of the item.
+        """
+
+        # Return the metadata of the item
+        return self._metadata
+
+    @property
+    def to(self) -> Any:
+        """
+        Gets the new value of the item.
+
+        Returns:
+            Any: The new value of the item.
+        """
+
+        # Return the new value of the item
+        return self._to
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the item was last updated.
+
+        Returns:
+            datetime: The timestamp when the item was last updated.
+        """
+
+        # Return the timestamp when the item was last updated
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the item.
+
+        Returns:
+            str: The UUID of the item.
+        """
+
+        # Return the UUID of the item
+        return self._uuid
+
     def to_mutable(self) -> Optional["MutableChangeHistoryItem"]:
         """
         Converts the immutable change history item to a mutable change history item.
@@ -1178,6 +1848,9 @@ class ImmutableChangeHistoryItem(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -1189,13 +1862,14 @@ class MutableChangeHistoryItem(MutableBaseObject):
     A change history item represents a change made to a mutable object.
 
     Attributes:
-        from_ (Any): The original value of the item.
-        to (Any): The new value of the item.
         created_at (Optional[datetime]): The timestamp when the item was created.
+        description (Optional[str]): The description of the item.
+        from_ (Any): The original value of the item.
         icon (Optional[str]): The icon of the item.
         id (Optional[int]): The ID of the item.
         key (Optional[str]): The key of the item.
         metadata (Optional[Dict[str, Any]]): The metadata of the item.
+        to (Any): The new value of the item.
         updated_at (Optional[datetime]): The timestamp when the item was last updated.
         uuid (Optional[str]): The UUID of the item.
     """
@@ -1205,6 +1879,7 @@ class MutableChangeHistoryItem(MutableBaseObject):
         from_: Any,
         to: Any,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -1216,13 +1891,14 @@ class MutableChangeHistoryItem(MutableBaseObject):
         Initializes a new instance of the MutableChangeHistoryItem class.
 
         Args:
-            from_ (Any): The original value of the item.
-            to (Any): The new value of the item.
             created_at (Optional[datetime]): The timestamp when the item was created.
+            description (Optional[str]): The description of the item.
+            from_ (Any): The original value of the item.
             icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
             metadata (Optional[Dict[str, Any]]): The metadata of the item.
+            to (Any): The new value of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
             uuid (Optional[str]): The UUID of the item.
 
@@ -1233,7 +1909,9 @@ class MutableChangeHistoryItem(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
             from_=from_,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -1242,7 +1920,309 @@ class MutableChangeHistoryItem(MutableBaseObject):
             updated_at=updated_at,
             uuid=uuid,
         )
-    
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Gets the timestamp when the item was created.
+
+        Returns:
+            datetime: The timestamp when the item was created.
+        """
+
+        # Return the timestamp when the item was created
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the item was created.
+
+        Args:
+            value (datetime): The timestamp when the item was created.
+
+        Returns:
+            None
+        """
+
+        # Set the timestamp when the item was created
+        self._created_at = value
+
+    @property
+    def description(self) -> str:
+        """
+        Gets the description of the item.
+
+        Returns:
+            str: The description of the item.
+        """
+
+        # Return the description of the item
+        return self._description
+
+    @description.setter
+    def description(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the description of the item.
+
+        Args:
+            value (str): The description of the item.
+
+        Returns:
+            None
+        """
+
+        # Set the description of the item
+        self._description = value
+
+    @property
+    def from_(self) -> Any:
+        """
+        Gets the original value of the item.
+
+        Returns:
+            Any: The original value of the item.
+        """
+
+        # Return the original value of the item
+        return self._from_
+
+    @from_.setter
+    def from_(
+        self,
+        value: Any,
+    ) -> None:
+        """
+        Sets the original value of the item.
+
+        Args:
+            value (Any): The original value of the item.
+
+        Returns:
+            None
+        """
+
+        # Set the original value of the item
+        self._from_ = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Gets the icon of the item.
+
+        Returns:
+            str: The icon of the item.
+        """
+
+        # Return the icon of the item
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the item.
+
+        Args:
+            value (str): The icon of the item.
+
+        Returns:
+            None
+        """
+
+        # Set the icon of the item
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the item.
+
+        Returns:
+            int: The ID of the item.
+        """
+
+        # Return the ID of the item
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the item.
+
+        Args:
+            value (int): The ID of the item.
+
+        Returns:
+            None
+        """
+
+        # Set the ID of the item
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Gets the key of the item.
+
+        Returns:
+            str: The key of the item.
+        """
+
+        # Return the key of the item
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the item.
+
+        Args:
+            value (str): The key of the item.
+
+        Returns:
+            None
+        """
+
+        # Set the key of the item
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Gets the metadata of the item.
+
+        Returns:
+            Dict[str, Any]: The metadata of the item.
+        """
+
+        # Return the metadata of the item
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Sets the metadata of the item.
+
+        Args:
+            **kwargs (Dict[str, Any]): The metadata of the item.
+
+        Returns:
+            None
+        """
+
+        # Check, if the 'metadata' dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Initialize the 'metadata' dictionary
+            self._metadata = {}
+
+        # Set the metadata of the item
+        self._metadata.update(kwargs)
+
+    @property
+    def to(self) -> Any:
+        """
+        Gets the new value of the item.
+
+        Returns:
+            Any: The new value of the item.
+        """
+
+        # Return the new value of the item
+        return self._to
+
+    @to.setter
+    def to(self, value: Any) -> None:
+        """
+        Sets the new value of the item.
+
+        Args:
+            value (Any): The new value of the item.
+
+        Returns:
+            None
+        """
+
+        # Set the new value of the item
+        self._to = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Gets the timestamp when the item was last updated.
+
+        Returns:
+            datetime: The timestamp when the item was last updated.
+        """
+
+        # Return the timestamp when the item was last updated
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the item was last updated.
+
+        Args:
+            value (datetime): The timestamp when the item was last updated.
+
+        Returns:
+            None
+        """
+
+        # Set the timestamp when the item was last updated
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the item.
+
+        Returns:
+            str: The UUID of the item.
+        """
+
+        # Return the UUID of the item
+        return self._uuid
+
+    @uuid.setter
+    def uuid(self, value: str) -> None:
+        """
+        Sets the UUID of the item.
+
+        Args:
+            value (str): The UUID of the item.
+
+        Returns:
+            None
+        """
+
+        # Set the UUID of the item
+        self._uuid = value
+
     def to_immutable(self) -> Optional[ImmutableChangeHistoryItem]:
         """
         Converts the mutable change history item to an immutable change history item.
@@ -1264,6 +2244,9 @@ class MutableChangeHistoryItem(MutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -1315,6 +2298,9 @@ class ChangeHistoryItemConverter:
                 message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -1350,6 +2336,9 @@ class ChangeHistoryItemConverter:
                 message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -1370,6 +2359,8 @@ class ChangeHistoryItemFactory:
         from_: Any,
         to: Any,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
+        icon: Optional[str] = "🕒",
         id: Optional[int] = None,
         key: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
@@ -1380,12 +2371,14 @@ class ChangeHistoryItemFactory:
         Creates and returns a new instance of ImmutableChangeHistoryItem class.
 
         Args:
-            from_ (Any): The original value of the item.
-            to (Any): The new value of the item.
             created_at (Optional[datetime]): The timestamp when the item was created.
+            description (Optional[str]): The description of the item.
+            from_ (Any): The original value of the item.
+            icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
             key (Optional[str]): The key of the item.
             metadata (Optional[Dict[str, Any]]): The metadata of the item.
+            to (Any): The new value of the item.
             updated_at (Optional[datetime]): The timestamp when the item was last updated.
             uuid (Optional[str]): The UUID of the item.
 
@@ -1398,12 +2391,14 @@ class ChangeHistoryItemFactory:
         try:
             # Attempt to create and return a new instance of the ImmutableChangeHistoryItem class
             return ImmutableChangeHistoryItem(
-                from_=from_,
-                to=to,
                 created_at=created_at,
+                description=description,
+                from_=from_,
+                icon=icon,
                 id=id,
                 key=key,
                 metadata=metadata,
+                to=to,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -1413,16 +2408,93 @@ class ChangeHistoryItemFactory:
                 message=f"Caught an exception while attempting to run 'create_change_history_item' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
 
-
 class ChangeHistoryItemBuilder(BaseObjectBuilder):
     """
+    A builder class used to create instances of ImmutableChangeHistoryItem class.
+
+    This class extends the BaseObjectBuilder class and provides a build method for creating instances of ImmutableChangeHistoryItem class.
     """
 
-    pass
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the ChangeHistoryItemBuilder class.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableChangeHistoryItem,
+            MutableChangeHistoryItem,
+        ]
+    ]:
+        """
+        Creates and returns a new instance of ImmutableChangeHistoryItem class.
+
+        Args:
+            as_mutable (bool): A flag indicating whether to return a MutableChangeHistoryItem instance.
+
+        Returns:
+            Optional[Union[ImmutableChangeHistoryItem, MutableChangeHistoryItem]]: The new instance of ImmutableChangeHistoryItem class.
+
+        Raises:
+            Exception: If an exception occurs while creating the change history item.
+        """
+        try:
+            # Attempt to create a new ImmutableChangeHistoryItem instance
+            change_history_item: Optional[ImmutableChangeHistoryItem] = (
+                ChangeHistoryItemFactory.create_change_history_item(
+                    **self.configuration
+                )
+            )
+
+            # Check, if the change history item exists
+            if not change_history_item:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create a change history item from configuration: {self.configuration}"
+                )
+
+                # Return early
+                return
+
+            # Check, if the as_mutable flag is set to True
+            if as_mutable:
+                # Convert the change history item to a MutableChangeHistoryItem instance and return it
+                return change_history_item.to_mutable()
+
+            # Return the change history item
+            return change_history_item
+
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
 
 
 class ChangeHistoryItemManager(BaseObjectManager):
@@ -1450,14 +2522,14 @@ class ChangeHistoryItemManager(BaseObjectManager):
         Returns:
             ChangeHistoryItemManager: The created or existing instance of ChangeHistoryItemManager class.
         """
-        
+
         # Check if the shared instance does not exist
         if cls._shared_instance is None:
             # Create a new instance by calling the parent class constructor
             cls._shared_instance = super(ChangeHistoryItemManager, cls).__new__(cls)
             # Initialize the instance
             cls._shared_instance.init()
-        
+
         # Return the shared instance
         return cls._shared_instance
 
@@ -1472,6 +2544,48 @@ class ChangeHistoryItemManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        change_history_item: Union[
+            ImmutableChangeHistoryItem,
+            MutableChangeHistoryItem,
+        ],
+    ) -> MutableChangeHistoryItem:
+        """
+        Runs pre-create tasks for the change history item.
+
+        Args:
+            change_history_item (Union[ImmutableChangeHistoryItem, MutableChangeHistoryItem]): The change history item to run pre-create tasks for.
+
+        Returns:
+            MutableChangeHistoryItem: The change history item with pre-create tasks run.
+        """
+
+        # Check, if the change history item is not mutable
+        if not change_history_item.is_mutable():
+            # Convert the change history item to a mutable change history item
+            change_history_item = change_history_item.to_mutable()
+
+        # Set the created at timestamp
+        change_history_item.created_at = (
+            change_history_item.created_at or Miscellaneous.get_current_date_time()
+        )
+
+        change_history_item.key = (
+            f"CHANGE_HISTORY_ITEM_{self.count_change_history_items()}"
+        )
+
+        # Set the updated at timestamp
+        change_history_item.updated_at = (
+            change_history_item.updated_at or Miscellaneous.get_current_date_time()
+        )
+
+        # Set the UUID
+        change_history_item.uuid = Miscellaneous.get_uuid()
+
+        # Return the change history item
+        return change_history_item
+
     def count_change_history_items(self) -> int:
         """
         Returns the number of change histories in the database.
@@ -1481,7 +2595,9 @@ class ChangeHistoryItemManager(BaseObjectManager):
         """
         try:
             # Count and return the number of change history items in the database
-            return asyncio.run(ChangeHistoryItemModel.count(database=Constants.DATABASE_PATH))
+            return asyncio.run(
+                ChangeHistoryItemModel.count(database=Constants.DATABASE_PATH)
+            )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1493,7 +2609,9 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
     def create_change_history_item(
         self,
-        change_history_item: Union[ImmutableChangeHistoryItem, MutableChangeHistoryItem],
+        change_history_item: Union[
+            ImmutableChangeHistoryItem, MutableChangeHistoryItem
+        ],
     ) -> Optional[ImmutableChangeHistoryItem]:
         """
         Creates a new change history item in the database.
@@ -1508,27 +2626,13 @@ class ChangeHistoryItemManager(BaseObjectManager):
             Exception: If an exception occurs while creating the change_history_item.
         """
         try:
-            # Check if the change history item object is immutable
-            if isinstance(
-                change_history_item,
-                MutableChangeHistoryItem,
-            ):
-                # If it is, convert it to a mutable change history item
-                change_history_item = change_history_item.to_mutable()
+            # Initialize the result (optional) ImmutableChangeHistoryItem to none
+            result: Optional[ImmutableChangeHistoryItem] = None
 
-            # Set the created_at timestamp of the change history item
-            change_history_item.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the key of the change history item
-            change_history_item.key = (
-                f"CHANGE_HISTORY_ITEM_{self.count_change_history_items() + 1}"
+            # Run pre-create tasks
+            change_history_item: MutableChangeHistoryItem = self._run_pre_create_tasks(
+                change_history_item=change_history_item
             )
-
-            # Set the updated_at timestamp of the change history item
-            change_history_item.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the change history item
-            change_history_item.uuid = Miscellaneous.get_uuid()
 
             # Convert the change history item object to a ChangeHistoryItemModel object
             model: ChangeHistoryItemModel = ChangeHistoryItemConverter.object_to_model(
@@ -1540,39 +2644,51 @@ class ChangeHistoryItemManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the change history item
-                change_history_item.id = id
-
-                # Convert the change history item to an immutable change history item
-                change_history_item = ImmutableChangeHistoryItem(
-                    **change_history_item.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a change history item ({change_history_item.__repr__()}) in the database."
                 )
 
-                # Add the change history item to the cache
-                self.add_to_cache(
-                    key=change_history_item.key,
-                    value=change_history_item,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable change history item
-                return change_history_item
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a change history item ({change_history_item}) in the database."
+            # Convert the change history item to a dictionary
+            kwargs: Dict[str, Any] = change_history_item.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the change history item
+            kwargs["id"] = id
+
+            # Create a new ImmutableChangeHistoryItem object
+            result = ChangeHistoryItemFactory.create_change_history_item(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableChangeHistoryItem from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the change history item to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableChangeHistoryItem instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'create_change history item' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'create_change_history_item' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1580,7 +2696,9 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
     def delete_change_history_item(
         self,
-        change_history_item: Union[ImmutableChangeHistoryItem, MutableChangeHistoryItem],
+        change_history_item: Union[
+            ImmutableChangeHistoryItem, MutableChangeHistoryItem
+        ],
     ) -> bool:
         """
         Deletes a change history item from the database.
@@ -1613,13 +2731,15 @@ class ChangeHistoryItemManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'delete_change_history_item' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_change_history_items(self) -> Optional[List[ImmutableChangeHistoryItem]]:
+    def get_all_change_history_items(
+        self,
+    ) -> Optional[List[ImmutableChangeHistoryItem]]:
         """
         Returns a list of all change histories in the database.
 
@@ -1673,7 +2793,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_all_change_history_items' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1729,7 +2849,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_change_history_item_by' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1783,7 +2903,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by_id' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_change_history_item_by_id' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1837,7 +2957,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'get_by_uuid' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'get_change_history_item_by_uuid' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1865,7 +2985,9 @@ class ChangeHistoryItemManager(BaseObjectManager):
             # Check, if the force refetch flag is set to False
             if not force_refetch:
                 # Search the stack for the passed keyword arguments
-                cached_result: Optional[List[ImmutableChangeHistoryItem]] = self.search_cache(**kwargs)
+                cached_result: Optional[List[ImmutableChangeHistoryItem]] = (
+                    self.search_cache(**kwargs)
+                )
 
                 # Check, if any cached results exist
                 if cached_result:
@@ -1899,7 +3021,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'search' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'search_change_history_items' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1907,7 +3029,9 @@ class ChangeHistoryItemManager(BaseObjectManager):
 
     def update_change_history_item(
         self,
-        change_history_item: Union[ImmutableChangeHistoryItem, MutableChangeHistoryItem],
+        change_history_item: Union[
+            ImmutableChangeHistoryItem, MutableChangeHistoryItem
+        ],
     ) -> Optional[ImmutableChangeHistoryItem]:
         """
         Updates a change history item with the given ID.
@@ -1970,7 +3094,7 @@ class ChangeHistoryItemManager(BaseObjectManager):
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}': {e}"
+                message=f"Caught an exception while attempting to run 'update_change_history_item' method from '{self.__class__.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -1985,6 +3109,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
 
     Attributes:
         created_at (Optional[datetime]): The timestamp when the item was created.
+        description (Optional[str]): The description of the item.
         from_ (Optional[Any]): The original value of the item.
         icon (Optional[str]): The icon of the item. Defaults to "🕒".
         id (Optional[int]): The ID of the item.
@@ -2027,6 +3152,22 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="DATETIME",
+        unique=False,
+    )
+
+    description: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="description",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
         unique=False,
     )
 
@@ -2161,6 +3302,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         from_: Optional[Any] = None,
         icon: Optional[str] = "🕒",
         id: Optional[int] = None,
@@ -2175,6 +3317,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the item was created.
+            description (Optional[str]): The description of the item.
             from_ (Optional[Any]): The original value of the item.
             icon (Optional[str]): The icon of the item. Defaults to "🕒".
             id (Optional[int]): The ID of the item.
@@ -2191,6 +3334,7 @@ class ChangeHistoryItemModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
             from_=from_,
             icon="🕒",
             id=id,

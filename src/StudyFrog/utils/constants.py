@@ -6,9 +6,8 @@ Date: 2025-02-06
 import copy
 import os
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from os import path
-from tkinter import ttk
 from typing import *
 
 
@@ -16,112 +15,9 @@ __all__: Final[List[str]] = ["Constants"]
 
 
 class Constants:
-    """
-    Contains various constants used throughout the program.
+    """ """
 
-    The constants that are available are:
-
-    * APPLICATION_NAME: The name of the application.
-    * APPLICATION_VERSION: The version of the application.
-
-    * BASE_ID: The base ID of objects in the application.
-    * CWD: The current working directory.
-    * DATA_PATH: The path to the data directory.
-    * DATABASE_PATH: The path to the database file.
-    * EXPORT_PATH: The path to the export directory.
-    * IMPORT_PATH: The path to the import directory.
-
-    * ANSWERS: The name of the table for answers.
-    * ASSOCIATIONS: The name of the table for associations.
-    * CHANGE_HISTORY: The name of the table for change history.
-    * CHANGE_HISTORY_ITEMS: The name of the table for change history items.
-    * CUSTOM_FIELDS: The name of the table for custom fields.
-    * DEFAULTS: The name of the table for defaults.
-    * DIFFICULTIES: The name of the table for difficulties.
-    * FLASHCARDS: The name of the table for flashcards.
-    * NOTES: The name of the table for notes.
-    * OPTIONS: The name of the table for options.
-    * PRIORITIES: The name of the table for priorities.
-    * QUESTIONS: The name of the table for questions.
-    * SETTINGS: The name of the table for settings.
-    * STACKS: The name of the table for stacks.
-    * TAGS: The name of the table for tags.
-    * USERS: The name of the table for users.
-
-    * DEFAULT_FONT_FAMILY: The default font family.
-    * DEFAULT_FONT_SIZE: The default font size.
-
-    * VERY_LARGE_FONT_SIZE: The very large font size.
-    * LARGE_FONT_SIZE: The large font size.
-    * SMALL_FONT_SIZE: The small font size.
-
-    * BOLD: The font weight bold.
-    * ITALIC: The font weight italic.
-    * NORMAL: The font weight normal.
-    * OVERSTRIKE: The font weight overstrike.
-    * UNDERLINE: The font weight underline.
-
-    * AMBER: The color amber.
-    * BLACK: The color black.
-    * BLUE: The color blue.
-    * BROWN: The color brown.
-    * CYAN: The color cyan.
-    * DEEP_PURPLE: The color deep purple.
-    * GREY: The color grey.
-    * GREEN: The color green.
-    * INDIGO: The color indigo.
-    * ORANGE: The color orange.
-    * PINK: The color pink.
-    * RED: The color red.
-    * TEAL: The color teal.
-    * WHITE: The color white.
-    * YELLOW: The color yellow.
-
-    * DEFAULT_GEOMETRY: The default geometry of the main window.
-    * GLOBAL_NAMESPACE: The namespace for global dispatching of events.
-
-    * HIGHEST: The highest priority.
-    * HIGH: The high priority.
-    * MEDIUM: The medium priority.
-    * LOW: The low priority.
-    * LOWEST: The lowest priority.
-
-    * HARD: The hard difficulty.
-    * MEDIUM: The medium difficulty.
-    * EASY: The easy difficulty.
-
-    * TRUE: The true value.
-    * FALSE: The false value.
-
-    * ANSWER_NAMESPACE: The namespace for the answer UI.
-    * ASSOCIATION_NAMESPACE: The namespace for the association UI.
-    * CHANGE_HISTORY_NAMESPACE: The namespace for the change history UI.
-    * CHANGE_HISTORY_ITEM_NAMESPACE: The namespace for the change history item UI.
-    * CUSTOM_FIELD_NAMESPACE: The namespace for the custom field UI.
-    * DEFAULT_NAMESPACE: The namespace for the default UI.
-    * DIFFICULTY_NAMESPACE: The namespace for the difficulty UI.
-    * FLASHCARD_NAMESPACE: The namespace for the flashcard UI.
-    * NOTE_NAMESPACE: The namespace for the note UI.
-    * OPTION_NAMESPACE: The namespace for the option UI.
-    * PRIORITY_NAMESPACE: The namespace for the priority UI.
-    * QUESTION_NAMESPACE: The namespace for the question UI.
-    * STACK_NAMESPACE: The namespace for the stack UI.
-    * TAG_NAMESPACE: The namespace for the tag UI.
-    * USER_NAMESPACE: The namespace for the user UI.
-
-    * CREATE_UI_NAMESPACE: The namespace for the create UI.
-    * DASHBOARD_UI_NAMESPACE: The namespace for the dashboard UI.
-    * EDIT_UI_NAMESPACE: The namespace for the edit UI.
-    * MAIN_UI_NAMESPACE: The namespace for the main UI.
-    * REPORT_UI_NAMESPACE: The namespace for the report UI.
-    * SEARCH_UI_NAMESPACE: The namespace for the search UI.
-    * SETTING_UI_NAMESPACE: The namespace for the setting UI.
-
-    * NOW: The current time.
-    * TODAY: The current date.
-    * TOMORROW: The current date plus one day.
-    * YESTERDAY: The current date minus one day.
-    """
+    DEFAULT: Final[str] = "default"
 
     APPLICATION_NAME: Final[str] = "🐸 StudyFrog"
     APPLICATION_VERSION: Final[float] = 0.1
@@ -129,6 +25,11 @@ class Constants:
     BASE_ID: Final[int] = 10000
 
     CWD: Final[str] = os.getcwd()
+
+    ASSETS_PATH: Final[str] = path.join(
+        CWD,
+        "assets",
+    )
 
     DATA_PATH: Final[str] = path.join(
         CWD,
@@ -159,6 +60,7 @@ class Constants:
     DEFAULTS: Final[str] = "defaults"
     DIFFICULTIES: Final[str] = "difficulties"
     FLASHCARDS: Final[str] = "flashcards"
+    IMAGES: Final[str] = "images"
     LEARNING_SESSIONS: Final[str] = "learning_sessions"
     LEARNING_SESSION_ACTIONS: Final[str] = "learning_session_actions"
     LEARNING_SESSION_ITEMS: Final[str] = "learning_session_items"
@@ -537,7 +439,7 @@ class Constants:
     BACKWARD_DIRECTION: Final[str] = "backward"
     FORWARD_DIRECTION: Final[str] = "forward"
 
-    GLOBAL_NAMESPACE: Final[str] = "GLOBAL"
+    GLOBAL_NAMESPACE: Final[str] = "global"
 
     HIGHEST: Final[str] = "highest"
     HIGH: Final[str] = "high"
@@ -556,17 +458,22 @@ class Constants:
     TRUE: Final[str] = "true"
     FALSE: Final[str] = "false"
 
-    CREATE_UI_NAMESPACE: Final[str] = "CREATE_UI"
-    DASHBOARD_UI_NAMESPACE: Final[str] = "DASHBOARD_UI"
-    EDIT_UI_NAMESPACE: Final[str] = "EDIT_UI"
-    LEARNING_SESSION_NAMESPACE: Final[str] = "LEARNING_SESSION"
-    MAIN_UI_NAMESPACE: Final[str] = "MAIN_UI"
-    REPORT_UI_NAMESPACE: Final[str] = "REPORT_UI"
-    SEARCH_UI_NAMESPACE: Final[str] = "SEARCH_UI"
-    SETTING_UI_NAMESPACE: Final[str] = "SETTING_UI"
-    STACK_SELECTION_NAMESPACE: Final[str] = "STACK_SELECTION"
+    CORRECT: Final[str] = "correct"
+    INCORRECT: Final[str] = "incorrect"
 
-    FLASHCARD_IMPORTER_NAMESPACE: Final[str] = "FLASHCARD_IMPORTER"
+    CREATE_UI_NAMESPACE: Final[str] = "create_ui"
+    DASHBOARD_UI_NAMESPACE: Final[str] = "dashboard_ui"
+    EDIT_UI_NAMESPACE: Final[str] = "edit_ui"
+    LEARNING_SESSION_NAMESPACE: Final[str] = "learning_session"
+    MAIN_UI_NAMESPACE: Final[str] = "main_ui"
+    REPORT_UI_NAMESPACE: Final[str] = "report_ui"
+    SEARCH_UI_NAMESPACE: Final[str] = "search_ui"
+    SETTING_UI_NAMESPACE: Final[str] = "setting_ui"
+    STACK_SELECTION_NAMESPACE: Final[str] = "stack_selection"
+
+    FLASHCARD_EXPORTER_NAMESPACE: Final[str] = "flashcard_exporter"
+
+    FLASHCARD_IMPORTER_NAMESPACE: Final[str] = "flashcard_importer"
 
     # The current date and time
     NOW: Final[datetime] = datetime.now()
@@ -579,6 +486,22 @@ class Constants:
 
     # The previous day
     YESTERDAY: Final[datetime] = datetime.today() - timedelta(days=1)
+
+    # The start of the day
+    START_OF_DAY: Final[datetime] = datetime.today().replace(
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
+
+    # The end of the day
+    END_OF_DAY: Final[datetime] = datetime.today().replace(
+        hour=23,
+        minute=59,
+        second=59,
+        microsecond=999999,
+    )
 
     # The start of the week
     START_OF_WEEK: Final[datetime] = datetime.today() - timedelta(
@@ -628,13 +551,19 @@ class Constants:
         "defaults": [],
         "difficulties": [],
         "flashcards": [],
+        "images": [],
+        "learning_sessions": [],
+        "learning_session_actions": [],
+        "learning_session_items": [],
         "notes": [],
         "options": [],
         "priorities": [],
         "questions": [],
         "settings": [],
         "stacks": [],
-        "statuses:": [],
+        "statuses": [],
+        "subjects": [],
+        "teachers": [],
         "users": [],
     }
 
@@ -657,6 +586,7 @@ class Constants:
         Returns:
             int: The base ID.
         """
+
         # Copy the base ID to prevent external modification
         return copy.deepcopy(cls.BASE_ID)
 
@@ -704,6 +634,7 @@ class Constants:
         Returns:
             int: The base repetition interval.
         """
+
         # Copy the base repetition interval to prevent external modification
         return copy.deepcopy(cls.BASE_REPETITION_INTERVAL_SECONDS)
 
@@ -721,6 +652,8 @@ class Constants:
         Returns:
             Union[Dict[str, str], List[str]]: The colors as a dictionary or a list.
         """
+
+        # Check, if the passed as_dict parameter is True
         if as_dict:
             # Initialize an empty dictionary
             result: Dict[str, str] = {}
@@ -771,3 +704,15 @@ class Constants:
                 + cls.WHITE.values()
                 + cls.BLACK.values()
             )
+
+    @classmethod
+    def get_json_template(cls) -> Dict[str, List[Optional[Any]]]:
+        """
+        Returns the JSON template.
+
+        Returns:
+            Dict[str, List[Optional[Any]]]: The JSON template.
+        """
+
+        # Return the JSON template
+        return copy.deepcopy(cls.JSON_TEMPLATE)

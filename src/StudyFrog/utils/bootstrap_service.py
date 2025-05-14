@@ -174,8 +174,8 @@ class BootstrapService(ImmutableBaseObject):
         try:
             # Define a list of answer names
             answers: List[str] = [
-                Constants.TRUE,
-                Constants.FALSE,
+                Constants.CORRECT,
+                Constants.INCORRECT,
             ]
 
             # Iterate over the answer names

@@ -4,6 +4,7 @@ Date: 2025-02-09
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 from typing import *
@@ -40,12 +41,12 @@ class ImmutableOption(ImmutableBaseObject):
         metadata (Optional[Dict[str, Any]]): The metadata of the Option.
         updated_at (Optional[datetime]): The timestamp when the Option was last updated.
         uuid (Optional[str]): The UUID of the Option.
-        value (str): The value of the Option.
+        value (Union[float, int, str]): The value of the Option.
     """
 
     def __init__(
         self,
-        value: str,
+        value: Union[float, int, str],
         created_at: Optional[datetime] = None,
         icon: Optional[str] = "🎚️",
         id: Optional[int] = None,
@@ -58,7 +59,7 @@ class ImmutableOption(ImmutableBaseObject):
         Initializes a new instance of the ImmutableOption class.
 
         Args:
-            value (str): The value of the instance.
+            value (Union[float, int, str]): The value of the instance.
             created_at (Optional[datetime]): The timestamp when the instance was created.
             icon (Optional[str]): The icon of the instance. Defaults to "🎚️".
             id (Optional[int]): The ID of the instance.
@@ -74,6 +75,7 @@ class ImmutableOption(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -83,22 +85,132 @@ class ImmutableOption(ImmutableBaseObject):
             value=value,
         )
 
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the Option was created.
+
+        Returns:
+            datetime: The timestamp when the Option was created.
+        """
+
+        # Return the created_at attribute
+        return self._created_at
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the Option.
+
+        Returns:
+            str: The icon of the Option.
+        """
+
+        # Return the icon attribute
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the Option.
+
+        Returns:
+            int: The ID of the Option.
+        """
+
+        # Return the id attribute
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the Option.
+
+        Returns:
+            str: The key of the Option.
+        """
+
+        # Return the key attribute
+        return self._key
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the Option.
+
+        Returns:
+            Dict[str, Any]: The metadata of the Option.
+        """
+
+        # Return the metadata attribute
+        return self._metadata
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the Option was last updated.
+
+        Returns:
+            datetime: The timestamp when the Option was last updated.
+        """
+
+        # Return the updated_at attribute
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the Option.
+
+        Returns:
+            str: The UUID of the Option.
+        """
+
+        # Return the uuid attribute
+        return self._uuid
+
+    @property
+    def value(self) -> Union[float, int, str]:
+        """
+        Returns the value of the Option.
+
+        Returns:
+            Union[float, int, str]: The value of the Option.
+        """
+
+        # Return the value attribute
+        return self._value
+
     def to_mutable(self) -> "MutableOption":
         """
         Returns a new instance of the MutableOption class with the same attributes as this instance.
 
         Returns:
             MutableOption: A new instance of the MutableOption class with the same attributes as this instance.
-        """
 
-        # Attempt to create and return a new instance of the MutableOption class with the same attributes as this instance
-        return MutableOption(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        Raises:
+            Exception: If an exception occurs while attempting to create a new instance of the MutableOption class.
+        """
+        try:
+            # Attempt to create and return a new instance of the MutableOption class with the same attributes as this instance
+            return MutableOption(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log the exception
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None
+            return None
 
 
 class MutableOption(MutableBaseObject):
@@ -113,12 +225,12 @@ class MutableOption(MutableBaseObject):
         metadata (Optional[Dict[str, Any]]): The metadata of the Option.
         updated_at (Optional[datetime]): The timestamp when the Option was last updated.
         uuid (Optional[str]): The UUID of the Option.
-        value (str): The value of the Option.
+        value (Union[float, int, str]): The value of the Option.
     """
 
     def __init__(
         self,
-        value: str,
+        value: Union[float, int, str],
         created_at: Optional[datetime] = None,
         icon: Optional[str] = "🎚️",
         id: Optional[int] = None,
@@ -131,7 +243,7 @@ class MutableOption(MutableBaseObject):
         Initializes a new instance of the MutableOption class.
 
         Args:
-            value (str): The value of the instance.
+            value (Union[float, int, str]): The value of the instance.
             created_at (Optional[datetime]): The timestamp when the instance was created.
             icon (Optional[str]): The icon of the instance. Defaults to "🎚️".
             id (Optional[int]): The ID of the instance.
@@ -147,6 +259,7 @@ class MutableOption(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -156,6 +269,254 @@ class MutableOption(MutableBaseObject):
             value=value,
         )
 
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the Option was created.
+
+        Returns:
+            datetime: The timestamp when the Option was created.
+        """
+
+        # Return the created_at attribute
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the Option was created.
+
+        Args:
+            value (datetime): The timestamp when the Option was created.
+
+        Returns:
+            None
+        """
+
+        # Set the created_at attribute
+        self._created_at = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the Option.
+
+        Returns:
+            str: The icon of the Option.
+        """
+
+        # Return the icon attribute
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the Option.
+
+        Args:
+            value (str): The icon of the Option.
+
+        Returns:
+            None
+        """
+
+        # Set the icon attribute
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the Option.
+
+        Returns:
+            int: The ID of the Option.
+        """
+
+        # Return the id attribute
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the Option.
+
+        Args:
+            value (int): The ID of the Option.
+
+        Returns:
+            None
+        """
+
+        # Set the id attribute
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the Option.
+
+        Returns:
+            str: The key of the Option.
+        """
+
+        # Return the key attribute
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the Option.
+
+        Args:
+            value (str): The key of the Option.
+
+        Returns:
+            None
+        """
+
+        # Set the key attribute
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the Option.
+
+        Returns:
+            Dict[str, Any]: The metadata of the Option.
+        """
+
+        # Return the metadata attribute
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Updates the metadata of the Option.
+
+        Args:
+            **kwargs (Dict[str, Any]): The new metadata of the Option.
+
+        Returns:
+            None
+        """
+
+        # Check, if the metadata dictionary exists
+        if not self.get(
+            default=None,
+            name="metadata",
+        ):
+            # Set the metadata of the learning session to an empty dictionary
+            self._metadata = {}
+
+        # Update the metadata of the learning session
+        self._metadata.update(**kwargs)
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the Option was last updated.
+
+        Returns:
+            datetime: The timestamp when the Option was last updated.
+        """
+
+        # Return the updated_at attribute
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the Option was last updated.
+
+        Args:
+            value (datetime): The timestamp when the Option was last updated.
+
+        Returns:
+            None
+        """
+
+        # Set the updated_at attribute
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the Option.
+
+        Returns:
+            str: The UUID of the Option.
+        """
+
+        # Return the uuid attribute
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the Option.
+
+        Args:
+            value (str): The UUID of the Option.
+
+        Returns:
+            None
+        """
+
+        # Set the uuid attribute
+        self._uuid = value
+
+    @property
+    def value(self) -> Union[float, int, str]:
+        """
+        Returns the value of the Option.
+
+        Returns:
+            Union[float, int, str]: The value of the Option.
+        """
+
+        # Return the value attribute
+        return self._value
+
+    @value.setter
+    def value(
+        self,
+        value: Union[float, int, str],
+    ) -> None:
+        """
+        Sets the value of the Option.
+
+        Args:
+            value (Union[float, int, str]): The value of the Option.
+
+        Returns:
+            None
+        """
+
+        # Set the value attribute
+        self._value = value
+
     def to_immutable(self) -> ImmutableOption:
         """
         Returns a new instance of the ImmutableOption class with the same attributes as this instance.
@@ -163,15 +524,26 @@ class MutableOption(MutableBaseObject):
         Returns:
             ImmutableOption: A new instance of the ImmutableOption class with the same attributes as this instance.
         """
-
-        # Attempt to create and return a new instance of the ImmutableOption class with the same attributes as this instance
-        return ImmutableOption(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Attempt to create and return a new instance of the ImmutableOption class with the same attributes as this instance
+            return ImmutableOption(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log the exception
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}' class: {e}",
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None
+            return None
 
 
 class OptionConverter:
@@ -323,9 +695,146 @@ class OptionFactory:
 
 
 class OptionBuilder(BaseObjectBuilder):
-    """ """
+    """
+    A builder class for creating Option instances.
 
-    pass
+    This class extends the BaseObjectBuilder class and provides a method for creating Option instances.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initializes a new instance of the OptionBuilder class.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableOption,
+            MutableOption,
+        ]
+    ]:
+        """
+        Creates an Option instance with the given parameters.
+
+        Args:
+            as_mutable (bool): A flag indicating whether to create a MutableOption instance or an ImmutableOption instance. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableOption, MutableOption]]: A new instance of the Option class if the creation was successful, otherwise None.
+
+        Raises:
+            Exception: If an exception occurs while creating the Option instance.
+        """
+        try:
+            # Attempt to create a new ImmutableOption instance
+            option: Optional[ImmutableOption] = OptionFactory.create_option(
+                **self.configuration
+            )
+
+            # Check, if the ImmutableOption instance exists
+            if not option:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create an instance of 'ImmutableOption' from '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return None
+
+            # Check, if the 'as_mutable' flag is set to True
+            if as_mutable:
+                # Convert the option to a MutableOption instance and return it
+                return option.to_mutable()
+
+            # Return the Option instance
+            return option
+        except Exception as e:
+            # Log an error message
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None
+            return None
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """ """
+
+        # Set the 'created_at' attribute
+        self.configuration["created_at"] = value
+
+        # Return the builder instance
+        return self
+
+    def metadata(
+        self,
+        value: Optional[Dict[str, Any]] = None,
+        **kwargs,
+    ) -> Self:
+        """
+        Sets the metadata of the Option.
+
+        Args:
+            value (Optional[Dict[str, Any]]): The metadata of the Option.
+            **kwargs (Dict[str, Any]): The metadata of the Option.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'metadata' exists in the configuration dictionary
+        if "metadata" not in self.configuration:
+            # Set the 'metadata' attribute
+            self.configuration["metadata"] = {}
+
+        # Check, if the 'value' argument exists
+        if value:
+            # Set the 'metadata' attribute
+            self.configuration["metadata"] = value
+
+            # Return the builder instance early
+            return self
+
+        # Update the 'metadata' attribute with the keyword arguments
+        self.configuration["metadata"].update(kwargs)
+
+        # Return the builder instance
+        return self
+
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the timestamp when the Option was last updated.
+
+        Args:
+            value (datetime): The timestamp when the Option was last updated.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the 'updated_at' attribute
+        self.configuration["updated_at"] = value
+
+        # Return the builder instance
+        return self
 
 
 class OptionManager(BaseObjectManager):
@@ -372,6 +881,46 @@ class OptionManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        option: Union[
+            ImmutableOption,
+            MutableOption,
+        ],
+    ) -> MutableOption:
+        """
+        Runs pre-create tasks for the given option.
+
+        Args:
+            option (Union[ImmutableOption, MutableOption]): The option to run pre-create tasks for.
+
+        Returns:
+            MutableOption: The option with pre-create tasks run.
+        """
+
+        # Check if the option object is immutable
+        if not option.is_mutable():
+            # If it is, convert it to a mutable option
+            option: MutableOption = option.to_mutable()
+
+        # Set the created_at timestamp of the option
+        option.created_at = Miscellaneous.get_current_datetime()
+
+        # Set the key of the option
+        option.key = f"OPTION_{self.count_options() + 1}"
+
+        # Set the metadata of the option
+        option.metadata = {} or option.metadata
+
+        # Set the updated_at timestamp of the option
+        option.updated_at = Miscellaneous.get_current_datetime()
+
+        # Set the uuid of the option
+        option.uuid = Miscellaneous.get_uuid()
+
+        # Return the option
+        return option
+
     def count_options(self) -> int:
         """
         Returns the number of options in the database.
@@ -408,31 +957,11 @@ class OptionManager(BaseObjectManager):
             Exception: If an exception occurs while creating the option.
         """
         try:
-            # Check if the option object is immutable
-            if isinstance(
-                option,
-                ImmutableOption,
-            ):
-                # If it is, convert it to a mutable option
-                option = MutableOption(
-                    **option.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
-                )
+            # Initialize the result (optional) ImmutableOption to none
+            result: Optional[ImmutableOption] = None
 
-            # Set the created_at timestamp of the option
-            option.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the key of the option
-            option.key = f"OPTION_{self.count_options() + 1}"
-
-            # Set the updated_at timestamp of the option
-            option.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the option
-            option.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            option: MutableOption = self._run_pre_create_tasks(option=option)
 
             # Convert the option object to a OptionModel object
             model: OptionModel = OptionConverter.object_to_model(object=option)
@@ -442,35 +971,47 @@ class OptionManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the option
-                option.id = id
-
-                # Convert the option to an immutable option
-                option = ImmutableOption(
-                    **option.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create an option ({option.__repr__()}) in the database."
                 )
 
-                # Add the option to the cache
-                self.add_to_cache(
-                    key=option.key,
-                    value=option,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable option
-                return option
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a option ({option}) in the database."
+            # Convert the option to a dictionary
+            kwargs: Dict[str, Any] = option.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the option
+            kwargs["id"] = id
+
+            # Create a new ImmutableOption object
+            result = OptionFactory.create_option(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableOption from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the option to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableOption instance
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

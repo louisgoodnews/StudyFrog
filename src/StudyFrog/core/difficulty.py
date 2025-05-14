@@ -4,6 +4,7 @@ Date: 2025-02-05
 """
 
 import asyncio
+import traceback
 
 from datetime import datetime
 from typing import *
@@ -36,15 +37,16 @@ class ImmutableDifficulty(ImmutableBaseObject):
 
     Attributes:
         emoji (str): The emoji of the difficulty.
-        name (str): The name of the difficulty.
-        value (float): The value of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
+        description (Optional[str]): The description of the difficulty.
         icon (str): The icon of the difficulty.
         id (int): The ID of the difficulty.
         key (str): The key of the difficulty.
         metadata (Dict[str, Any]): The metadata of the difficulty.
+        name (str): The name of the difficulty.
         updated_at (datetime): The timestamp when the difficulty was last updated.
         uuid (str): The UUID of the difficulty.
+        value (float): The value of the difficulty.
     """
 
     def __init__(
@@ -53,6 +55,7 @@ class ImmutableDifficulty(ImmutableBaseObject):
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -64,16 +67,17 @@ class ImmutableDifficulty(ImmutableBaseObject):
         Initializes a new instance of the Difficulty class.
 
         Args:
-            emoji (str): The emoji of the difficulty.
-            name (str): The name of the difficulty.
-            value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
+            description (Optional[str]): The description of the difficulty.
+            emoji (str): The emoji of the difficulty.
             icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
             metadata (Optional[Dict[str, Any]]): The metadata of the difficulty.
+            name (str): The name of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
             uuid (Optional[str]): The UUID of the difficulty.
+            value (float): The value of the difficulty.
 
         Returns:
             None
@@ -82,7 +86,9 @@ class ImmutableDifficulty(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
             emoji=emoji,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -93,6 +99,138 @@ class ImmutableDifficulty(ImmutableBaseObject):
             value=value,
         )
 
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the difficulty was created.
+
+        Returns:
+            datetime: The timestamp when the difficulty was created.
+        """
+
+        # Return the timestamp when the difficulty was created
+        return self._created_at
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description of the difficulty.
+
+        Returns:
+            str: The description of the difficulty.
+        """
+
+        # Return the description of the difficulty
+        return self._description
+
+    @property
+    def emoji(self) -> str:
+        """
+        Returns the emoji of the difficulty.
+
+        Returns:
+            str: The emoji of the difficulty.
+        """
+
+        # Return the emoji of the difficulty
+        return self._emoji
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the difficulty.
+
+        Returns:
+            str: The icon of the difficulty.
+        """
+
+        # Return the icon of the difficulty
+        return self._icon
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the difficulty.
+
+        Returns:
+            int: The ID of the difficulty.
+        """
+
+        # Return the ID of the difficulty
+        return self._id
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the difficulty.
+
+        Returns:
+            str: The key of the difficulty.
+        """
+
+        # Return the key of the difficulty
+        return self._key
+
+    @property
+    def metadata(self) -> Optional[Dict[str, Any]]:
+        """
+        Returns the metadata of the difficulty.
+
+        Returns:
+            Optional[Dict[str, Any]]: The metadata of the difficulty.
+        """
+
+        # Return the metadata of the difficulty
+        return self._metadata
+
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the difficulty.
+
+        Returns:
+            str: The name of the difficulty.
+        """
+
+        # Return the name of the difficulty
+        return self._name
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the difficulty was last updated.
+
+        Returns:
+            datetime: The timestamp when the difficulty was last updated.
+        """
+
+        # Return the timestamp when the difficulty was last updated
+        return self._updated_at
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the difficulty.
+
+        Returns:
+            str: The UUID of the difficulty.
+        """
+
+        # Return the UUID of the difficulty
+        return self._uuid
+
+    @property
+    def value(self) -> float:
+        """
+        Returns the value of the difficulty.
+
+        Returns:
+            float: The value of the difficulty.
+        """
+
+        # Return the value of the difficulty
+        return self._value
+
     def to_mutable(self) -> "MutableDifficulty":
         """
         Converts the immutable difficulty to a mutable difficulty.
@@ -100,15 +238,26 @@ class ImmutableDifficulty(ImmutableBaseObject):
         Returns:
             MutableDifficulty: The mutable difficulty.
         """
-
-        # Return a new instance of the MutableDifficulty class
-        return MutableDifficulty(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Attempt to create and return a new instance of the MutableDifficulty class
+            return MutableDifficulty(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_mutable' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
 
 class MutableDifficulty(MutableBaseObject):
@@ -122,6 +271,7 @@ class MutableDifficulty(MutableBaseObject):
         name (str): The name of the difficulty.
         value (float): The value of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
+        description (Optional[str]): The description of the difficulty.
         icon (str): The icon of the difficulty.
         id (int): The ID of the difficulty.
         key (str): The key of the difficulty.
@@ -147,16 +297,17 @@ class MutableDifficulty(MutableBaseObject):
         Initializes a new instance of the MutableDifficulty class.
 
         Args:
-            emoji (str): The emoji of the difficulty.
-            name (str): The name of the difficulty.
-            value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
+            description (Optional[str]): The description of the difficulty.
+            emoji (str): The emoji of the difficulty.
             icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
             metadata (Optional[Dict[str, Any]]): The metadata of the difficulty.
+            name (str): The name of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
             uuid (Optional[str]): The UUID of the difficulty.
+            value (float): The value of the difficulty.
 
         Returns:
             None
@@ -165,7 +316,9 @@ class MutableDifficulty(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
             emoji=emoji,
+            hide_attributes=True,
             icon=icon,
             id=id,
             key=key,
@@ -176,6 +329,336 @@ class MutableDifficulty(MutableBaseObject):
             value=value,
         )
 
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the timestamp when the difficulty was created.
+
+        Returns:
+            datetime: The timestamp when the difficulty was created.
+        """
+
+        # Return the timestamp when the difficulty was created
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the difficulty was created.
+
+        Args:
+            value (datetime): The timestamp when the difficulty was created.
+
+        Returns:
+            None
+        """
+
+        # Set the timestamp when the difficulty was created
+        self._created_at = value
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description of the difficulty.
+
+        Returns:
+            str: The description of the difficulty.
+        """
+
+        # Return the description of the difficulty
+        return self._description
+
+    @description.setter
+    def description(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the description of the difficulty.
+
+        Args:
+            value (str): The description of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the description of the difficulty
+        self._description = value
+
+    @property
+    def emoji(self) -> str:
+        """
+        Returns the emoji of the difficulty.
+
+        Returns:
+            str: The emoji of the difficulty.
+        """
+
+        # Return the emoji of the difficulty
+        return self._emoji
+
+    @emoji.setter
+    def emoji(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the emoji of the difficulty.
+
+        Args:
+            value (str): The emoji of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the emoji of the difficulty
+        self._emoji = value
+
+    @property
+    def icon(self) -> str:
+        """
+        Returns the icon of the difficulty.
+
+        Returns:
+            str: The icon of the difficulty.
+        """
+
+        # Return the icon of the difficulty
+        return self._icon
+
+    @icon.setter
+    def icon(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the icon of the difficulty.
+
+        Args:
+            value (str): The icon of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the icon of the difficulty
+        self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the difficulty.
+
+        Returns:
+            int: The ID of the difficulty.
+        """
+
+        # Return the ID of the difficulty
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the difficulty.
+
+        Args:
+            value (int): The ID of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the ID of the difficulty
+        self._id = value
+
+    @property
+    def key(self) -> str:
+        """
+        Returns the key of the difficulty.
+
+        Returns:
+            str: The key of the difficulty.
+        """
+
+        # Return the key of the difficulty
+        return self._key
+
+    @key.setter
+    def key(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the key of the difficulty.
+
+        Args:
+            value (str): The key of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the key of the difficulty
+        self._key = value
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        """
+        Returns the metadata of the difficulty.
+
+        Returns:
+            Dict[str, Any]: The metadata of the difficulty.
+        """
+
+        # Return the metadata of the difficulty
+        return self._metadata
+
+    @metadata.setter
+    def metadata(
+        self,
+        value: Dict[str, Any],
+    ) -> None:
+        """
+        Sets the metadata of the difficulty.
+
+        Args:
+            value (Dict[str, Any]): The metadata of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the metadata of the difficulty
+        self._metadata = value
+
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the difficulty.
+
+        Returns:
+            str: The name of the difficulty.
+        """
+
+        # Return the name of the difficulty
+        return self._name
+
+    @name.setter
+    def name(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the name of the difficulty.
+
+        Args:
+            value (str): The name of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the name of the difficulty
+        self._name = value
+
+    @property
+    def updated_at(self) -> datetime:
+        """
+        Returns the timestamp when the difficulty was last updated.
+
+        Returns:
+            datetime: The timestamp when the difficulty was last updated.
+        """
+
+        # Return the timestamp when the difficulty was last updated
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the timestamp when the difficulty was last updated.
+
+        Args:
+            value (datetime): The timestamp when the difficulty was last updated.
+
+        Returns:
+            None
+        """
+
+        # Set the timestamp when the difficulty was last updated
+        self._updated_at = value
+
+    @property
+    def uuid(self) -> str:
+        """
+        Returns the UUID of the difficulty.
+
+        Returns:
+            str: The UUID of the difficulty.
+        """
+
+        # Return the UUID of the difficulty
+        return self._uuid
+
+    @uuid.setter
+    def uuid(
+        self,
+        value: str,
+    ) -> None:
+        """
+        Sets the UUID of the difficulty.
+
+        Args:
+            value (str): The UUID of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the UUID of the difficulty
+        self._uuid = value
+
+    @property
+    def value(self) -> float:
+        """
+        Returns the value of the difficulty.
+
+        Returns:
+            float: The value of the difficulty.
+        """
+
+        # Return the value of the difficulty
+        return self._value
+
+    @value.setter
+    def value(
+        self,
+        value: float,
+    ) -> None:
+        """
+        Sets the value of the difficulty.
+
+        Args:
+            value (float): The value of the difficulty.
+
+        Returns:
+            None
+        """
+
+        # Set the value of the difficulty
+        self._value = value
+
     def to_immutable(self) -> ImmutableDifficulty:
         """
         Converts the mutable difficulty to an immutable difficulty.
@@ -183,15 +666,26 @@ class MutableDifficulty(MutableBaseObject):
         Returns:
             ImmutableDifficulty: The immutable difficulty.
         """
-
-        # Return a new instance of the ImmutableDifficulty class
-        return ImmutableDifficulty(
-            **self.to_dict(
-                exclude=[
-                    "_logger",
-                ]
+        try:
+            # Attempt to create and return a new instance of the ImmutableDifficulty class
+            return ImmutableDifficulty(
+                **self.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'to_immutable' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
 
 class DifficultyConverter:
@@ -240,6 +734,9 @@ class DifficultyConverter:
                 message=f"Caught an exception while attempting to run 'model_to_object' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -275,6 +772,9 @@ class DifficultyConverter:
                 message=f"Caught an exception while attempting to run 'object_to_model' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -296,6 +796,7 @@ class DifficultyFactory:
         name: str,
         value: float,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         icon: Optional[str] = "⭐",
         id: Optional[int] = None,
         key: Optional[str] = None,
@@ -307,16 +808,17 @@ class DifficultyFactory:
         Creates a new instance of the Difficulty class.
 
         Args:
-            emoji (str): The emoji of the difficulty.
-            name (str): The name of the difficulty.
-            value (float): The value of the difficulty.
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
+            description (Optional[str]): The description of the difficulty.
+            emoji (str): The emoji of the difficulty.
             icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
             key (Optional[str]): The key of the difficulty.
             metadata (Optional[Dict[str, Any]]): The metadata of the difficulty.
+            name (str): The name of the difficulty.
             updated_at (Optional[datetime]): The timestamp when the difficulty was last updated.
             uuid (Optional[str]): The UUID of the difficulty.
+            value (float): The value of the difficulty.
 
         Returns:
             Optional[ImmutableDifficulty]: The new instance of the Difficulty class.
@@ -325,6 +827,7 @@ class DifficultyFactory:
             # Attempt to create and return a Difficulty object
             return ImmutableDifficulty(
                 created_at=created_at,
+                description=description,
                 emoji=emoji,
                 icon=icon,
                 id=id,
@@ -341,6 +844,9 @@ class DifficultyFactory:
                 message=f"Caught an exception while attempting to run 'create_difficulty' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -348,7 +854,185 @@ class DifficultyFactory:
 class DifficultyBuilder(BaseObjectBuilder):
     """ """
 
-    pass
+    def __init__(self) -> None:
+        """ """
+
+        # Call the parent class constructor
+        super().__init__()
+
+    @override
+    def build(
+        self,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableDifficulty,
+            MutableDifficulty,
+        ]
+    ]:
+        """
+        Builds a new instance of the Difficulty class.
+
+        Args:
+            as_mutable (bool): A flag indicating whether to return a mutable instance of the Difficulty class. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableDifficulty, MutableDifficulty]]: The new instance of the Difficulty class.
+
+        Raises:
+            Exception: If an exception occurs while attempting to build the Difficulty instance.
+        """
+        try:
+            # Attempt to create a new ImmutableDifficulty instance
+            difficulty: Optional[ImmutableDifficulty] = (
+                DifficultyFactory.create_difficulty(**self.configuration)
+            )
+
+            # Check, if the difficulty exists
+            if not difficulty:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to create a new difficulty instance from the configuration: {self.configuration}"
+                )
+
+                # Return early
+                return
+
+            # Check, if the 'as_mutable' flag is set to True
+            if as_mutable:
+                # Convert the difficulty in to a MutableDifficulty instance and return it
+                return difficulty.to_mutable()
+
+            # Return the difficulty
+            return difficulty
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    def created_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the created_at timestamp of the difficulty.
+
+        Args:
+            value (datetime): The created_at timestamp of the difficulty.
+
+        Returns:
+            Self: The instance of the DifficultyBuilder class.
+        """
+
+        # Set the created_at timestamp of the difficulty
+        self._configuration["created_at"] = value
+
+        # Return the instance
+        return self
+
+    def description(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the description of the difficulty.
+
+        Args:
+            value (str): The description of the difficulty.
+
+        Returns:
+            Self: The instance of the DifficultyBuilder class.
+        """
+
+        # Set the description of the difficulty
+        self._configuration["description"] = value
+
+        # Return the instance
+        return self
+
+    def emoji(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the emoji of the difficulty.
+
+        Args:
+            value (str): The emoji of the difficulty.
+
+        Returns:
+            Self: The instance of the DifficultyBuilder class.
+        """
+
+        # Set the emoji of the difficulty
+        self._configuration["emoji"] = value
+
+        # Return the instance
+        return self
+
+    def metadata(
+        self,
+        **kwargs,
+    ) -> Self:
+        """ """
+
+        # Check, if the 'metadata' key exists in the configuration dictionary
+        if "metadata" not in self._configuration:
+            # Initialize the 'metadata' key with an empty dictionary
+            self._configuration["metadata"] = {}
+
+        # Update the 'metadata' key with the provided keyword arguments
+        self._configuration["metadata"].update(kwargs)
+
+        # Return the instance
+        return self
+
+    def name(
+        self,
+        value: str,
+    ) -> Self:
+        """
+        Sets the name of the difficulty.
+
+        Args:
+            value (str): The name of the difficulty.
+
+        Returns:
+            Self: The instance of the DifficultyBuilder class.
+        """
+
+        # Set the name of the difficulty
+        self._configuration["name"] = value
+
+        # Return the instance
+        return self
+
+    def updated_at(
+        self,
+        value: datetime,
+    ) -> Self:
+        """
+        Sets the updated_at timestamp of the difficulty.
+
+        Args:
+            value (datetime): The updated_at timestamp of the difficulty.
+
+        Returns:
+            Self: The instance of the DifficultyBuilder class.
+        """
+
+        # Set the updated_at timestamp of the difficulty
+        self._configuration["updated_at"] = value
+
+        # Return the instance
+        return self
 
 
 class DifficultyManager(BaseObjectManager):
@@ -395,6 +1079,56 @@ class DifficultyManager(BaseObjectManager):
         # Call the parent class constructor
         super().__init__()
 
+    def _run_pre_create_tasks(
+        self,
+        difficulty: Union[
+            ImmutableDifficulty,
+            MutableDifficulty,
+        ],
+    ) -> MutableDifficulty:
+        """
+        Runs pre-create tasks for the difficulty.
+
+        Args:
+            difficulty (Union[ImmutableDifficulty, MutableDifficulty]): The difficulty to run pre-create tasks on.
+
+        Returns:
+            MutableDifficulty: The difficulty with pre-create tasks run.
+        """
+
+        # Check if the difficulty object is immutable
+        if isinstance(
+            difficulty,
+            ImmutableDifficulty,
+        ):
+            # If it is, convert it to a mutable difficulty
+            difficulty = MutableDifficulty(
+                **difficulty.to_dict(
+                    exclude=[
+                        "_logger",
+                    ]
+                )
+            )
+
+        # Set the created_at timestamp of the difficulty
+        difficulty.created_at = (
+            difficulty.created_at or Miscellaneous.get_current_datetime()
+        )
+
+        # Set the key of the difficulty
+        difficulty.key = f"DIFFICULTY_{self.count_difficulties() + 1}"
+
+        # Set the updated_at timestamp of the difficulty
+        difficulty.updated_at = (
+            difficulty.updated_at or Miscellaneous.get_current_datetime()
+        )
+
+        # Set the uuid of the difficulty
+        difficulty.uuid = Miscellaneous.get_uuid()
+
+        # Return the difficulty object
+        return difficulty
+
     def count_difficulties(self) -> int:
         """
         Returns the number of difficulties in the database.
@@ -416,13 +1150,16 @@ class DifficultyManager(BaseObjectManager):
 
     def create_difficulty(
         self,
-        difficulty: ImmutableDifficulty,
+        difficulty: Union[
+            ImmutableDifficulty,
+            MutableDifficulty,
+        ],
     ) -> Optional[ImmutableDifficulty]:
         """
         Creates a new difficulty in the database.
 
         Args:
-            difficulty (ImmutableDifficulty): The difficulty to be created.
+            difficulty (Union[ImmutableDifficulty, MutableDifficulty]): The difficulty to be created.
 
         Returns:
             Optional[ImmutableDifficulty]: The newly created immutable difficulty if no exception occurs. Otherwise, None.
@@ -431,31 +1168,13 @@ class DifficultyManager(BaseObjectManager):
             Exception: If an exception occurs while creating the difficulty.
         """
         try:
-            # Check if the difficulty object is immutable
-            if isinstance(
-                difficulty,
-                ImmutableDifficulty,
-            ):
-                # If it is, convert it to a mutable difficulty
-                difficulty = MutableDifficulty(
-                    **difficulty.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
-                )
+            # Initialize the result (optional) ImmutableDifficulty to none
+            result: Optional[ImmutableDifficulty] = None
 
-            # Set the created_at timestamp of the difficulty
-            difficulty.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the key of the difficulty
-            difficulty.key = f"DIFFICULTY_{self.count_difficulties() + 1}"
-
-            # Set the updated_at timestamp of the difficulty
-            difficulty.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the difficulty
-            difficulty.uuid = Miscellaneous.get_uuid()
+            # Run pre-create tasks
+            difficulty: MutableDifficulty = self._run_pre_create_tasks(
+                difficulty=difficulty
+            )
 
             # Convert the difficulty object to a DifficultyModel object
             model: DifficultyModel = DifficultyConverter.object_to_model(
@@ -467,35 +1186,47 @@ class DifficultyManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the difficulty
-                difficulty.id = id
-
-                # Convert the difficulty to an immutable difficulty
-                difficulty = ImmutableDifficulty(
-                    **difficulty.to_dict(
-                        exclude=[
-                            "_logger",
-                        ]
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a difficulty ({difficulty.__repr__()}) in the database."
                 )
 
-                # Add the difficulty to the cache
-                self.add_to_cache(
-                    key=difficulty.key,
-                    value=difficulty,
-                )
+                # Return early
+                return
 
-                # Return the newly created immutable difficulty
-                return difficulty
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a difficulty ({difficulty}) in the database."
+            # Convert the difficulty to a dictionary
+            kwargs: Dict[str, Any] = difficulty.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the difficulty
+            kwargs["id"] = id
+
+            # Create a new ImmutableDifficulty object
+            result = DifficultyFactory.create_difficulty(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableDifficulty from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the difficulty to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created immutable difficulty
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -741,7 +1472,7 @@ class DifficultyManager(BaseObjectManager):
             # Return the difficulty if it exists
             if model is not None:
                 # Convert the DifficultyModel object to an Difficulty object
-                return ImmutableDifficulty(
+                difficulty: ImmutableDifficulty = DifficultyFactory.create_difficulty(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -749,6 +1480,15 @@ class DifficultyManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the difficulty to the cache
+                self.add_to_cache(
+                    key=difficulty.key,
+                    value=difficulty,
+                )
+
+                # Return the difficulty
+                return difficulty
             else:
                 # Return None indicating that the difficulty does not exist
                 return None
@@ -798,8 +1538,8 @@ class DifficultyManager(BaseObjectManager):
 
             # Return the difficulty if it exists
             if model is not None:
-                # Convert the DifficultyModel object to an Difficulty object
-                return ImmutableDifficulty(
+                # Convert the DifficultyModel object to an ImmutableDifficulty object
+                difficulty: ImmutableDifficulty = DifficultyFactory.create_difficulty(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -807,6 +1547,15 @@ class DifficultyManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the difficulty to the cache
+                self.add_to_cache(
+                    key=difficulty.key,
+                    value=difficulty,
+                )
+
+                # Return the difficulty
+                return difficulty
             else:
                 # Return None indicating that the difficulty does not exist
                 return None
@@ -856,8 +1605,8 @@ class DifficultyManager(BaseObjectManager):
 
             # Return the difficulty if it exists
             if model is not None:
-                # Convert the DifficultyModel object to an Difficulty object
-                return ImmutableDifficulty(
+                # Convert the DifficultyModel object to an ImmutableDifficulty object
+                difficulty: ImmutableDifficulty = DifficultyFactory.create_difficulty(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -865,6 +1614,15 @@ class DifficultyManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the difficulty to the cache
+                self.add_to_cache(
+                    key=difficulty.key,
+                    value=difficulty,
+                )
+
+                # Return the difficulty
+                return difficulty
             else:
                 # Return None indicating that the difficulty does not exist
                 return None
@@ -914,8 +1672,8 @@ class DifficultyManager(BaseObjectManager):
 
             # Return the difficulty if it exists
             if model is not None:
-                # Convert the DifficultyModel object to an Difficulty object
-                return ImmutableDifficulty(
+                # Convert the DifficultyModel object to an ImmutableDifficulty object
+                difficulty: ImmutableDifficulty = DifficultyFactory.create_difficulty(
                     **model.to_dict(
                         exclude=[
                             "_logger",
@@ -923,6 +1681,15 @@ class DifficultyManager(BaseObjectManager):
                         ]
                     )
                 )
+
+                # Add the difficulty to the cache
+                self.add_to_cache(
+                    key=difficulty.key,
+                    value=difficulty,
+                )
+
+                # Return the difficulty
+                return difficulty
             else:
                 # Return None indicating that the difficulty does not exist
                 return None
@@ -976,8 +1743,9 @@ class DifficultyManager(BaseObjectManager):
 
             # Return the found difficulties if any
             if models is not None and len(models) > 0:
-                return [
-                    ImmutableDifficulty(
+                # Convert the models to ImmutableDifficulty objects
+                difficulties: List[ImmutableDifficulty] = [
+                    DifficultyFactory.create_difficulty(
                         **model.to_dict(
                             exclude=[
                                 "_logger",
@@ -987,6 +1755,15 @@ class DifficultyManager(BaseObjectManager):
                     )
                     for model in models
                 ]
+
+                # Add the difficulties to the cache
+                self.add_to_cache(
+                    key=[difficulty.key for difficulty in difficulties],
+                    value=difficulties,
+                )
+
+                # Return the difficulties
+                return difficulties
             else:
                 # Return None indicating that no difficulties were found
                 return None
@@ -1081,6 +1858,7 @@ class DifficultyModel(ImmutableBaseModel):
     Attributes:
         id (int): The ID of the difficulty.
         created_at (datetime): The timestamp when the difficulty was created.
+        description (str): The description of the difficulty.
         emoji (str): The emoji of the difficulty.
         icon (str): The icon of the difficulty. Defaults to "⭐".
         key (str): The key of the difficulty.
@@ -1123,6 +1901,21 @@ class DifficultyModel(ImmutableBaseModel):
         size=None,
         type="DATETIME",
         unique=False,
+    )
+
+    description: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        index=False,
+        name="description",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=255,
+        type="VARCHAR",
+        unique=True,
     )
 
     emoji: Field = Field(
@@ -1248,6 +2041,7 @@ class DifficultyModel(ImmutableBaseModel):
     def __init__(
         self,
         created_at: Optional[datetime] = None,
+        description: Optional[str] = None,
         emoji: Optional[str] = None,
         icon: Optional[str] = "⭐",
         id: Optional[int] = None,
@@ -1263,6 +2057,7 @@ class DifficultyModel(ImmutableBaseModel):
 
         Args:
             created_at (Optional[datetime]): The timestamp when the difficulty was created.
+            description (Optional[str]): The description of the difficulty.
             emoji (Optional[str]): The emoji of the difficulty.
             icon (Optional[str]): The icon of the difficulty. Defaults to "⭐".
             id (Optional[int]): The ID of the difficulty.
@@ -1280,6 +2075,7 @@ class DifficultyModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             created_at=created_at,
+            description=description,
             emoji=emoji,
             icon="⭐",
             id=id,

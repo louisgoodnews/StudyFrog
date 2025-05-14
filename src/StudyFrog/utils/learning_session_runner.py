@@ -4,11 +4,11 @@ Date: 2025-03-29
 """
 
 import json
-import random
 import tkinter
 import traceback
 
 from datetime import datetime, timedelta
+from tkinter.constants import *
 from typing import *
 
 from core.answer import ImmutableAnswer
@@ -34,7 +34,7 @@ from core.learning.learning_session import (
 from core.ui.notifications.notifications import ToplevelNotification
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher, DispatcherNotification
+from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
@@ -106,6 +106,7 @@ class LearningSessionRunner:
                 settings=settings,
                 stacks=stacks,
             )
+
         # Return the shared instance
         return cls._shared_instance
 
@@ -205,7 +206,7 @@ class LearningSessionRunner:
 
     def _calculate_adaptive_interval(
         self,
-        difficulty: ImmutableDifficulty,
+        difficulty: int,
         priority: int,
         what: Literal["days", "seconds"] = "seconds",
     ) -> Union[int, float]:
@@ -213,7 +214,7 @@ class LearningSessionRunner:
         Calculates a new interval based on difficulty and priority.
 
         Args:
-            difficulty (ImmutableDifficulty): The rated difficulty.
+            difficulty (int): The difficulty ID.
             priority (int): The priority ID.
             what (Literal["days", "seconds"], optional): Output format. Defaults to "seconds".
 
@@ -222,27 +223,28 @@ class LearningSessionRunner:
         """
 
         try:
-            # Dispatch the "REQUEST_PRIORITY_LOAD" event in the 'global' namespace
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-                event=Events.REQUEST_PRIORITY_LOAD,
+            # Request the ImmutableDifficulty object
+            difficulty: Optional[ImmutableDifficulty] = self._request_entity(
+                event=Events.REQUEST_DIFFICULTY_LOAD,
                 field="id",
-                namespace=Constants.GLOBAL_NAMESPACE,
-                value=priority,
+                value=difficulty,
             )
 
-            # Check, if the notification exists or has errors
-            if not notification or notification.has_errors():
-                # Log a warning message indicating that something went wrong
+            # Check, if the difficulty object exists
+            if not difficulty:
+                # Log a warning message indicating that the difficulty object does not exist
                 self.logger.warning(
-                    message=f"Failed to dispatch 'REQUEST_PRIORITY_LOAD' event in 'global' namespace: {notification.get_errors() if notification else 'Unknown error'}"
+                    message=f"Failed to dispatch 'REQUEST_DIFFICULTY_LOAD' event in 'global' namespace: Difficulty object does not exist"
                 )
 
                 # Return early
                 return
 
-            # Get the priority object from the notification
-            priority: Optional[ImmutablePriority] = (
-                notification.get_one_and_only_result()
+            # Request the ImmutablePriority object
+            priority: Optional[ImmutablePriority] = self._request_entity(
+                event=Events.REQUEST_PRIORITY_LOAD,
+                field="id",
+                value=priority,
             )
 
             # Check, if the priority object exists
@@ -273,8 +275,155 @@ class LearningSessionRunner:
                 message=f"Caught an exception while attempting to run 'calculate_adaptive_interval' method from '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Raise the exception to the caller
             raise e
+
+    def _request_entity(
+        self,
+        event: DispatcherEvent,
+        **kwargs,
+    ) -> Optional[Any]:
+        """
+        Dispatches a request to get an entity by the passed keyword arguments.
+
+        This method dispatches a request to get an entity by the passed keyword arguments using the
+        dispatcher. It returns the result from the dispatcher.
+
+        Args:
+            event (DispatcherEvent): The event to dispatch.
+            **kwargs: Additional keyword arguments to pass to the dispatcher.
+
+        Returns:
+            Optional[Any]: The result from the dispatcher.
+        """
+
+        # Initialize the result any-type object as None
+        result: Optional[Any] = None
+
+        try:
+            # Dispatch the event in the 'global' namespace
+            dispatcher_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=event,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    **kwargs,
+                )
+            )
+
+            # Check, if the notification exists or has errors
+            if not dispatcher_notification or dispatcher_notification.has_errors():
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch '{event}' event in 'global' namespace: {dispatcher_notification.get_errors() if dispatcher_notification else 'This is likely a bug.'}"
+                )
+
+                # Return early
+                return
+
+            # Get the result from the notification
+            result = dispatcher_notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_request_entity' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Raise the exception to the caller
+            raise e
+        finally:
+            # Return the result to the caller
+            return result
+
+    def _update_entity(
+        self,
+        update: Union[
+            ImmutableAnswer,
+            ImmutableFlashcard,
+            ImmutableLearningSession,
+            ImmutableLearningSessionAction,
+            ImmutableLearningSessionItem,
+            ImmutableQuestion,
+            ImmutableStack,
+        ],
+    ) -> Optional[
+        Union[
+            ImmutableAnswer,
+            ImmutableFlashcard,
+            ImmutableLearningSession,
+            ImmutableLearningSessionAction,
+            ImmutableLearningSessionItem,
+            ImmutableQuestion,
+            ImmutableStack,
+        ]
+    ]:
+        """
+        Updates an entity in the database.
+
+        Args:
+            update (Union[ImmutableAnswer, ImmutableFlashcard, ImmutableLearningSession, ImmutableLearningSessionAction, ImmutableLearningSessionItem, ImmutableQuestion, ImmutableStack]): The entity to update.
+
+        Returns:
+            Optional[Union[ImmutableAnswer, ImmutableFlashcard, ImmutableLearningSession, ImmutableLearningSessionAction, ImmutableLearningSessionItem, ImmutableQuestion, ImmutableStack]]: The updated entity.
+
+        Raises:
+            Exception: If an exception occurs while updating the entity.
+        """
+
+        # Initialize the result Union[ImmutableAnswer, ImmutableFlashcard, ImmutableLearningSession, ImmutableLearningSessionAction, ImmutableLearningSessionItem, ImmutableQuestion, ImmutableStack] object to None
+        result: Optional[
+            Union[
+                ImmutableAnswer,
+                ImmutableFlashcard,
+                ImmutableLearningSession,
+                ImmutableLearningSessionAction,
+                ImmutableLearningSessionItem,
+                ImmutableQuestion,
+                ImmutableStack,
+            ]
+        ] = None
+
+        try:
+            # Dispatch the event in the 'global' namespace
+            dispatcher_notification: Optional[DispatcherNotification] = (
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_UPDATE,
+                    namespace=Constants.GLOBAL_NAMESPACE,
+                    update=update,
+                )
+            )
+
+            # Check, if the notification exists or has errors
+            if not dispatcher_notification or dispatcher_notification.has_errors():
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_UPDATE' event in 'global' namespace: {dispatcher_notification.get_errors() if dispatcher_notification else 'This is likely a bug.'}"
+                )
+
+                # Return early
+                return
+
+            # Get the result from the notification
+            result = dispatcher_notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_update_entity' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Raise the exception to the caller
+            raise e
+        finally:
+            # Return the result to the caller
+            return result
 
     def apply_filters(self) -> None:
         """
@@ -317,31 +466,10 @@ class LearningSessionRunner:
 
                 # Iterate over the descendants of the current stack
                 for key in descendants:
-                    # Dispatch the REQUEST_STACK_LOOKUP event in the 'global' namespace
-                    descendant_notification: Optional[DispatcherNotification] = (
-                        self.dispatcher.dispatch(
-                            event=Events.REQUEST_STACK_LOOKUP,
-                            key=key,
-                            namespace=Constants.GLOBAL_NAMESPACE,
-                        )
-                    )
-
-                    # Check, if the descendant notification exists or has errors
-                    if (
-                        not descendant_notification
-                        or descendant_notification.has_errors()
-                    ):
-                        # Log a warning message
-                        self.logger.warning(
-                            message=f"Failed to dispatch 'REQUEST_STACK_LOOKUP' in 'global' namespace. Skipping..."
-                        )
-
-                        # Skip the current iteration
-                        continue
-
                     # Get the one and only result (the descendant stack) from the descendant notification
-                    descendant_stack: Optional[ImmutableStack] = (
-                        descendant_notification.get_one_and_only_result()
+                    descendant_stack: Optional[ImmutableStack] = self._request_entity(
+                        event=Events.REQUEST_STACK_LOOKUP,
+                        key=key,
                     )
 
                     # Check, if the ImmutableStack descendant stack exists
@@ -361,30 +489,6 @@ class LearningSessionRunner:
                         else descendant_stack.contents
                     )
 
-            # Check, if randomisation is enabled in the settings
-            if self.settings.get(
-                "enable_randomisation",
-                False,
-            ):
-                # Shuffle the keys
-                random.shuffle(keys)
-
-            # Dispatch a request to get the contents of the stacks
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-                event=Events.REQUEST_GET_BY_KEYS,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                keys=keys,
-            )
-
-            if not notification:
-                # Log a warning message indicating that something went wrong
-                self.logger.warning(
-                    message=f"Failed to get contents for stacks: {', '.join(stack.__repr__() for stack in self.stacks)}"
-                )
-
-                # Return early
-                return
-
             # Get the contents of the stacks
             contents: Optional[
                 List[
@@ -394,7 +498,10 @@ class LearningSessionRunner:
                         ImmutableQuestion,
                     ]
                 ]
-            ] = notification.get_one_and_only_result()
+            ] = self._request_entity(
+                event=Events.REQUEST_GET_BY_KEYS,
+                keys=keys,
+            )
 
             if not contents:
                 # Log a warning message indicating that no contents were found
@@ -424,6 +531,14 @@ class LearningSessionRunner:
 
             # Add the filtered contents to the list
             self.contents.extend([content.key for content in contents])
+
+            # Check, if randomisation is enabled in the settings
+            if self.settings.get(
+                "enable_randomisation",
+                False,
+            ):
+                # Shuffle the contents
+                Miscellaneous.shuffle(iterable=self.contents)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -431,7 +546,7 @@ class LearningSessionRunner:
             )
 
             # Log the traceback of the exception
-            self.logger.error(message=traceback.format_exc())
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
@@ -500,26 +615,10 @@ class LearningSessionRunner:
             None: This method does not return any value.
         """
         try:
-            # Dispatch a request to lookup the status of the learning session
-            status_notification: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_STATUS_LOOKUP,
-                    name="new",
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
-            )
-
-            # Check if the notification is None
-            if not status_notification:
-                # Log a warning message indicating that something went wrong
-                self.logger.warning(message="Failed to create learning session")
-
-                # Return early
-                return
-
             # Get the status of the learning session
-            status: Optional[ImmutableStatus] = (
-                status_notification.get_one_and_only_result()
+            status: Optional[ImmutableStatus] = self._request_entity(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                name="new",
             )
 
             # Check if the status is None
@@ -618,48 +717,56 @@ class LearningSessionRunner:
             )
 
             # Log the traceback of the exception
-            self.logger.error(message=traceback.format_exc())
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
 
-    def create_learning_session_item(self) -> None:
+    def create_learning_session_item(
+        self,
+        reference: Optional[str] = None,
+    ) -> None:
         """
         Creates a learning session item in the database.
 
         This method dispatches a request to create the learning session item and
         updates the learning session with the newly created learning session item.
 
+        Args:
+            reference (Optional[str]): The key of the entity to be associated with the learning session item.
+
         Returns:
             None
         """
         try:
+            # Check, if the learning session item already exists
             if self.learning_session_item:
-                # Convert the learning session item to a mutable object
-                learning_session_item: MutableLearningSessionItem = (
-                    self.learning_session_item.to_mutable()
-                )
+                # Check, if the learning session item is mutable
+                if not self.learning_session_item.is_mutable():
+                    # Convert the learning session item to a mutable object
+                    self.learning_session_item = self.learning_session_item.to_mutable()
 
                 # Set the end time of the learning session item
-                learning_session_item.set(
+                self.learning_session_item.set(
                     name="end",
                     value=Miscellaneous.get_current_datetime(),
                 )
 
                 # Set the duration of the learning session item
-                learning_session_item.set(
+                self.learning_session_item.set(
                     name="duration",
                     value=(
-                        learning_session_item.end - learning_session_item.start
+                        self.learning_session_item.end - self.learning_session_item.start
                     ).total_seconds(),
                 )
 
-                # Dispatch the request to update the learning session item
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    learning_session_item=learning_session_item,
-                )
+                # Update the learning session item
+                self.learning_session_item = self._update_entity(update=self.learning_session_item)
+
+                # Check, if the learning session item is mutable
+                if self.learning_session_item.is_mutable():
+                    # Convert the learning session item back to immutable
+                    self.learning_session_item = self.learning_session_item.to_immutable()
 
             # Create a builder instance
             builder: LearningSessionItemBuilder = LearningSessionItemBuilder()
@@ -671,7 +778,7 @@ class LearningSessionRunner:
             builder.created_at(value=Miscellaneous.get_current_datetime())
 
             # Set the reference attribute of the builder
-            builder.reference(value=self.contents[self.content_index])
+            builder.reference(value=reference or self.contents[self.content_index])
 
             # Set the start attribute of the builder
             builder.start(value=Miscellaneous.get_current_datetime())
@@ -696,32 +803,21 @@ class LearningSessionRunner:
             # The learning session item is retrieved from the notification
             self.learning_session_item = create_notification.get_one_and_only_result()
 
-            # Convert the learning session into a mutable type
-            self.learning_session = self.learning_session.to_mutable()
+            # Check, if the learning session is mutable
+            if not self.learning_session.is_mutable():
+                # Convert the learning session into a mutable type
+                self.learning_session = self.learning_session.to_mutable()
 
             # Add the learning session item to the learning session
             self.learning_session.add_child(child=self.learning_session_item)
 
-            # Dispatch the request to update the learning session
-            update_notification: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_LEARNING_SESSION_UPDATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    learning_session=self.learning_session,
-                )
-            )
+            # Update the learning session
+            self.learning_session = self._update_entity(update=self.learning_session)
 
-            if not update_notification:
-                # Log a warning message indicating that something went wrong
-                self.logger.warning(message="Failed to update learning session")
-
-                # Return early
-                return
-
-            # The learning session is retrieved from the notification
-            self.learning_session: ImmutableLearningSession = (
-                update_notification.get_one_and_only_result()
-            )
+            # Check, if the learning session is mutable
+            if self.learning_session.is_mutable():
+                # Convert the learning session back to immutable
+                self.learning_session = self.learning_session.to_immutable()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -729,10 +825,52 @@ class LearningSessionRunner:
             )
 
             # Log the traceback of the exception
-            self.logger.error(message=traceback.format_exc())
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
+
+    def get_next_intrasession_review_item(self) -> Optional[
+        Union[
+            ImmutableFlashcard,
+            ImmutableNote,
+            ImmutableQuestion,
+        ]
+    ]:
+        """
+        Gets the next intrasession review item.
+
+        This method returns the next intrasession review item from the intrasession review queue.
+
+        Args:
+            None
+
+        Returns:
+            Optional[Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion]]: The next intrasession review item.
+        """
+
+        # Check, if the intrasession review queue is empty
+        if len(self.intrasession_review_queue) == 0:
+            # Return early
+            return None
+
+        # Get the next intrasession review item
+        item: Tuple[
+            datetime,
+            Union[
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+            ],
+        ] = self.intrasession_review_queue[0]
+
+        # Check, if the intrasession review item's timestamp is in the future
+        if item[0] > Miscellaneous.get_current_datetime():
+            # Return early
+            return None
+
+        # Remove the intrasession review item from the queue and return it
+        return self.intrasession_review_queue.pop(0)[1]
 
     def handle_end_of_run(
         self,
@@ -744,16 +882,64 @@ class LearningSessionRunner:
             "spaced_repetition",
         ],
     ) -> None:
-        """ """
-        try:
-            # Check, if the passed mode is not 'default'
-            if mode != "default":
-                pass
+        """
+        Handles the end of a run.
 
+        This method prompts the user to end the run and updates the learning session
+        accordingly. It first checks if the passed mode is not 'default'. If it is not,
+        it prompts the user to end the run and updates the learning session.
+
+        Args:
+            mode (Literal["default", "recall", "recall_at_random", "speed_test", "spaced_repetition"]): The mode of the run.
+
+        Returns:
+            None: This method does not return any value.
+
+        Raises:
+            Exception: If an exception occurs while handling the end of the run.
+        """
+        try:
             # Prompt the user to end the run
             response: str = ToplevelNotification.yes_no(
+                frame={
+                    "background": Constants.BLUE_GREY["700"],
+                },
                 message="Congratulations! You have completed the run. Do you wish to end the run?",
+                message_label={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                no_button={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                    "relief": FLAT,
+                },
                 title="End of run reached",
+                title_label={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                },
+                yes_button={
+                    "background": Constants.BLUE_GREY["700"],
+                    "font": (
+                        Constants.DEFAULT_FONT_FAMILY,
+                        Constants.DEFAULT_FONT_SIZE,
+                    ),
+                    "foreground": Constants.WHITE,
+                    "relief": FLAT,
+                },
             )
 
             # Check, if the user has chosen to end the run (i.e. if the response equals 'yes')
@@ -762,35 +948,53 @@ class LearningSessionRunner:
                 return
 
             # Check, if the learning session instance variable is mutable
-            if not isinstance(
-                self.learning_session,
-                MutableLearningSession,
-            ):
+            if not self.learning_session.is_mutable():
                 # Convert the learning session object into a mutable version
-                self.learning_session = self.learning_session.to_mutable()
+                self.learning_session: MutableLearningSession = self.learning_session.to_mutable()
 
             # Set the end timestamp of the learning session
             self.learning_session.end = Miscellaneous.get_current_datetime()
 
+            self.logger.debug(message=f"LearningSession start: {self.learning_session.start}")
+            self.logger.debug(message=f"LearningSession end: {self.learning_session.end}")
+
             # Calculate and set the duration of the learning session
-            self.learning_session.duration = Miscellaneous.calculate_duration(
-                as_="seconds",
-                end=self.learning_session.end,
-                start=self.learning_session.start,
+            # self.learning_session.duration = Miscellaneous.calculate_duration(
+            #     as_="seconds",
+            #     end=self.learning_session.end,
+            #     start=self.learning_session.start,
+            # )
+
+            # Request the 'Completed' status
+            status: Optional[ImmutableStatus] = self._request_entity(
+                event=Events.REQUEST_STATUS_LOAD,
+                field="name",
+                value="Completed",
             )
 
-            # Dispatch the REQUEST_LEARNING_SESSION_UPDATE event in the 'global' namespace
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-                event=Events.REQUEST_LEARNING_SESSION_UPDATE,
-                learning_session=self.learning_session,
-                namespace=Constants.GLOBAL_NAMESPACE,
-            )
-
-            # Check, if the notification exists or has errors()
-            if not notification or notification.has_errors():
+            # Check, if the status exists
+            if not status:
                 # Log a warning message indicating that something went wrong
                 self.logger.warning(
-                    message=f"Failed to dispatch REQUEST_LEARNING_SESSION_UPDATE event in 'global' namespace: {notification.get_errors() if notification else 'Unknown error'}"
+                    message=f"Failed to load 'Completed' status in 'handle_end_of_run' method from {self.__class__.__name__}"
+                )
+
+                # Return early
+                return
+
+            # Set the status of the learning session
+            self.learning_session.status = status.id
+
+            # Update the learning session in the database
+            self.learning_session = self._update_entity(
+                update=self.learning_session
+            )
+
+            # Check, if the learning session exists
+            if not self.learning_session:
+                # Log a warning message indicating that something went wrong
+                self.logger.warning(
+                    message=f"Failed to update learning session in 'handle_end_of_run' method from {self.__class__.__name__}. This is likely a bug."
                 )
 
                 # Return early
@@ -800,7 +1004,7 @@ class LearningSessionRunner:
             self.dispatcher.dispatch(
                 direction="forward",
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
-                learning_session=notification.get_one_and_only_result(),
+                learning_session=self.learning_session,
                 namespace=Constants.GLOBAL_NAMESPACE,
                 source="learning_session_ui",
                 target="learning_session_result_ui",
@@ -812,7 +1016,7 @@ class LearningSessionRunner:
             )
 
             # Log the traceback of the exception
-            self.logger.error(message=traceback.format_exc())
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
@@ -855,23 +1059,6 @@ class LearningSessionRunner:
                 # Return early
                 return
 
-            # Dispatch a request to lookup the item by key
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-                event=Events.REQUEST_GET_BY_KEY,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                key=self.contents[self.content_index],
-            )
-
-            # Check if the notification is None
-            if not notification:
-                # Log a warning message about the failed lookup
-                self.logger.warning(
-                    message=f"Failed to lookup item with key '{self.contents[self.content_index]}' in database in {self.__class__.__name__}. This is likely a bug."
-                )
-
-                # Return None indicating an exception occurred
-                return None
-
             # Check, if the 'text_analyzer' instance variable has been initialized
             if not self.text_analyzer:
                 # Initialize the 'text_analyzer' instance variable
@@ -880,7 +1067,10 @@ class LearningSessionRunner:
             # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace
             self.dispatcher.dispatch(
                 direction="forward",
-                entity=notification.get_one_and_only_result(),
+                entity=self._request_entity(
+                    event=Events.REQUEST_GET_BY_KEY,
+                    key=self.contents[self.content_index],
+                ),
                 event=Events.REQUEST_VALIDATE_NAVIGATION,
                 learning_session=self.learning_session,
                 master=tkinter.Toplevel(),
@@ -913,26 +1103,10 @@ class LearningSessionRunner:
             bool: True if the learning session is running, False otherwise.
         """
         try:
-            # Dispatch a request to lookup the 'completed' status
-            status_notification: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_STATUS_LOOKUP,
-                    name="completed",
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
-            )
-
-            # Check if the notification is None
-            if not status_notification:
-                # Log a warning message about the failed lookup
-                self.logger.warning(
-                    message=f"Failed to lookup 'completed' status in {self.__class__.__name__}"
-                )
-                return False
-
             # Retrieve the status of the learning session
-            status: Optional[ImmutableStatus] = (
-                status_notification.get_one_and_only_result()
+            status: Optional[ImmutableStatus] = self._request_entity(
+                event=Events.REQUEST_STATUS_LOOKUP,
+                name="completed",
             )
 
             # Verify if the status is None
@@ -950,6 +1124,9 @@ class LearningSessionRunner:
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'is_running' method from '{self.__class__.__name__}' class: {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return False indicating an exception occurred
             return False
@@ -1072,22 +1249,20 @@ class LearningSessionRunner:
                 # Return early
                 return
 
-            # Convert the learning session item to mutable
-            self.learning_session_item = self.learning_session_item.to_mutable()
+            # Check, if the learning session item is mutable
+            if not self.learning_session_item.is_mutable():
+                # Convert the learning session item to mutable
+                self.learning_session_item = self.learning_session_item.to_mutable()
 
             # Append the key of the learning session action to the actions of the learning session item
             self.learning_session_item.add_action(action=learning_session_action)
 
-            update_notification: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    learning_session_item=self.learning_session_item,
-                )
+            self.learning_session_item = self._update_entity(
+                update=self.learning_session_item
             )
 
             # Check if the notification is None
-            if not update_notification:
+            if not self.learning_session_item:
                 # Log a warning message indicating that something went wrong
                 self.logger.warning(
                     message=f"Failed to dispatch request to update LearningSessionItem object in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class"
@@ -1096,8 +1271,10 @@ class LearningSessionRunner:
                 # Return early
                 return
 
-            # Convert the learning session item back to immutable
-            self.learning_session_item = update_notification.get_one_and_only_result()
+            # Check, if the learning session item is mutable
+            if self.learning_session_item.is_mutable():
+                # Convert the learning session item back to immutable
+                self.learning_session_item = self.learning_session_item.to_immutable()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1105,7 +1282,7 @@ class LearningSessionRunner:
             )
 
             # Log the traceback of the exception
-            self.logger.error(message=traceback.format_exc())
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
@@ -1132,91 +1309,37 @@ class LearningSessionRunner:
             # Get the current timestamp
             timestamp: datetime = Miscellaneous.get_current_datetime()
 
-            # Dispatch a request to get the difficulty
-            passed_difficulty_notification: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
-                    name=difficulty,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
-            )
-
-            # Check if the notification is None
-            if not passed_difficulty_notification:
-                # Log a warning message indicating that something went wrong
-                self.logger.warning(
-                    message=f"Failed to dispatch request to get difficulty in 'on_notify_learning_session_difficulty_button_clicked' method from '{self.__class__.__name__}' class"
-                )
-
-                # Return early
-                return
-
             # Get the difficulty
-            passed_difficulty: ImmutableDifficulty = (
-                passed_difficulty_notification.get_one_and_only_result()
+            passed_difficulty: ImmutableDifficulty = self._request_entity(
+                event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                name=difficulty,
             )
 
-            # Dispatch a request to get the Content object
-            content_notification: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_GET_BY_KEY,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    key=self.contents[self.content_index],
-                )
-            )
-
-            # Check if the notification is None
-            if not content_notification:
-                # Log a warning message indicating that something went wrong
-                self.logger.warning(
-                    message=f"Failed to dispatch request to get Content object in 'on_notify_learning_session_difficulty_button_clicked' method from '{self.__class__.__name__}' class"
-                )
-
-                # Return early
-                return
-
-            # Get the Content object
+            # Get the content object
             content: Union[
                 ImmutableFlashcard,
                 ImmutableNote,
                 ImmutableQuestion,
-            ] = content_notification.get_one_and_only_result()
-
-            # Dispatch a request to get the difficulty
-            content_difficulty_notification: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_DIFFICULTY_LOOKUP,
-                    id=content.difficulty,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                )
+            ] = self._request_entity(
+                event=Events.REQUEST_GET_BY_KEY,
+                key=self.contents[self.content_index],
             )
 
-            # Convert the Content object to mutable
-            content = content.to_mutable()
+            # Check, if the content object is mutable
+            if not content.is_mutable():
+                # Convert the Content object to mutable
+                content = content.to_mutable()
 
             # Update the difficulty
             content.difficulty = passed_difficulty.id
 
             # Dispatch a request to update the Content object
-            self.dispatcher.dispatch(
-                event=Events.REQUEST_UPDATE,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                update=content,
-            )
-
-            # Check if the notification is None
-            if not content_difficulty_notification:
-                # Log a warning message indicating that something went wrong
-                self.logger.warning(
-                    message=f"Failed to dispatch request to get difficulty in 'on_notify_learning_session_difficulty_button_clicked' method from '{self.__class__.__name__}' class"
-                )
-
-                # Return early
-                return
+            self._update_entity(update=content)
 
             # Get the difficulty
-            content_difficulty: ImmutableDifficulty = (
-                content_difficulty_notification.get_one_and_only_result()
+            content_difficulty: ImmutableDifficulty = self._request_entity(
+                event=Events.REQUEST_DIFFICULTY_LOOKUP,
+                id=content.difficulty,
             )
 
             # Create a builder for the learning session action
@@ -1318,24 +1441,20 @@ class LearningSessionRunner:
                 create_notification.get_one_and_only_result()
             )
 
-            # Convert the learning session item to mutable
-            learning_session_item: MutableLearningSessionItem = (
-                self.learning_session_item.to_mutable()
-            )
+            # Check, if the learning session item is mutable
+            if not self.learning_session_item.is_mutable():
+                # Convert the learning session item to mutable
+                self.learning_session_item = self.learning_session_item.to_mutable()
 
             # Append the key of the learning session action to the actions of the learning session item
-            learning_session_item.actions.append(learning_session_action.key)
+            self.learning_session_item.actions.append(learning_session_action.key)
 
-            update_notification: Optional[DispatcherNotification] = (
-                self.dispatcher.dispatch(
-                    event=Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
-                    namespace=Constants.GLOBAL_NAMESPACE,
-                    learning_session_item=learning_session_item,
-                )
+            self.learning_session_item = self._update_entity(
+                update=self.learning_session_item
             )
 
             # Check if the notification is None
-            if not update_notification:
+            if not self.learning_session_item:
                 # Log a warning message indicating that something went wrong
                 self.logger.warning(
                     message=f"Failed to dispatch request to update LearningSessionItem object in 'on_notify_flashcard_learning_view_flashcard_flipped' method from '{self.__class__.__name__}' class"
@@ -1343,9 +1462,6 @@ class LearningSessionRunner:
 
                 # Return early
                 return
-
-            # Convert the learning session item back to immutable
-            self.learning_session_item = update_notification.get_one_and_only_result()
 
             # Schedule due by
             self.schedule_due_by(key=self.contents[self.content_index])
@@ -1363,16 +1479,21 @@ class LearningSessionRunner:
                 # Return early
                 return
 
+            # Check, if the learning session item is mutable
+            if self.learning_session_item.is_mutable():
+                # Convert the learning session item back to immutable
+                self.learning_session_item = self.learning_session_item.to_immutable()
+
             # Schedule for intrasession review
-            self.schedule_intrasession_review(
-                difficulty=content_difficulty,
-                entity=content,
-            )
+            self.schedule_intrasession_review(key=self.contents[self.content_index])
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'on_notify_learning_session_difficulty_button_clicked' method from '{self.__class__.__name__}' class: {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
@@ -1386,6 +1507,8 @@ class LearningSessionRunner:
         Returns:
             Tuple[int, int]: The index and limit of the learning session runner.
         """
+
+        # Return a tuple of the current index and the length of the contents
         return (
             # Return the current index
             self.content_index,
@@ -1414,127 +1537,117 @@ class LearningSessionRunner:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Increment the content index
-            self.content_index += 1
+            # Initialize the entity variable to None
+            entity: Optional[
+                Union[
+                    ImmutableFlashcard,
+                    ImmutableNote,
+                    ImmutableQuestion,
+                ]
+            ] = None
 
-            # Check if the content index is out of bounds
-            if self.content_index >= len(self.contents):
-                # Log a warning message about the out of bounds index
-                self.logger.warning(
-                    message=f"Content index {self.content_index} is out of bounds in {self.__class__.__name__}. This is likely a bug."
+            # Check, if the 'enable_spaced_review' mode has been enabled in the settings dictionary instance variable
+            if (
+                self.settings.get(
+                    "enable_spaced_review",
+                    False,
                 )
+                and self.content_index >= 0
+            ):
+                # Schedule an intrasession review
+                self.schedule_intrasession_review(key=self.contents[self.content_index])
 
-                # Reset the content index to the last valid index
-                self.content_index = len(self.contents) - 1
+                # Get the next intrasession review item
+                entity = self.get_next_intrasession_review_item()
+            else:
+                # Increment the content index
+                self.content_index += 1
 
-                # Handle case 'end of run'
-                self.handle_end_of_run(
-                    mode=Miscellaneous.any_to_snake(
-                        string=self.learning_session.mode.strip()
-                        .replace(
-                            "(",
-                            "",
-                        )
-                        .replace(
-                            ")",
-                            "",
+                # Check if the content index is out of bounds
+                if self.content_index >= len(self.contents):
+                    # Log a warning message about the out of bounds index
+                    self.logger.warning(
+                        message=f"Content index {self.content_index} is out of bounds in {self.__class__.__name__}. This is likely a bug."
+                    )
+
+                    # Reset the content index to the last valid index
+                    self.content_index = len(self.contents) - 1
+
+                    # Handle case 'end of run'
+                    self.handle_end_of_run(
+                        mode=Miscellaneous.any_to_snake(
+                            string=self.learning_session.mode.strip()
+                            .replace(
+                                "(",
+                                "",
+                            )
+                            .replace(
+                                ")",
+                                "",
+                            )
                         )
                     )
-                )
 
-                # Return None indicating an exception occurred
-                return None
+                    # Return None indicating an exception occurred
+                    return None
 
             # Schedule due by
             self.schedule_due_by(key=self.contents[self.content_index])
 
-            # Dispatch a request to lookup the item by key
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-                event=Events.REQUEST_GET_BY_KEY,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                key=self.contents[self.content_index],
-            )
-
-            # Check if the notification is None
-            if not notification:
-                # Log a warning message about the failed lookup
-                self.logger.warning(
-                    message=f"Failed to lookup item with key '{self.contents[self.content_index]}' in database in {self.__class__.__name__}. This is likely a bug."
+            # Check, if the entity exists
+            if not entity:
+                # Get the one an only result from the notification
+                entity = self._request_entity(
+                    event=Events.REQUEST_GET_BY_KEY,
+                    key=self.contents[self.content_index],
                 )
 
-                # Return None indicating an exception occurred
-                return None
-
             # Create a learning session item
-            self.create_learning_session_item()
+            self.create_learning_session_item(reference=entity.key if entity else None)
 
             # Handle mode
             self.handle_mode()
 
-            # Get the one an only result from the notification
-            item: Union[
-                ImmutableFlashcard,
-                ImmutableNote,
-                ImmutableQuestion,
-            ] = notification.get_one_and_only_result()
-
-            # Convert the item to mutable
-            item = item.to_mutable()
+            # Check, if the entity is immutable
+            if not entity.is_mutable():
+                # Convert the entity to mutable
+                entity = entity.to_mutable()
 
             # Update the 'last viewed at' field
-            item.last_viewed_at = datetime.now()
+            entity.last_viewed_at = Miscellaneous.get_current_datetime()
 
-            # Dispatch the REQUEST_UPDATE event in the 'global' namespace
-            self.dispatcher.dispatch(
-                event=Events.REQUEST_UPDATE,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                update=item,
+            # Update the entity in the database
+            entity = self._update_entity(
+                update=entity,
             )
 
-            # Convert the item to immutable
-            item = item.to_immutable()
-
-            # Check, if the item is a flashcard or note
+            # Check, if the entity is an ImmutableQuestion
             if isinstance(
-                item,
-                (
-                    ImmutableFlashcard,
-                    ImmutableNote,
-                ),
+                entity,
+                ImmutableQuestion,
             ):
-                # Return the item
-                return item
-
-            # Dispatch a request to get the question's answers by key
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-                event=Events.REQUEST_GET_BY_KEY,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                key=item.answers,
-            )
-
-            # Check if the notification is None
-            if not notification:
-                # Log a warning message about the failed lookup
-                self.logger.warning(
-                    message=f"Failed to lookup answers with key '{item.answers}' in database in {self.__class__.__name__}. This is likely a bug."
+                # Get the one an only result from the notification
+                answers: List[ImmutableAnswer] = self._request_entity(
+                    event=Events.REQUEST_GET_BY_KEYS,
+                    keys=entity.answers,
                 )
 
-                # Return None indicating an exception occurred
-                return None
+                # Set the entity to a tuple of the entity and answers
+                entity = (
+                    entity,
+                    answers,
+                )
 
-            # Get the one an only result from the notification
-            answers: List[ImmutableAnswer] = notification.get_one_and_only_result()
-
-            # Return the item
-            return (
-                item,
-                answers,
-            )
+            # Return the entity to the caller
+            return entity
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'on_request_learning_session_runner_load_next_item' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception occurred
             return None
@@ -1574,68 +1687,40 @@ class LearningSessionRunner:
                 # Return None indicating an exception occurred
                 return None
 
-            # Dispatch a request to lookup the item by key
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-                event=Events.REQUEST_GET_BY_KEY,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                key=self.contents[self.content_index],
-            )
-
-            # Check if the notification is None
-            if not notification:
-                # Log a warning message about the failed lookup
-                self.logger.warning(
-                    message=f"Failed to lookup item with key '{self.contents[self.content_index]}' in database in {self.__class__.__name__}. This is likely a bug."
-                )
-
-                # Return None indicating an exception occurred
-                return None
-
             # Create a learning session item
             self.create_learning_session_item()
 
             # Get the one an only result from the notification
-            item: Union[
+            entity: Union[
                 ImmutableFlashcard,
                 ImmutableNote,
                 ImmutableQuestion,
-            ] = notification.get_one_and_only_result()
-
-            # Check, if the item is a flashcard or note
-            if isinstance(item, (ImmutableFlashcard, ImmutableNote)):
-                # Return the item
-                return item
-
-            # Dispatch a request to get the question's answers by key
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+            ] = self._request_entity(
                 event=Events.REQUEST_GET_BY_KEY,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                key=item.answers,
+                key=self.contents[self.content_index],
             )
 
-            # Check if the notification is None
-            if not notification:
-                # Log a warning message about the failed lookup
-                self.logger.warning(
-                    message=f"Failed to lookup answers with key '{item.answers}' in database in {self.__class__.__name__}. This is likely a bug."
+            # Check, if the entity is a question
+            if isinstance(entity, ImmutableQuestion):
+                # Get the answers
+                entity = (
+                    entity,
+                    self._request_entity(
+                        event=Events.REQUEST_GET_BY_KEYS,
+                        keys=entity.answers,
+                    ),
                 )
 
-                # Return None indicating an exception occurred
-                return None
-
-            # Get the one an only result from the notification
-            answers: List[ImmutableAnswer] = notification.get_one_and_only_result()
-
-            # Return the item
-            return (
-                item,
-                answers,
-            )
+            # Return the entity
+            return entity
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'on_request_learning_session_runner_load_previous_item' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception occurred
             return None
@@ -1660,98 +1745,145 @@ class LearningSessionRunner:
         Raises:
             Exception: If an error occurs while attempting to run the method.
         """
-
-        # Dispatch a request to lookup the item by key
-        content_notification: Optional[DispatcherNotification] = (
-            self.dispatcher.dispatch(
+        try:
+            # Get the content from the notification
+            content: Optional[
+                Union[
+                    ImmutableFlashcard,
+                    ImmutableNote,
+                    ImmutableQuestion,
+                ]
+            ] = self._request_entity(
                 event=Events.REQUEST_GET_BY_KEY,
-                namespace=Constants.GLOBAL_NAMESPACE,
                 key=key,
             )
-        )
 
-        # Check if the notification is None or has errors
-        if not content_notification or content_notification.has_errors():
-            # Log a warning message about the failed lookup
-            self.logger.warning(
-                message=f"Failed to lookup item with key '{key}' in database in {self.__class__.__name__}. This is likely a bug."
+            # Check, if the content is None
+            if content is None:
+                # Log a warning message about the missing content
+                self.logger.warning(
+                    message=f"Content with key {key} not found in {self.__class__.__name__}. This is likely a bug."
+                )
+
+                # Return None indicating an exception occurred
+                return None
+
+            # Check, if the content object is mutable
+            if not content.is_mutable():
+                # Convert the Content object to mutable
+                content = content.to_mutable()
+
+            # Get the current datetime
+            now: datetime = Miscellaneous.get_current_datetime()
+
+            # Update last viewed timestamp
+            content.last_viewed_at = now
+
+            # Calculate the interval
+            interval: float = self._calculate_adaptive_interval(
+                difficulty=content.difficulty,
+                priority=content.priority,
+                what="days",
             )
 
-            # Return early
-            return
+            # Set the content's interval attribute
+            content.interval = interval
 
-        # Get the content from the notification
-        content: Union[
-            ImmutableFlashcard,
-            ImmutableNote,
-            ImmutableQuestion,
-        ] = content_notification.get_one_and_only_result()
+            # Calculate due datetime
+            content.due_by = now + timedelta(days=interval)
 
-        # Update the content to a mutable version
-        content = content.to_mutable()
-
-        # Dispatch a request to lookup the difficulty
-        difficulty_notification: Optional[DispatcherNotification] = (
-            self.dispatcher.dispatch(
-                event=Events.REQUEST_DIFFICULTY_LOAD,
-                field="id",
-                namespace=Constants.GLOBAL_NAMESPACE,
-                value=content.difficulty,
-            )
-        )
-
-        # Check if the notification is None or has errors
-        if not difficulty_notification or difficulty_notification.has_errors():
-            # Log a warning message about the failed lookup
-            self.logger.warning(
-                message=f"Failed to lookup difficulty with id '{content.difficulty}' in database in {self.__class__.__name__}. This is likely a bug."
+            # Update the content
+            self._update_entity(update=content)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'schedule_due_by' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Return early
-            return
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
-        # Get the difficulty from the notification
-        difficulty: ImmutableDifficulty = (
-            difficulty_notification.get_one_and_only_result()
-        )
-
-        # Get the current datetime
-        now: datetime = Miscellaneous.get_current_datetime()
-
-        # Update last viewed timestamp
-        content.last_viewed_at = now
-
-        # Calculate the interval
-        interval: float = self._calculate_adaptive_interval(
-            difficulty=difficulty,
-            priority=content.priority,
-        )
-
-        # Set the content's interval attribute
-        content.interval = interval
-
-        # Calculate due datetime
-        content.due_by = now + timedelta(days=interval)
-
-        # Update the content
-        self.dispatcher.dispatch(
-            event=Events.REQUEST_UPDATE,
-            namespace=Constants.GLOBAL_NAMESPACE,
-            update=content,
-        )
+            # Return None indicating an exception occurred
+            return None
 
     def schedule_intrasession_review(
         self,
-        difficulty: ImmutableDifficulty,
-        entity: Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion],
+        key: str,
     ) -> None:
-        """ """
+        """
+        Schedules an intrasession review for the passed entity.
 
-        # TODO:
-        #   - calculate the interval
-        #   - append a datetime object and the entity's key to the intrasession review queue
+        This method dispatches the REQUEST_PRIORITY_LOAD event to load the
+        priority with the passed ID and then calculates the interval based on
+        the difficulty and priority. It then adds the entity to the
+        intrasession review queue with the calculated due datetime and sorts
+        the queue by due datetime in ascending order.
 
-        pass
+        Args:
+            difficulty (ImmutableDifficulty): The difficulty.
+            entity (Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion]): The entity to schedule an intrasession review for.
+        """
+        try:
+            # Get the entity from the notification
+            entity: Union[
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+            ] = self._request_entity(
+                event=Events.REQUEST_GET_BY_KEY,
+                key=key,
+            )
+
+            # Calculate the interval
+            interval: float = self._calculate_adaptive_interval(
+                difficulty=entity.difficulty,
+                priority=entity.priority,
+                what="seconds",
+            )
+
+            # Calculate the due datetime
+            due_by: datetime = Miscellaneous.get_current_datetime() + timedelta(
+                seconds=interval
+            )
+
+            # Check, if the due datetime is tomorrow
+            if due_by > Constants.END_OF_DAY:
+
+                # Check, if the entity is immutable
+                if not entity.is_mutable():
+                    # Update the entity to a mutable version
+                    entity = entity.to_mutable()
+
+                # Set the entity's 'due_by' attribute to the due datetime
+                entity.due_by = due_by
+
+                # Update the entity
+                self._update_entity(update=entity)
+
+                # Return early
+                return None
+
+            # Add the key to the intrasession review queue
+            self.intrasession_review_queue.append(
+                (
+                    due_by,
+                    key,
+                )
+            )
+
+            # Sort the queue by due datetime in ascending order
+            self.intrasession_review_queue.sort(key=lambda x: x[0])
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'schedule_intrasession_review' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
     def subscribe_to_events(self) -> None:
         """
@@ -1788,6 +1920,9 @@ class LearningSessionRunner:
                 message=f"Caught an exception while attempting to run 'subscribe_to_events' method in '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Re-raise the exception to the caller
             raise e
 
@@ -1811,5 +1946,9 @@ class LearningSessionRunner:
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'unsubscribe_from_events' method in '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Re-raise the exception to the caller
             raise e

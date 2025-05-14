@@ -7,7 +7,6 @@ import tkinter
 import traceback
 
 from tkinter.constants import *
-
 from typing import *
 
 from core.difficulty import ImmutableDifficulty
@@ -16,6 +15,7 @@ from core.note import ImmutableNote
 from core.priority import ImmutablePriority
 from core.question import ImmutableQuestion
 from core.setting import SettingService
+from core.status import ImmutableStatus
 
 from core.learning.learning_session import (
     ImmutableLearningSession,
@@ -30,6 +30,7 @@ from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
@@ -88,7 +89,22 @@ class LearningSessionResultItem(tkinter.Frame):
         # Initialize this instance's Logger attribute
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
-    def _request_entity_by_key(
+        # Obtain the entity associated with the ImmutableLearningSessionItem instance's reference
+        self.entity: Optional[
+            Union[
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+            ]
+        ] = self._get_entity_by_key(key=self.learning_session_item.reference)
+
+        # Configure the grid
+        self.configure_grid()
+
+        # Create the widgets
+        self.create_widgets()
+
+    def _get_entity_by_key(
         self,
         key: str,
     ) -> Optional[
@@ -138,7 +154,7 @@ class LearningSessionResultItem(tkinter.Frame):
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run '_request_reference_entity' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run '_get_entity_by_key' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback
@@ -171,7 +187,8 @@ class LearningSessionResultItem(tkinter.Frame):
     def create_widgets(self) -> None:
         """ """
 
-        pass
+        # Update idletasks
+        self.update_idletasks()
 
 
 class LearningSessionResultUI(BaseUI):
@@ -223,7 +240,7 @@ class LearningSessionResultUI(BaseUI):
         """
 
         # Store the passed ImmutableLearningSession object in an instance variable
-        self.learning_session: Final[ImmutableLearningSession] = learning_session
+        self.learning_session: ImmutableLearningSession = learning_session
 
         # Call the parent class constructor
         super().__init__(
@@ -236,6 +253,127 @@ class LearningSessionResultUI(BaseUI):
             unified_factory=unified_factory,
             unified_manager=unified_manager,
         )
+
+        # Load the learning session items
+        self._load_learning_session_items()
+
+    def _get_entity_by_key(
+        self,
+        key: str,
+    ) -> Optional[
+        Union[
+            ImmutableFlashcard,
+            ImmutableNote,
+            ImmutableQuestion,
+        ]
+    ]:
+        """
+        Retrieves an entity by its key.
+
+        This method dispatches a request to get an entity associated with the given key
+        in the 'global' namespace. It returns the entity if found, otherwise None.
+
+        Args:
+            key (str): The key of the entity to be retrieved.
+
+        Returns:
+            Optional[Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion]]:
+                The entity associated with the key, or None if not found or an error occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to retrieve the entity.
+        """
+        try:
+            # Dispatch the REQUEST_GET_BY_KEY event in the 'global' namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_BY_KEY,
+                key=key,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Check if the notification exists or has errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_GET_BY_KEY' in global namespace for '{key}' key: {notification.get_errors() if notification else "This is likely a bug."}"
+                )
+
+                # Return early
+                return
+
+            # Return the one and only result of the notification
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message if an exception occurs
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_get_entity_by_key' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def _get_entities_by_keys(
+        self,
+        keys: List[str],
+    ) -> Optional[
+        List[
+            Union[
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+            ]
+        ]
+    ]:
+        """
+        Retrieves a list of entities by their keys.
+
+        This method dispatches a request to get entities associated with the given keys
+        in the 'global' namespace. It returns the entities in a list if found, otherwise None.
+
+        Args:
+            keys (List[str]): The keys of the entities to be retrieved.
+
+        Returns:
+            Optional[List[Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion]]]:
+                The entities associated with the keys, or None if not found or an error occurs.
+
+        Raises:
+            Exception: If an exception occurs while attempting to retrieve the entity.
+        """
+        try:
+            # Dispatch the REQUEST_GET_BY_KEYS event in the 'global' namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_GET_BY_KEYS,
+                keys=keys,
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Check if the notification exists or has errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch 'REQUEST_GET_BY_KEYS' in global namespace for '{', '.join(keys)}' keys: {notification.get_errors() if notification else "This is likely a bug."}"
+                )
+
+                # Return early
+                return
+
+            # Return the one and only result of the notification
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message if an exception occurs
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_get_entities_by_keys' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
     def _load_learning_session_items(self) -> None:
         """
@@ -250,31 +388,51 @@ class LearningSessionResultUI(BaseUI):
             None
         """
         try:
-            # Dispatch the REQUEST_GET_BY_KEYS event in the 'global' namespace
-            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-                event=Events.REQUEST_GET_BY_KEYS,
-                force_refetch=True,
-                keys=self.learning_session.items,
-                namespace=Constants.GLOBAL_NAMESPACE,
-            )
+            # Obtain the entities associated to the learning session
+            entities: Optional[
+                List[
+                    Union[
+                        ImmutableFlashcard,
+                        ImmutableNote,
+                        ImmutableQuestion,
+                    ]
+                ]
+            ] = self._get_entities_by_keys(keys=self.learning_session.children)
 
-            # Check, if the notification exists or has errors
-            if not notification or notification.has_errors():
+            # Check, if the entities exist
+            if not entities:
                 # Log a warning message
                 self.logger.warning(
-                    message=f"Failed to load learning session contents from unified manager: {notification.get_error()}"
+                    message=f"Failed to fetch learning session items. Aborting..."
                 )
 
                 # Return early
                 return
 
-            # Get the one and only result from the DispatcherNotification object
-            items: List[ImmutableLearningSessionItem] = (
-                notification.get_one_and_only_result()
-            )
+            # Iterate over the entities
+            for (
+                index,
+                entity,
+            ) in enumerate(iterable=entities):
+                # Configure the row at the current index to weight 1
+                self.details_scrolled_frame.container.grid_rowconfigure(
+                    index=index,
+                    weight=1,
+                )
 
-            # TODO:
-            #   - implement items display
+                # Create a new LearningSessionResultItem instance
+                result_item: LearningSessionResultItem = LearningSessionResultItem(
+                    dispatcher=self.dispatcher,
+                    learning_session_item=entity,
+                    master=self.details_scrolled_frame.container,
+                )
+
+                # Place the LearningSessionResultItem instance in the grid
+                result_item.grid(
+                    column=0,
+                    row=index,
+                    sticky=NSEW,
+                )
         except Exception as e:
             # Log an error message if an exception occurs
             self.logger.error(
@@ -375,6 +533,73 @@ class LearningSessionResultUI(BaseUI):
             # Log an error message
             self.logger.error(
                 message=f"Caught an exception while attempting to run '_on_retry_button_click' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def _request_entity(
+        self,
+        event: DispatcherEvent,
+        **kwargs,
+    ) -> Optional[
+        Union[
+            ImmutableDifficulty,
+            ImmutableFlashcard,
+            ImmutableLearningSession,
+            ImmutableLearningSessionAction,
+            ImmutableLearningSessionItem,
+            ImmutableNote,
+            ImmutablePriority,
+            ImmutableQuestion,
+            ImmutableStatus,
+        ]
+    ]:
+        """
+        Dispatches the given event in the 'global' namespace and returns the one and only result of the notification.
+
+        This method dispatches the given event in the 'global' namespace and returns the one and only result of the notification
+        if the notification exists and does not have errors. Otherwise, it logs a warning message and returns None.
+
+        Args:
+            event (DispatcherEvent): The event to be dispatched in the 'global' namespace.
+            **kwargs: Additional keyword arguments to be passed to the dispatcher.
+
+        Returns:
+            Optional[Union[ImmutableDifficulty, ImmutableFlashcard, ImmutableLearningSession, ImmutableLearningSessionAction, ImmutableLearningSessionItem, ImmutableNote, ImmutablePriority, ImmutableQuestion, ImmutableStatus]]:
+                The one and only result of the notification if the notification exists and does not have errors.
+                Otherwise, None.
+
+        Raises:
+            Exception: If an error occurs during dispatch or internal processing.
+        """
+        try:
+            # Dispatch the REQUEST_GET_BY_KEYS event in the 'global' namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=event,
+                namespace=Constants.GLOBAL_NAMESPACE,
+                **kwargs,
+            )
+
+            # Check if the notification exists or has errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch '{event}' event in 'global' namespace: {notification.get_errors() if notification else "This is likely a bug."}"
+                )
+
+                # Return early
+                return
+
+            # Return the one and only result of the notification
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_request_entity' method from '{self.__class__.__name__}': {e}"
             )
 
             # Log the traceback
@@ -674,10 +899,10 @@ class LearningSessionResultUI(BaseUI):
             )
 
             # Create the ScrolledFrame widget
-            scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+            self.details_scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
 
             # Place the ScrolledFrame in the grid
-            scrolled_frame.grid(
+            self.details_scrolled_frame.grid(
                 column=0,
                 padx=5,
                 pady=5,
@@ -686,24 +911,28 @@ class LearningSessionResultUI(BaseUI):
             )
 
             # Configure the ScrolledFrame widget
-            scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
+            self.details_scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
 
             # Configure the ScrolledFrame widget's tkinter.Canvas widget
-            scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+            self.details_scrolled_frame.configure_canvas(
+                background=Constants.BLUE_GREY["700"]
+            )
 
             # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
-            scrolled_frame.configure_container_frame(
+            self.details_scrolled_frame.configure_container_frame(
                 background=Constants.BLUE_GREY["700"]
             )
 
             # Apply default layout configuration to the ScrolledFrame widget
-            self._apply_default_frame_layout_configuration(frame=scrolled_frame)
+            self._apply_default_frame_layout_configuration(
+                frame=self.details_scrolled_frame
+            )
 
             # Update idletasks
             self.update_idletasks()
 
             # Return the ScrolledFrame widget to the caller
-            return scrolled_frame
+            return self.details_scrolled_frame
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(

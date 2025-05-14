@@ -40,6 +40,7 @@ class DispatcherEvent(ImmutableBaseObject):
         id: int,
         name: str,
         uuid: str,
+        data: Optional[Dict[str, Any]] = None,
     ) -> None:
         """
         Initializes a new instance of the DispatcherEvent class.
@@ -48,6 +49,7 @@ class DispatcherEvent(ImmutableBaseObject):
             id (int): The ID of the event.
             name (str): The name of the event.
             uuid (str): The UUID of the event.
+            data (Optional[Dict[str, Any]]): The data associated with the event. Defaults to None.
 
         Returns:
             None
@@ -55,10 +57,60 @@ class DispatcherEvent(ImmutableBaseObject):
 
         # Call the parent class constructor
         super().__init__(
+            data=data,
+            hide_attributes=True,
             id=id,
             name=name,
             uuid=uuid,
         )
+
+    @property
+    def data(self) -> Optional[Dict[str, Any]]:
+        """
+        Gets the data associated with the event.
+
+        Returns:
+            Optional[Dict[str, Any]]: The data associated with the event. Defaults to None.
+        """
+
+        # Return the data associated with the event
+        return self._data
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the event.
+
+        Returns:
+            int: The ID of the event.
+        """
+
+        # Return the ID of the event
+        return self._id
+
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the event.
+
+        Returns:
+            str: The name of the event.
+        """
+
+        # Return the name of the event
+        return self._name
+
+    @property
+    def uuid(self) -> str:
+        """
+        Gets the UUID of the event.
+
+        Returns:
+            str: The UUID of the event.
+        """
+
+        # Return the UUID of the event
+        return self._uuid
 
     @override
     def compare_to(
@@ -188,6 +240,7 @@ class DispatcherNotification(ImmutableBaseObject):
 
         # Call the parent constructor
         super().__init__(
+            hide_attributes=True,
             duration=duration,
             end=end,
             errors=errors,
@@ -198,6 +251,90 @@ class DispatcherNotification(ImmutableBaseObject):
             start=start,
         )
 
+    @property
+    def duration(self) -> float:
+        """
+        Gets the duration of the notification.
+
+        Returns:
+            float: The duration of the notification.
+        """
+
+        # Return the duration of the notification
+        return self._duration
+
+    @property
+    def end(self) -> datetime:
+        """
+        Gets the end time of the notification.
+
+        Returns:
+            datetime: The end time of the notification.
+        """
+
+        # Return the end time of the notification
+        return self._end
+
+    @property
+    def event(self) -> DispatcherEvent:
+        """
+        Gets the event associated with the notification.
+
+        Returns:
+            DispatcherEvent: The event associated with the notification.
+        """
+
+        # Return the event associated with the notification
+        return self._event
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the unique identifier of the notification.
+
+        Returns:
+            int: The unique identifier of the notification.
+        """
+
+        # Return the unique identifier of the notification
+        return self._id
+
+    @property
+    def namespace(self) -> str:
+        """
+        Gets the namespace under which the notification was created.
+
+        Returns:
+            str: The namespace under which the notification was created.
+        """
+
+        # Return the namespace under which the notification was created
+        return self._namespace
+
+    @property
+    def result(self) -> Dict[str, Any]:
+        """
+        Gets the result of the notification.
+
+        Returns:
+            Dict[str, Any]: The result of the notification.
+        """
+
+        # Return the result of the notification
+        return self._result
+
+    @property
+    def start(self) -> datetime:
+        """
+        Gets the start time of the notification.
+
+        Returns:
+            datetime: The start time of the notification.
+        """
+
+        # Return the start time of the notification
+        return self._start
+
     def get_all_results(self) -> List[Any]:
         """
         Returns the result of the notification.
@@ -207,7 +344,7 @@ class DispatcherNotification(ImmutableBaseObject):
         """
 
         # Get the result of the notification
-        return self["result"].values()
+        return list(self.result.values())
 
     def get_errors(self) -> List[Dict[str, Any]]:
         """ """
@@ -231,9 +368,9 @@ class DispatcherNotification(ImmutableBaseObject):
         """
         try:
             # Check if the result contains more than one or no value(s)
-            if len(self["result"]) == 1:
+            if len(self.result) == 1:
                 # Return the one and only result
-                result: Optional[Any] = self["result"][next(iter(self["result"]))]
+                result: Optional[Any] = self.result[next(iter(self.result))]
 
                 # Check if the result is a list with one element
                 if isinstance(result, list) and len(result) == 1:
@@ -273,17 +410,17 @@ class DispatcherNotification(ImmutableBaseObject):
         """
 
         # Check, if the key is present in the result
-        if key not in self["result"].keys():
+        if key not in self.result:
             # Log a warning message
             self.logger.warning(
-                message=f"Key '{key}' not found in result of notification '{self['name']}'"
+                message=f"Key '{key}' not found in result of notification '{self.name}'"
             )
 
             # Return early
             return
 
         # Return the result
-        return self["result"][key]
+        return self.result[key]
 
     def has(
         self,
@@ -298,7 +435,7 @@ class DispatcherNotification(ImmutableBaseObject):
         Returns:
             bool: True if the notification contains the given key, False otherwise.
         """
-        return key in self["result"].keys()
+        return key in self.result
 
     def has_errors(self) -> bool:
         """ """
@@ -313,7 +450,7 @@ class DispatcherNotification(ImmutableBaseObject):
         Returns:
             bool: True if the notification is empty, False otherwise.
         """
-        return len(self["result"].keys()) == 0
+        return len(self.result) == 0
 
 
 class DispatcherNotificationFactory:
@@ -458,7 +595,11 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         Returns:
             Self: The builder instance.
         """
+
+        # Set the duration of the notification
         self.configuration["duration"] = value
+
+        # Return the builder instance
         return self
 
     def end(
@@ -474,7 +615,11 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         Returns:
             Self: The builder instance.
         """
+
+        # Set the end datetime of the notification
         self.configuration["end"] = value
+
+        # Return the builder instance
         return self
 
     def errors(
@@ -525,7 +670,11 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         Returns:
             Self: The builder instance.
         """
+
+        # Set the event name associated with the notification
         self.configuration["event"] = value
+
+        # Return the builder instance
         return self
 
     def namespace(
@@ -541,7 +690,11 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         Returns:
             Self: The builder instance.
         """
+
+        # Set the namespace associated with the notification
         self.configuration["namespace"] = value
+
+        # Return the builder instance
         return self
 
     def result(
@@ -559,10 +712,16 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         Returns:
             Self: The builder instance.
         """
-        if "result" not in self.configuration.keys():
+
+        # Check, if the 'result' key is already present in the configuration dictionary
+        if "result" not in self.configuration:
+            # Initialize an empty dictionary under the 'result' key
             self.configuration["result"] = {}
 
+        # Set the result of the notification
         self.configuration["result"][key] = value
+
+        # Return the builder instance
         return self
 
     def start(
@@ -578,11 +737,24 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         Returns:
             Self: The builder instance.
         """
+
+        # Set the start datetime of the notification
         self.configuration["start"] = value
+
+        # Return the builder instance
         return self
 
 
 class DispatcherEventSubscription(ImmutableBaseObject):
+    """
+    A class representing a subscription to an event.
+
+    Attributes:
+        event (DispatcherEvent): The event associated with the subscription.
+        id (int): The ID of the subscription.
+        subscriptions (Dict[str, Dict[str, Any]]): The subscriptions dictionary.
+    """
+
     def __init__(
         self,
         event: DispatcherEvent,
@@ -601,9 +773,46 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             event=event,
+            hide_attributes=True,
             id=id,
             subscriptions={},
         )
+
+    @property
+    def event(self) -> DispatcherEvent:
+        """
+        Gets the event associated with the subscription.
+
+        Returns:
+            DispatcherEvent: The event associated with the subscription.
+        """
+
+        # Return the event associated with the subscription
+        return self._event
+
+    @property
+    def id(self) -> int:
+        """
+        Gets the ID of the subscription.
+
+        Returns:
+            int: The ID of the subscription.
+        """
+
+        # Return the ID of the subscription
+        return self._id
+
+    @property
+    def subscriptions(self) -> Dict[str, Dict[str, Any]]:
+        """
+        Gets the subscriptions dictionary.
+
+        Returns:
+            Dict[str, Dict[str, Any]]: The subscriptions dictionary.
+        """
+
+        # Return the subscriptions dictionary
+        return self._subscriptions
 
     def add_subscription(
         self,
@@ -673,6 +882,10 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         Raises:
             Exception: If an exception occurs while building the notification.
         """
+
+        # Get the current datetime
+        start: datetime = Miscellaneous.get_current_datetime()
+
         # Initialize a notification builder
         result: DispatcherNotificationBuilder = DispatcherNotificationBuilder()
 
@@ -686,23 +899,20 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         result.namespace(value=namespace)
 
         # Set the start time of the notification
-        result.start(value=Miscellaneous.get_current_datetime())
+        result.start(value=start)
 
         # Get the subscriptions in the namespace
         subscriptions: Dict[str, Any] = self.subscriptions.get(namespace, {})
 
         # Check if there are any subscriptions in the namespace
-        if len(subscriptions) == 0:
-            # Set the result of the notification
-            result.configuration["result"] = {}
-        else:
+        if len(subscriptions) > 0:
             # Iterate over the subscriptions in the namespace
             for (
                 uuid,
                 subscription,
             ) in subscriptions.items():
                 # Check if the subscription is persistent
-                if not subscription["persistent"]:
+                if not subscription.get("persistent", False):
                     # Add the subscription to the subscriptions dictionary
                     non_persistents.append(uuid)
 
@@ -747,13 +957,16 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             # Remove the subscription from the dispatcher
             self.remove_subscription(uuid=uuid)
 
+        # Get the current datetime
+        end: datetime = Miscellaneous.get_current_datetime()
+
         # Set the end time of the notification
-        result.end(value=Miscellaneous.get_current_datetime())
+        result.end(value=end)
 
         # Calculate the duration of the notification
         result.duration(
             value=(
-                result["configuration"]["end"] - result["configuration"]["start"]
+                end - start
             ).total_seconds()
         )
 
@@ -902,8 +1115,23 @@ class Dispatcher(ImmutableBaseObject):
             None
         """
 
-        # Initialize the subscriptions dictionary as an empty dictionary
-        self.subscriptions: Dict[str, DispatcherEventSubscription] = {}
+        # Call the parent class constructor
+        super().__init__(
+            hide_attributes=True,
+            subscriptions={},
+        )
+
+    @property
+    def subscriptions(self) -> Dict[str, DispatcherEventSubscription]:
+        """
+        Gets the subscriptions dictionary.
+
+        Returns:
+            Dict[str, DispatcherEventSubscription]: The subscriptions dictionary.
+        """
+
+        # Return the subscriptions dictionary
+        return self._subscriptions
 
     def dispatch(
         self,

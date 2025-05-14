@@ -1095,6 +1095,16 @@ class Events:
         name="global:request:get:all:users"
     )
 
+    # An event that indicates that the user wants to get an object by its ID
+    REQUEST_GET_BY_ID: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:get:by:id"
+    )
+
+    # An event that indicates that the user wants to get objects by their IDs
+    REQUEST_GET_BY_IDS: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="global:request:get:by:ids"
+    )
+
     # An event that indicates that the user wants to get an object by its key
     REQUEST_GET_BY_KEY: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="global:request:get:by:key"

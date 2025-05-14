@@ -1190,11 +1190,17 @@ class CreateUI(BaseUI):
                 kwargs["back_word_count"] + kwargs["front_word_count"]
             )
 
+            # Set the custom field values of the flashcard
+            kwargs["custom_field_values"] = []
+
             # Set the familiarity of the flashcard
             kwargs["familiarity"] = 0.0
 
-            # Set the custom field values of the flashcard
-            kwargs["custom_field_values"] = []
+            # Set the interval (in days) of the flashcard
+            kwargs["interval"] = Constants.BASE_REPETITION_INTERVAL_DAYS
+
+            # Set the metadata of the flashcard
+            kwargs["metadata"] = {}
 
             # Set the tags of the flashcard
             kwargs["tags"] = []
@@ -1222,10 +1228,7 @@ class CreateUI(BaseUI):
                 return
 
             # Check, if the flashcard was created succcessfully (i.e. if it has an ID)
-            if not flashcard.get(
-                default=None,
-                name="id",
-            ):
+            if not flashcard.id:
                 # Log a warning message
                 self.logger.warning(
                     message=f"Failed to create ImmutableFlashcard in the databse in 'handle_flashcard_creation' method. This is likely a bug."
@@ -1235,7 +1238,7 @@ class CreateUI(BaseUI):
                 return
 
             # Convert the stack to a MutableStack
-            stack = stack.to_mutable()
+            stack: MutableStack = stack.to_mutable()
 
             # Add the newly created ImmutableFlashcard object to the MutableStack's contents
             stack.add_to_contents(content=flashcard)
@@ -1402,7 +1405,7 @@ class CreateUI(BaseUI):
             kwargs["tags"] = []
 
             # Attempt to create the ImmutableStack object in the database and update the reference
-            stack: ImmutableStack = self._create_entity(
+            stack: Optional[ImmutableStack] = self._create_entity(
                 entity=UnifiedObjectFactory().create_stack(**kwargs),
                 event=Events.REQUEST_STACK_CREATE,
             )
@@ -1439,7 +1442,7 @@ class CreateUI(BaseUI):
                     return
 
                 # Convert the ImmutableStack ancestor to a MutableStack object
-                ancestor = ancestor.to_mutable()
+                ancestor: MutableStack = ancestor.to_mutable()
 
                 self.logger.debug(
                     message=f"Ancestor {ancestor.id} descendants pre adding: {ancestor.descendants}"
@@ -1582,7 +1585,7 @@ class CreateUI(BaseUI):
                 # Notify the user
                 ToplevelToastNotification(
                     message=f"Failed to create {Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} in the database. Please check the logs for additional information.",
-                    title=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} could no be created successfully",
+                    title=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} could not be created successfully",
                 )
 
                 # Return early
