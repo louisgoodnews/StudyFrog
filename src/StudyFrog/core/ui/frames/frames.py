@@ -377,147 +377,105 @@ class CollapsibleFrame(tkinter.Frame):
 
 class ScrolledFrame(tkinter.Frame):
     """
-    A scrollable frame widget that adds horizontal and vertical scrollbars.
+    A scrollable frame widget that supports horizontal and/or vertical scrolling.
 
-    This class represents a tkinter.Frame embedded in a scrollable Canvas, surrounded
-    by scrollbars. It is useful for placing widgets in a scrollable area when content
-    might exceed the visible bounds of the application window.
+    This class wraps a `tkinter.Canvas` with an embedded frame and scrollbars,
+    enabling other widgets to be placed inside the scrollable area.
 
     Attributes:
-        logger (Logger): Logger instance for debugging/logging.
-        container (tkinter.Frame): The outer container holding the Canvas and scrollbars.
-        canvas (tkinter.Canvas): The canvas on which this frame is drawn.
-        horizontal_scrollbar (tkinter.Scrollbar): Scrollbar for horizontal scrolling.
-        vertical_scrollbar (tkinter.Scrollbar): Scrollbar for vertical scrolling.
+        logger (Logger): Logger instance for internal logging.
+        canvas (tkinter.Canvas): Canvas widget used for scrolling.
+        container_frame (tkinter.Frame): Internal frame that holds the canvas and scrollbars.
+        horizontal_scrollbar (tkinter.Scrollbar): Optional horizontal scrollbar.
+        vertical_scrollbar (tkinter.Scrollbar): Optional vertical scrollbar.
     """
 
     def __init__(
         self,
         master: tkinter.Misc,
+        horizontal_scroll: bool = False,
+        vertical_scroll: bool = True,
         **kwargs,
     ) -> None:
         """
-        Initializes a new instance of the ScrolledFrame class.
-
-        This method creates a container frame that embeds a canvas and two scrollbars,
-        and adds this frame into the canvas to make it scrollable.
+        Initializes the ScrolledFrame widget.
 
         Args:
-            master (tkinter.Misc): The parent widget in which to place the scrolled frame.
-            **kwargs: Additional keyword arguments passed to the container frame.
+            master (tkinter.Misc): The parent widget.
+            horizontal_scroll (bool): Whether to enable horizontal scrolling. Defaults to False.
+            vertical_scroll (bool): Whether to enable vertical scrolling. Defaults to True.
+            **kwargs: Additional keyword arguments forwarded to the widgets.
 
         Returns:
             None
+
+        Raises:
+            ValueError: If both scroll directions are disabled.
         """
 
-        super().__init__(master=master)
+        # Check, if both the 'horizontal_scroll' and 'vertical_scroll' flags are set to False
+        if not horizontal_scroll and not vertical_scroll:
+            # Raise an Exception to inform about an illegal state
+            raise ValueError(
+                f"'horizontal_scroll' and 'vertical_scroll' flags cannot both be set to False at the same time in {self.__class__.__name__}"
+            )
 
-        # Initialize this class' logger instance in an instance variable
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
+        # Initialize this ScrolledFrame instance's Logger instance
+        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
-        #
-        self.grid_columnconfigure(
+        # Store the passed 'horizontal_scroll' bool flag in an instance variable
+        self.has_horizontal_scroll: bool = horizontal_scroll
+
+        # Store the passed 'horizontal_scroll' bool flag in an instance variable
+        self.has_vertical_scroll: bool = vertical_scroll
+
+        # Create the 'container frame' tkinter.Frame widget
+        self._container_frame: tkinter.Frame = tkinter.Frame(
+            master=master,
+            **kwargs,
+        )
+
+        # Place the 'container frame' tkinter.Frame widget in the grid
+        self._container_frame.grid(sticky=NSEW)
+
+        # Configure the 'container frame' tkinter.Frame widget's 0th column to weight 1
+        self._container_frame.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        #
-        self.grid_columnconfigure(
+        # Configure the 'container frame' tkinter.Frame widget's 1st column to weight 0
+        self._container_frame.grid_columnconfigure(
             index=1,
             weight=0,
         )
 
-        #
-        self.grid_rowconfigure(
+        # Configure the 'container frame' tkinter.Frame widget's 0th row to weight 1
+        self._container_frame.grid_rowconfigure(
             index=0,
             weight=1,
         )
 
-        #
-        self.grid_rowconfigure(
+        # Configure the 'container frame' tkinter.Frame widget's 1st row to weight 0
+        self._container_frame.grid_rowconfigure(
             index=1,
             weight=0,
         )
 
-        # Create a canvas widget
-        self._canvas: tkinter.Canvas = tkinter.Canvas(master=self)
+        # Create the tkinter.Canvas widget
+        self._canvas: tkinter.Canvas = tkinter.Canvas(
+            master=self._container_frame,
+            **kwargs,
+        )
 
-        # Place the canvas widget within the frame
+        # Place the tkinter.Canvas widget in the grid
         self._canvas.grid(
             column=0,
             row=0,
             sticky=NSEW,
         )
 
-        # Bind the 'on_canvas_configure' method to this widget via the '<Configure>' event
-        self.bind(
-            func=self._on_container_configure,
-            sequence="<Configure>",
-        )
-
-        # Bind the 'on_canvas_configure' method to the canvas widget via the '<Configure>' event
-        self._canvas.bind(
-            func=self._on_container_configure,
-            sequence="<Configure>",
-        )
-
-        # Get the name of the OS
-        system: str = platform.system()
-
-        # Check, if the OS is 'Windows"
-        if system.lower() == "windows":
-            #
-            self.bind_all(
-                func=self._on_mousewheel,
-                sequence="<MouseWheel>",
-            )
-        elif system.lower() == "darwin":
-            #
-            self.bind_all(
-                func=self._on_mousewheel,
-                sequence="<MouseWheel>",
-            )
-        else:
-            #
-            self.bind_all(
-                func=self._on_mousewheel,
-                sequence="<Button-4>",
-            )
-
-            #
-            self.bind_all(
-                func=self._on_mousewheel,
-                sequence="<Button-5>",
-            )
-
-        # Create the 'container' frame widget
-        self._container: tkinter.Frame = tkinter.Frame(
-            master=self._canvas,
-            **kwargs,
-        )
-
-        #
-        self._container.grid_columnconfigure(
-            index=0,
-            weight=1,
-        )
-
-        #
-        self._container.grid_rowconfigure(
-            index=0,
-            weight=1,
-        )
-
-        # Update idle tasks
-        self.update_idletasks()
-
-        # Bind the 'on_container_configure' method to the container widget via the '<Configure>' event
-        self._container.bind(
-            func=self._on_container_configure,
-            sequence="<Configure>",
-        )
-
-        # Add this frame to the canvas widget
+        # Create a new window inside the canvas
         self._canvas.create_window(
             *(
                 0,
@@ -525,33 +483,27 @@ class ScrolledFrame(tkinter.Frame):
             ),
             anchor=NW,
             tags="window",
-            window=self._container,
+            window=super().__init__(
+                master=self._canvas,
+                **kwargs,
+            ),
         )
 
-        # Create the 'vertical scrollbar' scrollbar widget
-        self._vertical_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
-            command=self._canvas.yview,
-            master=self,
-            orient=VERTICAL,
+        # Check, if the 'horizontal_scroll' flag is set to True
+        if horizontal_scroll:
+            # Create the 'horizontal scrollbar' tkinter.Scrollbar widget
+            self._horizontal_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
+                command=self._canvas.xview,
+                master=self._container_frame,
+                orient=HORIZONTAL,
+            )
+
+        # Configure the canvas widget's 'xscrollcommand' attribute
+        self._canvas.configure(
+            xscrollcommand=self._horizontal_scrollbar.set,
         )
 
-        # Place the 'vertical scrollbar' scrollbar widget within the frame
-        self._vertical_scrollbar.grid(
-            column=1,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NS,
-        )
-
-        # Create the 'horizontal scrollbar' scrollbar widget
-        self._horizontal_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
-            command=self._canvas.xview,
-            master=self,
-            orient=HORIZONTAL,
-        )
-
-        # Place the 'horizontal scrollbar' scrollbar widget within the frame
+        # Place the 'horizontal scrollbar' tkinter.Scrollbar widget in the grid
         self._horizontal_scrollbar.grid(
             column=0,
             padx=5,
@@ -560,46 +512,115 @@ class ScrolledFrame(tkinter.Frame):
             sticky=EW,
         )
 
-        # Configure the canvas widget
+        # Check, if the 'vertical_scroll' flag is set to True
+        if vertical_scroll:
+            # Create the 'vertical scrollbar' tkinter.Scrollbar widget
+            self._vertical_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
+                command=self._canvas.yview,
+                master=self._container_frame,
+                orient=VERTICAL,
+            )
+
+            # Configure the canvas widget's 'yscrollcommand' attribute
         self._canvas.configure(
-            xscrollcommand=self._horizontal_scrollbar.set,
             yscrollcommand=self._vertical_scrollbar.set,
         )
+
+        # Place the 'vertical scrollbar' tkinter.Scrollbar widget in the grid
+        self._vertical_scrollbar.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NS,
+        )
+
+        # Bind the 'on_configure' method to the ScrolledFrame widget via the '<Configure>' event
+        self.bind(
+            func=self._on_configure,
+            sequence="<Configure>",
+        )
+
+        # Bind the 'on_configure' method to the canvas widget via the '<Configure>' event
+        self._canvas.bind(
+            func=self._on_configure,
+            sequence="<Configure>",
+        )
+
+        # Get the name of the OS
+        system: str = platform.system()
+
+        # Check, if the OS is 'Windows" or "MacOS"
+        if system.lower() in [
+            "darwin",
+            "windows",
+        ]:
+            # Bind the 'on_mousewheel' method to the ScrolledFrame widget via the '<MouseWheel>' event
+            self.bind_all(
+                func=self._on_mousewheel,
+                sequence="<MouseWheel>",
+            )
+
+        # Assuming the OS is Linux-based
+        else:
+            # Bind the 'on_mousewheel' method to the ScrolledFrame widget via the '<Button-4>' event
+            self.bind_all(
+                func=self._on_mousewheel,
+                sequence="<Button-4>",
+            )
+
+            # Bind the 'on_mousewheel' method to the ScrolledFrame widget via the '<Button-5>' event
+            self.bind_all(
+                func=self._on_mousewheel,
+                sequence="<Button-5>",
+            )
+
+        # Update idle tasks
+        self.update_idletasks()
 
     @property
     def canvas(self) -> tkinter.Canvas:
         """
-        Returns the canvas widget on which this frame is drawn.
+        Returns the internal canvas used for rendering scrollable content.
+
+        Args:
+            None
 
         Returns:
             tkinter.Canvas: The canvas widget.
         """
 
-        # Return the tkinter.Canvas canvas
-        return self._container
+        # Return the tkinter.Canvas widget
+        return self._canvas
 
     @property
-    def container(self) -> tkinter.Frame:
+    def container_frame(self) -> tkinter.Frame:
         """
-        Returns the outer container frame holding the canvas and scrollbars.
+        Returns the outer container frame that holds the canvas and scrollbars.
+
+        Args:
+            None
 
         Returns:
-            tkinter.Frame: The outer container frame.
+            tkinter.Frame: The container frame widget.
         """
 
-        # Return the 'container' frame
-        return self._container
+        # Return the 'container frame' tkinter.Frame widget
+        return self._container_frame
 
     @property
     def horizontal_scrollbar(self) -> tkinter.Scrollbar:
         """
         Returns the horizontal scrollbar widget.
 
+        Args:
+            None
+
         Returns:
             tkinter.Scrollbar: The horizontal scrollbar.
         """
 
-        # Return the 'horizontal scrollbar' scrollbar
+        # Return the 'horizontal scrollbar' tkinter.Scrollbar widget
         return self._horizontal_scrollbar
 
     @property
@@ -607,45 +628,48 @@ class ScrolledFrame(tkinter.Frame):
         """
         Returns the vertical scrollbar widget.
 
+        Args:
+            None
+
         Returns:
             tkinter.Scrollbar: The vertical scrollbar.
         """
 
-        # Return the 'vertical scrollbar' scrollbar
+        # Return the 'vertical scrollbar' tkinter.Scrollbar widget
         return self._vertical_scrollbar
 
-    def _on_container_configure(
+    def _on_configure(
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
         """
-        Handles container resizing and updates the scroll region.
-
-        This method should be bound to the <Configure> event of the canvas
-        to dynamically update the scroll region when content is added or resized.
+        Handles the <Configure> event to update scroll region and canvas size.
 
         Args:
-            event (Optional[tkinter.Event]): The event object. Defaults to None.
+            event (Optional[tkinter.Event]): The configuration event.
 
         Returns:
             None
+
+        Raises:
+            Exception: If an error occurs during configuration.
         """
         try:
-            # Update idle tasks
-            self.update_idletasks()
-
             # Update scrollregion to encompass the entire embedded frame
             self._canvas.configure(scrollregion=self._canvas.bbox(ALL))
 
-            # Configure the width of the container frame
+            # Configure the width of the ScrolledFrame widget
             self._canvas.itemconfig(
                 tagOrId="window",
                 width=self._canvas.winfo_width(),
             )
+
+            # Update idle tasks
+            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run '_on_container_configure' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run '_on_configure' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message
@@ -659,16 +683,16 @@ class ScrolledFrame(tkinter.Frame):
         event: Optional[tkinter.Event] = None,
     ) -> None:
         """
-        Handles mouse wheel events to scroll the canvas content.
-
-        This method can be bound to mouse wheel events to allow vertical
-        scrolling via the user's mouse wheel or trackpad.
+        Handles mouse wheel scrolling for different platforms.
 
         Args:
-            event (Optional[tkinter.Event]): The mouse wheel event. Defaults to None.
+            event (Optional[tkinter.Event]): The mouse wheel event.
 
         Returns:
             None
+
+        Raises:
+            Exception: If an error occurs during scrolling.
         """
         try:
             # Check, if the event is None
@@ -687,17 +711,18 @@ class ScrolledFrame(tkinter.Frame):
                 "darwin",
                 "windows",
             ]:
+                # Update the amout to be a (int) fraction
                 amount = int(1 * (amount // 120))
 
-            # Update idle tasks
-            self.update_idletasks()
-
+            # Check, if the event's state is equal to 'Mod1'
             if event.state == "Mod1":
                 # Scroll the canvas in y-direction
                 self._canvas.yview_scroll(
                     number=amount,
                     what=UNITS,
                 )
+
+            # Check, if the event's state is equal to 'Shift|Mod1'
             elif event.state == "Shift|Mod1":
                 # Scroll the canvas in x-direction
                 self._canvas.xview_scroll(
@@ -721,30 +746,27 @@ class ScrolledFrame(tkinter.Frame):
         **kwargs,
     ) -> None:
         """
-        Configures the canvas widget inside the ScrolledFrame.
-
-        This method allows external customization of the canvas widget,
-        such as changing background color, scroll behavior, or other properties.
+        Configures the internal canvas widget with provided options.
 
         Args:
-            **kwargs: Keyword arguments to pass to the canvas' configure method.
+            **kwargs: Keyword arguments to configure the canvas.
 
         Returns:
             None
 
         Raises:
-            Exception: Raises an exception if any errors occur while attempting configuration.
+            Exception: If an error occurs during configuration.
         """
         try:
-            # Attempt to configure the canvas widget
+            # Attempt to configure the tkinter.Canvas widget with the passed keyword arguments
             self._canvas.configure(**kwargs)
         except Exception as e:
-            # Log an error message indicating that an exception has occurred
+            # Log an error message to indicate that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'configure_canvas' method from '{self.__class__.__name__}' class: {e}"
             )
 
-            # Log the traceback as error message
+            # Log the traceback
             self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
@@ -755,30 +777,27 @@ class ScrolledFrame(tkinter.Frame):
         **kwargs,
     ) -> None:
         """
-        Configures the container frame surrounding the canvas and scrollbars.
-
-        This method allows external customization of the outer frame,
-        such as padding, borders, or colors.
+        Configures the internal container frame widget.
 
         Args:
-            **kwargs: Keyword arguments to pass to the container's configure method.
+            **kwargs: Keyword arguments to configure the container frame.
 
         Returns:
             None
 
         Raises:
-            Exception: Raises an exception if any errors occur while attempting configuration.
+            Exception: If an error occurs during configuration.
         """
         try:
-            # Attempt to configure the 'container' frame widget
-            self._container.configure(**kwargs)
+            # Attempt to configure the 'container frame' tkinter.Frame widget with the passed keyword arguments
+            self._container_frame.configure(**kwargs)
         except Exception as e:
-            # Log an error message indicating that an exception has occurred
+            # Log an error message to indicate that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
             )
 
-            # Log the traceback as error message
+            # Log the traceback
             self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
@@ -791,28 +810,30 @@ class ScrolledFrame(tkinter.Frame):
         """
         Configures the horizontal scrollbar widget.
 
-        This method allows customization of the horizontal scrollbar,
-        including style, appearance, or orientation.
-
         Args:
-            **kwargs: Keyword arguments to pass to the scrollbar's configure method.
+            **kwargs: Keyword arguments to configure the scrollbar.
 
         Returns:
             None
 
         Raises:
-            Exception: Raises an exception if any errors occur while attempting configuration.
+            Exception: If an error occurs during configuration.
         """
         try:
-            # Attempt to configure the 'horizontal scrollbar' scrolblar widget
+            # Check, if this widget has a horizontal scrollbar
+            if not self.has_horizontal_scroll:
+                # Return early
+                return
+
+            # Attempt to configure the 'container frame' tkinter.Frame widget with the passed keyword arguments
             self._horizontal_scrollbar.configure(**kwargs)
         except Exception as e:
-            # Log an error message indicating that an exception has occurred
+            # Log an error message to indicate that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'configure_horizontal_scrollbar' method from '{self.__class__.__name__}' class: {e}"
             )
 
-            # Log the traceback as error message
+            # Log the traceback
             self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
@@ -825,28 +846,30 @@ class ScrolledFrame(tkinter.Frame):
         """
         Configures the vertical scrollbar widget.
 
-        This method allows customization of the vertical scrollbar,
-        including style, appearance, or orientation.
-
         Args:
-            **kwargs: Keyword arguments to pass to the scrollbar's configure method.
+            **kwargs: Keyword arguments to configure the scrollbar.
 
         Returns:
             None
 
         Raises:
-            Exception: Raises an exception if any errors occur while attempting configuration.
+            Exception: If an error occurs during configuration.
         """
         try:
-            # Attempt to configure the 'vertical scrollbar' scrollbar widget
+            # Check, if this widget has a vertical scrollbar
+            if not self.has_vertical_scroll:
+                # Return early
+                return
+
+            # Attempt to configure the 'container frame' tkinter.Frame widget with the passed keyword arguments
             self._vertical_scrollbar.configure(**kwargs)
         except Exception as e:
-            # Log an error message indicating that an exception has occurred
+            # Log an error message to indicate that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'configure_vertical_scrollbar' method from '{self.__class__.__name__}' class: {e}"
             )
 
-            # Log the traceback as error message
+            # Log the traceback
             self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller

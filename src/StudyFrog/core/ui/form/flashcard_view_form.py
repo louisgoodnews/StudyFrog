@@ -10,8 +10,10 @@ from tkinter.constants import *
 from tkinter import ttk
 from typing import *
 
-from core.ui.fields.select_fields import ComboboxSelectField
-from core.ui.fields.string_fields import MultiLineTextField
+from core.ui.fields.select_fields import ComboboxField
+from core.ui.fields.string_fields import MultiLineTextField, ReadOnlySingleLineTextField
+
+from core.ui.frames.frames import ScrolledFrame, TabbedFrame
 
 from core.difficulty import ImmutableDifficulty
 from core.flashcard import ImmutableFlashcard, MutableFlashcard
@@ -153,10 +155,10 @@ class FlashcardViewForm(tkinter.Frame):
         """
 
         # Create the top frame
-        top_frame: tkinter.Frame = tkinter.Frame(master=self)
-
-        # Configure the top frame
-        top_frame.configure(background=Constants.BLUE_GREY["700"])
+        top_frame: tkinter.Frame = tkinter.Frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the top frame widget's 0th column to weight 1
         top_frame.grid_columnconfigure(
@@ -178,10 +180,10 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create the center frame
-        center_frame: tkinter.Frame = tkinter.Frame(master=self)
-
-        # Configure the center frame
-        center_frame.configure(background=Constants.BLUE_GREY["700"])
+        center_frame: tkinter.Frame = tkinter.Frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the center frame
         center_frame.grid_columnconfigure(
@@ -203,10 +205,10 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create the bottom frame
-        bottom_frame: tkinter.Frame = tkinter.Frame(master=self)
-
-        # Configure the bottom frame
-        bottom_frame.configure(background=Constants.BLUE_GREY["700"])
+        bottom_frame: tkinter.Frame = tkinter.Frame(
+            background=Constants.BLUE_GREY["700"],
+            master=self,
+        )
 
         # Configure the bottom frame widget's 0th column to weight 1
         bottom_frame.grid_columnconfigure(
@@ -449,6 +451,15 @@ class FlashcardViewForm(tkinter.Frame):
         self,
         master: tkinter.Misc,
     ) -> None:
+        """
+
+        Args:
+            master:
+
+        Returns:
+            None
+        """
+
         # Configure the master widget's 0th column to weight 1
         master.grid_columnconfigure(
             index=0,
@@ -474,25 +485,22 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create the tabbed view widget
-        tabbed_view: Optional[Dict[str, Any]] = UIBuilder.get_tabbed_view(master=master)
+        tabbed_frame: TabbedFrame = TabbedFrame(
+            column=0,
+            master=master,
+            row=0,
+        )
 
         # Configure the tabbed view widget's root frame
-        tabbed_view["root"].configure(background=Constants.BLUE_GREY["700"])
+        tabbed_frame.configure(background=Constants.BLUE_GREY["700"])
 
         # Configure the tabbed view widget's top frame
-        tabbed_view["top_frame"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Place the tabbed view widget within the center frame
-        tabbed_view["root"].grid(
-            column=0,
-            row=0,
-            sticky=NSEW,
-        )
+        tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
 
         # Create the Core attributes frame
         core_attributes_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
-            master=tabbed_view["center_frame"],
+            master=tabbed_frame,
         )
 
         # Configure the Core attributes frame's 0th column to weight 1
@@ -508,13 +516,13 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Add the Core attributes frame to the tabbed view
-        tabbed_view["adder"](
+        tabbed_frame.add(
             label="Core Attributes",
             widget=core_attributes_frame,
         )
 
         # Style the Core attributes button
-        tabbed_view["core_attributes_button"].configure(
+        tabbed_frame["core_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -573,7 +581,7 @@ class FlashcardViewForm(tkinter.Frame):
         # Create the secondary attributes frame
         secondary_attributes_frame: tkinter.Frame = UIBuilder.get_scrolled_frame(
             background=Constants.BLUE_GREY["700"],
-            master=tabbed_view["center_frame"],
+            master=tabbed_frame,
         )
 
         # Style the secondary attributes frame's canvas widget
@@ -592,13 +600,13 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Add the secondary attributes frame to the tabbed view
-        tabbed_view["adder"](
+        tabbed_frame.add(
             label="Secondary Attributes",
             widget=secondary_attributes_frame["root"],
         )
 
         # Style the secondary attributes button
-        tabbed_view["secondary_attributes_button"].configure(
+        tabbed_frame["secondary_attributes_button"].configure(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -609,21 +617,19 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create the scrolled frame comments frame
-        comments_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
-            master=master
-        )
-
-        # Configure the scrolled frame comments frame's canvas frame
-        comments_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Configure the scrolled frame comments frame's frame widget
-        comments_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
+        comments_frame: ScrolledFrame = ScrolledFrame(master=master)
 
         # Configure the scrolled frame comments frame's root frame
-        comments_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+        comments_frame.configure(background=Constants.BLUE_GREY["700"])
+
+        # Configure the scrolled frame comments frame's canvas frame
+        comments_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+
+        # Configure the scrolled frame comments frame's frame widget
+        comments_frame.configure_container(background=Constants.BLUE_GREY["700"])
 
         # Place the comments frame widget within the center frame
-        comments_frame["root"].grid(
+        comments_frame.grid(
             column=0,
             row=1,
             sticky=NSEW,
@@ -647,7 +653,7 @@ class FlashcardViewForm(tkinter.Frame):
         """
 
         # Create a label widget to display the stack ID
-        self.id_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.id_field: ReadOnlySingleLineTextField = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -657,8 +663,11 @@ class FlashcardViewForm(tkinter.Frame):
             value=self.flashcard.id,
         )
 
+        # Style the ID field's root frame
+        self.id_field.configure(background=Constants.BLUE_GREY["700"])
+
         # Style the ID field's label widget
-        self.id_field["label"].configure(
+        self.id_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -667,11 +676,8 @@ class FlashcardViewForm(tkinter.Frame):
             foreground=Constants.WHITE,
         )
 
-        # Style the ID field's root frame
-        self.id_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
         # Place the ID field's root frame in the master widget
-        self.id_field["root"].grid(
+        self.id_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -680,7 +686,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack UUID
-        self.uuid_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.uuid_field: ReadOnlySingleLineTextField = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -690,8 +696,11 @@ class FlashcardViewForm(tkinter.Frame):
             value=self.flashcard.uuid,
         )
 
+        # Style the UUID field's root frame
+        self.uuid_field.configure(background=Constants.BLUE_GREY["700"])
+
         # Style the UUID field's label widget
-        self.uuid_field["label"].configure(
+        self.uuid_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -700,11 +709,8 @@ class FlashcardViewForm(tkinter.Frame):
             foreground=Constants.WHITE,
         )
 
-        # Style the UUID field's root frame
-        self.uuid_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
         # Place the UUID field's root frame in the master widget
-        self.uuid_field["root"].grid(
+        self.uuid_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -713,18 +719,25 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack creation date
-        self.created_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.MEDIUM_FONT_SIZE,
-            ),
-            label="Created at: ",
-            master=master,
-            value=Miscellaneous.datetime_to_string(datetime=self.flashcard.created_at),
+        self.created_at_field: ReadOnlySingleLineTextField = (
+            ReadOnlySingleLineTextField(
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.MEDIUM_FONT_SIZE,
+                ),
+                label="Created at: ",
+                master=master,
+                value=Miscellaneous.datetime_to_string(
+                    datetime=self.flashcard.created_at
+                ),
+            )
         )
 
+        # Style the created at field's root frame
+        self.created_at_field.configure(background=Constants.BLUE_GREY["700"])
+
         # Style the created at field's label widget
-        self.created_at_field["label"].configure(
+        self.created_at_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -733,11 +746,8 @@ class FlashcardViewForm(tkinter.Frame):
             foreground=Constants.WHITE,
         )
 
-        # Style the created at field's root frame
-        self.created_at_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
         # Place the created at field's root frame in the master widget
-        self.created_at_field["root"].grid(
+        self.created_at_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -746,18 +756,25 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack update date
-        self.updated_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
-            font=(
-                Constants.DEFAULT_FONT_FAMILY,
-                Constants.MEDIUM_FONT_SIZE,
-            ),
-            label="Updated at: ",
-            master=master,
-            value=Miscellaneous.datetime_to_string(datetime=self.flashcard.updated_at),
+        self.updated_at_field: ReadOnlySingleLineTextField = (
+            ReadOnlySingleLineTextField(
+                font=(
+                    Constants.DEFAULT_FONT_FAMILY,
+                    Constants.MEDIUM_FONT_SIZE,
+                ),
+                label="Updated at: ",
+                master=master,
+                value=Miscellaneous.datetime_to_string(
+                    datetime=self.flashcard.updated_at
+                ),
+            )
         )
 
+        # Style the updated at field's root frame
+        self.updated_at_field.configure(background=Constants.BLUE_GREY["700"])
+
         # Style the updated at field's label widget
-        self.updated_at_field["label"].configure(
+        self.updated_at_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -766,11 +783,8 @@ class FlashcardViewForm(tkinter.Frame):
             foreground=Constants.WHITE,
         )
 
-        # Style the updated at field's root frame
-        self.updated_at_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
         # Place the updated at field's root frame in the master widget
-        self.updated_at_field["root"].grid(
+        self.updated_at_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -798,7 +812,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a combobox select field for the difficulty
-        self.difficulty_field: Optional[Dict[str, Any]] = ttk.Combobox_field(
+        self.difficulty_field: ComboboxField = ComboboxField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -809,8 +823,11 @@ class FlashcardViewForm(tkinter.Frame):
             values=[difficulty.name for difficulty in difficulties],
         )
 
+        # Style the difficulty field's root frame
+        self.difficulty_field.configure(background=Constants.BLUE_GREY["700"])
+
         # Style the difficulty field's button widget
-        self.difficulty_field["button"].configure(
+        self.difficulty_field.configure_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -821,7 +838,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Style the difficulty field's label widget
-        self.difficulty_field["label"].configure(
+        self.difficulty_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -830,11 +847,8 @@ class FlashcardViewForm(tkinter.Frame):
             foreground=Constants.WHITE,
         )
 
-        # Style the difficulty field's root frame
-        self.difficulty_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
         # Set the difficulty field's value to the current difficulty
-        self.difficulty_field["setter"](
+        self.difficulty_field.set(
             value=next(
                 (
                     difficulty.name
@@ -846,7 +860,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Place the difficulty field's root frame in the master widget
-        self.difficulty_field["root"].grid(
+        self.difficulty_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -860,7 +874,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a combobox select field for the priority
-        self.priority_field: Optional[Dict[str, Any]] = ttk.Combobox_field(
+        self.priority_field: ComboboxField = ComboboxField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -871,8 +885,11 @@ class FlashcardViewForm(tkinter.Frame):
             values=[priority.name for priority in priorities],
         )
 
+        # Style the priority field's root frame
+        self.priority_field.configure(background=Constants.BLUE_GREY["700"])
+
         # Style the priority field's button widget
-        self.priority_field["button"].configure(
+        self.priority_field.configure_button(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -883,7 +900,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Style the priority field's label widget
-        self.priority_field["label"].configure(
+        self.priority_field.configure_label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -892,11 +909,8 @@ class FlashcardViewForm(tkinter.Frame):
             foreground=Constants.WHITE,
         )
 
-        # Style the priority field's root frame
-        self.priority_field["root"].configure(background=Constants.BLUE_GREY["700"])
-
         # Set the priority field's value to the current priority
-        self.priority_field["setter"](
+        self.priority_field.set(
             value=next(
                 (
                     priority.name
@@ -908,7 +922,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Place the priority field's root frame in the master widget
-        self.priority_field["root"].grid(
+        self.priority_field.grid(
             column=0,
             padx=5,
             pady=5,
@@ -967,6 +981,14 @@ class FlashcardViewForm(tkinter.Frame):
         self,
         event: Optional[tkinter.Event] = None,
     ) -> None:
+        """
+
+        Args:
+            event:
+
+        Returns:
+            None
+        """
         try:
             value: Optional[str] = self.front_text_field["getter"]()
 

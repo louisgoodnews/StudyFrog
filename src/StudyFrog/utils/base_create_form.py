@@ -647,6 +647,7 @@ class BaseCreateForm(tkinter.Frame):
         # Create the 'center frame' widgets
         self.create_center_frame_widgets(master=center_frame)
 
+    @override
     def destroy(self) -> None:
         """
         Cleans up resources and unsubscribes from events.
