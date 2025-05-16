@@ -415,7 +415,7 @@ class LearningSessionResultUI(BaseUI):
                 entity,
             ) in enumerate(iterable=entities):
                 # Configure the row at the current index to weight 1
-                self.details_scrolled_frame.container.grid_rowconfigure(
+                self.details_scrolled_frame.grid_rowconfigure(
                     index=index,
                     weight=1,
                 )
@@ -424,7 +424,7 @@ class LearningSessionResultUI(BaseUI):
                 result_item: LearningSessionResultItem = LearningSessionResultItem(
                     dispatcher=self.dispatcher,
                     learning_session_item=entity,
-                    master=self.details_scrolled_frame.container,
+                    master=self.details_scrolled_frame,
                 )
 
                 # Place the LearningSessionResultItem instance in the grid
@@ -1014,7 +1014,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame.container,
+                master=scrolled_frame,
                 text="Time Stats",
             )
 
@@ -1035,7 +1035,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame.container,
+                master=scrolled_frame,
                 text=f"Duration: {self.learning_session.duration // 60} minutes.",
             )
 
@@ -1056,7 +1056,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame.container,
+                master=scrolled_frame,
                 text=f"Number of contents: {len(self.learning_session.contents)}",
             )
 
@@ -1077,7 +1077,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame.container,
+                master=scrolled_frame,
                 text=f"Average on content: {self.learning_session.duration // len(self.learning_session.contents)} seconds",
             )
 
@@ -1098,7 +1098,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame.container,
+                master=scrolled_frame,
                 text=f"Number of stacks: {len(self.learning_session.stacks)} ({', '.join(self.learning_session.stacks)})",
             )
 

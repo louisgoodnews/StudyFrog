@@ -354,7 +354,7 @@ class PaginatedView(tkinter.Frame):
         )
 
         # Store the ScrolledFrame widget's 'container frame' in an instance variable
-        self.page_container = scrolled_frame.container
+        self.page_container = scrolled_frame
 
         # Update idletasks
         self.update_idletasks()

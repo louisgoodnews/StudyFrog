@@ -491,13 +491,11 @@ class BaseCreateForm(tkinter.Frame):
         )
 
         # Create the 'primary attributes' widgets
-        self.create_primary_attribute_widgets(
-            master=primary_attributes_scrolled_frame.container
-        )
+        self.create_primary_attribute_widgets(master=primary_attributes_scrolled_frame)
 
         # Create the 'secondary attributes' widgets
         self.create_secondary_attribute_widgets(
-            master=secondary_attributes_scrolled_frame.container
+            master=secondary_attributes_scrolled_frame
         )
 
     def create_primary_attribute_widgets(

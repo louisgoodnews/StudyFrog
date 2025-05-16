@@ -73,8 +73,8 @@ class FlashcardImporter(ImmutableBaseObject):
         """
         Creates or returns the singleton instance of the FlashcardImporter.
 
-        This method ensures that only one instance of the `FlashcardImporter` exists 
-        throughout the application runtime. If no instance exists yet, a new one is 
+        This method ensures that only one instance of the `FlashcardImporter` exists
+        throughout the application runtime. If no instance exists yet, a new one is
         created and initialized with the provided dispatcher.
 
         Args:
@@ -181,43 +181,43 @@ class FlashcardImporter(ImmutableBaseObject):
         )
 
         # Configure the 0th column of the ScrolledFrame widget to weight 1
-        scrolled_frame.container.grid_columnconfigure(
+        scrolled_frame.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
         # Configure the 0th row of the ScrolledFrame widget to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=0,
             weight=1,
         )
 
         # Configure the 1st row of the ScrolledFrame widget to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=1,
             weight=1,
         )
 
         # Configure the 2nd row of the ScrolledFrame widget to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=2,
             weight=1,
         )
 
         # Configure the 3rd row of the ScrolledFrame widget to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=3,
             weight=1,
         )
 
         # Configure the 4th row of the ScrolledFrame widget to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=4,
             weight=1,
         )
 
         # Configure the 5ft row of the ScrolledFrame widget to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=5,
             weight=1,
         )
@@ -235,7 +235,7 @@ class FlashcardImporter(ImmutableBaseObject):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             text=instruction,
         )
 
@@ -269,10 +269,12 @@ class FlashcardImporter(ImmutableBaseObject):
 
             # Normalize the label and convert it to snake case
             label = Miscellaneous.any_to_snake(
-                string=label.strip().replace(
+                string=label.strip()
+                .replace(
                     "*",
                     "",
-                ).replace(
+                )
+                .replace(
                     ":",
                     "",
                 )
@@ -284,7 +286,7 @@ class FlashcardImporter(ImmutableBaseObject):
         # Create the 'name' SingleLineTextField widget
         name_field: SingleLineTextField = SingleLineTextField(
             display_name="Name*: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
         )
@@ -336,7 +338,7 @@ class FlashcardImporter(ImmutableBaseObject):
         # Create the 'difficulty' ComboboxField widget
         difficulty_field: ComboboxField = ComboboxField(
             display_name="Difficulty*: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
             values=(
@@ -391,7 +393,7 @@ class FlashcardImporter(ImmutableBaseObject):
         # Create the 'priority' ComboboxField widget
         priority_field: ComboboxField = ComboboxField(
             display_name="Priority*: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
             values=[priority.name for priority in priorities] if priorities else [],
@@ -441,7 +443,7 @@ class FlashcardImporter(ImmutableBaseObject):
         # Create the 'due by' DateSelectField widget
         due_by_field: DateSelectField = DateSelectField(
             display_name="Due By*: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
             value=Miscellaneous.get_current_datetime(),
@@ -483,7 +485,7 @@ class FlashcardImporter(ImmutableBaseObject):
         # Create the 'description' MultiLineTextField widget
         description_field: MultiLineTextField = MultiLineTextField(
             display_name="Description: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.FLASHCARD_IMPORTER_NAMESPACE,
             on_change_callback=on_field_change,
         )

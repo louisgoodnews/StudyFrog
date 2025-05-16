@@ -432,49 +432,49 @@ class LearningStackSelectionUI(BaseUI):
         scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 0th column to weight 1
-        scrolled_frame.container.grid_columnconfigure(
+        scrolled_frame.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 0th row to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=0,
             weight=1,
         )
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 1st row to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=1,
             weight=1,
         )
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 2nd row to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=2,
             weight=1,
         )
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 3rd row to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=3,
             weight=1,
         )
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 4th row to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=4,
             weight=1,
         )
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 5ft row to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=5,
             weight=1,
         )
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 6th row to weight 1
-        scrolled_frame.container.grid_rowconfigure(
+        scrolled_frame.grid_rowconfigure(
             index=6,
             weight=1,
         )
@@ -492,7 +492,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'stacks field' MultiOptionSelectField widget
         stacks_field: MultiOptionSelectField = MultiOptionSelectField(
             display_name="Stacks*: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
             values=[
@@ -565,7 +565,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'difficulties field' MultiOptionSelectField widget
         difficulties_field: MultiOptionSelectField = MultiOptionSelectField(
             display_name="Difficulties: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             on_change_callback=self._on_field_change,
             values=[
                 difficulty.get(
@@ -639,7 +639,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'priorities field' MultiOptionSelectField widget
         priorities_field: MultiOptionSelectField = MultiOptionSelectField(
             display_name="Priorities: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             on_change_callback=self._on_field_change,
             values=[
                 priority.get(
@@ -710,7 +710,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'mode field' ComboboxField widget
         mode_field: ComboboxField = ComboboxField(
             display_name="Mode*: ",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
             readonly=True,
@@ -773,7 +773,7 @@ class LearningStackSelectionUI(BaseUI):
                 "Enable Countdown*? ",
                 "Enable Countup*? ",
             ],
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
             selection_mode="single",
@@ -834,7 +834,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'enable randomisation' CheckbuttonField widget
         randomisation_field: CheckbuttonField = CheckbuttonField(
             display_name="Enable Randomsiation?",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
         )
@@ -881,7 +881,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'enable spaced repetition' CheckbuttonField widget
         spaced_repetition_field: CheckbuttonField = CheckbuttonField(
             display_name="Enable Spaced Repetition?",
-            master=scrolled_frame.container,
+            master=scrolled_frame,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
             value=True,

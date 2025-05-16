@@ -164,7 +164,7 @@ class Miscellaneous:
         end: datetime,
         start: datetime,
         as_: Literal["seconds", "minutes", "hours"] = "seconds",
-    ) -> float:
+    ) -> Optional[Union[float, int]]:
         """
         Calculates the duration between two datetime objects.
 
@@ -174,7 +174,7 @@ class Miscellaneous:
             as_ (Literal["seconds", "minutes", "hours"]): The unit to return the duration in.
 
         Returns:
-            float: The duration between the two datetime objects in the specified unit.
+            Optional[Union[float, int]]: The duration between the two datetime objects in the specified unit.
         """
 
         # Calculate the duration in seconds
@@ -184,9 +184,9 @@ class Miscellaneous:
         if as_ == "seconds":
             return duration
         elif as_ == "minutes":
-            return duration / 60
+            return duration // 60
         elif as_ == "hours":
-            return duration / 3600
+            return duration // 3600
 
     @classmethod
     def camel_to_pascal(

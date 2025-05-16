@@ -1368,7 +1368,7 @@ class DashboardUI(BaseUI):
             for stack in stacks:
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.completed_stacks_frame.container,
+                    master=self.completed_stacks_frame,
                     stack=stack,
                 )
         except Exception as e:
@@ -1459,7 +1459,7 @@ class DashboardUI(BaseUI):
             for stack in stacks:
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.new_stacks_frame.container,
+                    master=self.new_stacks_frame,
                     stack=stack,
                 )
         except Exception as e:
@@ -1535,13 +1535,17 @@ class DashboardUI(BaseUI):
                     continue
 
                 # Check, if the ImmutableStack's 'last_viewed_at' date is within the current week
-                if not Constants.START_OF_WEEK <= stack.last_viewed_at <= Constants.END_OF_WEEK:
+                if (
+                    not Constants.START_OF_WEEK
+                    <= stack.last_viewed_at
+                    <= Constants.END_OF_WEEK
+                ):
                     # Skip the current iteration
                     continue
 
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.recently_viewed_stacks_frame.container,
+                    master=self.recently_viewed_stacks_frame,
                     stack=stack,
                 )
         except Exception as e:
@@ -1609,7 +1613,7 @@ class DashboardUI(BaseUI):
         try:
             # Create the stack item widgets
             self.create_stack_item_widgets(
-                master=self.new_stacks_frame.container,
+                master=self.new_stacks_frame,
                 stack=stack,
             )
         except Exception as e:

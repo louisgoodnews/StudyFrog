@@ -498,19 +498,19 @@ class ScrolledFrame(tkinter.Frame):
                 orient=HORIZONTAL,
             )
 
-        # Configure the canvas widget's 'xscrollcommand' attribute
-        self._canvas.configure(
-            xscrollcommand=self._horizontal_scrollbar.set,
-        )
+            # Configure the canvas widget's 'xscrollcommand' attribute
+            self._canvas.configure(
+                xscrollcommand=self._horizontal_scrollbar.set,
+            )
 
-        # Place the 'horizontal scrollbar' tkinter.Scrollbar widget in the grid
-        self._horizontal_scrollbar.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=1,
-            sticky=EW,
-        )
+            # Place the 'horizontal scrollbar' tkinter.Scrollbar widget in the grid
+            self._horizontal_scrollbar.grid(
+                column=0,
+                padx=5,
+                pady=5,
+                row=1,
+                sticky=EW,
+            )
 
         # Check, if the 'vertical_scroll' flag is set to True
         if vertical_scroll:
@@ -522,18 +522,18 @@ class ScrolledFrame(tkinter.Frame):
             )
 
             # Configure the canvas widget's 'yscrollcommand' attribute
-        self._canvas.configure(
-            yscrollcommand=self._vertical_scrollbar.set,
-        )
+            self._canvas.configure(
+                yscrollcommand=self._vertical_scrollbar.set,
+            )
 
-        # Place the 'vertical scrollbar' tkinter.Scrollbar widget in the grid
-        self._vertical_scrollbar.grid(
-            column=1,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NS,
-        )
+            # Place the 'vertical scrollbar' tkinter.Scrollbar widget in the grid
+            self._vertical_scrollbar.grid(
+                column=1,
+                padx=5,
+                pady=5,
+                row=0,
+                sticky=NS,
+            )
 
         # Bind the 'on_configure' method to the ScrolledFrame widget via the '<Configure>' event
         self.bind(

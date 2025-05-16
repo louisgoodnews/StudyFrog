@@ -5,6 +5,7 @@ Date: 2025-05-14
 
 import tkinter
 
+from datetime import datetime
 from tkinter.constants import *
 from typing import *
 
@@ -15,10 +16,9 @@ from core.question import ImmutableQuestion, MutableQuestion
 from core.stack import ImmutableStack, MutableStack
 
 from core.ui.frames.frames import ScrolledFrame, TabbedFrame
-from core.ui.ui_builder import UIBuilder
 
 from utils.constants import Constants
-from utils.dispatcher import Dispatcher
+from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
@@ -73,16 +73,16 @@ class BaseViewForm(tkinter.Frame):
                 Union[ImmutableQuestion, MutableQuestion],
                 Union[ImmutableStack, MutableStack],
             ]
-        ] = None
+        ] = self._process_entity(entity=entity)
 
         # Initialize this instance's Logger instance variable
         self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
+        # Initialize the timestamp instance variable to now
+        self.timestamp: datetime = Miscellaneous.get_current_datetime()
+
         # Initialize the list of subscription UUIDs as an empty list
         self.subscriptions: Final[List[str]] = []
-
-        # Process the entity
-        self._process_entity(entity=entity)
 
         # Configure the grid
         self.configure_grid()
@@ -95,6 +95,26 @@ class BaseViewForm(tkinter.Frame):
 
         # Subscribe to events
         self.subscribe_to_events()
+
+    def _check_timestamp(self) -> bool:
+        """
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Return True, if the timestamp is more than 3 minutes old, otherwise False
+        return (
+            Miscellaneous.calculate_duration(
+                as_="minutes",
+                end=Miscellaneous.get_current_datetime(),
+                start=self.timestamp,
+            )
+            >= 3
+        )
 
     def _on_field_change(
         self,
@@ -122,14 +142,26 @@ class BaseViewForm(tkinter.Frame):
             Union[ImmutableQuestion, MutableQuestion],
             Union[ImmutableStack, MutableStack],
         ],
-    ) -> None:
+    ) -> Union[
+        MutableAnswer,
+        MutableFlashcard,
+        MutableNote,
+        MutableQuestion,
+        MutableStack,
+    ]:
         """
 
         Args:
             entity:
 
         Returns:
-            None
+            Union[
+                MutableAnswer,
+                MutableFlashcard,
+                MutableNote,
+                MutableQuestion,
+                MutableStack,
+            ]
         """
 
         # Check, if the entity is not mutable
@@ -137,8 +169,8 @@ class BaseViewForm(tkinter.Frame):
             # Convert the (immutable) entity to a mutable type
             entity = entity.to_mutable()
 
-        # Store the passed entity in the entity instance variable
-        self.entity = entity
+        # Return the entity to the caller
+        return entity
 
     def _register_field(
         self,
@@ -156,6 +188,66 @@ class BaseViewForm(tkinter.Frame):
         """
 
         pass
+
+    def _update_entity(self) -> None:
+        """
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Initialize a dictionary of entity types and corresponding request update events
+        events: Dict[str, DispatcherEvent] = {
+            "answer": Events.REQUEST_ANSWER_UPDATE,
+            "flashcard": Events.REQUEST_FLASHCARD_UPDATE,
+            "note": Events.REQUEST_NOTE_UPDATE,
+            "question": Events.REQUEST_QUESTION_UPDATE,
+            "stack": Events.REQUEST_STACK_UPDATE,
+        }
+
+        # Attempt to get a match from the entity instance variable's key attribute
+        match: Optional[str] = Miscellaneous.find_match(string=self.entity.key)
+
+        # Check, if a match exists
+        if not match:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Found no match for pattern '([A-Za-z]+)' in '{self.entity.key}' key."
+            )
+
+            # Return early
+            return
+
+        # Convert the match to a lowercase version
+        match = match.lower() if not match.islower() else match
+
+        # Dispatch the event corresponding to the entity's type in the 'global' namespace
+        notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+            event=events.get(
+                match,
+                Events.GENERIC_EVENT,
+            ),
+            namespace=Constants.GLOBAL_NAMESPACE,
+            **{
+                match: self.entity,
+            },
+        )
+
+        # Check, if the notification exists or has errors
+        if not notification or notification.has_errors():
+            # Log a warning message
+            self.logger.warning(
+                message=f"Failed to dispatch request update event in the 'global' namespace."
+            )
+
+            # Return early
+            return
+
+        # Update the entity instance variable with the updated entity
+        self.entity = notification.get_one_and_only_result().to_mutable()
 
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         """
