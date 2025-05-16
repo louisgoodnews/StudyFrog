@@ -1621,6 +1621,31 @@ class Events:
         DispatcherEventFactory.create_event(name="ui:settings:button:clicked")
     )
 
+    # An event that indicates that a search bar field has been changed
+    SEARCH_BAR_FIELD_CHANGED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:search_bar_field:field:field:changed")
+    )
+
+    # An event that indicates that a search bar field has been cleared
+    SEARCH_BAR_FIELD_CLEARED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:search_bar_field:field:field:cleared")
+    )
+
+    # An event that indicates that a search bar field has been clicked
+    SEARCH_BAR_FIELD_CLICKED: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="ui:search_bar_field:field:field:clicked")
+    )
+
+    # An event that indicates that a search bar field has been retrieved
+    SEARCH_BAR_FIELD_GET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:search_bar_field:field:field:get"
+    )
+
+    # An event that indicates that a search bar field has been set
+    SEARCH_BAR_FIELD_SET: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:search_bar_field:field:field:set"
+    )
+
     # An event that indicates that the search query has been changed
     SEARCH_QUERY_CHANGED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="ui:search:query:changed"
@@ -2522,6 +2547,22 @@ class Events:
             cls.SCALE_FIELD_CLEARED,
             cls.SCALE_FIELD_GET,
             cls.SCALE_FIELD_SET,
+        ]
+
+    @classmethod
+    def get_search_bar_field_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all search bar field events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all search bar field events in the Events class.
+        """
+        return [
+            cls.SEARCH_BAR_FIELD_CHANGED,
+            cls.SEARCH_BAR_FIELD_CLEARED,
+            cls.SEARCH_BAR_FIELD_CLICKED,
+            cls.SEARCH_BAR_FIELD_GET,
+            cls.SEARCH_BAR_FIELD_SET,
         ]
 
     @classmethod

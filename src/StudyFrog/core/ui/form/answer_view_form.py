@@ -14,7 +14,7 @@ from core.answer import ImmutableAnswer, MutableAnswer
 from core.difficulty import ImmutableDifficulty
 from core.priority import ImmutablePriority
 
-from core.ui.ui_builder import UIBuilder
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -259,7 +259,7 @@ class AnswerViewForm(tkinter.Frame):
 
         # Create the single line text field for the stack name
         self.answer_text_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_scrolled_text_field(
+            MultiLineTextField(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.DEFAULT_FONT_SIZE,
@@ -315,7 +315,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create a separator widget to divide the flashcard view form widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=HORIZONTAL,
         )
@@ -408,7 +408,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create the separator widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=VERTICAL,
         )
@@ -468,7 +468,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create the scrolled frame comments frame
-        comments_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+        comments_frame: Optional[Dict[str, Any]] = ScrolledFrame(
             master=master,
         )
 
@@ -512,7 +512,7 @@ class AnswerViewForm(tkinter.Frame):
         """
 
         # Create a label widget to display the stack ID
-        self.id_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.id_field: Optional[Dict[str, Any]] = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -545,7 +545,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack UUID
-        self.uuid_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.uuid_field: Optional[Dict[str, Any]] = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -578,7 +578,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack creation date
-        self.created_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.created_at_field: Optional[Dict[str, Any]] = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -611,7 +611,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack update date
-        self.updated_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.updated_at_field: Optional[Dict[str, Any]] = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -644,7 +644,7 @@ class AnswerViewForm(tkinter.Frame):
         )
 
         # Create a separator widget
-        separator: tkinter.Frame = UIBuilder.get_separator(
+        separator: tkinter.Frame = ttk.Separator(
             master=master,
         )
 

@@ -5,7 +5,6 @@ Date: 2025-02-08
 
 import tkinter
 
-from datetime import datetime
 from tkinter.constants import *
 from typing import *
 
@@ -16,9 +15,9 @@ from core.stack import ImmutableStack
 from core.status import ImmutableStatus
 
 from utils.base_ui import BaseUI
-from core.ui.ui_builder import UIBuilder
 
 from core.ui.frames.frames import ScrolledFrame, TabbedFrame
+from core.ui.miscellaneous import DateClockWidget
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
@@ -258,9 +257,6 @@ class DashboardUI(BaseUI):
         # Create the "Top Frame" frame widgets
         self.create_top_frame_widgets(master=top_frame)
 
-        # Update idletasks
-        self.update_idletasks()
-
     def create_bottom_frame_widgets(
         self,
         master: tkinter.Misc,
@@ -277,9 +273,6 @@ class DashboardUI(BaseUI):
         Returns:
             None
         """
-
-        # Update idletasks
-        self.update_idletasks()
 
     def create_center_frame_widgets(
         self,
@@ -480,9 +473,6 @@ class DashboardUI(BaseUI):
         # Create the "TabbedFrame" widgets
         self.create_tabbed_frame_widgets(master=tabbed_frame)
 
-        # Update idletasks
-        self.update_idletasks()
-
     def create_tabbed_frame_widgets(
         self,
         master: TabbedFrame,
@@ -582,9 +572,6 @@ class DashboardUI(BaseUI):
 
             # Create the "Completed Stacks" frame widgets
             self.create_completed_stacks_frame_widgets(master=completed_stacks_frame)
-
-            # Update idletasks
-            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -702,9 +689,6 @@ class DashboardUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Update idletasks
-        self.update_idletasks()
-
     def create_recently_viewed_stacks_frame_widgets(
         self,
         master: tkinter.Misc,
@@ -817,9 +801,6 @@ class DashboardUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Update idletasks
-        self.update_idletasks()
-
     def create_completed_stacks_frame_widgets(
         self,
         master: tkinter.Misc,
@@ -930,9 +911,6 @@ class DashboardUI(BaseUI):
             row=1,
             sticky=NSEW,
         )
-
-        # Update idletasks
-        self.update_idletasks()
 
     def create_stack_item_widgets(
         self,
@@ -1217,22 +1195,37 @@ class DashboardUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Create a clock widget within the left frame
-        clock: Dict[str, Any] = UIBuilder.get_clock(
+        # Create a date clock widget within the left frame
+        date_clock: DateClockWidget = DateClockWidget(
+            background=Constants.BLUE_GREY["700"],
+            master=left_frame,
+        )
+
+        # Configure the date clock's root widget's background to be grey
+        date_clock.configure(background=Constants.BLUE_GREY["700"])
+
+        # Configure the date clock's date label widget's background to be grey
+        date_clock.configure_date_label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.LARGE_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            master=left_frame,
         )
 
-        # Configure the clock's root widget's background to be grey
-        clock["root"].configure(background=Constants.BLUE_GREY["700"])
+        # Configure the date clock's time label widget's background to be grey
+        date_clock.configure_time_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.LARGE_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
 
-        # Place the clock widget in the left frame
-        clock["root"].grid(
+        # Place the date clock widget in the left frame
+        date_clock.grid(
             column=0,
             padx=5,
             pady=5,
@@ -1285,9 +1278,6 @@ class DashboardUI(BaseUI):
             row=0,
             sticky=EW,
         )
-
-        # Update idletasks
-        self.update_idletasks()
 
     def lookup_completed_stacks(self) -> None:
         """

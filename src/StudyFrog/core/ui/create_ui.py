@@ -21,7 +21,7 @@ from core.ui.form.stack_create_form import StackCreateForm
 
 from core.ui.fields.select_fields import CheckbuttonField, ComboboxField
 
-from core.ui.ui_builder import UIBuilder
+
 
 from core.answer import AnswerFactory, ImmutableAnswer
 from core.difficulty import ImmutableDifficulty
@@ -745,7 +745,7 @@ class CreateUI(BaseUI):
         )
 
         # Create a separator widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=HORIZONTAL,
         )
@@ -1026,7 +1026,7 @@ class CreateUI(BaseUI):
         )
 
         # Create a separator widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=HORIZONTAL,
         )

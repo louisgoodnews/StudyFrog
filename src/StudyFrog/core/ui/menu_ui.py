@@ -11,9 +11,9 @@ from typing import *
 
 from core.setting import SettingService
 
-from utils.base_ui import BaseUI
-from core.ui.ui_builder import UIBuilder
+from core.ui.frames.frames import ScrolledFrame
 
+from utils.base_ui import BaseUI
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
 from utils.events import Events
@@ -150,20 +150,10 @@ class MenuUI(BaseUI):
         """
 
         # Attempt to create the "Top Frame" frame widget
-        top_frame: Optional[tkinter.Frame] = tkinter.Frame(
+        top_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
-
-        # Check, if the creation of the top frame was successfull
-        if not top_frame:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'top' frame in main window. This is likely a bug."
-            )
-
-            # Return early
-            return
 
         # Configure the "Top Frame" frame widget's 1st column to weight 1
         top_frame.grid_columnconfigure(
@@ -185,20 +175,10 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the "Center Frame" frame widget
-        center_frame: Optional[tkinter.Frame] = tkinter.Frame(
+        center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
-
-        # Check, if the creation of the center frame was successfull
-        if not center_frame:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'center' frame in main window. This is likely a bug."
-            )
-
-            # Return early
-            return
 
         # Configure the "Center Frame" frame widget's 1st column to weight 1
         center_frame.grid_columnconfigure(
@@ -220,20 +200,10 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the "Bottom Frame" frame widget
-        bottom_frame: Optional[tkinter.Frame] = tkinter.Frame(
+        bottom_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
             master=self,
         )
-
-        # Check, if the creation of the bottom frame was successfull
-        if not bottom_frame:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'bottom' frame in main window. This is likely a bug."
-            )
-
-            # Return early
-            return
 
         # Configure the "Bottom Frame" frame widget's 1st column to weight 1
         bottom_frame.grid_columnconfigure(
@@ -366,49 +336,34 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the scrolled frame widgets
-        scrolled_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+        scrolled_frame: ScrolledFrame = ScrolledFrame(
             master=master
         )
 
-        # Check, if the creation of the scrolled frame widgets was successfull
-        if not scrolled_frame:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'scrolled frame' in center frame widgets. This is likely a bug."
-            )
-
-            # Return early
-            return
+        # Style the scrolled frame widget's root widget
+        scrolled_frame.configure(
+            background=Constants.BLUE_GREY["700"],
+        )
 
         # Style the scrolled frame widget's canvas widget
-        scrolled_frame["canvas"].configure(background=Constants.BLUE_GREY["700"])
+        scrolled_frame.configure_canvas(
+            background=Constants.BLUE_GREY["700"],
+        )
 
         # Style the scrolled frame widget's frame widget
-        scrolled_frame["frame"].configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame widget's root widget
-        scrolled_frame["root"].configure(background=Constants.BLUE_GREY["700"])
+        scrolled_frame.configure_container_frame(
+            background=Constants.BLUE_GREY["700"],
+        )
 
         # Place the scrolled frame widget in the center frame
-        scrolled_frame["root"].grid(
+        scrolled_frame.grid(
             column=0,
             row=0,
             sticky=NSEW,
         )
 
-        # Configure the scrolled frame widget's frame widget's 1st column to weight 0
-        scrolled_frame["frame"].grid_columnconfigure(
-            index=0,
-            weight=0,
-        )
-
-        # Configure the scrolled frame widget's frame widget's 2nd column to weight 1
-        scrolled_frame["frame"].grid_columnconfigure(
-            index=1,
-            weight=1,
-        )
-
-        home_button: Optional[tkinter.Button] = tkinter.Button(
+        # Create the 'home button' tkinter.Button widget
+        home_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_home_button_clicked,
             font=(
@@ -416,20 +371,10 @@ class MenuUI(BaseUI):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            master=scrolled_frame["frame"],
+            master=scrolled_frame,
             relief=FLAT,
             text="🏠",
         )
-
-        # Check, if the creation of the home button was successfull
-        if not home_button:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'home' button in center frame widgets. This is likely a bug."
-            )
-
-            # Return early
-            return
 
         # Place the home button in the center frame
         home_button.grid(
@@ -439,26 +384,17 @@ class MenuUI(BaseUI):
             row=0,
         )
 
-        home_label: Optional[tkinter.Label] = tkinter.Label(
+        # Create the 'home label' tkinter.Label widget
+        home_label: tkinter.Label = tkinter.Label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            master=scrolled_frame["frame"],
+            master=scrolled_frame,
             text="Home",
         )
-
-        # Check, if the creation of the home label was successfull
-        if not home_label:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'home' label in center frame widgets. This is likely a bug."
-            )
-
-            # Return early
-            return
 
         # Bind the home label to the left mouse button click event
         home_label.bind(
@@ -509,8 +445,8 @@ class MenuUI(BaseUI):
             weight=1,
         )
 
-        # Attempt to create the StudyFrog label
-        study_frog_label: Optional[tkinter.Label] = tkinter.Label(
+        # Create the 'StudyFrog label' tkinter.Label widget
+        study_frog_label: tkinter.Label = tkinter.Label(
             background=Constants.BLUE_GREY["700"],
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -521,16 +457,6 @@ class MenuUI(BaseUI):
             text="StudyFrog",
         )
 
-        # Check, if the creation of the StudyFrog label was successfull
-        if not study_frog_label:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'StudyFrog' label in top frame widgets. This is likely a bug."
-            )
-
-            # Return early
-            return
-
         # Place the StudyFrog label in the top frame
         study_frog_label.grid(
             column=0,
@@ -538,8 +464,8 @@ class MenuUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Attempt to create the shutdown button
-        shutdown_button: Optional[tkinter.Button] = tkinter.Button(
+        # Create the 'shutdown button' tkinter.Button widget
+        shutdown_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_shutdown_button_clicked,
             font=(
@@ -551,16 +477,6 @@ class MenuUI(BaseUI):
             relief=FLAT,
             text="X",
         )
-
-        # Check, if the creation of the shutdown button was successfull
-        if not shutdown_button:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'shutdown' button in top frame widgets. This is likely a bug."
-            )
-
-            # Return early
-            return
 
         # Place the shutdown button in the top frame
         shutdown_button.grid(

@@ -21,7 +21,7 @@ from core.note import ImmutableNote
 from core.priority import ImmutablePriority
 from core.question import ImmutableQuestion
 
-from core.ui.ui_builder import UIBuilder
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -321,7 +321,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a separator widget to divide the flashcard view form widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=HORIZONTAL,
         )
@@ -414,7 +414,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create the separator widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=VERTICAL,
         )
@@ -534,7 +534,7 @@ class FlashcardViewForm(tkinter.Frame):
 
         # Create the description field
         self.back_text_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_multi_line_text_field(
+            MultiLineTextField(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
@@ -579,7 +579,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create the secondary attributes frame
-        secondary_attributes_frame: tkinter.Frame = UIBuilder.get_scrolled_frame(
+        secondary_attributes_frame: tkinter.Frame = ScrolledFrame(
             background=Constants.BLUE_GREY["700"],
             master=tabbed_frame,
         )
@@ -793,7 +793,7 @@ class FlashcardViewForm(tkinter.Frame):
         )
 
         # Create a separator widget
-        separator: tkinter.Frame = UIBuilder.get_separator(
+        separator: tkinter.Frame = ttk.Separator(
             master=master,
         )
 

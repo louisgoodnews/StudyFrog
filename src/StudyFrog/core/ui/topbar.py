@@ -11,7 +11,7 @@ from tkinter.constants import *
 
 from typing import *
 
-from core.ui.ui_builder import UIBuilder
+from core.ui.fields.string_fields import SearchbarField
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -324,17 +324,13 @@ class TopBar(tkinter.Frame):
         )
 
         # Create the "Search Bar" search bar widget
-        search_bar: Dict[str, Any] = UIBuilder.get_searchbar(
+        search_bar: SearchbarField = SearchbarField(
             master=right_frame,
-            command=lambda value: self.dispatcher.dispatch(
-                event=Events.SEARCH_QUERY_CHANGED,
-                namespace=Constants.GLOBAL_NAMESPACE,
-                value=value,
-            ),
+            display_name="Search",
         )
 
         # Configure the "Button" button widget
-        search_bar["button"].configure(
+        search_bar.configure_button(
             background=Constants.INDIGO["500"],
             command=self.on_searchbar_button_clicked,
             font=(
@@ -346,12 +342,12 @@ class TopBar(tkinter.Frame):
         )
 
         # Configure the "Entry" entry widget
-        search_bar["entry"].configure(
+        search_bar.configure_entry(
             font=(Constants.DEFAULT_FONT_FAMILY, Constants.DEFAULT_FONT_SIZE),
         )
 
         # Grid the "Search Bar" search bar widget in the "Right Frame" frame widget
-        search_bar["root"].grid(
+        search_bar.grid(
             column=0,
             padx=5,
             pady=5,
@@ -359,32 +355,35 @@ class TopBar(tkinter.Frame):
             sticky=NSEW,
         )
 
-        # Bind the "<Enter>" and "<Leave>" events to the "Button" widget
-        search_bar["button"].bind(
-            func=lambda e: search_bar["button"].config(
+        # Bind the "<Enter>" event to the "Button" widget
+        search_bar.bind(
+            func=lambda e: search_bar.button.config(
                 background=Constants.INDIGO["100"]
             ),
             sequence="<Enter>",
         )
 
-        search_bar["button"].bind(
-            func=lambda e: search_bar["button"].config(
+        # Bind the "<Leave>" event to the "Button" widget
+        search_bar.bind(
+            func=lambda e: search_bar.button.config(
                 background=Constants.INDIGO["500"]
             ),
             sequence="<Leave>",
         )
 
-        # Bind the "<FocusIn>" and "<FocusOut>" events to the "Entry" widget
-        search_bar["entry"].bind(
-            func=lambda e: search_bar["entry"].config(background="#E8EAF6"),
+        # Bind the "<FocusIn>" event to the "Entry" widget
+        search_bar.bind(
+            func=lambda e: search_bar.entry.config(background="#E8EAF6"),
             sequence="<FocusIn>",
         )
 
-        search_bar["entry"].bind(
-            func=lambda e: search_bar["entry"].config(background=Constants.WHITE),
+        # Bind the "<FocusOut>" event to the "Entry" widget
+        search_bar.bind(
+            func=lambda e: search_bar.entry.config(background=Constants.WHITE),
             sequence="<FocusOut>",
         )
 
+        # Configure the icons
         icons: Dict[str, Any] = {
             "🔔": "notification_ui",
             "❓": "help_ui",
@@ -435,7 +434,7 @@ class TopBar(tkinter.Frame):
                 row=0,
             )
 
-            # Bind the "<Enter>" and "<Leave>" events to the button
+            # Bind the "<Enter>" event to the button
             button.bind(
                 func=lambda e, btn=button: btn.config(
                     foreground=Constants.INDIGO["100"]
@@ -443,6 +442,7 @@ class TopBar(tkinter.Frame):
                 sequence="<Enter>",
             )
 
+            # Bind the "<Leave>" event to the button
             button.bind(
                 func=lambda e, btn=button: btn.config(foreground=Constants.WHITE),
                 sequence="<Leave>",

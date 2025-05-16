@@ -6,7 +6,6 @@ Date: 2025-04-20
 import tkinter
 import traceback
 
-from datetime import timedelta
 from tkinter.constants import *
 from typing import *
 
@@ -20,6 +19,7 @@ __all__: Final[List[str]] = [
     "ClockWidget",
     "CountdownWidget",
     "CountupWidget",
+    "DateClockWidget",
 ]
 
 
@@ -798,3 +798,260 @@ class CountupWidget(tkinter.Frame):
 
         # Return the 'is running' boolean flag instance variable
         return self._is_running
+
+
+class DateClockWidget(tkinter.Frame):
+    """
+    The DateClockWidget class is a tkinter.Frame widget that displays the current date and time.
+
+    This class consists of two tkinter.Label widgets, one for the time and one for the date.
+    """
+
+    def __init__(
+        self,
+        master: tkinter.Misc,
+        date_format: str = "%a, %d.%m.%Y",
+        time_format: str = "%H:%M:%S",
+        **kwargs,
+    ) -> None:
+        """
+        Initializes the DateClockWidget instance.
+
+        Args:
+            master (tkinter.Misc): The parent widget.
+            date_format (str): The date format string. Defaults to "%a, %d.%m.%Y".
+            time_format (str): The time format string. Defaults to "%H:%M:%S".
+            **kwargs: Additional keyword arguments to pass to the parent constructor.
+
+        Returns:
+            None
+        """
+
+        # Call the parent constructor
+        super().__init__(
+            master=master,
+            **kwargs,
+        )
+
+        # Initialize this class' Logger instance
+        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+
+        # Store the passed time format string in an instance variable
+        self.time_format: str = time_format
+
+        # Store the passed date format string in an instance variable
+        self.date_format: str = date_format
+
+        # Configure the grid
+        self.configure_grid()
+
+        # Create the widgets
+        self.create_widgets()
+
+        # Update the clock after 100 miliseconds
+        self.after(
+            100,
+            self._update_clock,
+        )
+
+    @property
+    def date_label(self) -> tkinter.Label:
+        """
+        Returns the internal tkinter.Label widget.
+
+        Args:
+            None
+
+        Returns:
+            tkinter.Label: The tkinter.Label widget.
+        """
+
+        # Return the tkinter.Label widget
+        return self._date_label
+
+    @property
+    def time_label(self) -> tkinter.Label:
+        """
+        Returns the internal tkinter.Label widget.
+
+        Args:
+            None
+
+        Returns:
+            tkinter.Label: The tkinter.Label widget.
+        """
+
+        # Return the tkinter.Label widget
+        return self._time_label
+
+    def _update_clock(self) -> None:
+        """
+        Updates the clock every second.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        timestamp: datetime = Miscellaneous.get_current_datetime()
+
+        # Update the time label
+        self.time_label.configure(
+            text=Miscellaneous.datetime_to_string(
+                datetime=timestamp,
+                format=self.time_format,
+            ),
+        )
+
+        # Update the date label
+        self.date_label.configure(
+            text=Miscellaneous.datetime_to_string(
+                datetime=timestamp,
+                format=self.date_format,
+            ),
+        )
+
+        # Schedule the next update
+        self.after(
+            1000,
+            self._update_clock,
+        )
+
+    def configure_date_label(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the date label widget.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the tkinter.Label widget's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while configuring the date label widget.
+        """
+        try:
+            # Attempt to configre the date label widget with the passed keyword argument
+            self._date_label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_date_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def configure_grid(self) -> None:
+        """
+        Configures the grid layout of the DateClockWidget instance.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Set the weight of the 0th column to 1
+        # This means that the column will stretch when the window is resized
+        self.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Set the weight of the 0th row to 0
+        # This means that the row will not stretch when the window is resized
+        self.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Set the weight of the 1st row to 0
+        # This means that the row will not stretch when the window is resized
+        self.grid_rowconfigure(
+            index=1,
+            weight=0,
+        )
+
+    def configure_time_label(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the time label widget.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the tkinter.Label widget's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while configuring the time label widget.
+        """
+        try:
+            # Attempt to configre the time label widget with the passed keyword argument
+            self._time_label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_time_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def create_widgets(self) -> None:
+        """
+        Creates and places the internal tkinter.Label widgets.
+
+        The labels are initialized with empty strings and added to the widget's grid.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Create a tkinter.Label widget
+        self._time_label: tkinter.Label = tkinter.Label(
+            master=self,
+            text="",
+        )
+
+        # Place the tkinter.Label widget in the grid
+        self._time_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a tkinter.Label widget
+        self._date_label: tkinter.Label = tkinter.Label(
+            master=self,
+            text="",
+        )
+
+        # Place the tkinter.Label widget in the grid
+        self._date_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )

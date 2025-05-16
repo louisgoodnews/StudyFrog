@@ -661,7 +661,10 @@ class ScrolledFrame(tkinter.Frame):
             # Configure the width of the ScrolledFrame widget
             self._canvas.itemconfig(
                 tagOrId="window",
-                width=self._canvas.winfo_width(),
+                width=max(
+                    self._canvas.winfo_width(),
+                    self._canvas.winfo_reqwidth(),
+                ),
             )
 
             # Update idle tasks

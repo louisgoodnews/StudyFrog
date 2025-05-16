@@ -12,7 +12,7 @@ from typing import *
 from core.setting import SettingService
 
 from utils.base_ui import BaseUI
-from core.ui.ui_builder import UIBuilder
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher

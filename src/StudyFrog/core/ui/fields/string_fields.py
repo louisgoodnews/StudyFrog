@@ -28,6 +28,7 @@ __all__: Final[List[str]] = [
     "PasswordTextField",
     "ReadOnlyMultiLineTextField",
     "ReadOnlySingleLineTextField",
+    "SearchbarField",
     "SingleLineTextField",
     "TextEditorField",
 ]
@@ -1472,6 +1473,483 @@ class ReadOnlyMultiLineTextField(MultiLineTextField):
         raise ValueError(
             f"{self.__class__.__name__} cannot be modified after initialization."
         )
+
+
+class SearchbarField(BaseField):
+    """ """
+
+    def __init__(
+        self,
+        display_name: str,
+        master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_change_callback: Optional[Callable[[str, str], None]] = None,
+        value: Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        """
+        Initializes a new instance of the SearchbarField class.
+
+        Args:
+            display_name (str): The string to display for the field.
+            master (tkinter.Misc): The master widget.
+            namespace (str, optional): The namespace for the search bar field. Defaults to Constants.GLOBAL_NAMESPACE.
+            on_change_callback (Optional[Callable[[str, str], None]], optional): The callback function to be called when the value of the search bar field changes. Defaults to None.
+            value (Optional[str], optional): The initial value of the search bar field. Defaults to None.
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor
+        super().__init__(
+            display_name,
+            master,
+            namespace,
+            on_change_callback,
+            value,
+            **kwargs,
+        )
+
+    @property
+    def button(self) -> tkinter.Button:
+        """
+        Returns the button widget.
+
+        Args:
+            None
+
+        Returns:
+            tkinter.Button: The button widget.
+        """
+
+        # Return the button widget
+        return self._button
+
+    @property
+    def entry(self) -> tkinter.Entry:
+        """
+        Returns the entry widget.
+
+        Args:
+            None
+
+        Returns:
+            tkinter.Entry: The entry widget.
+        """
+
+        # Return the entry widget
+        return self._entry
+
+    @property
+    def label(self) -> tkinter.Label:
+        """
+        Returns the label widget.
+
+        Args:
+            None
+
+        Returns:
+            tkinter.Label: The label widget.
+        """
+
+        # Return the label widget
+        return self._label
+
+    def _on_button_click(self) -> None:
+        """
+        This method is called when the button is clicked.
+
+        It dispatches the SEARCH_BAR_FIELD_CLICKED event.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Get the label and value of the single line text field
+        (
+            label,
+            value,
+        ) = (
+            self.display_name,
+            self.variable.get(),
+        )
+
+        # Dispatch the SEARCH_BAR_FIELD_CLICKED event
+        self.dispatcher.dispatch(
+            event=Events.SEARCH_BAR_FIELD_CLICKED,
+            label=label,
+            namespace=self.namespace,
+            value=value,
+        )
+
+    def _on_variable_change(self) -> None:
+        """
+        This method is called when the value of the search bar field changes.
+
+        It dispatches the SEARCH_BAR_FIELD_CHANGED event and calls the on_change_callback function with the new label and value.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Get the label and value of the single line text field
+        (
+            label,
+            value,
+        ) = (
+            self.display_name,
+            self.variable.get(),
+        )
+
+        # Dispatch the SEARCH_BAR_FIELD_CHANGED event
+        self.dispatcher.dispatch(
+            event=Events.SEARCH_BAR_FIELD_CHANGED,
+            label=label,
+            namespace=self.namespace,
+            value=value,
+        )
+
+        # Check, if the on_change_callback is present
+        if self.on_change_callback:
+            # Call the on_change_callback function with the new value
+            self.on_change_callback(
+                label,
+                value,
+            )
+
+    @override
+    def clear(
+        self,
+        dispatch: bool = False,
+    ) -> None:
+        """
+        Clears the search bar field.
+
+        This method clears the search bar field by setting its value to an empty string.
+
+        Args:
+            dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
+
+        Returns:
+            None
+        """
+
+        # Set the value of the variable to an empty string
+        self.variable.set(value="")
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the SEARCH_BAR_FIELD_CLEARED event
+            self.dispatcher.dispatch(
+                event=Events.SEARCH_BAR_FIELD_CLEARED,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=self.variable.get(),
+            )
+
+    def configure_button(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the button widget in the search bar field.
+
+        This method configures the button widget in the search bar field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the button widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                button widget.
+        """
+        try:
+            # Attempt to configure the button widget
+            self.button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_button' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+
+    def configure_entry(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the entry widget in the search bar field.
+
+        This method configures the entry widget in the search bar field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the entry widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                entry widget.
+        """
+        try:
+            # Attempt to configure the entry widget with the provided arguments
+            self.entry.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_entry' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @override
+    def configure_grid(self) -> None:
+        """
+        Configures the grid for the search bar field.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Set the weight of the 0th column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Set the weight of the 1st column to 1
+        # This means that the column will stretch when the window is resized
+        self.grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+
+        # Set the weight of the 2nd column to 0
+        # This means that the column will not stretch when the window is resized
+        self.grid_columnconfigure(
+            index=2,
+            weight=0,
+        )
+
+        # Set the weight of the 0th row to 1
+        # This means that the row will stretch when the window is resized
+        self.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the label widget in the search bar field.
+
+        This method configures the label widget in the search bar field
+        using the provided keyword arguments.
+
+        Args:
+            **kwargs: The keyword arguments to be passed to the configure method
+                of the label widget.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs while attempting to configure the
+                label widget.
+        """
+        try:
+            # Attempt to configure the label widget with the provided arguments
+            self.label.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @override
+    def create_widgets(
+        self,
+        display_name: str,
+        **kwargs,
+    ) -> None:
+        """
+        Creates the widgets for the search bar field.
+
+        Args:
+            display_name (str): The string to display for the field.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            None
+        """
+
+        # Create a tkinter.Label widget
+        self._label: tkinter.Label = tkinter.Label(
+            master=self,
+            text=display_name,
+            **kwargs.get(
+                "label",
+                {},
+            ),
+        )
+
+        # Place the tkinter.Label widget in the grid
+        self._label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a StringVar to hold the entry value
+        self.variable: tkinter.StringVar = tkinter.StringVar(value="")
+
+        # Add a trace to the variable
+        self.variable.trace_add(
+            callback=lambda *args: self._on_variable_change(),
+            mode="write",
+        )
+
+        # Create a tkinter.Entry widget
+        self._entry: tkinter.Entry = tkinter.Entry(
+            master=self,
+            textvariable=self.variable,
+            **kwargs.get(
+                "entry",
+                {},
+            ),
+        )
+
+        # Place the tkinter.Entry widget in the grid
+        self._entry.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create a tkinter.Button widget
+        self._button: tkinter.Button = tkinter.Button(
+            master=self,
+            text="Search",
+            **kwargs.get("button", {}),
+        )
+
+        # Place the tkinter.Button widget in the grid
+        self._button.grid(
+            column=2,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+    @override
+    def get(
+        self,
+        dispatch: bool = False,
+    ) -> Tuple[str, str]:
+        """
+        Retrieves the text of the label and the value of the search bar field.
+
+        Args:
+            dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
+
+        Returns:
+            Tuple[str, str]: A tuple containing the text of the label and the value of the text field.
+        """
+
+        # Obtain the label and value strings from the widgets
+        (
+            label,
+            value,
+        ) = (
+            self.display_name,
+            self.variable.get(),
+        )
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the SEARCH_BAR_FIELD_GET event
+            self.dispatcher.dispatch(
+                event=Events.SEARCH_BAR_FIELD_GET,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=value,
+            )
+
+        # Return the text of the label and the value of the text field
+        return (
+            label,
+            value,
+        )
+
+    @override
+    def set(
+        self,
+        value: str,
+        dispatch: bool = False,
+    ) -> None:
+        """
+        Sets the value of the search bar field.
+
+        Args:
+            dispatch (bool, optional): Whether to dispatch an event. Defaults to False.
+            value (str): The value to set for the search bar field.
+
+        Returns:
+            None
+        """
+
+        # Set the value of the search bar field
+        self.variable.set(value=value)
+
+        # Check, if the dispatch flag is set to True
+        if dispatch:
+            # Dispatch the SEARCH_BAR_FIELD_SET event
+            self.dispatcher.dispatch(
+                event=Events.SEARCH_BAR_FIELD_SET,
+                label=self.display_name,
+                namespace=self.namespace,
+                value=self.variable.get(),
+            )
 
 
 class SingleLineTextField(BaseField):
@@ -3321,7 +3799,9 @@ class TextEditorField(BaseField):
         """
 
         # Update the value associated with the 'slant' key in the 'config cache' dictionary instance variable
-        self.config_cache["slant"] = "italic" if self.config_cache["slant"] == "roman" else "roman"
+        self.config_cache["slant"] = (
+            "italic" if self.config_cache["slant"] == "roman" else "roman"
+        )
 
         # Apply the font
         self._apply_font()

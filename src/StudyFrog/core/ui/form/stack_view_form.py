@@ -18,7 +18,7 @@ from core.priority import ImmutablePriority
 from core.question import ImmutableQuestion
 from core.stack import ImmutableStack, MutableStack
 
-from core.ui.ui_builder import UIBuilder
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -330,7 +330,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create a separator widget to divide the stack view form widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=HORIZONTAL,
         )
@@ -423,7 +423,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the separator widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=VERTICAL,
         )
@@ -485,7 +485,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the tabbed view widget
-        tabbed_view: Optional[Dict[str, Any]] = UIBuilder.get_tabbed_view(master=master)
+        tabbed_view: Optional[Dict[str, Any]] = TabbedFrame(master=master)
 
         # Configure the tabbed view widget's root frame
         tabbed_view["root"].configure(background=Constants.BLUE_GREY["700"])
@@ -537,7 +537,7 @@ class StackViewForm(tkinter.Frame):
 
         # Create the description field
         self.description_field: Optional[Dict[str, Any]] = (
-            UIBuilder.get_multi_line_text_field(
+            MultiLineTextField(
                 font=(
                     Constants.DEFAULT_FONT_FAMILY,
                     Constants.MEDIUM_FONT_SIZE,
@@ -582,7 +582,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the secondary attributes frame
-        secondary_attributes_frame: tkinter.Frame = UIBuilder.get_scrolled_frame(
+        secondary_attributes_frame: tkinter.Frame = ScrolledFrame(
             background=Constants.BLUE_GREY["700"],
             master=tabbed_view["center_frame"],
         )
@@ -620,7 +620,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create the scrolled frame contents frame
-        contents_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+        contents_frame: Optional[Dict[str, Any]] = ScrolledFrame(
             master=master
         )
 
@@ -644,7 +644,7 @@ class StackViewForm(tkinter.Frame):
         self.contents_frame: tkinter.Frame = contents_frame["frame"]
 
         # Create the scrolled frame comments frame
-        comments_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+        comments_frame: Optional[Dict[str, Any]] = ScrolledFrame(
             master=master
         )
 
@@ -682,7 +682,7 @@ class StackViewForm(tkinter.Frame):
         """
 
         # Create a label widget to display the stack ID
-        self.id_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.id_field: Optional[Dict[str, Any]] = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -715,7 +715,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack UUID
-        self.uuid_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.uuid_field: Optional[Dict[str, Any]] = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -748,7 +748,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack creation date
-        self.created_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.created_at_field: Optional[Dict[str, Any]] = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -781,7 +781,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create a label widget to display the stack update date
-        self.updated_at_field: Optional[Dict[str, Any]] = UIBuilder.get_readonly_field(
+        self.updated_at_field: Optional[Dict[str, Any]] = ReadOnlySingleLineTextField(
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.MEDIUM_FONT_SIZE,
@@ -814,7 +814,7 @@ class StackViewForm(tkinter.Frame):
         )
 
         # Create a separator widget
-        separator: tkinter.Frame = UIBuilder.get_separator(
+        separator: tkinter.Frame = ttk.Separator(
             master=master,
         )
 
@@ -1419,7 +1419,7 @@ class StackViewForm(tkinter.Frame):
                 return
 
             # Create a new instance of tkinter.Menu
-            menu: tkinter.Menu = UIBuilder.get_menu(
+            menu: tkinter.Menu = tkinter.Menu(
                 master=self,
                 tearoff=0,
             )

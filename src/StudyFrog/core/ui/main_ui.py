@@ -15,7 +15,6 @@ from utils.base_ui import BaseUI
 from core.ui.ui_registry import UIRegistry
 from core.ui.topbar import TopBar
 
-from core.ui.ui_builder import UIBuilder
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherNotification
 from utils.events import Events
@@ -62,16 +61,7 @@ class MainUI(BaseUI):
         """
 
         # Get the root window
-        root: Optional[tkinter.Tk] = UIBuilder.get_tk()
-
-        if not root:
-            # Log a warning message
-            self.logger.warning(
-                message=f"Failed to get root window in '{self.__class__.__name__}'. This is likely a bug."
-            )
-
-            # Return early
-            return
+        root: tkinter.Tk = tkinter.Tk()
 
         # Configure the root window's 1st column to weight 1
         root.grid_columnconfigure(

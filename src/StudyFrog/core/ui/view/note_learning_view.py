@@ -11,7 +11,7 @@ from typing import *
 from core.note import ImmutableNote
 from core.setting import SettingService
 
-from core.ui.ui_builder import UIBuilder
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -214,7 +214,7 @@ class NoteLearningView(tkinter.Frame):
         )
 
         # Create the scrolled frame widgets
-        scrolled_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+        scrolled_frame: Optional[Dict[str, Any]] = ScrolledFrame(
             master=master
         )
 

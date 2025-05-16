@@ -18,7 +18,7 @@ from core.setting import SettingService
 from core.stack import ImmutableStack
 
 from utils.base_ui import BaseUI
-from core.ui.ui_builder import UIBuilder
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -398,7 +398,7 @@ class SearchUI(BaseUI):
         )
 
         # Get the scrolled frame dictionary
-        scrolled_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+        scrolled_frame: Optional[Dict[str, Any]] = ScrolledFrame(
             master=master
         )
 
@@ -608,7 +608,7 @@ class SearchUI(BaseUI):
         )
 
         # Get the searchbar dictionary
-        self.searchbar: Optional[Dict[str, Any]] = UIBuilder.get_searchbar(
+        self.searchbar: Optional[Dict[str, Any]] = SearchbarField(
             command=self.searchbar_command,
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -639,7 +639,7 @@ class SearchUI(BaseUI):
         )
 
         # Get the separator widget
-        separator: ttk.Separator = UIBuilder.get_separator(
+        separator: ttk.Separator = ttk.Separator(
             master=master,
             orient=HORIZONTAL,
         )

@@ -11,7 +11,7 @@ from typing import *
 from core.question import ImmutableQuestion
 from core.setting import SettingService
 
-from core.ui.ui_builder import UIBuilder
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
@@ -215,7 +215,7 @@ class QuestionLearningView(tkinter.Frame):
         )
 
         # Create the scrolled frame widgets
-        scrolled_frame: Optional[Dict[str, Any]] = UIBuilder.get_scrolled_frame(
+        scrolled_frame: Optional[Dict[str, Any]] = ScrolledFrame(
             master=master
         )
 

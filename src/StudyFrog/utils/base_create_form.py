@@ -9,7 +9,7 @@ from tkinter.constants import *
 from typing import *
 
 from core.ui.frames.frames import ScrolledFrame, TabbedFrame
-from core.ui.ui_builder import UIBuilder
+
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
