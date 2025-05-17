@@ -420,7 +420,7 @@ class MainUI(BaseUI):
 
                 # Raise an exception to the caller
                 raise ValueError(
-                    f"Failed to validate navigation for navigation request: direction ({direction}), source ({source}) and taraget ({target})."
+                    f"Failed to validate navigation for navigation request: direction ({direction}), source ({source}) and target ({target})."
                 )
 
             # Check, if a master is given

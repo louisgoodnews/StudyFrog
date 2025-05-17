@@ -49,6 +49,8 @@ class BaseField(tkinter.Frame):
         master: tkinter.Misc,
         namespace: str = Constants.GLOBAL_NAMESPACE,
         on_change_callback: Optional[Callable[[str, Any], None]] = None,
+        on_enter_callback: Optional[Callable[[], None]] = None,
+        on_leave_callback: Optional[Callable[[], None]] = None,
         value: Optional[Any] = None,
         **kwargs,
     ) -> None:
@@ -60,6 +62,8 @@ class BaseField(tkinter.Frame):
             master (tkinter.Misc): The master widget.
             namespace (str, optional): The namespace for the field. Defaults to Constants.GLOBAL_NAMESPACE.
             on_change_callback (Optional[Callable[[str, Any], None]], optional): The callback function to be called when the value of the field changes. Defaults to None.
+            on_enter_callback (Optional[Callable[[], None]], optional): The callback function to be called when the mouse enters the field. Defaults to None.
+            on_leave_callback (Optional[Callable[[], None]], optional): The callback function to be called when the mouse leaves the field. Defaults to None.
             value (Optional[Any], optional): The initial value of the field. Defaults to None.
             **kwargs: Additional keyword arguments for the widgets.
 
@@ -87,6 +91,12 @@ class BaseField(tkinter.Frame):
             on_change_callback
         )
 
+        # Store the on_enter_callback
+        self.on_enter_callback: Optional[Callable[[], None]] = on_enter_callback
+
+        # Store the on_leave_callback
+        self.on_leave_callback: Optional[Callable[[], None]] = on_leave_callback
+
         # Configure the grid
         self.configure_grid()
 
@@ -103,6 +113,68 @@ class BaseField(tkinter.Frame):
                 dispatch=False,
                 value=value,
             )
+
+    def _on_enter(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
+        """
+        Handles the mouse entering the field.
+
+        Args:
+            event (Optional[tkinter.Event], optional): The tkinter.Event to raise. Defaults to None.
+
+        Returns:
+            None
+        """
+
+        # Check, if the on_enter_callback is not None
+        if self.on_enter_callback is not None:
+            try:
+                # Call the on_enter_callback
+                self.on_enter_callback()
+            except Exception as e:
+                # Log an error message to indicate that an exception has occurred
+                self.logger.error(
+                    message=f"Caught an exception while attempting to run '{self.on_enter_callback.__name__}' method from '{self.__class__.__name__}' class: {e}"
+                )
+
+                # Log the traceback
+                self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+                # Re-raise the exception to the caller
+                raise e
+
+    def _on_leave(
+        self,
+        event: Optional[tkinter.Event] = None,
+    ) -> None:
+        """
+        Handles the mouse leaving the field.
+
+        Args:
+            event (Optional[tkinter.Event], optional): The tkinter.Event to raise. Defaults to None.
+
+        Returns:
+            None
+        """
+
+        # Check, if the on_leave_callback is not None
+        if self.on_leave_callback is not None:
+            try:
+                # Call the on_leave_callback
+                self.on_leave_callback()
+            except Exception as e:
+                # Log an error message to indicate that an exception has occurred
+                self.logger.error(
+                    message=f"Caught an exception while attempting to run '{self.on_leave_callback.__name__}' method from '{self.__class__.__name__}' class: {e}"
+                )
+
+                # Log the traceback
+                self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+                # Re-raise the exception to the caller
+                raise e
 
     def clear(
         self,

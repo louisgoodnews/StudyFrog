@@ -147,6 +147,18 @@ class ImmutablePriority(ImmutableBaseObject):
         return self._icon
 
     @property
+    def id(self) -> int:
+        """
+        Returns the ID of the priority.
+
+        Returns:
+            int: The ID of the priority.
+        """
+
+        # Return the ID of the priority
+        return self._id
+
+    @property
     def key(self) -> str:
         """
         Returns the key of the priority.
@@ -436,6 +448,36 @@ class MutablePriority(MutableBaseObject):
 
         # Set the icon of the priority
         self._icon = value
+
+    @property
+    def id(self) -> int:
+        """
+        Returns the ID of the priority.
+
+        Returns:
+            int: The ID of the priority.
+        """
+
+        # Return the ID of the priority
+        return self._id
+
+    @id.setter
+    def id(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the ID of the priority.
+
+        Args:
+            value (int): The ID of the priority.
+
+        Returns:
+            None
+        """
+
+        # Set the ID of the priority
+        self._id = value
 
     @property
     def key(self) -> str:

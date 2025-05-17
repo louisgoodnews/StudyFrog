@@ -547,6 +547,7 @@ class StackCreateForm(BaseCreateForm):
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
+            height=10,
         )
 
         # Register the 'description' MultiLineTextField widget
