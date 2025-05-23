@@ -454,23 +454,37 @@ class DashboardUI(BaseUI):
             sticky=NSEW,
         )
 
-        # Create the "TabbedFrame" widget
+        # Create a TabbedFrame widget
         tabbed_frame: TabbedFrame = TabbedFrame(
-            column=0,
             master=right_frame,
-            row=1,
         )
 
-        # Style the TabbedFrame's "Top Frame" widget
-        tabbed_frame.configure(background=Constants.BLUE_GREY["700"])
+        # Place the TabbedFrame widget in the master frame
+        tabbed_frame.grid(
+            column=0,
+            row=1,
+            sticky=NSEW,
+        )
 
-        # Style the TabbedFrame's "Container Frame" widget
-        tabbed_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
+        # Configure the TabbedFrame widget's 1st column to weight 1
+        tabbed_frame.container.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
 
-        # Style the TabbedFrame's "Top Frame" widget
+        # Configure the TabbedFrame widget's 1st row to weight 1
+        tabbed_frame.container.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the TabbedFrame widget's "Container Frame" widget
+        tabbed_frame.configure_container(background=Constants.BLUE_GREY["700"])
+
+        # Configure the TabbedFrame widget's "Top Frame" widget
         tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
 
-        # Create the "TabbedFrame" widgets
+        # Create the TabbedFrame widgets
         self.create_tabbed_frame_widgets(master=tabbed_frame)
 
     def create_tabbed_frame_widgets(
@@ -493,7 +507,7 @@ class DashboardUI(BaseUI):
             # Create the "New Stacks" frame widget
             new_stacks_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
-                master=master,
+                master=master.container,
             )
 
             # Add the "New Stacks" frame widget to the TabbedFrame
@@ -517,7 +531,7 @@ class DashboardUI(BaseUI):
             # Create the "Recently Viewed" frame widget
             recently_viewed_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
-                master=master,
+                master=master.container,
             )
 
             # Add the "Recently Viewed" frame widget to the TabbedFrame
@@ -541,7 +555,7 @@ class DashboardUI(BaseUI):
             # Create the "Completed Stacks" frame widget
             completed_stacks_frame: tkinter.Frame = tkinter.Frame(
                 background=Constants.BLUE_GREY["700"],
-                master=master,
+                master=master.container,
             )
 
             # Add the "Completed Stacks" frame widget to the TabbedFrame
@@ -666,20 +680,10 @@ class DashboardUI(BaseUI):
         )
 
         # Get a new scrolled frame widget
-        self.new_stacks_frame: ScrolledFrame = ScrolledFrame(master=master)
-
-        # Style the scrolled frame "Root" widget
-        # Set the background color to the main background color
-        self.new_stacks_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "Canvas" widget
-        # Set the background color to the main background color
-        self.new_stacks_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "Frame" widget
-        # Set the background color to the main background color
-        self.new_stacks_frame.configure_container_frame(
-            background=Constants.BLUE_GREY["700"]
+        self.new_stacks_frame: ScrolledFrame = ScrolledFrame(
+            background=Constants.BLUE_GREY["700"],
+            horizontal_scrollbar=True,
+            master=master,
         )
 
         # Place the scrolled frame widget in the main window
@@ -774,24 +778,10 @@ class DashboardUI(BaseUI):
         )
 
         # Get a new scrolled frame widget
-        self.recently_viewed_stacks_frame: ScrolledFrame = ScrolledFrame(master=master)
-
-        # Style the scrolled frame "Root" widget
-        # Set the background color to the main background color
-        self.recently_viewed_stacks_frame.configure(
-            background=Constants.BLUE_GREY["700"]
-        )
-
-        # Style the scrolled frame "Canvas" widget
-        # Set the background color to the main background color
-        self.recently_viewed_stacks_frame.configure_canvas(
-            background=Constants.BLUE_GREY["700"]
-        )
-
-        # Style the scrolled frame "Frame" widget
-        # Set the background color to the main background color
-        self.recently_viewed_stacks_frame.configure_container_frame(
-            background=Constants.BLUE_GREY["700"]
+        self.recently_viewed_stacks_frame: ScrolledFrame = ScrolledFrame(
+            background=Constants.BLUE_GREY["700"],
+            horizontal_scrollbar=True,
+            master=master,
         )
 
         # Place the scrolled frame widget in the main window
@@ -887,22 +877,10 @@ class DashboardUI(BaseUI):
         )
 
         # Get a new scrolled frame widget
-        self.completed_stacks_frame: ScrolledFrame = ScrolledFrame(master=master)
-
-        # Style the scrolled frame "Root" widget
-        # Set the background color to the main background color
-        self.completed_stacks_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Style the scrolled frame "Canvas" widget
-        # Set the background color to the main background color
-        self.completed_stacks_frame.configure_canvas(
-            background=Constants.BLUE_GREY["700"]
-        )
-
-        # Style the scrolled frame "Frame" widget
-        # Set the background color to the main background color
-        self.completed_stacks_frame.configure_container_frame(
-            background=Constants.BLUE_GREY["700"]
+        self.completed_stacks_frame: ScrolledFrame = ScrolledFrame(
+            background=Constants.BLUE_GREY["700"],
+            horizontal_scrollbar=True,
+            master=master,
         )
 
         # Place the scrolled frame widget in the main window
@@ -1358,7 +1336,7 @@ class DashboardUI(BaseUI):
             for stack in stacks:
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.completed_stacks_frame,
+                    master=self.completed_stacks_frame.container,
                     stack=stack,
                 )
         except Exception as e:
@@ -1449,7 +1427,7 @@ class DashboardUI(BaseUI):
             for stack in stacks:
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.new_stacks_frame,
+                    master=self.new_stacks_frame.container,
                     stack=stack,
                 )
         except Exception as e:
@@ -1535,7 +1513,7 @@ class DashboardUI(BaseUI):
 
                 # Create the stack item widgets
                 self.create_stack_item_widgets(
-                    master=self.recently_viewed_stacks_frame,
+                    master=self.recently_viewed_stacks_frame.container,
                     stack=stack,
                 )
         except Exception as e:
@@ -1603,7 +1581,7 @@ class DashboardUI(BaseUI):
         try:
             # Create the stack item widgets
             self.create_stack_item_widgets(
-                master=self.new_stacks_frame,
+                master=self.new_stacks_frame.container,
                 stack=stack,
             )
         except Exception as e:

@@ -104,7 +104,15 @@ class LearningStackSelectionUI(BaseUI):
             raise e
 
     def _get_difficulties(self) -> Optional[List[ImmutableDifficulty]]:
-        """ """
+        """
+        Attempts to get all ImmutableDifficulty objects from the database.
+
+        Args:
+            None
+
+        Returns:
+            Optional[List[ImmutableDifficulty]]: A list of all ImmutableDifficulty objects if no exception occurs. Otherwise, None.
+        """
 
         # Get the ImmutableDifficulty objects from the database
         difficulties: Optional[
@@ -123,7 +131,15 @@ class LearningStackSelectionUI(BaseUI):
         return difficulties or []
 
     def _get_priorities(self) -> Optional[List[ImmutablePriority]]:
-        """ """
+        """
+        Attempts to get all ImmutablePriority objects from the database.
+
+        Args:
+            None
+
+        Returns:
+            Optional[List[ImmutablePriority]]: A list of all ImmutablePriority objects if no exception occurs. Otherwise, None.
+        """
 
         # Get the ImmutablePriority objects from the database
         priorities: Optional[Union[ImmutablePriority, List[ImmutablePriority]]] = (
@@ -142,7 +158,15 @@ class LearningStackSelectionUI(BaseUI):
         return priorities or []
 
     def _get_stacks(self) -> Optional[List[ImmutableStack]]:
-        """ """
+        """
+        Attempts to get all ImmutableStack objects from the database.
+
+        Args:
+            None
+
+        Returns:
+            Optional[List[ImmutableStack]]: A list of all ImmutableStack objects if no exception occurs. Otherwise, None.
+        """
 
         # Get the ImmutableStack objects from the database
         stacks: Optional[Union[ImmutableStack, List[ImmutableStack]]] = (
@@ -161,7 +185,15 @@ class LearningStackSelectionUI(BaseUI):
         return stacks or []
 
     def _on_cancel_button_click(self) -> None:
-        """ """
+        """
+        Dispatches the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Dispatch the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace
         self.dispatcher.dispatch(
@@ -177,7 +209,16 @@ class LearningStackSelectionUI(BaseUI):
         label: str,
         value: Optional[Any] = None,
     ) -> None:
-        """ """
+        """
+        Dispatches the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace.
+
+        Args:
+            label (str): The label of the field that changed.
+            value (Optional[Any]): The value of the field that changed.
+
+        Returns:
+            None
+        """
 
         # Convert the passed label string to snake case
         label = Miscellaneous.any_to_snake(
@@ -205,7 +246,15 @@ class LearningStackSelectionUI(BaseUI):
         self.value_dict[label]["value"] = value
 
     def _on_start_button_click(self) -> None:
-        """ """
+        """
+        Dispatches the REQUEST_VALIDATE_NAVIGATION event in the 'global' namespace.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Get the completed form
         form: Dict[str, Any] = self.get()
@@ -251,7 +300,17 @@ class LearningStackSelectionUI(BaseUI):
         label: str,
         required: bool = False,
     ) -> None:
-        """ """
+        """
+        Registers a tkinter widget as a field.
+
+        Args:
+            field (tkinter.Misc): The tkinter widget to register.
+            label (str): The label of the field.
+            required (bool): Whether the field is required.
+
+        Returns:
+            None
+        """
 
         # Convert the passed label string to snake case
         label = Miscellaneous.any_to_snake(
@@ -286,6 +345,11 @@ class LearningStackSelectionUI(BaseUI):
             "widget": field,
         }
 
+        # Log an info message about successfull registration
+        self.logger.info(
+            message=f"'{label}' '{field.__class__.__name__}' instance registered in field dict.",
+        )
+
     @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
         # Call the parent class' 'collect_subscriptions' method to get the subscriptions list
@@ -296,7 +360,15 @@ class LearningStackSelectionUI(BaseUI):
 
     @override
     def configure_grid(self) -> None:
-        """ """
+        """
+        Configures the grid of this widget.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Configure this widget's 0th column to weight 1
         self.grid_columnconfigure(
@@ -326,7 +398,15 @@ class LearningStackSelectionUI(BaseUI):
         self,
         master: tkinter.Misc,
     ) -> None:
-        """ """
+        """
+        Creates the bottom frame widgets of this widget.
+
+        Args:
+            master (tkinter.Misc): The master widget to create the bottom frame widgets in.
+
+        Returns:
+            None
+        """
 
         # Configure the passed master widget's 0th column to weight 1
         master.grid_columnconfigure(
@@ -354,7 +434,7 @@ class LearningStackSelectionUI(BaseUI):
 
         # Create a 'start button' tkinter.Button widget
         start_button: tkinter.Button = tkinter.Button(
-            background=Constants.BLUE_GREY["700"],
+            background=Constants.GREEN["700"],
             command=self._on_start_button_click,
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
@@ -377,13 +457,13 @@ class LearningStackSelectionUI(BaseUI):
 
         # Create a 'cancel button' tkinter.Button widget
         cancel_button: tkinter.Button = tkinter.Button(
-            background=Constants.BLUE_GREY["700"],
+            background=Constants.YELLOW["700"],
             command=self._on_cancel_button_click,
             font=(
                 Constants.DEFAULT_FONT_FAMILY,
                 Constants.DEFAULT_FONT_SIZE,
             ),
-            foreground=Constants.WHITE,
+            foreground=Constants.BLACK,
             master=master,
             relief=FLAT,
             text="Cancel",
@@ -398,14 +478,19 @@ class LearningStackSelectionUI(BaseUI):
             sticky=E,
         )
 
-        # Update the idletasks
-        self.update_idletasks()
-
     def create_center_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
-        """ """
+        """
+        Creates the center frame widgets of this widget.
+
+        Args:
+            master (tkinter.Misc): The master widget to create the center frame widgets in.
+
+        Returns:
+            None
+        """
 
         # Configure the passed master widget's 0th column to weight 1
         master.grid_columnconfigure(
@@ -420,16 +505,17 @@ class LearningStackSelectionUI(BaseUI):
         )
 
         # Create the 'scrolled frame' ScrolledFrame widget
-        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+        scrolled_frame: ScrolledFrame = ScrolledFrame(
+            background=Constants.BLUE_GREY["700"],
+            master=master,
+        )
 
-        # Configure the 'scrolled frame' ScrolledFrame widget itself
-        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Configure the 'scrolled frame' ScrolledFrame widget's canvas widget
-        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
-
-        # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget
-        scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
+        # Place the 'scrolled frame' ScrolledFrame widget in the grid
+        scrolled_frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
 
         # Configure the 'scrolled frame' ScrolledFrame widget's 'container frame' widget's 0th column to weight 1
         scrolled_frame.grid_columnconfigure(
@@ -492,7 +578,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'stacks field' MultiOptionSelectField widget
         stacks_field: MultiOptionSelectField = MultiOptionSelectField(
             display_name="Stacks*: ",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
             values=[
@@ -520,7 +606,7 @@ class LearningStackSelectionUI(BaseUI):
         )
 
         # Configure the 'stacks field' MultiOptionSelectField widget's 'container frame' tkinter.Frame widget
-        stacks_field.configure_container_frame(background=Constants.BLUE_GREY["700"])
+        stacks_field.configure_container(background=Constants.BLUE_GREY["700"])
 
         # Configure the 'stacks field' MultiOptionSelectField widget's 'label' tkinter.Label widget
         stacks_field.configure_label(
@@ -565,7 +651,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'difficulties field' MultiOptionSelectField widget
         difficulties_field: MultiOptionSelectField = MultiOptionSelectField(
             display_name="Difficulties: ",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             on_change_callback=self._on_field_change,
             values=[
                 difficulty.get(
@@ -581,7 +667,7 @@ class LearningStackSelectionUI(BaseUI):
         difficulties_field.configure(background=Constants.BLUE_GREY["700"])
 
         # Configure the 'difficulties field' MultiOptionSelectField widget's 'container frame' tkinter.Frame widget
-        difficulties_field.configure_container_frame(
+        difficulties_field.configure_container(
             background=Constants.BLUE_GREY["700"]
         )
 
@@ -639,7 +725,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'priorities field' MultiOptionSelectField widget
         priorities_field: MultiOptionSelectField = MultiOptionSelectField(
             display_name="Priorities: ",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             on_change_callback=self._on_field_change,
             values=[
                 priority.get(
@@ -655,7 +741,7 @@ class LearningStackSelectionUI(BaseUI):
         priorities_field.configure(background=Constants.BLUE_GREY["700"])
 
         # Configure the 'priorities field' MultiOptionSelectField widget's 'container frame' tkinter.Frame widget
-        priorities_field.configure_container_frame(
+        priorities_field.configure_container(
             background=Constants.BLUE_GREY["700"]
         )
 
@@ -710,7 +796,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'mode field' ComboboxField widget
         mode_field: ComboboxField = ComboboxField(
             display_name="Mode*: ",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
             readonly=True,
@@ -834,7 +920,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'enable randomisation' CheckbuttonField widget
         randomisation_field: CheckbuttonField = CheckbuttonField(
             display_name="Enable Randomsiation?",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
         )
@@ -881,7 +967,7 @@ class LearningStackSelectionUI(BaseUI):
         # Create the 'enable spaced repetition' CheckbuttonField widget
         spaced_repetition_field: CheckbuttonField = CheckbuttonField(
             display_name="Enable Spaced Repetition?",
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             namespace=Constants.STACK_SELECTION_NAMESPACE,
             on_change_callback=self._on_field_change,
             value=True,
@@ -926,21 +1012,64 @@ class LearningStackSelectionUI(BaseUI):
             required=True,
         )
 
-        # Update the idletasks
-        self.update_idletasks()
-
     def create_top_frame_widgets(
         self,
         master: tkinter.Misc,
     ) -> None:
-        """ """
+        """
+        Creates the top frame widgets of this widget.
 
-        # Update the idletasks
-        self.update_idletasks()
+        Args:
+            master (tkinter.Misc): The master widget to create the top frame widgets in.
+
+        Returns:
+            None
+        """
+
+        # Configure the passed master widget's 0th column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the passed master widget's 0th row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Create a tkinter.Label widget
+        label: tkinter.Label = tkinter.Label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.LARGE_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            master=master,
+            text="Select your Learning Stack(s)",
+        )
+
+        # Place the tkinter.Label widget in the grid
+        label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
 
     @override
     def create_widgets(self) -> None:
-        """ """
+        """
+        Creates the widgets of this widget.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Create the 'top frame' tkinter.Frame widget
         top_frame: tkinter.Frame = tkinter.Frame(
@@ -989,9 +1118,6 @@ class LearningStackSelectionUI(BaseUI):
 
         # Create the 'bottom frame' widgets
         self.create_bottom_frame_widgets(master=bottom_frame)
-
-        # Update the idletasks
-        self.update_idletasks()
 
     def get(self) -> Dict[str, Any]:
         """

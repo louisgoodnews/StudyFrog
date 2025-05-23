@@ -1406,6 +1406,77 @@ class Events:
         DispatcherEventFactory.create_event(name="global:request:setting:update")
     )
 
+    # An event that indicates that the user wants to show a cancel toplevel notification
+    REQUEST_SHOW_CANCEL_TOPLEVEL: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_cancel_toplevel")
+    )
+
+    # An event that indicates that the user wants to show an okay toplevel notification
+    REQUEST_SHOW_OKAY_TOPLEVEL: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_okay_toplevel")
+    )
+
+    # An event that indicates that the user wants to show an okay/cancel toplevel notification
+    REQUEST_SHOW_OKAY_CANCEL_TOPLEVEL: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:request:show_okay_cancel_toplevel"
+        )
+    )
+
+    # An event that indicates that the user wants to show a retry toplevel notification
+    REQUEST_SHOW_RETRY_TOPLEVEL: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_retry_toplevel")
+    )
+
+    # An event that indicates that the user wants to show a retry/cancel toplevel notification
+    REQUEST_SHOW_RETRY_CANCEL_TOPLEVEL: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:request:show_retry_cancel_toplevel"
+        )
+    )
+
+    # An event that indicates that the user wants to show a yes/no toplevel notification
+    REQUEST_SHOW_YES_NO_TOPLEVEL: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_yes_no_toplevel")
+    )
+
+    # An event that indicates that the user wants to show a yes/no/cancel toplevel notification
+    REQUEST_SHOW_YES_NO_CANCEL_TOPLEVEL: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(
+            name="global:request:show_yes_no_cancel_toplevel"
+        )
+    )
+
+    # An event that indicates that the user wants to show a debug toast
+    REQUEST_SHOW_DEBUG_TOAST: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_debug_toast")
+    )
+
+    # An event that indicates that the user wants to show an error toast
+    REQUEST_SHOW_ERROR_TOAST: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_error_toast")
+    )
+
+    # An event that indicates that the user wants to show a generic toast
+    REQUEST_SHOW_GENERIC_TOAST: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_generic_toast")
+    )
+
+    # An event that indicates that the user wants to show an info toast
+    REQUEST_SHOW_INFO_TOAST: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_info_toast")
+    )
+
+    # An event that indicates that the user wants to show a success toast
+    REQUEST_SHOW_SUCCESS_TOAST: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_success_toast")
+    )
+
+    # An event that indicates that the user wants to show a warning toast
+    REQUEST_SHOW_WARNING_TOAST: Final[DispatcherEvent] = (
+        DispatcherEventFactory.create_event(name="global:request:show_warning_toast")
+    )
+
     # An event that indicates that the user wants to create a new stack
     REQUEST_STACK_CREATE: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="global:request:stack:create"
@@ -2729,6 +2800,41 @@ class Events:
             cls.REQUEST_TIMER_RESUME,
             cls.REQUEST_TIMER_START,
             cls.REQUEST_TIMER_STOP,
+        ]
+
+    @classmethod
+    def get_toast_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all toast events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all toast events in the Events class.
+        """
+        return [
+            cls.REQUEST_SHOW_DEBUG_TOAST,
+            cls.REQUEST_SHOW_ERROR_TOAST,
+            cls.REQUEST_SHOW_GENERIC_TOAST,
+            cls.REQUEST_SHOW_INFO_TOAST,
+            cls.REQUEST_SHOW_SUCCESS_TOAST,
+            cls.REQUEST_SHOW_WARNING_TOAST,
+        ]
+
+    @classmethod
+    def get_toplevel_events(cls) -> List[DispatcherEvent]:
+        """
+        Returns a list of all toplevel events in the Events class.
+
+        Returns:
+            List[DispatcherEvent]: A list of all toplevel events in the Events class.
+        """
+        return [
+            cls.REQUEST_SHOW_CANCEL_TOPLEVEL,
+            cls.REQUEST_SHOW_OKAY_TOPLEVEL,
+            cls.REQUEST_SHOW_OKAY_CANCEL_TOPLEVEL,
+            cls.REQUEST_SHOW_RETRY_TOPLEVEL,
+            cls.REQUEST_SHOW_RETRY_CANCEL_TOPLEVEL,
+            cls.REQUEST_SHOW_YES_NO_TOPLEVEL,
+            cls.REQUEST_SHOW_YES_NO_CANCEL_TOPLEVEL,
         ]
 
     @classmethod

@@ -756,17 +756,22 @@ class LearningSessionRunner:
                 self.learning_session_item.set(
                     name="duration",
                     value=(
-                        self.learning_session_item.end - self.learning_session_item.start
+                        self.learning_session_item.end
+                        - self.learning_session_item.start
                     ).total_seconds(),
                 )
 
                 # Update the learning session item
-                self.learning_session_item = self._update_entity(update=self.learning_session_item)
+                self.learning_session_item = self._update_entity(
+                    update=self.learning_session_item
+                )
 
                 # Check, if the learning session item is mutable
                 if self.learning_session_item.is_mutable():
                     # Convert the learning session item back to immutable
-                    self.learning_session_item = self.learning_session_item.to_immutable()
+                    self.learning_session_item = (
+                        self.learning_session_item.to_immutable()
+                    )
 
             # Create a builder instance
             builder: LearningSessionItemBuilder = LearningSessionItemBuilder()
@@ -900,70 +905,48 @@ class LearningSessionRunner:
         """
         try:
             # Prompt the user to end the run
-            response: str = ToplevelNotification.yes_no(
-                frame={
-                    "background": Constants.BLUE_GREY["700"],
-                },
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=Events.REQUEST_SHOW_YES_NO_TOPLEVEL,
                 message="Congratulations! You have completed the run. Do you wish to end the run?",
-                message_label={
-                    "background": Constants.BLUE_GREY["700"],
-                    "font": (
-                        Constants.DEFAULT_FONT_FAMILY,
-                        Constants.DEFAULT_FONT_SIZE,
-                    ),
-                    "foreground": Constants.WHITE,
-                },
-                no_button={
-                    "background": Constants.BLUE_GREY["700"],
-                    "font": (
-                        Constants.DEFAULT_FONT_FAMILY,
-                        Constants.DEFAULT_FONT_SIZE,
-                    ),
-                    "foreground": Constants.WHITE,
-                    "relief": FLAT,
-                },
-                title="End of run reached",
-                title_label={
-                    "background": Constants.BLUE_GREY["700"],
-                    "font": (
-                        Constants.DEFAULT_FONT_FAMILY,
-                        Constants.DEFAULT_FONT_SIZE,
-                    ),
-                    "foreground": Constants.WHITE,
-                },
-                yes_button={
-                    "background": Constants.BLUE_GREY["700"],
-                    "font": (
-                        Constants.DEFAULT_FONT_FAMILY,
-                        Constants.DEFAULT_FONT_SIZE,
-                    ),
-                    "foreground": Constants.WHITE,
-                    "relief": FLAT,
-                },
+                namespace=Constants.GLOBAL_NAMESPACE,
             )
 
+            # Check, if the notification exists or has errors
+            if not notification or notification.has_errors():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to prompt user to end run in 'handle_end_of_run' method from '{self.__class__.__name__}'"
+                )
+
+                # Return early
+                return
+
             # Check, if the user has chosen to end the run (i.e. if the response equals 'yes')
-            if response != "yes":
+            if notification.get_one_and_only_result() != "yes":
+                # Log an info message
+                self.logger.info(
+                    message=f"User has chosen to not end run in 'handle_end_of_run' method from '{self.__class__.__name__}' (response was '{notification.get_one_and_only_result()}')"
+                )
+
                 # Return early
                 return
 
             # Check, if the learning session instance variable is mutable
             if not self.learning_session.is_mutable():
                 # Convert the learning session object into a mutable version
-                self.learning_session: MutableLearningSession = self.learning_session.to_mutable()
+                learning_session: MutableLearningSession = (
+                    self.learning_session.to_mutable()
+                )
 
             # Set the end timestamp of the learning session
-            self.learning_session.end = Miscellaneous.get_current_datetime()
-
-            self.logger.debug(message=f"LearningSession start: {self.learning_session.start}")
-            self.logger.debug(message=f"LearningSession end: {self.learning_session.end}")
+            learning_session.end = Miscellaneous.get_current_datetime()
 
             # Calculate and set the duration of the learning session
-            # self.learning_session.duration = Miscellaneous.calculate_duration(
-            #     as_="seconds",
-            #     end=self.learning_session.end,
-            #     start=self.learning_session.start,
-            # )
+            learning_session.duration = Miscellaneous.calculate_duration(
+                as_="seconds",
+                end=learning_session.end,
+                start=learning_session.start,
+            )
 
             # Request the 'Completed' status
             status: Optional[ImmutableStatus] = self._request_entity(
@@ -983,12 +966,10 @@ class LearningSessionRunner:
                 return
 
             # Set the status of the learning session
-            self.learning_session.status = status.id
+            learning_session.status = status.id
 
             # Update the learning session in the database
-            self.learning_session = self._update_entity(
-                update=self.learning_session
-            )
+            self.learning_session = self._update_entity(update=learning_session)
 
             # Check, if the learning session exists
             if not self.learning_session:

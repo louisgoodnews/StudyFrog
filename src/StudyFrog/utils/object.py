@@ -169,9 +169,11 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
+        if not self.has(
+            name,
+        ):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
 
             # Return early since the attribute is not present
             return
@@ -213,15 +215,23 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
+        if not self.has(
+            name,
+        ):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
 
             # Return early since the attribute is not present
             return
 
         # Return the value of the attribute
-        return self.__dict__[name]
+        return self.__dict__.get(
+            name,
+            self.__dict__.get(
+                f"_{name}",
+                None,
+            ),
+        )
 
     @override
     def __getitem__(
@@ -239,15 +249,28 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if f"_{name}" in self.__dict__:
+        if self.has(
+            name,
+        ):
             # Return the value of the attribute
-            return self.__dict__[f"_{name}"]
-        elif name in self.__dict__:
+            return self.__dict__.get(
+                name,
+                self.__dict__.get(
+                    f"_{name}",
+                    None,
+                ),
+            )
+        elif self.has(
+            name,
+        ):
             # Return the value of the attribute
-            return self.__dict__[name]
+            return self.__dict__.get(
+                name,
+                None,
+            )
 
         # Log a warning message if the attribute does not exist
-        self.logger.warning(message=f"Attribute '{name}' does not exist.")
+        self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
 
         # Return None
         return None
@@ -410,9 +433,13 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__ and f"_{name}" not in self.__dict__:
+        if not self.has(
+            name,
+        ) and not self.has(
+            f"_{name}",
+        ):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
 
             # Return early since the attribute is not present
             return
@@ -439,9 +466,13 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__ and f"_{name}" not in self.__dict__:
+        if not self.has(
+            name,
+        ) and not self.has(
+            f"_{name}",
+        ):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
 
             # Return the default value if the attribute is not present
             return default
@@ -454,6 +485,23 @@ class MutableBaseObject:
                 default,
             ),
         )
+
+    def has(
+        self,
+        key: str,
+    ) -> bool:
+        """
+        Checks if the object has the given key.
+
+        :param key: The key to check.
+        :type key: str
+
+        :return: True if the object has the given key, False otherwise.
+        :rtype: bool
+        """
+
+        # Return True if the object has the given key
+        return key in self.__dict__
 
     def is_mutable(self) -> bool:
         """
@@ -565,8 +613,11 @@ class MutableBaseObject:
             key,
             value,
         ) in kwargs.items():
-            # Set the value of the attribute in the object's dictionary
-            self.__dict__[key] = value
+            # Set the value of the attribute in the object
+            self.set(
+                name=key,
+                value=value,
+            )
 
 
 class ImmutableBaseObject(MutableBaseObject):
@@ -627,9 +678,11 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
+        if not self.has(
+            name,
+        ):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
 
             # Return early since the attribute is not present
             return
@@ -680,12 +733,11 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
+        if not self.has(
+            name,
+        ):
             # Set the value of the attribute
-            super().__setattr__(
-                name=name,
-                value=value,
-            )
+            self.__dict__[name] = value
 
             # Return early since the attribute was set
             return
@@ -717,12 +769,11 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
+        if not self.has(
+            name,
+        ):
             # Set the value of the attribute
-            super().__setitem__(
-                name=name,
-                value=value,
-            )
+            self.__dict__[name] = value
 
             # Return early since the attribute was set
             return
@@ -750,9 +801,11 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if name not in self.__dict__:
+        if not self.has(
+            name,
+        ):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name}' does not exist.")
+            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
 
             # Return early since the attribute is not present
             return
@@ -796,12 +849,11 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if name in self.__dict__:
+        if not self.has(
+            name,
+        ):
             # Set the value of the attribute
-            super().set(
-                name=name,
-                value=value,
-            )
+            self.__dict__[name] = value
 
             # Return early since the attribute was set
             return
@@ -834,18 +886,13 @@ class ImmutableBaseObject(MutableBaseObject):
             value,
         ) in kwargs.items():
             # Check if the attribute exists
-            if not hasattr(
-                self,
+            if not self.has(
                 key,
             ):
                 # Set the value of the attribute
-                super().update(
-                    **{
-                        key: value,
-                    }
-                )
-            else:
-                # Raise an attribute error as the attribute is immutable
-                raise AttributeError(
-                    f"Cannot set attribute '{key}' in {self.__class__.__name__}, attribute is immutable."
-                )
+                self.__dict__[key] = value
+
+        # Raise an attribute error as the attribute is immutable
+        raise AttributeError(
+            f"Cannot set attribute(s) '{', '.join(key for key in kwargs.keys() if key in self.__dict__)}' in {self.__class__.__name__}, attribute is immutable."
+        )

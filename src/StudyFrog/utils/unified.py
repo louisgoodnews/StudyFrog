@@ -32,7 +32,9 @@ from core.tag import ImmutableTag
 from core.teacher import ImmutableTeacher
 from core.user import ImmutableUser
 
-from utils.logger import Logger
+from utils.constants import Constants
+from utils.dispatcher import Dispatcher
+from utils.events import Events
 from utils.miscellaneous import Miscellaneous
 from utils.object import ImmutableBaseObject
 
@@ -804,7 +806,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
         try:
             # Attempt to find a match in the given key
             match: Optional[str] = Miscellaneous.find_match(
-                string=update.__class__.__name__.strip().replace("Mutable", "").replace("Immutable", ""),
+                string=update.__class__.__name__.strip()
+                .replace("Mutable", "")
+                .replace("Immutable", ""),
                 group=1,
                 pattern=r"([A-Za-z]+)",
             )
@@ -1000,6 +1004,7 @@ class UnifiedObjectService(ImmutableBaseObject):
 
     def __new__(
         cls,
+        dispatcher: Dispatcher,
         unified_manager: UnifiedObjectManager,
     ) -> "UnifiedObjectService":
         """
@@ -1011,6 +1016,7 @@ class UnifiedObjectService(ImmutableBaseObject):
         If the instance already exists, returns the existing instance.
 
         Args:
+            dispatcher (Dispatcher): The dispatcher instance to be used by the service.
             unified_manager (UnifiedObjectManager): The manager instance to be used by the service.
 
         Returns:
@@ -1023,19 +1029,24 @@ class UnifiedObjectService(ImmutableBaseObject):
             cls._shared_instance = super(UnifiedObjectService, cls).__new__(cls)
 
             # Initialize the instance
-            cls._shared_instance.init(unified_manager=unified_manager)
+            cls._shared_instance.init(
+                dispatcher=dispatcher,
+                unified_manager=unified_manager,
+            )
 
         # Return the shared instance
         return cls._shared_instance
 
     def init(
         self,
+        dispatcher: Dispatcher,
         unified_manager: UnifiedObjectManager,
     ) -> None:
         """
         Initializes the shared instance of UnifiedObjectService.
 
         Args:
+            dispatcher (Dispatcher): The dispatcher instance to be used by the service.
             unified_manager (UnifiedObjectManager): The manager instance to be used by the service.
 
         Returns:
@@ -1043,10 +1054,821 @@ class UnifiedObjectService(ImmutableBaseObject):
         """
 
         # Call the parent class constructor
-        super().__init__()
+        super().__init__(
+            dispatcher=dispatcher,
+            subscriptions=[],
+            unified_manager=unified_manager,
+        )
 
-        # Store the passed unified_manager instance in an instance variable
-        self.unified_manager: UnifiedObjectManager = unified_manager
+        # Subscribe to events
+        self.subscribe_to_events()
+
+        # Log an info message about successfull initialization
+        self.logger.info(
+            message=f"Successfully initialized '{self.__class__.__name__}'"
+        )
+
+    def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects and returns a list of subscriptions.
+
+        This method creates a list of dictionaries containing event subscription configurations.
+
+        Args:
+            None
+
+        Returns:
+            List[Dict[str, Any]]: A list representing the subscriptions for events.
+        """
+
+        # Initialize the list of subscriptions
+        subscriptions: List[Dict[str, Any]] = [
+            {
+                "event": Events.APPLICATION_STOPPED,
+                "function": self.on_application_stopped,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": False,
+            },
+            {
+                "event": Events.REQUEST_ANSWER_CREATE,
+                "function": self.on_request_answer_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ANSWER_DELETE,
+                "function": self.on_request_answer_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ANSWER_LOAD,
+                "function": self.on_request_answer_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ANSWER_LOOKUP,
+                "function": self.on_request_answer_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ANSWER_UPDATE,
+                "function": self.on_request_answer_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ASSOCIATION_CREATE,
+                "function": self.on_request_association_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ASSOCIATION_DELETE,
+                "function": self.on_request_association_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ASSOCIATION_LOAD,
+                "function": self.on_request_association_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ASSOCIATION_LOOKUP,
+                "function": self.on_request_association_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_ASSOCIATION_UPDATE,
+                "function": self.on_request_association_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_CREATE,
+                "function": self.on_request_change_history_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_DELETE,
+                "function": self.on_request_change_history_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_LOAD,
+                "function": self.on_request_change_history_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_LOOKUP,
+                "function": self.on_request_change_history_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_UPDATE,
+                "function": self.on_request_change_history_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_ITEM_CREATE,
+                "function": self.on_request_change_history_item_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_ITEM_DELETE,
+                "function": self.on_request_change_history_item_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_ITEM_LOAD,
+                "function": self.on_request_change_history_item_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_ITEM_LOOKUP,
+                "function": self.on_request_change_history_item_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CHANGE_HISTORY_ITEM_UPDATE,
+                "function": self.on_request_change_history_item_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CUSTOM_FIELD_CREATE,
+                "function": self.on_request_custom_field_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CUSTOM_FIELD_DELETE,
+                "function": self.on_request_custom_field_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CUSTOM_FIELD_LOAD,
+                "function": self.on_request_custom_field_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CUSTOM_FIELD_LOOKUP,
+                "function": self.on_request_custom_field_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_CUSTOM_FIELD_UPDATE,
+                "function": self.on_request_custom_field_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_DIFFICULTY_CREATE,
+                "function": self.on_request_difficulty_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_DIFFICULTY_DELETE,
+                "function": self.on_request_difficulty_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_DIFFICULTY_LOAD,
+                "function": self.on_request_difficulty_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_DIFFICULTY_LOOKUP,
+                "function": self.on_request_difficulty_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_DIFFICULTY_UPDATE,
+                "function": self.on_request_difficulty_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_FLASHCARD_CREATE,
+                "function": self.on_request_flashcard_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_FLASHCARD_DELETE,
+                "function": self.on_request_flashcard_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_FLASHCARD_LOAD,
+                "function": self.on_request_flashcard_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_FLASHCARD_LOOKUP,
+                "function": self.on_request_flashcard_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_FLASHCARD_UPDATE,
+                "function": self.on_request_flashcard_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_ANSWERS,
+                "function": self.on_request_get_all_answers,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_ASSOCIATIONS,
+                "function": self.on_request_get_all_associations,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_CUSTOM_FIELDS,
+                "function": self.on_request_get_all_custom_fields,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_DEFAULTS,
+                "function": self.on_request_get_all_defaults,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_DIFFICULTIES,
+                "function": self.on_request_get_all_difficulties,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_FLASHCARDS,
+                "function": self.on_request_get_all_flashcards,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_NOTES,
+                "function": self.on_request_get_all_notes,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_OPTIONS,
+                "function": self.on_request_get_all_options,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_PRIORITIES,
+                "function": self.on_request_get_all_priorities,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_QUESTIONS,
+                "function": self.on_request_get_all_questions,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_SETTINGS,
+                "function": self.on_request_get_all_settings,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_STACKS,
+                "function": self.on_request_get_all_stacks,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_STATUSES,
+                "function": self.on_request_get_all_statuses,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_ALL_USERS,
+                "function": self.on_request_get_all_users,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_BY_KEY,
+                "function": self.on_request_get_by_key,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_GET_BY_KEYS,
+                "function": self.on_request_get_by_keys,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_CREATE,
+                "function": self.on_request_learning_session_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_DELETE,
+                "function": self.on_request_learning_session_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_LOAD,
+                "function": self.on_request_learning_session_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_LOOKUP,
+                "function": self.on_request_learning_session_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_UPDATE,
+                "function": self.on_request_learning_session_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ACTION_CREATE,
+                "function": self.on_request_learning_session_action_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ACTION_DELETE,
+                "function": self.on_request_learning_session_action_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ACTION_LOAD,
+                "function": self.on_request_learning_session_action_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ACTION_LOOKUP,
+                "function": self.on_request_learning_session_action_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ACTION_UPDATE,
+                "function": self.on_request_learning_session_action_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ITEM_CREATE,
+                "function": self.on_request_learning_session_item_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ITEM_DELETE,
+                "function": self.on_request_learning_session_item_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ITEM_LOAD,
+                "function": self.on_request_learning_session_item_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ITEM_LOOKUP,
+                "function": self.on_request_learning_session_item_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_LEARNING_SESSION_ITEM_UPDATE,
+                "function": self.on_request_learning_session_item_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_NOTE_CREATE,
+                "function": self.on_request_note_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_NOTE_DELETE,
+                "function": self.on_request_note_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_NOTE_LOAD,
+                "function": self.on_request_note_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_NOTE_LOOKUP,
+                "function": self.on_request_note_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_NOTE_UPDATE,
+                "function": self.on_request_note_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_OPTION_CREATE,
+                "function": self.on_request_option_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_OPTION_DELETE,
+                "function": self.on_request_option_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_OPTION_LOAD,
+                "function": self.on_request_option_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_OPTION_LOOKUP,
+                "function": self.on_request_option_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_OPTION_UPDATE,
+                "function": self.on_request_option_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_PRIORITY_CREATE,
+                "function": self.on_request_priority_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_PRIORITY_DELETE,
+                "function": self.on_request_priority_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_PRIORITY_LOAD,
+                "function": self.on_request_priority_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_PRIORITY_LOOKUP,
+                "function": self.on_request_priority_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_PRIORITY_UPDATE,
+                "function": self.on_request_priority_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_QUESTION_CREATE,
+                "function": self.on_request_question_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_QUESTION_DELETE,
+                "function": self.on_request_question_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_QUESTION_LOAD,
+                "function": self.on_request_question_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_QUESTION_LOOKUP,
+                "function": self.on_request_question_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_QUESTION_UPDATE,
+                "function": self.on_request_question_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SETTING_CREATE,
+                "function": self.on_request_setting_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SETTING_DELETE,
+                "function": self.on_request_setting_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SETTING_LOAD,
+                "function": self.on_request_setting_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SETTING_LOOKUP,
+                "function": self.on_request_setting_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SETTING_UPDATE,
+                "function": self.on_request_setting_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STACK_CREATE,
+                "function": self.on_request_stack_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STACK_DELETE,
+                "function": self.on_request_stack_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STACK_LOAD,
+                "function": self.on_request_stack_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STACK_LOOKUP,
+                "function": self.on_request_stack_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STACK_UPDATE,
+                "function": self.on_request_stack_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STATUS_CREATE,
+                "function": self.on_request_status_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STATUS_DELETE,
+                "function": self.on_request_status_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STATUS_LOAD,
+                "function": self.on_request_status_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STATUS_LOOKUP,
+                "function": self.on_request_status_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_STATUS_UPDATE,
+                "function": self.on_request_status_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SUBJECT_CREATE,
+                "function": self.on_request_subject_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SUBJECT_DELETE,
+                "function": self.on_request_subject_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SUBJECT_LOAD,
+                "function": self.on_request_subject_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SUBJECT_LOOKUP,
+                "function": self.on_request_subject_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_SUBJECT_UPDATE,
+                "function": self.on_request_subject_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TAG_CREATE,
+                "function": self.on_request_tag_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TAG_DELETE,
+                "function": self.on_request_tag_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TAG_LOAD,
+                "function": self.on_request_tag_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TAG_LOOKUP,
+                "function": self.on_request_tag_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TAG_UPDATE,
+                "function": self.on_request_tag_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TEACHER_CREATE,
+                "function": self.on_request_teacher_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TEACHER_DELETE,
+                "function": self.on_request_teacher_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TEACHER_LOAD,
+                "function": self.on_request_teacher_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TEACHER_LOOKUP,
+                "function": self.on_request_teacher_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_TEACHER_UPDATE,
+                "function": self.on_request_teacher_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_UPDATE,
+                "function": self.on_request_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_UPDATE_IN_BULK,
+                "function": self.on_request_update_in_bulk,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_USER_CREATE,
+                "function": self.on_request_user_create,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_USER_DELETE,
+                "function": self.on_request_user_delete,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_USER_LOAD,
+                "function": self.on_request_user_load,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_USER_LOOKUP,
+                "function": self.on_request_user_lookup,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
+                "event": Events.REQUEST_USER_UPDATE,
+                "function": self.on_request_user_update,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+        ]
+
+        # Return the list of subscriptions
+        return subscriptions
+
+    def on_application_stopped(self) -> bool:
+        """
+        Unsubscribes from all events subscribed in the edit UI.
+
+        This method iterates over the UUIDs in the subscriptions dictionary and
+        unregisters the event handlers associated with each UUID.
+
+        Returns:
+            bool: True if the events were unsubscribed successfully, False otherwise.
+        """
+        try:
+            # Unsubscribe from events
+            self.unsubscribe_from_events()
+
+            # Log an info message about successful shutdown
+            self.logger.info(
+                message=f"Successfully shut down '{self.__class__.__name__}'"
+            )
+
+            # Return True to the caller
+            return True
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'on_application_stopped' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Log a warning message about failed shutdown
+            self.logger.warning(
+                message=f"Failed to shut down '{self.__class__.__name__}'"
+            )
+
+            # Return False to the caller
+            return False
 
     def on_request_answer_create(
         self,
@@ -3596,3 +4418,74 @@ class UnifiedObjectService(ImmutableBaseObject):
 
         # Update the user in the database and return the result of the update
         return self.unified_manager.update_user(user=user)
+
+    def subscribe_to_events(self) -> None:
+        """
+        Subscribes to all events in the subscriptions dictionary.
+
+        This method iterates over the events and functions in the subscriptions
+        dictionary and registers them with the dispatcher. It also stores the
+        UUIDs of the subscriptions in the subscriptions list.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs while subscribing to events.
+        """
+        try:
+            # Create a dictionary of events and functions
+            subscriptions: List[Dict[str, Any]] = self.collect_subscriptions()
+
+            # Iterate over the events and functions in the subscriptions dictionary
+            for subscription in subscriptions:
+                # Store the UUID of the subscription in the subscriptions list
+                self.subscriptions.append(
+                    self.dispatcher.register(
+                        event=subscription["event"],
+                        function=subscription["function"],
+                        namespace=subscription["namespace"],
+                        persistent=subscription["persistent"],
+                    )
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'subscribe_to_events' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def unsubscribe_from_events(self) -> None:
+        """
+        Unsubscribes from all events subscribed in the edit UI.
+
+        This method iterates over the UUIDs in the subscriptions dictionary and
+        unregisters the event handlers associated with each UUID.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an error occurs while unsubscribing from events.
+        """
+        try:
+            # Iterate over the UUIDs in the subscriptions dictionary
+            for uuid in self.subscriptions:
+                # Unregister the handler for the given UUID
+                self.dispatcher.unregister(uuid=uuid)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'unsubscribe_from_events' method from '{self.__class__.__name__}': {e}",
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e

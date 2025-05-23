@@ -756,9 +756,6 @@ class LearningSessionResultUI(BaseUI):
                 row=0,
                 sticky=E,
             )
-
-            # Update idletasks
-            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -810,7 +807,7 @@ class LearningSessionResultUI(BaseUI):
             tabbed_frame.configure(background=Constants.BLUE_GREY["700"])
 
             # Configure the TabbedFrame widget's 'container frame' tkinter.Frame widget
-            tabbed_frame.configure_container_frame(
+            tabbed_frame.configure_container(
                 background=Constants.BLUE_GREY["700"]
             )
 
@@ -851,9 +848,6 @@ class LearningSessionResultUI(BaseUI):
                 name="details",
                 relief=FLAT,
             )
-
-            # Update idletasks
-            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -910,16 +904,8 @@ class LearningSessionResultUI(BaseUI):
                 sticky=NSEW,
             )
 
-            # Configure the ScrolledFrame widget
-            self.details_scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
-
-            # Configure the ScrolledFrame widget's tkinter.Canvas widget
-            self.details_scrolled_frame.configure_canvas(
-                background=Constants.BLUE_GREY["700"]
-            )
-
             # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
-            self.details_scrolled_frame.configure_container_frame(
+            self.details_scrolled_frame.configure_container(
                 background=Constants.BLUE_GREY["700"]
             )
 
@@ -927,9 +913,6 @@ class LearningSessionResultUI(BaseUI):
             self._apply_default_frame_layout_configuration(
                 frame=self.details_scrolled_frame
             )
-
-            # Update idletasks
-            self.update_idletasks()
 
             # Return the ScrolledFrame widget to the caller
             return self.details_scrolled_frame
@@ -995,16 +978,8 @@ class LearningSessionResultUI(BaseUI):
                 weight=1,
             )
 
-            # Configure the ScrolledFrame widget
-            scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
-
-            # Configure the ScrolledFrame widget's tkinter.Canvas widget
-            scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
-
             # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
-            scrolled_frame.configure_container_frame(
-                background=Constants.BLUE_GREY["700"]
-            )
+            scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
 
             # Create the 'time stats label' tkinter.Label widget
             time_stats_label: tkinter.Label = tkinter.Label(
@@ -1014,7 +989,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame,
+                master=scrolled_frame.container,
                 text="Time Stats",
             )
 
@@ -1035,7 +1010,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame,
+                master=scrolled_frame.container,
                 text=f"Duration: {self.learning_session.duration // 60} minutes.",
             )
 
@@ -1056,7 +1031,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame,
+                master=scrolled_frame.container,
                 text=f"Number of contents: {len(self.learning_session.contents)}",
             )
 
@@ -1077,7 +1052,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame,
+                master=scrolled_frame.container,
                 text=f"Average on content: {self.learning_session.duration // len(self.learning_session.contents)} seconds",
             )
 
@@ -1098,7 +1073,7 @@ class LearningSessionResultUI(BaseUI):
                     Constants.LARGE_FONT_SIZE,
                 ),
                 foreground=Constants.WHITE,
-                master=scrolled_frame,
+                master=scrolled_frame.container,
                 text=f"Number of stacks: {len(self.learning_session.stacks)} ({', '.join(self.learning_session.stacks)})",
             )
 
@@ -1113,9 +1088,6 @@ class LearningSessionResultUI(BaseUI):
 
             # Apply default layout configuration to the ScrolledFrame widget
             self._apply_default_frame_layout_configuration(frame=scrolled_frame)
-
-            # Update idletasks
-            self.update_idletasks()
 
             # Return the ScrolledFrame widget to the caller
             return scrolled_frame
@@ -1180,9 +1152,6 @@ class LearningSessionResultUI(BaseUI):
                 row=0,
                 sticky=NSEW,
             )
-
-            # Update idletasks
-            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -1263,9 +1232,6 @@ class LearningSessionResultUI(BaseUI):
 
             # Create and configure the top frame widgets
             self.create_top_frame_widgets(master=top_frame)
-
-            # Update idletasks
-            self.update_idletasks()
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(

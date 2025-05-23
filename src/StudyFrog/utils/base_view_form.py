@@ -150,6 +150,7 @@ class BaseViewForm(tkinter.Frame):
         MutableStack,
     ]:
         """
+        Processes the entity and returns a mutable version of it.
 
         Args:
             entity:
@@ -191,6 +192,7 @@ class BaseViewForm(tkinter.Frame):
 
     def _update_entity(self) -> None:
         """
+        Updates the entity instance variable with the updated entity.
 
         Args:
             None
@@ -199,41 +201,11 @@ class BaseViewForm(tkinter.Frame):
             None
         """
 
-        # Initialize a dictionary of entity types and corresponding request update events
-        events: Dict[str, DispatcherEvent] = {
-            "answer": Events.REQUEST_ANSWER_UPDATE,
-            "flashcard": Events.REQUEST_FLASHCARD_UPDATE,
-            "note": Events.REQUEST_NOTE_UPDATE,
-            "question": Events.REQUEST_QUESTION_UPDATE,
-            "stack": Events.REQUEST_STACK_UPDATE,
-        }
-
-        # Attempt to get a match from the entity instance variable's key attribute
-        match: Optional[str] = Miscellaneous.find_match(string=self.entity.key)
-
-        # Check, if a match exists
-        if not match:
-            # Log a warning message
-            self.logger.warning(
-                message=f"Found no match for pattern '([A-Za-z]+)' in '{self.entity.key}' key."
-            )
-
-            # Return early
-            return
-
-        # Convert the match to a lowercase version
-        match = match.lower() if not match.islower() else match
-
         # Dispatch the event corresponding to the entity's type in the 'global' namespace
         notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
-            event=events.get(
-                match,
-                Events.GENERIC_EVENT,
-            ),
+            event=Events.REQUEST_UPDATE,
             namespace=Constants.GLOBAL_NAMESPACE,
-            **{
-                match: self.entity,
-            },
+            update=self.entity,
         )
 
         # Check, if the notification exists or has errors
@@ -313,7 +285,17 @@ class BaseViewForm(tkinter.Frame):
             None
         """
 
-        pass
+        # Configure the passed 'master' tkinter.Frame widget's 0th column to weight 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the passed 'master' tkinter.Frame widget's 0th row to weight 1
+        master.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
 
     def create_center_frame_widgets(
         self,

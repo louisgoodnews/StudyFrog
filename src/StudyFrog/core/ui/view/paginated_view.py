@@ -342,7 +342,7 @@ class PaginatedView(tkinter.Frame):
         scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
 
         # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
-        scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
+        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
 
         # Place the ScrolledFrame widget in the grid
         scrolled_frame.grid(

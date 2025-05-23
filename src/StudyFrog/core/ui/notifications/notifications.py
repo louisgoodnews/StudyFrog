@@ -174,7 +174,7 @@ class ToplevelNotification:
                 master=toplevel,
                 text="Cancel",
                 **kwargs.get(
-                    "button",
+                    "cancel_button",
                     {},
                 ),
             )
@@ -339,7 +339,7 @@ class ToplevelNotification:
                 master=toplevel,
                 text="Okay",
                 **kwargs.get(
-                    "button",
+                    "okay_button",
                     {},
                 ),
             )
@@ -718,7 +718,7 @@ class ToplevelNotification:
                 master=toplevel,
                 text="retry",
                 **kwargs.get(
-                    "button",
+                    "retry_button",
                     {},
                 ),
             )

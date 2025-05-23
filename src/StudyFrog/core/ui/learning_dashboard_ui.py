@@ -80,9 +80,6 @@ class LearningDashboardUI(BaseUI):
             unified_manager=unified_manager,
         )
 
-        # Update idletasks
-        self.update_idletasks()
-
     def _on_stack_select_button_click(self) -> None:
         """
         Handles the click event of the stack select button in the learning dashboard UI.
@@ -171,7 +168,18 @@ class LearningDashboardUI(BaseUI):
         self,
         master: tkinter.Frame,
     ) -> None:
-        """ """
+        """
+        Creates and configures the bottom frame widgets.
+
+        This method initializes the bottom frame widgets within the learning dashboard UI
+        and sets their layout configuration.
+
+        Args:
+            master (tkinter.Frame): The parent frame for the bottom frame widgets.
+
+        Returns:
+            None
+        """
 
         # Configure the passed master tkinter.Frame widget's 0th column to weight 1
         master.grid_columnconfigure(
@@ -184,9 +192,6 @@ class LearningDashboardUI(BaseUI):
             index=0,
             weight=1,
         )
-
-        # Update idletasks
-        self.update_idletasks()
 
     def create_center_frame_widgets(
         self,
@@ -205,6 +210,8 @@ class LearningDashboardUI(BaseUI):
         Returns:
             None
         """
+
+        # Configure the passed master tkinter.Frame widget's 0th column to weight 1
         master.grid_columnconfigure(
             index=0,
             weight=1,
@@ -217,24 +224,17 @@ class LearningDashboardUI(BaseUI):
         )
 
         # Create a TabbedFrame widget
-        tabbed_frame: TabbedFrame = TabbedFrame(master=master)
+        tabbed_frame: TabbedFrame = TabbedFrame(
+            background=Constants.BLUE_GREY["700"],
+            master=master,
+        )
 
         # Place the TabbedFrame widget in the grid
         tabbed_frame.grid(
             column=0,
-            padx=5,
-            pady=5,
+            row=0,
             sticky=NSEW,
         )
-
-        # Configure the TabbedFrame widget
-        tabbed_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Configure the TabbedFrame widget's 'container frame' tkinter.Frame widget
-        tabbed_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
-
-        # Configure the TabbedFrame widget's 'top frame' tkinter.Frame widget
-        tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
 
         # Create and add the 'planning' widgets to the TabbedFrame widget
         planning_frame: ScrolledFrame = self.create_planning_widgets(
@@ -305,56 +305,9 @@ class LearningDashboardUI(BaseUI):
             relief=FLAT,
         )
 
-        # Update idletasks
-        self.update_idletasks()
-
-    def create_planning_widgets(
-        self,
-        master: tkinter.Frame,
-    ) -> ScrolledFrame:
-        """
-        Creates and configures the main widgets of the planning frame.
-
-        This method initializes the main widgets of the planning frame
-        within the learning dashboard UI and sets their layout
-        configuration.
-
-        Args:
-            master (tkinter.Frame): The parent frame for the planning widgets.
-
-        Returns:
-            ScrolledFrame: The created ScrolledFrame widget.
-        """
-
-        # Create a ScrolledFrame widget
-        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
-
-        # Place the ScrolledFrame widget in the grid
-        scrolled_frame.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            sticky=NSEW,
-        )
-
-        # Configure the ScrolledFrame widget
-        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Configure the ScrolledFrame widget's tkinter.Canvas widget
-        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
-
-        # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
-        scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
-
-        # Update idletasks
-        self.update_idletasks()
-
-        # Return the ScrolledFrame widget to the caller
-        return scrolled_frame
-
     def create_overview_widgets(
         self,
-        master: tkinter.Frame,
+        master: TabbedFrame,
     ) -> ScrolledFrame:
         """
         Creates and configures the main widgets of the overview frame.
@@ -364,41 +317,91 @@ class LearningDashboardUI(BaseUI):
         configuration.
 
         Args:
-            master (tkinter.Frame): The parent frame for the overview widgets.
+            master (TabbedFrame): The parent frame for the overview widgets.
 
         Returns:
             ScrolledFrame: The created ScrolledFrame widget.
         """
 
+        # Configure the master tkinter.Frame widget's 'container' tkinter.Frame widget's 0th column to weight 1
+        master.container.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master tkinter.Frame widget's 'container' tkinter.Frame widget's 0th row to weight 1
+        master.container.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
         # Create a ScrolledFrame widget
-        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+        scrolled_frame: ScrolledFrame = ScrolledFrame(
+            background=Constants.BLUE_GREY["700"],
+            horizontal_scrollbar=True,
+            master=master.container,
+        )
 
         # Place the ScrolledFrame widget in the grid
         scrolled_frame.grid(
             column=0,
-            padx=5,
-            pady=5,
+            row=0,
             sticky=NSEW,
         )
 
-        # Configure the ScrolledFrame widget
-        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
+        # Return the ScrolledFrame widget to the caller
+        return scrolled_frame
 
-        # Configure the ScrolledFrame widget's tkinter.Canvas widget
-        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
+    def create_planning_widgets(
+        self,
+        master: TabbedFrame,
+    ) -> ScrolledFrame:
+        """
+        Creates and configures the main widgets of the planning frame.
 
-        # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
-        scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
+        This method initializes the main widgets of the planning frame
+        within the learning dashboard UI and sets their layout
+        configuration.
 
-        # Update idletasks
-        self.update_idletasks()
+        Args:
+            master (TabbedFrame): The parent frame for the planning widgets.
+
+        Returns:
+            ScrolledFrame: The created ScrolledFrame widget.
+        """
+
+        # Configure the master tkinter.Frame widget's 'container' tkinter.Frame widget's 0th column to weight 1
+        master.container.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master tkinter.Frame widget's 'container' tkinter.Frame widget's 0th row to weight 1
+        master.container.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Create a ScrolledFrame widget
+        scrolled_frame: ScrolledFrame = ScrolledFrame(
+            background=Constants.BLUE_GREY["700"],
+            horizontal_scrollbar=True,
+            master=master.container,
+        )
+
+        # Place the ScrolledFrame widget in the grid
+        scrolled_frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
 
         # Return the ScrolledFrame widget to the caller
         return scrolled_frame
 
     def create_statistics_widgets(
         self,
-        master: tkinter.Frame,
+        master: TabbedFrame,
     ) -> ScrolledFrame:
         """
         Creates and configures the main widgets of the statistics frame.
@@ -407,34 +410,37 @@ class LearningDashboardUI(BaseUI):
         learning dashboard UI, setting their layout configuration.
 
         Args:
-            master (tkinter.Frame): The parent widget.
+            master (TabbedFrame): The parent widget.
 
         Returns:
             ScrolledFrame: The created ScrolledFrame widget.
         """
 
+        # Configure the master tkinter.Frame widget's 'container' tkinter.Frame widget's 0th column to weight 1
+        master.container.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the master tkinter.Frame widget's 'container' tkinter.Frame widget's 0th row to weight 1
+        master.container.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
         # Create a ScrolledFrame widget
-        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+        scrolled_frame: ScrolledFrame = ScrolledFrame(
+            background=Constants.BLUE_GREY["700"],
+            horizontal_scrollbar=True,
+            master=master.container,
+        )
 
         # Place the ScrolledFrame widget in the grid
         scrolled_frame.grid(
             column=0,
-            padx=5,
-            pady=5,
+            row=0,
             sticky=NSEW,
         )
-
-        # Configure the ScrolledFrame widget
-        scrolled_frame.configure(background=Constants.BLUE_GREY["700"])
-
-        # Configure the ScrolledFrame widget's tkinter.Canvas widget
-        scrolled_frame.configure_canvas(background=Constants.BLUE_GREY["700"])
-
-        # Configure the ScrolledFrame widget's 'container frame' tkinter.Frame widget
-        scrolled_frame.configure_container_frame(background=Constants.BLUE_GREY["700"])
-
-        # Update idletasks
-        self.update_idletasks()
 
         # Return the ScrolledFrame widget to the caller
         return scrolled_frame
@@ -490,9 +496,6 @@ class LearningDashboardUI(BaseUI):
             row=0,
             sticky=E,
         )
-
-        # Update idletasks
-        self.update_idletasks()
 
     @override
     def create_widgets(self) -> None:
@@ -557,6 +560,3 @@ class LearningDashboardUI(BaseUI):
 
         # Create the 'top frame' widgets
         self.create_top_frame_widgets(master=top_frame)
-
-        # Update idletasks
-        self.update_idletasks()

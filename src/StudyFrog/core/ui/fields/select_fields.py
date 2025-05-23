@@ -36,20 +36,70 @@ __all__: Final[List[str]] = [
 
 
 class EntitySelectTypes(Enum):
-    """ """
+    """
+    Enumerates the types of entities that can be selected.
 
-    ANSWER: Literal["answer"] = "answer"
-    DIFFICULTY: Literal["difficulty"] = "difficulty"
-    FLASHCARD: Literal["Flashcard"] = "flashcard"
-    NOTE: Literal["note"] = "note"
-    PRIORITY: Literal["priority"] = "priority"
-    QUESTION: Literal["question"] = "question"
-    STACK: Literal["stack"] = "stack"
-    STATUS: Literal["status"] = "status"
-    SUBJECT: Literal["subject"] = "subject"
-    TAG: Literal["tag"] = "tag"
-    TEACHER: Literal["teacher"] = "teacher"
-    USER: Literal["user"] = "user"
+    Attributes:
+        ANSWER: Final[Literal["answer"]] = "answer"
+        DIFFICULTY: Final[Literal["difficulty"]] = "difficulty"
+        FLASHCARD: Final[Literal["Flashcard"]] = "flashcard"
+        NOTE: Final[Literal["note"]] = "note"
+        PRIORITY: Final[Literal["priority"]] = "priority"
+        QUESTION: Final[Literal["question"]] = "question"
+        QUESTION_TYPE: Final[Literal["question_type"]] = "question_type"
+        STACK: Final[Literal["stack"]] = "stack"
+        STATUS: Final[Literal["status"]] = "status"
+        SUBJECT: Final[Literal["subject"]] = "subject"
+        TAG: Final[Literal["tag"]] = "tag"
+        TEACHER: Final[Literal["teacher"]] = "teacher"
+        USER: Final[Literal["user"]] = "user"
+    """
+
+    ANSWER: Final[Literal["answer"]] = "answer"
+    DIFFICULTY: Final[Literal["difficulty"]] = "difficulty"
+    FLASHCARD: Final[Literal["Flashcard"]] = "flashcard"
+    NOTE: Final[Literal["note"]] = "note"
+    PRIORITY: Final[Literal["priority"]] = "priority"
+    QUESTION: Final[Literal["question"]] = "question"
+    QUESTION_TYPE: Final[Literal["question_type"]] = "question_type"
+    STACK: Final[Literal["stack"]] = "stack"
+    STATUS: Final[Literal["status"]] = "status"
+    SUBJECT: Final[Literal["subject"]] = "subject"
+    TAG: Final[Literal["tag"]] = "tag"
+    TEACHER: Final[Literal["teacher"]] = "teacher"
+    USER: Final[Literal["user"]] = "user"
+
+    @classmethod
+    def get_entity_select_type(
+        cls,
+        type: Literal[
+            "answer",
+            "difficulty",
+            "flashcard",
+            "note",
+            "priority",
+            "question",
+            "question_type",
+            "stack",
+            "status",
+            "subject",
+            "tag",
+            "teacher",
+            "user",
+        ],
+    ) -> Self:
+        """
+        Returns the entity select type corresponding to the given type.
+
+        Args:
+            type (Literal["answer", "difficulty", "flashcard", "note", "priority", "question", "question_type", "stack", "status", "subject", "tag", "teacher", "user"]: The type.
+
+        Returns:
+            EntitySelectTypes: The entity select type corresponding to the given type.
+        """
+
+        # Return the entity select type corresponding to the given type
+        return cls[type]
 
 
 class CheckbuttonSelectField(BaseField):
@@ -3894,7 +3944,7 @@ class MultiOptionSelectField(BaseField):
             # Re-raise the exception to the caller
             raise e
 
-    def configure_container_frame(
+    def configure_container(
         self,
         **kwargs,
     ) -> None:
@@ -3904,7 +3954,7 @@ class MultiOptionSelectField(BaseField):
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run 'configure_container' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message

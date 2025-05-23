@@ -902,7 +902,10 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         result.start(value=start)
 
         # Get the subscriptions in the namespace
-        subscriptions: Dict[str, Any] = self.subscriptions.get(namespace, {})
+        subscriptions: Dict[str, Any] = self.subscriptions.get(
+            namespace,
+            {},
+        )
 
         # Check if there are any subscriptions in the namespace
         if len(subscriptions) > 0:
@@ -912,7 +915,10 @@ class DispatcherEventSubscription(ImmutableBaseObject):
                 subscription,
             ) in subscriptions.items():
                 # Check if the subscription is persistent
-                if not subscription.get("persistent", False):
+                if not subscription.get(
+                    "persistent",
+                    False,
+                ):
                     # Add the subscription to the subscriptions dictionary
                     non_persistents.append(uuid)
 

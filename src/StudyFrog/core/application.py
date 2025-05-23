@@ -3,7 +3,9 @@ Author: lodego
 Date: 2025-02-06
 """
 
-from datetime import datetime, timedelta
+import traceback
+
+from datetime import datetime
 
 from typing import *
 
@@ -13,7 +15,9 @@ from utils.bootstrap_service import BootstrapService
 from utils.constants import Constants
 from utils.events import Events
 from utils.logger import Logger
-from utils.miscellaneous import Miscellaneous
+from utils.utils import DateUtil
+from utils.toast_notification_service import ToastNotificationService
+from utils.toplevel_notification_service import ToplevelNotificationService
 
 
 __all__: Final[List[str]] = ["Application"]
@@ -58,6 +62,9 @@ class Application:
             None
         """
 
+        # Get the start time
+        self.start_time: datetime = DateUtil.now()
+
         # Initialize a logger
         self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
@@ -84,8 +91,15 @@ class Application:
             unified_manager=self.unified_manager,
         )
 
-        # Get the start time
-        self.start_time: datetime = Miscellaneous.get_current_datetime()
+        # Initialize the toast and toplevel notification services
+        self.toast_notification_service: ToastNotificationService = ToastNotificationService(
+            dispatcher=self.dispatcher,
+        )
+
+        # Initialize the toplevel notification service
+        self.toplevel_notification_service: ToplevelNotificationService = ToplevelNotificationService(
+            dispatcher=self.dispatcher,
+        )
 
     def start_application(self) -> None:
         try:
@@ -118,6 +132,9 @@ class Application:
                 message=f"Caught an exception while attempting to run 'start' method from '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Exit the application with a non-zero exit code indicating an exception occurred
             exit(1)
     
@@ -149,6 +166,9 @@ class Application:
                 message=f"Caught an exception while attempting to run 'subscribe_to_events' method from '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Re-raise the exception to the caller
             raise e
 
@@ -168,21 +188,15 @@ class Application:
             # Run the shutdown tasks
             self.bootstrap_service.run_shutdown_tasks()
 
-            # Get the end time
-            end_time: Final[datetime] = Miscellaneous.get_current_datetime()
-
             # Dispatch the "APPLICATION_STOPPED" event in the global namespace
             self.dispatcher.dispatch(
                 event=Events.APPLICATION_STOPPED,
                 namespace=Constants.GLOBAL_NAMESPACE,
             )
 
-            # Get the duration of the application
-            duration: Final[timedelta] = end_time - self.start_time
-
             # Log an info message indicating the application has been stopped
             self.logger.info(
-                message=f"{Constants.APPLICATION_NAME} ran for {duration.total_seconds()} seconds"
+                message=f"{Constants.APPLICATION_NAME} ran for {DateUtil.calculate_duration(start=self.start_time)} seconds"
             )
 
             # Log an info message indicating the application has been stopped
@@ -197,6 +211,9 @@ class Application:
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'stop' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Exit the application with a non-zero exit code indicating an exception occurred
             exit(1)

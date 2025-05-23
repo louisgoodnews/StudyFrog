@@ -275,7 +275,7 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the close button
-        close_button: Optional[tkinter.Button] = tkinter.Button(
+        close_button: tkinter.Button = tkinter.Button(
             background=Constants.BLUE_GREY["700"],
             command=self.on_close_button_clicked,
             font=(
@@ -287,16 +287,6 @@ class MenuUI(BaseUI):
             relief=FLAT,
             text="Close",
         )
-
-        # Check, if the creation of the close button was successfull
-        if not close_button:
-            # Log an error message to indicate that something went wrong
-            logger.error(
-                "Failed to create 'close' button in bottom frame widgets. This is likely a bug."
-            )
-
-            # Return early
-            return
 
         # Place the close button in the bottom frame
         close_button.grid(
@@ -351,7 +341,7 @@ class MenuUI(BaseUI):
         )
 
         # Style the scrolled frame widget's frame widget
-        scrolled_frame.configure_container_frame(
+        scrolled_frame.configure_container(
             background=Constants.BLUE_GREY["700"],
         )
 
@@ -475,7 +465,7 @@ class MenuUI(BaseUI):
             foreground=Constants.WHITE,
             master=master,
             relief=FLAT,
-            text="X",
+            text="🔴",
         )
 
         # Place the shutdown button in the top frame

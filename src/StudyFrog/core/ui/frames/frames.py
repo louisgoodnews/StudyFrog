@@ -31,9 +31,9 @@ class CollapsibleFrame(tkinter.Frame):
     managing UI complexity by hiding or showing advanced or optional options.
 
     Attributes:
-        is_collapsed (bool): Whether the frame is currently collapsed (i.e., content hidden).
-        logger (Logger): Logger instance for debugging/logging.
-        _child (Optional[tkinter.Misc]): The actual widget/content placed inside the collapsible area.
+            is_collapsed (bool): Whether the frame is currently collapsed (i.e., content hidden).
+            logger (Logger): Logger instance for debugging/logging.
+            _child (Optional[tkinter.Misc]): The actual widget/content placed inside the collapsible area.
     """
 
     def __init__(
@@ -48,12 +48,12 @@ class CollapsibleFrame(tkinter.Frame):
         Initializes a new instance of the CollapsibleFrame class.
 
         Args:
-            label (str): The text to display in the label.
-            master (tkinter.Misc): The master widget.
-            **kwargs: Additional keyword arguments passed to the parent Frame.
+                label (str): The text to display in the label.
+                master (tkinter.Misc): The master widget.
+                **kwargs: Additional keyword arguments passed to the parent Frame.
 
         Returns:
-            None
+                None
         """
 
         # Initialize this class' logger instance in an instance variable
@@ -71,25 +71,25 @@ class CollapsibleFrame(tkinter.Frame):
             **kwargs,
         )
 
-        #
+        # Configure the 0th column to weight 1
         self._container.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        #
+        # Configure the 1st column to weight 1
         self._container.grid_columnconfigure(
             index=1,
             weight=1,
         )
 
-        #
+        # Configure the 0th row to weight 0
         self._container.grid_rowconfigure(
             index=0,
             weight=0,
         )
 
-        #
+        # Configure the 1st row to weight 1
         self._container.grid_rowconfigure(
             index=1,
             weight=1,
@@ -108,7 +108,7 @@ class CollapsibleFrame(tkinter.Frame):
             text=label,
         )
 
-        # Place the button widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -145,7 +145,7 @@ class CollapsibleFrame(tkinter.Frame):
         Returns the toggle button widget that expands/collapses the frame.
 
         Returns;
-            tkinter.Button: the toggle button widget that expands/collapses the frame.
+                        tkinter.Button: the toggle button widget that expands/collapses the frame.
         """
 
         # Return the tkinter.Button button
@@ -157,7 +157,7 @@ class CollapsibleFrame(tkinter.Frame):
         Returns the child widget currently assigned to the collapsible frame.
 
         Returns:
-            Optional[tkinter.Misc]: The child widget currently assigned to the collapsible frame, if it exists. Otherwise None
+                        Optional[tkinter.Misc]: The child widget currently assigned to the collapsible frame, if it exists. Otherwise None
         """
 
         # Return the tkinter.Misc (optional) child
@@ -172,10 +172,10 @@ class CollapsibleFrame(tkinter.Frame):
         Sets the child widget for the collapsible content area.
 
         Args:
-            value (tkinter.Misc): The widget to be inserted inside the collapsible frame.
+                value (tkinter.Misc): The widget to be inserted inside the collapsible frame.
 
         Returns:
-            None
+                None
         """
 
         # Update the child to the passed value
@@ -187,7 +187,7 @@ class CollapsibleFrame(tkinter.Frame):
         Returns the internal container frame for the child content.
 
         Returns:
-            tkinter.Frame: The internal container frame for the child content.
+                tkinter.Frame: The internal container frame for the child content.
         """
 
         # Return the 'container' frame
@@ -199,7 +199,7 @@ class CollapsibleFrame(tkinter.Frame):
         Returns the label widget associated with the collapsible frame.
 
         Returns:
-            tkinter.Label: The label widget associated with the collapsible frame.
+                tkinter.Label: The label widget associated with the collapsible frame.
         """
 
         # Return the tkinter.Label label
@@ -213,7 +213,7 @@ class CollapsibleFrame(tkinter.Frame):
         of the internal container and updates the button label.
 
         Returns:
-            None
+                None
         """
 
         # Check, if this widget currently has a child
@@ -225,7 +225,7 @@ class CollapsibleFrame(tkinter.Frame):
         if self.is_collapsed:
             # Place the container widget in the grid
             self.grid(
-                colum=0,
+                column=0,
                 padx=5,
                 pady=5,
                 row=0,
@@ -248,7 +248,15 @@ class CollapsibleFrame(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the button widget with the passed keyword arguments.
+
+        Args:
+                **kwargs: Additional keyword arguments passed to the button widget's configure method.
+
+        Returns:
+                None
+        """
         try:
             # Attempt to configure the button widget
             self._button.configure(**kwargs)
@@ -268,7 +276,15 @@ class CollapsibleFrame(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the child widget with the passed keyword arguments.
+
+        Args:
+                **kwargs: Additional keyword arguments passed to the child widget's configure method.
+
+        Returns:
+                None
+        """
         try:
             # Check, if the child widget exists:
             if not self._child:
@@ -289,18 +305,26 @@ class CollapsibleFrame(tkinter.Frame):
             # Re-raise the exception to the caller
             raise e
 
-    def configure_container_frame(
+    def configure_container(
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the container frame widget with the passed keyword arguments.
+
+        Args:
+                **kwargs: Additional keyword arguments passed to the container frame widget's configure method.
+
+        Returns:
+                None
+        """
         try:
-            # Attempt to configure the container widget
+            # Attempt to configure the container frame widget
             self._container.configure(**kwargs)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
+                message=f"Caught an exception while attempting to run 'configure_container' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message
@@ -313,14 +337,50 @@ class CollapsibleFrame(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the label widget with the passed keyword arguments.
+
+        Args:
+                **kwargs: Additional keyword arguments passed to the label widget's configure method.
+
+        Returns:
+                None
+        """
         try:
-            # Attempt to configure the buttlabelon widget
+            # Attempt to configure the label widget
             self._label.configure(**kwargs)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'configure_label' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def configure_label(
+        self,
+        **kwargs,
+    ) -> None:
+        """
+        Attempts to configure the label widget with the passed keyword arguments.
+
+        Args:
+                **kwargs: Additional keyword arguments passed to the label widget's configure method.
+
+        Returns:
+                None
+        """
+        try:
+            # Attempt to configure the button widget
+            self._button.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure_button' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message
@@ -336,7 +396,7 @@ class CollapsibleFrame(tkinter.Frame):
         This is useful when re-assigning content or resetting the frame.
 
         Returns:
-            None
+                None
         """
 
         # Check, fi this widget currently has a child
@@ -360,10 +420,10 @@ class CollapsibleFrame(tkinter.Frame):
         The provided widget will be embedded in the collapsible frame.
 
         Args:
-            child (tkinter.Misc): The widget to be placed inside the collapsible content area.
+                child (tkinter.Misc): The widget to be placed inside the collapsible content area.
 
         Returns:
-            None
+                None
         """
 
         # Check, if the child's master is identical to this frame
@@ -374,268 +434,181 @@ class CollapsibleFrame(tkinter.Frame):
         # Upate the child attribute
         self.child = child
 
+        # Return
+        return
+
 
 class ScrolledFrame(tkinter.Frame):
     """
-    A scrollable frame widget that supports horizontal and/or vertical scrolling.
+    Represents a scrollable frame widget.
 
-    This class wraps a `tkinter.Canvas` with an embedded frame and scrollbars,
-    enabling other widgets to be placed inside the scrollable area.
-
-    Attributes:
-        logger (Logger): Logger instance for internal logging.
-        canvas (tkinter.Canvas): Canvas widget used for scrolling.
-        container_frame (tkinter.Frame): Internal frame that holds the canvas and scrollbars.
-        horizontal_scrollbar (tkinter.Scrollbar): Optional horizontal scrollbar.
-        vertical_scrollbar (tkinter.Scrollbar): Optional vertical scrollbar.
+    This class provides a scrollable frame widget that can be used to embed
+    other widgets within a scrollable area.
     """
 
     def __init__(
         self,
-        master: tkinter.Misc,
-        horizontal_scroll: bool = False,
-        vertical_scroll: bool = True,
+        master: tkinter.Frame,
+        horizontal_scrollbar: bool = False,
+        vertical_scrollbar: bool = True,
         **kwargs,
     ) -> None:
         """
-        Initializes the ScrolledFrame widget.
+        Initializes a new instance of the ScrolledFrame class.
 
         Args:
-            master (tkinter.Misc): The parent widget.
-            horizontal_scroll (bool): Whether to enable horizontal scrolling. Defaults to False.
-            vertical_scroll (bool): Whether to enable vertical scrolling. Defaults to True.
-            **kwargs: Additional keyword arguments forwarded to the widgets.
+                master (tkinter.Frame): The parent widget to embed the ScrolledFrame into.
+                horizontal_scrollbar (bool): Whether to enable the horizontal scrollbar. Default is False.
+                vertical_scrollbar (bool): Whether to enable the vertical scrollbar. Default is True.
+                **kwargs: Additional configuration options for the ScrolledFrame.
 
         Returns:
-            None
-
-        Raises:
-            ValueError: If both scroll directions are disabled.
+                None
         """
 
-        # Check, if both the 'horizontal_scroll' and 'vertical_scroll' flags are set to False
-        if not horizontal_scroll and not vertical_scroll:
-            # Raise an Exception to inform about an illegal state
-            raise ValueError(
-                f"'horizontal_scroll' and 'vertical_scroll' flags cannot both be set to False at the same time in {self.__class__.__name__}"
-            )
-
-        # Initialize this ScrolledFrame instance's Logger instance
-        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
-
-        # Store the passed 'horizontal_scroll' bool flag in an instance variable
-        self.has_horizontal_scroll: bool = horizontal_scroll
-
-        # Store the passed 'horizontal_scroll' bool flag in an instance variable
-        self.has_vertical_scroll: bool = vertical_scroll
-
-        # Create the 'container frame' tkinter.Frame widget
-        self._container_frame: tkinter.Frame = tkinter.Frame(
+        # Initialize the parent class
+        super().__init__(
             master=master,
             **kwargs,
         )
 
-        # Place the 'container frame' tkinter.Frame widget in the grid
-        self._container_frame.grid(sticky=NSEW)
-
-        # Configure the 'container frame' tkinter.Frame widget's 0th column to weight 1
-        self._container_frame.grid_columnconfigure(
+        # Configure the ScrolledFrame widget's 0th column to weight 1
+        self.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the 'container frame' tkinter.Frame widget's 1st column to weight 0
-        self._container_frame.grid_columnconfigure(
+        # Configure the ScrolledFrame widget's 1st column to weight 0
+        self.grid_columnconfigure(
             index=1,
             weight=0,
         )
 
-        # Configure the 'container frame' tkinter.Frame widget's 0th row to weight 1
-        self._container_frame.grid_rowconfigure(
+        # Configure the ScrolledFrame widget's 0th row to weight 1
+        self.grid_rowconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the 'container frame' tkinter.Frame widget's 1st row to weight 0
-        self._container_frame.grid_rowconfigure(
+        # Configure the ScrolledFrame widget's 1st row to weight 0
+        self.grid_rowconfigure(
             index=1,
             weight=0,
         )
 
-        # Create the tkinter.Canvas widget
-        self._canvas: tkinter.Canvas = tkinter.Canvas(
-            master=self._container_frame,
+        # Create a tkinter.Canvas widget
+        self.canvas: tkinter.Canvas = tkinter.Canvas(
+            master=self,
             **kwargs,
         )
 
-        # Place the tkinter.Canvas widget in the grid
-        self._canvas.grid(
+        # Place the tkinter.Canvas widget within the grid
+        self.canvas.grid(
             column=0,
             row=0,
             sticky=NSEW,
         )
 
-        # Create a new window inside the canvas
-        self._canvas.create_window(
-            *(
-                0,
-                0,
-            ),
-            anchor=NW,
-            tags="window",
-            window=super().__init__(
-                master=self._canvas,
-                **kwargs,
-            ),
-        )
-
-        # Check, if the 'horizontal_scroll' flag is set to True
-        if horizontal_scroll:
-            # Create the 'horizontal scrollbar' tkinter.Scrollbar widget
-            self._horizontal_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
-                command=self._canvas.xview,
-                master=self._container_frame,
-                orient=HORIZONTAL,
-            )
-
-            # Configure the canvas widget's 'xscrollcommand' attribute
-            self._canvas.configure(
-                xscrollcommand=self._horizontal_scrollbar.set,
-            )
-
-            # Place the 'horizontal scrollbar' tkinter.Scrollbar widget in the grid
-            self._horizontal_scrollbar.grid(
-                column=0,
-                padx=5,
-                pady=5,
-                row=1,
-                sticky=EW,
-            )
-
-        # Check, if the 'vertical_scroll' flag is set to True
-        if vertical_scroll:
-            # Create the 'vertical scrollbar' tkinter.Scrollbar widget
+        # Check, if the vertical scrollbar should be enabled
+        if vertical_scrollbar:
+            # Create a tkinter.Scrollbar widget
             self._vertical_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
-                command=self._canvas.yview,
-                master=self._container_frame,
+                command=self.canvas.yview,
+                master=self,
                 orient=VERTICAL,
             )
 
-            # Configure the canvas widget's 'yscrollcommand' attribute
-            self._canvas.configure(
-                yscrollcommand=self._vertical_scrollbar.set,
-            )
-
-            # Place the 'vertical scrollbar' tkinter.Scrollbar widget in the grid
+            # Place the tkinter.Scrollbar widget within the grid
             self._vertical_scrollbar.grid(
                 column=1,
-                padx=5,
-                pady=5,
                 row=0,
                 sticky=NS,
             )
 
-        # Bind the 'on_configure' method to the ScrolledFrame widget via the '<Configure>' event
-        self.bind(
+            # Configure the tkinter.Canvas widget to use the tkinter.Scrollbar widget
+            self.canvas.configure(yscrollcommand=self._vertical_scrollbar.set)
+
+        # Check, if the horizontal scrollbar should be enabled
+        if horizontal_scrollbar:
+            # Create a tkinter.Scrollbar widget
+            self._horizontal_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(
+                command=self.canvas.xview,
+                master=self,
+                orient=HORIZONTAL,
+            )
+
+            # Place the tkinter.Scrollbar widget within the grid
+            self._horizontal_scrollbar.grid(
+                column=0,
+                row=1,
+                sticky=EW,
+            )
+
+            # Configure the tkinter.Canvas widget to use the tkinter.Scrollbar widget
+            self.canvas.configure(xscrollcommand=self._horizontal_scrollbar.set)
+
+        # Create the 'container' tkinter.Frame widget
+        self._container: tkinter.Frame = tkinter.Frame(
+            master=self.canvas,
+            **kwargs,
+        )
+
+        # Add the 'container' tkinter.Frame widget to the tkinter.Canvas widget
+        self.canvas.create_window(
+            (
+                0,
+                0,
+            ),
+            anchor=NW,
+            window=self._container,
+        )
+
+        # Bind the tkinter.Canvas widget to the '_on_configure' method via the '<Configure>' event
+        self.canvas.bind(
             func=self._on_configure,
             sequence="<Configure>",
         )
 
-        # Bind the 'on_configure' method to the canvas widget via the '<Configure>' event
-        self._canvas.bind(
-            func=self._on_configure,
-            sequence="<Configure>",
+        # Bind the tkinter.Canvas widget to the '_on_mousewheel' method via the '<MouseWheel>' event
+        self.canvas.bind(
+            func=self._on_mousewheel,
+            sequence="<MouseWheel>",
         )
 
-        # Get the name of the OS
-        system: str = platform.system()
-
-        # Check, if the OS is 'Windows" or "MacOS"
-        if system.lower() in [
-            "darwin",
-            "windows",
-        ]:
-            # Bind the 'on_mousewheel' method to the ScrolledFrame widget via the '<MouseWheel>' event
-            self.bind_all(
-                func=self._on_mousewheel,
-                sequence="<MouseWheel>",
-            )
-
-        # Assuming the OS is Linux-based
-        else:
-            # Bind the 'on_mousewheel' method to the ScrolledFrame widget via the '<Button-4>' event
-            self.bind_all(
-                func=self._on_mousewheel,
-                sequence="<Button-4>",
-            )
-
-            # Bind the 'on_mousewheel' method to the ScrolledFrame widget via the '<Button-5>' event
-            self.bind_all(
-                func=self._on_mousewheel,
-                sequence="<Button-5>",
-            )
-
-        # Update idle tasks
-        self.update_idletasks()
-
     @property
-    def canvas(self) -> tkinter.Canvas:
+    def container(self) -> tkinter.Frame:
         """
-        Returns the internal canvas used for rendering scrollable content.
-
-        Args:
-            None
+        Returns the 'container' tkinter.Frame widget.
 
         Returns:
-            tkinter.Canvas: The canvas widget.
+                tkinter.Frame: The 'container' tkinter.Frame widget.
         """
 
-        # Return the tkinter.Canvas widget
-        return self._canvas
-
-    @property
-    def container_frame(self) -> tkinter.Frame:
-        """
-        Returns the outer container frame that holds the canvas and scrollbars.
-
-        Args:
-            None
-
-        Returns:
-            tkinter.Frame: The container frame widget.
-        """
-
-        # Return the 'container frame' tkinter.Frame widget
-        return self._container_frame
+        # Return the 'container' tkinter.Frame widget
+        return self._container
 
     @property
     def horizontal_scrollbar(self) -> tkinter.Scrollbar:
         """
-        Returns the horizontal scrollbar widget.
-
-        Args:
-            None
+        Returns the horizontal tkinter.Scrollbar widget.
 
         Returns:
-            tkinter.Scrollbar: The horizontal scrollbar.
+                tkinter.Scrollbar: The horizontal tkinter.Scrollbar widget.
         """
 
-        # Return the 'horizontal scrollbar' tkinter.Scrollbar widget
+        # Return the horizontal tkinter.Scrollbar widget
         return self._horizontal_scrollbar
 
     @property
     def vertical_scrollbar(self) -> tkinter.Scrollbar:
         """
-        Returns the vertical scrollbar widget.
-
-        Args:
-            None
+        Returns the vertical tkinter.Scrollbar widget.
 
         Returns:
-            tkinter.Scrollbar: The vertical scrollbar.
+                tkinter.Scrollbar: The vertical tkinter.Scrollbar widget.
         """
 
-        # Return the 'vertical scrollbar' tkinter.Scrollbar widget
+        # Return the vertical tkinter.Scrollbar widget
         return self._vertical_scrollbar
 
     def _on_configure(
@@ -643,271 +616,135 @@ class ScrolledFrame(tkinter.Frame):
         event: Optional[tkinter.Event] = None,
     ) -> None:
         """
-        Handles the <Configure> event to update scroll region and canvas size.
+        Updates the scroll region of the tkinter.Canvas widget based on the size of the 'container' tkinter.Frame widget.
 
         Args:
-            event (Optional[tkinter.Event]): The configuration event.
+                event (Optional[tkinter.Event]): The event object, if any.
 
         Returns:
-            None
-
-        Raises:
-            Exception: If an error occurs during configuration.
+                None
         """
-        try:
-            # Update scrollregion to encompass the entire embedded frame
-            self._canvas.configure(scrollregion=self._canvas.bbox(ALL))
 
-            # Configure the width of the ScrolledFrame widget
-            self._canvas.itemconfig(
-                tagOrId="window",
-                width=max(
-                    self._canvas.winfo_width(),
-                    self._canvas.winfo_reqwidth(),
-                ),
-            )
+        # Update the scroll region of the tkinter.Canvas widget based on the size of the 'container' tkinter.Frame widget
+        self.canvas.configure(scrollregion=self.canvas.bbox(ALL))
 
-            # Update idle tasks
-            self.update_idletasks()
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run '_on_configure' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
+        # Update idletasks
+        self.update_idletasks()
 
     def _on_mousewheel(
         self,
-        event: Optional[tkinter.Event] = None,
+        event: tkinter.Event,
     ) -> None:
         """
-        Handles mouse wheel scrolling for different platforms.
+        Handles mouse wheel events to scroll the tkinter.Canvas widget.
 
         Args:
-            event (Optional[tkinter.Event]): The mouse wheel event.
+            event (tkinter.Event): The mouse wheel event object.
 
         Returns:
             None
-
-        Raises:
-            Exception: If an error occurs during scrolling.
         """
-        try:
-            # Check, if the event is None
-            if not event:
-                # Return early
-                return
 
-            # Ontain the OS' sname
-            system: str = platform.system()
+        # Scroll the tkinter.Canvas widget
+        self.canvas.yview_scroll(
+            int(-1 * (event.delta / 120)),
+            "units",
+        )
 
-            # Initialise the amount int to 0
-            amount: int = event.delta
+    @override
+    def configure(
+        self,
+        name: Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the ScrolledFrame widget.
 
-            # Check, if teh OS is either Windows or Darwin (MacOS)
-            if system.lower() in [
-                "darwin",
-                "windows",
-            ]:
-                # Update the amout to be a (int) fraction
-                amount = int(1 * (amount // 120))
+        Args:
+            name (Optional[str]): The name of the ScrolledFrame widget.
+            **kwargs: Additional keyword arguments to pass to the tkinter.Frame widget's configure method.
 
-            # Check, if the event's state is equal to 'Mod1'
-            if event.state == "Mod1":
-                # Scroll the canvas in y-direction
-                self._canvas.yview_scroll(
-                    number=amount,
-                    what=UNITS,
-                )
+        Returns:
+            None
+        """
 
-            # Check, if the event's state is equal to 'Shift|Mod1'
-            elif event.state == "Shift|Mod1":
-                # Scroll the canvas in x-direction
-                self._canvas.xview_scroll(
-                    number=amount,
-                    what=UNITS,
-                )
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run '_on_mousewheel' method from '{self.__class__.__name__}' class: {e}"
+        # Check, if the name exists
+        if not name:
+            # Configure the ScrolledFrame widget directly
+            super().configure(
+                **kwargs,
             )
 
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+            # Return early
+            return
 
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the widget corresponding to the name
+        widget: Optional[tkinter.Misc] = getattr(
+            self,
+            name,
+            None,
+        )
 
-    def configure_canvas(
+        # Check, if the widget exists
+        if not widget:
+            # Return early
+            return
+
+        # Configure the widget
+        widget.configure(
+            **kwargs,
+        )
+
+    def configure_container(
         self,
         **kwargs,
     ) -> None:
         """
-        Configures the internal canvas widget with provided options.
+        Configures the 'container' tkinter.Frame widget.
 
         Args:
-            **kwargs: Keyword arguments to configure the canvas.
+            **kwargs: Additional keyword arguments to pass to the tkinter.Frame widget's configure method.
 
         Returns:
             None
-
-        Raises:
-            Exception: If an error occurs during configuration.
         """
-        try:
-            # Attempt to configure the tkinter.Canvas widget with the passed keyword arguments
-            self._canvas.configure(**kwargs)
-        except Exception as e:
-            # Log an error message to indicate that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_canvas' method from '{self.__class__.__name__}' class: {e}"
-            )
 
-            # Log the traceback
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
-
-    def configure_container_frame(
-        self,
-        **kwargs,
-    ) -> None:
-        """
-        Configures the internal container frame widget.
-
-        Args:
-            **kwargs: Keyword arguments to configure the container frame.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an error occurs during configuration.
-        """
-        try:
-            # Attempt to configure the 'container frame' tkinter.Frame widget with the passed keyword arguments
-            self._container_frame.configure(**kwargs)
-        except Exception as e:
-            # Log an error message to indicate that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the 'container' tkinter.Frame widget
+        self.container.configure(**kwargs)
 
     def configure_horizontal_scrollbar(
         self,
         **kwargs,
     ) -> None:
         """
-        Configures the horizontal scrollbar widget.
+        Configures the horizontal tkinter.Scrollbar widget.
 
         Args:
-            **kwargs: Keyword arguments to configure the scrollbar.
+            **kwargs: Additional keyword arguments to pass to the tkinter.Scrollbar widget's configure method.
 
         Returns:
             None
-
-        Raises:
-            Exception: If an error occurs during configuration.
         """
-        try:
-            # Check, if this widget has a horizontal scrollbar
-            if not self.has_horizontal_scroll:
-                # Return early
-                return
 
-            # Attempt to configure the 'container frame' tkinter.Frame widget with the passed keyword arguments
-            self._horizontal_scrollbar.configure(**kwargs)
-        except Exception as e:
-            # Log an error message to indicate that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_horizontal_scrollbar' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the horizontal tkinter.Scrollbar widget
+        self.horizontal_scrollbar.configure(**kwargs)
 
     def configure_vertical_scrollbar(
         self,
         **kwargs,
     ) -> None:
         """
-        Configures the vertical scrollbar widget.
+        Configures the vertical tkinter.Scrollbar widget.
 
         Args:
-            **kwargs: Keyword arguments to configure the scrollbar.
-
-        Returns:
-            None
-
-        Raises:
-            Exception: If an error occurs during configuration.
-        """
-        try:
-            # Check, if this widget has a vertical scrollbar
-            if not self.has_vertical_scroll:
-                # Return early
-                return
-
-            # Attempt to configure the 'container frame' tkinter.Frame widget with the passed keyword arguments
-            self._vertical_scrollbar.configure(**kwargs)
-        except Exception as e:
-            # Log an error message to indicate that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_vertical_scrollbar' method from '{self.__class__.__name__}' class: {e}"
-            )
-
-            # Log the traceback
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
-
-    @override
-    def destroy(self) -> None:
-        """
-        Cleans up and destroys the ScrolledFrame widget.
-
-        This method unbinds all mousewheel-related events to prevent memory leaks
-        or dangling event handlers, and then destroys the underlying Frame.
+            **kwargs: Additional keyword arguments to pass to the tkinter.Scrollbar widget's configure method.
 
         Returns:
             None
         """
 
-        # Obtain the OS' name
-        system: str = platform.system()
-
-        # Check, if the OS is 'Windows'
-        if system.lower() == "windows":
-            self._canvas.unbind_all(sequence="<MouseWheel>")
-
-        # Check, if the OS is 'Darwin' (MacOS)
-        elif system.lower() == "darwin":
-            self._canvas.unbind_all(sequence="<MouseWheel>")
-
-        # If the OS is neither Windows nor MacOS, assume it's Linux based
-        else:
-            self._canvas.unbind_all(sequence="<Button-4>")
-            self._canvas.unbind_all(sequence="<Button-5>")
-
-        # Call the parent class' 'destroy' method
-        super().destroy()
+        # Configure the vertical tkinter.Scrollbar widget
+        self.vertical_scrollbar.configure(**kwargs)
 
 
 class TabbedFrame(tkinter.Frame):
@@ -923,13 +760,14 @@ class TabbedFrame(tkinter.Frame):
         tabs (Dict[str, Dict[str, tkinter.Misc]]): A dictionary of tab labels mapped to their associated widgets and buttons.
         container (tkinter.Frame): The container that holds the tab headers and content.
         top_frame (tkinter.Frame): The top frame used for holding tab buttons.
+
+    Returns:
+        None
     """
 
     def __init__(
         self,
         master: tkinter.Misc,
-        column: int = 0,
-        row: int = 0,
         **kwargs: Optional[Dict[str, Any]],
     ) -> None:
         """
@@ -940,13 +778,17 @@ class TabbedFrame(tkinter.Frame):
 
         Args:
             master (tkinter.Misc): The parent widget to embed the TabbedFrame into.
-            column (int): The column position to grid the container in. Default is 0.
-            row (int): The row position to grid the container in. Default is 0.
             **kwargs: Additional configuration options for the container frame.
+
+        Returns:
+            None
         """
 
-        # Initialize this class' logger instance in an instance variable
-        self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
+        # Call the parent constructor with the passed arguments to initialize the tkinter.Frame widget
+        super().__init__(
+            master=master,
+            **kwargs,
+        )
 
         # Initialize the current tab (optional) string instance variable as None
         self.current_tab: Optional[str] = None
@@ -954,74 +796,64 @@ class TabbedFrame(tkinter.Frame):
         # Initialize the tabs dictionary instance variable as None
         self.tabs: Dict[str, tkinter.Misc] = {}
 
-        # Create the 'container frame' tkinter.Frame widget
-        self._container_frame: tkinter.Frame = tkinter.Frame(
-            master=master,
-            **kwargs,
-        )
-
-        self._container_frame.grid_columnconfigure(
-            index=0,
-            weight=1,
-        )
-
-        self._container_frame.grid_rowconfigure(
-            index=0,
-            weight=0,
-        )
-
-        self._container_frame.grid_rowconfigure(
-            index=1,
-            weight=1,
-        )
-
-        # Place the 'container frame' tkinter.Frame widget within the grid
-        self._container_frame.grid(
-            column=column,
-            row=row,
-            sticky=NSEW,
-        )
-
-        # Create the 'top frame' frame widget
-        self._top_frame: tkinter.Frame = tkinter.Frame(
-            master=self._container_frame,
-            **kwargs,
-        )
-
-        # Place the 'top frame' frame widget within the grid
-        self._top_frame.grid(
-            column=0,
-            padx=5,
-            pady=5,
-            row=0,
-            sticky=NSEW,
-        )
-
-        # Call the parent class constructor with the passed arguments
-        super().__init__(
-            master=self._container_frame,
-            **kwargs,
-        )
-
+        # Configure the TabbedFrame widget's 0th column to weight 1
         self.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
+        # Configure the TabbedFrame widget's 0th row to weight 0
         self.grid_rowconfigure(
             index=0,
+            weight=0,
+        )
+
+        # Configure the TabbedFrame widget's 1st row to weight 1
+        self.grid_rowconfigure(
+            index=1,
             weight=1,
         )
 
-        # Place this frame within the grid
-        self.grid(
+        # Create the 'top frame' tkinter.Frame widget
+        self._top_frame: tkinter.Frame = tkinter.Frame(
+            master=self,
+            **kwargs,
+        )
+
+        # Configure the 'top frame' tkinter.Frame widget's 0th row to weight 1
+        self._top_frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Create the 'container frame' tkinter.Frame widget
+        self._container: tkinter.Frame = tkinter.Frame(
+            master=self,
+            **kwargs,
+        )
+
+        # Place the 'container frame' tkinter.Frame widget within the grid
+        self._container.grid(
             column=0,
             row=1,
             sticky=NSEW,
         )
 
+        # Configure the 'container frame' tkinter.Frame widget's 0th column to weight 1
+        self._container.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the 'container frame' tkinter.Frame widget's 0th row to weight 1
+        self._container.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
     @property
-    def container_frame(self) -> tkinter.Frame:
+    def container(self) -> tkinter.Frame:
         """
         Returns the 'container frame' tkinter.Frame widget.
 
@@ -1030,7 +862,7 @@ class TabbedFrame(tkinter.Frame):
         """
 
         # Return the 'container frame' tkinter.Frame widget
-        return self._container_frame
+        return self._container
 
     @property
     def top_frame(self) -> tkinter.Frame:
@@ -1041,7 +873,7 @@ class TabbedFrame(tkinter.Frame):
             tkinter.Frame: The top frame widget.
         """
 
-        # Return the 'top frame' frame widget
+        # Return the 'top frame' tkinter.Frame widget
         return self._top_frame
 
     def _on_button_click(
@@ -1149,7 +981,7 @@ class TabbedFrame(tkinter.Frame):
             # Check, if the widget has been mapped already
             if not widget.winfo_ismapped():
                 # Show the passed widget
-                self.tabs[key]["widget"].grid(
+                widget.grid(
                     column=0,
                     row=0,
                     sticky=NSEW,
@@ -1159,7 +991,51 @@ class TabbedFrame(tkinter.Frame):
             self.current_tab = label
         else:
             # Hide the widegt from the grid
-            self.tabs[key]["widget"].grid_forget()
+            widget.grid_forget()
+
+    @override
+    def configure(
+        self,
+        name: Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the TabbedFrame widget.
+
+        Args:
+            name (Optional[str]): The name of the TabbedFrame widget.
+            **kwargs: Additional keyword arguments to pass to the tkinter.Frame widget's configure method.
+
+        Returns:
+            None
+        """
+
+        # Check, if the name exists
+        if not name:
+            # Configure the TabbedFrame widget directly
+            super().configure(
+                **kwargs,
+            )
+
+            # Return early
+            return
+
+        # Configure the widget corresponding to the name
+        widget: Optional[tkinter.Misc] = getattr(
+            self,
+            name,
+            None,
+        )
+
+        # Check, if the widget exists
+        if not widget:
+            # Return early
+            return
+
+        # Configure the widget
+        widget.configure(
+            **kwargs,
+        )
 
     def configure_button(
         self,
@@ -1178,34 +1054,20 @@ class TabbedFrame(tkinter.Frame):
 
         Returns:
             None
-
-        Raises:
-            Exception: If an error occurs during configuration, it will be logged and re-raised.
         """
-        try:
-            # Convert the passed name to snake case
-            key = Miscellaneous.any_to_snake(string=name)
 
-            # Check, if the passed name string is contained in the tabs dictionary instance variable
-            if key not in self.tabs:
-                # Return early
-                return
+        # Convert the passed name to snake case
+        key = Miscellaneous.any_to_snake(string=name)
 
-            # Attempt to configure the button widget corresponding to the passed name
-            self.tabs[key]["button"].configure(**kwargs)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_button' method from '{self.__class__.__name__}' class: {e}"
-            )
+        # Check, if the passed name string is contained in the tabs dictionary instance variable
+        if key not in self.tabs:
+            # Return early
+            return
 
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+        # Attempt to configure the button widget corresponding to the passed name
+        self.tabs[key]["button"].configure(**kwargs)
 
-            # Re-raise the exception to the caller
-            raise e
-
-    def configure_container_frame(
+    def configure_container(
         self,
         **kwargs,
     ) -> None:
@@ -1220,24 +1082,10 @@ class TabbedFrame(tkinter.Frame):
 
         Returns:
             None
-
-        Raises:
-            Exception: Raises an exception if any errors occur while attempting configuration.
         """
-        try:
-            # Attempt to configure the 'container frame' tkinter.Frame widget
-            self._container_frame.configure(**kwargs)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_container_frame' method from '{self.__class__.__name__}' class: {e}"
-            )
 
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the 'container frame' tkinter.Frame widget
+        self._container.configure(**kwargs)
 
     def configure_top_frame(
         self,
@@ -1254,24 +1102,10 @@ class TabbedFrame(tkinter.Frame):
 
         Returns:
             None
-
-        Raises:
-            Exception: Raises an exception if any errors occur while attempting configuration.
         """
-        try:
-            # Attempt to configure the 'top_frame' frame widget
-            self._top_frame.configure(**kwargs)
-        except Exception as e:
-            # Log an error message indicating that an exception has occurred
-            self.logger.error(
-                message=f"Caught an exception while attempting to run 'configure_top_frame' method from '{self.__class__.__name__}' class: {e}"
-            )
 
-            # Log the traceback as error message
-            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
-
-            # Re-raise the exception to the caller
-            raise e
+        # Configure the 'top frame' tkinter.Frame widget
+        self._top_frame.configure(**kwargs)
 
     def remove(
         self,
@@ -1287,11 +1121,11 @@ class TabbedFrame(tkinter.Frame):
             None
         """
 
-        #
+        # Destroy the button widget
         self.tabs[label]["button"].destroy()
 
-        #
+        # Destroy the widget
         self.tabs[label]["widget"].destroy()
 
-        #
+        # Remove the tab from the dictionary
         self.tabs.pop(label)
