@@ -628,6 +628,9 @@ class ScrolledFrame(tkinter.Frame):
         # Update the scroll region of the tkinter.Canvas widget based on the size of the 'container' tkinter.Frame widget
         self.canvas.configure(scrollregion=self.canvas.bbox(ALL))
 
+        # Configure the 'container' tkinter.Frame widget's width to match the width of the tkinter.Canvas widget
+        self._container.configure(width=self.canvas.winfo_width())
+
         # Update idletasks
         self.update_idletasks()
 

@@ -13,6 +13,7 @@ from utils.constants import Constants
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.object import ImmutableBaseObject
+from utils.utils import DateUtil
 
 
 __all__: Final[List[str]] = [
@@ -220,6 +221,7 @@ class DispatcherNotification(ImmutableBaseObject):
         start: datetime,
         errors: Optional[List[Dict[str, Any]]] = None,
         result: Optional[Dict[str, Any]] = None,
+        warnings: Optional[List[Dict[str, Any]]] = None,
     ) -> None:
         """
         Initializes a new instance of the DispatcherNotification class.
@@ -233,6 +235,7 @@ class DispatcherNotification(ImmutableBaseObject):
             namespace (str): The namespace under which the notification was created.
             result (Dict[str, Any]): The result of the notification.
             start (datetime): The timestamp when the notification started.
+            warnings (list, optional): A list of dictionary containing information regarding warnings.
 
         Returns:
             None
@@ -240,15 +243,16 @@ class DispatcherNotification(ImmutableBaseObject):
 
         # Call the parent constructor
         super().__init__(
-            hide_attributes=True,
             duration=duration,
             end=end,
             errors=errors,
             event=event,
+            hide_attributes=True,
             id=id,
             namespace=namespace,
             result=result,
             start=start,
+            warnings=warnings,
         )
 
     @property
@@ -335,9 +339,24 @@ class DispatcherNotification(ImmutableBaseObject):
         # Return the start time of the notification
         return self._start
 
+    @property
+    def warnings(self) -> List[Dict[str, Any]]:
+        """
+        Gets the list of warnings associated with the notification.
+
+        Returns:
+            List[Dict[str, Any]]: The list of warnings associated with the notification.
+        """
+
+        # Return the list associated with the 'warnings' key
+        return self._warnings
+
     def get_all_results(self) -> List[Any]:
         """
         Returns the result of the notification.
+
+        Args:
+            None
 
         Returns:
             List[Any]: The result of the notification.
@@ -347,7 +366,15 @@ class DispatcherNotification(ImmutableBaseObject):
         return list(self.result.values())
 
     def get_errors(self) -> List[Dict[str, Any]]:
-        """ """
+        """
+        Returns the list of errors associated with the notification.
+
+        Args:
+            None
+
+        Returns:
+            List[Dict[str, Any]]: The list of errors associated with the notification.
+        """
 
         # Return the list associated with the 'errors' key or an empty list
         return self.get(
@@ -361,6 +388,9 @@ class DispatcherNotification(ImmutableBaseObject):
 
         If the result contains more than one or no value(s), a ValueError is
         raised.
+
+        Args:
+            None
 
         Returns:
             Optional[Any]: The one and only result of the notification if it
@@ -438,18 +468,64 @@ class DispatcherNotification(ImmutableBaseObject):
         return key in self.result
 
     def has_errors(self) -> bool:
-        """ """
+        """
+        Returns True if the notification contains an 'errors' key, False otherwise.
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the notification contains an 'errors' key, False otherwise.
+        """
 
         # Return True, if the 'errors' key is present, otherwise False
         return self.has(key="errors")
+
+    def has_irregularities(self) -> bool:
+        """
+        Returns True if the notification contains any irregularities, (i.e. errors or warnings), False otherwise.
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the notification contains any irregularities, False otherwise.
+        """
+
+        # Return True, if the notification contains any irregularities, False otherwise
+        return any(
+            [
+                self.has_errors(),
+                self.has_warnings(),
+            ]
+        )
+
+    def has_warnings(self) -> bool:
+        """
+        Returns True if the notification contains a 'warnings' key, False otherwise.
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the notification contains a 'warnings' key, False otherwise.
+        """
+
+        # Return True, if the 'warnings' key is present, otherwise False
+        return self.has(key="warnings")
 
     def is_empty(self) -> bool:
         """
         Returns True if the notification is empty, False otherwise.
 
+        Args:
+            None
+
         Returns:
             bool: True if the notification is empty, False otherwise.
         """
+
+        # Return True, if the notification is empty, otherwise False
         return len(self.result) == 0
 
 
@@ -481,6 +557,7 @@ class DispatcherNotificationFactory:
         start: datetime,
         errors: Optional[List[Dict[str, Any]]] = None,
         result: Optional[Dict[str, Any]] = None,
+        warnings: Optional[List[Dict[str, Any]]] = None,
     ) -> Optional[DispatcherNotification]:
         """
         Creates a new instance of the DispatcherNotification class.
@@ -493,6 +570,7 @@ class DispatcherNotificationFactory:
             namespace (str): The namespace under which the notification was created.
             result (Any): The result of the notification.
             start (datetime): The timestamp when the notification started.
+            warnings (list, optional): A list of dictionary containing information regarding warnings.
 
         Returns:
             Optional[DispatcherNotification]: The created notification object if no exception occurs. Otherwise, None.
@@ -511,6 +589,7 @@ class DispatcherNotificationFactory:
                 namespace=namespace,
                 result=result,
                 start=start,
+                warnings=warnings,
             )
 
             # Increment the index for the next notification
@@ -744,6 +823,31 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+    def warnings(
+        self,
+        value: Dict[str, Any],
+    ) -> Self:
+        """
+        Sets the list of warnings associated with the notification.
+
+        Args:
+            value (Dict[str, Any]): The dictionary of warning related information.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Check, if the 'warnings' key is already present in the configuration dictionary
+        if "warnings" not in self.configuration:
+            # Initialize an empty list under the 'warnings' key
+            self.configuration["warnings"] = []
+
+        # Append a dictionary of warning related information to the warnings list
+        self.configuration["warnings"].append(value)
+
+        # Return the builder instance to th caller
+        return self
+
 
 class DispatcherEventSubscription(ImmutableBaseObject):
     """
@@ -861,8 +965,26 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             # Return None indicating an exception has occurred
             return None
 
+    def contains_namespace(
+        self,
+        namespace: str,
+    ) -> bool:
+        """
+        Checks if a namespace exists in the subscriptions dictionary.
+
+        Args:
+            namespace (str): The namespace to check.
+
+        Returns:
+            bool: True if the namespace exists, False otherwise.
+        """
+
+        # Return whether the namespace exists in the subscriptions dictionary
+        return namespace in self.subscriptions.keys()
+
     def notify_subscriptions(
         self,
+        builder: DispatcherNotificationBuilder,
         namespace: str,
         *args,
         **kwargs,
@@ -874,7 +996,10 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         function associated with each subscription.
 
         Args:
+            builder (DispatcherNotificationBuilder): The notification builder.
             namespace (str): The namespace under which the subscriptions are categorized.
+            *args: The arguments to pass to the function.
+            **kwargs: The keyword arguments to pass to the function.
 
         Returns:
             Optional[DispatcherNotification]: The notification built from the subscriptions.
@@ -884,22 +1009,19 @@ class DispatcherEventSubscription(ImmutableBaseObject):
         """
 
         # Get the current datetime
-        start: datetime = Miscellaneous.get_current_datetime()
-
-        # Initialize a notification builder
-        result: DispatcherNotificationBuilder = DispatcherNotificationBuilder()
+        start: datetime = DateUtil.now()
 
         # Initialize a list to store the UUIDs of non-persistent subscriptions
         non_persistents: List[str] = []
 
         # Set the event of the notification
-        result.event(value=self.event)
+        builder.event(value=self.event)
 
         # Set the namespace of the notification
-        result.namespace(value=namespace)
+        builder.namespace(value=namespace)
 
         # Set the start time of the notification
-        result.start(value=start)
+        builder.start(value=start)
 
         # Get the subscriptions in the namespace
         subscriptions: Dict[str, Any] = self.subscriptions.get(
@@ -929,7 +1051,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
 
                 try:
                     # Call the function associated with the subscription
-                    result.result(
+                    builder.result(
                         key=subscription["function"].__name__,
                         value=subscription["function"](
                             *args,
@@ -946,13 +1068,13 @@ class DispatcherEventSubscription(ImmutableBaseObject):
                     self.logger.error(message=traceback.format_exc())
 
                     # Add the function to the result with a Nonetype value
-                    result.result(
+                    builder.result(
                         key=subscription["function"].__name__,
                         value=None,
                     )
 
                     # Add the error to the result indicating that an exception has occurred
-                    result.errors(
+                    builder.errors(
                         exception=exception,
                         function=subscription["function"],
                         traceback=traceback.format_exc(),
@@ -960,7 +1082,7 @@ class DispatcherEventSubscription(ImmutableBaseObject):
 
         else:
             # Add the 'NaN' key with a None type value to the result to indicate an empty notification
-            result.result(
+            builder.result(
                 key="NaN",
                 value=None,
             )
@@ -971,22 +1093,21 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             self.remove_subscription(uuid=uuid)
 
         # Get the current datetime
-        end: datetime = Miscellaneous.get_current_datetime()
+        end: datetime = DateUtil.now()
 
         # Set the end time of the notification
-        result.end(value=end)
+        builder.end(value=end)
 
         # Calculate the duration of the notification
-        result.duration(
-            value=Miscellaneous.calculate_duration(
-                as_="seconds",
+        builder.duration(
+            value=DateUtil.calculate_duration(
                 end=end,
                 start=start,
             )
         )
 
-        # Build the notification and return it
-        return result.build()
+        # Return the notification
+        return builder
 
     def remove_subscription(
         self,
@@ -1154,7 +1275,7 @@ class Dispatcher(ImmutableBaseObject):
         namespace: str,
         *args,
         **kwargs,
-    ) -> Optional[DispatcherNotification]:
+    ) -> DispatcherNotification:
         """
         Dispatches an event to all registered subscriptions.
 
@@ -1165,25 +1286,57 @@ class Dispatcher(ImmutableBaseObject):
             **kwargs: Additional keyword arguments to be passed to the event handler.
 
         Returns:
-            Optional[DispatcherNotification]: The return value of the first function that handles the event.
+            DispatcherNotification: The notification object.
         """
+
+        # Initialize a new notification builder
+        builder: DispatcherNotificationBuilder = DispatcherNotificationBuilder()
+
         try:
             # Check if the event exists in the subscriptions dictionary
-            if event.name in self.subscriptions.keys():
-                # Attempt to dispatch the event
-                return self.subscriptions[event.name].notify_subscriptions(
-                    namespace=namespace,
-                    *args,
-                    **kwargs,
-                )
-            else:
+            if not self.is_event_registered(event=event):
                 # Log a warning message indicating the event was not found
                 self.logger.warning(
                     message=f"Event '{event.name}' not found in namespace '{namespace}'."
                 )
 
-                # Return None
-                return None
+                # Set the event of the notification builder
+                builder.event(value=event)
+
+                # Get the current datetime
+                start: datetime = DateUtil.now()
+
+                # Set the start time of the notification builder
+                builder.start(value=start)
+
+                # Set the namespace of the notification builder
+                builder.namespace(value=namespace)
+
+                # Add a warning to the notification builder
+                builder.warnings(
+                    value={
+                        "args": args,
+                        "event": event,
+                        "kwargs": kwargs,
+                        "message": f"Event '{event.name}' not found in namespace '{namespace}'.",
+                        "namespace": namespace,
+                        "timestamp": DateUtil.now(),
+                    }
+                )
+
+                # Set the end time of the notification builder
+                builder.end(value=DateUtil.now())
+
+                # Set the duration of the notification builder
+                builder.duration(value=DateUtil.calculate_duration(start=start))
+            else:
+                # Attempt to dispatch the event
+                builder = self.subscriptions[event.name].notify_subscriptions(
+                    builder=builder,
+                    namespace=namespace,
+                    *args,
+                    **kwargs,
+                )
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1194,9 +1347,66 @@ class Dispatcher(ImmutableBaseObject):
             self.logger.error(
                 message=f"An error occurred while dispatching event '{event.name}' in namespace '{namespace}' with arguments '{args}' and '{kwargs}'.",
             )
+        finally:
+            # Return the notification
+            return builder.build()
 
-            # Return None indicating an exception has occurred
-            return None
+    def is_event_registered(
+        self,
+        event: Union[DispatcherEvent, str],
+    ) -> bool:
+        """
+        Checks if a given event is registered.
+
+        Args:
+            event (Union[DispatcherEvent, str]): The event to check.
+
+        Returns:
+            bool: True if the event is registered, False otherwise.
+        """
+
+        # Check, if the event is a DispatcherEvent instance
+        if isinstance(
+            event,
+            DispatcherEvent,
+        ):
+            # Extract the event name
+            event = event.name
+
+        # Check, if the event is registered
+        return event in self.subscriptions.keys()
+
+    def is_namespace_registered(
+        self,
+        namespace: str,
+    ) -> bool:
+        """
+        Checks if a given namespace is registered.
+
+        Args:
+            namespace (str): The namespace to check.
+
+        Returns:
+            bool: True if the namespace is registered, False otherwise.
+        """
+
+        # Check, if the subscriptions dictionary is empty
+        if not self.subscriptions:
+            # Return False if the subscriptions dictionary is empty
+            return False
+
+        # Iterate over the subscriptions dictionary
+        for subscription in self.subscriptions.values():
+            # Check, if the subscription contains the namespace
+            if not subscription.contains_namespace(namespace=namespace):
+                # Skip to the next subscription
+                continue
+
+            # Return True if the namespace is registered
+            return True
+
+        # Return False if the namespace is not registered
+        return False
 
     def register(
         self,
@@ -1218,8 +1428,8 @@ class Dispatcher(ImmutableBaseObject):
             Optional[str]: The UUID of the subscription if successful, otherwise None.
         """
         try:
-            # Check if the event exists in the subscriptions dictionary
-            if event.name not in self.subscriptions.keys():
+            # Check if the event is already registered
+            if not self.is_event_registered(event=event):
                 # Create a new dictionary for the event if it doesn't exist
                 self.subscriptions[event.name] = {}
 
@@ -1304,7 +1514,7 @@ class Dispatcher(ImmutableBaseObject):
 
             if event:
                 # Remove the event from the subscriptions dictionary
-                if event.name in self.subscriptions.keys():
+                if self.is_event_registered(event=event):
                     self.subscriptions.pop(event.name)
 
                     # Log an info message indicating the subscriptions were removed
