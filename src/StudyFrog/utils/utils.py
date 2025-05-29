@@ -327,6 +327,40 @@ class DateUtil:
         return (cls.end_of_year(timezone=timezone) - cls.now(timezone=timezone)).days
 
     @classmethod
+    def decrement(
+        cls,
+        amount: Union[int, float],
+        date: Optional[datetime] = None,
+        what: Literal[
+            "seconds",
+            "minutes",
+            "hours",
+            "days",
+            "months",
+            "years",
+        ] = "days",
+    ) -> datetime:
+        """
+        Returns the datetime before the passed amount of time.
+
+        Args:
+            amount (Union[int, float]): The amount of time to decrement.
+            date (Optional[datetime], optional): The datetime to decrement. Defaults to None.
+            what (Literal["seconds", "minutes", "hours" ,"days", "months", "years"], optional): The amount of time to decrement. Defaults to "days".
+
+        Returns:
+            datetime: The datetime before the passed amount of time.
+        """
+
+        # Check, if a date has been passed
+        if not date:
+            # Set the date to the current datetime
+            date = cls.now()
+
+        # Return the datetime before the passed amount of time
+        return date - timedelta(**{what: amount})
+
+    @classmethod
     def end_of_day(
         cls,
         day: Optional[date] = None,
@@ -443,6 +477,40 @@ class DateUtil:
             if what == "datetime"
             else day.replace(month=12, day=31)
         )
+
+    @classmethod
+    def increment(
+        cls,
+        amount: Union[int, float],
+        date: Optional[datetime] = None,
+        what: Literal[
+            "seconds",
+            "minutes",
+            "hours",
+            "days",
+            "months",
+            "years",
+        ] = "days",
+    ) -> datetime:
+        """
+        Returns the datetime after the passed amount of time.
+
+        Args:
+            amount (Union[int, float]): The amount of time to increment.
+            date (Optional[datetime], optional): The datetime to increment. Defaults to None.
+            what (Literal["seconds", "minutes", "hours" ,"days", "months", "years"], optional): The amount of time to increment. Defaults to "days".
+
+        Returns:
+            datetime: The datetime after the passed amount of time.
+        """
+
+        # Check, if a date has been passed
+        if not date:
+            # Set the date to the current datetime
+            date = cls.now()
+
+        # Return the datetime after the passed amount of time
+        return date + timedelta(**{what: amount})
 
     @classmethod
     def now(
