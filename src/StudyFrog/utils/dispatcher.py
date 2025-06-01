@@ -397,6 +397,11 @@ class DispatcherNotification(ImmutableBaseObject):
                 contains exactly one value. Otherwise, None.
         """
         try:
+            # Check if the result is empty
+            if not self.result:
+                # Return None if the result is empty
+                return None
+
             # Check if the result contains more than one or no value(s)
             if len(self.result) == 1:
                 # Return the one and only result
@@ -447,7 +452,7 @@ class DispatcherNotification(ImmutableBaseObject):
             )
 
             # Return early
-            return
+            return None
 
         # Return the result
         return self.result[key]
@@ -756,6 +761,19 @@ class DispatcherNotificationBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+    def has_result(self) -> bool:
+        """
+        Checks if the notification has a result.
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the notification has a result, False otherwise.
+        """
+
+        return "result" in self.configuration
+
     def namespace(
         self,
         value: str,
@@ -1008,20 +1026,8 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             Exception: If an exception occurs while building the notification.
         """
 
-        # Get the current datetime
-        start: datetime = DateUtil.now()
-
         # Initialize a list to store the UUIDs of non-persistent subscriptions
         non_persistents: List[str] = []
-
-        # Set the event of the notification
-        builder.event(value=self.event)
-
-        # Set the namespace of the notification
-        builder.namespace(value=namespace)
-
-        # Set the start time of the notification
-        builder.start(value=start)
 
         # Get the subscriptions in the namespace
         subscriptions: Dict[str, Any] = self.subscriptions.get(
@@ -1029,82 +1035,70 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             {},
         )
 
-        # Check if there are any subscriptions in the namespace
-        if len(subscriptions) > 0:
-            # Iterate over the subscriptions in the namespace
-            for (
-                uuid,
-                subscription,
-            ) in subscriptions.items():
-                # Check if the subscription is persistent
-                if not subscription.get(
-                    "persistent",
-                    False,
-                ):
-                    # Add the subscription to the subscriptions dictionary
-                    non_persistents.append(uuid)
-
-                # Log a message indicating the function is beeing called
-                self.logger.info(
-                    message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
-                )
-
-                try:
-                    # Call the function associated with the subscription
-                    builder.result(
-                        key=subscription["function"].__name__,
-                        value=subscription["function"](
-                            *args,
-                            **kwargs,
-                        ),
-                    )
-                except Exception as exception:
-                    # Log an error message indicating that an exception has occurred
-                    self.logger.error(
-                        message=f"Caught an exception while attempting to run '{subscription["function"].__name__}' 'notify_subscription' from '{self.__class__.__name__}' class : {exception}"
-                    )
-
-                    # Log the traceback
-                    self.logger.error(message=traceback.format_exc())
-
-                    # Add the function to the result with a Nonetype value
-                    builder.result(
-                        key=subscription["function"].__name__,
-                        value=None,
-                    )
-
-                    # Add the error to the result indicating that an exception has occurred
-                    builder.errors(
-                        exception=exception,
-                        function=subscription["function"],
-                        traceback=traceback.format_exc(),
-                    )
-
-        else:
+        # Check if the subscriptions dictionary is empty
+        if not subscriptions:
             # Add the 'NaN' key with a None type value to the result to indicate an empty notification
             builder.result(
                 key="NaN",
                 value=None,
             )
 
+            # Return the builder instance to the caller
+            return builder
+
+        # Iterate over the subscriptions in the namespace
+        for (
+            uuid,
+            subscription,
+        ) in subscriptions.items():
+            # Check if the subscription is persistent
+            if not subscription.get(
+                "persistent",
+                False,
+            ):
+                # Add the subscription to the subscriptions dictionary
+                non_persistents.append(uuid)
+
+            # Log a message indicating the function is beeing called
+            self.logger.info(
+                message=f"Calling function '{subscription['function'].__name__}' with arguments '{args}' and '{kwargs}' in namespace '{namespace}'."
+            )
+
+            try:
+                # Call the function associated with the subscription
+                builder.result(
+                    key=subscription["function"].__name__,
+                    value=subscription["function"](
+                        *args,
+                        **kwargs,
+                    ),
+                )
+            except Exception as exception:
+                # Log an error message indicating that an exception has occurred
+                self.logger.error(
+                    message=f"Caught an exception while attempting to run '{subscription["function"].__name__}' 'notify_subscription' from '{self.__class__.__name__}' class : {exception}"
+                )
+
+                # Log the traceback
+                self.logger.error(message=traceback.format_exc())
+
+                # Add the function to the result with a Nonetype value
+                builder.result(
+                    key=subscription["function"].__name__,
+                    value=None,
+                )
+
+                # Add the error to the result indicating that an exception has occurred
+                builder.errors(
+                    exception=exception,
+                    function=subscription["function"],
+                    traceback=traceback.format_exc(),
+                )
+
         # Iterate over the non-persistent subscriptions
         for uuid in non_persistents:
             # Remove the subscription from the dispatcher
             self.remove_subscription(uuid=uuid)
-
-        # Get the current datetime
-        end: datetime = DateUtil.now()
-
-        # Set the end time of the notification
-        builder.end(value=end)
-
-        # Calculate the duration of the notification
-        builder.duration(
-            value=DateUtil.calculate_duration(
-                end=end,
-                start=start,
-            )
-        )
 
         # Return the notification
         return builder
@@ -1126,17 +1120,20 @@ class DispatcherEventSubscription(ImmutableBaseObject):
             # Iterate over the namesapces in the subscriptions dictionary
             for namespace in self.subscriptions.keys():
                 # Check if the UUID exists in the namespace
-                if uuid in self.subscriptions[namespace].keys():
-                    # Remove the subscription from the dictionary
-                    del self.subscriptions[namespace][uuid]
+                if uuid not in self.subscriptions[namespace].keys():
+                    # Skip to the next namespace
+                    continue
 
-                    # Log a message indicating the subscription was removed
-                    self.logger.info(
-                        message=f"Removed subscription with UUID '{uuid}' from namespace '{namespace}'."
-                    )
+                # Remove the subscription from the dictionary
+                del self.subscriptions[namespace][uuid]
 
-                    # Return True if the subscription was removed
-                    return True
+                # Log a message indicating the subscription was removed
+                self.logger.info(
+                    message=f"Removed subscription with UUID '{uuid}' from namespace '{namespace}'."
+                )
+
+                # Return True if the subscription was removed
+                return True
 
             # Log a warning message indicating the subscription was not found
             self.logger.warning(message=f"Subscription with UUID '{uuid}' not found.")
@@ -1292,6 +1289,18 @@ class Dispatcher(ImmutableBaseObject):
         # Initialize a new notification builder
         builder: DispatcherNotificationBuilder = DispatcherNotificationBuilder()
 
+        # Set the event of the notification builder
+        builder.event(value=event)
+
+        # Set the namespace of the notification builder
+        builder.namespace(value=namespace)
+
+        # Get the current datetime
+        start: datetime = DateUtil.now()
+
+        # Set the start time of the notification builder
+        builder.start(value=start)
+
         try:
             # Check if the event exists in the subscriptions dictionary
             if not self.is_event_registered(event=event):
@@ -1300,17 +1309,11 @@ class Dispatcher(ImmutableBaseObject):
                     message=f"Event '{event.name}' not found in namespace '{namespace}'."
                 )
 
-                # Set the event of the notification builder
-                builder.event(value=event)
-
-                # Get the current datetime
-                start: datetime = DateUtil.now()
-
-                # Set the start time of the notification builder
-                builder.start(value=start)
-
-                # Set the namespace of the notification builder
-                builder.namespace(value=namespace)
+                # Set the result of the notification builder
+                builder.result(
+                    key="NaN",
+                    value=None,
+                )
 
                 # Add a warning to the notification builder
                 builder.warnings(
@@ -1323,12 +1326,6 @@ class Dispatcher(ImmutableBaseObject):
                         "timestamp": DateUtil.now(),
                     }
                 )
-
-                # Set the end time of the notification builder
-                builder.end(value=DateUtil.now())
-
-                # Set the duration of the notification builder
-                builder.duration(value=DateUtil.calculate_duration(start=start))
             else:
                 # Attempt to dispatch the event
                 builder = self.subscriptions[event.name].notify_subscriptions(
@@ -1348,6 +1345,12 @@ class Dispatcher(ImmutableBaseObject):
                 message=f"An error occurred while dispatching event '{event.name}' in namespace '{namespace}' with arguments '{args}' and '{kwargs}'.",
             )
         finally:
+            # Set the end time of the notification builder
+            builder.end(value=DateUtil.now())
+
+            # Set the duration of the notification builder
+            builder.duration(value=DateUtil.calculate_duration(start=start))
+
             # Return the notification
             return builder.build()
 

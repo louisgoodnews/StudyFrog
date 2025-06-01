@@ -1378,6 +1378,12 @@ class UnifiedObjectService(ImmutableBaseObject):
                 "persistent": True,
             },
             {
+                "event": Events.REQUEST_GET_ALL_SUBJECTS,
+                "function": self.on_request_get_all_subjects,
+                "namespace": Constants.GLOBAL_NAMESPACE,
+                "persistent": True,
+            },
+            {
                 "event": Events.REQUEST_GET_ALL_USERS,
                 "function": self.on_request_get_all_users,
                 "namespace": Constants.GLOBAL_NAMESPACE,

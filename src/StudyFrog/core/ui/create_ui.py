@@ -628,6 +628,9 @@ class CreateUI(BaseUI):
             sticky=NSEW,
         )
 
+        # Create the "Top Frame" frame widgets
+        self.create_top_frame_widgets(master=top_frame)
+
         # Create the "Center Frame" frame widget
         self.center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
@@ -680,9 +683,6 @@ class CreateUI(BaseUI):
 
         # Create the "Bottom Frame" frame widgets
         self.create_bottom_frame_widgets(master=bottom_frame)
-
-        # Create the "Top Frame" frame widgets
-        self.create_top_frame_widgets(master=top_frame)
 
     def clear(self) -> None:
         """

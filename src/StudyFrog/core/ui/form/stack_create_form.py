@@ -8,20 +8,17 @@ import tkinter
 from tkinter.constants import *
 from typing import *
 
-from core.ui.fields.boolean_fields import CheckbuttonField
 from core.ui.fields.datetime_fields import DateSelectField
 from core.ui.fields.select_fields import ComboboxField
 from core.ui.fields.string_fields import (
-    MultiSelectAnswerField,
     MultiLineTextField,
     SingleLineTextField,
 )
 
-from core.ui.frames.frames import ScrolledFrame
-
 from core.ui.notifications.notifications import ToplevelToastNotification
 
 from core.stack import ImmutableStack
+from core.subject import ImmutableSubject
 
 from utils.base_create_form import BaseCreateForm
 from utils.constants import Constants
@@ -34,7 +31,11 @@ __all__: Final[List[str]] = ["StackCreateForm"]
 
 
 class StackCreateForm(BaseCreateForm):
-    """ """
+    """
+    A UI form for creating a new stack.
+
+    This class extends the BaseCreateForm class and provides a UI for creating a new stack.
+    """
 
     def __init__(
         self,
@@ -43,7 +44,18 @@ class StackCreateForm(BaseCreateForm):
         namespace: str,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Initializes a new instance of the StackCreateForm class.
+
+        Args:
+            dispatcher (Dispatcher): The Dispatcher instance used for event communication.
+            master (tkinter.Misc): The parent widget for this frame.
+            namespace (str): The namespace to dispatch events with.
+            **kwargs: Additional keyword arguments to pass to the parent class constructor.
+
+        Returns:
+            None
+        """
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -57,13 +69,31 @@ class StackCreateForm(BaseCreateForm):
         self,
         stack: ImmutableStack,
     ) -> None:
-        """ """
+        """
+        Handles the stack creation event.
+
+        Args:
+            stack (ImmutableStack): The stack that was created.
+
+        Returns:
+            None
+        """
 
         # Append the passed stack ImmutableStack object's name to the ComboboxField's value
         self.field_dict["ancestor"]["widget"].add(value=stack.name)
 
     @override
     def collect_subscriptions(self) -> List[Dict[str, Any]]:
+        """
+        Collects the subscriptions for this class.
+
+        Args:
+            None
+
+        Returns:
+            List[Dict[str, Any]]: The subscriptions for this class.
+        """
+
         # Call the parent class' 'collect_subscriptions' Method
         subscriptions: List[Dict[str, Any]] = super().collect_subscriptions()
 
@@ -86,7 +116,16 @@ class StackCreateForm(BaseCreateForm):
         label: str,
         value: Any,
     ) -> None:
-        """ """
+        """
+        Handles the field change event.
+
+        Args:
+            label (str): The label of the field that changed.
+            value (Any): The new value of the field.
+
+        Returns:
+            None
+        """
 
         # Call the super class' '_on_field_change' method with the passed arguments
         super()._on_field_change(
@@ -95,7 +134,7 @@ class StackCreateForm(BaseCreateForm):
         )
 
         # Check, if the changed field is the 'name' field
-        if label != "Name*: ":
+        if label.lower() != "name*: ":
             # Return early
             return
 
@@ -108,7 +147,7 @@ class StackCreateForm(BaseCreateForm):
 
         if not notification or notification.has_errors():
             # Log a warning message
-            self.logger.warning(message=f"")
+            self.logger.warning(message=f"Failed to dispatch the REQUEST_STACK_LOOKUP event in the global namespace.")
 
             # Return early
             return
@@ -130,9 +169,17 @@ class StackCreateForm(BaseCreateForm):
     @override
     def create_primary_attribute_widgets(
         self,
-        master: ScrolledFrame,
+        master: tkinter.Frame,
     ) -> None:
-        """ """
+        """
+        Creates the primary attribute widgets.
+
+        Args:
+            master (tkinter.Frame): The parent widget for the widgets.
+
+        Returns:
+            None
+        """
 
         # Configure the weight of the 0th column to 1
         master.grid_columnconfigure(
@@ -170,7 +217,7 @@ class StackCreateForm(BaseCreateForm):
             weight=0,
         )
 
-        # Configure the weight of the 5ft row to 1
+        # Configure the weight of the 5th row to 1
         master.grid_rowconfigure(
             index=5,
             weight=1,
@@ -560,8 +607,106 @@ class StackCreateForm(BaseCreateForm):
     @override
     def create_secondary_attribute_widgets(
         self,
-        master: ScrolledFrame,
+        master: tkinter.Frame,
     ) -> None:
-        """ """
+        """
+        Creates the secondary attribute widgets.
 
-        pass
+        Args:
+            master (tkinter.Frame): The parent widget for the widgets.
+
+        Returns:
+            None
+        """
+
+        # Configure the weight of the 0th column to 1
+        master.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Configure the weight of the 0th row to 0
+        master.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Dispatch the REQUEST_GET_ALL_SUBJECTS event in the global namespace
+        subject_notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+            event=Events.REQUEST_GET_ALL_SUBJECTS,
+            namespace=Constants.GLOBAL_NAMESPACE,
+        )
+
+        # Check, if the notification exists
+        if not subject_notification:
+            # Log a warning message
+            self.logger.warning(
+                message=f"Failed to dispatch the REQUEST_GET_ALL_SUBJECTS event in the global namespace."
+            )
+
+            # Return early
+            return
+
+        # Obtain the ImmutableSubject list from the DispatcherNotification's one and only result
+        subjects: Optional[Union[ImmutableSubject, List[ImmutableSubject]]] = (
+            subject_notification.get_one_and_only_result()
+        )
+
+        # Check, if the ImmutableSubject list exists
+        if not subjects:
+            # Set the ImmutableSubject list to an empty list
+            subjects = []
+        # Check if the ImmutableSubject is an instance of ImmutableSubject
+        elif subjects and isinstance(
+            subjects,
+            ImmutableSubject,
+        ):
+            # Set the ImmutableSubject list to an ImmutableSubject list
+            subjects = [subjects]
+
+        # Create the 'subject' ComboboxField widget
+        subject_field: ComboboxField = ComboboxField(
+            display_name="Subject: ",
+            master=master,
+            on_change_callback=self._on_field_change,
+            readonly=True,
+            values=[subject.name for subject in subjects] if subjects else [],
+        )
+
+        # Place the 'subject' ComboboxField widget in the grid
+        subject_field.grid(
+            column=0,
+            padx=10,
+            pady=10,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Style the 'subject' ComboboxField widget
+        subject_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Style the 'subject' ComboboxField widget's button
+        subject_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            relief=FLAT,
+        )
+
+        # Style the 'subject' ComboboxField widget's combobox
+        subject_field.configure_combobox(
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+        )
+
+        # Register the 'subject' ComboboxField widget
+        self._register_field(
+            label="Subject: ",
+            field=subject_field,
+            required=False,
+        )

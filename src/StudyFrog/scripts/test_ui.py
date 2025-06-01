@@ -59,12 +59,32 @@ def test_ui() -> None:
         )
 
         scrolled_frame: ScrolledFrame = ScrolledFrame(
+            horizontal_scrollbar=True,
             master=root,
-            column=0,
-            row=0,
         )
 
-        scrolled_frame.configure(background=Constants.RED["700"])
+        scrolled_frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+        for i in range(200):
+            scrolled_frame.container.grid_rowconfigure(
+                index=i,
+                weight=1,
+            )
+
+            label: tkinter.Label = tkinter.Label(
+                master=scrolled_frame.container,
+                text=f"Label {i}",
+            )
+
+            label.grid(
+                column=0,
+                row=i,
+                sticky=NSEW,
+            )
 
         # Start the main event loop
         root.mainloop()

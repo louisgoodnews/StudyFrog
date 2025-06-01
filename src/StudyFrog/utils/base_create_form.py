@@ -404,22 +404,34 @@ class BaseCreateForm(tkinter.Frame):
             master=master,
         )
 
-        # Configure the weight of the 0th column to 1
-        tabbed_frame.grid_columnconfigure(
+        # Configure the weight of the 0th column of the TabbedFrame widget's container to 1
+        tabbed_frame.container.grid_columnconfigure(
             index=0,
             weight=1,
         )
 
-        # Configure the weight of the 0th row to 1
-        tabbed_frame.grid_rowconfigure(
+        # Configure the weight of the 0th row of the TabbedFrame widget's container to 1
+        tabbed_frame.container.grid_rowconfigure(
             index=0,
             weight=1,
+        )
+
+        # Place the TabbedFrame widget in the grid
+        tabbed_frame.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
         )
 
         # Create the 'primary attributes' ScrolledFrame widget
         primary_attributes_scrolled_frame: ScrolledFrame = ScrolledFrame(
             background=Constants.BLUE_GREY["700"],
             master=tabbed_frame.container,
+        )
+
+        # Create the 'primary attributes' widgets
+        self.create_primary_attribute_widgets(
+            master=primary_attributes_scrolled_frame.container
         )
 
         # Add the 'primary attributes' ScrolledFrame widget to the TabbedFrame widget
@@ -446,6 +458,11 @@ class BaseCreateForm(tkinter.Frame):
             master=tabbed_frame.container,
         )
 
+        # Create the 'secondary attributes' widgets
+        self.create_secondary_attribute_widgets(
+            master=secondary_attributes_scrolled_frame.container
+        )
+
         # Add the 'secondary attributes' ScrolledFrame widget to the TabbedFrame widget
         tabbed_frame.add(
             label="Secondary Attributes",
@@ -462,16 +479,6 @@ class BaseCreateForm(tkinter.Frame):
             foreground=Constants.WHITE,
             name="Secondary Attributes",
             relief=FLAT,
-        )
-
-        # Create the 'primary attributes' widgets
-        self.create_primary_attribute_widgets(
-            master=primary_attributes_scrolled_frame.container
-        )
-
-        # Create the 'secondary attributes' widgets
-        self.create_secondary_attribute_widgets(
-            master=secondary_attributes_scrolled_frame.container
         )
 
     def create_primary_attribute_widgets(
@@ -602,6 +609,9 @@ class BaseCreateForm(tkinter.Frame):
             sticky=NSEW,
         )
 
+        # Create the 'top frame' widgets
+        self.create_top_frame_widgets(master=top_frame)
+
         # Create the 'center frame' tkinter.Frame widget
         center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
@@ -614,9 +624,6 @@ class BaseCreateForm(tkinter.Frame):
             row=1,
             sticky=NSEW,
         )
-
-        # Create the 'top frame' widgets
-        self.create_top_frame_widgets(master=top_frame)
 
         # Create the 'center frame' widgets
         self.create_center_frame_widgets(master=center_frame)

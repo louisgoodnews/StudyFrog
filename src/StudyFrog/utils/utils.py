@@ -27,10 +27,34 @@ class DateUtil:
         days_left_in_month(timezone: Optional[str] = None) -> int: Returns the number of days left in the month.
         days_left_in_week(timezone: Optional[str] = None) -> int: Returns the number of days left in the week.
         days_left_in_year(timezone: Optional[str] = None) -> int: Returns the number of days left in the year.
+        decrement(
+            amount: Union[int, float],
+            date: Optional[datetime] = None,
+            what: Literal[
+                "seconds",
+                "minutes",
+                "hours",
+                "days",
+                "months",
+                "years",
+            ] = "days",
+        ) -> datetime: Returns the datetime before the passed amount of time.
         end_of_day(day: Optional[date] = None) -> datetime: Returns the end of the day.
         end_of_month(day: Optional[date] = None) -> datetime: Returns the end of the month.
         end_of_week(day: Optional[date] = None) -> datetime: Returns the end of the week.
         end_of_year(day: Optional[date] = None) -> datetime: Returns the end of the year.
+        increment(
+            amount: Union[int, float],
+            date: Optional[datetime] = None,
+            what: Literal[
+                "seconds",
+                "minutes",
+                "hours",
+                "days",
+                "months",
+                "years",
+            ] = "days",
+        ) -> datetime: Returns the datetime after the passed amount of time.
         now(timezone: Optional[str] = None) -> datetime: Returns the current datetime.
         object_to_string(
             datetime_or_date: Union[datetime, date],
