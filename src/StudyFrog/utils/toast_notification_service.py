@@ -210,7 +210,6 @@ class ToastNotificationService(ImmutableBaseObject):
         try:
             # Initialize and show the toast notification
             ToplevelToastNotification(
-                background=Constants.BLUE["700"],
                 message=message,
                 message_label={
                     "background": Constants.BLUE["700"],
@@ -230,6 +229,9 @@ class ToastNotificationService(ImmutableBaseObject):
                         Constants.LARGE_FONT_SIZE,
                     ),
                     "foreground": Constants.WHITE,
+                },
+                toast={
+                    "background": Constants.BLUE["700"],
                 },
             )
         except Exception as e:
@@ -272,7 +274,6 @@ class ToastNotificationService(ImmutableBaseObject):
         try:
             # Initialize and show the toast notification
             ToplevelToastNotification(
-                background=Constants.RED["700"],
                 message=message,
                 message_label={
                     "background": Constants.RED["700"],
@@ -292,6 +293,9 @@ class ToastNotificationService(ImmutableBaseObject):
                         Constants.LARGE_FONT_SIZE,
                     ),
                     "foreground": Constants.BLACK,
+                },
+                toast={
+                    "background": Constants.RED["700"],
                 },
             )
         except Exception as e:
@@ -334,7 +338,6 @@ class ToastNotificationService(ImmutableBaseObject):
         try:
             # Initialize and show the toast notification
             ToplevelToastNotification(
-                background=Constants.BLUE_GREY["700"],
                 message=message,
                 message_label={
                     "background": Constants.BLUE_GREY["700"],
@@ -354,6 +357,9 @@ class ToastNotificationService(ImmutableBaseObject):
                         Constants.LARGE_FONT_SIZE,
                     ),
                     "foreground": Constants.WHITE,
+                },
+                toast={
+                    "background": Constants.BLUE_GREY["700"],
                 },
             )
         except Exception as e:
@@ -396,7 +402,6 @@ class ToastNotificationService(ImmutableBaseObject):
         try:
             # Initialize and show the toast notification
             ToplevelToastNotification(
-                background=Constants.GREY["700"],
                 message=message,
                 message_label={
                     "background": Constants.GREY["700"],
@@ -416,6 +421,9 @@ class ToastNotificationService(ImmutableBaseObject):
                         Constants.LARGE_FONT_SIZE,
                     ),
                     "foreground": Constants.WHITE,
+                },
+                toast={
+                    "background": Constants.GREY["700"],
                 },
             )
         except Exception as e:
@@ -458,7 +466,6 @@ class ToastNotificationService(ImmutableBaseObject):
         try:
             # Initialize and show the toast notification
             ToplevelToastNotification(
-                background=Constants.GREEN["700"],
                 message=message,
                 message_label={
                     "background": Constants.GREEN["700"],
@@ -478,6 +485,9 @@ class ToastNotificationService(ImmutableBaseObject):
                         Constants.LARGE_FONT_SIZE,
                     ),
                     "foreground": Constants.WHITE,
+                },
+                toast={
+                    "background": Constants.GREEN["700"],
                 },
             )
         except Exception as e:
@@ -520,7 +530,6 @@ class ToastNotificationService(ImmutableBaseObject):
         try:
             # Initialize and show the toast notification
             ToplevelToastNotification(
-                background=Constants.ORANGE["700"],
                 message=message,
                 message_label={
                     "background": Constants.ORANGE["700"],
@@ -540,6 +549,9 @@ class ToastNotificationService(ImmutableBaseObject):
                         Constants.LARGE_FONT_SIZE,
                     ),
                     "foreground": Constants.WHITE,
+                },
+                toast={
+                    "background": Constants.ORANGE["700"],
                 },
             )
         except Exception as e:

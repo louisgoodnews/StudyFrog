@@ -1583,7 +1583,9 @@ class CreateUI(BaseUI):
                 )
 
                 # Notify the user
-                ToplevelToastNotification(
+                self.dispatcher.dispatch(
+                    event=Events.REQUEST_SHOW_ERROR_TOAST,
+                    namespace=Constants.GLOBAL_NAMESPACE,
                     message=f"Failed to create {Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} in the database. Please check the logs for additional information.",
                     title=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} could not be created successfully",
                 )
@@ -1592,7 +1594,9 @@ class CreateUI(BaseUI):
                 return
 
             # Display a toast message to the user
-            ToplevelToastNotification(
+            self.dispatcher.dispatch(
+                event=Events.REQUEST_SHOW_SUCCESS_TOAST,
+                namespace=Constants.GLOBAL_NAMESPACE,
                 title=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} created successfully",
                 message=f"{Miscellaneous.snake_to_camel(string=form_data["type"]["value"])} with ID {entity.id} created successfully.",
             )

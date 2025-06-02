@@ -4,9 +4,9 @@ Date: 2025-02-11
 """
 
 import tkinter
+import traceback
 
 from tkinter.constants import *
-
 from typing import *
 
 from core.setting import SettingService
@@ -174,6 +174,9 @@ class MenuUI(BaseUI):
             sticky=NSEW,
         )
 
+        # Create the "Top Frame" frame widgets
+        self.create_top_frame_widgets(master=top_frame)
+
         # Attempt to create the "Center Frame" frame widget
         center_frame: tkinter.Frame = tkinter.Frame(
             background=Constants.BLUE_GREY["700"],
@@ -198,6 +201,9 @@ class MenuUI(BaseUI):
             row=1,
             sticky=NSEW,
         )
+
+        # Create the "Center Frame" frame widgets
+        self.create_center_frame_widgets(master=center_frame)
 
         # Attempt to create the "Bottom Frame" frame widget
         bottom_frame: tkinter.Frame = tkinter.Frame(
@@ -226,12 +232,6 @@ class MenuUI(BaseUI):
 
         # Create the "Bottom Frame" frame widgets
         self.create_bottom_frame_widgets(master=bottom_frame)
-
-        # Create the "Center Frame" frame widgets
-        self.create_center_frame_widgets(master=center_frame)
-
-        # Create the "Top Frame" frame widgets
-        self.create_top_frame_widgets(master=top_frame)
 
     def create_bottom_frame_widgets(
         self,
@@ -326,24 +326,10 @@ class MenuUI(BaseUI):
         )
 
         # Attempt to create the scrolled frame widgets
-        scrolled_frame: ScrolledFrame = ScrolledFrame(
-            master=master
-        )
+        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
 
         # Style the scrolled frame widget's root widget
-        scrolled_frame.configure(
-            background=Constants.BLUE_GREY["700"],
-        )
-
-        # Style the scrolled frame widget's canvas widget
-        scrolled_frame.configure_canvas(
-            background=Constants.BLUE_GREY["700"],
-        )
-
-        # Style the scrolled frame widget's frame widget
-        scrolled_frame.configure_container(
-            background=Constants.BLUE_GREY["700"],
-        )
+        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
 
         # Place the scrolled frame widget in the center frame
         scrolled_frame.grid(
@@ -361,7 +347,7 @@ class MenuUI(BaseUI):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             relief=FLAT,
             text="🏠",
         )
@@ -382,7 +368,7 @@ class MenuUI(BaseUI):
                 Constants.DEFAULT_FONT_SIZE,
             ),
             foreground=Constants.WHITE,
-            master=scrolled_frame,
+            master=scrolled_frame.container,
             text="Home",
         )
 
@@ -528,6 +514,9 @@ class MenuUI(BaseUI):
                 message=f"Caught an exception while attempting to run 'on_home_button_clicked' method from {self.__class__.__name__}: {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Re-raise the exception the caller
             raise e
 
@@ -555,6 +544,9 @@ class MenuUI(BaseUI):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'on_shutdown_button_clicked' method from {self.__class__.__name__}: {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception the caller
             raise e

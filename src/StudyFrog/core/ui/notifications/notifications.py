@@ -7,7 +7,6 @@ import tkinter
 import traceback
 
 from enum import Enum
-from tkinter import ttk
 from tkinter.constants import *
 from typing import *
 
@@ -32,9 +31,7 @@ class ToplevelPositions(Enum):
 
 
 class ToplevelNotification:
-    """
-    
-    """
+    """ """
 
     # Initialize this class' logger instance in a class variable
     logger: Final[Logger] = Logger.get_logger(name="ToplevelNotification")
@@ -1495,7 +1492,10 @@ class ToplevelToastNotification(tkinter.Toplevel):
         # Call the parent class constructor with the provided arguments
         super().__init__(
             master=master,
-            **kwargs,
+            **kwargs.get(
+                "toast",
+                {},
+            ),
         )
 
         # Set the focus on the window
@@ -1614,12 +1614,8 @@ class ToplevelToastNotification(tkinter.Toplevel):
         # Ring the bell
         self.bell()
 
-        # Schedule the fade in
-        self.fade_after_id = self.after(
-            25,
-            self._fade_in,
-            0.0,
-        )
+        # Show the window
+        self.show()
 
     @property
     def message_label(self) -> tkinter.Label:
@@ -1880,6 +1876,13 @@ class ToplevelToastNotification(tkinter.Toplevel):
                 # Set the y-coordinate to 10
                 y = 10
 
+            elif position == ToplevelPositions.CENTER:
+                # Set the x-coordinate to the width of the screen
+                x = screen_width / 2 - window_width / 2
+
+                # Set the y-coordinate to the height of the screen
+                y = screen_height / 2 - window_height / 2
+
             elif position == ToplevelPositions.BOTTOM_LEFT:
                 # Set the x-coordinate to 10
                 x = 10
@@ -1900,6 +1903,65 @@ class ToplevelToastNotification(tkinter.Toplevel):
             # Log an error message indicating that an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run '_place_toast' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback as error message
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    @override
+    def configure(
+        self,
+        name: Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the widget in question by the passed name.
+
+        This method is called when the widget in question needs to be configured. It configures the widget in question with the passed keyword arguments.
+
+        Args:
+            name (Optional[str]): The name of the widget in question
+            **kwargs: Any
+                Additional keyword arguments to pass to the tkinter.Misc constructor
+
+        Returns:
+            None
+        """
+        try:
+            # Check, if the 'name' argument is None
+            if name is None:
+                # Call the super class' 'configure' method with the passed keyword arguments
+                super().configure(**kwargs)
+
+                # Return early
+                return
+
+            # Get the widget in question by the passed name
+            widget: Optional[tkinter.Misc] = getattr(
+                self,
+                name,
+                None,
+            )
+
+            # Check, if the 'widget' is None
+            if widget is None:
+                # Log an error message indicating that the widget is not found
+                self.logger.error(
+                    message=f"Widget '{name}' not found in '{self.__class__.__name__}' class"
+                )
+
+                # Return early
+                return
+
+            # Configure the widget
+            widget.configure(**kwargs)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'configure' method from '{self.__class__.__name__}' class: {e}"
             )
 
             # Log the traceback as error message
@@ -1969,3 +2031,26 @@ class ToplevelToastNotification(tkinter.Toplevel):
 
             # Re-raise the exception to the caller
             raise e
+
+    def show(self) -> None:
+        """
+        Shows the toplevel widget.
+
+        This method is called when the toplevel widget needs to be shown. It shows the toplevel widget with a fade-in animation.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Place the toplevel widget
+        self._place_toast(position=self.position)
+
+        # Schedule the fade in
+        self.fade_after_id = self.after(
+            25,
+            self._fade_in,
+            0.0,
+        )

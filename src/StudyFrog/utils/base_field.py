@@ -128,22 +128,25 @@ class BaseField(tkinter.Frame):
             None
         """
 
-        # Check, if the on_enter_callback is not None
-        if self.on_enter_callback is not None:
-            try:
-                # Call the on_enter_callback
-                self.on_enter_callback()
-            except Exception as e:
-                # Log an error message to indicate that an exception has occurred
-                self.logger.error(
-                    message=f"Caught an exception while attempting to run '{self.on_enter_callback.__name__}' method from '{self.__class__.__name__}' class: {e}"
-                )
+        # Check, if the on_enter_callback is None
+        if self.on_enter_callback is None:
+            # Return early
+            return
 
-                # Log the traceback
-                self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+        try:
+            # Call the on_enter_callback
+            self.on_enter_callback()
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '{self.on_enter_callback.__name__}' method from '{self.__class__.__name__}' class: {e}"
+            )
 
-                # Re-raise the exception to the caller
-                raise e
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
     def _on_leave(
         self,
@@ -159,22 +162,25 @@ class BaseField(tkinter.Frame):
             None
         """
 
-        # Check, if the on_leave_callback is not None
-        if self.on_leave_callback is not None:
-            try:
-                # Call the on_leave_callback
-                self.on_leave_callback()
-            except Exception as e:
-                # Log an error message to indicate that an exception has occurred
-                self.logger.error(
-                    message=f"Caught an exception while attempting to run '{self.on_leave_callback.__name__}' method from '{self.__class__.__name__}' class: {e}"
-                )
+        # Check, if the on_leave_callback is None
+        if self.on_leave_callback is None:
+            # Return early
+            return
 
-                # Log the traceback
-                self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+        try:
+            # Call the on_leave_callback
+            self.on_leave_callback()
+        except Exception as e:
+            # Log an error message to indicate that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '{self.on_leave_callback.__name__}' method from '{self.__class__.__name__}' class: {e}"
+            )
 
-                # Re-raise the exception to the caller
-                raise e
+            # Log the traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
 
     def clear(
         self,
@@ -203,6 +209,9 @@ class BaseField(tkinter.Frame):
         This method configures the grid of the field widget by setting the
         weights of the columns and rows. It is called by the constructor of the
         BaseField class.
+
+        Args:
+            None
 
         Returns:
             None
@@ -263,6 +272,9 @@ class BaseField(tkinter.Frame):
 
         This method grabs the focus of the field widget, which is used to
         focus the widget when it is created.
+
+        Args:
+            None
 
         Returns:
             None

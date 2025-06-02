@@ -4,9 +4,9 @@ Date: 2025-02-08
 """
 
 import tkinter
+import traceback
 
 from tkinter.constants import *
-
 from typing import *
 
 from core.setting import SettingService
@@ -482,6 +482,9 @@ class MainUI(BaseUI):
                 message=f"Failed to validate navigation for navigation request: direction ({direction}), source ({source}) and target ({target})."
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -518,6 +521,11 @@ class MainUI(BaseUI):
             # Set true, if all event subscribers confirm and thus validate, otherwise False
             result: bool = all(notification.get_all_results())
 
+            # Log an info message with the result
+            self.logger.info(
+                message=f"Navigation validation result: {result}"
+            )
+
             if result:
                 # Dispatch the NAVIGATE_VALIDATE_SUCCESS event in the global namespace indicating a success
                 self.dispatcher.dispatch(
@@ -544,6 +552,9 @@ class MainUI(BaseUI):
                 event=Events.NAVIGATE_VALIDATE_FAILURE,
                 namespace=Constants.GLOBAL_NAMESPACE,
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return False to indicate that validation failed
             return False

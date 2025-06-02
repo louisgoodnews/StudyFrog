@@ -253,7 +253,7 @@ class ImmutableStack(ImmutableBaseObject):
             datetime: The last viewed date of the stack.
         """
 
-        return self._last_viewed_date
+        return self._last_viewed_at
 
     @property
     def metadata(self) -> Dict[str, Any]:
@@ -959,7 +959,7 @@ class MutableStack(MutableBaseObject):
             datetime: The last viewed date of the stack.
         """
 
-        return self._last_viewed_date
+        return self._last_viewed_at
 
     @last_viewed_at.setter
     def last_viewed_at(
@@ -976,7 +976,7 @@ class MutableStack(MutableBaseObject):
             None
         """
 
-        self._last_viewed_date = value
+        self._last_viewed_at = value
 
     @property
     def metadata(self) -> Dict[str, Any]:

@@ -268,6 +268,8 @@ class BaseUI(tkinter.Frame):
         Returns:
             bool: True if the navigation is valid, False otherwise.
         """
+
+        # Return True to the caller
         return True
 
     def subscribe_to_events(self) -> None:
