@@ -187,7 +187,7 @@ class ToastNotificationService(ImmutableBaseObject):
         message: str,
         title: str,
         on_click_callback: Optional[Callable[[], None]] = None,
-        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_LEFT,
+        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_RIGHT,
     ) -> None:
         """
         Shows a debug toast notification.
@@ -198,7 +198,7 @@ class ToastNotificationService(ImmutableBaseObject):
         Args:
             message (str): The message to display.
             on_click_callback (Optional[Callable[[], None]]): The callback to execute when the toast notification is clicked.
-            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_LEFT.
+            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_RIGHT.
             title (str): The title of the toast notification.
 
         Returns:
@@ -251,7 +251,7 @@ class ToastNotificationService(ImmutableBaseObject):
         message: str,
         title: str,
         on_click_callback: Optional[Callable[[], None]] = None,
-        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_LEFT,
+        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_RIGHT,
     ) -> None:
         """
         Shows an error toast notification.
@@ -262,7 +262,7 @@ class ToastNotificationService(ImmutableBaseObject):
         Args:
             message (str): The message to display.
             on_click_callback (Optional[Callable[[], None]]): The callback to execute when the toast notification is clicked.
-            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_LEFT.
+            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_RIGHT.
             title (str): The title of the toast notification.
 
         Returns:
@@ -315,7 +315,7 @@ class ToastNotificationService(ImmutableBaseObject):
         message: str,
         title: str,
         on_click_callback: Optional[Callable[[], None]] = None,
-        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_LEFT,
+        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_RIGHT,
     ) -> None:
         """
         Shows a generic toast notification.
@@ -326,7 +326,7 @@ class ToastNotificationService(ImmutableBaseObject):
         Args:
             message (str): The message to display.
             on_click_callback (Optional[Callable[[], None]]): The callback to execute when the toast notification is clicked.
-            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_LEFT.
+            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_RIGHT.
             title (str): The title of the toast notification.
 
         Returns:
@@ -379,7 +379,7 @@ class ToastNotificationService(ImmutableBaseObject):
         message: str,
         title: str,
         on_click_callback: Optional[Callable[[], None]] = None,
-        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_LEFT,
+        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_RIGHT,
     ) -> None:
         """
         Shows an info toast notification.
@@ -390,7 +390,7 @@ class ToastNotificationService(ImmutableBaseObject):
         Args:
             message (str): The message to display.
             on_click_callback (Optional[Callable[[], None]]): The callback to execute when the toast notification is clicked.
-            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_LEFT.
+            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_RIGHT.
             title (str): The title of the toast notification.
 
         Returns:
@@ -443,7 +443,7 @@ class ToastNotificationService(ImmutableBaseObject):
         message: str,
         title: str,
         on_click_callback: Optional[Callable[[], None]] = None,
-        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_LEFT,
+        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_RIGHT,
     ) -> None:
         """
         Shows a success toast notification.
@@ -454,7 +454,7 @@ class ToastNotificationService(ImmutableBaseObject):
         Args:
             message (str): The message to display.
             on_click_callback (Optional[Callable[[], None]]): The callback to execute when the toast notification is clicked.
-            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_LEFT.
+            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_RIGHT.
             title (str): The title of the toast notification.
 
         Returns:
@@ -507,7 +507,7 @@ class ToastNotificationService(ImmutableBaseObject):
         message: str,
         title: str,
         on_click_callback: Optional[Callable[[], None]] = None,
-        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_LEFT,
+        position: Union[ToplevelPositions, str] = ToplevelPositions.TOP_RIGHT,
     ) -> None:
         """
         Shows a warning toast notification.
@@ -518,7 +518,7 @@ class ToastNotificationService(ImmutableBaseObject):
         Args:
             message (str): The message to display.
             on_click_callback (Optional[Callable[[], None]]): The callback to execute when the toast notification is clicked.
-            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_LEFT.
+            position (Union[ToplevelPositions, str]): The position of the toast notification. Defaults to ToplevelPositions.TOP_RIGHT.
             title (str): The title of the toast notification.
 
         Returns:

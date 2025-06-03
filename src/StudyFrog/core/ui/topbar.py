@@ -6,9 +6,7 @@ Date: 2025-02-08
 import tkinter
 
 from tkinter import ttk
-
 from tkinter.constants import *
-
 from typing import *
 
 from core.ui.fields.string_fields import SearchbarField
@@ -329,7 +327,10 @@ class TopBar(tkinter.Frame):
             display_name="Search",
         )
 
-        # Configure the "Button" button widget
+        # Configure the search bar widget's background color
+        search_bar.configure(background=Constants.INDIGO["500"])
+
+        # Configure the search bar widget's "Button" button widget
         search_bar.configure_button(
             background=Constants.INDIGO["500"],
             command=self.on_searchbar_button_clicked,
@@ -341,7 +342,17 @@ class TopBar(tkinter.Frame):
             relief=FLAT,
         )
 
-        # Configure the "Entry" entry widget
+        # Configure the search bar widget's "Label" label widget
+        search_bar.configure_label(
+            background=Constants.INDIGO["500"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Configure the search bar widget's "Entry" entry widget
         search_bar.configure_entry(
             font=(Constants.DEFAULT_FONT_FAMILY, Constants.DEFAULT_FONT_SIZE),
         )
@@ -357,27 +368,23 @@ class TopBar(tkinter.Frame):
 
         # Bind the "<Enter>" event to the "Button" widget
         search_bar.bind(
-            func=lambda e: search_bar.button.config(
-                background=Constants.INDIGO["100"]
-            ),
+            func=lambda e: search_bar.button.config(background=Constants.INDIGO["100"]),
             sequence="<Enter>",
         )
 
         # Bind the "<Leave>" event to the "Button" widget
         search_bar.bind(
-            func=lambda e: search_bar.button.config(
-                background=Constants.INDIGO["500"]
-            ),
+            func=lambda e: search_bar.button.config(background=Constants.INDIGO["500"]),
             sequence="<Leave>",
         )
 
-        # Bind the "<FocusIn>" event to the "Entry" widget
+        # Bind the "<FocusIn>" event to the search bar widget's "Entry" widget
         search_bar.bind(
             func=lambda e: search_bar.entry.config(background="#E8EAF6"),
             sequence="<FocusIn>",
         )
 
-        # Bind the "<FocusOut>" event to the "Entry" widget
+        # Bind the "<FocusOut>" event to the search bar widget's "Entry" widget
         search_bar.bind(
             func=lambda e: search_bar.entry.config(background=Constants.WHITE),
             sequence="<FocusOut>",

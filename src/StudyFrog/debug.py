@@ -9,8 +9,10 @@ from scripts.clear_database import clear_database
 from scripts.test_ui import test_ui
 from scripts.upsert_database import upsert_database
 
-from utils.utils import DateUtil
+from utils.component_accessor import ComponentAccessor
+from utils.miscellaneous import Miscellaneous
 from utils.logger import Logger
+from utils.utils import DateUtil
 
 
 def debug() -> None:
@@ -31,7 +33,9 @@ def debug() -> None:
     logger.debug(message="Debugging...")
 
     # Log a debug message
-    logger.debug(message=f"Debugging completed. (runtime {DateUtil.calculate_duration(start=start)} seconds)")
+    logger.debug(
+        message=f"Debugging completed. (runtime {DateUtil.calculate_duration(start=start)} seconds)"
+    )
 
 
 if __name__ == "__main__":

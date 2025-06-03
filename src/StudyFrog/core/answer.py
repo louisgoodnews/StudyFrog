@@ -37,6 +37,7 @@ class ImmutableAnswer(ImmutableBaseObject):
 
     Attributes:
         answer_text (str): The text of the answer.
+        answer_text_word_count (int): The word count of the answer text.
         created_at (datetime): The timestamp when the answer was created.
         custom_field_values (List[Dict[str, Any]]): A list of custom field values.
         icon (str): The icon of the answer.
@@ -44,6 +45,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         key (str): The key of the answer.
         metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
         tags (List[str]): The keys of the tags associated with the answer.
+        total_word_count (int): The total word count of the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
         uuid (str): The UUID of the answer.
     """
@@ -51,6 +53,7 @@ class ImmutableAnswer(ImmutableBaseObject):
     def __init__(
         self,
         answer_text: str,
+        answer_text_word_count: Optional[int] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         icon: Optional[str] = "💬",
@@ -58,6 +61,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         key: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
+        total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -66,6 +70,7 @@ class ImmutableAnswer(ImmutableBaseObject):
 
         Args:
             answer_text (str): The text of the answer.
+            answer_text_word_count (Optional[int]): The word count of the answer text.
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
@@ -73,6 +78,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             key (Optional[str]): The key of the answer.
             metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             tags (List[str]): The keys of the tags associated with the answer.
+            total_word_count (Optional[int]): The total word count of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
 
@@ -83,6 +89,7 @@ class ImmutableAnswer(ImmutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             answer_text=answer_text,
+            answer_text_word_count=answer_text_word_count,
             created_at=created_at,
             custom_field_values=custom_field_values,
             hide_attributes=True,
@@ -91,6 +98,7 @@ class ImmutableAnswer(ImmutableBaseObject):
             key=key,
             metadata=metadata,
             tags=tags,
+            total_word_count=total_word_count,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -105,6 +113,17 @@ class ImmutableAnswer(ImmutableBaseObject):
         """
 
         return self._answer_text
+
+    @property
+    def answer_text_word_count(self) -> int:
+        """
+        Gets the word count of the answer text.
+
+        Returns:
+            int: The word count of the answer text.
+        """
+
+        return self._answer_text_word_count
 
     @property
     def created_at(self) -> datetime:
@@ -184,6 +203,17 @@ class ImmutableAnswer(ImmutableBaseObject):
         return self._tags
 
     @property
+    def total_word_count(self) -> int:
+        """
+        Gets the total word count of the answer.
+
+        Returns:
+            int: The total word count of the answer.
+        """
+
+        return self._total_word_count
+
+    @property
     def updated_at(self) -> datetime:
         """
         Gets the timestamp when the answer was last updated.
@@ -237,6 +267,7 @@ class MutableAnswer(MutableBaseObject):
 
     Attributes:
         answer_text (str): The text of the answer.
+        answer_text_word_count (int): The word count of the answer text.
         created_at (datetime): The timestamp when the answer was created.
         custom_field_values (List[Dict[str, Any]]): A list of custom field values.
         icon (str): The icon of the answer.
@@ -244,6 +275,7 @@ class MutableAnswer(MutableBaseObject):
         key (str): The key of the answer.
         metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
         tags (List[str]): The keys of the tags associated with the answer.
+        total_word_count (int): The total word count of the answer.
         updated_at (datetime): The timestamp when the answer was last updated.
         uuid (str): The UUID of the answer.
     """
@@ -251,6 +283,7 @@ class MutableAnswer(MutableBaseObject):
     def __init__(
         self,
         answer_text: str,
+        answer_text_word_count: Optional[int] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         icon: Optional[str] = "💬",
@@ -258,6 +291,7 @@ class MutableAnswer(MutableBaseObject):
         key: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
+        total_word_count: Optional[int] = None,  
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -266,6 +300,7 @@ class MutableAnswer(MutableBaseObject):
 
         Args:
             answer_text (str): The text of the answer.
+            answer_text_word_count (Optional[int]): The word count of the answer text.
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
@@ -273,6 +308,7 @@ class MutableAnswer(MutableBaseObject):
             key (Optional[str]): The key of the answer.
             metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             tags (List[str]): The keys of the tags associated with the answer.
+            total_word_count (Optional[int]): The total word count of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
 
@@ -283,6 +319,7 @@ class MutableAnswer(MutableBaseObject):
         # Call the parent class constructor
         super().__init__(
             answer_text=answer_text,
+            answer_text_word_count=answer_text_word_count,
             created_at=created_at,
             custom_field_values=custom_field_values,
             hide_attributes=True,
@@ -291,6 +328,7 @@ class MutableAnswer(MutableBaseObject):
             key=key,
             metadata=metadata,
             tags=tags,
+            total_word_count=total_word_count,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -322,6 +360,34 @@ class MutableAnswer(MutableBaseObject):
         """
 
         self._answer_text = value
+
+    @property
+    def answer_text_word_count(self) -> int:
+        """
+        Gets the word count of the answer text.
+
+        Returns:
+            int: The word count of the answer text.
+        """
+
+        return self._answer_text_word_count
+
+    @answer_text_word_count.setter
+    def answer_text_word_count(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the word count of the answer text.
+
+        Args:
+            value (int): The new word count of the answer text.
+
+        Returns:
+            None
+        """
+
+        self._answer_text_word_count = value
 
     @property
     def created_at(self) -> datetime:
@@ -517,6 +583,34 @@ class MutableAnswer(MutableBaseObject):
             self._tags.append(value)
 
     @property
+    def total_word_count(self) -> int:
+        """
+        Gets the total word count of the answer.
+
+        Returns:
+            int: The total word count of the answer.
+        """
+
+        return self._total_word_count
+
+    @total_word_count.setter
+    def total_word_count(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the total word count of the answer.
+
+        Args:
+            value (int): The new total word count of the answer.
+
+        Returns:
+            None
+        """
+
+        self._total_word_count = value
+
+    @property
     def updated_at(self) -> datetime:
         """
         Gets the timestamp when the answer was last updated.
@@ -680,6 +774,7 @@ class AnswerFactory:
     def create_answer(
         cls,
         answer_text: str,
+        answer_text_word_count: Optional[int] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         icon: Optional[str] = "💬",
@@ -687,6 +782,7 @@ class AnswerFactory:
         key: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
+        total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> Optional[ImmutableAnswer]:
@@ -695,6 +791,7 @@ class AnswerFactory:
 
         Args:
             answer_text (str): The text of the answer.
+            answer_text_word_count (Optional[int]): The word count of the answer text.
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): A list of custom field values.
             icon (Optional[str]): The icon of the answer. Defaults to "💬".
@@ -702,6 +799,7 @@ class AnswerFactory:
             key (Optional[str]): The key of the answer.
             metadata (Optional[Dict[str, Any]]): A dictionary of metadata.
             tags (List[str]): The keys of the tags associated with the answer.
+            total_word_count (Optional[int]): The total word count of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
 
@@ -715,6 +813,7 @@ class AnswerFactory:
             # Attempt to create an d return an ImmutableAnswer object
             return ImmutableAnswer(
                 answer_text=answer_text,
+                answer_text_word_count=answer_text_word_count,
                 created_at=created_at,
                 custom_field_values=custom_field_values,
                 icon=icon,
@@ -722,6 +821,7 @@ class AnswerFactory:
                 key=key,
                 metadata=metadata,
                 tags=tags,
+                total_word_count=total_word_count,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -789,6 +889,32 @@ class AnswerBuilder(BaseObjectBuilder):
 
         # Set the answer text
         self.configuration["answer_text"] = value
+
+        # Set the answer text wordcount
+        self.answer_text_word_count(value=len(value.split(" ")))
+
+        # Set the total wordcount
+        self.total_word_count(value=len(value.split(" ")))
+
+        # Return the builder instance
+        return self
+
+    def answer_text_word_count(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the answer text wordcount for the builder.
+
+        Args:
+            value (int): The answer text wordcount to set.
+
+        Returns:
+            Self: The builder instance with the answer text wordcount set.
+        """
+
+        # Set the answer text wordcount
+        self.configuration["answer_text_word_count"] = value
 
         # Return the builder instance
         return self
@@ -890,6 +1016,25 @@ class AnswerBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+    def total_word_count(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the total wordcount of the answer.
+
+        Args:
+            value (int): The total wordcount of the answer.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the total wordcount
+        self.configuration["total_word_count"] = value
+
+        # Return the builder instance
+        return self
 
 class AnswerManager(BaseObjectManager):
     """
@@ -1605,6 +1750,7 @@ class AnswerModel(ImmutableBaseModel):
 
     Attributes:
         answer_text (Optional[str]): The text of the answer.
+        answer_text_word_count (Optional[int]): The word count of the answer text.
         created_at (Optional[datetime]): The timestamp when the answer was created.
         custom_field_values (List[Dict[str, Any]]): The custom field values of the answer.
         icon (Optional[str]): The icon of the answer. Defaults to "💬".
@@ -1613,6 +1759,7 @@ class AnswerModel(ImmutableBaseModel):
         metadata (Dict[str, Any]): The metadata of the answer.
         table (str): The table name of the answer model.
         tags (List[str]): The keys of the tags associated with the answer.
+        total_word_count (Optional[int]): The total word count of the answer.
         updated_at (Optional[datetime]): The timestamp when the answer was last updated.
         uuid (Optional[str]): The UUID of the answer.
     """
@@ -1649,6 +1796,22 @@ class AnswerModel(ImmutableBaseModel):
         size=255,
         type="VARCHAR",
         unique=True,
+    )
+
+    answer_text_word_count: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="answer_text_word_count",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
     )
 
     created_at: Field = Field(
@@ -1744,6 +1907,22 @@ class AnswerModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="JSON",
+        unique=False,
+    )
+
+    total_word_count: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="total_word_count",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
         unique=False,
     )
 

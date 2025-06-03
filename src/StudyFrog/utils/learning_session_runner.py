@@ -147,6 +147,9 @@ class LearningSessionRunner:
         # Initialize the current content index
         self.content_index: int = -1
 
+        # Initialize the current entity to None
+        self.current_entity: Optional[Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion,]] = None
+
         # Store the passed difficulty list in an immutable instance variable
         self.difficulties: List[Union[ImmutableDifficulty]] = difficulties
 
@@ -909,6 +912,7 @@ class LearningSessionRunner:
                 event=Events.REQUEST_SHOW_YES_NO_TOPLEVEL,
                 message="Congratulations! You have completed the run. Do you wish to end the run?",
                 namespace=Constants.GLOBAL_NAMESPACE,
+                title="Run Completed",
             )
 
             # Check, if the notification exists or has errors
@@ -934,18 +938,17 @@ class LearningSessionRunner:
             # Check, if the learning session instance variable is mutable
             if not self.learning_session.is_mutable():
                 # Convert the learning session object into a mutable version
-                learning_session: MutableLearningSession = (
+                self.learning_session: MutableLearningSession = (
                     self.learning_session.to_mutable()
                 )
 
             # Set the end timestamp of the learning session
-            learning_session.end = Miscellaneous.get_current_datetime()
+            self.learning_session.end = Miscellaneous.get_current_datetime()
 
             # Calculate and set the duration of the learning session
-            learning_session.duration = Miscellaneous.calculate_duration(
+            self.learning_session.duration = Miscellaneous.calculate_duration(
                 as_="seconds",
-                end=learning_session.end,
-                start=learning_session.start,
+                start=self.learning_session.start,
             )
 
             # Request the 'Completed' status
@@ -966,10 +969,10 @@ class LearningSessionRunner:
                 return
 
             # Set the status of the learning session
-            learning_session.status = status.id
+            self.learning_session.status = status.id
 
             # Update the learning session in the database
-            self.learning_session = self._update_entity(update=learning_session)
+            self.learning_session = self._update_entity(update=self.learning_session)
 
             # Check, if the learning session exists
             if not self.learning_session:
@@ -1527,6 +1530,11 @@ class LearningSessionRunner:
                 ]
             ] = None
 
+            # Check, if a previous entity exists
+            if self.current_entity:
+                # Log the estimated reading time
+                self.logger.debug(message=Miscellaneous.estimate_reading_time(content=self.current_entity.total_word_count))
+
             # Check, if the 'enable_spaced_review' mode has been enabled in the settings dictionary instance variable
             if (
                 self.settings.get(
@@ -1619,6 +1627,9 @@ class LearningSessionRunner:
                     answers,
                 )
 
+            # Set the current entity
+            self.current_entity = entity
+
             # Return the entity to the caller
             return entity
         except Exception as e:
@@ -1691,6 +1702,9 @@ class LearningSessionRunner:
                         keys=entity.answers,
                     ),
                 )
+
+            # Set the current entity
+            self.current_entity = entity
 
             # Return the entity
             return entity

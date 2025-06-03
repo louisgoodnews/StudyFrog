@@ -7,7 +7,7 @@ import asyncio
 import traceback
 
 from datetime import datetime
-
+from enum import Enum
 from typing import *
 
 from core.difficulty import ImmutableDifficulty, MutableDifficulty
@@ -30,7 +30,51 @@ __all__: Final[List[str]] = [
     "QuestionFactory",
     "QuestionManager",
     "QuestionModel",
+    "QuestionTypes",
 ]
+
+
+class QuestionTypes(Enum):
+    """
+    An enum representing the types of questions.
+
+    Attributes:
+        CLOZE (str): The type of the question.
+        MULTIPLE_CHOICE (str): The type of the question.
+        MULTIPLE_SELECT (str): The type of the question.
+        OPEN_ANSWER (str): The type of the question.
+        TRUE_FALSE (str): The type of the question.
+    """
+
+    CLOZE: Literal["CLOZE"] = "CLOZE"
+    MULTIPLE_CHOICE: Literal["MULTIPLE_CHOICE"] = "MULTIPLE_CHOICE"
+    MULTIPLE_SELECT: Literal["MULTIPLE_SELECT"] = "MULTIPLE_SELECT"
+    OPEN_ANSWER: Literal["OPEN_ANSWER"] = "OPEN_ANSWER"
+    TRUE_FALSE: Literal["TRUE_FALSE"] = "TRUE_FALSE"
+
+    @classmethod
+    def get(
+        cls,
+        value: Literal[
+            "CLOZE",
+            "MULTIPLE_CHOICE",
+            "MULTIPLE_SELECT",
+            "OPEN_ANSWER",
+            "TRUE_FALSE",
+        ],
+    ) -> Literal["QuestionTypes"]:
+        """
+        Gets the type of the question.
+
+        Args:
+            value (Literal["CLOZE", "MULTIPLE_CHOICE", "MULTIPLE_SELECT", "OPEN_ANSWER", "TRUE_FALSE"]: The type of the question.
+
+        Returns:
+            Literal[QuestionTypes]: The type of the question.
+        """
+
+        # Return the type of the question
+        return cls(value)
 
 
 class ImmutableQuestion(ImmutableBaseObject):
@@ -54,7 +98,7 @@ class ImmutableQuestion(ImmutableBaseObject):
         priority (int): The priority of the question.
         status (int): The status of the question.
         question_text (str): The text of the question.
-        question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
+        question_type (Literal[QuestionTypes]): The type of the question.
         status (int): The status of the question.
         tags (Optional[List[str]]): The tags associated with the question.
         updated_at (datetime): The timestamp when the question was last updated.
@@ -64,11 +108,7 @@ class ImmutableQuestion(ImmutableBaseObject):
     def __init__(
         self,
         question_text: str,
-        question_type: Literal[
-            "MULTIPLE_CHOICE",
-            "OPEN_ANSWER",
-            "TRUE_FALSE",
-        ],
+        question_type: Literal[QuestionTypes],
         answers: Optional[List[str]] = None,
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
@@ -83,8 +123,10 @@ class ImmutableQuestion(ImmutableBaseObject):
         last_viewed_at: Optional[datetime] = None,
         metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
+        question_text_word_count: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
+        total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -93,7 +135,7 @@ class ImmutableQuestion(ImmutableBaseObject):
 
         Args:
             question_text (str): The text of the question.
-            question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
+            question_type (Literal[QuestionTypes]): The type of the question.
             answers (Optional[List[str]]): The answers to the question.
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
@@ -108,8 +150,10 @@ class ImmutableQuestion(ImmutableBaseObject):
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
             metadata (Optional[Dict[str, Any]]): The metadata of the question.
             priority (Optional[int]): The priority of the question.
+            question_text_word_count (Optional[int]): The word count of the question text.
             status (Optional[int]): The status of the question.
             tags (Optional[List[str]]): The tags associated with the question.
+            total_word_count (Optional[int]): The total word count of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -135,9 +179,11 @@ class ImmutableQuestion(ImmutableBaseObject):
             metadata=metadata,
             priority=priority,
             question_text=question_text,
+            question_text_word_count=question_text_word_count,
             question_type=question_type,
             status=status,
             tags=tags,
+            total_word_count=total_word_count,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -299,16 +345,24 @@ class ImmutableQuestion(ImmutableBaseObject):
         return self._question_text
 
     @property
-    def question_type(self) -> Literal[
-        "MULTIPLE_CHOICE",
-        "OPEN_ANSWER",
-        "TRUE_FALSE",
-    ]:
+    def question_text_word_count(self) -> int:
+        """
+        Gets the word count of the question text.
+
+        Returns:
+            int: The word count of the question text.
+        """
+
+        # Return the word count of the question text
+        return self._question_text_word_count
+
+    @property
+    def question_type(self) -> Literal[QuestionTypes]:
         """
         Gets the type of the question.
 
         Returns:
-            Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]: The type of the question.
+            Literal[QuestionTypes]: The type of the question.
         """
 
         # Return the type of the question
@@ -337,6 +391,18 @@ class ImmutableQuestion(ImmutableBaseObject):
 
         # Return the tags of the question
         return self._tags
+
+    @property
+    def total_word_count(self) -> int:
+        """
+        Gets the total word count of the question.
+
+        Returns:
+            int: The total word count of the question.
+        """
+
+        # Return the total word count of the question
+        return self._total_word_count
 
     @property
     def updated_at(self) -> datetime:
@@ -410,11 +476,13 @@ class MutableQuestion(MutableBaseObject):
         last_viewed_at (datetime): The timestamp when the question was last viewed.
         metadata (Optional[Dict[str, Any]]): The metadata of the question.
         priority (int): The priority of the question.
+        question_text_word_count (Optional[int]): The word count of the question text.
         status (int): The status of the question.
         question_text (str): The text of the question.
-        question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
+        question_type (Literal[QuestionTypes]): The type of the question.
         status (int): The status of the question.
         tags (Optional[List[str]]): The tags associated with the question.
+        total_word_count (Optional[int]): The total word count of the question.
         updated_at (datetime): The timestamp when the question was last updated.
         uuid (str): The UUID of the question.
     """
@@ -422,7 +490,7 @@ class MutableQuestion(MutableBaseObject):
     def __init__(
         self,
         question_text: str,
-        question_type: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
+        question_type: Literal[QuestionTypes],
         answers: Optional[List[str]] = None,
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
@@ -437,8 +505,10 @@ class MutableQuestion(MutableBaseObject):
         last_viewed_at: Optional[datetime] = None,
         metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
+        question_text_word_count: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
+        total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -447,7 +517,7 @@ class MutableQuestion(MutableBaseObject):
 
         Args:
             question_text (str): The text of the question.
-            question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
+            question_type (Literal[QuestionTypes]): The type of the question.
             answers (Optional[List[str]]): The answers to the question.
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
@@ -462,8 +532,10 @@ class MutableQuestion(MutableBaseObject):
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
             metadata (Optional[Dict[str, Any]]): The metadata of the question.
             priority (Optional[int]): The priority of the question.
+            question_text_word_count (Optional[int]): The word count of the question text.
             status (Optional[int]): The status of the question.
             tags (Optional[List[str]]): The tags associated with the question.
+            total_word_count (Optional[int]): The total word count of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -489,9 +561,11 @@ class MutableQuestion(MutableBaseObject):
             metadata=metadata,
             priority=priority,
             question_text=question_text,
+            question_text_word_count=question_text_word_count,
             question_type=question_type,
             status=status,
             tags=tags,
+            total_word_count=total_word_count,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -915,16 +989,42 @@ class MutableQuestion(MutableBaseObject):
         self._question_text = value
 
     @property
-    def question_type(self) -> Literal[
-        "MULTIPLE_CHOICE",
-        "OPEN_ANSWER",
-        "TRUE_FALSE",
-    ]:
+    def question_text_word_count(self) -> int:
+        """
+        Gets the word count of the question text.
+
+        Returns:
+            int: The word count of the question text.
+        """
+
+        # Return the word count of the question text
+        return self._question_text_word_count
+
+    @question_text_word_count.setter
+    def question_text_word_count(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the word count of the question text.
+
+        Args:
+            value (int): The new word count of the question text.
+
+        Returns:
+            None
+        """
+
+        # Set the word count of the question text
+        self._question_text_word_count = value
+
+    @property
+    def question_type(self) -> Literal[QuestionTypes]:
         """
         Gets the type of the question.
 
         Returns:
-            Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]: The type of the question.
+            Literal[QuestionTypes]: The type of the question.
         """
 
         # Return the type of the question
@@ -933,17 +1033,13 @@ class MutableQuestion(MutableBaseObject):
     @question_type.setter
     def question_type(
         self,
-        value: Literal[
-            "MULTIPLE_CHOICE",
-            "OPEN_ANSWER",
-            "TRUE_FALSE",
-        ],
+        value: Literal[QuestionTypes],
     ) -> None:
         """
         Sets the type of the question.
 
         Args:
-            value (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]: The new type of the question.
+            value (Literal[QuestionTypes]): The new type of the question.
 
         Returns:
             None
@@ -1022,6 +1118,36 @@ class MutableQuestion(MutableBaseObject):
         ):
             # Extend the list with the passed value
             self._tags.extend(value)
+
+    @property
+    def total_word_count(self) -> int:
+        """
+        Gets the total word count of the question.
+
+        Returns:
+            int: The total word count of the question.
+        """
+
+        # Return the total word count of the question
+        return self._total_word_count
+
+    @total_word_count.setter
+    def total_word_count(
+        self,
+        value: int,
+    ) -> None:
+        """
+        Sets the total word count of the question.
+
+        Args:
+            value (int): The new total word count of the question.
+
+        Returns:
+            None
+        """
+
+        # Set the total word count of the question
+        self._total_word_count = value
 
     @property
     def updated_at(self) -> datetime:
@@ -1339,11 +1465,7 @@ class QuestionFactory:
     def create_question(
         cls,
         question_text: str,
-        question_type: Literal[
-            "MULTIPLE_CHOICE",
-            "OPEN_ANSWER",
-            "TRUE_FALSE",
-        ],
+        question_type: Literal[QuestionTypes],
         answers: Optional[List[str]] = None,
         correct_answers: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
@@ -1355,8 +1477,10 @@ class QuestionFactory:
         last_viewed_at: Optional[datetime] = None,
         metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
+        question_text_word_count: Optional[int] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
+        total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> MutableQuestion:
@@ -1365,7 +1489,7 @@ class QuestionFactory:
 
         Args:
             question_text (str): The text of the question.
-            question_type (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]): The type of the question.
+            question_type (Literal[QuestionTypes]): The type of the question.
             answers (Optional[List[str]]): The answers to the question.
             correct_answers (Optional[List[str]]): The correct answers to the question.
             created_at (Optional[datetime]): The timestamp when the question was created.
@@ -1377,8 +1501,10 @@ class QuestionFactory:
             last_viewed_at (Optional[datetime]): The timestamp when the question was last viewed.
             metadata (Optional[Dict[str, Any]]): The metadata of the question.
             priority (Optional[int]): The priority of the question.
+            question_text_word_count (Optional[int]): The word count of the question text.
             status (Optional[int]): The status of the question.
             tags (Optional[List[str]]): The tags associated with the question.
+            total_word_count (Optional[int]): The total word count of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -1400,9 +1526,11 @@ class QuestionFactory:
                 metadata=metadata,
                 priority=priority,
                 question_text=question_text,
+                question_text_word_count=question_text_word_count,
                 question_type=question_type,
                 status=status,
                 tags=tags,
+                total_word_count=total_word_count,
                 updated_at=updated_at,
                 uuid=uuid,
             )
@@ -1688,6 +1816,12 @@ class QuestionBuilder(BaseObjectBuilder):
         # Set the priority value in the configuration dictionary
         self.configuration["priority"] = value
 
+        # Set the question text wordcount
+        self.question_text_wordcount(value=len(value.split(" ")))
+
+        # Set the total wordcount
+        self.total_wordcount(value=len(value.split(" ")))
+
         # Return the builder instance
         return self
 
@@ -1711,15 +1845,35 @@ class QuestionBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+    def question_text_word_count(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the question text word count of the flashcard.
+
+        Args:
+            value (int): The question text word count of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the question_text_word_count value in the configuration dictionary
+        self.configuration["question_text_word_count"] = value
+
+        # Return the builder instance
+        return self
+
     def question_type(
         self,
-        value: Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"],
+        value: Literal[QuestionTypes],
     ) -> Self:
         """
         Sets the question type of the flashcard.
 
         Args:
-            value (Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]: The question type of the flashcard.
+            value (Literal[QuestionTypes]): The question type of the flashcard.
 
         Returns:
             Self: The builder instance.
@@ -1784,6 +1938,26 @@ class QuestionBuilder(BaseObjectBuilder):
         ):
             # Extend the 'tags' list with the new values
             self.configuration["tags"].extend(value)
+
+        # Return the builder instance
+        return self
+
+    def total_word_count(
+        self,
+        value: int,
+    ) -> Self:
+        """
+        Sets the total word count of the flashcard.
+
+        Args:
+            value (int): The total word count of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
+        # Set the total_word_count value in the configuration dictionary
+        self.configuration["total_word_count"] = value
 
         # Return the builder instance
         return self
@@ -2488,9 +2662,11 @@ class QuestionModel(ImmutableBaseModel):
         last_viewed_at (Field): The timestamp when the question was last viewed.
         priority (Field): The priority of the question.
         question_text (Field): The text of the question.
+        question_text_word_count (Field): The word count of the question text.
         question_type (Field): The type of the question.
         status (Field): The status of the question.
         tags (Field): The tags associated with the question.
+        total_word_count (Field): The total word count of the question.
         updated_at (Field): The timestamp when the question was last updated.
         uuid (Field): The UUID of the question.
     """
@@ -2737,6 +2913,22 @@ class QuestionModel(ImmutableBaseModel):
         unique=False,
     )
 
+    question_text_word_count: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="question_text_word_count",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
+        unique=False,
+    )
+
     question_type: Field = Field(
         autoincrement=False,
         default=None,
@@ -2782,6 +2974,22 @@ class QuestionModel(ImmutableBaseModel):
         primary_key=False,
         size=None,
         type="JSON",
+        unique=False,
+    )
+
+    total_word_count: Field = Field(
+        autoincrement=False,
+        default=None,
+        description="",
+        foreign_key=None,
+        index=False,
+        name="total_word_count",
+        nullable=False,
+        on_delete=None,
+        on_update=None,
+        primary_key=False,
+        size=None,
+        type="INTEGER",
         unique=False,
     )
 
@@ -2833,8 +3041,10 @@ class QuestionModel(ImmutableBaseModel):
         metadata: Optional[Dict[str, Any]] = None,
         priority: Optional[int] = None,
         question_text: Optional[str] = None,
+        question_text_word_count: Optional[int] = None,
         question_type: Optional[
             Literal[
+                "CLOZE",
                 "MULTIPLE_CHOICE",
                 "OPEN_ANSWER",
                 "TRUE_FALSE",
@@ -2842,6 +3052,7 @@ class QuestionModel(ImmutableBaseModel):
         ] = None,
         status: Optional[int] = None,
         tags: Optional[List[str]] = None,
+        total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -2863,9 +3074,11 @@ class QuestionModel(ImmutableBaseModel):
             metadata (Optional[Dict[str, Any]]): The metadata of the question.
             priority (Optional[int]): The priority of the question.
             question_text (Optional[str]): The text of the question.
-            question_type (Optional[Literal["MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]]): The type of the question.
+            question_text_word_count (Optional[int]): The word count of the question text.
+            question_type (Optional[Literal["CLOZE", "MULTIPLE_CHOICE", "OPEN_ANSWER", "TRUE_FALSE"]]): The type of the question.
             status (Optional[int]): The ID of the status of the question.
             tags (Optional[List[str]]): The tags associated with the question.
+            total_word_count (Optional[int]): The total word count of the question.
             updated_at (Optional[datetime]): The timestamp when the question was last updated.
             uuid (Optional[str]): The UUID of the question.
 
@@ -2889,10 +3102,12 @@ class QuestionModel(ImmutableBaseModel):
             metadata=metadata,
             priority=priority,
             question_text=question_text,
+            question_text_word_count=question_text_word_count,
             question_type=question_type,
             status=status,
             table=Constants.QUESTIONS,
             tags=tags,
+            total_word_count=total_word_count,
             updated_at=updated_at,
             uuid=uuid,
         )

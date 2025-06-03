@@ -165,12 +165,12 @@ class ImmutableLearningSession(ImmutableBaseObject):
         return self._contents
 
     @property
-    def created_at(self) -> Optional[datetime]:
+    def created_at(self) -> datetime:
         """
         Returns the created_at of the learning session.
 
         Returns:
-            Optional[datetime]: The created_at of the learning session.
+            datetime: The created_at of the learning session.
         """
         return self._created_at
 
@@ -196,12 +196,12 @@ class ImmutableLearningSession(ImmutableBaseObject):
         return self._duration
 
     @property
-    def end(self) -> Optional[datetime]:
+    def end(self) -> datetime:
         """
         Returns the end of the learning session.
 
         Returns:
-            Optional[datetime]: The end of the learning session.
+            datetime: The end of the learning session.
         """
 
         return self._end
@@ -262,12 +262,12 @@ class ImmutableLearningSession(ImmutableBaseObject):
         return self._mode
 
     @property
-    def result(self) -> Optional[int]:
+    def result(self) -> int:
         """
         Returns the result of the learning session.
 
         Returns:
-            Optional[int]: The result of the learning session.
+            int: The result of the learning session.
         """
 
         return self._result
@@ -295,45 +295,45 @@ class ImmutableLearningSession(ImmutableBaseObject):
         return self._stacks
 
     @property
-    def start(self) -> Optional[datetime]:
+    def start(self) -> datetime:
         """
         Returns the start of the learning session.
 
         Returns:
-            Optional[datetime]: The start of the learning session.
+            datetime: The start of the learning session.
         """
 
         return self._start
 
     @property
-    def status(self) -> Optional[int]:
+    def status(self) -> int:
         """
         Returns the status of the learning session.
 
         Returns:
-            Optional[int]: The status of the learning session.
+            int: The status of the learning session.
         """
 
         return self._status
 
     @property
-    def updated_at(self) -> Optional[datetime]:
+    def updated_at(self) -> datetime:
         """
         Returns the updated_at of the learning session.
 
         Returns:
-            Optional[datetime]: The updated_at of the learning session.
+            datetime: The updated_at of the learning session.
         """
 
         return self._updated_at
 
     @property
-    def uuid(self) -> Optional[str]:
+    def uuid(self) -> str:
         """
         Returns the uuid of the learning session.
 
         Returns:
-            Optional[str]: The uuid of the learning session.
+            str: The uuid of the learning session.
         """
 
         return self._uuid
@@ -609,12 +609,12 @@ class MutableLearningSession(MutableBaseObject):
             self._contents = [value]
 
     @property
-    def created_at(self) -> Optional[datetime]:
+    def created_at(self) -> datetime:
         """
         Returns the created_at of the learning session.
 
         Returns:
-            Optional[datetime]: The created_at of the learning session.
+            datetime: The created_at of the learning session.
         """
         return self._created_at
 
@@ -710,12 +710,12 @@ class MutableLearningSession(MutableBaseObject):
         self._duration = value
 
     @property
-    def end(self) -> Optional[datetime]:
+    def end(self) -> datetime:
         """
         Returns the end of the learning session.
 
         Returns:
-            Optional[datetime]: The end of the learning session.
+            datetime: The end of the learning session.
         """
 
         return self._end
@@ -723,13 +723,13 @@ class MutableLearningSession(MutableBaseObject):
     @end.setter
     def end(
         self,
-        value: Optional[datetime],
+        value: datetime,
     ) -> None:
         """
         Sets the end of the learning session.
 
         Args:
-            value (Optional[datetime]): The new end of the learning session.
+            value (datetime): The new end of the learning session.
 
         Returns:
             None
@@ -904,12 +904,12 @@ class MutableLearningSession(MutableBaseObject):
         self._mode = value
 
     @property
-    def result(self) -> Optional[int]:
+    def result(self) -> int:
         """
         Returns the result of the learning session.
 
         Returns:
-            Optional[int]: The result of the learning session.
+            int: The result of the learning session.
         """
 
         return self._result
@@ -1017,12 +1017,12 @@ class MutableLearningSession(MutableBaseObject):
             self._stacks.extend(value)
 
     @property
-    def start(self) -> Optional[datetime]:
+    def start(self) -> datetime:
         """
         Returns the start of the learning session.
 
         Returns:
-            Optional[datetime]: The start of the learning session.
+            datetime: The start of the learning session.
         """
 
         return self._start
@@ -1030,13 +1030,13 @@ class MutableLearningSession(MutableBaseObject):
     @start.setter
     def start(
         self,
-        value: Optional[datetime],
+        value: datetime,
     ) -> None:
         """
         Sets the start of the learning session.
 
         Args:
-            value (Optional[datetime]): The new start of the learning session.
+            value (datetime): The new start of the learning session.
 
         Returns:
             None
@@ -1044,12 +1044,12 @@ class MutableLearningSession(MutableBaseObject):
         self._start = value
 
     @property
-    def status(self) -> Optional[int]:
+    def status(self) -> int:
         """
         Returns the status of the learning session.
 
         Returns:
-            Optional[int]: The status of the learning session.
+            int: The status of the learning session.
         """
 
         return self._status
@@ -1057,13 +1057,13 @@ class MutableLearningSession(MutableBaseObject):
     @status.setter
     def status(
         self,
-        value: Optional[int],
+        value: int,
     ) -> None:
         """
         Sets the status of the learning session.
 
         Args:
-            value (Optional[int]): The new status of the learning session.
+            value (int): The new status of the learning session.
 
         Returns:
             None
@@ -1071,12 +1071,12 @@ class MutableLearningSession(MutableBaseObject):
         self._status = value
 
     @property
-    def updated_at(self) -> Optional[datetime]:
+    def updated_at(self) -> datetime:
         """
         Returns the updated_at of the learning session.
 
         Returns:
-            Optional[datetime]: The updated_at of the learning session.
+            datetime: The updated_at of the learning session.
         """
 
         return self._updated_at
@@ -1084,13 +1084,13 @@ class MutableLearningSession(MutableBaseObject):
     @updated_at.setter
     def updated_at(
         self,
-        value: Optional[datetime],
+        value: datetime,
     ) -> None:
         """
         Sets the updated_at of the learning session.
 
         Args:
-            value (Optional[datetime]): The new updated_at of the learning session.
+            value (datetime): The new updated_at of the learning session.
 
         Returns:
             None
@@ -1098,12 +1098,12 @@ class MutableLearningSession(MutableBaseObject):
         self._updated_at = value
 
     @property
-    def uuid(self) -> Optional[str]:
+    def uuid(self) -> str:
         """
         Returns the uuid of the learning session.
 
         Returns:
-            Optional[str]: The uuid of the learning session.
+            str: The uuid of the learning session.
         """
 
         return self._uuid
@@ -1111,13 +1111,13 @@ class MutableLearningSession(MutableBaseObject):
     @uuid.setter
     def uuid(
         self,
-        value: Optional[str],
+        value: str,
     ) -> None:
         """
         Sets the uuid of the learning session.
 
         Args:
-            value (Optional[str]): The new uuid of the learning session.
+            value (str): The new uuid of the learning session.
 
         Returns:
             None

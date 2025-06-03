@@ -10,8 +10,9 @@ from datetime import datetime
 
 from typing import *
 
-from core.difficulty import ImmutableDifficulty, MutableDifficulty
-from core.priority import ImmutablePriority, MutablePriority
+from core.difficulty import DifficultyManager, ImmutableDifficulty, MutableDifficulty
+from core.priority import PriorityManager, ImmutablePriority, MutablePriority
+from core.status import StatusManager, ImmutableStatus, MutableStatus
 
 from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
@@ -1491,6 +1492,123 @@ class FlashcardFactory:
                 message=f"Caught an exception while attempting to run 'create_flashcard' method from '{cls.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default_flashcard(
+        cls,
+        back_text: str,
+        front_text: str,
+        as_mutable: bool = False,
+    ) -> Optional[ImmutableFlashcard]:
+        """
+        Creates and returns a new instance of ImmutableFlashcard class.
+
+        This method creates a new flashcard with default values.
+
+        Args:
+            back_text (str): The back side of the flashcard.
+            front_text (str): The front side of the flashcard.
+            as_mutable (bool): Whether to return the flashcard as a MutableFlashcard object. Defaults to False.
+
+        Returns:
+            Optional[ImmutableFlashcard]: The created flashcard object if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the flashcard.
+        """
+        try:
+            # Attempt to obtain the 'Medium' difficulty from the database
+            difficulty: Optional[
+                ImmutableDifficulty
+            ] = DifficultyManager().get_difficulty_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the difficulty was found
+            if not difficulty:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Difficulty '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to obtain the 'Medium' priority from the database
+            priority: Optional[ImmutablePriority] = PriorityManager().get_priority_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the priority was found
+            if not priority:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Priority '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to get the 'New' status
+            status: Optional[ImmutableStatus] = StatusManager().get_status_by(
+                field="name",
+                value=Constants.NEW,
+            )
+
+            # Check, if the status was found
+            if not status:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Status '{Constants.NEW}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to create an ImmutableFlashcard object
+            flashcard: Optional[ImmutableFlashcard] = cls.create_flashcard(
+                back_text=back_text,
+                back_word_count=len(back_text.split(" ")),
+                front_text=front_text,
+                front_word_count=len(front_text.split(" ")),
+                difficulty=difficulty.id,
+                metadata={"created_by": "FlashcardFactory"},
+                priority=priority.id,
+                status=status.id,
+                total_word_count=len(back_text.split(" ")) + len(front_text.split(" ")),
+            )
+
+            # Check, if the flashcard was created
+            if not flashcard:
+                # Log a warning message
+                cls.logger.warning(message="Flashcard not created. Aborting...")
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Check, if the 'as_mutable' flag is set
+            if as_mutable:
+                # Return the flashcard as a MutableFlashcard object
+                return flashcard.to_mutable()
+
+            # Return the flashcard
+            return flashcard
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default_flashcard' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return None indicating an exception has occurred
             return None
 
@@ -1576,16 +1694,51 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: str,
     ) -> Self:
+        """
+        Sets the back text of the flashcard.
+
+        Args:
+            value (str): The back text of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the back_text value in the configuration dictionary
         self.configuration["back_text"] = value
+
+        # Set the back_text wordcount
+        self.back_text_wordcount(value=len(value.split(" ")))
+
+        # Set the total wordcount
+        self.total_wordcount(
+            value=self.configuration.get(
+                "front_word_count",
+                0,
+            )
+            + self.configuration.get(
+                "back_word_count",
+                0,
+            )
+        )
 
         # Return the builder instance
         return self
 
     def back_word_count(
         self,
-        value: Optional[int] = None,
+        value: int,
     ) -> Self:
+        """
+        Sets the back wordcount of the flashcard.
+
+        Args:
+            value (int): The back wordcount of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the back_word_count value in the configuration dictionary
         self.configuration["back_word_count"] = value
 
@@ -1596,6 +1749,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[List[Dict[str, Any]]] = None,
     ) -> Self:
+        """
+        Sets the custom field values of the flashcard.
+
+        Args:
+            value (Optional[List[Dict[str, Any]]]): The custom field values of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the custom_field_values value in the configuration dictionary
         self.configuration["custom_field_values"] = value
 
@@ -1606,6 +1769,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[int] = None,
     ) -> Self:
+        """
+        Sets the difficulty of the flashcard.
+
+        Args:
+            value (Optional[int]): The difficulty of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the difficulty value in the configuration dictionary
         self.configuration["difficulty"] = value
 
@@ -1616,6 +1789,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[datetime] = None,
     ) -> Self:
+        """
+        Sets the due by of the flashcard.
+
+        Args:
+            value (Optional[datetime]): The due by of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the due_by value in the configuration dictionary
         self.configuration["due_by"] = value
 
@@ -1626,6 +1809,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[float] = None,
     ) -> Self:
+        """
+        Sets the familiarity of the flashcard.
+
+        Args:
+            value (Optional[float]): The familiarity of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the familiarity value in the configuration dictionary
         self.configuration["familiarity"] = value
 
@@ -1636,16 +1829,51 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: str,
     ) -> Self:
+        """
+        Sets the front text of the flashcard.
+
+        Args:
+            value (str): The front text of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the front_text value in the configuration dictionary
         self.configuration["front_text"] = value
+
+        # Set the front_text wordcount
+        self.front_text_wordcount(value=len(value.split(" ")))
+
+        # Set the total wordcount
+        self.total_wordcount(
+            value=self.configuration.get(
+                "front_word_count",
+                0,
+            )
+            + self.configuration.get(
+                "back_word_count",
+                0,
+            )
+        )
 
         # Return the builder instance
         return self
 
     def front_word_count(
         self,
-        value: Optional[int] = None,
+        value: int,
     ) -> Self:
+        """
+        Sets the front wordcount of the flashcard.
+
+        Args:
+            value (int): The front wordcount of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the front_word_count value in the configuration dictionary
         self.configuration["front_word_count"] = value
 
@@ -1656,6 +1884,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[int] = None,
     ) -> Self:
+        """
+        Sets the interval of the flashcard.
+
+        Args:
+            value (Optional[int]): The interval of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the interval value in the configuration dictionary
         self.configuration["interval"] = value
 
@@ -1666,6 +1904,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[datetime] = None,
     ) -> Self:
+        """
+        Sets the last viewed at of the flashcard.
+
+        Args:
+            value (Optional[datetime]): The last viewed at of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the last_viewed_at value in the configuration dictionary
         self.configuration["last_viewed_at"] = value
 
@@ -1700,6 +1948,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[int] = None,
     ) -> Self:
+        """
+        Sets the priority of the flashcard.
+
+        Args:
+            value (Optional[int]): The priority of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the priority value in the configuration dictionary
         self.configuration["priority"] = value
 
@@ -1710,6 +1968,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[int] = None,
     ) -> Self:
+        """
+        Sets the status of the flashcard.
+
+        Args:
+            value (Optional[int]): The status of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the status value in the configuration dictionary
         self.configuration["status"] = value
 
@@ -1720,6 +1988,16 @@ class FlashcardBuilder(BaseObjectBuilder):
         self,
         value: Optional[List[str]] = None,
     ) -> Self:
+        """
+        Sets the tags of the flashcard.
+
+        Args:
+            value (Optional[List[str]]): The tags of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the tags value in the configuration dictionary
         self.configuration["tags"] = value
 
@@ -1728,8 +2006,18 @@ class FlashcardBuilder(BaseObjectBuilder):
 
     def total_word_count(
         self,
-        value: Optional[int] = None,
+        value: int,
     ) -> Self:
+        """
+        Sets the total wordcount of the flashcard.
+
+        Args:
+            value (int): The total wordcount of the flashcard.
+
+        Returns:
+            Self: The builder instance.
+        """
+
         # Set the total_word_count value in the configuration dictionary
         self.configuration["total_word_count"] = value
 

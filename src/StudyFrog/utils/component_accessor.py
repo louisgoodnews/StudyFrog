@@ -430,8 +430,8 @@ class ComponentAccessor:
 
             # Register the flashcard factory
             factory.register_factory(
-                factory=FlashcardManager,
-                name="flashcard_manager",
+                factory=FlashcardFactory,
+                name="flashcard_factory",
             )
 
             # Register the note factory

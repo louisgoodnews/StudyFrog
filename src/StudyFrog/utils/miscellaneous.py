@@ -161,21 +161,36 @@ class Miscellaneous:
     @classmethod
     def calculate_duration(
         cls,
-        end: datetime,
         start: datetime,
         as_: Literal["seconds", "minutes", "hours"] = "seconds",
+        end: Optional[datetime] = None,
     ) -> Optional[Union[float, int]]:
         """
         Calculates the duration between two datetime objects.
 
         Args:
-            end (datetime): The end datetime.
             start (datetime): The start datetime.
+            end (Optional[datetime]): The end datetime. If None, the current datetime is used.
             as_ (Literal["seconds", "minutes", "hours"]): The unit to return the duration in.
 
         Returns:
             Optional[Union[float, int]]: The duration between the two datetime objects in the specified unit.
         """
+
+        # Check, if the start datetime is None
+        if start is None:
+            # Log an error message indicating an invalid start datetime
+            cls.logger.error(
+                message="Invalid start datetime: None (must be a datetime object)"
+            )
+
+            # Return None indicating an invalid start datetime
+            return None
+
+        # Check, if the end datetime is None
+        if end is None:
+            # Use the current datetime
+            end = cls.get_current_datetime()
 
         # Calculate the duration in seconds
         duration: float = (end - start).total_seconds()
@@ -515,6 +530,55 @@ class Miscellaneous:
 
         # Return None
         return None
+
+    @classmethod
+    def estimate_reading_time(
+        cls,
+        content: Union[
+            float,
+            int,
+            str,
+        ],
+        as_: Literal["minutes", "seconds"] = "minutes",
+    ) -> float:
+        """
+        Estimates the reading time for a given content.
+
+        Args:
+            as_ (Literal["minutes", "seconds"]): The unit to return the reading time in. Defaults to "minutes".
+            content (Union[float, int, str]): The content to estimate the reading time for.
+
+        Returns:
+            float: The estimated reading time in minutes or seconds.
+        """
+
+        # Check, if the content is empty
+        if content is None or (isinstance(content, str) and not content.strip()):
+            # Return early
+            return 0.0
+
+        # Check, if the unit is supported
+        if as_ not in {
+            "minutes",
+            "seconds",
+        }:
+            # Raise a ValueError
+            raise ValueError(f"Unsupported unit: {as_}")
+
+        # Initialize the result float to 0.0
+        result: float = 0.0
+
+        # Set the base rate of words per minute
+        base_rate: int = 200
+
+        # Calculate the word count
+        word_count: float = len(content.strip().split()) if isinstance(content, str) else float(content)
+
+        # Calculate the estimated reading time
+        result = word_count / base_rate
+
+        # Return the estimated reading time
+        return result if as_ == "minutes" else result * 60
 
     @classmethod
     def find_match(
