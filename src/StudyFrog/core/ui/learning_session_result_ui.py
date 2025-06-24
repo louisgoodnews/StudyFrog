@@ -33,6 +33,7 @@ from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.navigation import NavigationHistoryItem, NavigationHistoryService
 from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
+from utils.utils import DateUtil
 
 
 __all__: Final[List[str]] = ["LearningSessionResultUI"]
@@ -802,6 +803,13 @@ class LearningSessionResultUI(BaseUI):
 
             # Create a TabbedFrame widget
             tabbed_frame: TabbedFrame = TabbedFrame(master=master)
+
+            # Place the TabbedFrame widget in the grid
+            tabbed_frame.grid(
+                column=0,
+                row=0,
+                sticky=NSEW,
+            )
 
             # Configure the TabbedFrame widget
             tabbed_frame.configure(background=Constants.BLUE_GREY["700"])

@@ -33,6 +33,7 @@ from core.user import UserFactory, UserManager
 
 from utils.dispatcher import Dispatcher
 from utils.logger import Logger
+from utils.miscellaneous import Miscellaneous
 from utils.unified import UnifiedObjectFactory, UnifiedObjectManager
 
 
@@ -378,124 +379,40 @@ class ComponentAccessor:
         """
         try:
             # Create the factory instance
-            factory: UnifiedObjectFactory = UnifiedObjectFactory()
+            result: UnifiedObjectFactory = UnifiedObjectFactory()
 
-            # Register the answer factory
-            factory.register_factory(
-                factory=AnswerFactory,
-                name="answer_factory",
-            )
+            factories: List[Type] = [
+                AnswerFactory,
+                AssociationFactory,
+                ChangeHistoryFactory,
+                ChangeHistoryItemFactory,
+                CommentFactory,
+                CustomFieldFactory,
+                DefaultFactory,
+                DifficultyFactory,
+                FlashcardFactory,
+                NoteFactory,
+                PriorityFactory,
+                QuestionFactory,
+                SettingFactory,
+                StackFactory,
+                StatusFactory,
+                SubjectFactory,
+                TagFactory,
+                TeacherFactory,
+                UserFactory,
+            ]
 
-            # Register the association factory
-            factory.register_factory(
-                factory=AssociationFactory,
-                name="association_factory",
-            )
-
-            # Register the change history factory
-            factory.register_factory(
-                factory=ChangeHistoryFactory,
-                name="change_history_factory",
-            )
-
-            # Register the change history item factory
-            factory.register_factory(
-                factory=ChangeHistoryItemFactory,
-                name="change_history_item_factory",
-            )
-
-            # Register the comment factory
-            factory.register_factory(
-                factory=CommentFactory,
-                name="comment_factory",
-            )
-
-            # Register the custom field factory
-            factory.register_factory(
-                factory=CustomFieldFactory,
-                name="custom_field_factory",
-            )
-
-            # Register the default factory
-            factory.register_factory(
-                factory=DefaultFactory,
-                name="default_factory",
-            )
-
-            # Register the difficulty factory
-            factory.register_factory(
-                factory=DifficultyFactory,
-                name="difficulty_factory",
-            )
-
-            # Register the flashcard factory
-            factory.register_factory(
-                factory=FlashcardFactory,
-                name="flashcard_factory",
-            )
-
-            # Register the note factory
-            factory.register_factory(
-                factory=NoteFactory,
-                name="note_factory",
-            )
-
-            # Register the priority factory
-            factory.register_factory(
-                factory=PriorityFactory,
-                name="priority_factory",
-            )
-
-            # Register the question factory
-            factory.register_factory(
-                factory=QuestionFactory,
-                name="question_factory",
-            )
-
-            # Register the setting factory
-            factory.register_factory(
-                factory=SettingFactory,
-                name="setting_factory",
-            )
-
-            # Register the stack factory
-            factory.register_factory(
-                factory=StackFactory,
-                name="stack_factory",
-            )
-
-            # Register the status factory
-            factory.register_factory(
-                factory=StatusFactory,
-                name="status_factory",
-            )
-
-            # Register the subject factory
-            factory.register_factory(
-                factory=SubjectFactory,
-                name="subject_factory",
-            )
-
-            # Register the tag factory
-            factory.register_factory(
-                factory=TagFactory,
-                name="tag_factory",
-            )
-
-            # Register the teacher factory
-            factory.register_factory(
-                factory=TeacherFactory,
-                name="teacher_factory",
-            )
-
-            # Register the user factory
-            factory.register_factory(
-                factory=UserFactory,
-                name="user_factory",
-            )
+            # Iterate over the list of factory classes
+            for factory in factories:
+                # Register the factory
+                result.register_factory(
+                    name=Miscellaneous.camel_to_snake(string=factory.__name__),
+                    factory=factory,
+                )
 
             # Return the factory instance
-            return factory
+            return result
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             cls.logger.error(
@@ -518,124 +435,41 @@ class ComponentAccessor:
         """
         try:
             # Create the manager instance
-            manager: UnifiedObjectManager = UnifiedObjectManager()
+            result: UnifiedObjectManager = UnifiedObjectManager()
 
-            # Register the answer manager
-            manager.register_manager(
-                name="answer_manager",
-                manager=AnswerManager,
-            )
+            # Initialize the list of manager classes
+            managers: List[Type] = [
+                AnswerManager,
+                AssociationManager,
+                ChangeHistoryManager,
+                ChangeHistoryItemManager,
+                CommentManager,
+                CustomFieldManager,
+                DefaultManager,
+                DifficultyManager,
+                FlashcardManager,
+                NoteManager,
+                PriorityManager,
+                QuestionManager,
+                SettingManager,
+                StackManager,
+                StatusManager,
+                SubjectManager,
+                TagManager,
+                TeacherManager,
+                UserManager,
+            ]
 
-            # Register the association manager
-            manager.register_manager(
-                name="association_manager",
-                manager=AssociationManager,
-            )
-
-            # Register the change history manager
-            manager.register_manager(
-                name="change_history_manager",
-                manager=ChangeHistoryManager,
-            )
-
-            # Register the change history item manager
-            manager.register_manager(
-                name="change_history_item_manager",
-                manager=ChangeHistoryItemManager,
-            )
-
-            # Register the comment manager
-            manager.register_manager(
-                name="comment_manager",
-                manager=CommentManager,
-            )
-
-            # Register the custom field manager
-            manager.register_manager(
-                name="custom_field_manager",
-                manager=CustomFieldManager,
-            )
-
-            # Register the default manager
-            manager.register_manager(
-                name="default_manager",
-                manager=DefaultManager,
-            )
-
-            # Register the difficulty manager
-            manager.register_manager(
-                name="difficulty_manager",
-                manager=DifficultyManager,
-            )
-
-            # Register the flashcard manager
-            manager.register_manager(
-                name="flashcard_manager",
-                manager=FlashcardManager,
-            )
-
-            # Register the note manager
-            manager.register_manager(
-                name="note_manager",
-                manager=NoteManager,
-            )
-
-            # Register the priority manager
-            manager.register_manager(
-                name="priority_manager",
-                manager=PriorityManager,
-            )
-
-            # Register the question manager
-            manager.register_manager(
-                name="question_manager",
-                manager=QuestionManager,
-            )
-
-            # Register the setting manager
-            manager.register_manager(
-                name="setting_manager",
-                manager=SettingManager,
-            )
-
-            # Register the stack manager
-            manager.register_manager(
-                name="stack_manager",
-                manager=StackManager,
-            )
-
-            # Register the status manager
-            manager.register_manager(
-                name="status_manager",
-                manager=StatusManager,
-            )
-
-            # Register the subject manager
-            manager.register_manager(
-                name="subject_manager",
-                manager=SubjectManager,
-            )
-
-            # Register the tag manager
-            manager.register_manager(
-                name="tag_manager",
-                manager=TagManager,
-            )
-
-            # Register the teacher manager
-            manager.register_manager(
-                name="teacher_manager",
-                manager=TeacherManager,
-            )
-
-            # Register the user manager
-            manager.register_manager(
-                name="user_manager",
-                manager=UserManager,
-            )
+            # Iterate over the list of manager classes
+            for manager in managers:
+                # Register the manager
+                result.register_manager(
+                    name=Miscellaneous.camel_to_snake(string=manager.__name__),
+                    manager=manager,
+                )
 
             # Return the manager instance
-            return manager
+            return result
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             cls.logger.error(

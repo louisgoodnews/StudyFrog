@@ -32,6 +32,7 @@ __all__: Final[List[str]] = [
     "FlashcardBuilder",
     "FlashcardManager",
     "FlashcardModel",
+    "Flashcards",
 ]
 
 
@@ -3242,3 +3243,331 @@ class FlashcardModel(ImmutableBaseModel):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+
+class Flashcards:
+    """
+    A utility class for managing flashcards.
+
+    This class provides a set of methods for retrieving and saving flashcards.
+    """
+
+    configuration: Final[Dict[str, Any]] = {}
+
+    # Initialize this class's Logger instance
+    logger: Final[Logger] = Logger.get_logger(name="Flashcards")
+
+    # Initialize this class's FlashcardManager instance
+    manager: Final[FlashcardManager] = FlashcardManager()
+
+    @classmethod
+    def build(
+        cls,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableFlashcard,
+            MutableFlashcard,
+        ]
+    ]:
+        """
+        Builds a flashcard and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to build the flashcard as mutable. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableFlashcard, MutableFlashcard,]]: The flashcard if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Check, if the configuration dictionary is empty
+            if not cls.configuration:
+                # Log a warning message
+                cls.logger.warning(
+                    message="Configuration dictionary is empty. Use this class' 'set' method to set the configuration dictionary."
+                )
+
+                # Return early
+                return None
+
+            # Initialize the builder
+            builder: FlashcardBuilder = FlashcardBuilder()
+
+            # Update the builder's configuration
+            builder.configuration.update(cls.configuration)
+
+            # Build the flashcard
+            flashcard: Union[ImmutableFlashcard, MutableFlashcard] = builder.build(
+                as_mutable=as_mutable
+            )
+
+            # Clear the configuration
+            cls.configuration.clear()
+
+            # Return the flashcard
+            return flashcard
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def clear(cls) -> None:
+        """
+        Clears the configuration dictionary.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Clear the configuration dictionary
+        cls.configuration.clear()
+
+    @classmethod
+    def create(
+        cls,
+        **kwargs,
+    ) -> Optional[ImmutableFlashcard]:
+        """
+        Creates a new flashcard and returns it.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the create_flashcard method.
+
+        Returns:
+            Optional[ImmutableFlashcard]: The flashcard if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return FlashcardFactory.create_flashcard(**kwargs)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default(
+        cls,
+        back_text: str,
+        front_text: str,
+        as_mutable: bool = False,
+    ) -> Optional[ImmutableFlashcard]:
+        """
+        Creates a new flashcard and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to create the flashcard as mutable. Defaults to False.
+            back_text (str): The back side of the flashcard.
+            front_text (str): The front side of the flashcard.
+
+        Returns:
+            Optional[ImmutableFlashcard]: The flashcard if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return FlashcardFactory.create_default_flashcard(
+                as_mutable=as_mutable,
+                back_text=back_text,
+                front_text=front_text,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get(
+        cls,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        **kwargs,
+    ) -> Optional[ImmutableFlashcard]:
+        """
+        Retrieves a flashcard by the given ID, key, or other fields.
+
+        Args:
+            id (Optional[int]): The ID of the flashcard.
+            key (Optional[str]): The key of the flashcard.
+            **kwargs: Additional keyword arguments to pass to the get_flashcard_by method.
+
+        Returns:
+            Optional[ImmutableFlashcard]: The flashcard with the given ID, key, or other fields if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            if id:
+                return cls.manager.get_flashcard_by_id(
+                    force_refetch=True,
+                    id=id,
+                )
+            elif key:
+                return cls.manager.get_flashcard_by_key(
+                    force_refetch=True,
+                    key=key,
+                )
+            else:
+                return cls.manager.get_flashcard_by(
+                    force_refetch=True,
+                    **kwargs,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get_all(cls) -> Optional[List[ImmutableFlashcard]]:
+        """
+        Returns a list of all flashcards in the database.
+
+        Returns:
+            Optional[List[ImmutableFlashcard]]: The flashcards if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.get_all_flashcards(force_refetch=True)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def save(
+        cls,
+        flashcard: Union[
+            ImmutableFlashcard,
+            MutableFlashcard,
+        ],
+    ) -> ImmutableFlashcard:
+        """
+        Saves the passed flashcard to the database and returns it.
+
+        Args:
+            flashcard (Union[ImmutableFlashcard, MutableFlashcard]): The flashcard to save.
+
+        Returns:
+            ImmutableFlashcard: The saved flashcard if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.create_flashcard(flashcard=flashcard)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'save' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def search(
+        cls,
+        **kwargs,
+    ) -> Optional[List[ImmutableFlashcard]]:
+        """
+        Searches for flashcards in the database and returns them.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the search_flashcards method.
+
+        Returns:
+            Optional[List[ImmutableFlashcard]]: The flashcards if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.search_flashcards(
+                force_refetch=True,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def set(
+        cls,
+        key: str,
+        value: Optional[Any] = None,
+    ) -> None:
+        """
+        Sets a configuration value.
+
+        Args:
+            key (str): The key of the configuration value.
+            value (Optional[Any]): The value of the configuration value.
+
+        Returns:
+            None
+        """
+
+        # Check, if the key is already contained within the configuration dictionary
+        if key in cls.configuration:
+            # Log a warning message indicating that the key is already contained within the configuration dictionary
+            cls.logger.warning(
+                message=f"Key '{key}' is already contained within the configuration dictionary. Overwriting..."
+            )
+
+        # Set the configuration value corresponding to the passed key
+        cls.configuration[key] = value

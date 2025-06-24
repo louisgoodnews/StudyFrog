@@ -19,7 +19,7 @@ from core.question import ImmutableQuestion
 from core.setting import SettingService
 from core.stack import ImmutableStack
 
-from core.ui.miscellaneous import CountdownWidget, CountupWidget
+from core.ui.miscellaneous import CountdownClockWidget, CountupClockWidget
 
 from core.ui.view.flashcard_learning_view import FlashcardLearningView
 from core.ui.view.note_learning_view import NoteLearningView
@@ -781,14 +781,14 @@ class LearningSessionUI(BaseUI):
 
             # Check, if 'countdown' mode is enabled
             if self.settings["enable_countdown"]:
-                # Create the CountdownWidget
-                countdown: CountdownWidget = CountdownWidget(
+                # Create the CountdownClockWidget
+                countdown: CountdownClockWidget = CountdownClockWidget(
                     dispatcher=self.dispatcher,
                     master=master,
                     namespace=Constants.LEARNING_SESSION_NAMESPACE,
                 )
 
-                # Place the CountdownWidget in the grid
+                # Place the CountdownClockWidget in the grid
                 countdown.grid(
                     column=2,
                     padx=5,
@@ -796,10 +796,10 @@ class LearningSessionUI(BaseUI):
                     row=0,
                 )
 
-                # Configure the CountdownWidget
+                # Configure the CountdownClockWidget
                 countdown.configure(background=Constants.BLUE_GREY["700"])
 
-                # Configure the CountdownWidget's label
+                # Configure the CountdownClockWidget's label
                 countdown.configure_label(
                     background=Constants.BLUE_GREY["700"],
                     font=(
@@ -809,7 +809,7 @@ class LearningSessionUI(BaseUI):
                     foreground=Constants.WHITE,
                 )
 
-                # Configure the CountdownWidget's 'pause button' tkinter.Button widegt
+                # Configure the CountdownClockWidget's 'pause button' tkinter.Button widegt
                 countdown.configure_pause_button(
                     background=Constants.BLUE_GREY["700"],
                     font=(
@@ -820,7 +820,7 @@ class LearningSessionUI(BaseUI):
                     relief=FLAT,
                 )
 
-                # Configure the CountdownWidget's 'resuome button' tkinter.Button widegt
+                # Configure the CountdownClockWidget's 'resuome button' tkinter.Button widegt
                 countdown.configure_resume_button(
                     background=Constants.BLUE_GREY["700"],
                     font=(
@@ -833,14 +833,14 @@ class LearningSessionUI(BaseUI):
 
             # Check, if 'countup' mode is enabled
             elif self.settings["enable_countup"]:
-                # Create the CountupWidget
-                countup: CountupWidget = CountupWidget(
+                # Create the CountupClockWidget
+                countup: CountupClockWidget = CountupClockWidget(
                     dispatcher=self.dispatcher,
                     master=master,
                     namespace=Constants.LEARNING_SESSION_NAMESPACE,
                 )
 
-                # Place the CountupWidget in the grid
+                # Place the CountupClockWidget in the grid
                 countup.grid(
                     column=2,
                     padx=5,
@@ -848,10 +848,10 @@ class LearningSessionUI(BaseUI):
                     row=0,
                 )
 
-                # Configure the CountupWidget
+                # Configure the CountupClockWidget
                 countup.configure(background=Constants.BLUE_GREY["700"])
 
-                # Configure the CountupWidget's label
+                # Configure the CountupClockWidget's label
                 countup.configure_label(
                     background=Constants.BLUE_GREY["700"],
                     font=(
@@ -861,7 +861,7 @@ class LearningSessionUI(BaseUI):
                     foreground=Constants.WHITE,
                 )
 
-                # Configure the CountupWidget's 'pause button' tkinter.Button widegt
+                # Configure the CountupClockWidget's 'pause button' tkinter.Button widegt
                 countup.configure_pause_button(
                     background=Constants.BLUE_GREY["700"],
                     font=(
@@ -872,7 +872,7 @@ class LearningSessionUI(BaseUI):
                     relief=FLAT,
                 )
 
-                # Configure the CountupWidget's 'resuome button' tkinter.Button widegt
+                # Configure the CountupClockWidget's 'resuome button' tkinter.Button widegt
                 countup.configure_resume_button(
                     background=Constants.BLUE_GREY["700"],
                     font=(

@@ -2586,7 +2586,7 @@ class ReadOnlyMultiLineTextField(MultiLineTextField):
         )
 
         # Configure the entry widget to be read-only
-        self._entry.configure(state=DISABLED)
+        self._entry.configure(state="readonly")
 
     @override
     def clear(
@@ -2668,6 +2668,17 @@ class ReadOnlyMultiLineTextField(MultiLineTextField):
             ValueError: If the ReadOnlyField is modified after initialization.
         """
 
+        # Check, if the tkinter.StringVar instance is empty
+        if not self.text.get():
+            # Set the value of the tkinter.StringVar instance
+            self.text.insert(
+                chars=value,
+                index="1.0",
+            )
+
+            # Return early
+            return
+
         # Raise an error to indicate that the field cannot be modified
         raise ValueError(
             f"{self.__class__.__name__} cannot be modified after initialization."
@@ -2715,7 +2726,7 @@ class ReadOnlySingleLineTextField(SingleLineTextField):
         )
 
         # Configure the entry widget to be read-only
-        self._entry.configure(state=DISABLED)
+        self._entry.configure(state="readonly")
 
     @override
     def clear(
@@ -2796,6 +2807,14 @@ class ReadOnlySingleLineTextField(SingleLineTextField):
         Raises:
             ValueError: If the ReadOnlyField is modified after initialization.
         """
+
+        # Check, if the tkinter.StringVar instance is empty
+        if not self.variable.get():
+            # Set the value of the tkinter.StringVar instance
+            self.variable.set(value=value)
+
+            # Return early
+            return
 
         # Raise an error to indicate that the field cannot be modified
         raise ValueError(

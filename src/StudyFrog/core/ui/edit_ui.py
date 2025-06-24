@@ -429,14 +429,12 @@ class EditUI(BaseUI):
                 answer=self.answer,
                 dispatcher=self.dispatcher,
                 master=master,
-                unified_manager=self.unified_manager,
             )
         elif self.flashcard:
             self.form = FlashcardViewForm(
                 dispatcher=self.dispatcher,
-                master=master,
                 flashcard=self.flashcard,
-                unified_manager=self.unified_manager,
+                master=master,
             )
         elif self.note:
             pass
@@ -445,14 +443,12 @@ class EditUI(BaseUI):
                 dispatcher=self.dispatcher,
                 master=master,
                 question=self.question,
-                unified_manager=self.unified_manager,
             )
         elif self.stack:
             self.form = StackViewForm(
                 dispatcher=self.dispatcher,
                 master=master,
                 stack=self.stack,
-                unified_manager=self.unified_manager,
             )
 
         self.form.grid(

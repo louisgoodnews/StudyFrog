@@ -9,6 +9,9 @@ import traceback
 from datetime import datetime
 from typing import *
 
+from core.difficulty import DifficultyManager, ImmutableDifficulty
+from core.priority import PriorityManager, ImmutablePriority
+
 from utils.builder import BaseObjectBuilder
 from utils.constants import Constants
 from utils.field import Field
@@ -17,6 +20,7 @@ from utils.manager import BaseObjectManager
 from utils.miscellaneous import Miscellaneous
 from utils.model import ImmutableBaseModel
 from utils.object import MutableBaseObject, ImmutableBaseObject
+from utils.utils import DateUtil
 
 
 __all__: Final[List[str]] = [
@@ -27,6 +31,7 @@ __all__: Final[List[str]] = [
     "SubjectBuilder",
     "SubjectManager",
     "SubjectModel",
+    "Subjects",
 ]
 
 
@@ -935,54 +940,92 @@ class SubjectFactory:
     def create_default_subject(
         cls,
         name: str,
-    ) -> Optional[ImmutableSubject]:
+        as_mutable: bool = False,
+    ) -> Optional[Union[ImmutableSubject, MutableSubject]]:
         """
         Creates and returns a new instance of the ImmutableSubject class with default values.
 
         Args:
             name (str): The name of the subject.
+            as_mutable (bool, optional): Whether to return a mutable subject. Defaults to False.
 
         Returns:
-            Optional[ImmutableSubject]: The created subject object if no exception occurs. Otherwise, None.
+            Optional[Union[ImmutableSubject, MutableSubject]]: The created subject object if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while creating the subject.
         """
         try:
-            # Import the DifficultyManager locally
-            from core.difficulty import DifficultyManager
+            # Attempt to obtain the 'Medium' difficulty from the database
+            difficulty: Optional[
+                ImmutableDifficulty
+            ] = DifficultyManager().get_difficulty_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
 
-            # Import the PriorityManager locally
-            from core.priority import PriorityManager
+            # Check, if the difficulty was found
+            if not difficulty:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Difficulty '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to obtain the 'Medium' priority from the database
+            priority: Optional[ImmutablePriority] = PriorityManager().get_priority_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the priority was found
+            if not priority:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Priority '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
 
             # Attempt to create and return a subject with (most) default attributes
-            return ImmutableSubject(
-                created_at=Miscellaneous.get_current_datetime(),
+            subject: Optional[ImmutableSubject] = cls.create_subject  (
+                created_at=DateUtil.now(),
                 custom_field_values=[],
-                description=f"Default subject '{name}' created at {Miscellaneous.datetime_to_string(datetime=Miscellaneous.get_current_datetime())}",
-                difficulty=DifficultyManager()
-                .get_difficulty_by(
-                    field="name",
-                    value="Medium",
-                )
-                .get(
-                    default=None,
-                    name="id",
-                ),
+                description=f"Default subject '{name}' created at { DateUtil.object_to_string(datetime_or_date=DateUtil.now())}",
+                difficulty=difficulty.id,
                 icon="🧑‍🏫",
-                metadata={},
+                id=None,
+                key=None,
+                metadata={
+                    "created_by": "SubjectFactory",
+                },
                 name=name,
-                priority=PriorityManager()
-                .get_priority_by(
-                    field="name",
-                    value="Medium",
-                )
-                .get(
-                    default=None,
-                    name="id",
-                ),
+                priority=priority.id,
                 tags=[],
+                updated_at=DateUtil.now(),
+                uuid=Miscellaneous.get_uuid(),
             )
+
+            # Check, if the subject was created successfully
+            if not subject:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Subject '{name}' not created. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Check, if the 'as_mutable' flag is set
+            if as_mutable:
+                # Return the subject as a MutableSubject object
+                return subject.to_mutable()
+
+            # Return the subject
+            return subject
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             cls.logger.error(
@@ -1299,13 +1342,13 @@ class SubjectManager(BaseObjectManager):
                 )
 
             # Set the created_at timestamp of the subject
-            subject.created_at = Miscellaneous.get_current_datetime()
+            subject.created_at = DateUtil.now()
 
             # Set the key of the subject
             subject.key = f"SUBJECT_{self.count_subjects() + 1}"
 
             # Set the updated_at timestamp of the subject
-            subject.updated_at = Miscellaneous.get_current_datetime()
+            subject.updated_at = DateUtil.now()
 
             # Set the uuid of the subject
             subject.uuid = Miscellaneous.get_uuid()
@@ -2122,3 +2165,332 @@ class SubjectModel(ImmutableBaseModel):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+
+class Subjects:
+    """
+    A utility class for managing subjects.
+
+    This class provides a set of methods for retrieving and saving subjects.
+    """
+
+    # Initialize this class's configuration dictionary
+    configuration: Final[Dict[str, Any]] = {}
+
+    # Initialize this class's Logger instance
+    logger: Final[Logger] = Logger.get_logger(name="Subjects")
+
+    # Initialize this class's FlashcardManager instance
+    manager: Final[SubjectManager] = SubjectManager()
+
+    @classmethod
+    def build(
+        cls,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableSubject,
+            MutableSubject,
+        ]
+    ]:
+        """
+        Builds a subject and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to build the subject as mutable. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableSubject, MutableSubject,]]: The subject if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Check, if the configuration dictionary is empty
+            if not cls.configuration:
+                # Log a warning message
+                cls.logger.warning(
+                    message="Configuration dictionary is empty. Use this class' 'set' method to set the configuration dictionary."
+                )
+
+                # Return early
+                return None
+
+            # Initialize the builder
+            builder: SubjectBuilder = SubjectBuilder()
+
+            # Update the builder's configuration
+            builder.configuration.update(cls.configuration)
+
+            # Build the subject
+            subject: Union[ImmutableSubject, MutableSubject] = builder.build(
+                as_mutable=as_mutable
+            )
+
+            # Clear the configuration
+            cls.configuration.clear()
+
+            # Return the subject
+            return subject
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def clear(cls) -> None:
+        """
+        Clears the configuration dictionary.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Clear the configuration dictionary
+        cls.configuration.clear()
+
+    @classmethod
+    def create(
+        cls,
+        **kwargs,
+    ) -> Optional[ImmutableSubject]:
+        """
+        Creates a new subject and returns it.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the create_subject method.
+
+        Returns:
+            Optional[ImmutableSubject]: The subject if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return SubjectFactory.create_subject(**kwargs)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default(
+        cls,
+        back_text: str,
+        front_text: str,
+        as_mutable: bool = False,
+    ) -> Optional[ImmutableSubject]:
+        """
+        Creates a new subject and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to create the subject as mutable. Defaults to False.
+            back_text (str): The back side of the flashcard.
+            front_text (str): The front side of the flashcard.
+
+        Returns:
+            Optional[ImmutableSubject]: The subject if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return SubjectFactory.create_default_subject(
+                as_mutable=as_mutable,
+                back_text=back_text,
+                front_text=front_text,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get(
+        cls,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        **kwargs,
+    ) -> Optional[ImmutableSubject]:
+        """
+        Retrieves a subject by the given ID, key, or other fields.
+
+        Args:
+            id (Optional[int]): The ID of the subject.
+            key (Optional[str]): The key of the subject.
+            **kwargs: Additional keyword arguments to pass to the get_subject_by method.
+
+        Returns:
+            Optional[ImmutableSubject]: The subject with the given ID, key, or other fields if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            if id:
+                return cls.manager.get_subject_by_id(
+                    force_refetch=True,
+                    id=id,
+                )
+            elif key:
+                return cls.manager.get_subject_by_key(
+                    force_refetch=True,
+                    key=key,
+                )
+            else:
+                return cls.manager.get_subject_by(
+                    force_refetch=True,
+                    **kwargs,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get_all(cls) -> Optional[List[ImmutableSubject]]:
+        """
+        Returns a list of all subjects in the database.
+
+        Returns:
+            Optional[List[ImmutableSubject]]: The subjects if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.get_all_subjects(force_refetch=True)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def save(
+        cls,
+        subject: Union[
+            ImmutableSubject,
+            MutableSubject,
+        ],
+    ) -> ImmutableSubject:
+        """
+        Saves the passed subject to the database and returns it.
+
+        Args:
+            subject (Union[ImmutableSubject, MutableSubject]): The subject to save.
+
+        Returns:
+            ImmutableSubject: The saved subject if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.create_subject(subject=subject)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'save' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def search(
+        cls,
+        **kwargs,
+    ) -> Optional[List[ImmutableSubject]]:
+        """
+        Searches for subjects in the database and returns them.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the search_subjects method.
+
+        Returns:
+            Optional[List[ImmutableSubject]]: The subjects if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.search_subjects(
+                force_refetch=True,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def set(
+        cls,
+        key: str,
+        value: Optional[Any] = None,
+    ) -> None:
+        """
+        Sets a configuration value.
+
+        Args:
+            key (str): The key of the configuration value.
+            value (Optional[Any]): The value of the configuration value.
+
+        Returns:
+            None
+        """
+
+        # Check, if the key is already contained within the configuration dictionary
+        if key in cls.configuration:
+            # Log a warning message indicating that the key is already contained within the configuration dictionary
+            cls.logger.warning(
+                message=f"Key '{key}' is already contained within the configuration dictionary. Overwriting..."
+            )
+
+        # Set the configuration value corresponding to the passed key
+        cls.configuration[key] = value

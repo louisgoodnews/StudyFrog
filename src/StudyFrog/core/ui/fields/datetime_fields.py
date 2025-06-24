@@ -15,6 +15,7 @@ from utils.base_field import BaseField
 from utils.constants import Constants
 from utils.events import Events
 from utils.miscellaneous import Miscellaneous
+from utils.utils import DateUtil
 
 
 __all__: Final[List[str]] = ["DateSelectField"]
@@ -38,7 +39,7 @@ class DateSelectField(BaseField):
         on_change_callback: Optional[Callable[[str, Optional[datetime]], None]] = None,
         readonly: bool = False,
         value: Optional[Union[datetime, str]] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Initializes a new instance of the DateSelectField class.
@@ -48,7 +49,7 @@ class DateSelectField(BaseField):
             master (tkinter.Misc): The master widget.
             date_format (str): The format string used to parse and display dates.
             namespace (str): The namespace to dispatch events under.
-            on_change_callback (Optional[Callable[[str, Optional[datetime]], None]]): 
+            on_change_callback (Optional[Callable[[str, Optional[datetime]], None]]):
                 Callback function when the date value changes.
             readonly (bool): Whether the entry should be readonly.
             value (Optional[Union[datetime, string]]): The initial value for the field.
@@ -120,7 +121,10 @@ class DateSelectField(BaseField):
         """
 
         # Check, if the passed value string has a valid format
-        if not Miscellaneous.validate_date_format(date_format=value):
+        if not DateUtil.validate_date_format(format_string=value):
+            # Log a warning message
+            self.logger.warning(message=f"Invalid date format: {value}")
+
             # Return early
             return
 
@@ -193,8 +197,10 @@ class DateSelectField(BaseField):
         # Check, if the value is not None
         if not value:
             # Log a warning message
-            self.logger.warning(message=f"Could not obtain value from Calendar widget. This is likely a bug.")
-            
+            self.logger.warning(
+                message=f"Could not obtain value from Calendar widget. This is likely a bug."
+            )
+
             # Return early
             return
 
@@ -206,9 +212,10 @@ class DateSelectField(BaseField):
             event=Events.DATE_SELECT_FIELD_CHANGED,
             label=self.display_name,
             namespace=self.namespace,
-            value=Miscellaneous.string_to_datetime(
+            value=DateUtil.string_to_object(
                 date_string=value,
                 format=self.date_format,
+                what="datetime",
             ),
         )
 
@@ -237,14 +244,16 @@ class DateSelectField(BaseField):
         # Attempt to find matches for the date_format within the current entry value
         match: Optional[str] = Miscellaneous.find_match(
             fullmatch=True,
-            pattern=Miscellaneous.date_format_to_regex_pattern(date_format=self.date_format),
+            pattern=DateUtil.date_format_to_regex_pattern(date_format=self.date_format),
             string=string_value,
         )
 
         # Check, if a match has been found
         if not match:
             # Configure the warning label's text
-            self.warning_label.configure(text=f"Entry value '{self.variable.get()}' is not in a valid format. Expected: '{self.date_format}'.")
+            self.warning_label.configure(
+                text=f"Entry value '{self.variable.get()}' is not in a valid format. Expected: '{self.date_format}'."
+            )
 
             # Place the 'warning label' label widget within the grid
             self.warning_label.grid(
@@ -254,7 +263,7 @@ class DateSelectField(BaseField):
                 row=1,
                 sticky=NSEW,
             )
-            
+
             # Return early
             return
         else:
@@ -268,9 +277,10 @@ class DateSelectField(BaseField):
                 event=Events.DATE_SELECT_FIELD_CHANGED,
                 label=self.display_name,
                 namespace=self.namespace,
-                value=Miscellaneous.string_to_datetime(
+                value=DateUtil.string_to_object(
                     date_string=match,
                     format=self.date_format,
+                    what="datetime",
                 ),
             )
 
@@ -279,9 +289,10 @@ class DateSelectField(BaseField):
             # Call the 'on_change_callback' function and pass the display name as well as the variable's value to it
             self.on_change_callback(
                 self.display_name,
-                Miscellaneous.string_to_datetime(
+                DateUtil.string_to_object(
                     date_string=match,
                     format=self.date_format,
+                    what="datetime",
                 ),
             )
 
@@ -349,8 +360,7 @@ class DateSelectField(BaseField):
 
         # Create a label widget
         label: tkinter.Label = tkinter.Label(
-            master=self.toplevel,
-            text="Please select a date."
+            master=self.toplevel, text="Please select a date."
         )
 
         # Place the label widget within the grid
@@ -360,7 +370,7 @@ class DateSelectField(BaseField):
             pady=5,
             row=0,
             sticky=NSEW,
-        )        
+        )
 
         # Create a calendar widget
         self.calendar = tkcalendar.Calendar(
@@ -658,15 +668,10 @@ class DateSelectField(BaseField):
 
         # Create a label widget
         self._label: tkinter.Label = tkinter.Label(
-            master=self,
-            text=display_name,
-            **kwargs.get(
-                "label",
-               {}
-            )
+            master=self, text=display_name, **kwargs.get("label", {})
         )
 
-       # Place the label widget within the grid
+        # Place the label widget within the grid
         self._label.grid(
             column=0,
             padx=5,
@@ -677,23 +682,18 @@ class DateSelectField(BaseField):
 
         # Create a string variable
         self.variable: tkinter.StringVar = tkinter.StringVar(
-            value=Miscellaneous.datetime_to_string(
-                datetime=Miscellaneous.get_current_datetime(),
+            value=DateUtil.object_to_string(
+                datetime_or_date=DateUtil.now(),
                 format=self.date_format,
             )
         )
 
         # Create an entry widget
         self._entry: tkinter.Entry = tkinter.Entry(
-            master=self,
-            textvariable=self.variable,
-            **kwargs.get(
-                "entry",
-               {}
-            )
+            master=self, textvariable=self.variable, **kwargs.get("entry", {})
         )
 
-       # Place the entry widget within the grid
+        # Place the entry widget within the grid
         self._entry.grid(
             column=1,
             padx=5,
@@ -718,13 +718,10 @@ class DateSelectField(BaseField):
             command=lambda: self.clear(dispatch=True),
             master=self,
             text="X",
-            **kwargs.get(
-                "clear_button",
-               {}
-            )
+            **kwargs.get("clear_button", {}),
         )
 
-       # Place the 'clear button' button widget within the grid
+        # Place the 'clear button' button widget within the grid
         self._clear_button.grid(
             column=2,
             padx=5,
@@ -737,13 +734,10 @@ class DateSelectField(BaseField):
             command=self._on_select_button_click,
             master=self,
             text="Select",
-            **kwargs.get(
-                "select_button",
-               {}
-            )
+            **kwargs.get("select_button", {}),
         )
 
-       # Place the 'select button' button widget within the grid
+        # Place the 'select button' button widget within the grid
         self._select_button.grid(
             column=3,
             padx=5,
@@ -760,7 +754,7 @@ class DateSelectField(BaseField):
             foreground=Constants.RED["default"],
             master=self,
             text=f"Entry value '{self.variable.get()}' is not in a valid format. Expected: '{self.date_format}'.",
-        )        
+        )
 
     def get(
         self,
@@ -782,9 +776,10 @@ class DateSelectField(BaseField):
             value,
         ) = (
             self.display_name,
-            Miscellaneous.string_to_datetime(
+            DateUtil.string_to_object(
                 date_string=self.variable.get(),
                 format=self.date_format,
+                what="datetime",
             ),
         )
 
@@ -839,8 +834,8 @@ class DateSelectField(BaseField):
             datetime,
         ):
             # Attempt to convert the string to a datetime object
-            value = Miscellaneous.datetime_to_string(
-                datetime=value,
+            value = DateUtil.object_to_string(
+                datetime_or_date=value,
                 format=self.date_format,
             )
 

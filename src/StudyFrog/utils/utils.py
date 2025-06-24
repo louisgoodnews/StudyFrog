@@ -3,6 +3,7 @@ Author: lodego
 Date: 2025-05-20
 """
 
+import re
 import traceback
 
 from datetime import date, datetime, timedelta
@@ -247,6 +248,93 @@ class DateUtil:
 
             # Return None
             return None
+
+    @classmethod
+    def date_format_to_regex_pattern(
+        cls,
+        date_format: str,
+    ) -> Optional[str]:
+        """
+        Converts a datetime format string into a regex pattern.
+
+        This method transforms a strftime-compatible format (e.g., "%Y-%m-%d")
+        into a regex pattern that can be used to validate or match strings
+        with the same structure.
+
+        Example:
+            "%d.%m.%Y" -> r"\d{1,2}\.\d{1,2}\.\d{4}"
+
+        Args:
+            date_format (str): The datetime format string to convert.
+
+        Returns:
+            Optional[str]: A regex pattern matching the given format, or None if the input is invalid.
+        """
+
+        # Check, if the format is empty or None
+        if not date_format:
+            # Return early
+            return None
+
+        # Mapping of strftime tokens to regex equivalents
+        token_map: Dict[str, str] = {
+            "%d": r"\d{1,2}",  # Day of the month (1–31)
+            "%m": r"\d{1,2}",  # Month (1–12)
+            "%y": r"\d{2}",  # Two-digit year
+            "%Y": r"\d{4}",  # Four-digit year
+            "%H": r"\d{1,2}",  # Hour (0–23)
+            "%I": r"\d{1,2}",  # Hour (1–12)
+            "%M": r"\d{1,2}",  # Minute (0–59)
+            "%S": r"\d{1,2}",  # Second (0–59)
+            "%f": r"\d{1,6}",  # Microsecond
+            "%p": r"(AM|PM|am|pm)",  # AM/PM in various cases
+            "%b": r"[A-Za-z]{3}",  # Abbreviated month name
+            "%B": r"[A-Za-z]+",  # Full month name
+            "%a": r"[A-Za-z]{3}",  # Abbreviated weekday name
+            "%A": r"[A-Za-z]+",  # Full weekday name
+            "%j": r"\d{1,3}",  # Day of the year (1–366)
+            "%U": r"\d{1,2}",  # Week number (Sunday first)
+            "%W": r"\d{1,2}",  # Week number (Monday first)
+            "%w": r"\d",  # Weekday as a digit (0–6)
+            "%z": r"[\+\-]\d{4}",  # UTC offset (e.g., +0200)
+            "%Z": r"[A-Za-z]+",  # Time zone abbreviation
+            "%c": r".+",  # Locale-specific datetime representation
+            "%x": r".+",  # Locale-specific date
+            "%X": r".+",  # Locale-specific time
+            "%%": r"%",  # Literal '%'
+        }
+
+        # Prepare the final regex string
+        regex_pattern: str = ""
+
+        # Iterate through the format string by index
+        i: int = 0
+
+        while i < len(date_format):
+            # If a token begins with '%', try to match a known format token
+            if date_format[i] == "%" and i + 1 < len(date_format):
+                # Extract the token
+                token: str = date_format[i : i + 2]
+
+                # If it's a recognized token, add its regex form
+                if token in token_map:
+                    # Add the regex form to the pattern
+                    regex_pattern += token_map[token]
+
+                    # Increment the index by 2
+                    i += 2
+
+                    # Skip the next character
+                    continue
+
+            # If not a format token, escape and add the character literally
+            regex_pattern += re.escape(date_format[i])
+
+            # Increment the index
+            i += 1
+
+        # Return the assembled regex pattern
+        return regex_pattern
 
     @classmethod
     def day_after_tomorrow(
@@ -767,6 +855,33 @@ class DateUtil:
             if what == "datetime"
             else cls.now(timezone=timezone) + timedelta(days=1)
         )
+
+    @classmethod
+    def validate_date_format(
+        cls,
+        format_string: str,
+    ) -> bool:
+        """
+        Validates whether the given format string is supported by datetime.strptime.
+
+        Args:
+            format_string (str): The date format string to test.
+
+        Returns:
+            bool: True if format is valid, False otherwise.
+        """
+        try:
+            # Try parsing a dummy date using the format
+            datetime.datetime.strptime(
+                cls.object_to_string(datetime_or_date=cls.now()),
+                format_string,
+            )
+
+            # Return True
+            return True
+        except (ValueError, TypeError):
+            # Return False, if an exception occures
+            return False
 
     @classmethod
     def yesterday(

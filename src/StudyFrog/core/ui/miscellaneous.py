@@ -11,14 +11,16 @@ from typing import *
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher
+from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 
 
 __all__: Final[List[str]] = [
     "ClockWidget",
-    "CountdownWidget",
-    "CountupWidget",
+    "CountdownButtonWidget",
+    "CountdownClockWidget",
+    "CountupClockWidget",
     "DateClockWidget",
 ]
 
@@ -201,8 +203,164 @@ class ClockWidget(tkinter.Frame):
         )
 
 
-class CountdownWidget(tkinter.Frame):
-    """ """
+class CountdownButtonWidget(tkinter.Button):
+    """
+    A countdown button widget that disables itself during a countdown and re-enables it once the countdown is complete.
+    """
+
+    def __init__(
+        self,
+        display_name: str,
+        master: tkinter.Misc,
+        namespace: str = Constants.GLOBAL_NAMESPACE,
+        on_click_callback: Optional[Callable[[str], None]] = None,
+        time_to_countdown: int = 10,
+        **kwargs,
+    ) -> None:
+        """
+        Initializes a new instance of the CountdownButtonWidget class.
+
+        Args:
+            master (tkinter.Misc): The master widget.
+            namespace (str): The namespace to use for event dispatching.
+            on_click_callback (Optional[Callable[[str], None]]): The callback to execute when the button is clicked.
+            time_to_countdown (int): The time in seconds to count down.
+            **kwargs: Additional keyword arguments passed to the parent Button.
+
+        Returns:
+            None
+        """
+
+        # Call the parent class constructor with the passed arguments
+        super().__init__(
+            master=master,
+            **kwargs,
+        )
+
+        # Initialize this class' Logger instance
+        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
+
+        # Initialize the Dispatcher instance
+        self.dispatcher: Dispatcher = Dispatcher()
+
+        # Store the passed display_name string in an instance variable
+        self.display_name: str = display_name
+
+        # Store the passed namespace string in an instance variable
+        self.namespace: str = namespace
+
+        # Store the passed on_click_callback callable in an instance variable
+        self.on_click_callback: Optional[Callable[[str], None]] = on_click_callback
+
+        # Store the passed time_to_countdown int in an instance variable
+        self.time_to_countdown: int = time_to_countdown
+
+        # Set the button's text
+        self.configure(text=f"{self.time_to_countdown} seconds remaining")
+
+        # Check, if the button has a callback
+        if self.cget(key="command"):
+            # Set the on_click_callback to the button's command
+            self.on_click_callback = self.cget(key="command")
+
+        # Set the button's command to the _on_button_click method
+        self.configure(command=self._on_button_click)
+
+        # Execute the countdown
+        self._execute_countdown()
+
+    def _execute_countdown(self) -> None:
+        """
+        Executes the countdown logic.
+
+        This Method disables the button, then starts the countdown an re-enables the button once the countdown has reached 0.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the execution of the method.
+        """
+        try:
+            # Disable the button
+            self.configure(state=DISABLED)
+
+            # Start the countdown
+            for i in range(self.time_to_countdown, 0, -1):
+                # Update the button's text
+                self.configure(text=f"{i} seconds remaining")
+
+                # Wait for 1 second
+                self.after(1000)
+
+            # Re-enable the button
+            self.configure(state=NORMAL)
+
+            # Update the button's text to the display name
+            self.configure(text=self.display_name)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_execute_countdown' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the exceptions traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+    def _on_button_click(self) -> None:
+        """
+        Handles the logic for expanding/collapsing the frame.
+
+        When the button is clicked, this method toggles the visibility
+        of the internal container and updates the button label.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the execution of the method.
+        """
+        try:
+            # Get the button's text
+            text: str = self.cget(key="text")
+
+            # Check, if the 'on_click_callback' callable is not None
+            if self.on_click_callback:
+                # Call the 'on_click_callback' callable with the passed namespace string
+                self.on_click_callback(text)
+
+            # Dispatch the COUNTDOWN_BUTTON_CLICKED event
+            self.dispatcher.dispatch(
+                event=Events.COUNTDOWN_BUTTON_CLICKED,
+                namespace=self.namespace,
+                text=text,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_on_button_click' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the exceptions traceback
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Re-raise the exception to the caller
+            raise e
+
+
+class CountdownClockWidget(tkinter.Frame):
+    """
+    A countdown clock widget that displays the remaining time in hours, minutes, and seconds.
+    """
 
     def __init__(
         self,
@@ -214,7 +372,21 @@ class CountdownWidget(tkinter.Frame):
         seconds: int = 0,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Initializes a new instance of the CountdownClockWidget class.
+
+        Args:
+            dispatcher (Dispatcher): The dispatcher to use for event dispatching.
+            master (tkinter.Misc): The master widget.
+            hours (int): The number of hours to count down.
+            minutes (int): The number of minutes to count down.
+            namespace (str): The namespace to use for event dispatching.
+            seconds (int): The number of seconds to count down.
+            **kwargs: Additional keyword arguments passed to the parent Frame.
+
+        Returns:
+            None
+        """
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -257,27 +429,59 @@ class CountdownWidget(tkinter.Frame):
 
     @property
     def label(self) -> tkinter.Label:
-        """ """
+        """
+        Returns the internal label widget.
+
+        Useful for configuring or styling the label externally.
+
+        Returns:
+            tkinter.Label: The label widget displaying the current time.
+        """
 
         # Return the tkinter.Label widget
         return self._label
 
     @property
     def pause_button(self) -> tkinter.Button:
-        """ """
+        """
+        Returns the internal pause button widget.
+
+        Useful for configuring or styling the button externally.
+
+        Returns:
+            tkinter.Button: The pause button widget.
+        """
 
         # Return the 'pause button' tkinter.Button widget
         return self._pause_button
 
     @property
     def resume_button(self) -> tkinter.Button:
-        """ """
+        """
+        Returns the internal resume button widget.
+
+        Useful for configuring or styling the button externally.
+
+        Returns:
+            tkinter.Button: The resume button widget.
+        """
 
         # Return the 'resume button' tkinter.Button widget
         return self._resume_button
 
     def _on_pause_button_click(self) -> None:
-        """ """
+        """
+        Handles the logic for pausing the countdown.
+
+        When the pause button is clicked, this method disables the pause button,
+        enables the resume button, and updates the 'is running' flag.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Check, if the countdown is not running
         if not self._is_running:
@@ -297,7 +501,18 @@ class CountdownWidget(tkinter.Frame):
         self.after_cancel(id=self.update_call)
 
     def _on_resume_button_click(self) -> None:
-        """ """
+        """
+        Handles the logic for resuming the countdown.
+
+        When the resume button is clicked, this method disables the resume button,
+        enables the pause button, and updates the 'is running' flag.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Check, if the countdown is running
         if self._is_running:
@@ -320,7 +535,19 @@ class CountdownWidget(tkinter.Frame):
         )
 
     def _update_clock(self) -> None:
-        """ """
+        """
+        Updates the clock display.
+
+        This method decrements the seconds, minutes, and hours, and updates the label
+        display accordingly. If the countdown reaches zero, it resets the values and
+        disables the buttons.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Check, if the countdown is running
         if not self._is_running:
@@ -358,7 +585,20 @@ class CountdownWidget(tkinter.Frame):
         )
 
     def configure_grid(self) -> None:
-        """ """
+        """
+        Configures the grid layout for the widget.
+
+        This method sets up the grid layout for the widget by configuring the weights
+        of the columns and rows. The 0th column has a weight of 1, meaning it will
+        stretch when the window is resized. The 1st and 2nd columns have a weight of 0,
+        meaning they will not stretch. The 0th row also has a weight of 0.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Set the weight of the 0th column to 1
         # This means that the column will stretch when the window is resized
@@ -392,7 +632,18 @@ class CountdownWidget(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the label widget with the passed keyword arguments.
+
+        Args:
+            **kwargs: Additional keyword arguments passed to the label widget's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the execution of the method.
+       """
         try:
             # Attempt to configure the label widget
             self._label.configure(**kwargs)
@@ -412,7 +663,18 @@ class CountdownWidget(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the pause button widget with the passed keyword arguments.
+
+        Args:
+            **kwargs: Additional keyword arguments passed to the pause button widget's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the execution of the method.
+        """
         try:
             # Attempt to configure the label widget
             self._pause_button.configure(**kwargs)
@@ -432,7 +694,18 @@ class CountdownWidget(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the resume button widget with the passed keyword arguments.
+
+        Args:
+            **kwargs: Additional keyword arguments passed to the resume button widget's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the execution of the method.
+        """
         try:
             # Attempt to configure the 'resume button' tkinter.Button widget
             self._resume_button.configure(**kwargs)
@@ -449,7 +722,18 @@ class CountdownWidget(tkinter.Frame):
             raise e
 
     def create_widgets(self) -> None:
-        """ """
+        """
+        Creates the internal widgets for the widget.
+
+        This method creates the internal widgets for the widget, including the label,
+        pause button, and resume button. It also places the widgets in the grid layout.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Create a tkinter.Label widget
         self._label: tkinter.Label = tkinter.Label(
@@ -498,14 +782,21 @@ class CountdownWidget(tkinter.Frame):
         )
 
     def is_running(self) -> bool:
-        """ """
+        """
+        Returns the 'is running' boolean flag instance variable.
+
+        Returns:
+            bool: The 'is running' boolean flag instance variable.
+        """
 
         # Return the 'is running' boolean flag instance variable
         return self._is_running
 
 
-class CountupWidget(tkinter.Frame):
-    """ """
+class CountupClockWidget(tkinter.Frame):
+    """
+    A countup clock widget that displays the elapsed time in hours, minutes, and seconds.
+    """
 
     def __init__(
         self,
@@ -517,7 +808,21 @@ class CountupWidget(tkinter.Frame):
         seconds: int = 0,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Initializes a new instance of the CountupClockWidget class.
+
+        Args:
+            dispatcher (Dispatcher): The dispatcher to use for event dispatching.
+            master (tkinter.Misc): The master widget.
+            hours (int): The number of hours to count up.
+            minutes (int): The number of minutes to count up.
+            namespace (str): The namespace to use for event dispatching.
+            seconds (int): The number of seconds to count up.
+            **kwargs: Additional keyword arguments passed to the parent Frame.
+
+        Returns:
+            None
+        """
 
         # Call the parent class constructor with the passed arguments
         super().__init__(
@@ -560,27 +865,60 @@ class CountupWidget(tkinter.Frame):
 
     @property
     def label(self) -> tkinter.Label:
-        """ """
+        """
+        Returns the internal label widget.
+
+        Useful for configuring or styling the label externally.
+
+        Returns:
+            tkinter.Label: The label widget displaying the current time.
+        """
 
         # Return the tkinter.Label widget
         return self._label
 
     @property
     def pause_button(self) -> tkinter.Button:
-        """ """
+        """
+        Returns the internal 'pause button' tkinter.Button widget.
+
+        Useful for configuring or styling the 'pause button' externally.
+
+        Returns:
+            tkinter.Button: The 'pause button' tkinter.Button widget.
+        """
 
         # Return the 'pause button' tkinter.Button widget
         return self._pause_button
 
     @property
     def resume_button(self) -> tkinter.Button:
-        """ """
+        """
+        Returns the internal 'resume button' tkinter.Button widget.
+
+        Useful for configuring or styling the 'resume button' externally.
+
+        Returns:
+            tkinter.Button: The 'resume button' tkinter.Button widget.
+        """
 
         # Return the 'resume button' tkinter.Button widget
         return self._resume_button
 
     def _on_pause_button_click(self) -> None:
-        """ """
+        """
+        Handles the logic for pausing the countup.
+
+        When the 'pause button' tkinter.Button widget is clicked, this method updates the
+        'is running' boolean flag instance variable and disables the 'pause button' tkinter.Button
+        widget while enabling the 'resume button' tkinter.Button widget.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Check, if the countup is not running
         if not self._is_running:
@@ -600,7 +938,19 @@ class CountupWidget(tkinter.Frame):
         self.after_cancel(id=self.update_call)
 
     def _on_resume_button_click(self) -> None:
-        """ """
+        """
+        Handles the logic for resuming the countup.
+
+        When the 'resume button' tkinter.Button widget is clicked, this method updates the
+        'is running' boolean flag instance variable and disables the 'resume button' tkinter.Button
+        widget while enabling the 'pause button' tkinter.Button widget.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Check, if the countup is not running
         if self._is_running:
@@ -623,7 +973,17 @@ class CountupWidget(tkinter.Frame):
         )
 
     def _update_clock(self) -> None:
-        """ """
+        """
+        Updates the countup clock.
+
+        This method updates the countup clock by incrementing the seconds int and updating the tkinter.Label widget's text.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Check, if the countup is not running
         if not self._is_running:
@@ -661,7 +1021,17 @@ class CountupWidget(tkinter.Frame):
         )
 
     def configure_grid(self) -> None:
-        """ """
+        """
+        Configures the grid layout for the widget.
+
+        This method configures the grid layout for the widget by setting the weights of the columns and rows.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Set the weight of the 0th column to 1
         # This means that the column will stretch when the window is resized
@@ -688,7 +1058,18 @@ class CountupWidget(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the label widget with the passed keyword arguments.
+
+        Args:
+            **kwargs: Additional keyword arguments passed to the label widget's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the execution of the method.
+        """
         try:
             # Attempt to configure the label widget
             self._label.configure(**kwargs)
@@ -708,7 +1089,18 @@ class CountupWidget(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the pause button widget with the passed keyword arguments.
+
+        Args:
+            **kwargs: Additional keyword arguments passed to the pause button widget's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the execution of the method.
+        """
         try:
             # Attempt to configure the label widget
             self._pause_button.configure(**kwargs)
@@ -728,7 +1120,18 @@ class CountupWidget(tkinter.Frame):
         self,
         **kwargs,
     ) -> None:
-        """ """
+        """
+        Attempts to configure the resume button widget with the passed keyword arguments.
+
+        Args:
+            **kwargs: Additional keyword arguments passed to the resume button widget's configure method.
+
+        Returns:
+            None
+
+        Raises:
+            Exception: If an exception occurs during the execution of the method.
+        """
         try:
             # Attempt to configure the 'resume button' tkinter.Button widget
             self._resume_button.configure(**kwargs)
@@ -745,7 +1148,17 @@ class CountupWidget(tkinter.Frame):
             raise e
 
     def create_widgets(self) -> None:
-        """ """
+        """
+        Creates the internal widgets for the widget.
+
+        This method creates the internal widgets for the widget, including the label and the buttons.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 
         # Create a tkinter.Label widget
         self._label: tkinter.Label = tkinter.Label(
@@ -794,7 +1207,12 @@ class CountupWidget(tkinter.Frame):
         )
 
     def is_running(self) -> bool:
-        """ """
+        """
+        Returns the 'is running' boolean flag instance variable.
+
+        Returns:
+            bool: The 'is running' boolean flag instance variable.
+        """
 
         # Return the 'is running' boolean flag instance variable
         return self._is_running

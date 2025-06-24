@@ -4,9 +4,11 @@ Date: 2025-05-14
 """
 
 import tkinter
+import traceback
 
 from datetime import datetime
 from tkinter.constants import *
+from tkinter import ttk
 from typing import *
 
 from core.answer import ImmutableAnswer, MutableAnswer
@@ -15,6 +17,7 @@ from core.note import ImmutableNote, MutableNote
 from core.question import ImmutableQuestion, MutableQuestion
 from core.stack import ImmutableStack, MutableStack
 
+from core.ui.fields.string_fields import ReadOnlySingleLineTextField
 from core.ui.frames.frames import ScrolledFrame, TabbedFrame
 
 from utils.constants import Constants
@@ -22,6 +25,7 @@ from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
 from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
+from utils.utils import DateUtil
 
 
 __all__: Final[List[str]] = ["BaseViewForm"]
@@ -79,7 +83,7 @@ class BaseViewForm(tkinter.Frame):
         self.logger: Final[Logger] = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the timestamp instance variable to now
-        self.timestamp: datetime = Miscellaneous.get_current_datetime()
+        self.timestamp: datetime = DateUtil.now()
 
         # Initialize the list of subscription UUIDs as an empty list
         self.subscriptions: Final[List[str]] = []
@@ -96,6 +100,44 @@ class BaseViewForm(tkinter.Frame):
         # Subscribe to events
         self.subscribe_to_events()
 
+    @property
+    def entity(self) -> Union[
+        Union[
+            ImmutableAnswer,
+            MutableAnswer,
+            ImmutableFlashcard,
+            MutableFlashcard,
+            ImmutableNote,
+            MutableNote,
+            ImmutableQuestion,
+            MutableQuestion,
+            ImmutableStack,
+            MutableStack,
+        ]
+    ]:
+        """
+        Returns the entity.
+
+        Returns:
+            Union[
+                Union[
+                    ImmutableAnswer,
+                    MutableAnswer,
+                    ImmutableFlashcard,
+                    MutableFlashcard,
+                    ImmutableNote,
+                    MutableNote,
+                    ImmutableQuestion,
+                    MutableQuestion,
+                    ImmutableStack,
+                    MutableStack,
+                ]
+            ]
+        """
+
+        # Return the entity
+        return self._entity
+
     def _check_timestamp(self) -> bool:
         """
 
@@ -108,10 +150,9 @@ class BaseViewForm(tkinter.Frame):
 
         # Return True, if the timestamp is more than 3 minutes old, otherwise False
         return (
-            Miscellaneous.calculate_duration(
-                as_="minutes",
-                end=Miscellaneous.get_current_datetime(),
+            DateUtil.calculate_duration(
                 start=self.timestamp,
+                what="minutes",
             )
             >= 3
         )
@@ -122,16 +163,50 @@ class BaseViewForm(tkinter.Frame):
         value: Optional[Any] = None,
     ) -> None:
         """
+        Handles changes to form fields.
+
+        This method is triggered whenever a form field's value changes. It
+        normalizes the label (removes suffixes like ': ' and '*: ', converts it to
+        snake_case) and stores the new value in the internal `entity` instance
+        variable.
 
         Args:
-            label:
-            value:
+            label (str): The label of the changed field.
+            value (Optional[Any]): The new value of the field.
 
         Returns:
             None
         """
 
-        pass
+        # Normalize the label and convert it to snake case
+        label = Miscellaneous.any_to_snake(
+            string=label.strip()
+            .replace(
+                "*",
+                "",
+            )
+            .replace(
+                ":",
+                "",
+            )
+        )
+
+        # Update the entity with the new value
+        self.entity.set(
+            name=label,
+            value=value,
+        )
+
+        # Check if the timestamp is more than 3 minutes old
+        if not self._check_timestamp():
+            # Return early
+            return
+
+        # Update the entity (i.e., save it to the database)
+        self._update_entity()
+
+        # Update the timestamp
+        self.timestamp = DateUtil.now()
 
     def _process_entity(
         self,
@@ -177,18 +252,110 @@ class BaseViewForm(tkinter.Frame):
         self,
         label: str,
         field: tkinter.Misc,
+        required: bool = False,
     ) -> None:
         """
 
         Args:
             label:
             field:
+            required:
 
         Returns:
             None
         """
 
         pass
+
+    def _request_entites(
+        self,
+        type: Literal[
+            "answer",
+            "difficulty",
+            "flashcard",
+            "note",
+            "priority",
+            "question",
+            "stack",
+            "subject",
+            "tag",
+            "teacher",
+        ],
+    ) -> List[Any]:
+        """
+        Requests all entities of the specified type from the dispatcher.
+
+        Args:
+            type (Literal[str]): The type of entity to request. Can be one of the following:
+                "answer"
+                "difficulty"
+                "flashcard"
+                "note"
+                "priority"
+                "question"
+                "stack"
+                "subject"
+                "tag"
+                "teacher"
+            ]: The type of entity to request.
+
+        Returns:
+            List[Any]: The requested entities.
+
+        Raises:
+            ValueError: If the type is not one of the allowed values.
+        """
+        try:
+            events: Dict[str, DispatcherEvent] = {
+                "answer": Events.REQUEST_GET_ALL_ANSWERS,
+                "difficulty": Events.REQUEST_GET_ALL_DIFFICULTIES,
+                "flashcard": Events.REQUEST_GET_ALL_FLASHCARDS,
+                "note": Events.REQUEST_GET_ALL_NOTES,
+                "priority": Events.REQUEST_GET_ALL_PRIORITIES,
+                "question": Events.REQUEST_GET_ALL_QUESTIONS,
+                "stack": Events.REQUEST_GET_ALL_STACKS,
+                "subject": Events.REQUEST_GET_ALL_SUBJECTS,
+                "tag": Events.REQUEST_GET_ALL_TAGS,
+                "teacher": Events.REQUEST_GET_ALL_TEACHERS,
+            }
+
+            # Check, if the passed type argument is valid
+            if type not in events:
+                # Log an error message
+                self.logger.error(message=f"Invalid type argument: {type}")
+
+                # Raise a ValueError
+                raise ValueError(f"Invalid type argument: {type}")
+
+            # Dispatch the event corresponding to the entity's type in the 'global' namespace
+            notification: Optional[DispatcherNotification] = self.dispatcher.dispatch(
+                event=events[type],
+                namespace=Constants.GLOBAL_NAMESPACE,
+            )
+
+            # Check, if the notification exists or has irregularities
+            if not notification or notification.has_irregularities():
+                # Log a warning message
+                self.logger.warning(
+                    message=f"Failed to dispatch request get all event in the 'global' namespace."
+                )
+
+                # Return an empty list indicating that an exception has ocurred
+                return []
+
+            # Return the list of entities to the caller
+            return notification.get_one_and_only_result()
+        except Exception as e:
+            # Log an error message indicating that an exception has ocurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run '_request_entites' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return an empty list indicating that an exception has ocurred
+            return []
 
     def _update_entity(self) -> None:
         """
@@ -208,8 +375,8 @@ class BaseViewForm(tkinter.Frame):
             update=self.entity,
         )
 
-        # Check, if the notification exists or has errors
-        if not notification or notification.has_errors():
+        # Check, if the notification exists or has irregularities
+        if not notification or notification.has_irregularities():
             # Log a warning message
             self.logger.warning(
                 message=f"Failed to dispatch request update event in the 'global' namespace."
@@ -392,6 +559,9 @@ class BaseViewForm(tkinter.Frame):
         # Create a TabbedFrame widget
         tabbed_frame: TabbedFrame = TabbedFrame(master=master)
 
+        # Configure the TabbedFrame widget's top frame
+        tabbed_frame.configure_top_frame(background=Constants.BLUE_GREY["700"])
+
         # Place the TabbedFrame widget in the grid
         tabbed_frame.grid(
             column=0,
@@ -405,10 +575,32 @@ class BaseViewForm(tkinter.Frame):
             widget=self.create_primary_tab_widgets(master=tabbed_frame),
         )
 
+        # Configure the 'primary attributes' tab button
+        tabbed_frame.configure_button(
+            name="primary_attributes",
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
         # Add the 'secondary attributes tab' widgets to the TabbedFrame widget
         tabbed_frame.add(
             label="Secondary Attributes",
             widget=self.create_secondary_tab_widgets(master=tabbed_frame),
+        )
+
+        # Configure the 'secondary attributes' tab button
+        tabbed_frame.configure_button(
+            name="secondary_attributes",
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
         )
 
     def create_center_right_frame_widgets(
@@ -416,9 +608,10 @@ class BaseViewForm(tkinter.Frame):
         master: tkinter.Frame,
     ) -> None:
         """
+        Creates the center right frame widgets.
 
         Args:
-            master:
+            master (tkinter.Frame): The master widget.
 
         Returns:
             None
@@ -437,13 +630,261 @@ class BaseViewForm(tkinter.Frame):
         )
 
         # Create a ScrolledFrame widget
-        scrolled_frame: ScrolledFrame = ScrolledFrame(master=master)
+        scrolled_frame: ScrolledFrame = ScrolledFrame(
+            background=Constants.BLUE_GREY["700"],
+            horizontal_scrollbar=True,
+            master=master,
+        )
+
+        # Configure the ScrolledFrame widget's container
+        scrolled_frame.configure_container(background=Constants.BLUE_GREY["700"])
+
+        # Configure the ScrolledFrame widget's 0th column to weight 1
+        scrolled_frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
 
         # Place the ScrolledFrame widget in the grid
         scrolled_frame.grid(
             column=0,
             row=0,
             sticky=NSEW,
+        )
+
+        # Create the 'ID' ReadOnlySingleLineTextField widget
+        id_field: ReadOnlySingleLineTextField = ReadOnlySingleLineTextField(
+            display_name="ID*: ",
+            master=scrolled_frame.container,
+            value=self.entity.id,
+        )
+
+        # Configure the 'ID' ReadOnlySingleLineTextField widget
+        id_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Configure the 'ID' ReadOnlySingleLineTextField widget's button
+        id_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Configure the 'ID' ReadOnlySingleLineTextField widget's label
+        id_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Place the 'ID' ReadOnlySingleLineTextField widget in the grid
+        id_field.grid(
+            column=0,
+            row=0,
+            sticky=NSEW,
+        )
+
+        # Configure the ScrolledFrame widget's container's 0th row to weight 0
+        scrolled_frame.container.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+        # Create the 'created at' ReadOnlySingleLineTextField widget
+        created_at_field: ReadOnlySingleLineTextField = ReadOnlySingleLineTextField(
+            display_name="Created At*: ",
+            master=scrolled_frame.container,
+            value=DateUtil.object_to_string(
+                datetime_or_date=self.entity.created_at,
+                format="%Y-%m-%d",
+            ),
+        )
+
+        # Configure the 'created at' ReadOnlySingleLineTextField widget
+        created_at_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Configure the 'created at' ReadOnlySingleLineTextField widget's button
+        created_at_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Configure the 'created at' ReadOnlySingleLineTextField widget's label
+        created_at_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Place the 'created at' ReadOnlySingleLineTextField widget in the grid
+        created_at_field.grid(
+            column=0,
+            row=1,
+            sticky=NSEW,
+        )
+
+        # Configure the ScrolledFrame widget's container's 1th row to weight 0
+        scrolled_frame.container.grid_rowconfigure(
+            index=1,
+            weight=0,
+        )
+
+        # Create the 'updated at' ReadOnlySingleLineTextField widget
+        updated_at_field: ReadOnlySingleLineTextField = ReadOnlySingleLineTextField(
+            display_name="Updated At*: ",
+            master=scrolled_frame.container,
+            value=DateUtil.object_to_string(
+                datetime_or_date=self.entity.updated_at,
+                format="%Y-%m-%d",
+            ),
+        )
+
+        # Configure the 'updated at' ReadOnlySingleLineTextField widget
+        updated_at_field.configure(background=Constants.BLUE_GREY["700"])
+
+        # Configure the 'updated at' ReadOnlySingleLineTextField widget's button
+        updated_at_field.configure_button(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Configure the 'updated at' ReadOnlySingleLineTextField widget's label
+        updated_at_field.configure_label(
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+        )
+
+        # Place the 'updated at' ReadOnlySingleLineTextField widget in the grid
+        updated_at_field.grid(
+            column=0,
+            row=2,
+            sticky=NSEW,
+        )
+
+        # Configure the ScrolledFrame widget's container's 2nd row to weight 0
+        scrolled_frame.container.grid_rowconfigure(
+            index=2,
+            weight=0,
+        )
+
+        # Create the 'top separator' ttk.Separator widget
+        top_separator: ttk.Separator = ttk.Separator(
+            master=scrolled_frame.container,
+            orient=HORIZONTAL,
+        )
+
+        # Place the 'top separator' ttk.Separator widget in the grid
+        top_separator.grid(
+            column=0,
+            pady=5,
+            row=3,
+            sticky=NSEW,
+        )
+
+        # Configure the ScrolledFrame widget's container's 3rd row to weight 0
+        scrolled_frame.container.grid_rowconfigure(
+            index=3,
+            weight=0,
+        )
+
+        # Configure the ScrolledFrame widget's container's 4th row to weight 0
+        scrolled_frame.container.grid_rowconfigure(
+            index=4,
+            weight=0,
+        )
+
+        # Create the 'details' ttk.Label widget
+        details_label: ttk.Label = ttk.Label(
+            anchor=CENTER,
+            background=Constants.BLUE_GREY["700"],
+            font=(
+                Constants.DEFAULT_FONT_FAMILY,
+                Constants.DEFAULT_FONT_SIZE,
+            ),
+            foreground=Constants.WHITE,
+            justify=LEFT,
+            master=scrolled_frame.container,
+            text="Details: ",
+        )
+
+        # Place the 'details' ttk.Label widget in the grid
+        details_label.grid(
+            column=0,
+            pady=5,
+            row=4,
+            sticky=NSEW,
+        )
+
+        # Configure the ScrolledFrame widget's container's 4th row to weight 0
+        scrolled_frame.container.grid_rowconfigure(
+            index=4,
+            weight=0,
+        )
+
+        # Create a tkinter.Frame widget
+        frame: tkinter.Frame = tkinter.Frame(
+            background=Constants.BLUE_GREY["700"],
+            master=scrolled_frame.container,
+        )
+
+        # Configure the tkinter.Frame widget's 0th column to weight 1
+        frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        # Place the tkinter.Frame widget in the grid
+        frame.grid(
+            column=0,
+            row=5,
+            sticky=NSEW,
+        )
+
+        # Configure the ScrolledFrame widget's container's 5th row to weight 1
+        scrolled_frame.container.grid_rowconfigure(
+            index=5,
+            weight=1,
+        )
+
+        # Create the 'details' frame widgets
+        self.create_details_frame_widgets(master=frame)
+
+    def create_details_frame_widgets(
+        self,
+        master: tkinter.Frame,
+    ) -> None:
+        """
+        Creates the details frame widgets.
+
+        Args:
+            master (tkinter.Frame): The master widget.
+
+        Returns:
+            None
+        """
+
+        raise NotImplementedError(
+            f"The 'create_details_frame_widgets' method must be implemented in the {self.__class__.__name__} class."
         )
 
     def create_primary_tab_widgets(

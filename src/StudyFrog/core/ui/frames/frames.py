@@ -637,7 +637,7 @@ class ScrolledFrame(tkinter.Frame):
             self.canvas.configure(scrollregion=self.canvas.bbox(ALL))
 
             # Update idletasks to ensure geometry info is correct
-            self.canvas.update_idletasks()
+            self._container.update_idletasks()
 
             # Configure the 'container' tkinter.Frame widget
             self.canvas.itemconfigure(
@@ -763,7 +763,7 @@ class ScrolledFrame(tkinter.Frame):
         """
         try:
             # Configure the 'container' tkinter.Frame widget
-            self.container.configure(**kwargs)
+            self._container.configure(**kwargs)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -791,7 +791,7 @@ class ScrolledFrame(tkinter.Frame):
         """
         try:
             # Configure the horizontal tkinter.Scrollbar widget
-            self.horizontal_scrollbar.configure(**kwargs)
+            self._horizontal_scrollbar.configure(**kwargs)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -819,7 +819,7 @@ class ScrolledFrame(tkinter.Frame):
         """
         try:
             # Configure the vertical tkinter.Scrollbar widget
-            self.vertical_scrollbar.configure(**kwargs)
+            self._vertical_scrollbar.configure(**kwargs)
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(
@@ -875,6 +875,9 @@ class TabbedFrame(tkinter.Frame):
             master=master,
             **kwargs,
         )
+
+        # Initialize this class' Logger instance in an instance variable
+        self.logger: Logger = Logger.get_logger(name=self.__class__.__name__)
 
         # Initialize the current tab (optional) string instance variable as None
         self.current_tab: Optional[str] = None
@@ -1143,7 +1146,7 @@ class TabbedFrame(tkinter.Frame):
         """
 
         # Convert the passed name to snake case
-        key = Miscellaneous.any_to_snake(string=name)
+        key: str = Miscellaneous.any_to_snake(string=name.strip())
 
         # Check, if the passed name string is contained in the tabs dictionary instance variable
         if key not in self.tabs:
@@ -1207,11 +1210,19 @@ class TabbedFrame(tkinter.Frame):
             None
         """
 
+        # Convert the passed label to snake case
+        key: str = Miscellaneous.any_to_snake(string=label.strip())
+
+        # Check, if the passed label string is contained in the tabs dictionary instance variable
+        if key not in self.tabs:
+            # Return early
+            return
+
         # Destroy the button widget
-        self.tabs[label]["button"].destroy()
+        self.tabs[key]["button"].destroy()
 
         # Destroy the widget
-        self.tabs[label]["widget"].destroy()
+        self.tabs[key]["widget"].destroy()
 
         # Remove the tab from the dictionary
-        self.tabs.pop(label)
+        self.tabs.pop(key)

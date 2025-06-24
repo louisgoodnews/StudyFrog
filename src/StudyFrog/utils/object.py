@@ -169,11 +169,11 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ):
+        if not self.has(key=name):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
+            self.logger.warning(
+                message=f"Attribute '{name.strip("_")}' does not exist."
+            )
 
             # Return early since the attribute is not present
             return
@@ -215,11 +215,11 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ):
+        if not self.has(key=name):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
+            self.logger.warning(
+                message=f"Attribute '{name.strip("_")}' does not exist."
+            )
 
             # Return early since the attribute is not present
             return
@@ -249,31 +249,23 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if self.has(
-            name,
-        ):
-            # Return the value of the attribute
-            return self.__dict__.get(
-                name,
-                self.__dict__.get(
-                    f"_{name}",
-                    None,
-                ),
+        if not self.has(key=name):
+            # Log a warning message if the attribute does not exist
+            self.logger.warning(
+                message=f"Attribute '{name.strip("_")}' does not exist."
             )
-        elif self.has(
+
+            # Return None
+            return None
+
+        # Return the value of the attribute
+        return self.__dict__.get(
             name,
-        ):
-            # Return the value of the attribute
-            return self.__dict__.get(
-                name,
+            self.__dict__.get(
+                f"_{name}",
                 None,
-            )
-
-        # Log a warning message if the attribute does not exist
-        self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
-
-        # Return None
-        return None
+            ),
+        )
 
     @override
     def __repr__(
@@ -399,7 +391,7 @@ class MutableBaseObject:
         """
 
         # Check if the object contains the given key
-        return f"_{key}" in self.__dict__
+        return key in self.__dict__ or f"_{key}" in self.__dict__
 
     def contains_value(
         self,
@@ -433,13 +425,11 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ) and not self.has(
-            f"_{name}",
-        ):
+        if not self.has(key=name):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
+            self.logger.warning(
+                message=f"Attribute '{name.strip("_")}' does not exist."
+            )
 
             # Return early since the attribute is not present
             return
@@ -466,13 +456,11 @@ class MutableBaseObject:
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ) and not self.has(
-            f"_{name}",
-        ):
+        if not self.has(key=name):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
+            self.logger.warning(
+                message=f"Attribute '{name.strip("_")}' does not exist."
+            )
 
             # Return the default value if the attribute is not present
             return default
@@ -501,7 +489,7 @@ class MutableBaseObject:
         """
 
         # Return True if the object has the given key
-        return key in self.__dict__
+        return key in self.__dict__ or f"_{key}" in self.__dict__
 
     def is_mutable(self) -> bool:
         """
@@ -678,14 +666,16 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ):
+        if not self.has(key=name):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
+            self.logger.warning(
+                message=f"Attribute '{name.strip("_")}' does not exist."
+            )
 
-            # Return early since the attribute is not present
-            return
+            # Raise an attribute error as the attribute is immutable
+            raise AttributeError(
+                f"Attribute '{name.strip("_")}' does not exist in {self.__class__.__name__}."
+            )
 
         # Raise an attribute error as the attribute is immutable
         raise AttributeError(
@@ -733,19 +723,17 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ):
-            # Set the value of the attribute
-            self.__dict__[name] = value
+        if self.has(key=name):
+            # Raise an attribute error as the attribute is immutable
+            raise AttributeError(
+                f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
+            )
 
-            # Return early since the attribute was set
-            return
+        # Set the value of the attribute
+        self.__dict__[name] = value
 
-        # Raise an attribute error as the attribute is immutable
-        raise AttributeError(
-            f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
-        )
+        # Return early since the attribute was set
+        return
 
     @override
     def __setitem__(
@@ -769,19 +757,17 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ):
-            # Set the value of the attribute
-            self.__dict__[name] = value
+        if self.has(key=name):
+            # Raise an attribute error as the attribute is immutable
+            raise AttributeError(
+                f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
+            )
 
-            # Return early since the attribute was set
-            return
+        # Set the value of the attribute
+        self.__dict__[name] = value
 
-        # Raise an attribute error as the attribute is immutable
-        raise AttributeError(
-            f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
-        )
+        # Return early since the attribute was set
+        return
 
     @override
     def delete(
@@ -790,6 +776,9 @@ class ImmutableBaseObject(MutableBaseObject):
     ) -> None:
         """
         Deletes the attribute with the given name.
+
+        This method is not implemented for immutable objects.
+        It will instead raise an exception if either the attribute does not exist or if the attribute is immutable.
 
         :param name: The name of the attribute to delete.
         :type name: str
@@ -801,14 +790,16 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ):
+        if not self.has(key=name):
             # Log a warning message if the attribute does not exist
-            self.logger.warning(message=f"Attribute '{name.strip("_")}' does not exist.")
+            self.logger.warning(
+                message=f"Attribute '{name.strip("_")}' does not exist."
+            )
 
-            # Return early since the attribute is not present
-            return
+            # Raise an attribute error as the attribute is immutable
+            raise AttributeError(
+                f"Attribute '{name.strip("_")}' does not exist in {self.__class__.__name__}."
+            )
 
         # Raise an attribute error as the attribute is immutable
         raise AttributeError(
@@ -849,19 +840,17 @@ class ImmutableBaseObject(MutableBaseObject):
         """
 
         # Check if the attribute exists
-        if not self.has(
-            name,
-        ):
-            # Set the value of the attribute
-            self.__dict__[name] = value
+        if self.has(key=name):
+            # Raise an attribute error as the attribute is immutable
+            raise AttributeError(
+                f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
+            )
 
-            # Return early since the attribute was set
-            return
+        # Set the value of the attribute
+        self.__dict__[name] = value
 
-        # Raise an attribute error as the attribute is immutable
-        raise AttributeError(
-            f"Cannot set attribute '{name}' in {self.__class__.__name__}, attribute is immutable."
-        )
+        # Return early since the attribute was set
+        return
 
     @override
     def update(
@@ -886,9 +875,7 @@ class ImmutableBaseObject(MutableBaseObject):
             value,
         ) in kwargs.items():
             # Check if the attribute exists
-            if not self.has(
-                key,
-            ):
+            if not self.has(key=key):
                 # Set the value of the attribute
                 self.__dict__[key] = value
 

@@ -8,10 +8,10 @@ import json
 import random
 import re
 import threading
+import traceback
 import uuid
 
 from typing import *
-
 from datetime import datetime, timedelta
 
 from utils.logger import Logger
@@ -572,7 +572,9 @@ class Miscellaneous:
         base_rate: int = 200
 
         # Calculate the word count
-        word_count: float = len(content.strip().split()) if isinstance(content, str) else float(content)
+        word_count: float = (
+            len(content.strip().split()) if isinstance(content, str) else float(content)
+        )
 
         # Calculate the estimated reading time
         result = word_count / base_rate
@@ -600,19 +602,26 @@ class Miscellaneous:
             Optional[str]: The string that matched the pattern, or None if no match was found.
         """
 
+        # Initialize the match variable
+        match: Optional[re.Match] = None
+
+        # Check, if a full match is required
         if fullmatch:
             # Find a match for the string against the pattern
-            match: Optional[re.Match] = re.fullmatch(
-                pattern=pattern,
-                string=string,
-            )
-        elif not fullmatch:
-            # Find a match for the string against the pattern
-            match: Optional[re.Match] = re.match(
+            match = re.fullmatch(
                 pattern=pattern,
                 string=string,
             )
 
+        # Check, if a partial match is required
+        elif not fullmatch:
+            # Find a match for the string against the pattern
+            match = re.match(
+                pattern=pattern,
+                string=string,
+            )
+
+        # Check, if a match was found
         if not match:
             # Log an error message indicating that no match was found
             cls.logger.error(
@@ -766,6 +775,71 @@ class Miscellaneous:
             str: A new UUID.
         """
         return str(uuid.uuid4())
+
+    @classmethod
+    def grade(
+        cls,
+        score: Union[float, int],
+    ) -> float:
+        """
+        Returns the grade for a given score.
+
+        This method calculates the grade for a given score based on a set of grading thresholds.
+        These thresholds are:
+            >=95% = 1.0
+            >=90% = 1.3
+            >=85% = 1.7
+            >=80% = 2.0
+            >=75% = 2.3
+            >=70% = 2.7
+            >=65% = 3.0
+            >=60% = 3.3
+            >=55% = 3.7
+            >=50% = 4.0
+
+        Note:
+            If the score is less than 50%, the method returns 5.0, i.e. a failed grade.
+
+        Args:
+            score (Union[float, int]): The score to calculate the grade for.
+
+        Returns:
+            float: The grade for the given score.
+        """
+
+        # A dictionary of grading thresholds
+        grading: Dict[str, float] = {
+            "100": 1.0,
+            "95": 1.0,
+            "90": 1.3,
+            "85": 1.7,
+            "80": 2.0,
+            "75": 2.3,
+            "70": 2.7,
+            "65": 3.0,
+            "60": 3.3,
+            "55": 3.7,
+            "50": 4.0,
+        }
+
+        # Calculate the percentage of the score
+        percentage: float = score / 100
+
+        # Iterate over the grading dictionary
+        for (
+            key,
+            value,
+        ) in grading.items():
+            # Check, if the percentage is less than the key
+            if percentage < float(key):
+                # Skip the current iteration
+                continue
+
+            # Return the value
+            return value
+
+        # Return a failed grade
+        return 5.0
 
     @classmethod
     def is_datetime_string(

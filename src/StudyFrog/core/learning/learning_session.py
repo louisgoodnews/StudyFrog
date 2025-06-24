@@ -2023,7 +2023,7 @@ class LearningSessionManager(BaseObjectManager):
             Exception: If an exception occurs while creating the learning_session.
         """
         try:
-            
+
             # Initialize the result (optional) ImmutableLearningSession to none
             result: Optional[ImmutableLearningSession] = None
 
@@ -2136,21 +2136,29 @@ class LearningSessionManager(BaseObjectManager):
             # Return False indicating an exception has occurred
             return False
 
-    def get_all_learning_sessions(self) -> Optional[List[ImmutableLearningSession]]:
+    def get_all_learning_sessions(
+        self,
+        force_refetch: bool = False,
+    ) -> Optional[List[ImmutableLearningSession]]:
         """
-        Returns a list of all learning_sessions in the database.
+        Returns a list of all LearningSession objects in the database.
+
+        Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
-            Optional[List[ImmutableLearningSession]]: A list of all learning_sessions in the database if no exception occurs. Otherwise, None.
+            Optional[List[ImmutableLearningSession]]: A list of all LearningSession objects in the database if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_learning_sessions():
-                # Return the list of immutable learning_sessions from the cache
-                return self.get_cache_values()
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if cache and table size are equal
+                if self.cache and len(self._cache) == self.count_learning_sessions():
+                    # Return the list of immutable learning_sessions from the cache
+                    return self.get_cache_values()
 
             # Get all learning_sessions from the database
             models: List[LearningSessionModel] = asyncio.run(
@@ -2193,27 +2201,31 @@ class LearningSessionManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableLearningSession]:
         """
-        Retrieves a learning_session by the given field and value.
+        Retrieves a LearningSession object by the given field and value.
 
         Args:
             field (str): The field to search by.
             value (Any): The value to search for.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
-            Optional[ImmutableLearningSession]: The learning_session with the given field and value if no exception occurs. Otherwise, None.
+            Optional[ImmutableLearningSession]: The LearningSession object with the given field and value if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the learning_session is already in the cache
-            if self.is_key_in_cache(key=field):
-                # Return the learning_session from the cache
-                return self.get_value_from_cache(key=field)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the LearningSession is already in the cache
+                if self.is_key_in_cache(key=field):
+                    # Return the LearningSession from the cache
+                    return self.get_value_from_cache(key=field)
 
-            # Get the learning_session with the given field and value from the database
+            # Get the LearningSession with the given field and value from the database
             model: Optional[LearningSessionModel] = asyncio.run(
                 LearningSessionModel.get_by(
                     column=field,
@@ -2222,31 +2234,36 @@ class LearningSessionManager(BaseObjectManager):
                 )
             )
 
-            # Return the learning_session if it exists
-            if model is not None:
-                # Convert the LearningSessionModel object to an ImmutableLearningSession object
-                learning_session: ImmutableLearningSession = (
-                    LearningSessionFactory.create_learning_session(
-                        **model.to_dict(
-                            exclude=[
-                                "_logger",
-                                "table",
-                            ]
-                        )
+            # Return the LearningSession if it exists
+            if not model:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"LearningSession with {field} = {value} does not exist"
+                )
+
+                # Return None indicating that the LearningSession does not exist
+                return None
+
+            # Convert the LearningSessionModel object to an ImmutableLearningSession object
+            learning_session: ImmutableLearningSession = (
+                LearningSessionFactory.create_learning_session(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
                     )
                 )
+            )
 
-                # Add the learning_session to the cache
-                self.add_to_cache(
-                    key=learning_session.key,
-                    value=learning_session,
-                )
+            # Add the LearningSession to the cache
+            self.add_to_cache(
+                key=learning_session.key,
+                value=learning_session,
+            )
 
-                # Return the learning_session
-                return learning_session
-            else:
-                # Return None indicating that the learning_session does not exist
-                return None
+            # Return the LearningSession
+            return learning_session
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -2259,26 +2276,30 @@ class LearningSessionManager(BaseObjectManager):
     def get_learning_session_by_id(
         self,
         id: int,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableLearningSession]:
         """
-        Returns a learning_session with the given ID.
+        Returns a LearningSession object with the given ID.
 
         Args:
-            id (int): The ID of the learning_session.
+            id (int): The ID of the LearningSession object.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
-            Optional[ImmutableLearningSession]: The learning_session with the given ID if no exception occurs. Otherwise, None.
+            Optional[ImmutableLearningSession]: The LearningSession object with the given ID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the learning_session is already in the cache
-            if self.is_key_in_cache(key=f"LEARNING_SESSION_{id}"):
-                # Return the learning_session from the cache
-                return self.get_value_from_cache(key=f"LEARNING_SESSION_{id}")
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the LearningSession is already in the cache
+                if self.is_key_in_cache(key=f"LEARNING_SESSION_{id}"):
+                    # Return the LearningSession from the cache
+                    return self.get_value_from_cache(key=f"LEARNING_SESSION_{id}")
 
-            # Get the learning_session with the given ID from the database
+            # Get the LearningSession with the given ID from the database
             model: Optional[LearningSessionModel] = asyncio.run(
                 LearningSessionModel.get_by(
                     column="id",
@@ -2287,31 +2308,36 @@ class LearningSessionManager(BaseObjectManager):
                 )
             )
 
-            # Return the learning_session if it exists
-            if model is not None:
-                # Convert the LearningSessionModel object to an ImmutableLearningSession object
-                learning_session: ImmutableLearningSession = (
-                    LearningSessionFactory.create_learning_session(
-                        **model.to_dict(
-                            exclude=[
-                                "_logger",
-                                "table",
-                            ]
-                        )
+            # Check, if the LearningSession exists
+            if not model:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"LearningSession with id = {id} does not exist"
+                )
+
+                # Return None indicating that the LearningSession does not exist
+                return None
+
+            # Convert the LearningSessionModel object to an ImmutableLearningSession object
+            learning_session: ImmutableLearningSession = (
+                LearningSessionFactory.create_learning_session(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
                     )
                 )
+            )
 
-                # Add the learning_session to the cache
-                self.add_to_cache(
-                    key=learning_session.key,
-                    value=learning_session,
-                )
+            # Add the LearningSession to the cache
+            self.add_to_cache(
+                key=learning_session.key,
+                value=learning_session,
+            )
 
-                # Return the learning_session
-                return learning_session
-            else:
-                # Return None indicating that the learning_session does not exist
-                return None
+            # Return the LearningSession
+            return learning_session
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -2324,26 +2350,30 @@ class LearningSessionManager(BaseObjectManager):
     def get_learning_session_by_key(
         self,
         key: str,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableLearningSession]:
         """
-        Returns a learning_session with the given key.
+        Returns a LearningSession object with the given key.
 
         Args:
-            key (str): The key of the learning_session.
+            key (str): The key of the LearningSession object.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
-            Optional[ImmutableLearningSession]: The learning_session with the given key if no exception occurs. Otherwise, None.
+            Optional[ImmutableLearningSession]: The LearningSession object with the given key if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the learning_session is already in the cache
-            if self.is_key_in_cache(key=key):
-                # Return the learning_session from the cache
-                return self.get_value_from_cache(key=key)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check, if the LearningSession is already in the cache
+                if self.is_key_in_cache(key=key):
+                    # Return the LearningSession from the cache
+                    return self.get_value_from_cache(key=key)
 
-            # Get the learning_session with the given key from the database
+            # Get the LearningSession with the given key from the database
             model: Optional[LearningSessionModel] = asyncio.run(
                 LearningSessionModel.get_by(
                     column="key",
@@ -2353,30 +2383,35 @@ class LearningSessionManager(BaseObjectManager):
             )
 
             # Return the learning_session if it exists
-            if model is not None:
-                # Convert the LearningSessionModel object to an ImmutableLearningSession object
-                learning_session: ImmutableLearningSession = (
-                    LearningSessionFactory.create_learning_session(
-                        **model.to_dict(
-                            exclude=[
-                                "_logger",
-                                "table",
-                            ]
-                        )
+            if not model:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"LearningSession with key = {key} does not exist"
+                )
+
+                # Return None indicating that the LearningSession does not exist
+                return None
+
+            # Convert the LearningSessionModel object to an ImmutableLearningSession object
+            learning_session: ImmutableLearningSession = (
+                LearningSessionFactory.create_learning_session(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
                     )
                 )
+            )
 
-                # Add the learning_session to the cache
-                self.add_to_cache(
-                    key=learning_session.key,
-                    value=learning_session,
-                )
+            # Add the learning_session to the cache
+            self.add_to_cache(
+                key=learning_session.key,
+                value=learning_session,
+            )
 
-                # Return the learning_session
-                return learning_session
-            else:
-                # Return None indicating that the learning_session does not exist
-                return None
+            # Return the learning_session
+            return learning_session
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -2389,24 +2424,28 @@ class LearningSessionManager(BaseObjectManager):
     def get_learning_session_by_uuid(
         self,
         uuid: str,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableLearningSession]:
         """
-        Returns a learning_session with the given UUID.
+        Returns a LearningSession object with the given UUID.
 
         Args:
-            uuid (str): The UUID of the learning_session.
+            uuid (str): The UUID of the LearningSession object.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
-            Optional[ImmutableLearningSession]: The learning_session with the given UUID if no exception occurs. Otherwise, None.
+            Optional[ImmutableLearningSession]: The LearningSession object with the given UUID if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the learning_session is already in the cache
-            if self.is_key_in_cache(key=uuid):
-                # Return the learning_session from the cache
-                return self.get_value_from_cache(key=uuid)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the learning_session is already in the cache
+                if self.is_key_in_cache(key=uuid):
+                    # Return the learning_session from the cache
+                    return self.get_value_from_cache(key=uuid)
 
             # Get the learning_session with the given UUID from the database
             model: Optional[LearningSessionModel] = asyncio.run(
@@ -2418,30 +2457,35 @@ class LearningSessionManager(BaseObjectManager):
             )
 
             # Return the learning_session if it exists
-            if model is not None:
-                # Convert the LearningSessionModel object to an ImmutableLearningSession object
-                learning_session: ImmutableLearningSession = (
-                    LearningSessionFactory.create_learning_session(
-                        **model.to_dict(
-                            exclude=[
-                                "_logger",
-                                "table",
-                            ]
-                        )
+            if not model:
+                # Log a warning message
+                self.logger.warning(
+                    message=f"LearningSession with uuid = {uuid} does not exist"
+                )
+
+                # Return None indicating that the LearningSession does not exist
+                return None
+
+            # Convert the LearningSessionModel object to an ImmutableLearningSession object
+            learning_session: ImmutableLearningSession = (
+                LearningSessionFactory.create_learning_session(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
                     )
                 )
+            )
 
-                # Add the learning_session to the cache
-                self.add_to_cache(
-                    key=learning_session.key,
-                    value=learning_session,
-                )
+            # Add the learning_session to the cache
+            self.add_to_cache(
+                key=learning_session.key,
+                value=learning_session,
+            )
 
-                # Return the learning_session
-                return learning_session
-            else:
-                # Return None indicating that the learning_session does not exist
-                return None
+            # Return the learning_session
+            return learning_session
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -2453,22 +2497,36 @@ class LearningSessionManager(BaseObjectManager):
 
     def search_learning_sessions(
         self,
+        force_refetch: bool = False,
         **kwargs,
     ) -> Optional[Union[List[ImmutableLearningSession]]]:
         """
-        Searches for learning_sessions in the database.
+        Searches for LearningSession objects in the database.
 
         Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
             **kwargs: Any additional keyword arguments to be passed to the search method of the LearningSessionModel class.
 
         Returns:
-            Optional[Union[List[ImmutableLearningSession]]]: The found learning_sessions if no exception occurs. Otherwise, None.
+            Optional[Union[List[ImmutableLearningSession]]]: The found LearningSession objects if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Search for learning_sessions in the database
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Search the stack for the passed keyword arguments
+                cached_result: Optional[List[ImmutableLearningSession]] = (
+                    self.search_cache(**kwargs)
+                )
+
+                # Check, if any cached results exist
+                if cached_result:
+                    # Return the cached results
+                    return cached_result
+
+            # Search for LearningSessionModel objects in the database
             models: Optional[List[LearningSessionModel]] = asyncio.run(
                 LearningSessionModel.search(
                     database=Constants.DATABASE_PATH,
@@ -2476,33 +2534,37 @@ class LearningSessionManager(BaseObjectManager):
                 )
             )
 
-            # Return the found learning_sessions if any
-            if models is not None and len(models) > 0:
-                learning_sessions: List[ImmutableLearningSession] = [
-                    LearningSessionFactory.create(
-                        **model.to_dict(
-                            exclude=[
-                                "_logger",
-                                "table",
-                            ]
-                        )
-                    )
-                    for model in models
-                ]
+            # Check, if any LearningSessionModel objects were found
+            if not models:
+                # Log a warning message
+                self.logger.warning(message="No learning_sessions found")
 
-                # Iterate over the found learning_sessions
-                for learning_session in learning_sessions:
-                    # Add the learning_session to the cache
-                    self.add_to_cache(
-                        key=learning_session.key,
-                        value=learning_session,
-                    )
-
-                # Return the found learning_sessions
-                return learning_sessions
-            else:
-                # Return None indicating that no learning_sessions were found
+                # Return None indicating that no LearningSessions were found
                 return None
+
+            # Convert the LearningSessionModel objects to ImmutableLearningSession objects
+            learning_sessions: List[ImmutableLearningSession] = [
+                LearningSessionFactory.create(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+                for model in models
+            ]
+
+            # Iterate over the found LearningSessions
+            for learning_session in learning_sessions:
+                # Add the LearningSession to the cache
+                self.add_to_cache(
+                    key=learning_session.key,
+                    value=learning_session,
+                )
+
+            # Return the found LearningSessions
+            return learning_sessions
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -2517,13 +2579,13 @@ class LearningSessionManager(BaseObjectManager):
         learning_session: Union[ImmutableLearningSession, MutableLearningSession],
     ) -> Optional[ImmutableLearningSession]:
         """
-        Updates a learning_session with the given ID.
+        Updates a LearningSession object with the given ID.
 
         Args:
-            learning_session (Union[ImmutableLearningSession, MutableLearningSession]): The learning_session to update.
+            learning_session (Union[ImmutableLearningSession, MutableLearningSession]): The LearningSession object to update.
 
         Returns:
-            Optional[ImmutableLearningSession]: The updated learning_session if no exception occurs. Otherwise, None.
+            Optional[ImmutableLearningSession]: The updated LearningSession object if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
@@ -3675,6 +3737,57 @@ class LearningSessionActionManager(BaseObjectManager):
         """
         pass
 
+    def _run_pre_create_tasks(
+        self,
+        learning_session_action: Union[
+            ImmutableLearningSessionAction, MutableLearningSessionAction
+        ],
+    ) -> MutableLearningSessionAction:
+        """
+        Runs pre-create tasks for the learning_session_action.
+
+        Args:
+            learning_session_action (Union[ImmutableLearningSessionAction, MutableLearningSessionAction]): The learning_session_action to run pre-create tasks for.
+
+        Returns:
+            MutableLearningSessionAction: The learning_session_action with pre-create tasks run.
+        """
+        try:
+            # Check if the learning_session_action object is immutable
+            if not learning_session_action.is_mutable():
+                # If it is, convert it to a mutable learning_session_action
+                learning_session_action = learning_session_action.to_mutable()
+
+            # Set the created_at timestamp of the learning_session_action
+            learning_session_action.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the custom_field_values of the learning_session_action
+            learning_session_action.custom_field_values = (
+                [] or learning_session_action.custom_field_values
+            )
+
+            # Set the key of the learning_session_action
+            learning_session_action.key = (
+                f"LEARNING_SESSION_ACTION_{self.count_learning_session_actions() + 1}"
+            )
+
+            # Set the updated_at timestamp of the learning_session_action
+            learning_session_action.updated_at = Miscellaneous.get_current_datetime()
+
+            # Set the uuid of the learning_session_action
+            learning_session_action.uuid = Miscellaneous.get_uuid()
+
+            # Return the learning_session_action
+            return learning_session_action
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'count' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return 0 indicating an exception has occurred
+            return 0
+
     def count_learning_session_actions(self) -> int:
         """
         Returns the number of learning_session_actions in the database.
@@ -3715,32 +3828,12 @@ class LearningSessionActionManager(BaseObjectManager):
             Exception: If an exception occurs while creating the learning_session_action.
         """
         try:
-            # Check if the learning_session_action object is immutable
-            if isinstance(
-                learning_session_action,
-                ImmutableLearningSessionAction,
-            ):
-                # If it is, convert it to a mutable learning_session_action
-                learning_session_action = learning_session_action.to_mutable()
-
-            # Set the created_at timestamp of the learning_session_action
-            learning_session_action.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the custom_field_values of the learning_session_action
-            learning_session_action.custom_field_values = (
-                [] or learning_session_action.custom_field_values
+            # Run pre-create tasks for the learning_session_action
+            learning_session_action: MutableLearningSessionAction = (
+                self._run_pre_create_tasks(
+                    learning_session_action=learning_session_action
+                )
             )
-
-            # Set the key of the learning_session_action
-            learning_session_action.key = (
-                f"LEARNING_SESSION_ACTION_{self.count_learning_session_actions() + 1}"
-            )
-
-            # Set the updated_at timestamp of the learning_session_action
-            learning_session_action.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the learning_session_action
-            learning_session_action.uuid = Miscellaneous.get_uuid()
 
             # Convert the learning_session_action object to a LearningSessionActionModel object
             model: LearningSessionActionModel = (
@@ -3754,37 +3847,49 @@ class LearningSessionActionManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the learning_session_action
-                learning_session_action.id = id
-
-                # Convert the learning_session_action to an immutable learning_session_action
-                learning_session_action = (
-                    LearningSessionActionFactory.create_learning_session_action(
-                        **learning_session_action.to_dict(
-                            exclude=[
-                                "_logger",
-                            ]
-                        )
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a learning_session_action ({learning_session_action}) in the database."
                 )
 
-                # Add the learning_session_action to the cache
-                self.add_to_cache(
-                    key=learning_session_action.key,
-                    value=learning_session_action,
-                )
+                # Return None indicating an error has occurred
+                return None
 
-                # Return the newly created immutable learning_session_action
-                return learning_session_action
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a learning_session_action ({learning_session_action}) in the database."
+            # Convert the MutableLearningSessionAction object to a dictionary
+            kwargs: Dict[str, Any] = learning_session_action.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the LearningSessionAction dictionary
+            kwargs["id"] = id
+
+            # Create a new ImmutableLearningSessionAction object
+            result = LearningSessionActionFactory.create_learning_session_action(
+                **kwargs
+            )
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableLearningSessionAction from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the ImmutableLearningSessionAction object to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableLearningSessionAction object
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -3826,7 +3931,7 @@ class LearningSessionActionManager(BaseObjectManager):
                 ).delete()
             )
 
-            # Remove the learning_session_action from the cache
+            # Remove the ImmutableLearningSessionAction object from the cache
             self.remove_from_cache(key=learning_session_action.key)
 
             # Return True if the learning_session_action was deleted successfully
@@ -3842,9 +3947,13 @@ class LearningSessionActionManager(BaseObjectManager):
 
     def get_all_learning_session_actions(
         self,
+        force_refetch: bool = False,
     ) -> Optional[List[ImmutableLearningSessionAction]]:
         """
         Returns a list of all learning_session_actions in the database.
+
+        Args:
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
             Optional[List[ImmutableLearningSessionAction]]: A list of all learning_session_actions in the database if no exception occurs. Otherwise, None.
@@ -3853,12 +3962,17 @@ class LearningSessionActionManager(BaseObjectManager):
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if cache and table size are equal
-            if self.cache and len(self._cache) == self.count_learning_session_actions():
-                # Return the list of immutable learning_session_actions from the cache
-                return self.get_cache_values()
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if cache and table size are equal
+                if (
+                    self.cache
+                    and len(self._cache) == self.count_learning_session_actions()
+                ):
+                    # Return the list of immutable learning_session_actions from the cache
+                    return self.get_cache_values()
 
-            # Get all learning_session_actions from the database
+            # Get all LearningSessionActionModel objects from the database
             models: List[LearningSessionActionModel] = asyncio.run(
                 LearningSessionActionModel.get_all(database=Constants.DATABASE_PATH)
             )
@@ -3876,15 +3990,15 @@ class LearningSessionActionManager(BaseObjectManager):
                 for model in models
             ]
 
-            # Iterate over the list of immutable learning_session_actions
+            # Iterate over the list of immutable LearningSessionActions
             for learning_session_action in learning_session_actions:
-                # Add the immutable learning_session_action to the cache
+                # Add the immutable LearningSessionAction to the cache
                 self.add_to_cache(
                     key=learning_session_action.key,
                     value=learning_session_action,
                 )
 
-            # Return the list of immutable learning_session_actions
+            # Return the list of immutable LearningSessionActions
             return learning_session_actions
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -3899,25 +4013,29 @@ class LearningSessionActionManager(BaseObjectManager):
         self,
         field: str,
         value: Any,
+        force_refetch: bool = False,
     ) -> Optional[ImmutableLearningSessionAction]:
         """
-        Retrieves a learning_session_action by the given field and value.
+        Retrieves a LearningSessionAction by the given field and value.
 
         Args:
             field (str): The field to search by.
             value (Any): The value to search for.
+            force_refetch (bool): Forces a search in the database, bypassing the cache. Defaults to False.
 
         Returns:
-            Optional[ImmutableLearningSessionAction]: The learning_session_action with the given field and value if no exception occurs. Otherwise, None.
+            Optional[ImmutableLearningSessionAction]: The LearningSessionAction with the given field and value if no exception occurs. Otherwise, None.
 
         Raises:
             Exception: If an exception occurs while running the SQL query.
         """
         try:
-            # Check if the learning_session_action is already in the cache
-            if self.is_key_in_cache(key=field):
-                # Return the learning_session_action from the cache
-                return self.get_value_from_cache(key=field)
+            # Check, if the force refetch flag is set to False
+            if not force_refetch:
+                # Check if the LearningSessionAction is already in the cache
+                if self.is_key_in_cache(key=field):
+                    # Return the LearningSessionAction from the cache
+                    return self.get_value_from_cache(key=field)
 
             # Get the learning_session_action with the given field and value from the database
             model: Optional[LearningSessionActionModel] = asyncio.run(
@@ -3929,30 +4047,35 @@ class LearningSessionActionManager(BaseObjectManager):
             )
 
             # Return the learning_session_action if it exists
-            if model is not None:
-                # Convert the LearningSessionActionModel object to an ImmutableLearningSessionAction object
-                learning_session_action: ImmutableLearningSessionAction = (
-                    LearningSessionActionFactory.create_learning_session_action(
-                        **model.to_dict(
-                            exclude=[
-                                "_logger",
-                                "table",
-                            ]
-                        )
-                    )
+            if not model:
+                # Log a warning message indicating that the learning_session_action does not exist
+                self.logger.warning(
+                    message=f"LearningSessionAction with field '{field}'='{value}' does not exist"
                 )
 
-                # Add the learning_session_action to the cache
-                self.add_to_cache(
-                    key=learning_session_action.key,
-                    value=learning_session_action,
-                )
-
-                # Return the learning_session_action
-                return learning_session_action
-            else:
                 # Return None indicating that the learning_session_action does not exist
                 return None
+
+            # Convert the LearningSessionActionModel object to an ImmutableLearningSessionAction object
+            learning_session_action: ImmutableLearningSessionAction = (
+                LearningSessionActionFactory.create_learning_session_action(
+                    **model.to_dict(
+                        exclude=[
+                            "_logger",
+                            "table",
+                        ]
+                    )
+                )
+            )
+
+            # Add the learning_session_action to the cache
+            self.add_to_cache(
+                key=learning_session_action.key,
+                value=learning_session_action,
+            )
+
+            # Return the learning_session_action
+            return learning_session_action
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -5249,6 +5372,57 @@ class LearningSessionItemManager(BaseObjectManager):
         """
         pass
 
+    def _run_pre_create_tasks(
+        self,
+        learning_session_item: Union[
+            ImmutableLearningSessionItem, MutableLearningSessionItem
+        ],
+    ) -> MutableLearningSessionItem:
+        """
+        Runs pre-create tasks for the learning_session_item.
+
+        Args:
+            learning_session_item (Union[ImmutableLearningSessionItem, MutableLearningSessionItem]): The learning_session_item to run pre-create tasks for.
+
+        Returns:
+            MutableLearningSessionItem: The learning_session_item with pre-create tasks run.
+        """
+        try:
+            # Check if the learning_session_item object is immutable
+            if not learning_session_item.is_mutable():
+                # If it is, convert it to a mutable learning_session_item
+                learning_session_item = learning_session_item.to_mutable()
+
+            # Set the created_at timestamp of the learning_session_item
+            learning_session_item.created_at = Miscellaneous.get_current_datetime()
+
+            # Set the custom_field_values of the learning_session_item
+            learning_session_item.custom_field_values = (
+                [] or learning_session_item.custom_field_values
+            )
+
+            # Set the key of the learning_session_item
+            learning_session_item.key = (
+                f"LEARNING_SESSION_ITEM_{self.count_learning_session_items() + 1}"
+            )
+
+            # Set the updated_at timestamp of the learning_session_item
+            learning_session_item.updated_at = Miscellaneous.get_current_datetime()
+
+            # Set the uuid of the learning_session_item
+            learning_session_item.uuid = Miscellaneous.get_uuid()
+
+            # Return the learning_session_item
+            return learning_session_item
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            self.logger.error(
+                message=f"Caught an exception while attempting to run 'count' method from '{self.__class__.__name__}': {e}"
+            )
+
+            # Return 0 indicating an exception has occurred
+            return 0
+
     def count_learning_session_items(self) -> int:
         """
         Returns the number of learning_session_items in the database.
@@ -5289,37 +5463,12 @@ class LearningSessionItemManager(BaseObjectManager):
             Exception: If an exception occurs while creating the learning_session_item.
         """
         try:
-            # Check if the learning_session_item object is immutable
-            if isinstance(
-                learning_session_item,
-                ImmutableLearningSessionItem,
-            ):
-                # If it is, convert it to a mutable learning_session_item
-                learning_session_item = learning_session_item.to_mutable()
-
-            # Set the actions of the learning_session_item
-            learning_session_item.actions = [] or learning_session_item.actions
-
-            # Set the created_at timestamp of the learning_session_item
-            learning_session_item.created_at = Miscellaneous.get_current_datetime()
-
-            # Set the custom_field_values of the learning_session_item
-            learning_session_item.custom_field_values = (
-                [] or learning_session_item.custom_field_values
+            # Run pre-create tasks for the learning_session_item
+            learning_session_item: MutableLearningSessionItem = (
+                self._run_pre_create_tasks(learning_session_item=learning_session_item)
             )
 
-            # Set the key of the learning_session_item
-            learning_session_item.key = (
-                f"LEARNING_SESSION_ITEM_{self.count_learning_session_items() + 1}"
-            )
-
-            # Set the updated_at timestamp of the learning_session_item
-            learning_session_item.updated_at = Miscellaneous.get_current_datetime()
-
-            # Set the uuid of the learning_session_item
-            learning_session_item.uuid = Miscellaneous.get_uuid()
-
-            # Convert the learning_session_item object to a LearningSessionItemModel object
+            # Convert the MutableLearningSessionItem object to a LearningSessionItemModel object
             model: LearningSessionItemModel = (
                 LearningSessionItemConverter.object_to_model(
                     object=learning_session_item
@@ -5331,37 +5480,47 @@ class LearningSessionItemManager(BaseObjectManager):
                 model.create(database=Constants.DATABASE_PATH)
             )
 
-            if id:
-                # Set the ID of the learning_session_item
-                learning_session_item.id = id
-
-                # Convert the learning_session_item to an immutable learning_session_item
-                learning_session_item = (
-                    LearningSessionItemFactory.create_learning_session_item(
-                        **learning_session_item.to_dict(
-                            exclude=[
-                                "_logger",
-                            ]
-                        )
-                    )
+            # Check, if the ID is not None
+            if not id:
+                # Log a warning message indicating an error has occurred
+                self.logger.warning(
+                    message=f"It seems that an error has occured while attempting to create a learning_session_item ({learning_session_item}) in the database."
                 )
 
-                # Add the learning_session_item to the cache
-                self.add_to_cache(
-                    key=learning_session_item.key,
-                    value=learning_session_item,
-                )
+                # Return None indicating an error has occurred
+                return None
 
-                # Return the newly created immutable learning_session_item
-                return learning_session_item
-
-            # Log a warning message indicating an error has occurred
-            self.logger.warning(
-                message=f"It seems that an error has occured while attempting to create a learning_session_item ({learning_session_item}) in the database."
+            # Convert the MutableLearningSessionItem object to a dictionary
+            kwargs: Dict[str, Any] = learning_session_item.to_dict(
+                exclude=[
+                    "_logger",
+                ]
             )
 
-            # Return None indicating an error has occurred
-            return None
+            # Set the ID of the LearningSessionItem dictionary
+            kwargs["id"] = id
+
+            # Create a new ImmutableLearningSessionItem object
+            result = LearningSessionItemFactory.create_learning_session_item(**kwargs)
+
+            # Check, if the result is not None
+            if not result:
+                # Log an error message indicating an error has occurred
+                self.logger.error(
+                    message=f"It seems that there was an error while attempting to create an ImmutableLearningSessionItem from the dictionary ({kwargs}) returned by the database. This is likely a serious issue."
+                )
+
+                # Return early
+                return
+
+            # Add the ImmutableLearningSessionItem object to the cache
+            self.add_to_cache(
+                key=result.key,
+                value=result,
+            )
+
+            # Return the newly created ImmutableLearningSessionItem object
+            return result
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(

@@ -27,11 +27,8 @@ from core.learning.learning_session import (
     ImmutableLearningSessionAction,
     LearningSessionActionBuilder,
     ImmutableLearningSessionItem,
-    MutableLearningSessionItem,
     LearningSessionItemBuilder,
 )
-
-from core.ui.notifications.notifications import ToplevelNotification
 
 from utils.constants import Constants
 from utils.dispatcher import Dispatcher, DispatcherEvent, DispatcherNotification
@@ -39,6 +36,7 @@ from utils.events import Events
 from utils.logger import Logger
 from utils.miscellaneous import Miscellaneous
 from utils.text_analyzer import TextAnalyzer
+from utils.utils import DateUtil
 
 
 __all__: List[str] = ["LearningSessionRunner"]
@@ -148,7 +146,13 @@ class LearningSessionRunner:
         self.content_index: int = -1
 
         # Initialize the current entity to None
-        self.current_entity: Optional[Union[ImmutableFlashcard, ImmutableNote, ImmutableQuestion,]] = None
+        self.current_entity: Optional[
+            Union[
+                ImmutableFlashcard,
+                ImmutableNote,
+                ImmutableQuestion,
+            ]
+        ] = None
 
         # Store the passed difficulty list in an immutable instance variable
         self.difficulties: List[Union[ImmutableDifficulty]] = difficulties
@@ -688,7 +692,7 @@ class LearningSessionRunner:
 
             # Set the start of the learning session
             # The start is set to the current datetime
-            builder.start(value=Miscellaneous.get_current_datetime())
+            builder.start(value=DateUtil.now())
 
             # Set the status of the learning session
             # The status is set to the status of the learning session
@@ -752,16 +756,13 @@ class LearningSessionRunner:
                 # Set the end time of the learning session item
                 self.learning_session_item.set(
                     name="end",
-                    value=Miscellaneous.get_current_datetime(),
+                    value=DateUtil.now(),
                 )
 
                 # Set the duration of the learning session item
                 self.learning_session_item.set(
                     name="duration",
-                    value=(
-                        self.learning_session_item.end
-                        - self.learning_session_item.start
-                    ).total_seconds(),
+                    value=DateUtil.calculate_duration(start=self.learning_session_item.start),
                 )
 
                 # Update the learning session item
@@ -783,13 +784,13 @@ class LearningSessionRunner:
             builder.actions(value=[])
 
             # Set the created_at attribute of the builder
-            builder.created_at(value=Miscellaneous.get_current_datetime())
+            builder.created_at(value=DateUtil.now())
 
             # Set the reference attribute of the builder
             builder.reference(value=reference or self.contents[self.content_index])
 
             # Set the start attribute of the builder
-            builder.start(value=Miscellaneous.get_current_datetime())
+            builder.start(value=DateUtil.now())
 
             # Dispatch the request to create the learning session
             create_notification: Optional[DispatcherNotification] = (
@@ -873,7 +874,7 @@ class LearningSessionRunner:
         ] = self.intrasession_review_queue[0]
 
         # Check, if the intrasession review item's timestamp is in the future
-        if item[0] > Miscellaneous.get_current_datetime():
+        if item[0] > DateUtil.now():
             # Return early
             return None
 
@@ -943,12 +944,12 @@ class LearningSessionRunner:
                 )
 
             # Set the end timestamp of the learning session
-            self.learning_session.end = Miscellaneous.get_current_datetime()
+            self.learning_session.end = DateUtil.now()
 
             # Calculate and set the duration of the learning session
-            self.learning_session.duration = Miscellaneous.calculate_duration(
-                as_="seconds",
+            self.learning_session.duration = DateUtil.calculate_duration(
                 start=self.learning_session.start,
+                what="seconds",
             )
 
             # Request the 'Completed' status
@@ -1134,7 +1135,7 @@ class LearningSessionRunner:
         """
         try:
             # Get the current timestamp
-            timestamp: datetime = Miscellaneous.get_current_datetime()
+            timestamp: datetime = DateUtil.now()
 
             # Create a builder for the learning session action
             builder: LearningSessionActionBuilder = LearningSessionActionBuilder()
@@ -1180,7 +1181,7 @@ class LearningSessionRunner:
                     # The settings of the learning session
                     "settings": self.settings,
                     # The timestamp of the learning session action
-                    "timestamp": Miscellaneous.datetime_to_string(datetime=timestamp),
+                    "timestamp": DateUtil.object_to_string(datetime_or_date=timestamp),
                     # The time elapsed since the start of the learning session
                     "time_elapsed_since_start": (
                         timestamp - self.learning_session_item.start
@@ -1291,7 +1292,7 @@ class LearningSessionRunner:
         """
         try:
             # Get the current timestamp
-            timestamp: datetime = Miscellaneous.get_current_datetime()
+            timestamp: datetime = DateUtil.now()
 
             # Get the difficulty
             passed_difficulty: ImmutableDifficulty = self._request_entity(
@@ -1382,7 +1383,7 @@ class LearningSessionRunner:
                     # The settings of the learning session
                     "settings": self.settings,
                     # The timestamp of the learning session action
-                    "timestamp": Miscellaneous.datetime_to_string(datetime=timestamp),
+                    "timestamp": DateUtil.object_to_string(datetime_or_date=timestamp),
                     # The time elapsed since the start of the learning session
                     "time_elapsed_since_start": (
                         timestamp - self.learning_session_item.start
@@ -1396,9 +1397,11 @@ class LearningSessionRunner:
             # Set the duration of the learning session action
             # This is the time difference between the end and start of the learning session action
             builder.duration(
-                value=(
-                    builder.configuration["end"] - builder.configuration["start"]
-                ).total_seconds()
+                value=DateUtil.calculate_duration(
+                    end=builder.configuration["end"],
+                    start=builder.configuration["start"],
+                    what="seconds",
+                )
             )
 
             # Dispatch a request to create the learning session action
@@ -1530,11 +1533,6 @@ class LearningSessionRunner:
                 ]
             ] = None
 
-            # Check, if a previous entity exists
-            if self.current_entity:
-                # Log the estimated reading time
-                self.logger.debug(message=Miscellaneous.estimate_reading_time(content=self.current_entity.total_word_count))
-
             # Check, if the 'enable_spaced_review' mode has been enabled in the settings dictionary instance variable
             if (
                 self.settings.get(
@@ -1603,7 +1601,7 @@ class LearningSessionRunner:
                 entity = entity.to_mutable()
 
             # Update the 'last viewed at' field
-            entity.last_viewed_at = Miscellaneous.get_current_datetime()
+            entity.last_viewed_at = DateUtil.now()
 
             # Update the entity in the database
             entity = self._update_entity(
@@ -1769,7 +1767,7 @@ class LearningSessionRunner:
                 content = content.to_mutable()
 
             # Get the current datetime
-            now: datetime = Miscellaneous.get_current_datetime()
+            now: datetime = DateUtil.now()
 
             # Update last viewed timestamp
             content.last_viewed_at = now
@@ -1837,7 +1835,7 @@ class LearningSessionRunner:
             )
 
             # Calculate the due datetime
-            due_by: datetime = Miscellaneous.get_current_datetime() + timedelta(
+            due_by: datetime = DateUtil.now() + timedelta(
                 seconds=interval
             )
 

@@ -3,6 +3,8 @@ Author: lodego
 Date: 2025-02-05
 """
 
+import traceback
+
 from typing import *
 
 from utils.database_service import DatabaseService
@@ -92,6 +94,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'count' method from '{cls.__name__}' class: {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
+            )
+
             # Return 0 indicating an exception occurred
             return 0
 
@@ -161,6 +168,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'save' method from '{self.__class__.__name__}' class: {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
+            )
+
             # Return None indicating an exception occurred
             return None
 
@@ -217,6 +229,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'create_table' method from '{cls.__name__}' class: {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
+            )
+
             # Return False indicating an exception occurred
             return False
 
@@ -266,6 +283,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'delete' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
             )
 
             # Return False indicating the operation failed (i.e., if a boolean was returned)
@@ -322,6 +344,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'drop_table' method from '{cls.__name__}' class: {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
+            )
+
             # Return False indicating the operation failed (i.e., if a boolean was returned)
             return False
 
@@ -368,6 +395,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
             # Log an error message indicating an exception has occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'execute' method from '{cls.__name__}' class: {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
             )
 
             # Return None indicating an exception occurred
@@ -421,6 +453,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
             # Log an error message indicating an exception has occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_all' method from '{cls.__name__}' class: {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
             )
 
             # Return an empty list indicating an exception occurred
@@ -486,6 +523,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
             # Log an error message indicating an exception occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'get_by' method from '{cls.__name__}' class: {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
             )
 
             # Return None indicating an exception occurred
@@ -677,6 +719,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'search' method from '{cls.__name__}' class: {e}"
             )
 
+            # Log the traceback of the exception
+            cls.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
+            )
+
             # Return None indicating an exception occurred
             return None
 
@@ -759,6 +806,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
             # Log an error message indicating an exception has occurred
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'update' method from '{self.__class__.__name__}' class: {e}"
+            )
+
+            # Log the traceback of the exception
+            self.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
             )
 
             # Return False indicating an exception occurred
@@ -858,6 +910,11 @@ class ImmutableBaseModel(ImmutableBaseObject):
             # Log an error message indicating an exception occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'upsert_table' method from '{cls.__name__}' class: {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(
+                message=f"Traceback: {traceback.format_exc()}"
             )
 
             # Raise the exception to the caller

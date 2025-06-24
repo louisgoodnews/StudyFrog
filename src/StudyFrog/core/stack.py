@@ -157,6 +157,17 @@ class ImmutableStack(ImmutableBaseObject):
         return self._contents
 
     @property
+    def created_at(self) -> datetime:
+        """
+        Returns the created_at of the stack.
+
+        Returns:
+            datetime: The created_at of the stack.
+        """
+
+        return self._created_at
+
+    @property
     def custom_field_values(self) -> List[Dict[str, Any]]:
         """
         Returns the custom field values of the stack.
@@ -694,6 +705,34 @@ class MutableStack(MutableBaseObject):
         """
 
         return self._custom_field_values
+
+    @property
+    def created_at(self) -> datetime:
+        """
+        Returns the created_at of the stack.
+
+        Returns:
+            datetime: The created_at of the stack.
+        """
+
+        return self._created_at
+
+    @created_at.setter
+    def created_at(
+        self,
+        value: datetime,
+    ) -> None:
+        """
+        Sets the created_at of the stack.
+
+        Args:
+            value (datetime): The new created_at of the stack.
+
+        Returns:
+            None
+        """
+
+        self._created_at = value
 
     @custom_field_values.setter
     def custom_field_values(

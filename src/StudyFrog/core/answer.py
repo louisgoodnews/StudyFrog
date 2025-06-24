@@ -24,8 +24,10 @@ __all__: Final[List[str]] = [
     "MutableAnswer",
     "AnswerConverter",
     "AnswerFactory",
+    "AnswerBuilder",
     "AnswerManager",
     "AnswerModel",
+    "Answers",
 ]
 
 
@@ -291,7 +293,7 @@ class MutableAnswer(MutableBaseObject):
         key: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
-        total_word_count: Optional[int] = None,  
+        total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1036,6 +1038,7 @@ class AnswerBuilder(BaseObjectBuilder):
         # Return the builder instance
         return self
 
+
 class AnswerManager(BaseObjectManager):
     """
     A manager class for managing answers in the application.
@@ -1176,9 +1179,7 @@ class AnswerManager(BaseObjectManager):
             kwargs["id"] = id
 
             # Convert the answer to an immutable answer
-            result = AnswerFactory.create_answer(
-                **kwargs
-            )
+            result = AnswerFactory.create_answer(**kwargs)
 
             # Check, if the result is not None
             if not result:
@@ -1961,6 +1962,7 @@ class AnswerModel(ImmutableBaseModel):
     def __init__(
         self,
         answer_text: Optional[str] = None,
+        answer_text_word_count: Optional[int] = None,
         created_at: Optional[datetime] = None,
         custom_field_values: Optional[List[Dict[str, Any]]] = None,
         icon: Optional[str] = None,
@@ -1976,6 +1978,7 @@ class AnswerModel(ImmutableBaseModel):
 
         Args:
             answer_text (Optional[str]): The text of the answer.
+            answer_text_word_count (Optional[int]): The word count of the answer text.
             created_at (Optional[datetime]): The timestamp when the answer was created.
             custom_field_values (Optional[List[Dict[str, Any]]]): The values of the custom fields.
             icon (Optional[str]): The icon of the answer.
@@ -1993,6 +1996,7 @@ class AnswerModel(ImmutableBaseModel):
         # Call the parent class constructor
         super().__init__(
             answer_text=answer_text,
+            answer_text_word_count=answer_text_word_count,
             created_at=created_at,
             icon="💬",
             id=id,
@@ -2003,3 +2007,346 @@ class AnswerModel(ImmutableBaseModel):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+
+class Answers:
+    """
+    A utility class for managing answers.
+
+    This class provides a set of methods for retrieving and saving answers.
+    """
+
+    configuration: Final[Dict[str, Any]] = {}
+
+    # Initialize this class's Logger instance
+    logger: Final[Logger] = Logger.get_logger(name="Answers")
+
+    # Initialize this class's AnswerManager instance
+    manager: Final[AnswerManager] = AnswerManager()
+
+    @classmethod
+    def build(
+        cls,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableAnswer,
+            MutableAnswer,
+        ]
+    ]:
+        """
+        Builds an answer and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to build the answer as mutable. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableAnswer, MutableAnswer,]]: The answer if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Check, if the configuration dictionary is empty
+            if not cls.configuration:
+                # Log a warning message
+                cls.logger.warning(
+                    message="Configuration dictionary is empty. Use this class' 'set' method to set the configuration dictionary."
+                )
+
+                # Return early
+                return None
+
+            # Initialize the builder
+            builder: AnswerBuilder = AnswerBuilder()
+
+            # Update the builder's configuration
+            builder.configuration.update(cls.configuration)
+
+            # Build the answer
+            answer: Union[ImmutableAnswer, MutableAnswer] = builder.build(
+                as_mutable=as_mutable
+            )
+
+            # Clear the configuration
+            cls.configuration.clear()
+
+            # Return the answer
+            return answer
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def clear(cls) -> None:
+        """
+        Clears the configuration dictionary.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Clear the configuration dictionary
+        cls.configuration.clear()
+
+    @classmethod
+    def configure(
+        cls,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the configuration dictionary.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the configure method.
+
+        Returns:
+            None
+        """
+
+        # Update the configuration dictionary
+        cls.configuration.update(kwargs)
+
+    @classmethod
+    def create(
+        cls,
+        **kwargs,
+    ) -> Optional[ImmutableAnswer]:
+        """
+        Creates a new answer and returns it.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the create_answer method.
+
+        Returns:
+            Optional[ImmutableAnswer]: The answer if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return AnswerFactory.create_answer(**kwargs)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default(
+        cls,
+        answer_text: str,
+        as_mutable: bool = False,
+    ) -> Optional[ImmutableAnswer]:
+        """
+        Creates a new answer and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to create the answer as mutable. Defaults to False.
+            answer_text (str): The text of the answer.
+
+        Returns:
+            Optional[ImmutableAnswer]: The answer if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return AnswerFactory.create_default_answer(
+                as_mutable=as_mutable,
+                answer_text=answer_text,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get(
+        cls,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        **kwargs,
+    ) -> Optional[ImmutableAnswer]:
+        """
+        Retrieves an answer by the given ID, key, or other fields.
+
+        Args:
+            id (Optional[int]): The ID of the answer.
+            key (Optional[str]): The key of the answer.
+            **kwargs: Additional keyword arguments to pass to the get_answer_by method.
+
+        Returns:
+            Optional[ImmutableAnswer]: The answer with the given ID, key, or other fields if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            if id:
+                return cls.manager.get_answer_by_id(
+                    force_refetch=True,
+                    id=id,
+                )
+            elif key:
+                return cls.manager.get_answer_by_key(
+                    force_refetch=True,
+                    key=key,
+                )
+            else:
+                return cls.manager.get_answer_by(
+                    force_refetch=True,
+                    **kwargs,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get_all(cls) -> Optional[List[ImmutableAnswer]]:
+        """
+        Returns a list of all answers in the database.
+
+        Returns:
+            Optional[List[ImmutableAnswer]]: The answers if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.get_all_answers(force_refetch=True)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def save(
+        cls,
+        answer: Union[
+            ImmutableAnswer,
+            MutableAnswer,
+        ],
+    ) -> ImmutableAnswer:
+        """
+        Saves the passed answer to the database and returns it.
+
+        Args:
+            answer (Union[ImmutableAnswer, MutableAnswer]): The answer to save.
+
+        Returns:
+            ImmutableAnswer: The saved answer if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.create_answer(answer=answer)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'save' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def search(
+        cls,
+        **kwargs,
+    ) -> Optional[List[ImmutableAnswer]]:
+        """
+        Searches for answers in the database and returns them.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the search_answers method.
+
+        Returns:
+            Optional[List[ImmutableAnswer]]: The answers if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.search_answers(
+                force_refetch=True,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def set(
+        cls,
+        key: str,
+        value: Optional[Any] = None,
+    ) -> None:
+        """
+        Sets a configuration value.
+
+        Args:
+            key (str): The key of the configuration value.
+            value (Optional[Any]): The value of the configuration value.
+
+        Returns:
+            None
+        """
+
+        # Check, if the key is already contained within the configuration dictionary
+        if key in cls.configuration:
+            # Log a warning message indicating that the key is already contained within the configuration dictionary
+            cls.logger.warning(
+                message=f"Key '{key}' is already contained within the configuration dictionary. Overwriting..."
+            )
+
+        # Set the configuration value corresponding to the passed key
+        cls.configuration[key] = value

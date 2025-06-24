@@ -205,6 +205,11 @@ class Events:
         DispatcherEventFactory.create_event(name="ui:combobox_select_field:field:field:set")
     )
 
+    # An event that indicates that a countdown button has been clicked
+    COUNTDOWN_BUTTON_CLICKED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
+        name="ui:countdown_button:clicked"
+    )
+
     # An event that indicates that a create button has been clicked
     CREATE_BUTTON_CLICKED: Final[DispatcherEvent] = DispatcherEventFactory.create_event(
         name="ui:create:button:clicked"

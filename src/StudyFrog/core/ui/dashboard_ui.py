@@ -1082,7 +1082,7 @@ class DashboardUI(BaseUI):
 
                 # Bind the label widget to a command that dispatches an event when clicked
                 label.bind(
-                    func=lambda stack=stack: self.dispatcher.dispatch(
+                    func=lambda event: self.dispatcher.dispatch(
                         direction="forward",
                         event=Events.REQUEST_VALIDATE_NAVIGATION,
                         namespace=Constants.GLOBAL_NAMESPACE,

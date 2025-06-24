@@ -125,6 +125,11 @@ class UnifiedObjectFactory(ImmutableBaseObject):
                 # Ignore the attribute error and try the next Factory
                 pass
 
+        # Log an error message indicating that the attribute is not found in any Factory
+        self.logger.error(
+            message=f"Attribute '{name}' not found in any Factory"
+        )
+
         # Raise an AttributeError if the attribute is not found in any Factory
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{name}'"
@@ -161,6 +166,9 @@ class UnifiedObjectFactory(ImmutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'register_Factory' from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Raise the exception to the caller
             raise e
@@ -222,6 +230,9 @@ class UnifiedObjectFactory(ImmutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run '{factory}.{method}' from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Raise the exception to the caller
             raise e
@@ -306,6 +317,11 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 # Ignore the attribute error and try the next manager
                 pass
 
+        # Log an error message indicating that the attribute is not found in any manager
+        self.logger.error(
+            message=f"Attribute '{name}' not found in any manager"
+        )
+
         # Raise an AttributeError if the attribute is not found in any manager
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{name}'"
@@ -334,6 +350,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
+                ImmutableLearningSession,
+                ImmutableLearningSessionAction,
+                ImmutableLearningSessionItem,
             ]
         ]
     ]:
@@ -365,6 +384,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
+                ImmutableLearningSession,
+                ImmutableLearningSessionAction,
+                ImmutableLearningSessionItem,
             ]]]]: The list of all registered managers if no exception occurs. Otherwise, None.
         """
         try:
@@ -387,6 +409,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
+                    ImmutableLearningSession,
+                    ImmutableLearningSessionAction,
+                    ImmutableLearningSessionItem,
                 ]
             ] = [
                 manager.__getattr__(
@@ -407,6 +432,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_all' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating an exception has occurred
             return None
@@ -434,6 +462,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
+            ImmutableLearningSession,
+            ImmutableLearningSessionAction,
+            ImmutableLearningSessionItem,
         ]
     ]:
         """
@@ -463,6 +494,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
+                    ImmutableLearningSession,
+                    ImmutableLearningSessionAction,
+                    ImmutableLearningSessionItem,
                 ]
             ]: The retrieved object if the key exists, otherwise None.
 
@@ -470,22 +504,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
             Exception: If an exception occurs while attempting to run the 'get_by_key' method.
         """
         try:
-            # Attempt to find a match in the given key
-            match: Optional[str] = Miscellaneous.find_match(
-                string=key,
-                group=1,
-                pattern=r"([A-Za-z]+)",
-            )
-
-            if not match:
-                # Log an error message indicating that the key format is invalid
-                self.logger.error(message=f"Invalid key format: '{key}'")
-
-                # Return early since the key is invalid
-                return
-
             # Update the match to a snake case representation
-            match = Miscellaneous.pascal_to_snake(string=match)
+            match = Miscellaneous.pascal_to_snake(string=key[:key.rindex("_")])
 
             # Run the 'get_by_key' method of the corresponding manager
             return self.run(
@@ -499,6 +519,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_by_key' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
@@ -528,6 +551,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
+                    ImmutableLearningSession,
+                    ImmutableLearningSessionAction,
+                    ImmutableLearningSessionItem,
                 ]
             ]
         ]
@@ -561,6 +587,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                             ImmutableNote,
                             ImmutableUser,
                             ImmutableDefault,
+                            ImmutableLearningSession,
+                            ImmutableLearningSessionAction,
+                            ImmutableLearningSessionItem,
                         ]
                     ]
                 ]
@@ -591,7 +620,10 @@ class UnifiedObjectManager(ImmutableBaseObject):
                         ImmutableNote,
                         ImmutableUser,
                         ImmutableDefault,
-                    ]
+                        ImmutableLearningSession,
+                        ImmutableLearningSessionAction,
+                        ImmutableLearningSessionItem,
+                        ]
                 ]
             ] = []
 
@@ -612,6 +644,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'get_by_keys' method from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Re-raise the exception to the caller
             raise e
@@ -647,6 +682,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
             self.logger.error(
                 message=f"Caught an exception while attempting to run 'register_manager' from '{self.__class__.__name__}': {e}"
             )
+
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Raise the exception to the caller
             raise e
@@ -706,6 +744,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run '{manager}.{method}' from '{self.__class__.__name__}': {e}"
             )
 
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Raise the exception to the caller
             raise e
 
@@ -729,6 +770,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
+            ImmutableLearningSession,
+            ImmutableLearningSessionAction,
+            ImmutableLearningSessionItem,
         ],
     ) -> Optional[
         Union[
@@ -749,6 +793,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
             ImmutableNote,
             ImmutableUser,
             ImmutableDefault,
+            ImmutableLearningSession,
+            ImmutableLearningSessionAction,
+            ImmutableLearningSessionItem,
         ]
     ]:
         """
@@ -774,6 +821,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
+                    ImmutableLearningSession,
+                    ImmutableLearningSessionAction,
+                    ImmutableLearningSessionItem,
                 ]
             ): The unified object to update.
 
@@ -797,6 +847,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
+                    ImmutableLearningSession,
+                    ImmutableLearningSessionAction,
+                    ImmutableLearningSessionItem,
                 ]
             ]: The updated unified object if no exception occurs. Otherwise, None.
 
@@ -838,7 +891,7 @@ class UnifiedObjectManager(ImmutableBaseObject):
             )
 
             # Log the traceback
-            self.logger.error(message=traceback.format_exc())
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating that an exception has occurred
             return None
@@ -864,6 +917,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
+                ImmutableLearningSession,
+                ImmutableLearningSessionAction,
+                ImmutableLearningSessionItem,
             ]
         ],
     ) -> Optional[
@@ -886,6 +942,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 ImmutableNote,
                 ImmutableUser,
                 ImmutableDefault,
+                ImmutableLearningSession,
+                ImmutableLearningSessionAction,
+                ImmutableLearningSessionItem,
             ]
         ]
     ]:
@@ -913,6 +972,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                         ImmutableNote,
                         ImmutableUser,
                         ImmutableDefault,
+                        ImmutableLearningSession,
+                        ImmutableLearningSessionAction,
+                        ImmutableLearningSessionItem,
                     ]
                 ]
             ): A list of unified objects to update.
@@ -938,6 +1000,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                         ImmutableNote,
                         ImmutableUser,
                         ImmutableDefault,
+                        ImmutableLearningSession,
+                        ImmutableLearningSessionAction,
+                        ImmutableLearningSessionItem,
                     ]
                 ]
             ]: The updated unified objects if no exception occurs. Otherwise, None.
@@ -966,6 +1031,9 @@ class UnifiedObjectManager(ImmutableBaseObject):
                     ImmutableNote,
                     ImmutableUser,
                     ImmutableDefault,
+                    ImmutableLearningSession,
+                    ImmutableLearningSessionAction,
+                    ImmutableLearningSessionItem,
                 ]
             ] = []
 
@@ -982,8 +1050,8 @@ class UnifiedObjectManager(ImmutableBaseObject):
                 message=f"Caught an exception while attempting to run 'update_in_bulk' method from '{self.__class__.__name__}': {e}"
             )
 
-            # Log the traceback
-            self.logger.error(message=traceback.format_exc())
+            # Log the traceback of the exception
+            self.logger.error(message=f"Traceback: {traceback.format_exc()}")
 
             # Return None indicating that an exception has occurred
             return None
@@ -1848,6 +1916,10 @@ class UnifiedObjectService(ImmutableBaseObject):
         Returns:
             bool: True if the events were unsubscribed successfully, False otherwise.
         """
+
+        # Initialize the result to False
+        result: bool = False
+
         try:
             # Unsubscribe from events
             self.unsubscribe_from_events()
@@ -1857,8 +1929,9 @@ class UnifiedObjectService(ImmutableBaseObject):
                 message=f"Successfully shut down '{self.__class__.__name__}'"
             )
 
-            # Return True to the caller
-            return True
+            # Set the result to True
+            result = True
+
         except Exception as e:
             # Log an error message indicating an exception has occurred
             self.logger.error(
@@ -1872,9 +1945,9 @@ class UnifiedObjectService(ImmutableBaseObject):
             self.logger.warning(
                 message=f"Failed to shut down '{self.__class__.__name__}'"
             )
-
-            # Return False to the caller
-            return False
+        finally:
+            # Return the result to the caller
+            return result
 
     def on_request_answer_create(
         self,

@@ -233,9 +233,6 @@ class ToplevelNotificationService(ImmutableBaseObject):
                 },
                 on_click_callback=on_click_callback,
                 title=title,
-                toplevel={
-                    "background": Constants.BLUE_GREY["700"],
-                },
                 title_label={
                     "background": Constants.BLUE_GREY["700"],
                     "font": (
@@ -244,6 +241,7 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     ),
                     "foreground": Constants.WHITE,
                 },
+                toplevel={"background": Constants.BLUE_GREY["700"]},
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -302,9 +300,6 @@ class ToplevelNotificationService(ImmutableBaseObject):
                 },
                 on_click_callback=on_click_callback,
                 title=title,
-                toplevel={
-                    "background": Constants.BLUE_GREY["700"],
-                },
                 title_label={
                     "background": Constants.BLUE_GREY["700"],
                     "font": (
@@ -313,6 +308,7 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     ),
                     "foreground": Constants.WHITE,
                 },
+                toplevel={"background": Constants.BLUE_GREY["700"]},
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -379,9 +375,6 @@ class ToplevelNotificationService(ImmutableBaseObject):
                 },
                 on_click_callback=on_click_callback,
                 title=title,
-                toplevel={
-                    "background": Constants.BLUE_GREY["700"],
-                },
                 title_label={
                     "background": Constants.BLUE_GREY["700"],
                     "font": (
@@ -390,6 +383,7 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     ),
                     "foreground": Constants.WHITE,
                 },
+                toplevel={"background": Constants.BLUE_GREY["700"]},
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -448,9 +442,6 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     "foreground": Constants.WHITE,
                 },
                 title=title,
-                toplevel={
-                    "background": Constants.BLUE_GREY["700"],
-                },
                 title_label={
                     "background": Constants.BLUE_GREY["700"],
                     "font": (
@@ -459,6 +450,7 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     ),
                     "foreground": Constants.WHITE,
                 },
+                toplevel={"background": Constants.BLUE_GREY["700"]},
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -525,9 +517,6 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     "foreground": Constants.WHITE,
                 },
                 title=title,
-                toplevel={
-                    "background": Constants.BLUE_GREY["700"],
-                },
                 title_label={
                     "background": Constants.BLUE_GREY["700"],
                     "font": (
@@ -536,6 +525,7 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     ),
                     "foreground": Constants.WHITE,
                 },
+                toplevel={"background": Constants.BLUE_GREY["700"]},
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -594,9 +584,6 @@ class ToplevelNotificationService(ImmutableBaseObject):
                 },
                 on_click_callback=on_click_callback,
                 title=title,
-                toplevel={
-                    "background": Constants.BLUE_GREY["700"],
-                },
                 title_label={
                     "background": Constants.BLUE_GREY["700"],
                     "font": (
@@ -613,6 +600,7 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     ),
                     "foreground": Constants.WHITE,
                 },
+                toplevel={"background": Constants.BLUE_GREY["700"]},
             )
         except Exception as e:
             # Log an error message indicating an exception has occurred
@@ -679,9 +667,6 @@ class ToplevelNotificationService(ImmutableBaseObject):
                 },
                 on_click_callback=on_click_callback,
                 title=title,
-                toplevel={
-                    "background": Constants.BLUE_GREY["700"],
-                },
                 title_label={
                     "background": Constants.BLUE_GREY["700"],
                     "font": (
@@ -690,6 +675,7 @@ class ToplevelNotificationService(ImmutableBaseObject):
                     ),
                     "foreground": Constants.WHITE,
                 },
+                toplevel={"background": Constants.BLUE_GREY["700"]},
                 yes_button={
                     "background": Constants.GREEN["700"],
                     "font": (
