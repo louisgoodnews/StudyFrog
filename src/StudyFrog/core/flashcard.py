@@ -3294,7 +3294,7 @@ class Flashcards:
             builder: FlashcardBuilder = FlashcardBuilder()
 
             # Update the builder's configuration
-            builder.configuration.update(cls.configuration)
+            builder.kwargs(**cls.configuration)
 
             # Build the flashcard
             flashcard: Union[ImmutableFlashcard, MutableFlashcard] = builder.build(
@@ -3332,6 +3332,24 @@ class Flashcards:
 
         # Clear the configuration dictionary
         cls.configuration.clear()
+
+    @classmethod
+    def configure(
+        cls,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the configuration dictionary.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the configure method.
+
+        Returns:
+            None
+        """
+
+        # Update the configuration dictionary
+        cls.configuration.update(kwargs)
 
     @classmethod
     def create(

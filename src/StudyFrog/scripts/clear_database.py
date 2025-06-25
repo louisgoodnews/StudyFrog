@@ -4,7 +4,9 @@ Date: 2025-04-29
 """
 
 import asyncio
+import traceback
 
+from datetime import datetime
 from typing import *
 
 from core.learning.learning_session import (
@@ -36,6 +38,7 @@ from core.user import UserModel
 from utils.constants import Constants
 from utils.logger import Logger
 from utils.model import ImmutableBaseModel
+from utils.utils import DateUtil
 
 
 __all__: Final[List[str]] = ["clear_database"]
@@ -52,6 +55,8 @@ def clear_database() -> bool:
 
     # Get the logger
     logger: Logger = Logger.get_logger(name="clear_database")
+
+    start: datetime = DateUtil.now()
 
     # Set of model classes to clear
     model_classes: Set[Type[ImmutableBaseModel]] = {
@@ -92,6 +97,9 @@ def clear_database() -> bool:
                 message=f"Failed to drop table '{model_class.__name__}': {str(e)}"
             )
 
+            # Log the traceback of the exception
+            logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return False indicating an exception has occurred
             return False
 
@@ -104,8 +112,14 @@ def clear_database() -> bool:
                 message=f"Failed to create table '{model_class.__name__}': {str(e)}"
             )
 
+            # Log the traceback of the exception
+            logger.error(message=f"Traceback: {traceback.format_exc()}")
+
             # Return False indicating an exception has occurred
             return False
+
+    # Log an info message indicating the tables were successfully cleared
+    logger.info(message=f"Database cleared. Took {DateUtil.calculate_duration(start=start)}")
 
     # Return True indicating the tables were successfully cleared
     return True

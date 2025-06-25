@@ -30,6 +30,7 @@ __all__: Final[List[str]] = [
     "Notebuilder",
     "NoteManager",
     "NoteModel",
+    "Notes",
 ]
 
 
@@ -1253,6 +1254,114 @@ class NoteFactory:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'create_Note' method from '{cls.__name__}': {e}"
+            )
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default(
+        cls,
+        body_text: str,
+        title_text: str,
+        as_mutable: bool = False,
+    ) -> Optional[Union[ImmutableNote, MutableNote]]:
+        """
+        Creates and returns a new instance of ImmutableNote class.
+
+        This method creates a new note with default values.
+
+        Args:
+            body_text (str): The body of the Note.
+            title_text (str): The title of the Note.
+            as_mutable (bool): Whether to return the note as a MutableNote object. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableNote, MutableNote]]: The created note object if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while creating the note.
+        """
+        try:
+            # Attempt to obtain the 'Medium' difficulty from the database
+            difficulty: Optional[
+                ImmutableDifficulty
+            ] = DifficultyManager().get_difficulty_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the difficulty was found
+            if not difficulty:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Difficulty '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to obtain the 'Medium' priority from the database
+            priority: Optional[ImmutablePriority] = PriorityManager().get_priority_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the priority was found
+            if not priority:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Priority '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to get the 'New' status
+            status: Optional[ImmutableStatus] = StatusManager().get_status_by(
+                field="name",
+                value=Constants.NEW,
+            )
+
+            # Check, if the status was found
+            if not status:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Status '{Constants.NEW}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to create an ImmutableNote object
+            note: Optional[ImmutableNote] = cls.create_note(
+                body_text=body_text,
+                title_text=title_text,
+                difficulty=difficulty.id,
+                metadata={"created_by": "NoteFactory"},
+                priority=priority.id,
+                status=status.id,
+            )
+
+            # Check, if the note was created
+            if not note:
+                # Log a warning message
+                cls.logger.warning(message="Note not created. Aborting...")
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Check, if the 'as_mutable' flag is set
+            if as_mutable:
+                # Return the note as a MutableNote object
+                return note.to_mutable()
+
+            # Return the note
+            return note
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default' method from '{cls.__name__}': {e}"
             )
 
             # Return None indicating an exception has occurred
@@ -2519,3 +2628,349 @@ class NoteModel(ImmutableBaseModel):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+
+class Notes:
+    """
+    A utility class for managing notes.
+
+    This class provides a set of methods for retrieving and saving notes.
+    """
+
+    configuration: Final[Dict[str, Any]] = {}
+
+    # Initialize this class's Logger instance
+    logger: Final[Logger] = Logger.get_logger(name="Notes")
+
+    # Initialize this class's NoteManager instance
+    manager: Final[NoteManager] = NoteManager()
+
+    @classmethod
+    def build(
+        cls,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableNote,
+            MutableNote,
+        ]
+    ]:
+        """
+        Builds a note and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to build the note as mutable. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableNote, MutableNote,]]: The note if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Check, if the configuration dictionary is empty
+            if not cls.configuration:
+                # Log a warning message
+                cls.logger.warning(
+                    message="Configuration dictionary is empty. Use this class' 'set' method to set the configuration dictionary."
+                )
+
+                # Return early
+                return None
+
+            # Initialize the builder
+            builder: NoteBuilder = NoteBuilder()
+
+            # Update the builder's configuration
+            builder.kwargs(**cls.configuration)
+
+            # Build the note
+            note: Union[ImmutableNote, MutableNote] = builder.build(
+                as_mutable=as_mutable
+            )
+
+            # Clear the configuration
+            cls.configuration.clear()
+
+            # Return the note
+            return note
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def clear(cls) -> None:
+        """
+        Clears the configuration dictionary.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Clear the configuration dictionary
+        cls.configuration.clear()
+
+    @classmethod
+    def configure(
+        cls,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the configuration dictionary.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the configure method.
+
+        Returns:
+            None
+        """
+
+        # Update the configuration dictionary
+        cls.configuration.update(kwargs)
+
+    @classmethod
+    def create(
+        cls,
+        **kwargs,
+    ) -> Optional[ImmutableNote]:
+        """
+        Creates a new note and returns it.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the create_flashcard method.
+
+        Returns:
+            Optional[ImmutableNote]: The note if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return NoteFactory.create_note(**kwargs)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default(
+        cls,
+        body_text: str,
+        title_text: str,
+        as_mutable: bool = False,
+    ) -> Optional[ImmutableNote]:
+        """
+        Creates a new note and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to create the note as mutable. Defaults to False.
+            body_text (str): The body of the note.
+            title_text (str): The title of the note.
+
+        Returns:
+            Optional[ImmutableNote]: The note if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return NoteFactory.create_default_note(
+                as_mutable=as_mutable,
+                body_text=body_text,
+                title_text=title_text,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get(
+        cls,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        **kwargs,
+    ) -> Optional[ImmutableNote]:
+        """
+        Retrieves a note by the given ID, key, or other fields.
+
+        Args:
+            id (Optional[int]): The ID of the note.
+            key (Optional[str]): The key of the note.
+            **kwargs: Additional keyword arguments to pass to the get_note_by method.
+
+        Returns:
+            Optional[ImmutableNote]: The note with the given ID, key, or other fields if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            if id:
+                return cls.manager.get_note_by_id(
+                    force_refetch=True,
+                    id=id,
+                )
+            elif key:
+                return cls.manager.get_note_by_key(
+                    force_refetch=True,
+                    key=key,
+                )
+            else:
+                return cls.manager.get_note_by(
+                    force_refetch=True,
+                    **kwargs,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get_all(cls) -> Optional[List[ImmutableNote]]:
+        """
+        Returns a list of all notes in the database.
+
+        Returns:
+            Optional[List[ImmutableNote]]: The notes if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.get_all_notes(force_refetch=True)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def save(
+        cls,
+        note: Union[
+            ImmutableNote,
+            MutableNote,
+        ],
+    ) -> ImmutableNote:
+        """
+        Saves the passed note to the database and returns it.
+
+        Args:
+            note (Union[ImmutableNote, MutableNote]): The note to save.
+
+        Returns:
+            ImmutableNote: The saved note if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.create_note(note=note)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'save' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def search(
+        cls,
+        **kwargs,
+    ) -> Optional[List[ImmutableNote]]:
+        """
+        Searches for notes in the database and returns them.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the search_notes method.
+
+        Returns:
+            Optional[List[ImmutableNote]]: The notes if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.search_notes(
+                force_refetch=True,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def set(
+        cls,
+        key: str,
+        value: Optional[Any] = None,
+    ) -> None:
+        """
+        Sets a configuration value.
+
+        Args:
+            key (str): The key of the configuration value.
+            value (Optional[Any]): The value of the configuration value.
+
+        Returns:
+            None
+        """
+
+        # Check, if the key is already contained within the configuration dictionary
+        if key in cls.configuration:
+            # Log a warning message indicating that the key is already contained within the configuration dictionary
+            cls.logger.warning(
+                message=f"Key '{key}' is already contained within the configuration dictionary. Overwriting..."
+            )
+
+        # Set the configuration value corresponding to the passed key
+        cls.configuration[key] = value

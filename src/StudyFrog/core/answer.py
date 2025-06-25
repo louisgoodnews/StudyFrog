@@ -1970,6 +1970,7 @@ class AnswerModel(ImmutableBaseModel):
         key: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
+        total_word_count: Optional[int] = None,
         updated_at: Optional[datetime] = None,
         uuid: Optional[str] = None,
     ) -> None:
@@ -1986,6 +1987,7 @@ class AnswerModel(ImmutableBaseModel):
             key (Optional[str]): The key of the answer.
             metadata (Optional[Dict[str, Any]]): The metadata of the answer.
             tags (Optional[List[str]]): The keys of the tags associated with the answer.
+            total_word_count (Optional[int]): The total word count of the answer.
             updated_at (Optional[datetime]): The timestamp when the answer was last updated.
             uuid (Optional[str]): The UUID of the answer.
 
@@ -2004,6 +2006,7 @@ class AnswerModel(ImmutableBaseModel):
             metadata=metadata,
             table=Constants.ANSWERS,
             tags=tags,
+            total_word_count=total_word_count,
             updated_at=updated_at,
             uuid=uuid,
         )
@@ -2058,7 +2061,7 @@ class Answers:
             builder: AnswerBuilder = AnswerBuilder()
 
             # Update the builder's configuration
-            builder.configuration.update(cls.configuration)
+            builder.kwargs(**cls.configuration)
 
             # Build the answer
             answer: Union[ImmutableAnswer, MutableAnswer] = builder.build(

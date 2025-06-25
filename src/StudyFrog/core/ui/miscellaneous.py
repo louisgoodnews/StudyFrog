@@ -344,6 +344,7 @@ class CountdownButtonWidget(tkinter.Button):
                 namespace=self.namespace,
                 text=text,
             )
+
         except Exception as e:
             # Log an error message indicating that an exception has occurred
             self.logger.error(

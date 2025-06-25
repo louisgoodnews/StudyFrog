@@ -31,6 +31,7 @@ __all__: Final[List[str]] = [
     "QuestionManager",
     "QuestionModel",
     "QuestionTypes",
+    "Questions",
 ]
 
 
@@ -1538,6 +1539,112 @@ class QuestionFactory:
             # Log an error message indicating an exception has occurred
             cls.logger.error(
                 message=f"Caught an exception while attempting to run 'create_question' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default_question(
+        cls,
+        question_text: str,
+        as_mutable: bool = False,
+    ) -> Optional[Union[ImmutableQuestion, MutableQuestion]]:
+        """
+        Creates a default question object.
+
+        Args:
+            question_text (str): The text of the question.
+            as_mutable (bool): A flag indicating whether the question should be mutable.
+
+        Returns:
+            Optional[Union[ImmutableQuestion, MutableQuestion]]: A default question object if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Attempt to obtain the 'Medium' difficulty from the database
+            difficulty: Optional[
+                ImmutableDifficulty
+            ] = DifficultyManager().get_difficulty_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the difficulty was found
+            if not difficulty:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Difficulty '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to obtain the 'Medium' priority from the database
+            priority: Optional[ImmutablePriority] = PriorityManager().get_priority_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the priority was found
+            if not priority:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Priority '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to get the 'New' status
+            status: Optional[ImmutableStatus] = StatusManager().get_status_by(
+                field="name",
+                value=Constants.NEW,
+            )
+
+            # Check, if the status was found
+            if not status:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Status '{Constants.NEW}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to create an ImmutableQuestion object
+            question: Optional[ImmutableQuestion] = cls.create_question(
+                question_text=question_text,
+                question_type=QuestionTypes.MULTIPLE_SELECT,
+                answers=answers,
+                correct_answers=correct_answers,
+                difficulty=difficulty.id,
+                metadata={"created_by": "QuestionFactory"},
+                priority=priority.id,
+                status=status.id,
+            )
+
+            # Check, if the question was created
+            if not question:
+                # Log a warning message
+                cls.logger.warning(message="Question not created. Aborting...")
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Check, if the 'as_mutable' flag is set
+            if as_mutable:
+                # Return the question as a MutableQuestion object
+                return question.to_mutable()
+
+            # Return the question
+            return question
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default_question' method from '{cls.__name__}': {e}"
             )
 
             # Log the traceback
@@ -3111,3 +3218,346 @@ class QuestionModel(ImmutableBaseModel):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+
+class Questions:
+    """
+    A utility class for managing questions.
+
+    This class provides a set of methods for retrieving and saving questions.
+    """
+
+    configuration: Final[Dict[str, Any]] = {}
+
+    # Initialize this class's Logger instance
+    logger: Final[Logger] = Logger.get_logger(name="Questions")
+
+    # Initialize this class's QuestionManager instance
+    manager: Final[QuestionManager] = QuestionManager()
+
+    @classmethod
+    def build(
+        cls,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableQuestion,
+            MutableQuestion,
+        ]
+    ]:
+        """
+        Builds a question and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to build the question as mutable. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableQuestion, MutableQuestion,]]: The question if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Check, if the configuration dictionary is empty
+            if not cls.configuration:
+                # Log a warning message
+                cls.logger.warning(
+                    message="Configuration dictionary is empty. Use this class' 'set' method to set the configuration dictionary."
+                )
+
+                # Return early
+                return None
+
+            # Initialize the builder
+            builder: QuestionBuilder = QuestionBuilder()
+
+            # Update the builder's configuration
+            builder.kwargs(**cls.configuration)
+
+            # Build the question
+            question: Union[ImmutableQuestion, MutableQuestion] = builder.build(
+                as_mutable=as_mutable
+            )
+
+            # Clear the configuration
+            cls.configuration.clear()
+
+            # Return the question
+            return question
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def clear(cls) -> None:
+        """
+        Clears the configuration dictionary.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Clear the configuration dictionary
+        cls.configuration.clear()
+
+    @classmethod
+    def configure(
+        cls,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the configuration dictionary.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the configure method.
+
+        Returns:
+            None
+        """
+
+        # Update the configuration dictionary
+        cls.configuration.update(kwargs)
+
+    @classmethod
+    def create(
+        cls,
+        **kwargs,
+    ) -> Optional[ImmutableQuestion]:
+        """
+        Creates a new question and returns it.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the create_question method.
+
+        Returns:
+            Optional[ImmutableQuestion]: The question if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return QuestionFactory.create_question(**kwargs)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default(
+        cls,
+        question_text: str,
+        as_mutable: bool = False,
+    ) -> Optional[ImmutableQuestion]:
+        """
+        Creates a new question and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to create the question as mutable. Defaults to False.
+            question_text (str): The text of the question.
+
+        Returns:
+            Optional[ImmutableQuestion]: The question if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return QuestionFactory.create_default_question(
+                as_mutable=as_mutable,
+                question_text=question_text,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get(
+        cls,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        **kwargs,
+    ) -> Optional[ImmutableQuestion]:
+        """
+        Retrieves a question by the given ID, key, or other fields.
+
+        Args:
+            id (Optional[int]): The ID of the question.
+            key (Optional[str]): The key of the question.
+            **kwargs: Additional keyword arguments to pass to the get_question_by method.
+
+        Returns:
+            Optional[ImmutableQuestion]: The question with the given ID, key, or other fields if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            if id:
+                return cls.manager.get_question_by_id(
+                    force_refetch=True,
+                    id=id,
+                )
+            elif key:
+                return cls.manager.get_question_by_key(
+                    force_refetch=True,
+                    key=key,
+                )
+            else:
+                return cls.manager.get_question_by(
+                    force_refetch=True,
+                    **kwargs,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get_all(cls) -> Optional[List[ImmutableQuestion]]:
+        """
+        Returns a list of all questions in the database.
+
+        Returns:
+            Optional[List[ImmutableQuestion]]: The questions if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.get_all_questions(force_refetch=True)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def save(
+        cls,
+        question: Union[
+            ImmutableQuestion,
+            MutableQuestion,
+        ],
+    ) -> ImmutableQuestion:
+        """
+        Saves the passed question to the database and returns it.
+
+        Args:
+            question (Union[ImmutableQuestion, MutableQuestion]): The question to save.
+
+        Returns:
+            ImmutableQuestion: The saved question if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.create_question(question=question)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'save' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def search(
+        cls,
+        **kwargs,
+    ) -> Optional[List[ImmutableQuestion]]:
+        """
+        Searches for questions in the database and returns them.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the search_questions method.
+
+        Returns:
+            Optional[List[ImmutableQuestion]]: The questions if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.search_questions(
+                force_refetch=True,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def set(
+        cls,
+        key: str,
+        value: Optional[Any] = None,
+    ) -> None:
+        """
+        Sets a configuration value.
+
+        Args:
+            key (str): The key of the configuration value.
+            value (Optional[Any]): The value of the configuration value.
+
+        Returns:
+            None
+        """
+
+        # Check, if the key is already contained within the configuration dictionary
+        if key in cls.configuration:
+            # Log a warning message indicating that the key is already contained within the configuration dictionary
+            cls.logger.warning(
+                message=f"Key '{key}' is already contained within the configuration dictionary. Overwriting..."
+            )
+
+        # Set the configuration value corresponding to the passed key
+        cls.configuration[key] = value

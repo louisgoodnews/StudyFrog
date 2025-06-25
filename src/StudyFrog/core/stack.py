@@ -28,6 +28,7 @@ __all__: Final[List[str]] = [
     "StackBuilder",
     "StackManager",
     "StackModel",
+    "Stacks",
 ]
 
 
@@ -1712,6 +1713,103 @@ class StackFactory:
             # Return None indicating an exception has occurred
             return None
 
+    @classmethod
+    def create_default_stack(
+        cls,
+        name: str,
+        as_mutable: bool = False,
+    ) -> Optional[Union[ImmutableStack, MutableStack]]:
+        """ """
+        try:
+            # Attempt to obtain the 'Medium' difficulty from the database
+            difficulty: Optional[
+                ImmutableDifficulty
+            ] = DifficultyManager().get_difficulty_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the difficulty was found
+            if not difficulty:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Difficulty '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to obtain the 'Medium' priority from the database
+            priority: Optional[ImmutablePriority] = PriorityManager().get_priority_by(
+                field="name",
+                value=Constants.MEDIUM,
+            )
+
+            # Check, if the priority was found
+            if not priority:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Priority '{Constants.MEDIUM}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to get the 'New' status
+            status: Optional[ImmutableStatus] = StatusManager().get_status_by(
+                field="name",
+                value=Constants.NEW,
+            )
+
+            # Check, if the status was found
+            if not status:
+                # Log a warning message
+                cls.logger.warning(
+                    message=f"Status '{Constants.NEW}' not found. Aborting..."
+                )
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Attempt to create an ImmutableStack object
+            stack: Optional[ImmutableStack] = cls.create_stack(
+                contents=[],
+                descendants=[],
+                description="",
+                name=name,
+                difficulty=difficulty.id,
+                metadata={"created_by": "StackFactory"},
+                priority=priority.id,
+                status=status.id,
+            )
+
+            # Check, if the stack was created
+            if not stack:
+                # Log a warning message
+                cls.logger.warning(message="Stack not created. Aborting...")
+
+                # Return None indicating an exception has occurred
+                return None
+
+            # Check, if the 'as_mutable' flag is set
+            if as_mutable:
+                # Return the stack as a MutableStack object
+                return stack.to_mutable()
+
+            # Return the stack
+            return stack
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default_stack' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
 
 class StackBuilder(BaseObjectBuilder):
     """
@@ -2248,9 +2346,7 @@ class StackManager(BaseObjectManager):
             result: Optional[ImmutableStack] = None
 
             # Run pre-create tasks
-            stack: MutableStack = self._run_pre_create_tasks(
-                stack=stack
-            )
+            stack: MutableStack = self._run_pre_create_tasks(stack=stack)
 
             # Convert the stack object to a StackModel object
             model: StackModel = StackConverter.object_to_model(object=stack)
@@ -3302,3 +3398,346 @@ class StackModel(ImmutableBaseModel):
             updated_at=updated_at,
             uuid=uuid,
         )
+
+
+class Stacks:
+    """
+    A utility class for managing stacks.
+
+    This class provides a set of methods for retrieving and saving stacks.
+    """
+
+    configuration: Final[Dict[str, Any]] = {}
+
+    # Initialize this class's Logger instance
+    logger: Final[Logger] = Logger.get_logger(name="Stacks")
+
+    # Initialize this class's StackManager instance
+    manager: Final[StackManager] = StackManager()
+
+    @classmethod
+    def build(
+        cls,
+        as_mutable: bool = False,
+    ) -> Optional[
+        Union[
+            ImmutableStack,
+            MutableStack,
+        ]
+    ]:
+        """
+        Builds a stack and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to build the stack as mutable. Defaults to False.
+
+        Returns:
+            Optional[Union[ImmutableStack, MutableStack,]]: The stack if no exception occurs. Otherwise, None.
+        """
+        try:
+            # Check, if the configuration dictionary is empty
+            if not cls.configuration:
+                # Log a warning message
+                cls.logger.warning(
+                    message="Configuration dictionary is empty. Use this class' 'set' method to set the configuration dictionary."
+                )
+
+                # Return early
+                return None
+
+            # Initialize the builder
+            builder: StackBuilder = StackBuilder()
+
+            # Update the builder's configuration
+            builder.kwargs(**cls.configuration)
+
+            # Build the stack
+            stack: Union[ImmutableStack, MutableStack] = builder.build(
+                as_mutable=as_mutable
+            )
+
+            # Clear the configuration
+            cls.configuration.clear()
+
+            # Return the stack
+            return stack
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'build' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def clear(cls) -> None:
+        """
+        Clears the configuration dictionary.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Clear the configuration dictionary
+        cls.configuration.clear()
+
+    @classmethod
+    def configure(
+        cls,
+        **kwargs,
+    ) -> None:
+        """
+        Configures the configuration dictionary.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the configure method.
+
+        Returns:
+            None
+        """
+
+        # Update the configuration dictionary
+        cls.configuration.update(kwargs)
+
+    @classmethod
+    def create(
+        cls,
+        **kwargs,
+    ) -> Optional[ImmutableStack]:
+        """
+        Creates a new stack and returns it.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the create_flashcard method.
+
+        Returns:
+            Optional[ImmutableStack]: The stack if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return StackFactory.create_stack(**kwargs)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def create_default(
+        cls,
+        name: str,
+        as_mutable: bool = False,
+    ) -> Optional[ImmutableStack]:
+        """
+        Creates a new stack and returns it.
+
+        Args:
+            as_mutable (bool, optional): Whether to create the stack as mutable. Defaults to False.
+            name (str): The name of the stack.
+
+        Returns:
+            Optional[ImmutableStack]: The stack if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return StackFactory.create_default_stack(
+                as_mutable=as_mutable,
+                name=name,
+            )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'create_default' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get(
+        cls,
+        id: Optional[int] = None,
+        key: Optional[str] = None,
+        **kwargs,
+    ) -> Optional[ImmutableStack]:
+        """
+        Retrieves a stack by the given ID, key, or other fields.
+
+        Args:
+            id (Optional[int]): The ID of the stack.
+            key (Optional[str]): The key of the stack.
+            **kwargs: Additional keyword arguments to pass to the get_stack_by method.
+
+        Returns:
+            Optional[ImmutableStack]: The stack with the given ID, key, or other fields if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            if id:
+                return cls.manager.get_stack_by_id(
+                    force_refetch=True,
+                    id=id,
+                )
+            elif key:
+                return cls.manager.get_stack_by_key(
+                    force_refetch=True,
+                    key=key,
+                )
+            else:
+                return cls.manager.get_stack_by(
+                    force_refetch=True,
+                    **kwargs,
+                )
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def get_all(cls) -> Optional[List[ImmutableStack]]:
+        """
+        Returns a list of all stacks in the database.
+
+        Returns:
+            Optional[List[ImmutableStack]]: The stacks if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.get_all_stacks(force_refetch=True)
+        except Exception as e:
+            # Log an error message indicating an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'get_all' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def save(
+        cls,
+        stack: Union[
+            ImmutableStack,
+            MutableStack,
+        ],
+    ) -> ImmutableStack:
+        """
+        Saves the passed stack to the database and returns it.
+
+        Args:
+            stack (Union[ImmutableStack, MutableStack]): The stack to save.
+
+        Returns:
+            ImmutableStack: The saved stack if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.create_stack(stack=stack)
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'save' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def search(
+        cls,
+        **kwargs,
+    ) -> Optional[List[ImmutableStack]]:
+        """
+        Searches for stacks in the database and returns them.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the search_stacks method.
+
+        Returns:
+            Optional[List[ImmutableStack]]: The stacks if no exception occurs. Otherwise, None.
+
+        Raises:
+            Exception: If an exception occurs while running the SQL query.
+        """
+        try:
+            return cls.manager.search_stacks(
+                force_refetch=True,
+                **kwargs,
+            )
+        except Exception as e:
+            # Log an error message indicating that an exception has occurred
+            cls.logger.error(
+                message=f"Caught an exception while attempting to run 'search' method from '{cls.__name__}': {e}"
+            )
+
+            # Log the traceback of the exception
+            cls.logger.error(message=f"Traceback: {traceback.format_exc()}")
+
+            # Return None indicating an exception has occurred
+            return None
+
+    @classmethod
+    def set(
+        cls,
+        key: str,
+        value: Optional[Any] = None,
+    ) -> None:
+        """
+        Sets a configuration value.
+
+        Args:
+            key (str): The key of the configuration value.
+            value (Optional[Any]): The value of the configuration value.
+
+        Returns:
+            None
+        """
+
+        # Check, if the key is already contained within the configuration dictionary
+        if key in cls.configuration:
+            # Log a warning message indicating that the key is already contained within the configuration dictionary
+            cls.logger.warning(
+                message=f"Key '{key}' is already contained within the configuration dictionary. Overwriting..."
+            )
+
+        # Set the configuration value corresponding to the passed key
+        cls.configuration[key] = value
