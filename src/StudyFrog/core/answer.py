@@ -1532,6 +1532,8 @@ class AnswerManager(BaseObjectManager):
                     # Create a new answer if it doesn't exist
                     answer: ImmutableAnswer = AnswerFactory.create_answer(
                         answer_text=default.value,
+                        answer_text_word_count=len(default.value.split(" ")),
+                        total_word_count=len(default.value.split(" ")),
                     )
 
                     # Add the newly created answer to the result
