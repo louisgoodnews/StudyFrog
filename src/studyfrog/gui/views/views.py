@@ -5,6 +5,7 @@ Date: 2025-11-16
 
 from typing import Final, Literal
 
+from gui.factory import get_toplevel
 from gui.views.create_view import get_create_view
 from gui.views.dashboard_view import get_dashboard_view
 from gui.views.edit_view import get_edit_view
@@ -41,10 +42,16 @@ def get_view(
 
     try:
         if name == "create":
+            if not "master" in kwargs:
+                kwargs["master"] = get_toplevel()
             return get_create_view(**kwargs)
+
         elif name == "dashboard":
             return get_dashboard_view(**kwargs)
+
         elif name == "edit":
+            if not "master" in kwargs:
+                kwargs["master"] = get_toplevel()
             return get_edit_view(**kwargs)
     except Exception as e:
         log_exception(

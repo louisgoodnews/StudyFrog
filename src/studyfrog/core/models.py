@@ -4,7 +4,7 @@ Date: 2025-11-17
 Description: This module contains functions for creating various objects.
 """
 
-from typing import Any, Final, Literal, Optional
+from typing import Any, Final, Literal, Optional, Union
 
 from utils.utils import get_now_str, get_today_str, get_uuid_str
 
@@ -62,6 +62,28 @@ def get_answer(
     kwargs["text"] = text
 
     kwargs["type"] = "ANSWER"
+
+    return _get_object_dict(**kwargs)
+
+
+def get_customfield(
+    name: str,
+    **kwargs,
+) -> dict[str, Any]:
+    """
+    Returns a dictionary containing a custom field's attributes.
+
+    Args:
+        name (str): The custom field's name.
+        **kwargs (dict[str, Any]): Additional keywords to pass to the custom field's attributes.
+
+    Returns:
+        dict[str, Any]: A dictionary containing a custom field's attributes.
+    """
+
+    kwargs["name"] = name
+
+    kwargs["type"] = "CUSTOMFIELD"
 
     return _get_object_dict(**kwargs)
 
@@ -170,6 +192,44 @@ def get_note(
     kwargs["title"] = title
 
     kwargs["type"] = "NOTE"
+
+    return _get_object_dict(**kwargs)
+
+
+def get_option(
+    name: str,
+    value: Union[
+        bool,
+        float,
+        int,
+        str,
+    ],
+    customfields: Optional[list[str]] = None,
+    **kwargs,
+) -> dict[str, Any]:
+    """
+    Returns a dictionary containing an option's attributes.
+
+    Args:
+        customfields (Optional[list[str]]): The option's custom fields.
+        name (str): The option's name.
+        value (Union[bool, float, int, str]): The option's value.
+        **kwargs (dict[str, Any]): Additional keywords to pass to the option's attributes.
+
+    Returns:
+        dict[str, Any]: A dictionary containing an option's attributes.
+    """
+
+    if not customfields:
+        customfields = []
+
+    kwargs["customfields"] = customfields
+
+    kwargs["name"] = name
+
+    kwargs["type"] = "OPTION"
+
+    kwargs["value"] = value
 
     return _get_object_dict(**kwargs)
 

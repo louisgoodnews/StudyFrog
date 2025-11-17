@@ -4,6 +4,7 @@ Date: 2025-11-16
 """
 
 import sys
+import threading
 import tkinter
 import traceback
 import uuid
@@ -26,6 +27,8 @@ COLORIZATION: Final[dict[str, str]] = {
     "UNDERLINED": "\033[4m",
     "WARNING": "\033[33m",
 }
+
+LOCK: Final[threading.Lock] = threading.Lock()
 
 
 # ---------- Functions ---------- #
@@ -170,8 +173,11 @@ def get_file_content_bytes(path: Path) -> Optional[bytes]:
         Optional[bytes]: The content of the file or None if reading the file fails.
     """
 
+    global LOCK
+
     try:
-        return path.read_bytes()
+        with LOCK:
+            return path.read_bytes()
     except Exception:
         return None
 
@@ -187,8 +193,11 @@ def get_file_content_str(path: Path) -> Optional[str]:
         Optional[str]: The content of the file or None if reading the file fails.
     """
 
+    global LOCK
+
     try:
-        return path.read_text(encoding="utf-8")
+        with LOCK:
+            return path.read_text(encoding="utf-8")
     except Exception:
         return None
 
@@ -495,8 +504,11 @@ def write_file_bytes(
         bool: True if the file was written successfully, False otherwise.
     """
 
+    global LOCK
+
     try:
-        path.write_bytes(data=data)
+        with LOCK:
+            path.write_bytes(data=data)
         return True
     except Exception:
         return False
@@ -519,11 +531,14 @@ def write_file_str(
         bool: True if the file was written successfully, False otherwise.
     """
 
+    global LOCK
+
     try:
-        path.write_text(
-            data=data,
-            encoding=encoding,
-        )
+        with LOCK:
+            path.write_text(
+                data=data,
+                encoding=encoding,
+            )
         return True
     except Exception:
         return False

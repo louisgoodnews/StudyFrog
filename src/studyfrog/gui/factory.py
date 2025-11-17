@@ -5,7 +5,7 @@ Date: 2025-11-16
 
 import tkinter
 
-from typing import Final, Literal
+from typing import Final, Literal, Optional
 
 from gui.constants import COLOR_CONFIG
 
@@ -60,6 +60,30 @@ def get_frame(
     return tkinter.Frame(
         master=master,
         *args,
+        **kwargs,
+    )
+
+
+def get_toplevel(
+    master: Optional[tkinter.Widget] = None,
+    **kwargs,
+) -> tkinter.Toplevel:
+    """
+    Returns a tkinter.Toplevel widget.
+
+    Args:
+        master (Optional[tkinter.Widget]): The master of the tkinter.Toplevel widget to be created.
+        **kwargs: Additional keyword arguments passed to the tkinter.Toplevel constructor.
+
+    Returns:
+        tkinter.Toplevel: The tkinter.Toplevel widget.
+    """
+
+    if not kwargs:
+        kwargs.update(COLOR_CONFIG["window"][get_color_mode()])
+
+    return tkinter.Toplevel(
+        master=master,
         **kwargs,
     )
 
