@@ -103,4 +103,6 @@ WINDOW_TITLE: Final[Literal[f"{PROJECT_NAME} ({PROJECT_VERSION})"]] = (
 # ---------- Auto-Export ---------- #
 
 # Auto-export all non-private symbols
-__all__: Final[list[str]] = [name for name in globals() if not name.startswith("_")]
+__all__: Final[list[str]] = [
+    name for name in globals() if not name.startswith("_") and name.isidentifier()
+]
