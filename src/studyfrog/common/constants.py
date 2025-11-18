@@ -44,6 +44,8 @@ ANSWERS_TABLE_FILE: Final[Path] = DATA_DIR / "answers.json"
 
 CONFIG_FILE: Final[Path] = CONFIG_DIR / "config.json"
 
+CUSTOMFIELDS_TABLE_FILE: Final[Path] = DATA_DIR / "customfields.json"
+
 DIFFICULTIES_TABLE_FILE: Final[Path] = DATA_DIR / "difficulties.json"
 
 FLASHCARDS_TABLE_FILE: Final[Path] = DATA_DIR / "flashcards.json"

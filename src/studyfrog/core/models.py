@@ -46,18 +46,25 @@ def _get_object_dict(**kwargs) -> dict[str, Any]:
 
 def get_answer(
     text: str,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing an answer's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The answer's custom fields.
         text (str): The answer's text.
         **kwargs (dict[str, Any]): Additional keywords to pass to the answer's attributes.
 
     Returns:
         dict[str, Any]: A dictionary containing an answer's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["text"] = text
 
@@ -68,18 +75,25 @@ def get_answer(
 
 def get_customfield(
     name: str,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a custom field's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The custom field's custom fields.
         name (str): The custom field's name.
         **kwargs (dict[str, Any]): Additional keywords to pass to the custom field's attributes.
 
     Returns:
         dict[str, Any]: A dictionary containing a custom field's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["name"] = name
 
@@ -91,12 +105,14 @@ def get_customfield(
 def get_difficulty(
     name: str,
     value: int,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a difficulty's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The difficulty's custom fields.
         name (str): The difficulty's name.
         value (int): The difficulty's value.
         **kwargs (dict[str, Any]): Additional keywords to pass to the difficulty's attributes.
@@ -104,6 +120,11 @@ def get_difficulty(
     Returns:
         dict[str, Any]: A dictionary containing a difficulty's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["name"] = name
 
@@ -119,6 +140,7 @@ def get_flashcard(
     front_text: str,
     difficulty: Optional[str] = None,
     priority: Optional[str] = None,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
@@ -126,6 +148,7 @@ def get_flashcard(
 
     Args:
         back_text (str): The flashcard's back text.
+        customfields (Optional[dict[str, Any]]): The flashcard's custom fields.
         difficulty (Optional[str]): The flashcard's difficulty.
         front_text (str): The flashcard's front text.
         priority (Optional[str]): The flashcard's priority.
@@ -134,6 +157,11 @@ def get_flashcard(
     Returns:
         dict[str, Any]: A dictionary containing a flashcard's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["back_text"] = back_text
 
@@ -154,16 +182,25 @@ def get_flashcard(
     return _get_object_dict(**kwargs)
 
 
-def get_image(**kwargs) -> dict[str, Any]:
+def get_image(
+    customfields: Optional[dict[str, Any]] = None,
+    **kwargs,
+) -> dict[str, Any]:
     """
     Returns a dictionary containing an image's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The image's custom fields.
         **kwargs (dict[str, Any]): Additional keywords to pass to the image's attributes.
 
     Returns:
         dict[str, Any]: A dictionary containing an image's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["type"] = "IMAGE"
 
@@ -173,12 +210,14 @@ def get_image(**kwargs) -> dict[str, Any]:
 def get_note(
     text: str,
     title: str,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a note's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The note's custom fields.
         text (str): The note's text.
         title (str): The note's title.
         **kwargs (dict[str, Any]): Additional keywords to pass to the note's attributes.
@@ -186,6 +225,11 @@ def get_note(
     Returns:
         dict[str, Any]: A dictionary containing a note's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["text"] = text
 
@@ -237,12 +281,14 @@ def get_option(
 def get_priority(
     name: str,
     value: int,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a priority's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The priority's custom fields.
         name (str): The priority's name.
         value (int): The priority's value.
         **kwargs (dict[str, Any]): Additional keywords to pass to the priority's attributes.
@@ -250,6 +296,11 @@ def get_priority(
     Returns:
         dict[str, Any]: A dictionary containing a priority's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["name"] = name
 
@@ -264,12 +315,14 @@ def get_question(
     question_type: Literal["multiple_choice", "open", "true_false"],
     text: str,
     answers: Optional[list[str]] = None,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a question's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The question's custom fields.
         question_type (Literal["multiple_choice", "open", "true_false"]): The question's type.
         text (str): The question's text.
         **kwargs (dict[str, Any]): Additional keywords to pass to the question's attributes.
@@ -283,6 +336,11 @@ def get_question(
 
     kwargs["answers"] = answers
 
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
+
     kwargs["question_type"] = question_type
 
     kwargs["text"] = text
@@ -294,18 +352,25 @@ def get_question(
 
 def get_rehearsal_run(
     rehearsal_run_items: Optional[list[str]] = None,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a rehearsal run's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The rehearsal run's custom fields.
         rehearsal_run_items (Optional[list[str]]): The rehearsal run items.
         **kwargs (dict[str, Any]): Additional keywords to pass to the rehearsal run's attributes.
 
     Returns:
         dict[str, Any]: A dictionary containing a rehearsal run's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     if not rehearsal_run_items:
         rehearsal_run_items = []
@@ -317,32 +382,50 @@ def get_rehearsal_run(
     return _get_object_dict(**kwargs)
 
 
-def get_rehearsal_run_item(**kwargs) -> dict[str, Any]:
+def get_rehearsal_run_item(
+    customfields: Optional[dict[str, Any]] = None,
+    **kwargs,
+) -> dict[str, Any]:
     """
     Returns a dictionary containing a rehearsal run item's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The rehearsal run item's custom fields.
         **kwargs (dict[str, Any]): Additional keywords to pass to the rehearsal run item's attributes.
 
     Returns:
         dict[str, Any]: A dictionary containing a rehearsal run item's attributes.
     """
 
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
+
     kwargs["type"] = "REHEARSAL_RUN_ITEM"
 
     return _get_object_dict(**kwargs)
 
 
-def get_stack(**kwargs) -> dict[str, Any]:
+def get_stack(
+    customfields: Optional[dict[str, Any]] = None,
+    **kwargs,
+) -> dict[str, Any]:
     """
     Returns a dictionary containing a stack's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The stack's custom fields.
         **kwargs (dict[str, Any]): Additional keywords to pass to the stack's attributes.
 
     Returns:
         dict[str, Any]: A dictionary containing a stack's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["type"] = "STACK"
 
@@ -351,6 +434,7 @@ def get_stack(**kwargs) -> dict[str, Any]:
 
 def get_subject(
     teacher: str,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
@@ -364,6 +448,11 @@ def get_subject(
         dict[str, Any]: A dictionary containing a subject's attributes.
     """
 
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
+
     kwargs["teacher"] = teacher
 
     kwargs["type"] = "SUBJECT"
@@ -373,18 +462,25 @@ def get_subject(
 
 def get_teacher(
     subjects: Optional[list[str]] = None,
+    customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a teacher's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The teacher's custom fields.
         subjects (Optional[list[str]]): The teacher's subjects.
         **kwargs (dict[str, Any]): Additional keywords to pass to the teacher's attributes.
 
     Returns:
         dict[str, Any]: A dictionary containing a teacher's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     if not subjects:
         subjects = []
@@ -396,16 +492,25 @@ def get_teacher(
     return _get_object_dict(**kwargs)
 
 
-def get_user(**kwargs) -> dict[str, Any]:
+def get_user(
+    customfields: Optional[dict[str, Any]] = None,
+    **kwargs,
+) -> dict[str, Any]:
     """
     Returns a dictionary containing a user's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The user's custom fields.
         **kwargs (dict[str, Any]): Additional keywords to pass to the user's attributes.
 
     Returns:
         dict[str, Any]: A dictionary containing a user's attributes.
     """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
 
     kwargs["type"] = "USER"
 

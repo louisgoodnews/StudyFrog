@@ -25,11 +25,14 @@ COLORIZATION: Final[dict[str, str]] = {
     "ERROR": "\033[31m",
     "INFO": "\033[32m",
     "ITALIC": "\033[3m",
+    "TRACE": "\033[34m",
     "UNDERLINED": "\033[4m",
     "WARNING": "\033[33m",
 }
 
 LOCK: Final[threading.Lock] = threading.Lock()
+
+NAME: Final[Literal["utils.utils"]] = "utils.utils"
 
 
 # ---------- Functions ---------- #
@@ -61,10 +64,17 @@ def ensure_dir(path: Path) -> bool:
         bool: True if the directory exists, False otherwise.
     """
 
+    global NAME
+
     try:
         path.mkdir(exist_ok=True)
         return True
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to ensure directory.",
+        )
         return False
 
 
@@ -79,11 +89,18 @@ def ensure_file(path: Path) -> bool:
         bool: True if the file exists, False otherwise.
     """
 
+    global NAME
+
     try:
         ensure_dir(path.parent)
         path.touch(exist_ok=True)
         return True
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to ensure file.",
+        )
         return False
 
 
@@ -98,6 +115,8 @@ def ensure_json(path: Path) -> bool:
         bool: True if the JSON file exists, False otherwise.
     """
 
+    global NAME
+
     try:
         ensure_dir(path.parent)
         if not path.exists():
@@ -106,7 +125,12 @@ def ensure_json(path: Path) -> bool:
                 encoding="utf-8",
             )
         return True
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to ensure JSON file.",
+        )
         return False
 
 
@@ -135,13 +159,20 @@ def get_dir(path: Path) -> bool:
         bool: True if the directory exists, False otherwise.
     """
 
+    global NAME
+
     try:
         path.mkdir(
             exist_ok=True,
             parent=True,
         )
         return True
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to get directory.",
+        )
         return False
 
 
@@ -156,10 +187,17 @@ def get_file(path: Path) -> bool:
         bool: True if the file exists, False otherwise.
     """
 
+    global NAME
+
     try:
         path.touch()
         return True
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to get file.",
+        )
         return False
 
 
@@ -179,7 +217,12 @@ def get_file_content_bytes(path: Path) -> Optional[bytes]:
     try:
         with LOCK:
             return path.read_bytes()
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to get file content as bytes.",
+        )
         return None
 
 
@@ -199,7 +242,12 @@ def get_file_content_json(path: Path) -> Optional[dict[str, Any]]:
     try:
         with LOCK:
             return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to get file content as JSON.",
+        )
         return None
 
 
@@ -219,7 +267,12 @@ def get_file_content_str(path: Path) -> Optional[str]:
     try:
         with LOCK:
             return path.read_text(encoding="utf-8")
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to get file content as string.",
+        )
         return None
 
 
@@ -349,6 +402,102 @@ def get_widget_children(widget: tkinter.Widget) -> list[tkinter.Widget]:
     return widget.winfo_children()
 
 
+def is_dict_empty(dictionary: dict[str, Any]) -> bool:
+    """
+    Returns True if the dictionary is empty, False otherwise.
+
+    Args:
+        dictionary (dict[str, Any]): The dictionary to check.
+
+    Returns:
+        bool: True if the dictionary is empty, False otherwise.
+    """
+
+    return not dictionary
+
+
+def is_item_in_list(
+    item: Any,
+    list_: list[Any],
+) -> bool:
+    """
+    Returns True if the item is in the list, False otherwise.
+
+    Args:
+        item (Any): The item to check.
+        list_ (list[Any]): The list to check.
+
+    Returns:
+        bool: True if the item is in the list, False otherwise.
+    """
+
+    return item in list_
+
+
+def is_item_in_tuple(
+    item: Any,
+    tuple_: tuple[Any, ...],
+) -> bool:
+    """
+    Returns True if the item is in the tuple, False otherwise.
+
+    Args:
+        item (Any): The item to check.
+        tuple_ (tuple[Any, ...]): The tuple to check.
+
+    Returns:
+        bool: True if the item is in the tuple, False otherwise.
+    """
+
+    return item in tuple_
+
+
+def is_key_in_dict(
+    key: str,
+    dictionary: dict[str, Any],
+) -> bool:
+    """
+    Returns True if the key is in the dictionary, False otherwise.
+
+    Args:
+        key (str): The key to check.
+        dictionary (dict[str, Any]): The dictionary to check.
+
+    Returns:
+        bool: True if the key is in the dictionary, False otherwise.
+    """
+
+    return key in dictionary
+
+
+def is_list_empty(list_: list[Any]) -> bool:
+    """
+    Returns True if the list is empty, False otherwise.
+
+    Args:
+        list_ (list[Any]): The list to check.
+
+    Returns:
+        bool: True if the list is empty, False otherwise.
+    """
+
+    return not list_
+
+
+def is_tuple_empty(tuple_: tuple[Any, ...]) -> bool:
+    """
+    Returns True if the tuple is empty, False otherwise.
+
+    Args:
+        tuple_ (tuple[Any, ...]): The tuple to check.
+
+    Returns:
+        bool: True if the tuple is empty, False otherwise.
+    """
+
+    return not tuple_
+
+
 def log(
     message: str,
     name: str,
@@ -374,7 +523,7 @@ def log(
     )
 
     print(
-        f"{color}{get_now_str()} - [{level.upper()}] - [{name.upper()}]:{message}{COLORIZATION["DEFAULT"]};"
+        f"{color}{get_now_str()} - [{level.upper()}] - [{name.upper()}]: {message}{COLORIZATION["DEFAULT"]};"
     )
 
 
@@ -446,6 +595,7 @@ def log_error(
 
 def log_exception(
     exception: Exception,
+    message: str,
     name: str,
 ) -> None:
     """
@@ -453,6 +603,7 @@ def log_exception(
 
     Args:
         exception (Exception): The exception to log.
+        message (str): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -461,7 +612,7 @@ def log_exception(
 
     log(
         level="ERROR",
-        message=f"{exception}\n{traceback.format_exc()}",
+        message=f"{message}\n{exception}\n{traceback.format_exc()}",
         name=name,
     )
 
@@ -483,6 +634,28 @@ def log_info(
 
     log(
         level="INFO",
+        message=message,
+        name=name,
+    )
+
+
+def log_trace(
+    message: str,
+    name: str,
+) -> None:
+    """
+    Logs a message at the "TRACE" level.
+
+    Args:
+        message (str): The message to log.
+        name (str): The name under which to log.
+
+    Returns:
+        None
+    """
+
+    log(
+        level="TRACE",
         message=message,
         name=name,
     )
@@ -510,6 +683,54 @@ def log_warning(
     )
 
 
+def str_to_date(date_string: str) -> Optional[date]:
+    """
+    Converts a string to a date object.
+
+    Args:
+        date_string (str): The string to convert.
+
+    Returns:
+        Optional[date]: The date object or None if the conversion failed.
+    """
+
+    global NAME
+
+    try:
+        return date.fromisoformat(date_string)
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to convert string to date.",
+        )
+        return None
+
+
+def str_to_datetime(datetime_string: str) -> Optional[datetime]:
+    """
+    Converts a string to a datetime object.
+
+    Args:
+        datetime_string (str): The string to convert.
+
+    Returns:
+        Optional[datetime]: The datetime object or None if the conversion failed.
+    """
+
+    global NAME
+
+    try:
+        return datetime.fromisoformat(datetime_string)
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to convert string to datetime.",
+        )
+        return None
+
+
 def write_file_bytes(
     data: bytes,
     path: Path,
@@ -525,13 +746,18 @@ def write_file_bytes(
         bool: True if the file was written successfully, False otherwise.
     """
 
-    global LOCK
+    global LOCK, NAME
 
     try:
         with LOCK:
             path.write_bytes(data=data)
         return True
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to write bytes to file.",
+        )
         return False
 
 
@@ -559,7 +785,12 @@ def write_file_json(
                 encoding="utf-8",
             )
         return True
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to write JSON to file.",
+        )
         return False
 
 
@@ -589,7 +820,12 @@ def write_file_str(
                 encoding=encoding,
             )
         return True
-    except Exception:
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to write string to file.",
+        )
         return False
 
 
