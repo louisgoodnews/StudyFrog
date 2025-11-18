@@ -3,10 +3,12 @@ Author: Louis Goodnews
 Date: 2025-11-16
 """
 
-from typing import Final
+from typing import Final, Literal
 
 
 # ---------- Constants ---------- #
+
+NAME: Final[Literal["gui.views.logic.edit_view_logic"]] = "gui.views.logic.edit_view_logic"
 
 
 # ---------- Functions ---------- #

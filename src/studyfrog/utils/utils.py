@@ -3,6 +3,7 @@ Author: Louis Goodnews
 Date: 2025-11-16
 """
 
+import json
 import sys
 import threading
 import tkinter
@@ -11,7 +12,7 @@ import uuid
 
 from datetime import date, datetime
 from pathlib import Path
-from typing import Final, Literal, Optional
+from typing import Any, Final, Literal, Optional
 
 
 # ---------- Constants ---------- #
@@ -178,6 +179,26 @@ def get_file_content_bytes(path: Path) -> Optional[bytes]:
     try:
         with LOCK:
             return path.read_bytes()
+    except Exception:
+        return None
+
+
+def get_file_content_json(path: Path) -> Optional[dict[str, Any]]:
+    """
+    Returns the content of a file as a JSON object.
+
+    Args:
+        path (Path): A Path object pointing to the location from which the file contents are to be read.
+
+    Returns:
+        Optional[dict[str, Any]]: The content of the file as a JSON object or None if reading the file fails.
+    """
+
+    global LOCK
+
+    try:
+        with LOCK:
+            return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return None
 
@@ -509,6 +530,34 @@ def write_file_bytes(
     try:
         with LOCK:
             path.write_bytes(data=data)
+        return True
+    except Exception:
+        return False
+
+
+def write_file_json(
+    data: dict[str, Any],
+    path: Path,
+) -> bool:
+    """
+    Writes a JSON object to a specified file.
+
+    Args:
+        data (dict[str, Any]): The data to write to the file.
+        path (Path): The path to the file.
+
+    Returns:
+        bool: True if the file was written successfully, False otherwise.
+    """
+
+    global LOCK
+
+    try:
+        with LOCK:
+            path.write_text(
+                data=json.dumps(data),
+                encoding="utf-8",
+            )
         return True
     except Exception:
         return False
