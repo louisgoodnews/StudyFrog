@@ -41,7 +41,7 @@ from utils.utils import (
 
 NAME: Final[Literal["core.storage"]] = "core.storage"
 
-TABLES: dict[str, Path] = {
+TABLE_FILES: dict[str, Path] = {
     "answers": ANSWERS_TABLE_FILE,
     "associations": ASSOCIATIONS_TABLE_FILE,
     "configs": CONFIGS_FILE,
@@ -438,10 +438,10 @@ def create_table_if_not_exists(
         bool: True if the table was created, False otherwise.
     """
 
-    global NAME, TABLES
+    global NAME, TABLE_FILES
 
     try:
-        if not ensure_json(path=TABLES[table_name]):
+        if not ensure_json(path=TABLE_FILES[table_name]):
             return False
 
         if not is_dict_empty(get_table_content(table_name=table_name)):
@@ -454,7 +454,7 @@ def create_table_if_not_exists(
                 "created_on": get_today_str(),
                 "entries": {"total": 0, "values": {}},
                 "metadata": {},
-                "name": TABLES[table_name].stem,
+                "name": TABLE_FILES[table_name].stem,
                 "schema": {"fields": {"total": 0, "values": []}},
                 "updated_at": get_now_str(),
                 "updated_on": get_today_str(),
@@ -940,10 +940,10 @@ def get_table_file_path(
         Exception: If there is an error retrieving the table file path.
     """
 
-    global NAME, TABLES
+    global NAME, TABLE_FILES
 
     try:
-        return TABLES[table_name]
+        return TABLE_FILES[table_name]
     except KeyError as e:
         log_exception(
             exception=e,
