@@ -42,7 +42,7 @@ NAME: Final[Literal["core.storage"]] = "core.storage"
 
 TABLES: dict[str, Path] = {
     "answers": ANSWERS_TABLE_FILE,
-    "config": CONFIG_FILE,
+    "configs": CONFIG_FILE,
     "customfields": CUSTOMFIELDS_TABLE_FILE,
     "difficulties": DIFFICULTIES_TABLE_FILE,
     "flashcards": FLASHCARDS_TABLE_FILE,
@@ -62,159 +62,11 @@ TABLES: dict[str, Path] = {
 # ---------- Functions ---------- #
 
 
-def count_entries_in_table(
-    name: Literal[
-        "answers",
-        "config",
-        "customfields",
-        "difficulties",
-        "flashcards",
-        "images",
-        "notes",
-        "priorities",
-        "questions",
-        "rehearsal_runs",
-        "rehearsal_run_items",
-        "stacks",
-        "subjects",
-        "teachers",
-        "users",
-    ],
-) -> int:
-    """
-    Counts the number of entries in the table.
-
-    Args:
-        name (Literal[...]): The name of the table. Can be one of:
-            - "answers"
-            - "config"
-            - "customfields"
-            - "difficulties"
-            - "flashcards"
-            - "images"
-            - "notes"
-            - "priorities"
-            - "questions"
-            - "rehearsal_runs"
-            - "rehearsal_run_items"
-            - "stacks"
-            - "subjects"
-            - "teachers"
-            - "users"
-
-    Returns:
-        int: The number of entries in the table.
-
-    Raises:
-        Exception: If there is an error counting the entries.
-    """
-
-    global NAME
-
-    try:
-        return (
-            get_table_content(name=name)
-            .get(
-                "entries",
-                {},
-            )
-            .get(
-                "total",
-                0,
-            )
-        )
-    except Exception as e:
-        log_exception(
-            exception=e,
-            name=NAME,
-            message=f"Failed to count entries in table with name '{name}'.",
-        )
-        return 0
-
-
-def create_table_if_not_exists(
-    name: Literal[
-        "answers",
-        "config",
-        "customfields",
-        "difficulties",
-        "flashcards",
-        "images",
-        "notes",
-        "priorities",
-        "questions",
-        "rehearsal_runs",
-        "rehearsal_run_items",
-        "stacks",
-        "subjects",
-        "teachers",
-        "users",
-    ],
-) -> bool:
-    """
-    Creates a table if it doesn't exist.
-
-    Args:
-        name (Literal[...]): The name of the table. Can be one of:
-            - "answers"
-            - "config"
-            - "customfields"
-            - "difficulties"
-            - "flashcards"
-            - "images"
-            - "notes"
-            - "priorities"
-            - "questions"
-            - "rehearsal_runs"
-            - "rehearsal_run_items"
-            - "stacks"
-            - "subjects"
-            - "teachers"
-            - "users"
-
-    Returns:
-        bool: True if the table was created, False otherwise.
-    """
-
-    global NAME, TABLES
-
-    try:
-        if not ensure_json(path=TABLES[name]):
-            return False
-
-        if not is_dict_empty(get_table_content(name=name)):
-            return False
-
-        write_table_content(
-            name=name,
-            table={
-                "created_at": get_now_str(),
-                "created_on": get_today_str(),
-                "entries": {"total": 0, "values": {}},
-                "metadata": {},
-                "name": TABLES[name].stem,
-                "schema": {"fields": {"total": 0, "values": []}},
-                "updated_at": get_now_str(),
-                "updated_on": get_today_str(),
-                "uuid": get_uuid_str(),
-            },
-        )
-
-        return True
-    except Exception as e:
-        log_exception(
-            exception=e,
-            name=NAME,
-            message=f"Failed to create table with name '{name}'.",
-        )
-        return False
-
-
 def add_table_entry(
     entry: dict[str, Any],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -235,9 +87,9 @@ def add_table_entry(
 
     Args:
         entry (dict[str, Any]): The entry to add.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -262,7 +114,7 @@ def add_table_entry(
     global NAME
 
     try:
-        table: dict[str, Any] = get_table_content(name=name)
+        table: dict[str, Any] = get_table_content(table_name=table_name)
 
         new_id: int = int(
             table.get("entries", {}).get(
@@ -274,14 +126,14 @@ def add_table_entry(
         entry["created_at"] = get_now_str()
         entry["created_on"] = get_today_str()
         entry["id"] = new_id
-        entry["key"] = f"{name.upper()}_{new_id}"
+        entry["key"] = f"{entry['type'].upper()}_{new_id}"
         entry["updated_at"] = get_now_str()
         entry["updated_on"] = get_today_str()
 
         table["entries"]["values"][str(new_id)] = entry
 
-        table["schema"]["fields"]["values"] = list(
-            set(table["schema"]["fields"]["values"] + list(entry.keys()))
+        table["schema"]["fields"]["values"] = sorted(
+            list(set(table["schema"]["fields"]["values"] + list(entry.keys())))
         )
 
         table["schema"]["fields"]["total"] = len(table["schema"]["fields"]["values"])
@@ -289,7 +141,7 @@ def add_table_entry(
         table["entries"]["total"] = new_id + 1
 
         write_table_content(
-            name=name,
+            table_name=table_name,
             table=table,
         )
 
@@ -298,16 +150,16 @@ def add_table_entry(
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to add entry to table with name '{name}'.",
+            message=f"Failed to add entry to table with name '{table_name}'.",
         )
         raise e
 
 
 def add_table_entry_if_not_exists(
     entry: dict[str, Any],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -328,9 +180,9 @@ def add_table_entry_if_not_exists(
 
     Args:
         entry (dict[str, Any]): The entry to add.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -356,14 +208,30 @@ def add_table_entry_if_not_exists(
 
     try:
         filtered_entries: list[dict[str, Any]] = filter_table_entries(
-            name=name,
-            **entry,
+            table_name=table_name,
+            **{
+                key: value
+                for (
+                    key,
+                    value,
+                ) in entry.items()
+                if not key
+                in {
+                    "created_at",
+                    "created_on",
+                    "id",
+                    "key",
+                    "updated_at",
+                    "updated_on",
+                    "uuid",
+                }
+            },
         )
 
         if not filtered_entries:
             return add_table_entry(
                 entry=entry,
-                name=name,
+                table_name=table_name,
             )
 
         return filtered_entries[0]["id"]
@@ -371,16 +239,16 @@ def add_table_entry_if_not_exists(
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to add entry to table with name '{name}'.",
+            message=f"Failed to add entry to table with name '{table_name}'.",
         )
         raise e
 
 
 def add_table_entries(
     entries: list[dict[str, Any]],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -401,9 +269,9 @@ def add_table_entries(
 
     Args:
         entries (list[dict[str, Any]]): The entries to add.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -431,7 +299,7 @@ def add_table_entries(
         return [
             add_table_entry(
                 entry=entry,
-                name=name,
+                table_name=table_name,
             )
             for entry in entries
         ]
@@ -439,15 +307,163 @@ def add_table_entries(
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to add entries to table with name '{name}'.",
+            message=f"Failed to add entries to table with name '{table_name}'.",
         )
         raise e
 
 
-def empty_table(
-    name: Literal[
+def count_entries_in_table(
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
+        "customfields",
+        "difficulties",
+        "flashcards",
+        "images",
+        "notes",
+        "priorities",
+        "questions",
+        "rehearsal_runs",
+        "rehearsal_run_items",
+        "stacks",
+        "subjects",
+        "teachers",
+        "users",
+    ],
+) -> int:
+    """
+    Counts the number of entries in the table.
+
+    Args:
+        table_name (Literal[...]): The name of the table. Can be one of:
+            - "answers"
+            - "configs"
+            - "customfields"
+            - "difficulties"
+            - "flashcards"
+            - "images"
+            - "notes"
+            - "priorities"
+            - "questions"
+            - "rehearsal_runs"
+            - "rehearsal_run_items"
+            - "stacks"
+            - "subjects"
+            - "teachers"
+            - "users"
+
+    Returns:
+        int: The number of entries in the table.
+
+    Raises:
+        Exception: If there is an error counting the entries.
+    """
+
+    global NAME
+
+    try:
+        return (
+            get_table_content(table_name=table_name)
+            .get(
+                "entries",
+                {},
+            )
+            .get(
+                "total",
+                0,
+            )
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to count entries in table with name '{table_name}'.",
+        )
+        return 0
+
+
+def create_table_if_not_exists(
+    table_name: Literal[
+        "answers",
+        "configs",
+        "customfields",
+        "difficulties",
+        "flashcards",
+        "images",
+        "notes",
+        "priorities",
+        "questions",
+        "rehearsal_runs",
+        "rehearsal_run_items",
+        "stacks",
+        "subjects",
+        "teachers",
+        "users",
+    ],
+) -> bool:
+    """
+    Creates a table if it doesn't exist.
+
+    Args:
+        table_name (Literal[...]): The name of the table. Can be one of:
+            - "answers"
+            - "configs"
+            - "customfields"
+            - "difficulties"
+            - "flashcards"
+            - "images"
+            - "notes"
+            - "priorities"
+            - "questions"
+            - "rehearsal_runs"
+            - "rehearsal_run_items"
+            - "stacks"
+            - "subjects"
+            - "teachers"
+            - "users"
+
+    Returns:
+        bool: True if the table was created, False otherwise.
+    """
+
+    global NAME, TABLES
+
+    try:
+        if not ensure_json(path=TABLES[table_name]):
+            return False
+
+        if not is_dict_empty(get_table_content(table_name=table_name)):
+            return False
+
+        write_table_content(
+            table_name=table_name,
+            table={
+                "created_at": get_now_str(),
+                "created_on": get_today_str(),
+                "entries": {"total": 0, "values": {}},
+                "metadata": {},
+                "name": TABLES[table_name].stem,
+                "schema": {"fields": {"total": 0, "values": []}},
+                "updated_at": get_now_str(),
+                "updated_on": get_today_str(),
+                "uuid": get_uuid_str(),
+            },
+        )
+
+        return True
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to create table with name '{table_name}'.",
+        )
+        return False
+
+
+def empty_table(
+    table_name: Literal[
+        "answers",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -467,9 +483,9 @@ def empty_table(
     Empties the table.
 
     Args:
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -491,28 +507,28 @@ def empty_table(
     global NAME
 
     try:
-        table: dict[str, Any] = get_table_content(name=name)
+        table: dict[str, Any] = get_table_content(table_name=table_name)
 
         table["entries"]["values"] = {}
         table["entries"]["total"] = 0
 
         return write_table_content(
-            name=name,
+            table_name=table_name,
             table=table,
         )
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to empty table with name '{name}'.",
+            message=f"Failed to empty table with name '{table_name}'.",
         )
         return False
 
 
 def filter_table_entries(
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -533,9 +549,9 @@ def filter_table_entries(
     Filters the entries in the table.
 
     Args:
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -567,22 +583,22 @@ def filter_table_entries(
                         value,
                     ) in kwargs.items()
                 ),
-                get_all_table_entries(name=name),
+                get_all_table_entries(table_name=table_name),
             )
         )
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to filter entries in table with name '{name}'.",
+            message=f"Failed to filter entries in table with name '{table_name}'.",
         )
         return []
 
 
 def get_all_table_entries(
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -602,9 +618,9 @@ def get_all_table_entries(
     Gets all entries from the table.
 
     Args:
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -627,7 +643,7 @@ def get_all_table_entries(
 
     try:
         return (
-            get_table_content(name=name)
+            get_table_content(table_name=table_name)
             .get(
                 "entries",
                 {},
@@ -642,16 +658,16 @@ def get_all_table_entries(
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to get all entries from table with name '{name}'.",
+            message=f"Failed to get all entries from table with name '{table_name}'.",
         )
         return []
 
 
 def get_table_entry(
     id: Union[int, str],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -672,9 +688,9 @@ def get_table_entry(
 
     Args:
         id (Union[int, str]): The ID of the entry to retrieve.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -705,7 +721,7 @@ def get_table_entry(
             id = str(id)
 
         return (
-            get_table_content(name=name)
+            get_table_content(table_name=table_name)
             .get(
                 "entries",
                 {},
@@ -723,16 +739,16 @@ def get_table_entry(
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to get entry with ID '{id}' from table with name '{name}'.",
+            message=f"Failed to get entry with ID '{id}' from table with name '{table_name}'.",
         )
         return {}
 
 
 def get_table_entries(
     ids: list[Union[int, str]],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -752,9 +768,9 @@ def get_table_entries(
 
     Args:
         ids (list[Union[int, str]]): The IDs of the entries to retrieve.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -781,7 +797,7 @@ def get_table_entries(
         return [
             get_table_entry(
                 id=id,
-                name=name,
+                table_name=table_name,
             )
             for id in ids
         ]
@@ -789,15 +805,15 @@ def get_table_entries(
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to get entries with IDs '{ids}' from table with name '{name}'.",
+            message=f"Failed to get entries with IDs '{ids}' from table with name '{table_name}'.",
         )
         return []
 
 
 def get_table_content(
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -816,9 +832,9 @@ def get_table_content(
     Returns the content of the table.
 
     Args:
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -842,21 +858,21 @@ def get_table_content(
     global NAME
 
     try:
-        ensure_json(path=get_table_file_path(name=name))
-        return get_file_content_json(path=get_table_file_path(name=name))
+        ensure_json(path=get_table_file_path(table_name=table_name))
+        return get_file_content_json(path=get_table_file_path(table_name=table_name))
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to get content of table with name '{name}'.",
+            message=f"Failed to get content of table with name '{table_name}'.",
         )
         return {}
 
 
 def get_table_file_path(
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -875,9 +891,9 @@ def get_table_file_path(
     Returns the path to the table file.
 
     Args:
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -901,27 +917,27 @@ def get_table_file_path(
     global NAME, TABLES
 
     try:
-        return TABLES[name]
+        return TABLES[table_name]
     except KeyError as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to get file path for table with name '{name}'.",
+            message=f"Failed to get file path for table with name '{table_name}'.",
         )
         raise e
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to get file path for table with name '{name}'.",
+            message=f"Failed to get file path for table with name '{table_name}'.",
         )
         raise e
 
 
 def is_table_empty(
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -940,9 +956,9 @@ def is_table_empty(
     Returns True if the table is empty, False otherwise.
 
     Args:
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -963,21 +979,21 @@ def is_table_empty(
     global NAME
 
     try:
-        return is_dict_empty(dictionary=get_table_content(name=name))
+        return is_dict_empty(dictionary=get_table_content(table_name=table_name))
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to check if table with name '{name}' is empty.",
+            message=f"Failed to check if table with name '{table_name}' is empty.",
         )
         return False
 
 
 def remove_table_entry(
     id: Union[int, str],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -997,9 +1013,9 @@ def remove_table_entry(
 
     Args:
         id (Union[int, str]): The ID of the entry to remove.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -1023,30 +1039,30 @@ def remove_table_entry(
     global NAME
 
     try:
-        table: dict[str, Any] = get_table_content(name=name)
+        table: dict[str, Any] = get_table_content(table_name=table_name)
 
         table["entries"]["values"].pop(str(id), None)
 
         table["entries"]["total"] -= 1
 
         return write_table_content(
-            name=name,
+            table_name=table_name,
             table=table,
         )
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to remove entry with ID '{id}' from table with name '{name}'.",
+            message=f"Failed to remove entry with ID '{id}' from table with name '{table_name}'.",
         )
         return False
 
 
 def remove_table_entries(
     ids: list[Union[int, str]],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -1066,9 +1082,9 @@ def remove_table_entries(
 
     Args:
         ids (list[Union[int, str]]): The IDs of the entries to remove.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -1096,7 +1112,7 @@ def remove_table_entries(
         return [
             remove_table_entry(
                 id=id,
-                name=name,
+                table_name=table_name,
             )
             for id in ids
         ]
@@ -1104,7 +1120,7 @@ def remove_table_entries(
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to remove entries with IDs '{ids}' from table with name '{name}'.",
+            message=f"Failed to remove entries with IDs '{ids}' from table with name '{table_name}'.",
         )
         return []
 
@@ -1112,9 +1128,9 @@ def remove_table_entries(
 def update_table_entry(
     entry: dict[str, Any],
     id: Union[int, str],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -1136,9 +1152,9 @@ def update_table_entry(
     Args:
         entry (dict[str, Any]): The entry to update.
         id (Union[int, str]): The ID of the entry to update.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -1163,7 +1179,7 @@ def update_table_entry(
     global NAME
 
     try:
-        table: dict[str, Any] = get_table_content(name=name)
+        table: dict[str, Any] = get_table_content(table_name=table_name)
 
         if not is_key_in_dict(
             key=str(id),
@@ -1176,21 +1192,21 @@ def update_table_entry(
 
         table["entries"]["values"][str(id)] = entry
 
-        table["schema"]["fields"]["values"] = list(
-            set(table["schema"]["fields"]["values"] + list(entry.keys()))
+        table["schema"]["fields"]["values"] = sorted(
+            list(set(table["schema"]["fields"]["values"] + list(entry.keys())))
         )
 
         table["schema"]["fields"]["total"] = len(table["schema"]["fields"]["values"])
 
         return write_table_content(
-            name=name,
+            table_name=table_name,
             table=table,
         )
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to update entry with ID '{id}' in table with name '{name}'.",
+            message=f"Failed to update entry with ID '{id}' in table with name '{table_name}'.",
         )
         return False
 
@@ -1198,9 +1214,9 @@ def update_table_entry(
 def update_table_entries(
     entries: list[dict[str, Any]],
     ids: list[Union[int, str]],
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -1221,9 +1237,9 @@ def update_table_entries(
     Args:
         entries (list[dict[str, Any]]): The entries to update.
         ids (list[Union[int, str]]): The IDs of the entries to update.
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -1253,7 +1269,7 @@ def update_table_entries(
             update_table_entry(
                 entry=entry,
                 id=id,
-                name=name,
+                table_name=table_name,
             )
             for entry, id in zip(
                 entries,
@@ -1265,22 +1281,22 @@ def update_table_entries(
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to update entries with IDs '{ids}' in table with name '{name}'.",
+            message=f"Failed to update entries with IDs '{ids}' in table with name '{table_name}'.",
         )
         raise e
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to update entries with IDs '{ids}' in table with name '{name}'.",
+            message=f"Failed to update entries with IDs '{ids}' in table with name '{table_name}'.",
         )
         raise e
 
 
 def write_table_content(
-    name: Literal[
+    table_name: Literal[
         "answers",
-        "config",
+        "configs",
         "customfields",
         "difficulties",
         "flashcards",
@@ -1300,9 +1316,9 @@ def write_table_content(
     Writes the content of the table to a file.
 
     Args:
-        name (Literal[...]): The name of the table. Can be one of:
+        table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
-            - "config"
+            - "configs"
             - "customfields"
             - "difficulties"
             - "flashcards"
@@ -1328,16 +1344,16 @@ def write_table_content(
     global NAME
 
     try:
-        ensure_json(path=get_table_file_path(name=name))
+        ensure_json(path=get_table_file_path(table_name=table_name))
         return write_file_json(
             data=table,
-            path=get_table_file_path(name=name),
+            path=get_table_file_path(table_name=table_name),
         )
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
-            message=f"Failed to write table content to file with name '{name}'.",
+            message=f"Failed to write table content to file with name '{table_name}'.",
         )
         return False
 

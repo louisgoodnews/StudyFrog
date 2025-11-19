@@ -493,6 +493,7 @@ def get_teacher(
 
 
 def get_user(
+    name: str,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
@@ -501,6 +502,7 @@ def get_user(
 
     Args:
         customfields (Optional[dict[str, Any]]): The user's custom fields.
+        name (str): The user's name.
         **kwargs (dict[str, Any]): Additional keywords to pass to the user's attributes.
 
     Returns:
@@ -511,6 +513,8 @@ def get_user(
         customfields = {}
 
     kwargs["customfields"] = customfields
+
+    kwargs["name"] = name
 
     kwargs["type"] = "USER"
 

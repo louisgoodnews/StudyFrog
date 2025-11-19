@@ -290,6 +290,39 @@ def get_home() -> Path:
     return Path.home()
 
 
+def get_length_of_obj(obj: Any) -> int:
+    """
+    Returns the length of an object.
+
+    Args:
+        obj (Any): The object to get the length of.
+
+    Returns:
+        int: The length of the object.
+
+    Raises:
+        ValueError: If the object has no length.
+    """
+
+    global NAME
+
+    try:
+        if not hasattr(
+            obj,
+            "__len__",
+        ):
+            raise ValueError("Object has no length.")
+
+        return len(obj)
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to get length of object.",
+        )
+        return None
+
+
 def get_now() -> datetime:
     """
     Returns the current date and time.
@@ -330,6 +363,20 @@ def get_platform() -> Literal["darwin", "linux", "windows"]:
     """
 
     return sys.platform.lower()
+
+
+def get_size_of_obj(obj: Any) -> int:
+    """
+    Returns the size of an object in bytes.
+
+    Args:
+        obj (Any): The object to get the size of.
+
+    Returns:
+        int: The size of the object in bytes.
+    """
+
+    return sys.getsizeof(obj)
 
 
 def get_today() -> date:
@@ -400,6 +447,39 @@ def get_widget_children(widget: tkinter.Widget) -> list[tkinter.Widget]:
     """
 
     return widget.winfo_children()
+
+
+def invert_dict(dictionary: dict[str, Any]) -> dict[Any, str]:
+    """
+    Returns the inverse of a dictionary.
+
+    Args:
+        dictionary (dict[str, Any]): The dictionary to invert.
+
+    Returns:
+        dict[Any, str]: The inverse of the passed dictionary.
+
+    Raises:
+        Exception: If inversion of the dictionary fails.
+    """
+
+    global NAME
+
+    try:
+        return {
+            value: key
+            for (
+                key,
+                value,
+            ) in dictionary.items()
+        }
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to invert dictionary.",
+        )
+        return None
 
 
 def is_dict_empty(dictionary: dict[str, Any]) -> bool:
@@ -681,6 +761,26 @@ def log_warning(
         message=message,
         name=name,
     )
+
+
+def pluralize_str(string: str) -> str:
+    """
+    Pluralizes a string.
+
+    Args:
+        string (str): The string to pluralize.
+
+    Returns:
+        str: The pluralized string.
+    """
+
+    if string.endswith("y"):
+        return string[:-1] + "ies"
+
+    if string.endswith("s"):
+        return string + "es"
+
+    return string + "s"
 
 
 def str_to_date(date_string: str) -> Optional[date]:

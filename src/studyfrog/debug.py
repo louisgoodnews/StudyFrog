@@ -7,7 +7,7 @@ Date: 2025-11-16
 def debug() -> None:
     """
     Entrypoint for debugging the StudyFrog project.
-    
+
     Args:
         None
 
@@ -26,4 +26,3 @@ def debug() -> None:
 
 if __name__ == "__main__":
     debug()
-

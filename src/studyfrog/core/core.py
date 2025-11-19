@@ -31,7 +31,17 @@ from common.constants import (
     TEACHERS_TABLE_FILE,
     USERS_TABLE_FILE,
 )
-from core.storage import create_table_if_not_exists
+from core.defaults import (
+    EASY_DIFFICULTY,
+    HARD_DIFFICULTY,
+    HIGH_PRIORITY,
+    HIGHEST_PRIORITY,
+    LOW_PRIORITY,
+    LOWEST_PRIORITY,
+    MEDIUM_DIFFICULTY,
+    STUDY_FROG_USER,
+)
+from core.storage import add_table_entry_if_not_exists, create_table_if_not_exists
 from gui.gui import (
     get_bottom_frame,
     get_center_frame,
@@ -43,7 +53,7 @@ from gui.gui import (
     get_view_menu,
 )
 from gui.views.views import get_view
-from utils.utils import ensure_dir, ensure_json, log_exception, log_info
+from utils.utils import ensure_dir, ensure_json, log_exception, log_info, pluralize_str
 
 
 # ---------- Constants ---------- #
@@ -76,6 +86,21 @@ def ensure_defaults() -> None:
     )
 
     try:
+        for dictionary in (
+            EASY_DIFFICULTY,
+            HARD_DIFFICULTY,
+            HIGH_PRIORITY,
+            HIGHEST_PRIORITY,
+            LOW_PRIORITY,
+            LOWEST_PRIORITY,
+            MEDIUM_DIFFICULTY,
+            STUDY_FROG_USER,
+        ):
+            add_table_entry_if_not_exists(
+                entry=dictionary,
+                table_name=pluralize_str(string=dictionary["type"].lower()),
+            )
+
         log_info(
             message="Defaults ensured.",
             name=NAME,
@@ -275,7 +300,7 @@ def initialize_tables() -> None:
             TEACHERS_TABLE_FILE,
             USERS_TABLE_FILE,
         ]:
-            create_table_if_not_exists(name=path.stem)
+            create_table_if_not_exists(table_name=path.stem)
 
         log_info(
             message="Tables initialized.",
@@ -312,6 +337,7 @@ def run_post_start_tasks() -> None:
     )
 
     try:
+        ensure_defaults()
         log_info(
             message="Post-start tasks completed.",
             name=NAME,
@@ -383,7 +409,6 @@ def run_pre_start_tasks() -> None:
     )
 
     try:
-        ensure_defaults()
         initialize_directories()
         initialize_files()
         initialize_gui()
