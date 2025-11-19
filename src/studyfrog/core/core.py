@@ -16,7 +16,8 @@ from common.constants import (
     RESOURCES_DIR,
     TEMP_DIR,
     ANSWERS_TABLE_FILE,
-    CONFIG_FILE,
+    ASSOCIATIONS_TABLE_FILE,
+    CONFIGS_FILE,
     CUSTOMFIELDS_TABLE_FILE,
     DIFFICULTIES_TABLE_FILE,
     FLASHCARDS_TABLE_FILE,
@@ -186,7 +187,8 @@ def initialize_files() -> None:
     try:
         for path in [
             ANSWERS_TABLE_FILE,
-            CONFIG_FILE,
+            ASSOCIATIONS_TABLE_FILE,
+            CONFIGS_FILE,
             CUSTOMFIELDS_TABLE_FILE,
             DIFFICULTIES_TABLE_FILE,
             FLASHCARDS_TABLE_FILE,
@@ -285,7 +287,8 @@ def initialize_tables() -> None:
     try:
         for path in [
             ANSWERS_TABLE_FILE,
-            CONFIG_FILE,
+            ASSOCIATIONS_TABLE_FILE,
+            CONFIGS_FILE,
             CUSTOMFIELDS_TABLE_FILE,
             DIFFICULTIES_TABLE_FILE,
             FLASHCARDS_TABLE_FILE,

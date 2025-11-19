@@ -8,7 +8,8 @@ from typing import Any, Final, Literal, Union
 
 from common.constants import (
     ANSWERS_TABLE_FILE,
-    CONFIG_FILE,
+    ASSOCIATIONS_TABLE_FILE,
+    CONFIGS_FILE,
     CUSTOMFIELDS_TABLE_FILE,
     DIFFICULTIES_TABLE_FILE,
     FLASHCARDS_TABLE_FILE,
@@ -42,7 +43,8 @@ NAME: Final[Literal["core.storage"]] = "core.storage"
 
 TABLES: dict[str, Path] = {
     "answers": ANSWERS_TABLE_FILE,
-    "configs": CONFIG_FILE,
+    "associations": ASSOCIATIONS_TABLE_FILE,
+    "configs": CONFIGS_FILE,
     "customfields": CUSTOMFIELDS_TABLE_FILE,
     "difficulties": DIFFICULTIES_TABLE_FILE,
     "flashcards": FLASHCARDS_TABLE_FILE,
@@ -66,6 +68,7 @@ def add_table_entry(
     entry: dict[str, Any],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -89,6 +92,7 @@ def add_table_entry(
         entry (dict[str, Any]): The entry to add.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -159,6 +163,7 @@ def add_table_entry_if_not_exists(
     entry: dict[str, Any],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -182,6 +187,7 @@ def add_table_entry_if_not_exists(
         entry (dict[str, Any]): The entry to add.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -248,6 +254,7 @@ def add_table_entries(
     entries: list[dict[str, Any]],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -271,6 +278,7 @@ def add_table_entries(
         entries (list[dict[str, Any]]): The entries to add.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -315,6 +323,7 @@ def add_table_entries(
 def count_entries_in_table(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -337,6 +346,7 @@ def count_entries_in_table(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -385,6 +395,7 @@ def count_entries_in_table(
 def create_table_if_not_exists(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -407,6 +418,7 @@ def create_table_if_not_exists(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -463,6 +475,7 @@ def create_table_if_not_exists(
 def empty_table(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -485,6 +498,7 @@ def empty_table(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -528,6 +542,7 @@ def empty_table(
 def filter_table_entries(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -551,6 +566,7 @@ def filter_table_entries(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -598,6 +614,7 @@ def filter_table_entries(
 def get_all_table_entries(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -620,6 +637,7 @@ def get_all_table_entries(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -667,6 +685,7 @@ def get_table_entry(
     id: Union[int, str],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -690,6 +709,7 @@ def get_table_entry(
         id (Union[int, str]): The ID of the entry to retrieve.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -748,6 +768,7 @@ def get_table_entries(
     ids: list[Union[int, str]],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -770,6 +791,7 @@ def get_table_entries(
         ids (list[Union[int, str]]): The IDs of the entries to retrieve.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -813,6 +835,7 @@ def get_table_entries(
 def get_table_content(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -834,6 +857,7 @@ def get_table_content(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -872,6 +896,7 @@ def get_table_content(
 def get_table_file_path(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -893,6 +918,7 @@ def get_table_file_path(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -937,6 +963,7 @@ def get_table_file_path(
 def is_table_empty(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -958,6 +985,7 @@ def is_table_empty(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -993,6 +1021,7 @@ def remove_table_entry(
     id: Union[int, str],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -1015,6 +1044,7 @@ def remove_table_entry(
         id (Union[int, str]): The ID of the entry to remove.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -1062,6 +1092,7 @@ def remove_table_entries(
     ids: list[Union[int, str]],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -1084,6 +1115,7 @@ def remove_table_entries(
         ids (list[Union[int, str]]): The IDs of the entries to remove.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -1130,6 +1162,7 @@ def update_table_entry(
     id: Union[int, str],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -1154,6 +1187,7 @@ def update_table_entry(
         id (Union[int, str]): The ID of the entry to update.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -1216,6 +1250,7 @@ def update_table_entries(
     ids: list[Union[int, str]],
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -1239,6 +1274,7 @@ def update_table_entries(
         ids (list[Union[int, str]]): The IDs of the entries to update.
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"
@@ -1296,6 +1332,7 @@ def update_table_entries(
 def write_table_content(
     table_name: Literal[
         "answers",
+        "associations",
         "configs",
         "customfields",
         "difficulties",
@@ -1318,6 +1355,7 @@ def write_table_content(
     Args:
         table_name (Literal[...]): The name of the table. Can be one of:
             - "answers"
+            - "associations"
             - "configs"
             - "customfields"
             - "difficulties"

@@ -73,6 +73,66 @@ def get_answer(
     return _get_object_dict(**kwargs)
 
 
+def get_association(
+    answer: Union[int, list[Union[int, str]], str],
+    customfield: Union[int, list[Union[int, str]], str],
+    difficulty: Union[int, list[Union[int, str]], str],
+    flashcard: Union[int, list[Union[int, str]], str],
+    image: Union[int, list[Union[int, str]], str],
+    note: Union[int, list[Union[int, str]], str],
+    option: Union[int, list[Union[int, str]], str],
+    priority: Union[int, list[Union[int, str]], str],
+    question: Union[int, list[Union[int, str]], str],
+    rehearsal_run: Union[int, list[Union[int, str]], str],
+    rehearsal_run_item: Union[int, list[Union[int, str]], str],
+    stack: Union[int, list[Union[int, str]], str],
+    subject: Union[int, list[Union[int, str]], str],
+    teacher: Union[int, list[Union[int, str]], str],
+    **kwargs,
+) -> dict[str, Any]:
+    """
+    Returns a dictionary containing an association's attributes.
+
+    Args:
+        answer (Union[int, list[Union[int, str]], str]): The association's answer.
+        customfield (Union[int, list[Union[int, str]], str]): The association's custom field.
+        difficulty (Union[int, list[Union[int, str]], str]): The association's difficulty.
+        flashcard (Union[int, list[Union[int, str]], str]): The association's flashcard.
+        image (Union[int, list[Union[int, str]], str]): The association's image.
+        note (Union[int, list[Union[int, str]], str]): The association's note.
+        option (Union[int, list[Union[int, str]], str]): The association's option.
+        priority (Union[int, list[Union[int, str]], str]): The association's priority.
+        question (Union[int, list[Union[int, str]], str]): The association's question.
+        rehearsal_run (Union[int, list[Union[int, str]], str]): The association's rehearsal run.
+        rehearsal_run_item (Union[int, list[Union[int, str]], str]): The association's rehearsal run item.
+        stack (Union[int, list[Union[int, str]], str]): The association's stack.
+        subject (Union[int, list[Union[int, str]], str]): The association's subject.
+        teacher (Union[int, list[Union[int, str]], str]): The association's teacher.
+        **kwargs (dict[str, Any]): Additional keywords to pass to the association's attributes.
+
+    Returns:
+        dict[str, Any]: A dictionary containing an association's attributes.
+    """
+
+    kwargs["answer"] = answer
+    kwargs["customfield"] = customfield
+    kwargs["difficulty"] = difficulty
+    kwargs["flashcard"] = flashcard
+    kwargs["image"] = image
+    kwargs["note"] = note
+    kwargs["option"] = option
+    kwargs["priority"] = priority
+    kwargs["question"] = question
+    kwargs["rehearsal_run"] = rehearsal_run
+    kwargs["rehearsal_run_item"] = rehearsal_run_item
+    kwargs["stack"] = stack
+    kwargs["subject"] = subject
+    kwargs["teacher"] = teacher
+    kwargs["type"] = "ASSOCIATION"
+
+    return _get_object_dict(**kwargs)
+
+
 def get_customfield(
     name: str,
     customfields: Optional[dict[str, Any]] = None,

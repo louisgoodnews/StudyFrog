@@ -26,7 +26,7 @@ BACKUP_DIR: Final[Path] = LOCAL_DIR / "backup"
 
 CACHE_DIR: Final[Path] = LOCAL_DIR / "cache"
 
-CONFIG_DIR: Final[Path] = LOCAL_DIR / "config"
+CONFIG_DIR: Final[Path] = LOCAL_DIR / "configs"
 
 DATA_DIR: Final[Path] = LOCAL_DIR / "data"
 
@@ -42,7 +42,9 @@ TEMP_DIR: Final[Path] = LOCAL_DIR / "temp"
 
 ANSWERS_TABLE_FILE: Final[Path] = DATA_DIR / "answers.json"
 
-CONFIG_FILE: Final[Path] = CONFIG_DIR / "config.json"
+ASSOCIATIONS_TABLE_FILE: Final[Path] = DATA_DIR / "associations.json"
+
+CONFIGS_FILE: Final[Path] = CONFIG_DIR / "configs.json"
 
 CUSTOMFIELDS_TABLE_FILE: Final[Path] = DATA_DIR / "customfields.json"
 
