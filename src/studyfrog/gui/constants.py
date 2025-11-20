@@ -30,11 +30,29 @@ DEFAULT_FONT_FAMILY: Final[Literal["Helvetica"]] = "Helvetica"
 
 DEFAULT_FONT_SIZE: Final[int] = 12
 
-DEFAULT_FONT_WEIGHT: Final[Literal["normal", "bold"]] = "normal"
+SMALL_FONT_SIZE: Final[int] = 10
 
-DEFAULT_FONT: Final[tuple[str, int, Literal["normal", "bold"]]] = (
+LARGE_FONT_SIZE: Final[int] = 16
+
+BOLD_FONT_WEIGHT: Final[Literal["bold"]] = "bold"
+
+DEFAULT_FONT_WEIGHT: Final[Literal["normal"]] = "normal"
+
+DEFAULT_FONT: Final[tuple[str, int, Literal["normal"]]] = (
     DEFAULT_FONT_FAMILY,
     DEFAULT_FONT_SIZE,
+    DEFAULT_FONT_WEIGHT,
+)
+
+SMALL_FONT: Final[tuple[str, int, Literal["normal"]]] = (
+    DEFAULT_FONT_FAMILY,
+    SMALL_FONT_SIZE,
+    DEFAULT_FONT_WEIGHT,
+)
+
+LARGE_FONT: Final[tuple[str, int, Literal["normal"]]] = (
+    DEFAULT_FONT_FAMILY,
+    LARGE_FONT_SIZE,
     DEFAULT_FONT_WEIGHT,
 )
 
@@ -70,8 +88,16 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         },
     },
     "label": {
-        "dark": {"font": DEFAULT_FONT},
-        "light": {"font": DEFAULT_FONT},
+        "dark": {
+            "background": DARK_SECONDARY,
+            "bg": DARK_SECONDARY,
+            "font": DEFAULT_FONT,
+            "foreground": WHITE,
+            "fg": WHITE,
+        },
+        "light": {
+            "font": DEFAULT_FONT,
+        },
     },
     "menu": {
         "dark": {
@@ -93,6 +119,16 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         "dark": {"background": DARK_SECONDARY},
         "light": {"background": WHITE},
     },
+    "toplevel": {
+        "dark": {
+            "background": DARK_SECONDARY,
+            "bg": DARK_SECONDARY,
+        },
+        "light": {
+            "background": WHITE,
+            "bg": WHITE,
+        },
+    },
     "window": {
         "dark": {
             "background": DARK_SECONDARY,
@@ -104,6 +140,8 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         },
     },
 }
+
+TOAST_GEOMETRY: Final[Literal["400x200+100+100"]] = "400x200+100+100"
 
 TOPLEVEL_GEOMETRY: Final[Literal["960x540+0+0"]] = "960x540+0+0"
 

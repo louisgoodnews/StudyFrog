@@ -9,8 +9,8 @@ from tkinter.constants import NSEW
 from typing import Final, Literal, Optional
 
 from gui.constants import TOPLEVEL_GEOMETRY
-from gui.factory import get_frame
-from utils.utils import destroy_widget_children, log_exception
+from gui.factory import get_frame, get_success_toast
+from utils.utils import destroy_widget_children, log_exception, log_info
 
 
 # ---------- Constants ---------- #
@@ -48,7 +48,7 @@ def clear_bottom_frame() -> None:
             message="Failed to clear bottom frame",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to clear bottom frame: {e}") from e
 
 
 def clear_center_frame() -> None:
@@ -70,7 +70,7 @@ def clear_center_frame() -> None:
             message="Failed to clear center frame",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to clear center frame: {e}") from e
 
 
 def clear_top_frame() -> None:
@@ -92,7 +92,7 @@ def clear_top_frame() -> None:
             message="Failed to clear top frame",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to clear top frame: {e}") from e
 
 
 def clear_widgets() -> None:
@@ -116,7 +116,7 @@ def clear_widgets() -> None:
             message="Failed to clear widgets",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to clear widgets: {e}") from e
 
 
 def configure_bottom_frame_grid() -> None:
@@ -138,7 +138,7 @@ def configure_bottom_frame_grid() -> None:
             message="Failed to configure bottom frame grid",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to configure bottom frame grid: {e}") from e
 
 
 def configure_center_frame_grid() -> None:
@@ -160,7 +160,7 @@ def configure_center_frame_grid() -> None:
             message="Failed to configure center frame grid",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to configure center frame grid: {e}") from e
 
 
 def configure_grid() -> None:
@@ -184,7 +184,7 @@ def configure_grid() -> None:
             message="Failed to configure grid",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to configure grid: {e}") from e
 
 
 def configure_top_frame_grid() -> None:
@@ -206,7 +206,7 @@ def configure_top_frame_grid() -> None:
             message="Failed to configure top frame grid",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to configure top frame grid: {e}") from e
 
 
 def create_bottom_frame_widgets(master: tkinter.Frame) -> None:
@@ -228,7 +228,7 @@ def create_bottom_frame_widgets(master: tkinter.Frame) -> None:
             message="Failed to create bottom frame widgets",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to create bottom frame widgets: {e}") from e
 
 
 def create_center_frame_widgets(master: tkinter.Frame) -> None:
@@ -250,7 +250,7 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
             message="Failed to create center frame widgets",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to create center frame widgets: {e}") from e
 
 
 def create_top_frame_widgets(master: tkinter.Frame) -> None:
@@ -272,7 +272,7 @@ def create_top_frame_widgets(master: tkinter.Frame) -> None:
             message="Failed to create top frame widgets",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to create top frame widgets: {e}") from e
 
 
 def create_widgets() -> None:
@@ -296,7 +296,7 @@ def create_widgets() -> None:
             message="Failed to create widgets",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to create widgets: {e}") from e
 
 
 def get_bottom_frame() -> tkinter.Frame:
@@ -357,29 +357,50 @@ def get_center_frame() -> tkinter.Frame:
     return CENTER_FRAME
 
 
-def get_create_view(master: tkinter.Toplevel) -> None:
+def get_create_view(
+    master: tkinter.Toplevel,
+    what: Optional[Literal["flashcard", "note", "question", "stack", "subject", "teacher"]] = None,
+) -> None:
     """
     Returns the create view.
 
     Args:
         master (tkinter.Toplevel): The master window.
+        what (Optional[Literal["flashcard", "note", "question", "stack", "subject", "teacher"]]): The type of entity to create. Default is None.
 
     Returns:
         None
     """
 
     try:
+        log_info(
+            message="Getting create view",
+            name=NAME,
+        )
+
         set_master(master=master)
+
         clear_widgets()
         create_widgets()
         configure_grid()
+
+        log_info(
+            message="Got create view successfully",
+            name=NAME,
+        )
+
+        get_success_toast(
+            message="Create view loaded successfully",
+            title="Success",
+        )
+
     except Exception as e:
         log_exception(
             exception=e,
             message="Failed to get create view",
             name=NAME,
         )
-        raise e
+        raise Exception(f"Failed to get create view: {e}") from e
 
 
 def get_master() -> tkinter.Toplevel:

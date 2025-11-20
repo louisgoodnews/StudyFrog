@@ -6,17 +6,18 @@ Date: 2025-11-16
 import tkinter
 
 from tkinter.constants import NSEW
-from typing import Final, Literal, Optional
+from typing import Any, Final, Literal, Optional
 
-from gui.factory import get_button, get_scrolled_frame
+from gui.factory import get_button, get_frame, get_label, get_scrolled_frame, get_success_toast
 from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
 from gui.views.logic.dashboard_view_logic import (
+    load_stacks,
     on_create_button_click,
     on_delete_button_click,
     on_edit_button_click,
     on_view_button_click,
 )
-from utils.utils import destroy_widget_children, log_exception, log_info
+from utils.utils import destroy_widget_children, get_widget_children, log_exception, log_info
 
 
 # ---------- Constants ---------- #
@@ -40,8 +41,6 @@ def clear_bottom_frame() -> None:
         None
     """
 
-    global NAME
-
     try:
         destroy_widget_children(get_bottom_frame())
     except Exception as e:
@@ -63,8 +62,6 @@ def clear_center_frame() -> None:
     Returns:
         None
     """
-
-    global NAME
 
     try:
         destroy_widget_children(get_center_frame())
@@ -88,8 +85,6 @@ def clear_top_frame() -> None:
         None
     """
 
-    global NAME
-
     try:
         destroy_widget_children(get_top_frame())
     except Exception as e:
@@ -111,8 +106,6 @@ def clear_widgets() -> None:
     Returns:
         None
     """
-
-    global NAME
 
     try:
         clear_bottom_frame()
@@ -137,8 +130,6 @@ def configure_bottom_frame_grid() -> None:
     Returns:
         None
     """
-
-    global NAME
 
     try:
         get_bottom_frame().grid_columnconfigure(
@@ -169,8 +160,6 @@ def configure_center_frame_grid() -> None:
         None
     """
 
-    global NAME
-
     try:
         get_center_frame().grid_columnconfigure(
             index=0,
@@ -200,8 +189,6 @@ def configure_grid() -> None:
         None
     """
 
-    global NAME
-
     try:
         configure_bottom_frame_grid()
         configure_center_frame_grid()
@@ -225,8 +212,6 @@ def configure_top_frame_grid() -> None:
     Returns:
         None
     """
-
-    global NAME
 
     try:
         get_top_frame().grid_columnconfigure(
@@ -257,8 +242,6 @@ def create_bottom_frame_widgets(master: tkinter.Frame) -> None:
         None
     """
 
-    global NAME
-
     try:
         pass
     except Exception as e:
@@ -281,8 +264,6 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
         None
     """
 
-    global NAME
-
     try:
         scrolled_frame: dict[str, tkinter.Widget] = get_scrolled_frame(master=master)
 
@@ -304,6 +285,83 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
         raise e
 
 
+def create_dashboard_view_item(
+    master: tkinter.Frame,
+    stack: dict[str, Any],
+) -> None:
+    """
+    Creates a dashboard view item.
+
+    Args:
+        master (tkinter.Frame): The master frame.
+        stack (dict[str, Any]): The stack.
+
+    Returns:
+        None
+    """
+
+    try:
+        frame: tkinter.Frame = get_frame(master=master)
+
+        frame.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=len(get_widget_children(master=master)),
+            sticky=NSEW,
+        )
+
+        get_label(
+            master=frame,
+            text=stack["name"],
+        ).grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+        get_button(
+            command=on_delete_button_click,
+            master=frame,
+            text="Delete",
+        ).grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+        get_button(
+            command=on_edit_button_click,
+            master=frame,
+            text="Edit",
+        ).grid(
+            column=2,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+        get_button(
+            command=on_view_button_click,
+            master=frame,
+            text="View",
+        ).grid(
+            column=3,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to create dashboard view item",
+            name=NAME,
+        )
+        raise e
+
+
 def create_top_frame_widgets(master: tkinter.Frame) -> None:
     """
     Creates the top frame widgets.
@@ -314,8 +372,6 @@ def create_top_frame_widgets(master: tkinter.Frame) -> None:
     Returns:
         None
     """
-
-    global NAME
 
     try:
         get_button(
@@ -348,8 +404,6 @@ def create_widgets() -> None:
         None
     """
 
-    global NAME
-
     try:
         create_bottom_frame_widgets(master=get_bottom_frame())
         create_center_frame_widgets(master=get_center_frame())
@@ -377,8 +431,6 @@ def get_container() -> tkinter.Frame:
         ValueError: If the container has not been set.
     """
 
-    global CONTAINER
-
     if CONTAINER is None:
         raise ValueError("Container not set. Call 'set_container' first.")
 
@@ -396,8 +448,6 @@ def get_dashboard_view() -> None:
         None
     """
 
-    global NAME
-
     try:
         log_info(
             message="Getting dashboard view",
@@ -408,9 +458,20 @@ def get_dashboard_view() -> None:
         create_widgets()
         configure_grid()
 
+        for stack in load_stacks():
+            create_dashboard_view_item(
+                master=get_container(),
+                stack=stack,
+            )
+
         log_info(
             message="Got dashboard view successfully",
             name=NAME,
+        )
+
+        get_success_toast(
+            message="Dashboard view loaded successfully",
+            title="Success",
         )
     except Exception as e:
         log_exception(

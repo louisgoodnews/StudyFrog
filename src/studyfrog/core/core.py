@@ -12,6 +12,7 @@ from common.constants import (
     DATA_DIR,
     EXPORTS_DIR,
     IMPORTS_DIR,
+    LOCAL_DIR,
     LOG_DIR,
     RESOURCES_DIR,
     TEMP_DIR,
@@ -94,8 +95,6 @@ def ensure_defaults() -> None:
         Exception: If an error occurs.
     """
 
-    global NAME
-
     log_info(
         message="Ensuring defaults...",
         name=NAME,
@@ -127,7 +126,7 @@ def ensure_defaults() -> None:
             message="Failed to ensure defaults.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to ensure defaults: {e}") from e
 
 
 def initialize_directories() -> None:
@@ -144,8 +143,6 @@ def initialize_directories() -> None:
         Exception: If an error occurs.
     """
 
-    global NAME
-
     log_info(
         message="Initializing directories...",
         name=NAME,
@@ -153,6 +150,7 @@ def initialize_directories() -> None:
 
     try:
         for path in (
+            LOCAL_DIR,
             ASSETS_DIR,
             BACKUP_DIR,
             CONFIG_DIR,
@@ -175,7 +173,7 @@ def initialize_directories() -> None:
             message="Failed to initialize directories.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to initialize directories: {e}") from e
 
 
 def initialize_files() -> None:
@@ -191,8 +189,6 @@ def initialize_files() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Initializing files...",
@@ -232,7 +228,7 @@ def initialize_files() -> None:
             message="Failed to initialize files.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to initialize files: {e}") from e
 
 
 def initialize_gui() -> None:
@@ -248,8 +244,6 @@ def initialize_gui() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Initializing GUI...",
@@ -277,7 +271,7 @@ def initialize_gui() -> None:
             message="Failed to initialize GUI.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to initialize GUI: {e}") from e
 
 
 def initialize_tables() -> None:
@@ -293,8 +287,6 @@ def initialize_tables() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Initializing tables...",
@@ -334,7 +326,7 @@ def initialize_tables() -> None:
             message="Failed to initialize tables.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to initialize tables: {e}") from e
 
 
 def run_post_start_tasks() -> None:
@@ -350,8 +342,6 @@ def run_post_start_tasks() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Running post-start tasks...",
@@ -372,7 +362,7 @@ def run_post_start_tasks() -> None:
             message="Failed to run post-start tasks.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to run post-start tasks: {e}") from e
 
 
 def run_post_stop_tasks() -> None:
@@ -388,8 +378,6 @@ def run_post_stop_tasks() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Running post-stop tasks...",
@@ -408,7 +396,7 @@ def run_post_stop_tasks() -> None:
             message="Failed to run post-stop tasks.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to run post-stop tasks: {e}") from e
 
 
 def run_pre_start_tasks() -> None:
@@ -424,8 +412,6 @@ def run_pre_start_tasks() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Running pre-start tasks...",
@@ -449,7 +435,7 @@ def run_pre_start_tasks() -> None:
             message="Failed to run pre-start tasks.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to run pre-start tasks: {e}") from e
 
 
 def run_pre_stop_tasks() -> None:
@@ -465,8 +451,6 @@ def run_pre_stop_tasks() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Running pre-stop tasks...",
@@ -485,7 +469,7 @@ def run_pre_stop_tasks() -> None:
             message="Failed to run pre-stop tasks.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to run pre-stop tasks: {e}") from e
 
 
 def start() -> None:
@@ -501,8 +485,6 @@ def start() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Starting application...",
@@ -523,7 +505,7 @@ def start() -> None:
             message="Failed to start application.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to start application: {e}") from e
 
 
 def stop() -> None:
@@ -539,8 +521,6 @@ def stop() -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global NAME
 
     log_info(
         message="Stopping application...",
@@ -561,7 +541,7 @@ def stop() -> None:
             message="Failed to stop application.",
             exception=e,
         )
-        raise e
+        raise Exception(f"Failed to stop application: {e}") from e
 
 
 # ---------- Auto-Export ---------- #

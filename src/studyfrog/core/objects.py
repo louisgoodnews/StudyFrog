@@ -16,7 +16,7 @@ from core.storage import (
     update_table_entries,
     update_table_entry,
 )
-from src.studyfrog.utils.utils import log_exception
+from utils.utils import log_exception
 
 
 # ---------- Constants ---------- #
