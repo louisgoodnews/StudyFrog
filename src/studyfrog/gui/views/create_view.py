@@ -6,10 +6,11 @@ Date: 2025-11-16
 import tkinter
 
 from tkinter.constants import NSEW
-from typing import Final, Literal, Optional
+from typing import Final, Literal, Optional, Type
 
 from gui.constants import TOPLEVEL_GEOMETRY
 from gui.factory import get_frame, get_success_toast
+from gui.views.logic.create_view_logic import get_form_getter, on_combobox_change
 from utils.utils import destroy_widget_children, log_exception, log_info
 
 
@@ -24,6 +25,24 @@ MASTER: Optional[tkinter.Toplevel] = None
 NAME: Final[Literal["gui.views.views.create_view"]] = "gui.views.views.create_view"
 
 TOP_FRAME: Optional[tkinter.Frame] = None
+
+WhatType: Type[
+    Literal[
+        "flashcard",
+        "note",
+        "question",
+        "stack",
+        "subject",
+        "teacher",
+    ]
+] = Literal[
+    "flashcard",
+    "note",
+    "question",
+    "stack",
+    "subject",
+    "teacher",
+]
 
 
 # ---------- Functions ---------- #
@@ -359,14 +378,15 @@ def get_center_frame() -> tkinter.Frame:
 
 def get_create_view(
     master: tkinter.Toplevel,
-    what: Optional[Literal["flashcard", "note", "question", "stack", "subject", "teacher"]] = None,
+    what: WhatType = "flashcard",
 ) -> None:
     """
     Returns the create view.
 
     Args:
         master (tkinter.Toplevel): The master window.
-        what (Optional[Literal["flashcard", "note", "question", "stack", "subject", "teacher"]]): The type of entity to create. Default is None.
+        what (WhatType): The type of entity to create. Default is "flashcard".
+            Must be one of "flashcard", "note", "question", "stack", "subject", "teacher".
 
     Returns:
         None
@@ -383,6 +403,8 @@ def get_create_view(
         clear_widgets()
         create_widgets()
         configure_grid()
+
+        get_form_getter(what=what)(master=get_center_frame())
 
         log_info(
             message="Got create view successfully",

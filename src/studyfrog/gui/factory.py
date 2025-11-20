@@ -8,8 +8,8 @@ import tkinter
 from tkinter.constants import ALL, BOTH, NSEW, NW, TOP, VERTICAL, YES
 from typing import Any, Final, Literal, Optional
 
-from gui.constants import COLOR_CONFIG, LARGE_FONT, TOAST_GEOMETRY
-from utils.utils import is_dict_empty, log_exception
+from gui.constants import COLOR_CONFIG, TOAST_GEOMETRY
+from utils.utils import log_exception
 
 # ---------- Constants ---------- #
 
@@ -110,6 +110,42 @@ def get_color_mode() -> Literal[
     return COLOR_MODE
 
 
+def get_entry(
+    master: tkinter.Widget,
+    *args,
+    **kwargs,
+) -> tkinter.Entry:
+    """
+    Returns a tkinter.Entry widget.
+
+    Args:
+        master (tkinter.Widget): The master of the tkinter.Entry widget to be created.
+        *args: Additional arguments passed to the tkinter.Entry constructor.
+        **kwargs: Additional keyword arguments passed to the tkinter.Entry constructor.
+
+    Returns:
+        tkinter.Entry: The tkinter.Entry widget.
+    """
+
+    try:
+        keyword_arguments: dict[str, Any] = dict(COLOR_CONFIG["entry"][get_color_mode()])
+
+        keyword_arguments.update(kwargs)
+
+        return tkinter.Entry(
+            master=master,
+            *args,
+            **keyword_arguments,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to get entry",
+            name=NAME,
+        )
+        raise Exception(f"Failed to get entry: {e}") from e
+
+
 def get_error_toast(
     message: str,
     title: str,
@@ -128,8 +164,8 @@ def get_error_toast(
         fade_step (float): The step size for the fade animation.
         message (str): The message to be displayed in the toast.
         title (str): The title of the toast.
-        *args: Additional arguments passed to the tkinter.Frame constructor.
-        **kwargs: Additional keyword arguments passed to the tkinter.Frame constructor.
+        *args: Additional arguments passed to the tkinter.Toplevel constructor.
+        **kwargs: Additional keyword arguments passed to the tkinter.Toplevel constructor.
 
     Returns:
         None
@@ -216,8 +252,8 @@ def get_info_toast(
         fade_step (float): The step size for the fade animation.
         message (str): The message to be displayed in the toast.
         title (str): The title of the toast.
-        *args: Additional arguments passed to the tkinter.Frame constructor.
-        **kwargs: Additional keyword arguments passed to the tkinter.Frame constructor.
+        *args: Additional arguments passed to the tkinter.Toplevel constructor.
+        **kwargs: Additional keyword arguments passed to the tkinter.Toplevel constructor.
 
     Returns:
         None
@@ -473,8 +509,8 @@ def get_success_toast(
         fade_step (float): The step size for the fade animation.
         message (str): The message to be displayed in the toast.
         title (str): The title of the toast.
-        *args: Additional arguments passed to the tkinter.Frame constructor.
-        **kwargs: Additional keyword arguments passed to the tkinter.Frame constructor.
+        *args: Additional arguments passed to the tkinter.Toplevel constructor.
+        **kwargs: Additional keyword arguments passed to the tkinter.Toplevel constructor.
 
     Returns:
         None
@@ -689,8 +725,8 @@ def get_warning_toast(
         fade_step (float): The step size for the fade animation.
         message (str): The message to be displayed in the toast.
         title (str): The title of the toast.
-        *args: Additional arguments passed to the tkinter.Frame constructor.
-        **kwargs: Additional keyword arguments passed to the tkinter.Frame constructor.
+        *args: Additional arguments passed to the tkinter.Toplevel constructor.
+        **kwargs: Additional keyword arguments passed to the tkinter.Toplevel constructor.
 
     Returns:
         None

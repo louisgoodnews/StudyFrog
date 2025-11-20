@@ -77,6 +77,22 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         "dark": {"background": DARK_SECONDARY},
         "light": {"background": WHITE},
     },
+    "entry": {
+        "dark": {
+            "background": DARK_SECONDARY,
+            "bg": DARK_SECONDARY,
+            "font": DEFAULT_FONT,
+            "foreground": WHITE,
+            "fg": WHITE,
+        },
+        "light": {
+            "background": WHITE,
+            "bg": WHITE,
+            "font": DEFAULT_FONT,
+            "foreground": BLACK,
+            "fg": BLACK,
+        },
+    },
     "frame": {
         "dark": {
             "background": DARK_SECONDARY,
