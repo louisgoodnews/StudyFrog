@@ -875,7 +875,7 @@ def register_subscription(
     """
 
     try:
-        if not 0 < priority < 100:
+        if not 0 < priority < 101:
             raise ValueError("Priority must be between 0 and 100.")
 
         if not is_key_in_dict(

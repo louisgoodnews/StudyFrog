@@ -215,6 +215,8 @@ from core.objects import (
     add_difficulties,
     add_flashcard,
     add_flashcards,
+    add_image,
+    add_images,
     add_note,
     add_notes,
     add_option,
@@ -298,6 +300,8 @@ from core.objects import (
     remove_difficulties,
     remove_flashcard,
     remove_flashcards,
+    remove_image,
+    remove_images,
     remove_note,
     remove_notes,
     remove_option,
@@ -330,6 +334,8 @@ from core.objects import (
     update_difficulties,
     update_flashcard,
     update_flashcards,
+    update_image,
+    update_images,
     update_note,
     update_notes,
     update_option,
@@ -768,6 +774,8 @@ def initialize_subscriptions() -> None:
             add_difficulties,
             add_flashcard,
             add_flashcards,
+            add_image,
+            add_images,
             add_note,
             add_notes,
             add_option,
@@ -851,6 +859,8 @@ def initialize_subscriptions() -> None:
             remove_difficulties,
             remove_flashcard,
             remove_flashcards,
+            remove_image,
+            remove_images,
             remove_note,
             remove_notes,
             remove_option,
@@ -883,6 +893,8 @@ def initialize_subscriptions() -> None:
             update_difficulties,
             update_flashcard,
             update_flashcards,
+            update_image,
+            update_images,
             update_note,
             update_notes,
             update_option,
@@ -922,6 +934,11 @@ def initialize_subscriptions() -> None:
                     persistent=True,
                     priority=100,
                 )
+            )
+
+            log_info(
+                message=f"Registered '{event.upper()}' event for subscription with function '{function.__name__}'.",
+                name=NAME,
             )
 
         log_info(
