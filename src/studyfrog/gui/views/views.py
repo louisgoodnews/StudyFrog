@@ -56,6 +56,7 @@ def get_view(
     except Exception as e:
         log_exception(
             exception=e,
+            message=f"Failed to get view '{name}'",
             name=f"{NAME}.get_view",
         )
         raise e

@@ -8,8 +8,9 @@ import tkinter
 from tkinter.constants import NSEW
 from typing import Final, Literal, Optional
 
+from gui.constants import TOPLEVEL_GEOMETRY
 from gui.factory import get_frame
-from utils.utils import destroy_widget_children
+from utils.utils import destroy_widget_children, log_exception
 
 
 # ---------- Constants ---------- #
@@ -42,6 +43,11 @@ def clear_bottom_frame() -> None:
     try:
         destroy_widget_children(get_bottom_frame())
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to clear bottom frame",
+            name=NAME,
+        )
         raise e
 
 
@@ -59,6 +65,11 @@ def clear_center_frame() -> None:
     try:
         destroy_widget_children(get_center_frame())
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to clear center frame",
+            name=NAME,
+        )
         raise e
 
 
@@ -76,6 +87,11 @@ def clear_top_frame() -> None:
     try:
         destroy_widget_children(get_top_frame())
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to clear top frame",
+            name=NAME,
+        )
         raise e
 
 
@@ -95,6 +111,11 @@ def clear_widgets() -> None:
         clear_center_frame()
         clear_top_frame()
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to clear widgets",
+            name=NAME,
+        )
         raise e
 
 
@@ -112,6 +133,11 @@ def configure_bottom_frame_grid() -> None:
     try:
         pass
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to configure bottom frame grid",
+            name=NAME,
+        )
         raise e
 
 
@@ -129,6 +155,11 @@ def configure_center_frame_grid() -> None:
     try:
         pass
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to configure center frame grid",
+            name=NAME,
+        )
         raise e
 
 
@@ -148,6 +179,11 @@ def configure_grid() -> None:
         configure_center_frame_grid()
         configure_top_frame_grid()
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to configure grid",
+            name=NAME,
+        )
         raise e
 
 
@@ -165,6 +201,11 @@ def configure_top_frame_grid() -> None:
     try:
         pass
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to configure top frame grid",
+            name=NAME,
+        )
         raise e
 
 
@@ -182,6 +223,11 @@ def create_bottom_frame_widgets(master: tkinter.Frame) -> None:
     try:
         pass
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to create bottom frame widgets",
+            name=NAME,
+        )
         raise e
 
 
@@ -199,6 +245,11 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
     try:
         pass
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to create center frame widgets",
+            name=NAME,
+        )
         raise e
 
 
@@ -216,6 +267,11 @@ def create_top_frame_widgets(master: tkinter.Frame) -> None:
     try:
         pass
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to create top frame widgets",
+            name=NAME,
+        )
         raise e
 
 
@@ -235,6 +291,11 @@ def create_widgets() -> None:
         create_center_frame_widgets(master=get_center_frame())
         create_top_frame_widgets(master=get_top_frame())
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to create widgets",
+            name=NAME,
+        )
         raise e
 
 
@@ -313,6 +374,11 @@ def get_create_view(master: tkinter.Toplevel) -> None:
         create_widgets()
         configure_grid()
     except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to get create view",
+            name=NAME,
+        )
         raise e
 
 
@@ -329,8 +395,6 @@ def get_master() -> tkinter.Toplevel:
     Raises:
         ValueError: If the master is not set. Call 'set_master' first.
     """
-
-    global MASTER
 
     if MASTER is None:
         raise ValueError("Master not set. Call 'set_master' first.")
@@ -401,6 +465,8 @@ def set_master(master: tkinter.Toplevel) -> None:
         index=2,
         weight=0,
     )
+
+    MASTER.geometry(newGeometry=TOPLEVEL_GEOMETRY)
 
 
 # ---------- Auto-Export ---------- #

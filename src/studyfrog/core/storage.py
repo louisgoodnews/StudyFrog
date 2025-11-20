@@ -115,15 +115,13 @@ def add_table_entry(
         Exception: If there is an error adding the entry.
     """
 
-    global NAME
-
     try:
         table: dict[str, Any] = get_table_content(table_name=table_name)
 
         new_id: int = int(
-            table.get("entries", {}).get(
-                "total",
-                0,
+            table.get("metadata", {}).get(
+                "next_id",
+                1,
             )
         )
 
@@ -131,6 +129,7 @@ def add_table_entry(
         entry["created_on"] = get_today_str()
         entry["id"] = new_id
         entry["key"] = f"{entry['type'].upper()}_{new_id}"
+        table["metadata"]["next_id"] = new_id + 1
         entry["updated_at"] = get_now_str()
         entry["updated_on"] = get_today_str()
 
@@ -142,7 +141,7 @@ def add_table_entry(
 
         table["schema"]["fields"]["total"] = len(table["schema"]["fields"]["values"])
 
-        table["entries"]["total"] = new_id + 1
+        table["entries"]["total"] = new_id
 
         write_table_content(
             table_name=table_name,
@@ -209,8 +208,6 @@ def add_table_entry_if_not_exists(
     Raises:
         Exception: If there is an error adding the entry.
     """
-
-    global NAME
 
     try:
         filtered_entries: list[dict[str, Any]] = filter_table_entries(
@@ -301,8 +298,6 @@ def add_table_entries(
         Exception: If there is an error adding the entries.
     """
 
-    global NAME
-
     try:
         return [
             add_table_entry(
@@ -369,8 +364,6 @@ def count_entries_in_table(
         Exception: If there is an error counting the entries.
     """
 
-    global NAME
-
     try:
         return (
             get_table_content(table_name=table_name)
@@ -389,7 +382,7 @@ def count_entries_in_table(
             name=NAME,
             message=f"Failed to count entries in table with name '{table_name}'.",
         )
-        return 0
+        raise e
 
 
 def create_table_if_not_exists(
@@ -438,8 +431,6 @@ def create_table_if_not_exists(
         bool: True if the table was created, False otherwise.
     """
 
-    global NAME, TABLE_FILES
-
     try:
         if not ensure_json(path=TABLE_FILES[table_name]):
             return False
@@ -453,7 +444,7 @@ def create_table_if_not_exists(
                 "created_at": get_now_str(),
                 "created_on": get_today_str(),
                 "entries": {"total": 0, "values": {}},
-                "metadata": {},
+                "metadata": {"next_id": 1},
                 "name": TABLE_FILES[table_name].stem,
                 "schema": {"fields": {"total": 0, "values": []}},
                 "updated_at": get_now_str(),
@@ -517,8 +508,6 @@ def empty_table(
     Returns:
         bool: True if the table was emptied, False otherwise.
     """
-
-    global NAME
 
     try:
         table: dict[str, Any] = get_table_content(table_name=table_name)
@@ -587,8 +576,6 @@ def filter_table_entries(
         list[dict[str, Any]]: The filtered entries.
     """
 
-    global NAME
-
     try:
         return list(
             filter(
@@ -656,8 +643,6 @@ def get_all_table_entries(
     Returns:
         dict[str, Any]: The table.
     """
-
-    global NAME
 
     try:
         return (
@@ -730,8 +715,6 @@ def get_table_entry(
     Raises:
         Exception: If there is an error retrieving the entry.
     """
-
-    global NAME
 
     try:
         if isinstance(
@@ -813,8 +796,6 @@ def get_table_entries(
         Exception: If there is an error retrieving the entries.
     """
 
-    global NAME
-
     try:
         return [
             get_table_entry(
@@ -879,8 +860,6 @@ def get_table_content(
         Exception: If there is an error retrieving the table content.
     """
 
-    global NAME
-
     try:
         ensure_json(path=get_table_file_path(table_name=table_name))
         return get_file_content_json(path=get_table_file_path(table_name=table_name))
@@ -939,8 +918,6 @@ def get_table_file_path(
     Raises:
         Exception: If there is an error retrieving the table file path.
     """
-
-    global NAME, TABLE_FILES
 
     try:
         return TABLE_FILES[table_name]
@@ -1004,8 +981,6 @@ def is_table_empty(
         bool: True if the table is empty, False otherwise.
     """
 
-    global NAME
-
     try:
         return is_dict_empty(dictionary=get_table_content(table_name=table_name))
     except Exception as e:
@@ -1066,14 +1041,12 @@ def remove_table_entry(
         Exception: If there is an error removing the entry.
     """
 
-    global NAME
-
     try:
         table: dict[str, Any] = get_table_content(table_name=table_name)
 
+        table["metadata"]["next_id"] = max(table["metadata"]["next_id"], int(id) + 1)
         table["entries"]["values"].pop(str(id), None)
-
-        table["entries"]["total"] -= 1
+        table["entries"]["total"] = max(0, table["entries"]["total"] - 1)
 
         return write_table_content(
             table_name=table_name,
@@ -1137,8 +1110,6 @@ def remove_table_entries(
     Raises:
         Exception: If there is an error removing the entries.
     """
-
-    global NAME
 
     try:
         return [
@@ -1209,8 +1180,6 @@ def update_table_entry(
     Raises:
         Exception: If there is an error updating the entry.
     """
-
-    global NAME
 
     try:
         table: dict[str, Any] = get_table_content(table_name=table_name)
@@ -1298,8 +1267,6 @@ def update_table_entries(
         Exception: If there is an error updating the entries.
     """
 
-    global NAME
-
     try:
         return [
             update_table_entry(
@@ -1378,8 +1345,6 @@ def write_table_content(
     Raises:
         Exception: If there is an error writing the table content.
     """
-
-    global NAME
 
     try:
         ensure_json(path=get_table_file_path(table_name=table_name))

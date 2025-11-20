@@ -32,6 +32,12 @@ from common.constants import (
     TEACHERS_TABLE_FILE,
     USERS_TABLE_FILE,
 )
+from common.events import (
+    APPLICATION_STARTED,
+    APPLICATION_STARTING,
+    APPLICATION_STOPPED,
+    APPLICATION_STOPPING,
+)
 from core.defaults import (
     EASY_DIFFICULTY,
     HARD_DIFFICULTY,
@@ -54,7 +60,14 @@ from gui.gui import (
     get_view_menu,
 )
 from gui.views.views import get_view
-from utils.utils import ensure_dir, ensure_json, log_exception, log_info, pluralize_str
+from utils.utils import (
+    ensure_dir,
+    ensure_json,
+    log_exception,
+    log_info,
+    pluralize_str,
+    publish_event,
+)
 
 
 # ---------- Constants ---------- #
@@ -345,6 +358,7 @@ def run_post_start_tasks() -> None:
             message="Post-start tasks completed.",
             name=NAME,
         )
+        publish_event(event=APPLICATION_STARTED)
         get_root().mainloop()
     except Exception as e:
         log_exception(
@@ -381,6 +395,7 @@ def run_post_stop_tasks() -> None:
             message="Post-stop tasks completed.",
             name=NAME,
         )
+        publish_event(event=APPLICATION_STOPPED)
     except Exception as e:
         log_exception(
             name=NAME,
@@ -421,6 +436,7 @@ def run_pre_start_tasks() -> None:
             message="Pre-start tasks completed.",
             name=NAME,
         )
+        publish_event(event=APPLICATION_STARTING)
     except Exception as e:
         log_exception(
             name=NAME,
@@ -456,6 +472,7 @@ def run_pre_stop_tasks() -> None:
             message="Pre-stop tasks completed.",
             name=NAME,
         )
+        publish_event(event=APPLICATION_STOPPING)
     except Exception as e:
         log_exception(
             name=NAME,

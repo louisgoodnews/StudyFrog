@@ -12,7 +12,7 @@ import uuid
 
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Final, Literal, Optional
+from typing import Any, Callable, Final, Literal, Optional
 
 
 # ---------- Constants ---------- #
@@ -33,6 +33,8 @@ COLORIZATION: Final[dict[str, str]] = {
 LOCK: Final[threading.Lock] = threading.Lock()
 
 NAME: Final[Literal["utils.utils"]] = "utils.utils"
+
+SUBSCRIPTIONS: Final[dict[str, list[dict[str, Any]]]] = {}
 
 
 # ---------- Functions ---------- #
@@ -783,6 +785,112 @@ def pluralize_str(string: str) -> str:
     return string + "s"
 
 
+def publish_event(
+    event: str,
+    *args,
+    **kwargs,
+) -> dict[str, Any]:
+    """
+    Publishes an event to all subscribers.
+
+    Args:
+        event (str): The event to publish.
+        *args: The arguments to pass to the subscribers.
+        **kwargs: The keyword arguments to pass to the subscribers.
+
+    Returns:
+        dict[str, list[dict[str, Any]]]: A mapping from function name to a list
+            of results, each with:
+                - "uuid": the subscription UUID
+                - "result": the return value of the subscriber
+    """
+
+    result: dict[str, Any] = {}
+
+    if not is_key_in_dict(
+        key=event,
+        dictionary=SUBSCRIPTIONS,
+    ):
+        return result
+
+    for subscription in list(
+        sorted(
+            SUBSCRIPTIONS[event],
+            key=lambda x: x["priority"],
+            reverse=True,
+        ),
+    ):
+        function: Callable[..., Any] = subscription["function"]
+
+        if not is_key_in_dict(
+            key=function.__name__,
+            dictionary=result,
+        ):
+            result[function.__name__] = []
+
+        try:
+            result[function.__name__].append(
+                {
+                    "uuid": subscription["uuid"],
+                    "result": function(
+                        *args,
+                        **kwargs,
+                    ),
+                }
+            )
+
+            if not subscription["persistent"]:
+                unsubscribe_subscription(uuid=subscription["uuid"])
+
+        except Exception as e:
+            log_exception(
+                exception=e,
+                name=NAME,
+                message=f"Failed to publish event: {event}",
+            )
+
+    return result
+
+
+def register_subscription(
+    event: str,
+    function: Callable[..., Any],
+    persistent: bool = False,
+    priority: int = 0,
+) -> str:
+    """
+    Registers a subscription to an event.
+
+    Args:
+        event (str): The event to subscribe to.
+        function (Callable[..., Any]): The function to call when the event is triggered.
+        persistent (bool): Whether the subscription should be persistent.
+        priority (int): The priority of the subscription.
+
+    Returns:
+        str: The UUID of the subscription.
+    """
+
+    if not is_key_in_dict(
+        key=event,
+        dictionary=SUBSCRIPTIONS,
+    ):
+        SUBSCRIPTIONS[event] = []
+
+    uuid: str = get_uuid_str()
+
+    SUBSCRIPTIONS[event].append(
+        {
+            "function": function,
+            "persistent": persistent,
+            "priority": priority,
+            "uuid": uuid,
+        }
+    )
+
+    return uuid
+
+
 def str_to_date(date_string: str) -> Optional[date]:
     """
     Converts a string to a date object.
@@ -829,6 +937,37 @@ def str_to_datetime(datetime_string: str) -> Optional[datetime]:
             message=f"Failed to convert string to datetime.",
         )
         return None
+
+
+def unsubscribe_subscription(uuid: str) -> bool:
+    """
+    Unsubscribes from an event.
+
+    Args:
+        uuid (str): The UUID of the subscription to unsubscribe from.
+
+    Returns:
+        bool: True if the subscription was unsubscribed successfully, False otherwise.
+    """
+
+    for (
+        event,
+        subscriptions,
+    ) in list(SUBSCRIPTIONS.items()):
+        for (
+            index,
+            subscription,
+        ) in enumerate(iterable=subscriptions):
+            if subscription["uuid"] != uuid:
+                continue
+
+            del subscriptions[index]
+            return True
+
+        if not SUBSCRIPTIONS[event]:
+            del SUBSCRIPTIONS[event]
+
+    return False
 
 
 def write_file_bytes(

@@ -55,6 +55,10 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
             "bg": WHITE,
         },
     },
+    "canvas": {
+        "dark": {"background": DARK_SECONDARY},
+        "light": {"background": WHITE},
+    },
     "frame": {
         "dark": {
             "background": DARK_SECONDARY,
@@ -64,6 +68,10 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
             "background": WHITE,
             "bg": WHITE,
         },
+    },
+    "label": {
+        "dark": {"font": DEFAULT_FONT},
+        "light": {"font": DEFAULT_FONT},
     },
     "menu": {
         "dark": {
@@ -81,6 +89,10 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
             "fg": BLACK,
         },
     },
+    "scrollbar": {
+        "dark": {"background": DARK_SECONDARY},
+        "light": {"background": WHITE},
+    },
     "window": {
         "dark": {
             "background": DARK_SECONDARY,
@@ -92,6 +104,8 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         },
     },
 }
+
+TOPLEVEL_GEOMETRY: Final[Literal["960x540+0+0"]] = "960x540+0+0"
 
 WINDOW_GEOMETRY: Final[Literal["1920x1080+0+0"]] = "1920x1080+0+0"
 
