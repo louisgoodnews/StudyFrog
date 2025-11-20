@@ -23,4 +23,5 @@ dist/
 .vscode/
 
 # local
+.local
 .local/

@@ -520,6 +520,32 @@ def get_subject(
     return _get_object_dict(**kwargs)
 
 
+def get_tag(
+    name: str,
+    customfields: Optional[dict[str, Any]] = None,
+    **kwargs,
+) -> dict[str, Any]:
+    """
+    Returns a dictionary containing a tag's attributes.
+
+    Args:
+        name (str): The tag's name.
+        **kwargs (dict[str, Any]): Additional keywords to pass to the tag's attributes.
+
+    Returns:
+        dict[str, Any]: A dictionary containing a tag's attributes.
+    """
+
+    if not customfields:
+        customfields = {}
+
+    kwargs["customfields"] = customfields
+    kwargs["name"] = name
+    kwargs["type"] = "TAG"
+
+    return _get_object_dict(**kwargs)
+
+
 def get_teacher(
     subjects: Optional[list[str]] = None,
     customfields: Optional[dict[str, Any]] = None,

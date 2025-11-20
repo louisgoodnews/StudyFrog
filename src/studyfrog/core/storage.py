@@ -15,12 +15,14 @@ from common.constants import (
     FLASHCARDS_TABLE_FILE,
     IMAGES_TABLE_FILE,
     NOTES_TABLE_FILE,
+    OPTIONS_TABLE_FILE,
     PRIORITIES_TABLE_FILE,
     QUESTIONS_TABLE_FILE,
     REHEARSAL_RUNS_TABLE_FILE,
     REHEARSAL_RUN_ITEMS_TABLE_FILE,
     STACKS_TABLE_FILE,
     SUBJECTS_TABLE_FILE,
+    TAGS_TABLE_FILE,
     TEACHERS_TABLE_FILE,
     USERS_TABLE_FILE,
 )
@@ -50,12 +52,14 @@ TABLE_FILES: dict[str, Path] = {
     "flashcards": FLASHCARDS_TABLE_FILE,
     "images": IMAGES_TABLE_FILE,
     "notes": NOTES_TABLE_FILE,
+    "options": OPTIONS_TABLE_FILE,
     "priorities": PRIORITIES_TABLE_FILE,
     "questions": QUESTIONS_TABLE_FILE,
     "rehearsal_runs": REHEARSAL_RUNS_TABLE_FILE,
     "rehearsal_run_items": REHEARSAL_RUN_ITEMS_TABLE_FILE,
     "stacks": STACKS_TABLE_FILE,
     "subjects": SUBJECTS_TABLE_FILE,
+    "tags": TAGS_TABLE_FILE,
     "teachers": TEACHERS_TABLE_FILE,
     "users": USERS_TABLE_FILE,
 }
@@ -75,12 +79,14 @@ def add_table_entry(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -99,12 +105,14 @@ def add_table_entry(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -169,12 +177,14 @@ def add_table_entry_if_not_exists(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -193,12 +203,14 @@ def add_table_entry_if_not_exists(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -258,12 +270,14 @@ def add_table_entries(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -282,12 +296,14 @@ def add_table_entries(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -325,12 +341,14 @@ def count_entries_in_table(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -348,12 +366,14 @@ def count_entries_in_table(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -395,12 +415,14 @@ def create_table_if_not_exists(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -418,12 +440,14 @@ def create_table_if_not_exists(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -473,12 +497,14 @@ def empty_table(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -496,12 +522,14 @@ def empty_table(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -538,12 +566,14 @@ def filter_table_entries(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -562,12 +592,14 @@ def filter_table_entries(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
         **kwargs (dict[str, Any]): The keyword arguments to filter by.
@@ -608,12 +640,14 @@ def get_all_table_entries(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -631,12 +665,14 @@ def get_all_table_entries(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -677,12 +713,14 @@ def get_table_entry(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -701,11 +739,13 @@ def get_table_entry(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -758,11 +798,13 @@ def get_table_entries(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -781,11 +823,13 @@ def get_table_entries(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -823,11 +867,13 @@ def get_table_content(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -845,11 +891,13 @@ def get_table_content(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -882,11 +930,13 @@ def get_table_file_path(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -904,11 +954,13 @@ def get_table_file_path(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -947,11 +999,13 @@ def is_table_empty(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -969,11 +1023,13 @@ def is_table_empty(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -1003,11 +1059,13 @@ def remove_table_entry(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -1026,11 +1084,13 @@ def remove_table_entry(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -1072,11 +1132,13 @@ def remove_table_entries(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -1095,12 +1157,14 @@ def remove_table_entries(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -1140,12 +1204,14 @@ def update_table_entry(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_runs",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -1165,12 +1231,14 @@ def update_table_entry(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -1226,11 +1294,13 @@ def update_table_entries(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -1250,12 +1320,14 @@ def update_table_entries(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
 
@@ -1306,11 +1378,13 @@ def write_table_content(
         "flashcards",
         "images",
         "notes",
+        "options",
         "priorities",
         "questions",
         "rehearsal_run_items",
         "stacks",
         "subjects",
+        "tags",
         "teachers",
         "users",
     ],
@@ -1329,12 +1403,14 @@ def write_table_content(
             - "flashcards"
             - "images"
             - "notes"
+            - "options"
             - "priorities"
             - "questions"
             - "rehearsal_runs"
             - "rehearsal_run_items"
             - "stacks"
             - "subjects"
+            - "tags"
             - "teachers"
             - "users"
         table (dict[str, Any]): The content of the table.

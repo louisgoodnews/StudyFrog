@@ -56,6 +56,8 @@ IMAGES_TABLE_FILE: Final[Path] = DATA_DIR / "images.json"
 
 NOTES_TABLE_FILE: Final[Path] = DATA_DIR / "notes.json"
 
+OPTIONS_TABLE_FILE: Final[Path] = DATA_DIR / "options.json"
+
 PRIORITIES_TABLE_FILE: Final[Path] = DATA_DIR / "priorities.json"
 
 QUESTIONS_TABLE_FILE: Final[Path] = DATA_DIR / "questions.json"
@@ -67,6 +69,8 @@ REHEARSAL_RUN_ITEMS_TABLE_FILE: Final[Path] = DATA_DIR / "rehearsal_run_items.js
 STACKS_TABLE_FILE: Final[Path] = DATA_DIR / "stacks.json"
 
 SUBJECTS_TABLE_FILE: Final[Path] = DATA_DIR / "subjects.json"
+
+TAGS_TABLE_FILE: Final[Path] = DATA_DIR / "tags.json"
 
 TEACHERS_TABLE_FILE: Final[Path] = DATA_DIR / "teachers.json"
 
