@@ -63,7 +63,11 @@ def get_form_getter(what: WhatType) -> Callable[[tkinter.Frame], None]:
 
     Returns:
         Callable[[tkinter.Frame], None]: The getter for the specified type.
+
+    Raises:
+        Exception: If the specified type is not supported.
     """
+
     try:
         return WHAT_TYPE_TO_FORM_GETTER[what]
     except Exception as e:
@@ -88,6 +92,9 @@ def on_combobox_change(
 
     Returns:
         None
+
+    Raises:
+        Exception: If the specified type is not supported.
     """
 
     try:

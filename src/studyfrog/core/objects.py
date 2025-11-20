@@ -433,6 +433,7 @@ def _make_update_entry(table_name: str) -> Callable[[int, dict[str, Any]], bool]
 # ---------- Add One ---------- #
 
 add_answer: Callable[[dict[str, Any]], int] = _make_add_entry(table_name=ANSWERS)
+add_association: Callable[[dict[str, Any]], int] = _make_add_entry(table_name=ASSOCIATIONS)
 add_customfield: Callable[[dict[str, Any]], int] = _make_add_entry(table_name=CUSTOMFIELDS)
 add_difficulty: Callable[[dict[str, Any]], int] = _make_add_entry(table_name=DIFFICULTIES)
 add_flashcard: Callable[[dict[str, Any]], int] = _make_add_entry(table_name=FLASHCARDS)
@@ -455,6 +456,9 @@ add_user: Callable[[dict[str, Any]], int] = _make_add_entry(table_name=USERS)
 # ---------- Add Multiple ---------- #
 
 add_answers: Callable[[list[dict[str, Any]]], list[int]] = _make_add_entries(table_name=ANSWERS)
+add_associations: Callable[[list[dict[str, Any]]], list[int]] = _make_add_entries(
+    table_name=ASSOCIATIONS
+)
 add_customfields: Callable[[list[dict[str, Any]]], list[int]] = _make_add_entries(
     table_name=CUSTOMFIELDS
 )
@@ -486,7 +490,10 @@ add_users: Callable[[list[dict[str, Any]]], list[int]] = _make_add_entries(table
 
 # ---------- Get All ---------- #
 
-get_all_ansers: Callable[[None], list[dict[str, Any]]] = _make_get_all_entries(table_name=ANSWERS)
+get_all_answers: Callable[[None], list[dict[str, Any]]] = _make_get_all_entries(table_name=ANSWERS)
+get_all_associations: Callable[[None], list[dict[str, Any]]] = _make_get_all_entries(
+    table_name=ASSOCIATIONS
+)
 get_all_customfields: Callable[[None], list[dict[str, Any]]] = _make_get_all_entries(
     table_name=CUSTOMFIELDS
 )
@@ -525,6 +532,9 @@ get_all_users: Callable[[None], list[dict[str, Any]]] = _make_get_all_entries(ta
 # ---------- Get One ---------- #
 
 get_answer: Callable[[Union[int, str]], dict[str, Any]] = _make_get_entry(table_name=ANSWERS)
+get_association: Callable[[Union[int, str]], dict[str, Any]] = _make_get_entry(
+    table_name=ASSOCIATIONS
+)
 get_customfield: Callable[[Union[int, str]], dict[str, Any]] = _make_get_entry(
     table_name=CUSTOMFIELDS
 )
@@ -554,6 +564,9 @@ get_user: Callable[[Union[int, str]], dict[str, Any]] = _make_get_entry(table_na
 
 get_answers: Callable[[list[Union[int, str]]], list[dict[str, Any]]] = _make_get_entries(
     table_name=ANSWERS
+)
+get_associations: Callable[[list[Union[int, str]]], list[dict[str, Any]]] = _make_get_entries(
+    table_name=ASSOCIATIONS
 )
 get_customfields: Callable[[list[Union[int, str]]], list[dict[str, Any]]] = _make_get_entries(
     table_name=CUSTOMFIELDS
@@ -605,6 +618,7 @@ get_users: Callable[[list[Union[int, str]]], list[dict[str, Any]]] = _make_get_e
 # ---------- Remove One ---------- #
 
 remove_answer: Callable[[Union[int, str]], None] = _make_remove_entry(table_name=ANSWERS)
+remove_association: Callable[[Union[int, str]], None] = _make_remove_entry(table_name=ASSOCIATIONS)
 remove_customfield: Callable[[Union[int, str]], None] = _make_remove_entry(table_name=CUSTOMFIELDS)
 remove_difficulty: Callable[[Union[int, str]], None] = _make_remove_entry(table_name=DIFFICULTIES)
 remove_flashcard: Callable[[Union[int, str]], None] = _make_remove_entry(table_name=FLASHCARDS)
@@ -629,6 +643,9 @@ remove_user: Callable[[Union[int, str]], None] = _make_remove_entry(table_name=U
 # ---------- Remove Multiple ---------- #
 
 remove_answers: Callable[[list[Union[int, str]]], None] = _make_remove_entries(table_name=ANSWERS)
+remove_associations: Callable[[list[Union[int, str]]], None] = _make_remove_entries(
+    table_name=ASSOCIATIONS
+)
 remove_customfields: Callable[[list[Union[int, str]]], None] = _make_remove_entries(
     table_name=CUSTOMFIELDS
 )
@@ -663,6 +680,9 @@ remove_users: Callable[[list[Union[int, str]]], None] = _make_remove_entries(tab
 
 update_answer: Callable[[Union[int, str], dict[str, Any]], None] = _make_update_entry(
     table_name=ANSWERS
+)
+update_association: Callable[[Union[int, str], dict[str, Any]], None] = _make_update_entry(
+    table_name=ASSOCIATIONS
 )
 update_customfield: Callable[[Union[int, str], dict[str, Any]], None] = _make_update_entry(
     table_name=CUSTOMFIELDS
@@ -713,6 +733,9 @@ update_user: Callable[[Union[int, str], dict[str, Any]], None] = _make_update_en
 
 update_answers: Callable[[list[Union[int, str]], dict[str, Any]], None] = _make_update_entries(
     table_name=ANSWERS
+)
+update_associations: Callable[[list[Union[int, str]], dict[str, Any]], None] = _make_update_entries(
+    table_name=ASSOCIATIONS
 )
 update_customfields: Callable[[list[Union[int, str]], dict[str, Any]], None] = _make_update_entries(
     table_name=CUSTOMFIELDS

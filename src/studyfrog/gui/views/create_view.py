@@ -57,6 +57,9 @@ def clear_bottom_frame() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the bottom frame is not set. Call 'set_bottom_frame' first.
     """
 
     try:
@@ -79,6 +82,9 @@ def clear_center_frame() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the center frame is not set. Call 'set_center_frame' first.
     """
 
     try:
@@ -101,6 +107,9 @@ def clear_top_frame() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the top frame is not set. Call 'set_top_frame' first.
     """
 
     try:
@@ -123,6 +132,11 @@ def clear_widgets() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the bottom frame is not set. Call 'set_bottom_frame' first.
+        Exception: If the center frame is not set. Call 'set_center_frame' first.
+        Exception: If the top frame is not set. Call 'set_top_frame' first.
     """
 
     try:
@@ -147,6 +161,9 @@ def configure_bottom_frame_grid() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the bottom frame is not set. Call 'set_bottom_frame' first.
     """
 
     try:
@@ -169,6 +186,9 @@ def configure_center_frame_grid() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the center frame is not set. Call 'set_center_frame' first.
     """
 
     try:
@@ -191,6 +211,11 @@ def configure_grid() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the bottom frame is not set. Call 'set_bottom_frame' first.
+        Exception: If the center frame is not set. Call 'set_center_frame' first.
+        Exception: If the top frame is not set. Call 'set_top_frame' first.
     """
 
     try:
@@ -215,6 +240,9 @@ def configure_top_frame_grid() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the top frame is not set. Call 'set_top_frame' first.
     """
 
     try:
@@ -237,6 +265,9 @@ def create_bottom_frame_widgets(master: tkinter.Frame) -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the bottom frame is not set. Call 'set_bottom_frame' first.
     """
 
     try:
@@ -259,6 +290,9 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the center frame is not set. Call 'set_center_frame' first.
     """
 
     try:
@@ -281,6 +315,9 @@ def create_top_frame_widgets(master: tkinter.Frame) -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the top frame is not set. Call 'set_top_frame' first.
     """
 
     try:
@@ -303,6 +340,11 @@ def create_widgets() -> None:
 
     Returns:
         None
+
+    Raises:
+        Exception: If the bottom frame is not set. Call 'set_bottom_frame' first.
+        Exception: If the center frame is not set. Call 'set_center_frame' first.
+        Exception: If the top frame is not set. Call 'set_top_frame' first.
     """
 
     try:
@@ -390,6 +432,9 @@ def get_create_view(
 
     Returns:
         None
+
+    Raises:
+        Exception: If an error occurs.
     """
 
     try:

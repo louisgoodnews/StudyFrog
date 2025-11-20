@@ -52,6 +52,10 @@ ADD_REHEARSAL_RUN: Final[Literal["add_rehearsal_run"]] = "add_rehearsal_run"
 
 ADD_REHEARSAL_RUNS: Final[Literal["add_rehearsal_runs"]] = "add_rehearsal_runs"
 
+ADD_REHEARSAL_RUN_ITEM: Final[Literal["add_rehearsal_run_item"]] = "add_rehearsal_run_item"
+
+ADD_REHEARSAL_RUN_ITEMS: Final[Literal["add_rehearsal_run_items"]] = "add_rehearsal_run_items"
+
 ADD_STACK: Final[Literal["add_stack"]] = "add_stack"
 
 ADD_STACKS: Final[Literal["add_stacks"]] = "add_stacks"
@@ -101,6 +105,10 @@ GET_ALL_PRIORITIES: Final[Literal["get_all_priorities"]] = "get_all_priorities"
 GET_ALL_QUESTIONS: Final[Literal["get_all_questions"]] = "get_all_questions"
 
 GET_ALL_REHEARSAL_RUNS: Final[Literal["get_all_rehearsal_runs"]] = "get_all_rehearsal_runs"
+
+GET_ALL_REHEARSAL_RUN_ITEMS: Final[Literal["get_all_rehearsal_run_items"]] = (
+    "get_all_rehearsal_run_items"
+)
 
 GET_ALL_STACKS: Final[Literal["get_all_stacks"]] = "get_all_stacks"
 
@@ -156,6 +164,10 @@ GET_REHEARSAL_RUN: Final[Literal["get_rehearsal_run"]] = "get_rehearsal_run"
 
 GET_REHEARSAL_RUNS: Final[Literal["get_rehearsal_runs"]] = "get_rehearsal_runs"
 
+GET_REHEARSAL_RUN_ITEM: Final[Literal["get_rehearsal_run_item"]] = "get_rehearsal_run_item"
+
+GET_REHEARSAL_RUN_ITEMS: Final[Literal["get_rehearsal_run_items"]] = "get_rehearsal_run_items"
+
 GET_STACK: Final[Literal["get_stack"]] = "get_stack"
 
 GET_STACKS: Final[Literal["get_stacks"]] = "get_stacks"
@@ -179,6 +191,10 @@ GET_USERS: Final[Literal["get_users"]] = "get_users"
 REMOVE_ANSWER: Final[Literal["remove_answer"]] = "remove_answer"
 
 REMOVE_ANSWERS: Final[Literal["remove_answers"]] = "remove_answers"
+
+REMOVE_ASSOCIATION: Final[Literal["remove_association"]] = "remove_association"
+
+REMOVE_ASSOCIATIONS: Final[Literal["remove_associations"]] = "remove_associations"
 
 REMOVE_CUSTOMFIELD: Final[Literal["remove_customfield"]] = "remove_customfield"
 
@@ -216,6 +232,12 @@ REMOVE_REHEARSAL_RUN: Final[Literal["remove_rehearsal_run"]] = "remove_rehearsal
 
 REMOVE_REHEARSAL_RUNS: Final[Literal["remove_rehearsal_runs"]] = "remove_rehearsal_runs"
 
+REMOVE_REHEARSAL_RUN_ITEM: Final[Literal["remove_rehearsal_run_item"]] = "remove_rehearsal_run_item"
+
+REMOVE_REHEARSAL_RUN_ITEMS: Final[Literal["remove_rehearsal_run_items"]] = (
+    "remove_rehearsal_run_items"
+)
+
 REMOVE_STACK: Final[Literal["remove_stack"]] = "remove_stack"
 
 REMOVE_STACKS: Final[Literal["remove_stacks"]] = "remove_stacks"
@@ -235,6 +257,10 @@ REMOVE_TEACHERS: Final[Literal["remove_teachers"]] = "remove_teachers"
 REMOVE_USER: Final[Literal["remove_user"]] = "remove_user"
 
 REMOVE_USERS: Final[Literal["remove_users"]] = "remove_users"
+
+UPDATE_ANSWER: Final[Literal["update_answer"]] = "update_answer"
+
+UPDATE_ANSWERS: Final[Literal["update_answers"]] = "update_answers"
 
 UPDATE_ASSOCIATION: Final[Literal["update_association"]] = "update_association"
 

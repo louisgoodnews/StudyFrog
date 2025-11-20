@@ -869,26 +869,40 @@ def register_subscription(
 
     Returns:
         str: The UUID of the subscription.
+
+    Raises:
+        ValueError: If the priority is not between 0 and 100.
     """
 
-    if not is_key_in_dict(
-        key=event,
-        dictionary=SUBSCRIPTIONS,
-    ):
-        SUBSCRIPTIONS[event] = []
+    try:
+        if not 0 < priority < 100:
+            raise ValueError("Priority must be between 0 and 100.")
 
-    uuid: str = get_uuid_str()
+        if not is_key_in_dict(
+            key=event,
+            dictionary=SUBSCRIPTIONS,
+        ):
+            SUBSCRIPTIONS[event] = []
 
-    SUBSCRIPTIONS[event].append(
-        {
-            "function": function,
-            "persistent": persistent,
-            "priority": priority,
-            "uuid": uuid,
-        }
-    )
+        uuid: str = get_uuid_str()
 
-    return uuid
+        SUBSCRIPTIONS[event].append(
+            {
+                "function": function,
+                "persistent": persistent,
+                "priority": priority,
+                "uuid": uuid,
+            }
+        )
+
+        return uuid
+    except Exception as e:
+        log_exception(
+            exception=e,
+            name=NAME,
+            message=f"Failed to register subscription: {event}",
+        )
+        raise Exception(f"Failed to register subscription: {e}") from e
 
 
 def str_to_date(date_string: str) -> Optional[date]:
