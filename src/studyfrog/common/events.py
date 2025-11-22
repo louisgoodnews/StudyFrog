@@ -76,6 +76,70 @@ ADD_USER: Final[Literal["add_user"]] = "add_user"
 
 ADD_USERS: Final[Literal["add_users"]] = "add_users"
 
+ADDED_ANSWER: Final[Literal["added_answer"]] = "added_answer"
+
+ADDED_ANSWERS: Final[Literal["added_answers"]] = "added_answers"
+
+ADDED_CUSTOMFIELD: Final[Literal["added_customfield"]] = "added_customfield"
+
+ADDED_CUSTOMFIELDS: Final[Literal["added_customfields"]] = "added_customfields"
+
+ADDED_DIFFICULTY: Final[Literal["added_difficulty"]] = "added_difficulty"
+
+ADDED_DIFFICULTIES: Final[Literal["added_difficulties"]] = "added_difficulties"
+
+ADDED_FLASHCARD: Final[Literal["added_flashcard"]] = "added_flashcard"
+
+ADDED_FLASHCARDS: Final[Literal["added_flashcards"]] = "added_flashcards"
+
+ADDED_IMAGE: Final[Literal["added_image"]] = "added_image"
+
+ADDED_IMAGES: Final[Literal["added_images"]] = "added_images"
+
+ADDED_NOTE: Final[Literal["added_note"]] = "added_note"
+
+ADDED_NOTES: Final[Literal["added_notes"]] = "added_notes"
+
+ADDED_OPTION: Final[Literal["added_option"]] = "added_option"
+
+ADDED_OPTIONS: Final[Literal["added_options"]] = "added_options"
+
+ADDED_PRIORITY: Final[Literal["added_priority"]] = "added_priority"
+
+ADDED_PRIORITIES: Final[Literal["added_priorities"]] = "added_priorities"
+
+ADDED_QUESTION: Final[Literal["added_question"]] = "added_question"
+
+ADDED_QUESTIONS: Final[Literal["added_questions"]] = "added_questions"
+
+ADDED_REHEARSAL_RUN: Final[Literal["added_rehearsal_run"]] = "added_rehearsal_run"
+
+ADDED_REHEARSAL_RUNS: Final[Literal["added_rehearsal_runs"]] = "added_rehearsal_runs"
+
+ADDED_REHEARSAL_RUN_ITEM: Final[Literal["added_rehearsal_run_item"]] = "added_rehearsal_run_item"
+
+ADDED_REHEARSAL_RUN_ITEMS: Final[Literal["added_rehearsal_run_items"]] = "added_rehearsal_run_items"
+
+ADDED_STACK: Final[Literal["added_stack"]] = "added_stack"
+
+ADDED_STACKS: Final[Literal["added_stacks"]] = "added_stacks"
+
+ADDED_SUBJECT: Final[Literal["added_subject"]] = "added_subject"
+
+ADDED_SUBJECTS: Final[Literal["added_subjects"]] = "added_subjects"
+
+ADDED_TAG: Final[Literal["added_tag"]] = "added_tag"
+
+ADDED_TAGS: Final[Literal["added_tags"]] = "added_tags"
+
+ADDED_TEACHER: Final[Literal["added_teacher"]] = "added_teacher"
+
+ADDED_TEACHERS: Final[Literal["added_teachers"]] = "added_teachers"
+
+ADDED_USER: Final[Literal["added_user"]] = "added_user"
+
+ADDED_USERS: Final[Literal["added_users"]] = "added_users"
+
 APPLICATION_STARTED: Final[Literal["application_started"]] = "application_started"
 
 APPLICATION_STARTING: Final[Literal["application_starting"]] = "application_starting"

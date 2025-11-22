@@ -4,7 +4,7 @@ Date: 2025-11-17
 """
 
 from pathlib import Path
-from typing import Any, Final, Literal, Union
+from typing import Any, Final, Literal, Set, Union
 
 from common.constants import (
     ANSWERS_TABLE_FILE,
@@ -25,6 +25,13 @@ from common.constants import (
     TAGS_TABLE_FILE,
     TEACHERS_TABLE_FILE,
     USERS_TABLE_FILE,
+)
+from common.exceptions import (
+    StudyFrogTableExtractionException,
+    StudyFrogTableInsertionException,
+    StudyFrogTableLookupException,
+    StudyFrogTableRetrievalException,
+    StudyFrogTableUpdateException,
 )
 from utils.utils import (
     ensure_json,
@@ -120,7 +127,7 @@ def add_table_entry(
         int: The ID of the added entry.
 
     Raises:
-        Exception: If there is an error adding the entry.
+        StudyFrogTableInsertionException: If there is an error adding the entry.
     """
 
     try:
@@ -163,7 +170,9 @@ def add_table_entry(
             name=NAME,
             message=f"Failed to add entry to table with name '{table_name}'.",
         )
-        raise e
+        raise StudyFrogTableInsertionException(
+            message=f"Failed to add entry to table with name '{table_name}'.",
+        ) from e
 
 
 def add_table_entry_if_not_exists(
@@ -218,7 +227,7 @@ def add_table_entry_if_not_exists(
         int: The ID of the added entry.
 
     Raises:
-        Exception: If there is an error adding the entry.
+        StudyFrogTableInsertionException: If there is an error adding the entry.
     """
 
     try:
@@ -256,7 +265,9 @@ def add_table_entry_if_not_exists(
             name=NAME,
             message=f"Failed to add entry to table with name '{table_name}'.",
         )
-        raise e
+        raise StudyFrogTableInsertionException(
+            message=f"Failed to add entry to table with name '{table_name}'.",
+        ) from e
 
 
 def add_table_entries(
@@ -311,7 +322,7 @@ def add_table_entries(
         list[int]: The IDs of the added entries.
 
     Raises:
-        Exception: If there is an error adding the entries.
+        StudyFrogTableInsertionException: If there is an error adding the entries.
     """
 
     try:
@@ -361,7 +372,9 @@ def add_table_entries(
             name=NAME,
             message=f"Failed to add entries to table with name '{table_name}'.",
         )
-        raise e
+        raise StudyFrogTableInsertionException(
+            message=f"Failed to add entries to table with name '{table_name}'.",
+        ) from e
 
 
 def count_entries_in_table(
@@ -414,7 +427,7 @@ def count_entries_in_table(
         int: The number of entries in the table.
 
     Raises:
-        Exception: If there is an error counting the entries.
+        StudyFrogTableLookupException: If there is an error counting the entries.
     """
 
     try:
@@ -435,7 +448,9 @@ def count_entries_in_table(
             name=NAME,
             message=f"Failed to count entries in table with name '{table_name}'.",
         )
-        raise e
+        raise StudyFrogTableLookupException(
+            message=f"Failed to count entries in table with name '{table_name}'.",
+        ) from e
 
 
 def create_table_if_not_exists(
@@ -639,6 +654,9 @@ def filter_table_entries(
 
     Returns:
         list[dict[str, Any]]: The filtered entries.
+
+    Raises:
+        StudyFrogTableLookupException: If there is an error filtering the entries.
     """
 
     try:
@@ -660,7 +678,9 @@ def filter_table_entries(
             name=NAME,
             message=f"Failed to filter entries in table with name '{table_name}'.",
         )
-        return []
+        raise StudyFrogTableLookupException(
+            message=f"Failed to filter entries in table with name '{table_name}'.",
+        ) from e
 
 
 def get_all_table_entries(
@@ -711,6 +731,9 @@ def get_all_table_entries(
 
     Returns:
         dict[str, Any]: The table.
+
+    Raises:
+        StudyFrogTableExtractionException: If there is an error getting the entries.
     """
 
     try:
@@ -732,7 +755,9 @@ def get_all_table_entries(
             name=NAME,
             message=f"Failed to get all entries from table with name '{table_name}'.",
         )
-        return []
+        raise StudyFrogTableExtractionException(
+            message=f"Failed to get all entries from table with name '{table_name}'.",
+        ) from e
 
 
 def get_table_entry(
@@ -786,7 +811,7 @@ def get_table_entry(
         dict[str, Any]: The entry from the table.
 
     Raises:
-        Exception: If there is an error retrieving the entry.
+        StudyFrogTableExtractionException: If there is an error retrieving the entry.
     """
 
     try:
@@ -817,7 +842,9 @@ def get_table_entry(
             name=NAME,
             message=f"Failed to get entry with ID '{id}' from table with name '{table_name}'.",
         )
-        return {}
+        raise StudyFrogTableExtractionException(
+            message=f"Failed to get entry with ID '{id}' from table with name '{table_name}'.",
+        ) from e
 
 
 def get_table_entries(
@@ -870,24 +897,30 @@ def get_table_entries(
         list[dict[str, Any]]: The entries from the table.
 
     Raises:
-        Exception: If there is an error retrieving the entries.
+        StudyFrogTableExtractionException: If there is an error retrieving the entries.
     """
 
     try:
-        return [
-            get_table_entry(
-                id=id,
-                table_name=table_name,
-            )
-            for id in ids
-        ]
+        table: dict[str, Any] = get_table_content(table_name=table_name)
+
+        entries: dict[str, Any] = table.get(
+            "entries",
+            {},
+        ).get(
+            "values",
+            {},
+        )
+
+        return [entries.get(str(id)) for id in ids]
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
             message=f"Failed to get entries with IDs '{ids}' from table with name '{table_name}'.",
         )
-        return []
+        raise StudyFrogTableExtractionException(
+            message=f"Failed to get entries with IDs '{ids}' from table with name '{table_name}'.",
+        ) from e
 
 
 def get_table_content(
@@ -938,7 +971,7 @@ def get_table_content(
         dict[str, Any]: The content of the table.
 
     Raises:
-        Exception: If there is an error retrieving the table content.
+        StudyFrogTableRetrievalException: If there is an error retrieving the table content.
     """
 
     try:
@@ -950,7 +983,9 @@ def get_table_content(
             name=NAME,
             message=f"Failed to get content of table with name '{table_name}'.",
         )
-        return {}
+        raise StudyFrogTableRetrievalException(
+            message=f"Failed to get content of table with name '{table_name}'.",
+        ) from e
 
 
 def get_table_file_path(
@@ -1068,6 +1103,9 @@ def is_table_empty(
 
     Returns:
         bool: True if the table is empty, False otherwise.
+
+    Raises:
+        StudyFrogTableLookupException: If there is an error checking if the table is empty.
     """
 
     try:
@@ -1078,7 +1116,9 @@ def is_table_empty(
             name=NAME,
             message=f"Failed to check if table with name '{table_name}' is empty.",
         )
-        return False
+        raise StudyFrogTableLookupException(
+            message=f"Failed to check if table with name '{table_name}' is empty.",
+        ) from e
 
 
 def remove_table_entry(
@@ -1131,7 +1171,7 @@ def remove_table_entry(
         bool: True if the entry was removed, False otherwise.
 
     Raises:
-        Exception: If there is an error removing the entry.
+        StudyFrogTableUpdateException: If there is an error removing the entry.
     """
 
     try:
@@ -1151,7 +1191,9 @@ def remove_table_entry(
             name=NAME,
             message=f"Failed to remove entry with ID '{id}' from table with name '{table_name}'.",
         )
-        return False
+        raise StudyFrogTableUpdateException(
+            message=f"Failed to remove entry with ID '{id}' from table with name '{table_name}'.",
+        ) from e
 
 
 def remove_table_entries(
@@ -1205,24 +1247,50 @@ def remove_table_entries(
         list[bool]: A list of booleans indicating whether each entry was removed.
 
     Raises:
-        Exception: If there is an error removing the entries.
+        StudyFrogTableUpdateException: If there is an error removing the entries.
     """
 
     try:
-        return [
-            remove_table_entry(
-                id=id,
+        table: dict[str, Any] = get_table_content(table_name=table_name)
+        entries: dict[str, Any] = table.get("entries", {}).get("values", {})
+        result: list[bool] = []
+
+        max_id: int = 0
+        removed_count: int = 0
+
+        for id_value in ids:
+            id_str: str = str(id_value)
+            if id_str in entries:
+                entries.pop(id_str)
+                result.append(True)
+                removed_count += 1
+                try:
+                    id_num: int = int(id_str)
+                    max_id = max(max_id, id_num)
+                except (ValueError, TypeError):
+                    pass
+            else:
+                result.append(False)
+
+        if removed_count > 0:
+            table["metadata"]["next_id"] = max(max_id + 1, table["metadata"].get("next_id", 0))
+            table["entries"]["total"] = max(0, len(entries))
+
+            write_table_content(
                 table_name=table_name,
+                table=table,
             )
-            for id in ids
-        ]
+
+        return result
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
             message=f"Failed to remove entries with IDs '{ids}' from table with name '{table_name}'.",
         )
-        return []
+        raise StudyFrogTableUpdateException(
+            message=f"Failed to remove entries with IDs '{ids}' from table with name '{table_name}'.",
+        ) from e
 
 
 def update_table_entry(
@@ -1279,7 +1347,7 @@ def update_table_entry(
         bool: True if the entry was updated, False otherwise.
 
     Raises:
-        Exception: If there is an error updating the entry.
+        StudyFrogTableUpdateException: If there is an error updating the entry.
     """
 
     try:
@@ -1312,7 +1380,9 @@ def update_table_entry(
             name=NAME,
             message=f"Failed to update entry with ID '{id}' in table with name '{table_name}'.",
         )
-        return False
+        raise StudyFrogTableUpdateException(
+            message=f"Failed to update entry with ID '{id}' in table with name '{table_name}'.",
+        ) from e
 
 
 def update_table_entries(
@@ -1369,36 +1439,59 @@ def update_table_entries(
 
     Raises:
         ValueError: If the number of entries and IDs do not match.
-        Exception: If there is an error updating the entries.
+        StudyFrogTableUpdateException: If there is an error updating the entries.
     """
+    if len(entries) != len(ids):
+        raise ValueError(
+            f"Number of entries ({len(entries)}) does not match number of IDs ({len(ids)})"
+        )
 
     try:
-        return [
-            update_table_entry(
-                entry=entry,
-                id=id,
+        table: dict[str, Any] = get_table_content(table_name=table_name)
+        table_entries: dict[str, Any] = table.get("entries", {}).get("values", {})
+        schema_fields: Set[str] = set(table["schema"]["fields"]["values"])
+        now: str = get_now_str()
+        today: str = get_today_str()
+        result: list[bool] = []
+        needs_schema_update: bool = False
+
+        for entry, id_value in zip(entries, ids, strict=True):
+            id_str: str = str(id_value)
+            if id_str not in table_entries:
+                result.append(False)
+                continue
+
+            entry["updated_at"] = now
+            entry["updated_on"] = today
+
+            entry_fields: Set[str] = set(entry.keys())
+            if not entry_fields.issubset(schema_fields):
+                schema_fields.update(entry_fields)
+                needs_schema_update = True
+
+            table_entries[id_str] = entry
+            result.append(True)
+
+        if needs_schema_update:
+            table["schema"]["fields"]["values"] = sorted(schema_fields)
+            table["schema"]["fields"]["total"] = len(schema_fields)
+
+        if any(result):
+            write_table_content(
                 table_name=table_name,
+                table=table,
             )
-            for entry, id in zip(
-                entries,
-                ids,
-                strict=True,
-            )
-        ]
-    except ValueError as e:
-        log_exception(
-            exception=e,
-            name=NAME,
-            message=f"Failed to update entries with IDs '{ids}' in table with name '{table_name}'.",
-        )
-        raise e
+
+        return result
     except Exception as e:
         log_exception(
             exception=e,
             name=NAME,
             message=f"Failed to update entries with IDs '{ids}' in table with name '{table_name}'.",
         )
-        raise e
+        raise StudyFrogTableUpdateException(
+            message=f"Failed to update entries with IDs '{ids}' in table with name '{table_name}'.",
+        ) from e
 
 
 def write_table_content(
@@ -1452,7 +1545,7 @@ def write_table_content(
         bool: True if the file was written successfully, False otherwise.
 
     Raises:
-        Exception: If there is an error writing the table content.
+        StudyFrogTableUpdateException: If there is an error writing the table content.
     """
 
     try:
@@ -1467,7 +1560,9 @@ def write_table_content(
             name=NAME,
             message=f"Failed to write table content to file with name '{table_name}'.",
         )
-        return False
+        raise StudyFrogTableUpdateException(
+            message=f"Failed to write table content to file with name '{table_name}'.",
+        ) from e
 
 
 # ---------- Auto-Export ---------- #

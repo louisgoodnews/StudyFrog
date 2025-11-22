@@ -7,7 +7,15 @@ import tkinter
 
 from typing import Any, Callable, Final, Literal, Type
 
-from common.events import GET_FORM
+from common.events import (
+    ADDED_FLASHCARD,
+    ADDED_NOTE,
+    ADDED_QUESTION,
+    ADDED_STACK,
+    ADDED_SUBJECT,
+    ADDED_TEACHER,
+    GET_FORM,
+)
 from core.models import (
     get_flashcard_model,
     get_note_model,
@@ -24,7 +32,13 @@ from core.objects import (
     add_subject,
     add_teacher,
     get_difficulty,
+    get_flashcard,
+    get_note,
     get_priority,
+    get_question,
+    get_stack,
+    get_subject,
+    get_teacher,
 )
 from gui.views.forms.flashcard_create_form import get_flashcard_create_form
 from gui.views.forms.note_create_form import get_note_create_form
@@ -32,7 +46,13 @@ from gui.views.forms.question_create_form import get_question_create_form
 from gui.views.forms.stack_create_form import get_stack_create_form
 from gui.views.forms.subject_create_form import get_subject_create_form
 from gui.views.forms.teacher_create_form import get_teacher_create_form
-from utils.utils import is_dict_empty, is_key_in_dict, log_debug, log_exception, publish_event
+from utils.utils import (
+    is_dict_empty,
+    is_key_in_dict,
+    log_exception,
+    log_info,
+    publish_event,
+)
 
 
 # ---------- Types ---------- #
@@ -62,6 +82,25 @@ NAME: Final[Literal["gui.views.logic.create_view_logic"]] = "gui.views.logic.cre
 
 NAMESPACE: Final[Literal["CREATE_FORMS"]] = "CREATE_FORMS"
 
+WHAT_TYPE_TO_ADDED_EVENT: dict[
+    WhatType,
+    Literal[
+        "added_flashcard",
+        "added_note",
+        "added_question",
+        "added_stack",
+        "added_subject",
+        "added_teacher",
+    ],
+] = {
+    "flashcard": ADDED_FLASHCARD,
+    "note": ADDED_NOTE,
+    "question": ADDED_QUESTION,
+    "stack": ADDED_STACK,
+    "subject": ADDED_SUBJECT,
+    "teacher": ADDED_TEACHER,
+}
+
 WHAT_TYPE_TO_FORM_GETTER: dict[
     WhatType,
     Callable[[tkinter.Frame], None],
@@ -74,9 +113,9 @@ WHAT_TYPE_TO_FORM_GETTER: dict[
     "teacher": get_teacher_create_form,
 }
 
-WHAT_TYPE_TO_MODEL_ADDER: dict[
+WHAT_TYPE_TO_DATABASE_ADDER: dict[
     WhatType,
-    Callable[[tkinter.Frame], None],
+    Callable[[dict[str, Any]], None],
 ] = {
     "flashcard": add_flashcard,
     "note": add_note,
@@ -86,9 +125,21 @@ WHAT_TYPE_TO_MODEL_ADDER: dict[
     "teacher": add_teacher,
 }
 
+WHAT_TYPE_TO_DATABASE_GETTER: dict[
+    WhatType,
+    Callable[[dict[str, Any]], None],
+] = {
+    "flashcard": get_flashcard,
+    "note": get_note,
+    "question": get_question,
+    "stack": get_stack,
+    "subject": get_subject,
+    "teacher": get_teacher,
+}
+
 WHAT_TYPE_TO_MODEL_GETTER: dict[
     WhatType,
-    Callable[[tkinter.Frame], None],
+    Callable[[Any], None],
 ] = {
     "flashcard": get_flashcard_model,
     "note": get_note_model,
@@ -237,7 +288,23 @@ def on_create_button_click() -> None:
         ):
             form_data["priority"] = get_priority(entry_id=5).get("key")
 
-        WHAT_TYPE_TO_MODEL_ADDER[what](entry=WHAT_TYPE_TO_MODEL_GETTER[what](**form_data))
+        id: int = WHAT_TYPE_TO_DATABASE_ADDER[what](
+            entry=WHAT_TYPE_TO_MODEL_GETTER[what](**form_data)
+        )
+
+        log_info(
+            message=f"{what.title()} created successfully",
+            name=NAME,
+        )
+
+        publish_event(
+            event=WHAT_TYPE_TO_ADDED_EVENT[what],
+            namespace=NAMESPACE,
+            **{
+                "what": what,
+                "model": WHAT_TYPE_TO_DATABASE_GETTER[what](entry_id=id),
+            },
+        )
     except Exception as e:
         log_exception(
             exception=e,
