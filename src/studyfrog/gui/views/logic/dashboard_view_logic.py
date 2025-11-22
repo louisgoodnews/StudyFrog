@@ -60,7 +60,10 @@ def on_create_button_click() -> None:
     """
 
     try:
-        get_create_view(master=get_toplevel(master=get_root()))
+        get_create_view(
+            master=get_toplevel(master=get_root()),
+            what="stack",
+        )
     except Exception as e:
         log_exception(
             exception=e,

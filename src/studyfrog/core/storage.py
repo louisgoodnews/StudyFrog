@@ -141,7 +141,7 @@ def add_table_entry(
         entry["updated_at"] = get_now_str()
         entry["updated_on"] = get_today_str()
 
-        table["entries"]["values"][str(new_id)] = entry
+        table["entries"]["values"][str(new_id)] = dict(sorted(entry.items()))
 
         table["schema"]["fields"]["values"] = sorted(
             list(set(table["schema"]["fields"]["values"] + list(entry.keys())))
@@ -315,13 +315,46 @@ def add_table_entries(
     """
 
     try:
-        return [
-            add_table_entry(
-                entry=entry,
-                table_name=table_name,
+        result: list[int] = []
+
+        table: dict[str, Any] = get_table_content(table_name=table_name)
+
+        new_id: int = int(
+            table.get("metadata", {}).get(
+                "next_id",
+                1,
             )
-            for entry in entries
-        ]
+        )
+
+        for entry in entries:
+            entry["created_at"] = get_now_str()
+            entry["created_on"] = get_today_str()
+            entry["id"] = new_id
+            entry["key"] = f"{entry['type'].upper()}_{new_id}"
+            table["metadata"]["next_id"] = new_id + 1
+            entry["updated_at"] = get_now_str()
+            entry["updated_on"] = get_today_str()
+
+            table["entries"]["values"][str(new_id)] = dict(sorted(entry.items()))
+
+            table["schema"]["fields"]["values"] = sorted(
+                list(set(table["schema"]["fields"]["values"] + list(entry.keys())))
+            )
+
+            table["schema"]["fields"]["total"] = len(table["schema"]["fields"]["values"])
+
+            result.append(new_id)
+
+            new_id += 1
+
+        table["entries"]["total"] = new_id
+
+        write_table_content(
+            table_name=table_name,
+            table=table,
+        )
+
+        return result
     except Exception as e:
         log_exception(
             exception=e,

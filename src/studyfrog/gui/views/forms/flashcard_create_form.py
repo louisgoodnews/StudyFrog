@@ -16,6 +16,8 @@ NAME: Final[Literal["gui.views.forms.flashcard_create_form"]] = (
     "gui.views.forms.flashcard_create_form"
 )
 
+FORM_WIDGETS: Final[dict[str, tkinter.Widget]] = {}
+
 
 # ---------- Functions ---------- #
 

@@ -84,6 +84,12 @@ APPLICATION_STOPPED: Final[Literal["application_stopped"]] = "application_stoppe
 
 APPLICATION_STOPPING: Final[Literal["application_stopping"]] = "application_stopping"
 
+CANCEL_BUTTON_CLICKED: Final[Literal["cancel_button_clicked"]] = "cancel_button_clicked"
+
+CONFIRM_BUTTON_CLICKED: Final[Literal["confirm_button_clicked"]] = "confirm_button_clicked"
+
+CREATE_BUTTON_CLICKED: Final[Literal["create_button_clicked"]] = "create_button_clicked"
+
 GET_ALL_ANSWERS: Final[Literal["get_all_answers"]] = "get_all_answers"
 
 GET_ALL_ASSOCIATIONS: Final[Literal["get_all_associations"]] = "get_all_associations"
@@ -140,6 +146,8 @@ GET_FLASHCARD: Final[Literal["get_flashcard"]] = "get_flashcard"
 
 GET_FLASHCARDS: Final[Literal["get_flashcards"]] = "get_flashcards"
 
+GET_FORM: Final[Literal["get_form"]] = "get_form"
+
 GET_IMAGE: Final[Literal["get_image"]] = "get_image"
 
 GET_IMAGES: Final[Literal["get_images"]] = "get_images"
@@ -187,6 +195,8 @@ GET_TEACHERS: Final[Literal["get_teachers"]] = "get_teachers"
 GET_USER: Final[Literal["get_user"]] = "get_user"
 
 GET_USERS: Final[Literal["get_users"]] = "get_users"
+
+OK_BUTTON_CLICKED: Final[Literal["ok_button_clicked"]] = "ok_button_clicked"
 
 REMOVE_ANSWER: Final[Literal["remove_answer"]] = "remove_answer"
 

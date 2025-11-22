@@ -34,7 +34,7 @@ LOCK: Final[threading.Lock] = threading.Lock()
 
 NAME: Final[Literal["utils.utils"]] = "utils.utils"
 
-SUBSCRIPTIONS: Final[dict[str, list[dict[str, Any]]]] = {}
+SUBSCRIPTIONS: Final[dict[str, dict[str, list[dict[str, Any]]]]] = {}
 
 
 # ---------- Functions ---------- #
@@ -66,8 +66,6 @@ def ensure_dir(path: Path) -> bool:
         bool: True if the directory exists, False otherwise.
     """
 
-    global NAME
-
     try:
         path.mkdir(exist_ok=True)
         return True
@@ -90,8 +88,6 @@ def ensure_file(path: Path) -> bool:
     Returns:
         bool: True if the file exists, False otherwise.
     """
-
-    global NAME
 
     try:
         ensure_dir(path.parent)
@@ -116,8 +112,6 @@ def ensure_json(path: Path) -> bool:
     Returns:
         bool: True if the JSON file exists, False otherwise.
     """
-
-    global NAME
 
     try:
         ensure_dir(path.parent)
@@ -161,8 +155,6 @@ def get_dir(path: Path) -> bool:
         bool: True if the directory exists, False otherwise.
     """
 
-    global NAME
-
     try:
         path.mkdir(
             exist_ok=True,
@@ -188,8 +180,6 @@ def get_file(path: Path) -> bool:
     Returns:
         bool: True if the file exists, False otherwise.
     """
-
-    global NAME
 
     try:
         path.touch()
@@ -292,7 +282,7 @@ def get_home() -> Path:
     return Path.home()
 
 
-def get_length_of_obj(obj: Any) -> int:
+def get_length_of_obj(obj: Any) -> Optional[int]:
     """
     Returns the length of an object.
 
@@ -300,13 +290,11 @@ def get_length_of_obj(obj: Any) -> int:
         obj (Any): The object to get the length of.
 
     Returns:
-        int: The length of the object.
+        Optional[int]: The length of the object or None if the object has no length.
 
     Raises:
         ValueError: If the object has no length.
     """
-
-    global NAME
 
     try:
         if not hasattr(
@@ -465,8 +453,6 @@ def invert_dict(dictionary: dict[str, Any]) -> dict[Any, str]:
         Exception: If inversion of the dictionary fails.
     """
 
-    global NAME
-
     try:
         return {
             value: key
@@ -496,6 +482,78 @@ def is_dict_empty(dictionary: dict[str, Any]) -> bool:
     """
 
     return not dictionary
+
+
+def is_equal(
+    value: Any,
+    other: Any,
+) -> bool:
+    """
+    Returns True if the value is equal to the other, False otherwise.
+
+    Args:
+        value (Any): The value to compare.
+        other (Any): The other value to compare.
+
+    Returns:
+        bool: True if the value is equal to the other, False otherwise.
+    """
+
+    return value == other
+
+
+def is_greater_than(
+    value: Any,
+    other: Any,
+) -> bool:
+    """
+    Returns True if the value is greater than the other, False otherwise.
+
+    Args:
+        value (Any): The value to compare.
+        other (Any): The other value to compare.
+
+    Returns:
+        bool: True if the value is greater than the other, False otherwise.
+    """
+
+    if not hasattr(
+        value,
+        "__gt__",
+    ) or not hasattr(
+        other,
+        "__gt__",
+    ):
+        raise ValueError("Value and other must support the greater than operator.")
+
+    return value > other
+
+
+def is_greater_than_or_equal(
+    value: Any,
+    other: Any,
+) -> bool:
+    """
+    Returns True if the value is greater than or equal to the other, False otherwise.
+
+    Args:
+        value (Any): The value to compare.
+        other (Any): The other value to compare.
+
+    Returns:
+        bool: True if the value is greater than or equal to the other, False otherwise.
+    """
+
+    if not hasattr(
+        value,
+        "__ge__",
+    ) or not hasattr(
+        other,
+        "__ge__",
+    ):
+        raise ValueError("Value and other must support the greater than or equal to operator.")
+
+    return value >= other
 
 
 def is_item_in_list(
@@ -552,6 +610,60 @@ def is_key_in_dict(
     return key in dictionary
 
 
+def is_less_than(
+    value: Any,
+    other: Any,
+) -> bool:
+    """
+    Returns True if the value is less than the other, False otherwise.
+
+    Args:
+        value (Any): The value to compare.
+        other (Any): The other value to compare.
+
+    Returns:
+        bool: True if the value is less than the other, False otherwise.
+    """
+
+    if not hasattr(
+        value,
+        "__lt__",
+    ) or not hasattr(
+        other,
+        "__lt__",
+    ):
+        raise ValueError("Value and other must support the less than operator.")
+
+    return value < other
+
+
+def is_less_than_or_equal(
+    value: Any,
+    other: Any,
+) -> bool:
+    """
+    Returns True if the value is less than or equal to the other, False otherwise.
+
+    Args:
+        value (Any): The value to compare.
+        other (Any): The other value to compare.
+
+    Returns:
+        bool: True if the value is less than or equal to the other, False otherwise.
+    """
+
+    if not hasattr(
+        value,
+        "__le__",
+    ) or not hasattr(
+        other,
+        "__le__",
+    ):
+        raise ValueError("Value and other must support the less than or equal to operator.")
+
+    return value <= other
+
+
 def is_list_empty(list_: list[Any]) -> bool:
     """
     Returns True if the list is empty, False otherwise.
@@ -564,6 +676,24 @@ def is_list_empty(list_: list[Any]) -> bool:
     """
 
     return not list_
+
+
+def is_not_equal(
+    value: Any,
+    other: Any,
+) -> bool:
+    """
+    Returns True if the value is not equal to the other, False otherwise.
+
+    Args:
+        value (Any): The value to compare.
+        other (Any): The other value to compare.
+
+    Returns:
+        bool: True if the value is not equal to the other, False otherwise.
+    """
+
+    return value != other
 
 
 def is_tuple_empty(tuple_: tuple[Any, ...]) -> bool:
@@ -787,6 +917,7 @@ def pluralize_str(string: str) -> str:
 
 def publish_event(
     event: str,
+    namespace: str = "GLOBAL",
     *args,
     **kwargs,
 ) -> dict[str, Any]:
@@ -795,6 +926,7 @@ def publish_event(
 
     Args:
         event (str): The event to publish.
+        namespace (str): The namespace to publish the event to.
         *args: The arguments to pass to the subscribers.
         **kwargs: The keyword arguments to pass to the subscribers.
 
@@ -813,9 +945,15 @@ def publish_event(
     ):
         return result
 
+    if not is_key_in_dict(
+        key=namespace,
+        dictionary=SUBSCRIPTIONS[event],
+    ):
+        return result
+
     for subscription in list(
         sorted(
-            SUBSCRIPTIONS[event],
+            SUBSCRIPTIONS[event][namespace],
             key=lambda x: x["priority"],
             reverse=True,
         ),
@@ -855,6 +993,7 @@ def publish_event(
 def register_subscription(
     event: str,
     function: Callable[..., Any],
+    namespace: str = "GLOBAL",
     persistent: bool = False,
     priority: int = 0,
 ) -> str:
@@ -864,6 +1003,7 @@ def register_subscription(
     Args:
         event (str): The event to subscribe to.
         function (Callable[..., Any]): The function to call when the event is triggered.
+        namespace (str): The namespace to subscribe to.
         persistent (bool): Whether the subscription should be persistent.
         priority (int): The priority of the subscription.
 
@@ -875,18 +1015,24 @@ def register_subscription(
     """
 
     try:
-        if not 0 < priority < 101:
+        if not 0 <= priority <= 100:
             raise ValueError("Priority must be between 0 and 100.")
 
         if not is_key_in_dict(
             key=event,
             dictionary=SUBSCRIPTIONS,
         ):
-            SUBSCRIPTIONS[event] = []
+            SUBSCRIPTIONS[event] = {}
+
+        if not is_key_in_dict(
+            key=namespace,
+            dictionary=SUBSCRIPTIONS[event],
+        ):
+            SUBSCRIPTIONS[event][namespace] = []
 
         uuid: str = get_uuid_str()
 
-        SUBSCRIPTIONS[event].append(
+        SUBSCRIPTIONS[event][namespace].append(
             {
                 "function": function,
                 "persistent": persistent,
@@ -916,8 +1062,6 @@ def str_to_date(date_string: str) -> Optional[date]:
         Optional[date]: The date object or None if the conversion failed.
     """
 
-    global NAME
-
     try:
         return date.fromisoformat(date_string)
     except Exception as e:
@@ -939,8 +1083,6 @@ def str_to_datetime(datetime_string: str) -> Optional[datetime]:
     Returns:
         Optional[datetime]: The datetime object or None if the conversion failed.
     """
-
-    global NAME
 
     try:
         return datetime.fromisoformat(datetime_string)
@@ -969,17 +1111,24 @@ def unsubscribe_subscription(uuid: str) -> bool:
         subscriptions,
     ) in list(SUBSCRIPTIONS.items()):
         for (
-            index,
-            subscription,
-        ) in enumerate(iterable=subscriptions):
-            if subscription["uuid"] != uuid:
-                continue
+            namespace,
+            subscriptions,
+        ) in list(subscriptions.items()):
+            for (
+                index,
+                subscription,
+            ) in enumerate(iterable=subscriptions):
+                if subscription["uuid"] != uuid:
+                    continue
 
-            del subscriptions[index]
-            return True
+                del subscriptions[index]
+                return True
 
-        if not SUBSCRIPTIONS[event]:
-            del SUBSCRIPTIONS[event]
+            if not SUBSCRIPTIONS[event][namespace]:
+                del SUBSCRIPTIONS[event][namespace]
+
+            if not SUBSCRIPTIONS[event]:
+                del SUBSCRIPTIONS[event]
 
     return False
 

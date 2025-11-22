@@ -202,6 +202,7 @@ from core.defaults import (
     LOW_PRIORITY,
     LOWEST_PRIORITY,
     MEDIUM_DIFFICULTY,
+    MEDIUM_PRIORITY,
     STUDY_FROG_USER,
 )
 from core.objects import (
@@ -422,6 +423,7 @@ def ensure_defaults() -> None:
             LOW_PRIORITY,
             LOWEST_PRIORITY,
             MEDIUM_DIFFICULTY,
+            MEDIUM_PRIORITY,
             STUDY_FROG_USER,
         ):
             add_table_entry_if_not_exists(

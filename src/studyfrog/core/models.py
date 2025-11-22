@@ -44,7 +44,7 @@ def _get_object_dict(**kwargs) -> dict[str, Any]:
     return dict(sorted(kwargs.items()))
 
 
-def get_answer(
+def get_answer_model(
     text: str,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
@@ -65,15 +65,13 @@ def get_answer(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["text"] = text
-
     kwargs["type"] = "ANSWER"
 
     return _get_object_dict(**kwargs)
 
 
-def get_association(
+def get_association_model(
     answer: Union[int, list[Union[int, str]], str],
     customfield: Union[int, list[Union[int, str]], str],
     difficulty: Union[int, list[Union[int, str]], str],
@@ -133,7 +131,7 @@ def get_association(
     return _get_object_dict(**kwargs)
 
 
-def get_customfield(
+def get_customfield_model(
     name: str,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
@@ -154,15 +152,13 @@ def get_customfield(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["name"] = name
-
     kwargs["type"] = "CUSTOMFIELD"
 
     return _get_object_dict(**kwargs)
 
 
-def get_difficulty(
+def get_difficulty_model(
     name: str,
     value: int,
     customfields: Optional[dict[str, Any]] = None,
@@ -185,17 +181,14 @@ def get_difficulty(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["name"] = name
-
     kwargs["type"] = "DIFFICULTY"
-
     kwargs["value"] = value
 
     return _get_object_dict(**kwargs)
 
 
-def get_flashcard(
+def get_flashcard_model(
     back_text: str,
     front_text: str,
     difficulty: Optional[str] = None,
@@ -222,9 +215,7 @@ def get_flashcard(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["back_text"] = back_text
-
     kwargs["front_text"] = front_text
 
     if not difficulty:
@@ -236,13 +227,12 @@ def get_flashcard(
         priority = ""
 
     kwargs["priority"] = priority
-
     kwargs["type"] = "FLASHCARD"
 
     return _get_object_dict(**kwargs)
 
 
-def get_image(
+def get_image_model(
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
@@ -261,13 +251,12 @@ def get_image(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["type"] = "IMAGE"
 
     return _get_object_dict(**kwargs)
 
 
-def get_note(
+def get_note_model(
     text: str,
     title: str,
     customfields: Optional[dict[str, Any]] = None,
@@ -290,17 +279,14 @@ def get_note(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["text"] = text
-
     kwargs["title"] = title
-
     kwargs["type"] = "NOTE"
 
     return _get_object_dict(**kwargs)
 
 
-def get_option(
+def get_option_model(
     name: str,
     value: Union[
         bool,
@@ -328,17 +314,14 @@ def get_option(
         customfields = []
 
     kwargs["customfields"] = customfields
-
     kwargs["name"] = name
-
     kwargs["type"] = "OPTION"
-
     kwargs["value"] = value
 
     return _get_object_dict(**kwargs)
 
 
-def get_priority(
+def get_priority_model(
     name: str,
     value: int,
     customfields: Optional[dict[str, Any]] = None,
@@ -361,17 +344,14 @@ def get_priority(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["name"] = name
-
     kwargs["type"] = "PRIORITY"
-
     kwargs["value"] = value
 
     return _get_object_dict(**kwargs)
 
 
-def get_question(
+def get_question_model(
     question_type: Literal["multiple_choice", "open", "true_false"],
     text: str,
     answers: Optional[list[str]] = None,
@@ -400,17 +380,14 @@ def get_question(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["question_type"] = question_type
-
     kwargs["text"] = text
-
     kwargs["type"] = "QUESTION"
 
     return _get_object_dict(**kwargs)
 
 
-def get_rehearsal_run(
+def get_rehearsal_run_model(
     rehearsal_run_items: Optional[list[str]] = None,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
@@ -436,13 +413,12 @@ def get_rehearsal_run(
         rehearsal_run_items = []
 
     kwargs["rehearsal_run_items"] = rehearsal_run_items
-
     kwargs["type"] = "REHEARSAL_RUN"
 
     return _get_object_dict(**kwargs)
 
 
-def get_rehearsal_run_item(
+def get_rehearsal_run_item_model(
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
@@ -461,13 +437,15 @@ def get_rehearsal_run_item(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["type"] = "REHEARSAL_RUN_ITEM"
 
     return _get_object_dict(**kwargs)
 
 
-def get_stack(
+def get_stack_model(
+    difficulty: str,
+    name: str,
+    priority: str,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
 ) -> dict[str, Any]:
@@ -476,6 +454,9 @@ def get_stack(
 
     Args:
         customfields (Optional[dict[str, Any]]): The stack's custom fields.
+        difficulty (str): The stack's difficulty.
+        name (str): The stack's name.
+        priority (str): The stack's priority.
         **kwargs (dict[str, Any]): Additional keywords to pass to the stack's attributes.
 
     Returns:
@@ -486,13 +467,18 @@ def get_stack(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
+    kwargs["difficulty"] = difficulty
+    kwargs["name"] = name
+    kwargs["priority"] = priority
     kwargs["type"] = "STACK"
 
     return _get_object_dict(**kwargs)
 
 
-def get_subject(
+def get_subject_model(
+    difficulty: str,
+    name: str,
+    priority: str,
     teacher: str,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
@@ -501,6 +487,10 @@ def get_subject(
     Returns a dictionary containing a subject's attributes.
 
     Args:
+        customfields (Optional[dict[str, Any]]): The subject's custom fields.
+        difficulty (str): The subject's difficulty.
+        name (str): The subject's name.
+        priority (str): The subject's priority.
         teacher (str): The subject's teacher.
         **kwargs (dict[str, Any]): Additional keywords to pass to the subject's attributes.
 
@@ -512,15 +502,16 @@ def get_subject(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
+    kwargs["difficulty"] = difficulty
+    kwargs["name"] = name
+    kwargs["priority"] = priority
     kwargs["teacher"] = teacher
-
     kwargs["type"] = "SUBJECT"
 
     return _get_object_dict(**kwargs)
 
 
-def get_tag(
+def get_tag_model(
     name: str,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
@@ -546,7 +537,10 @@ def get_tag(
     return _get_object_dict(**kwargs)
 
 
-def get_teacher(
+def get_teacher_model(
+    difficulty: str,
+    name: str,
+    priority: str,
     subjects: Optional[list[str]] = None,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
@@ -556,6 +550,9 @@ def get_teacher(
 
     Args:
         customfields (Optional[dict[str, Any]]): The teacher's custom fields.
+        difficulty (str): The teacher's difficulty.
+        name (str): The teacher's name.
+        priority (str): The teacher's priority.
         subjects (Optional[list[str]]): The teacher's subjects.
         **kwargs (dict[str, Any]): Additional keywords to pass to the teacher's attributes.
 
@@ -567,18 +564,20 @@ def get_teacher(
         customfields = {}
 
     kwargs["customfields"] = customfields
+    kwargs["difficulty"] = difficulty
+    kwargs["name"] = name
+    kwargs["priority"] = priority
 
     if not subjects:
         subjects = []
 
     kwargs["subjects"] = subjects
-
     kwargs["type"] = "TEACHER"
 
     return _get_object_dict(**kwargs)
 
 
-def get_user(
+def get_user_model(
     name: str,
     customfields: Optional[dict[str, Any]] = None,
     **kwargs,
@@ -599,9 +598,7 @@ def get_user(
         customfields = {}
 
     kwargs["customfields"] = customfields
-
     kwargs["name"] = name
-
     kwargs["type"] = "USER"
 
     return _get_object_dict(**kwargs)

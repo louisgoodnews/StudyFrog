@@ -5,26 +5,21 @@ Date: 2025-11-16
 
 import tkinter
 
-from tkinter.constants import NSEW
+from tkinter.constants import NSEW, W
 from typing import Final, Literal, Optional, Type
 
-from gui.constants import TOPLEVEL_GEOMETRY
-from gui.factory import get_frame, get_success_toast
-from gui.views.logic.create_view_logic import get_form_getter, on_combobox_change
+from gui.constants import DEFAULT_FONT, LARGE_BOLD_FONT, TOPLEVEL_GEOMETRY
+from gui.factory import get_button, get_frame, get_label, get_success_toast
+from gui.views.logic.create_view_logic import (
+    get_form_getter,
+    on_cancel_button_click,
+    on_combobox_change,
+    on_create_button_click,
+)
 from utils.utils import destroy_widget_children, log_exception, log_info
 
 
-# ---------- Constants ---------- #
-
-BOTTOM_FRAME: Optional[tkinter.Frame] = None
-
-CENTER_FRAME: Optional[tkinter.Frame] = None
-
-MASTER: Optional[tkinter.Toplevel] = None
-
-NAME: Final[Literal["gui.views.views.create_view"]] = "gui.views.views.create_view"
-
-TOP_FRAME: Optional[tkinter.Frame] = None
+# ---------- Types ---------- #
 
 WhatType: Type[
     Literal[
@@ -43,6 +38,23 @@ WhatType: Type[
     "subject",
     "teacher",
 ]
+
+
+# ---------- Constants ---------- #
+
+BOTTOM_FRAME: Optional[tkinter.Frame] = None
+
+CENTER_FRAME: Optional[tkinter.Frame] = None
+
+MASTER: Optional[tkinter.Toplevel] = None
+
+NAME: Final[Literal["gui.views.views.create_view"]] = "gui.views.views.create_view"
+
+TITLE_LABEL: Optional[tkinter.Label] = None
+
+TOP_FRAME: Optional[tkinter.Frame] = None
+
+WHAT: Optional[WhatType] = None
 
 
 # ---------- Functions ---------- #
@@ -167,7 +179,18 @@ def configure_bottom_frame_grid() -> None:
     """
 
     try:
-        pass
+        get_bottom_frame().grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+        get_bottom_frame().grid_columnconfigure(
+            index=1,
+            weight=0,
+        )
+        get_bottom_frame().grid_columnconfigure(
+            index=2,
+            weight=0,
+        )
     except Exception as e:
         log_exception(
             exception=e,
@@ -271,7 +294,26 @@ def create_bottom_frame_widgets(master: tkinter.Frame) -> None:
     """
 
     try:
-        pass
+        get_button(
+            command=on_create_button_click,
+            master=master,
+            text="Create",
+        ).grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+        get_button(
+            command=on_cancel_button_click,
+            master=master,
+            text="Cancel",
+        ).grid(
+            column=2,
+            padx=5,
+            pady=5,
+            row=0,
+        )
     except Exception as e:
         log_exception(
             exception=e,
@@ -321,7 +363,37 @@ def create_top_frame_widgets(master: tkinter.Frame) -> None:
     """
 
     try:
-        pass
+        title_label: tkinter.Label = get_label(
+            anchor=W,
+            font=LARGE_BOLD_FONT,
+            master=master,
+            text=f"Create {get_what()}",
+        )
+
+        title_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        set_title_label(title_label=title_label)
+
+        description_label: tkinter.Label = get_label(
+            anchor=W,
+            font=DEFAULT_FONT,
+            master=master,
+            text="Required fields are marked with an asterisk. *",
+        )
+
+        description_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
     except Exception as e:
         log_exception(
             exception=e,
@@ -444,6 +516,7 @@ def get_create_view(
         )
 
         set_master(master=master)
+        set_what(what=what)
 
         clear_widgets()
         create_widgets()
@@ -468,6 +541,26 @@ def get_create_view(
             name=NAME,
         )
         raise Exception(f"Failed to get create view: {e}") from e
+
+
+def get_title_label() -> tkinter.Label:
+    """
+    Returns the label.
+
+    Args:
+        None
+
+    Returns:
+        tkinter.Label: The label.
+
+    Raises:
+        ValueError: If the label is not set. Call 'set_title_label' first.
+    """
+
+    if LABEL is None:
+        raise ValueError("Label not set. Call 'set_title_label' first.")
+
+    return LABEL
 
 
 def get_master() -> tkinter.Toplevel:
@@ -519,6 +612,44 @@ def get_top_frame() -> tkinter.Frame:
     return TOP_FRAME
 
 
+def get_what() -> WhatType:
+    """
+    Returns the what.
+
+    Args:
+        None
+
+    Returns:
+        WhatType: The what.
+
+    Raises:
+        ValueError: If the what is not set. Call 'set_what' first.
+    """
+
+    global WHAT
+
+    if WHAT is None:
+        raise ValueError("What not set. Call 'set_what' first.")
+
+    return WHAT
+
+
+def set_title_label(title_label: tkinter.Label) -> None:
+    """
+    Sets the title label.
+
+    Args:
+        title_label (tkinter.Label): The title label.
+
+    Returns:
+        None
+    """
+
+    global TITLE_LABEL
+
+    TITLE_LABEL = title_label
+
+
 def set_master(master: tkinter.Toplevel) -> None:
     """
     Sets the master of the create view.
@@ -555,6 +686,22 @@ def set_master(master: tkinter.Toplevel) -> None:
     )
 
     MASTER.geometry(newGeometry=TOPLEVEL_GEOMETRY)
+
+
+def set_what(what: WhatType) -> None:
+    """
+    Sets the what.
+
+    Args:
+        what (WhatType): The what.
+
+    Returns:
+        None
+    """
+
+    global WHAT
+
+    WHAT = what
 
 
 # ---------- Auto-Export ---------- #

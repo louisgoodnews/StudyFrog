@@ -201,7 +201,7 @@ def _make_get_entry(table_name: str) -> Callable[[int], dict[str, Any]]:
         """
         try:
             return get_table_entry(
-                entry_id=entry_id,
+                id=entry_id,
                 table_name=table_name,
             )
         except Exception as e:
@@ -241,7 +241,7 @@ def _make_get_entries(table_name: str) -> Callable[[list[int]], list[dict[str, A
         """
         try:
             return get_table_entries(
-                entry_ids=entry_ids,
+                ids=entry_ids,
                 table_name=table_name,
             )
         except Exception as e:
@@ -283,7 +283,7 @@ def _make_remove_entries(table_name: str) -> Callable[[list[int]], list[bool]]:
         """
         try:
             return remove_table_entries(
-                entry_ids=entry_ids,
+                ids=entry_ids,
                 table_name=table_name,
             )
         except Exception as e:
@@ -325,7 +325,7 @@ def _make_remove_entry(table_name: str) -> Callable[[int], bool]:
         """
         try:
             return remove_table_entry(
-                entry_id=entry_id,
+                id=entry_id,
                 table_name=table_name,
             )
         except Exception as e:
@@ -371,7 +371,7 @@ def _make_update_entries(table_name: str) -> Callable[[list[int], dict[str, Any]
         """
         try:
             return update_table_entries(
-                entry_ids=entry_ids,
+                ids=entry_ids,
                 entry=entry,
                 table_name=table_name,
             )
@@ -415,7 +415,7 @@ def _make_update_entry(table_name: str) -> Callable[[int, dict[str, Any]], bool]
         """
         try:
             return update_table_entry(
-                entry_id=entry_id,
+                id=entry_id,
                 entry=entry,
                 table_name=table_name,
             )

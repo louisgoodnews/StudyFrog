@@ -56,6 +56,12 @@ LARGE_FONT: Final[tuple[str, int, Literal["normal"]]] = (
     DEFAULT_FONT_WEIGHT,
 )
 
+LARGE_BOLD_FONT: Final[tuple[str, int, Literal["bold"]]] = (
+    DEFAULT_FONT_FAMILY,
+    LARGE_FONT_SIZE,
+    BOLD_FONT_WEIGHT,
+)
+
 WHITE: Final[Literal["#FFFFFF"]] = "#FFFFFF"
 
 COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
