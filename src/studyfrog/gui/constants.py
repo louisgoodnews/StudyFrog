@@ -3,6 +3,7 @@ Author: Louis Goodnews
 Date: 2025-11-16
 """
 
+from tkinter import ttk
 from typing import Final, Literal
 
 from common.constants import PROJECT_NAME, PROJECT_VERSION
@@ -64,6 +65,7 @@ LARGE_BOLD_FONT: Final[tuple[str, int, Literal["bold"]]] = (
 
 WHITE: Final[Literal["#FFFFFF"]] = "#FFFFFF"
 
+
 COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
     "button": {
         "dark": {
@@ -83,20 +85,24 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         "dark": {"background": DARK_SECONDARY},
         "light": {"background": WHITE},
     },
+    "combobox": {
+        "dark": {"font": DEFAULT_FONT},
+        "light": {"font": DEFAULT_FONT},
+    },
     "entry": {
         "dark": {
             "background": DARK_SECONDARY,
             "bg": DARK_SECONDARY,
+            "fg": WHITE,
             "font": DEFAULT_FONT,
             "foreground": WHITE,
-            "fg": WHITE,
         },
         "light": {
             "background": WHITE,
             "bg": WHITE,
+            "fg": BLACK,
             "font": DEFAULT_FONT,
             "foreground": BLACK,
-            "fg": BLACK,
         },
     },
     "frame": {
@@ -141,6 +147,22 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         "dark": {"background": DARK_SECONDARY},
         "light": {"background": WHITE},
     },
+    "text": {
+        "dark": {
+            "background": DARK_SECONDARY,
+            "bg": DARK_SECONDARY,
+            "fg": WHITE,
+            "font": DEFAULT_FONT,
+            "foreground": WHITE,
+        },
+        "light": {
+            "background": WHITE,
+            "bg": WHITE,
+            "fg": BLACK,
+            "font": DEFAULT_FONT,
+            "foreground": BLACK,
+        },
+    },
     "toplevel": {
         "dark": {
             "background": DARK_SECONDARY,
@@ -162,6 +184,8 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         },
     },
 }
+
+READONLY: Final[Literal["readonly"]] = "readonly"
 
 TOAST_GEOMETRY: Final[Literal["400x200+100+100"]] = "400x200+100+100"
 

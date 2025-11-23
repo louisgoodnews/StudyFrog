@@ -5,21 +5,45 @@ Date: 2025-11-16
 
 import tkinter
 
+from tkinter import ttk
 from tkinter.constants import NSEW
 from typing import Any, Final, Literal, Optional
 
-from common.events import GET_FORM
-from gui.factory import get_entry, get_label
-from utils.utils import destroy_widget_children, log_exception, log_info, register_subscription
+from common.events import (
+    GET_ALL_DIFFICULTIES,
+    GET_ALL_PRIORITIES,
+    GET_ALL_SUBJECTS,
+    GET_ALL_TEACHERS,
+    GET_FORM,
+)
+from gui.factory import get_combobox, get_entry, get_label, get_text
+from utils.utils import (
+    destroy_widget_children,
+    is_list_empty,
+    log_exception,
+    log_info,
+    log_warning,
+    publish_event,
+    register_subscription,
+    unsubscribe_subscription,
+)
 
 
 # ---------- Constants ---------- #
+
+DIFFICULTIES: Final[list[str]] = []
 
 FORM_VARIABLES: Final[dict[str, tkinter.Widget]] = {}
 
 NAME: Final[Literal["gui.views.forms.stack_create_form"]] = "gui.views.forms.stack_create_form"
 
+PRIORITIES: Final[list[str]] = []
+
+SUBJECTS: Final[list[str]] = []
+
 SUBSCRIPTION: Optional[str] = None
+
+TEACHERS: Final[list[str]] = []
 
 
 # ---------- Functions ---------- #
@@ -75,6 +99,10 @@ def configure_master_grid(master: tkinter.Frame) -> None:
             index=0,
             weight=0,
         )
+        master.grid_rowconfigure(
+            index=1,
+            weight=0,
+        )
     except Exception as e:
         log_exception(
             exception=e,
@@ -97,6 +125,7 @@ def create_widgets(master: tkinter.Frame) -> None:
     Raises:
         Exception: If an error occurs.
     """
+
     try:
         name_label: tkinter.Label = get_label(
             master=master,
@@ -127,6 +156,189 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["name"] = name_var
+
+        description_var: tkinter.StringVar = tkinter.StringVar()
+
+        description_label: tkinter.Label = get_label(
+            master=master,
+            text="Description: ",
+        )
+
+        description_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
+
+        description_text: tkinter.Text = get_text(
+            master=master,
+        )
+
+        description_text.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
+
+        description_text.bind(
+            func=lambda event: description_var.set(
+                value=description_text.get(
+                    "1.0",
+                    "end-1c",
+                )
+            ),
+            sequence="<KeyRelease>",
+        )
+
+        FORM_VARIABLES["description"] = description_var
+
+        difficulty_var: tkinter.StringVar = tkinter.StringVar()
+
+        difficulty_label: tkinter.Label = get_label(
+            master=master,
+            text="Difficulty*: ",
+        )
+
+        difficulty_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
+
+        difficulty_combobox: ttk.Combobox = get_combobox(
+            master=master,
+            textvariable=difficulty_var,
+            values=[difficulty["name"] for difficulty in get_difficulties()],
+        )
+
+        difficulty_combobox.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
+
+        difficulty_combobox.bind(
+            func=lambda event: difficulty_var.set(value=difficulty_combobox.get()),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        FORM_VARIABLES["difficulty"] = difficulty_var
+
+        priority_var: tkinter.StringVar = tkinter.StringVar()
+
+        priority_label: tkinter.Label = get_label(
+            master=master,
+            text="Priority*: ",
+        )
+
+        priority_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=3,
+            sticky=NSEW,
+        )
+
+        priority_combobox: ttk.Combobox = get_combobox(
+            master=master,
+            textvariable=priority_var,
+            values=[priority["name"] for priority in get_priorities()],
+        )
+
+        priority_combobox.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=3,
+            sticky=NSEW,
+        )
+
+        priority_combobox.bind(
+            func=lambda event: priority_var.set(value=priority_combobox.get()),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        FORM_VARIABLES["priority"] = priority_var
+
+        subject_var: tkinter.StringVar = tkinter.StringVar()
+
+        subject_label: tkinter.Label = get_label(
+            master=master,
+            text="Subject: ",
+        )
+
+        subject_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=4,
+            sticky=NSEW,
+        )
+
+        subject_combobox: ttk.Combobox = get_combobox(
+            master=master,
+            textvariable=subject_var,
+            values=[subject["name"] for subject in get_subjects()],
+        )
+
+        subject_combobox.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=4,
+            sticky=NSEW,
+        )
+
+        subject_combobox.bind(
+            func=lambda event: subject_var.set(value=subject_combobox.get()),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        FORM_VARIABLES["subject"] = subject_var
+
+        teacher_var: tkinter.StringVar = tkinter.StringVar()
+
+        teacher_label: tkinter.Label = get_label(
+            master=master,
+            text="Teacher: ",
+        )
+
+        teacher_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=5,
+            sticky=NSEW,
+        )
+
+        teacher_combobox: ttk.Combobox = get_combobox(
+            master=master,
+            textvariable=teacher_var,
+            values=[teacher["name"] for teacher in get_teachers()],
+        )
+
+        teacher_combobox.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=5,
+            sticky=NSEW,
+        )
+
+        teacher_combobox.bind(
+            func=lambda event: teacher_var.set(value=teacher_combobox.get()),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        FORM_VARIABLES["teacher"] = teacher_var
     except Exception as e:
         log_exception(
             exception=e,
@@ -136,50 +348,26 @@ def create_widgets(master: tkinter.Frame) -> None:
         raise Exception(f"Failed to create widgets: {e}") from e
 
 
-def get_stack_create_form(master: tkinter.Frame) -> None:
+def get_difficulties() -> list[str]:
     """
-    Get the stack create form.
+    Get the difficulties.
 
     Args:
-        master (tkinter.Frame): The master frame.
+        None
 
     Returns:
-        None
+        list[str]: The difficulties.
 
     Raises:
         Exception: If an error occurs.
     """
 
-    global SUBSCRIPTION
-
-    try:
-        log_info(
-            message="Getting stack create form",
-            name=NAME,
+    if is_list_empty(list_=DIFFICULTIES):
+        raise Exception(
+            "Difficulties are empty. Check the logs for errors as this should not be happening."
         )
 
-        clear_master_frame(master=master)
-        configure_master_grid(master=master)
-        create_widgets(master=master)
-
-        SUBSCRIPTION = register_subscription(
-            event=GET_FORM,
-            function=on_get_form,
-            namespace="CREATE_FORMS",
-            persistent=False,
-        )
-
-        log_info(
-            message="Got stack create form successfully",
-            name=NAME,
-        )
-    except Exception as e:
-        log_exception(
-            exception=e,
-            message="Failed to get stack create form",
-            name=NAME,
-        )
-        raise Exception(f"Failed to get stack create form: {e}") from e
+    return DIFFICULTIES
 
 
 def get_form() -> dict[str, Any]:
@@ -209,6 +397,22 @@ def get_form() -> dict[str, Any]:
             }
         )
 
+        result["difficulty"] = next(
+            (
+                difficulty["key"]
+                for difficulty in get_difficulties()
+                if difficulty["name"] == result["difficulty"]
+            ),
+        )
+
+        result["priority"] = next(
+            (
+                priority["key"]
+                for priority in get_priorities()
+                if priority["name"] == result["priority"]
+            ),
+        )
+
         return result
     except Exception as e:
         log_exception(
@@ -217,6 +421,244 @@ def get_form() -> dict[str, Any]:
             name=NAME,
         )
         raise Exception(f"Failed to get form: {e}") from e
+
+
+def get_priorities() -> list[dict[str, Any]]:
+    """
+    Get the priorities.
+
+    Args:
+        None
+
+    Returns:
+        list[dict[str, Any]]: The priorities.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    if is_list_empty(list_=PRIORITIES):
+        raise Exception(
+            "Priorities are empty. Check the logs for errors as this should not be happening."
+        )
+
+    return PRIORITIES
+
+
+def get_stack_create_form(master: tkinter.Frame) -> None:
+    """
+    Get the stack create form.
+
+    Args:
+        master (tkinter.Frame): The master frame.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    global SUBSCRIPTION
+
+    try:
+        log_info(
+            message="Getting stack create form",
+            name=NAME,
+        )
+
+        set_difficulties(difficulties=load_difficulties())
+        set_priorities(priorities=load_priorities())
+        set_subjects(subjects=load_subjects())
+        set_teachers(teachers=load_teachers())
+
+        clear_master_frame(master=master)
+        configure_master_grid(master=master)
+        create_widgets(master=master)
+
+        subscribe()
+
+        log_info(
+            message="Got stack create form successfully",
+            name=NAME,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to get stack create form",
+            name=NAME,
+        )
+        raise Exception(f"Failed to get stack create form: {e}") from e
+
+
+def get_subjects() -> list[str]:
+    """
+    Get the subjects.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: The subjects.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    if is_list_empty(list_=SUBJECTS):
+        log_warning(
+            message="Subjects are empty. Check the logs for additional warnings. StudyFrog will still function though.",
+            name=NAME,
+        )
+
+    return SUBJECTS
+
+
+def get_teachers() -> list[str]:
+    """
+    Get the teachers.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: The teachers.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    if is_list_empty(list_=TEACHERS):
+        log_warning(
+            "Teachers are empty. Check the logs for additional warnings. StudyFrog will still function though.",
+            name=NAME,
+        )
+
+    return TEACHERS
+
+
+def load_difficulties() -> list[str]:
+    """
+    Load the difficulties.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: The difficulties.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+    try:
+        return list(
+            publish_event(
+                event=GET_ALL_DIFFICULTIES,
+                namespace="GLOBAL",
+            )
+            .get("get_all_entries")[0]
+            .get("result")
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to load difficulties",
+            name=NAME,
+        )
+        raise Exception(f"Failed to load difficulties: {e}") from e
+
+
+def load_priorities() -> list[str]:
+    """
+    Load the priorities.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: The priorities.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+    try:
+        return list(
+            publish_event(
+                event=GET_ALL_PRIORITIES,
+                namespace="GLOBAL",
+            )
+            .get("get_all_entries")[0]
+            .get("result")
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to load priorities",
+            name=NAME,
+        )
+        raise Exception(f"Failed to load priorities: {e}") from e
+
+
+def load_subjects() -> list[str]:
+    """
+    Load the subjects.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: The subjects.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+    try:
+        return list(
+            publish_event(
+                event=GET_ALL_SUBJECTS,
+                namespace="GLOBAL",
+            )
+            .get("get_all_entries")[0]
+            .get("result")
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to load subjects",
+            name=NAME,
+        )
+        raise Exception(f"Failed to load subjects: {e}") from e
+
+
+def load_teachers() -> list[str]:
+    """
+    Load the teachers.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: The teachers.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+    try:
+        return list(
+            publish_event(
+                event=GET_ALL_TEACHERS,
+                namespace="GLOBAL",
+            )
+            .get("get_all_entries")[0]
+            .get("result")
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to load teachers",
+            name=NAME,
+        )
+        raise Exception(f"Failed to load teachers: {e}") from e
 
 
 def on_get_form() -> dict[str, Any]:
@@ -242,6 +684,122 @@ def on_get_form() -> dict[str, Any]:
             name=NAME,
         )
         raise Exception(f"Failed to handle get form event: {e}") from e
+
+
+def set_difficulties(difficulties: list[dict[str, Any]]) -> None:
+    """
+    Set the difficulties.
+
+    Args:
+        difficulties (list[dict[str, Any]]): The difficulties.
+
+    Returns:
+        None
+    """
+
+    DIFFICULTIES.extend(difficulties)
+
+
+def set_priorities(priorities: list[dict[str, Any]]) -> None:
+    """
+    Set the priorities.
+
+    Args:
+        priorities (list[dict[str, Any]]): The priorities.
+
+    Returns:
+        None
+    """
+
+    PRIORITIES.extend(priorities)
+
+
+def set_subjects(subjects: list[dict[str, Any]]) -> None:
+    """
+    Set the subjects.
+
+    Args:
+        subjects (list[dict[str, Any]]): The subjects.
+
+    Returns:
+        None
+    """
+
+    SUBJECTS.extend(subjects)
+
+
+def set_teachers(teachers: list[dict[str, Any]]) -> None:
+    """
+    Set the teachers.
+
+    Args:
+        teachers (list[dict[str, Any]]): The teachers.
+
+    Returns:
+        None
+    """
+
+    TEACHERS.extend(teachers)
+
+
+def subscribe() -> None:
+    """
+    Subscribe to the get form event.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    global SUBSCRIPTION
+
+    try:
+        SUBSCRIPTION = register_subscription(
+            event=GET_FORM,
+            function=on_get_form,
+            namespace="CREATE_FORMS",
+            persistent=False,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to subscribe",
+            name=NAME,
+        )
+        raise Exception(f"Failed to subscribe: {e}") from e
+
+
+def unsubscribe() -> None:
+    """
+    Unsubscribe from the get form event.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    global SUBSCRIPTION
+
+    try:
+        unsubscribe_subscription(uuid=SUBSCRIPTION)
+        SUBSCRIPTION = None
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to unsubscribe",
+            name=NAME,
+        )
+        raise Exception(f"Failed to unsubscribe: {e}") from e
 
 
 # ---------- Auto-Export ---------- #

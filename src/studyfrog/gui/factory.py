@@ -5,6 +5,7 @@ Date: 2025-11-16
 
 import tkinter
 
+from tkinter import ttk
 from tkinter.constants import ALL, BOTH, NSEW, NW, TOP, VERTICAL, YES
 from typing import Any, Final, Literal, Optional
 
@@ -108,6 +109,42 @@ def get_color_mode() -> Literal[
     """
 
     return COLOR_MODE
+
+
+def get_combobox(
+    master: tkinter.Widget,
+    *args,
+    **kwargs,
+) -> ttk.Combobox:
+    """
+    Returns a ttk.Combobox widget.
+
+    Args:
+        master (tkinter.Widget): The master of the ttk.Combobox widget to be created.
+        *args: Additional arguments passed to the ttk.Combobox constructor.
+        **kwargs: Additional keyword arguments passed to the ttk.Combobox constructor.
+
+    Returns:
+        ttk.Combobox: The ttk.Combobox widget.
+    """
+
+    try:
+        keyword_arguments: dict[str, Any] = dict(COLOR_CONFIG["combobox"][get_color_mode()])
+
+        keyword_arguments.update(kwargs)
+
+        return ttk.Combobox(
+            master=master,
+            *args,
+            **keyword_arguments,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to get combobox",
+            name=NAME,
+        )
+        raise Exception(f"Failed to get combobox: {e}") from e
 
 
 def get_entry(
@@ -398,8 +435,16 @@ def get_scrolled_frame(
             None
         """
 
-        canvas: tkinter.Canvas = event.widget
-        canvas.configure(scrollregion=canvas.bbox(ALL))
+        try:
+            canvas: tkinter.Canvas = result["canvas"]
+            canvas.configure(scrollregion=canvas.bbox(ALL))
+        except Exception as e:
+            log_exception(
+                exception=e,
+                message="Failed to configure scroll region",
+                name=NAME,
+            )
+            raise Exception(f"Failed to configure scroll region: {e}") from e
 
     try:
         result: dict[str, tkinter.Widget] = {}
@@ -475,6 +520,8 @@ def get_scrolled_frame(
 
         result["scrollbar"].grid(
             column=1,
+            padx=5,
+            pady=5,
             row=0,
             sticky=NSEW,
         )
@@ -541,6 +588,39 @@ def get_success_toast(
             name=NAME,
         )
         raise Exception(f"Failed to get success toast: {e}") from e
+
+
+def get_text(
+    master: tkinter.Widget,
+    **kwargs,
+) -> tkinter.Text:
+    """
+    Returns a tkinter.Text widget.
+
+    Args:
+        master (tkinter.Widget): The master of the tkinter.Text widget to be created.
+        **kwargs: Additional keyword arguments passed to the tkinter.Text constructor.
+
+    Returns:
+        tkinter.Text: The tkinter.Text widget.
+    """
+
+    try:
+        keyword_arguments: dict[str, Any] = dict(COLOR_CONFIG["text"][get_color_mode()])
+
+        keyword_arguments.update(kwargs)
+
+        return tkinter.Text(
+            master=master,
+            **keyword_arguments,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to get text",
+            name=NAME,
+        )
+        raise Exception(f"Failed to get text: {e}") from e
 
 
 def get_toast(

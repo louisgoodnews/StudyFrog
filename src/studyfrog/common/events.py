@@ -154,6 +154,10 @@ CONFIRM_BUTTON_CLICKED: Final[Literal["confirm_button_clicked"]] = "confirm_butt
 
 CREATE_BUTTON_CLICKED: Final[Literal["create_button_clicked"]] = "create_button_clicked"
 
+DESTROY_WIDGET: Final[Literal["destroy_widget"]] = "destroy_widget"
+
+DESTROY_WIDGET_CHILDREN: Final[Literal["destroy_widget_children"]] = "destroy_widget_children"
+
 GET_ALL_ANSWERS: Final[Literal["get_all_answers"]] = "get_all_answers"
 
 GET_ALL_ASSOCIATIONS: Final[Literal["get_all_associations"]] = "get_all_associations"

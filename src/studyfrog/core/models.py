@@ -446,14 +446,18 @@ def get_stack_model(
     difficulty: str,
     name: str,
     priority: str,
+    contents: Optional[dict[str, Any]] = None,
     customfields: Optional[dict[str, Any]] = None,
+    description: Optional[str] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a stack's attributes.
 
     Args:
+        contents (Optional[dict[str, Any]]): The stack's contents.
         customfields (Optional[dict[str, Any]]): The stack's custom fields.
+        description (Optional[str]): The stack's description.
         difficulty (str): The stack's difficulty.
         name (str): The stack's name.
         priority (str): The stack's priority.
@@ -463,10 +467,16 @@ def get_stack_model(
         dict[str, Any]: A dictionary containing a stack's attributes.
     """
 
+    if not contents:
+        contents = {}
+
+    kwargs["contents"] = contents
+
     if not customfields:
         customfields = {}
 
     kwargs["customfields"] = customfields
+    kwargs["description"] = description
     kwargs["difficulty"] = difficulty
     kwargs["name"] = name
     kwargs["priority"] = priority

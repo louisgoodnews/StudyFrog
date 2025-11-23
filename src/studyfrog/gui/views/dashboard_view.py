@@ -8,6 +8,7 @@ import tkinter
 from tkinter.constants import NSEW
 from typing import Any, Final, Literal, Optional
 
+from common.events import ADDED_STACK
 from gui.factory import get_button, get_frame, get_label, get_scrolled_frame, get_success_toast
 from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
 from gui.views.logic.dashboard_view_logic import (
@@ -17,7 +18,14 @@ from gui.views.logic.dashboard_view_logic import (
     on_edit_button_click,
     on_view_button_click,
 )
-from utils.utils import destroy_widget_children, get_widget_children, log_exception, log_info
+from utils.utils import (
+    destroy_widget_children,
+    get_widget_children,
+    log_exception,
+    log_info,
+    register_subscription,
+    unsubscribe_subscription,
+)
 
 
 # ---------- Constants ---------- #
@@ -25,6 +33,8 @@ from utils.utils import destroy_widget_children, get_widget_children, log_except
 CONTAINER: Optional[tkinter.Frame] = None
 
 NAME: Final[Literal["gui.views.views.dashboard_view"]] = "gui.views.views.dashboard_view"
+
+SUBSCRIPTION: Optional[str] = None
 
 
 # ---------- Functions ---------- #
@@ -275,6 +285,11 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
             sticky=NSEW,
         )
 
+        scrolled_frame["container"].grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
         set_container(frame=scrolled_frame["container"])
     except Exception as e:
         log_exception(
@@ -307,8 +322,33 @@ def create_dashboard_view_item(
             column=0,
             padx=5,
             pady=5,
-            row=len(get_widget_children(master=master)),
+            row=len(get_widget_children(widget=master)),
             sticky=NSEW,
+        )
+
+        frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        frame.grid_columnconfigure(
+            index=1,
+            weight=0,
+        )
+
+        frame.grid_columnconfigure(
+            index=2,
+            weight=0,
+        )
+
+        frame.grid_columnconfigure(
+            index=3,
+            weight=0,
+        )
+
+        frame.grid_rowconfigure(
+            index=0,
+            weight=0,
         )
 
         get_label(
@@ -319,6 +359,7 @@ def create_dashboard_view_item(
             padx=5,
             pady=5,
             row=0,
+            sticky=NSEW,
         )
 
         get_button(
@@ -448,6 +489,8 @@ def get_dashboard_view() -> None:
         None
     """
 
+    global SUBSCRIPTION
+
     try:
         log_info(
             message="Getting dashboard view",
@@ -457,6 +500,8 @@ def get_dashboard_view() -> None:
         clear_widgets()
         create_widgets()
         configure_grid()
+
+        subscribe()
 
         for stack in load_stacks():
             create_dashboard_view_item(
@@ -482,6 +527,34 @@ def get_dashboard_view() -> None:
         raise e
 
 
+def on_added_stack(**kwargs) -> None:
+    """
+    Handles the added stack event.
+
+    Args:
+        **kwargs (dict[str, Any]): The keyword arguments.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        create_dashboard_view_item(
+            master=get_container(),
+            stack=kwargs["model"],
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to handle added stack event",
+            name=NAME,
+        )
+        raise e
+
+
 def set_container(frame: tkinter.Frame) -> None:
     """
     Sets the container frame for the dashboard view.
@@ -496,6 +569,61 @@ def set_container(frame: tkinter.Frame) -> None:
     global CONTAINER
 
     CONTAINER = frame
+
+
+def subscribe() -> None:
+    """
+    Subscribes to the added stack event.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    global SUBSCRIPTION
+
+    try:
+        SUBSCRIPTION = register_subscription(
+            event=ADDED_STACK,
+            function=on_added_stack,
+            namespace="GLOBAL",
+            persistent=False,
+            priority=100,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to subscribe",
+            name=NAME,
+        )
+        raise e
+
+
+def unsubscribe() -> None:
+    """
+    Unsubscribes from the added stack event.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    global SUBSCRIPTION
+
+    try:
+        unsubscribe_subscription(uuid=SUBSCRIPTION)
+        SUBSCRIPTION = None
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to unsubscribe",
+            name=NAME,
+        )
+        raise e
 
 
 # ---------- Auto-Export ---------- #

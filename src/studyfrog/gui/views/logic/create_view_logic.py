@@ -40,6 +40,7 @@ from core.objects import (
     get_subject,
     get_teacher,
 )
+from gui.factory import get_error_toast, get_success_toast
 from gui.views.forms.flashcard_create_form import get_flashcard_create_form
 from gui.views.forms.note_create_form import get_note_create_form
 from gui.views.forms.question_create_form import get_question_create_form
@@ -222,7 +223,7 @@ def on_combobox_change(
     """
 
     try:
-        get_form_getter(value)(master=master)
+        get_form_getter(what=value.lower())(master=master)
     except Exception as e:
         log_exception(
             exception=e,
@@ -297,9 +298,14 @@ def on_create_button_click() -> None:
             name=NAME,
         )
 
+        get_success_toast(
+            message=f"{what.title()} created successfully",
+            title=f"{what.title()} created successfully",
+        )
+
         publish_event(
             event=WHAT_TYPE_TO_ADDED_EVENT[what],
-            namespace=NAMESPACE,
+            namespace="GLOBAL",
             **{
                 "what": what,
                 "model": WHAT_TYPE_TO_DATABASE_GETTER[what](entry_id=id),
@@ -310,6 +316,10 @@ def on_create_button_click() -> None:
             exception=e,
             message="Failed to handle create button click event",
             name=NAME,
+        )
+        get_error_toast(
+            message=f"Failed to create {what.title()}: {e}",
+            title=f"Failed to create {what.title()}",
         )
         raise Exception(f"Failed to handle create button click event: {e}") from e
 

@@ -5,11 +5,19 @@ Date: 2025-11-16
 
 import tkinter
 
-from tkinter.constants import NSEW, W
+from tkinter import ttk
+from tkinter.constants import E, NSEW, W
 from typing import Final, Literal, Optional, Type
 
-from gui.constants import DEFAULT_FONT, LARGE_BOLD_FONT, TOPLEVEL_GEOMETRY
-from gui.factory import get_button, get_frame, get_label, get_success_toast
+from gui.constants import DEFAULT_FONT, LARGE_BOLD_FONT, READONLY, TOPLEVEL_GEOMETRY
+from gui.factory import (
+    get_button,
+    get_combobox,
+    get_frame,
+    get_label,
+    get_scrolled_frame,
+    get_success_toast,
+)
 from gui.views.logic.create_view_logic import (
     get_form_getter,
     on_cancel_button_click,
@@ -45,6 +53,8 @@ WhatType: Type[
 BOTTOM_FRAME: Optional[tkinter.Frame] = None
 
 CENTER_FRAME: Optional[tkinter.Frame] = None
+
+CONTAINER_FRAME: Optional[tkinter.Frame] = None
 
 MASTER: Optional[tkinter.Toplevel] = None
 
@@ -215,7 +225,22 @@ def configure_center_frame_grid() -> None:
     """
 
     try:
-        pass
+        get_center_frame().grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+        get_center_frame().grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+        get_container_frame().grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+        get_container_frame().grid_rowconfigure(
+            index=1,
+            weight=1,
+        )
     except Exception as e:
         log_exception(
             exception=e,
@@ -338,7 +363,90 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
     """
 
     try:
-        pass
+        what_label: tkinter.Label = get_label(
+            anchor=W,
+            font=LARGE_BOLD_FONT,
+            master=master,
+            text="What*?",
+        )
+
+        what_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+
+        frame: tkinter.Frame = get_frame(master=master)
+
+        frame.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        frame.grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+
+        frame.grid_columnconfigure(
+            index=1,
+            weight=1,
+        )
+
+        frame.grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        what_values: list[str] = [
+            "Stack",
+            "Subject",
+            "Tag",
+            "Teacher",
+            "User",
+        ]
+
+        what_combobox: ttk.Combobox = get_combobox(
+            master=frame,
+            state=READONLY,
+            values=what_values,
+        )
+
+        what_combobox.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=E,
+        )
+
+        what_combobox.current(what_values.index(get_what().title()))
+
+        what_combobox.bind(
+            func=lambda event: on_combobox_change(
+                master=get_container_frame(),
+                value=what_combobox.get(),
+            ),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        scrolled_frame: dict[str, tkinter.Widget] = get_scrolled_frame(master=master)
+
+        scrolled_frame["root"].grid(
+            column=0,
+            columnspan=2,
+            padx=5,
+            pady=5,
+            row=1,
+            rowspan=2,
+            sticky=NSEW,
+        )
+
+        set_container_frame(frame=scrolled_frame["container"])
     except Exception as e:
         log_exception(
             exception=e,
@@ -448,7 +556,10 @@ def get_bottom_frame() -> tkinter.Frame:
     if BOTTOM_FRAME is not None:
         return BOTTOM_FRAME
 
-    BOTTOM_FRAME = get_frame(master=get_master())
+    BOTTOM_FRAME = get_frame(
+        height=50,
+        master=get_master(),
+    )
 
     BOTTOM_FRAME.grid(
         column=0,
@@ -490,6 +601,28 @@ def get_center_frame() -> tkinter.Frame:
     return CENTER_FRAME
 
 
+def get_container_frame() -> tkinter.Frame:
+    """
+    Returns the container frame.
+
+    Args:
+        None
+
+    Returns:
+        tkinter.Frame: The container frame.
+
+    Raises:
+        ValueError: If the container frame is not set. Call 'set_container_frame' first.
+    """
+
+    global CONTAINER_FRAME
+
+    if CONTAINER_FRAME is None:
+        raise ValueError("Container frame not set. Call 'set_container_frame' first.")
+
+    return CONTAINER_FRAME
+
+
 def get_create_view(
     master: tkinter.Toplevel,
     what: WhatType = "flashcard",
@@ -522,7 +655,7 @@ def get_create_view(
         create_widgets()
         configure_grid()
 
-        get_form_getter(what=what)(master=get_center_frame())
+        get_form_getter(what=what)(master=get_container_frame())
 
         log_info(
             message="Got create view successfully",
@@ -541,26 +674,6 @@ def get_create_view(
             name=NAME,
         )
         raise Exception(f"Failed to get create view: {e}") from e
-
-
-def get_title_label() -> tkinter.Label:
-    """
-    Returns the label.
-
-    Args:
-        None
-
-    Returns:
-        tkinter.Label: The label.
-
-    Raises:
-        ValueError: If the label is not set. Call 'set_title_label' first.
-    """
-
-    if LABEL is None:
-        raise ValueError("Label not set. Call 'set_title_label' first.")
-
-    return LABEL
 
 
 def get_master() -> tkinter.Toplevel:
@@ -583,6 +696,26 @@ def get_master() -> tkinter.Toplevel:
     return MASTER
 
 
+def get_title_label() -> tkinter.Label:
+    """
+    Returns the title label.
+
+    Args:
+        None
+
+    Returns:
+        tkinter.Label: The title label.
+
+    Raises:
+        ValueError: If the title label is not set. Call 'set_title_label' first.
+    """
+
+    if TITLE_LABEL is None:
+        raise ValueError("Title label not set. Call 'set_title_label' first.")
+
+    return TITLE_LABEL
+
+
 def get_top_frame() -> tkinter.Frame:
     """
     Returns the top frame.
@@ -599,7 +732,10 @@ def get_top_frame() -> tkinter.Frame:
     if TOP_FRAME is not None:
         return TOP_FRAME
 
-    TOP_FRAME = get_frame(master=get_master())
+    TOP_FRAME = get_frame(
+        height=50,
+        master=get_master(),
+    )
 
     TOP_FRAME.grid(
         column=0,
@@ -634,20 +770,20 @@ def get_what() -> WhatType:
     return WHAT
 
 
-def set_title_label(title_label: tkinter.Label) -> None:
+def set_container_frame(frame: tkinter.Frame) -> None:
     """
-    Sets the title label.
+    Sets the container frame.
 
     Args:
-        title_label (tkinter.Label): The title label.
+        frame (tkinter.Frame): The container frame.
 
     Returns:
         None
     """
 
-    global TITLE_LABEL
+    global CONTAINER_FRAME
 
-    TITLE_LABEL = title_label
+    CONTAINER_FRAME = frame
 
 
 def set_master(master: tkinter.Toplevel) -> None:
@@ -686,6 +822,22 @@ def set_master(master: tkinter.Toplevel) -> None:
     )
 
     MASTER.geometry(newGeometry=TOPLEVEL_GEOMETRY)
+
+
+def set_title_label(title_label: tkinter.Label) -> None:
+    """
+    Sets the title label.
+
+    Args:
+        title_label (tkinter.Label): The title label.
+
+    Returns:
+        None
+    """
+
+    global TITLE_LABEL
+
+    TITLE_LABEL = title_label
 
 
 def set_what(what: WhatType) -> None:
