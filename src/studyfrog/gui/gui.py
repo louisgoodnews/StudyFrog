@@ -34,6 +34,27 @@ TOP_FRAME: Optional[tkinter.Frame] = None
 # ---------- Functions ---------- #
 
 
+def _none_root() -> None:
+    """
+    Sets the global ROOT variable to None.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    global ROOT
+
+    if not ROOT:
+        return
+
+    ROOT.destroy()
+
+    ROOT = None
+
+
 def get_bottom_frame() -> tkinter.Frame:
     """
 
@@ -234,6 +255,11 @@ def get_root() -> tkinter.Tk:
         weight=0,
     )
 
+    ROOT.protocol(
+        name="WM_DELETE_WINDOW",
+        func=_none_root,
+    )
+
     return ROOT
 
 
@@ -305,6 +331,39 @@ def get_view_menu() -> tkinter.Menu:
     )
 
     return VIEW_MENU
+
+
+def is_root_active() -> bool:
+    """
+    Returns whether the root window is active.
+
+    Args:
+        None
+
+    Returns:
+        bool: True if the root window is active, False otherwise.
+    """
+
+    return ROOT is not None
+
+
+def make_root_none_if_possible() -> None:
+    """
+    Sets the global ROOT variable to None if the root window is active.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    global ROOT
+
+    if ROOT.winfo_exists():
+        return
+
+    ROOT = None
 
 
 # ---------- Auto-Export ---------- #

@@ -370,12 +370,13 @@ from gui.gui import (
     get_root,
     get_top_frame,
     get_view_menu,
+    is_root_active,
+    make_root_none_if_possible,
 )
 from gui.views.views import get_view
 from utils.utils import (
     ensure_dir,
     ensure_json,
-    log_debug,
     log_exception,
     log_info,
     pluralize_str,
@@ -1073,6 +1074,11 @@ def run_post_stop_tasks() -> None:
         )
         publish_event(event=APPLICATION_STOPPED)
         unsubscribe_subscriptions()
+
+        if is_root_active():
+            get_root().destroy()
+
+            make_root_none_if_possible()
     except Exception as e:
         log_exception(
             name=NAME,

@@ -438,6 +438,10 @@ def get_scrolled_frame(
         try:
             canvas: tkinter.Canvas = result["canvas"]
             canvas.configure(scrollregion=canvas.bbox(ALL))
+            canvas.itemconfig(
+                result["window_id"],
+                width=canvas.winfo_width(),
+            )
         except Exception as e:
             log_exception(
                 exception=e,
@@ -499,7 +503,7 @@ def get_scrolled_frame(
             sequence="<Configure>",
         )
 
-        result["canvas"].create_window(
+        result["window_id"] = result["canvas"].create_window(
             (
                 0,
                 0,

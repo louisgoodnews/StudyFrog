@@ -489,8 +489,8 @@ def get_subject_model(
     difficulty: str,
     name: str,
     priority: str,
-    teacher: str,
     customfields: Optional[dict[str, Any]] = None,
+    teacher: Optional[str] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
@@ -501,7 +501,7 @@ def get_subject_model(
         difficulty (str): The subject's difficulty.
         name (str): The subject's name.
         priority (str): The subject's priority.
-        teacher (str): The subject's teacher.
+        teacher (Optional[str]): The subject's teacher.
         **kwargs (dict[str, Any]): Additional keywords to pass to the subject's attributes.
 
     Returns:

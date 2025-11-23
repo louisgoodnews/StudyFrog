@@ -10,16 +10,25 @@ from tkinter.constants import NSEW
 from typing import Any, Final, Literal, Optional
 
 from common.events import (
+    ADD_SUBJECT,
+    ADD_TEACHER,
     GET_ALL_DIFFICULTIES,
     GET_ALL_PRIORITIES,
+    GET_ALL_STACKS,
     GET_ALL_SUBJECTS,
     GET_ALL_TEACHERS,
     GET_FORM,
+    GET_SUBJECT,
+    GET_TEACHER,
 )
+from core.models import get_subject_model, get_teacher_model
+from gui.constants import READONLY
 from gui.factory import get_combobox, get_entry, get_label, get_text
 from utils.utils import (
     destroy_widget_children,
+    is_item_in_list,
     is_list_empty,
+    log_debug,
     log_exception,
     log_info,
     log_warning,
@@ -31,22 +40,52 @@ from utils.utils import (
 
 # ---------- Constants ---------- #
 
-DIFFICULTIES: Final[list[str]] = []
+DIFFICULTIES: Final[list[dict[str, Any]]] = []
 
 FORM_VARIABLES: Final[dict[str, tkinter.Widget]] = {}
 
 NAME: Final[Literal["gui.views.forms.stack_create_form"]] = "gui.views.forms.stack_create_form"
 
-PRIORITIES: Final[list[str]] = []
+PRIORITIES: Final[list[dict[str, Any]]] = []
 
-SUBJECTS: Final[list[str]] = []
+STACKS: Final[list[dict[str, Any]]] = []
+
+SUBJECTS: Final[list[dict[str, Any]]] = []
 
 SUBSCRIPTION: Optional[str] = None
 
-TEACHERS: Final[list[str]] = []
+TEACHERS: Final[list[dict[str, Any]]] = []
 
 
 # ---------- Functions ---------- #
+
+
+def append_subject(subject: dict[str, Any]) -> None:
+    """
+    Append the subject.
+
+    Args:
+        subject (dict[str, Any]): The subject.
+
+    Returns:
+        None
+    """
+
+    SUBJECTS.append(subject)
+
+
+def append_teacher(teacher: dict[str, Any]) -> None:
+    """
+    Append the teacher.
+
+    Args:
+        teacher (dict[str, Any]): The teacher.
+
+    Returns:
+        None
+    """
+
+    TEACHERS.append(teacher)
 
 
 def clear_master_frame(master: tkinter.Frame) -> None:
@@ -302,6 +341,14 @@ def create_widgets(master: tkinter.Frame) -> None:
             sequence="<<ComboboxSelected>>",
         )
 
+        subject_combobox.bind(
+            func=lambda event: on_subject_combobox_return(
+                combobox=subject_combobox,
+                value=subject_var.get(),
+            ),
+            sequence="<Return>",
+        )
+
         FORM_VARIABLES["subject"] = subject_var
 
         teacher_var: tkinter.StringVar = tkinter.StringVar()
@@ -338,7 +385,52 @@ def create_widgets(master: tkinter.Frame) -> None:
             sequence="<<ComboboxSelected>>",
         )
 
+        teacher_combobox.bind(
+            func=lambda event: on_teacher_combobox_return(
+                combobox=teacher_combobox,
+                value=teacher_var.get(),
+            ),
+            sequence="<Return>",
+        )
+
         FORM_VARIABLES["teacher"] = teacher_var
+
+        stack_var: tkinter.StringVar = tkinter.StringVar()
+
+        stack_label: tkinter.Label = get_label(
+            master=master,
+            text="Stack: ",
+        )
+
+        stack_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=6,
+            sticky=NSEW,
+        )
+
+        stack_combobox: ttk.Combobox = get_combobox(
+            master=master,
+            state=READONLY,
+            textvariable=stack_var,
+            values=[stack["name"] for stack in get_stacks()],
+        )
+
+        stack_combobox.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=6,
+            sticky=NSEW,
+        )
+
+        stack_combobox.bind(
+            func=lambda event: stack_var.set(value=stack_combobox.get()),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        FORM_VARIABLES["stack"] = stack_var
     except Exception as e:
         log_exception(
             exception=e,
@@ -399,17 +491,41 @@ def get_form() -> dict[str, Any]:
 
         result["difficulty"] = next(
             (
-                difficulty["key"]
+                difficulty.get("key")
                 for difficulty in get_difficulties()
-                if difficulty["name"] == result["difficulty"]
+                if difficulty.get("name") == result.get("difficulty")
             ),
         )
 
         result["priority"] = next(
             (
-                priority["key"]
+                priority.get("key")
                 for priority in get_priorities()
-                if priority["name"] == result["priority"]
+                if priority.get("name") == result.get("priority")
+            ),
+        )
+
+        result["stack"] = next(
+            (
+                stack.get("key")
+                for stack in get_stacks()
+                if stack.get("name") == result.get("stack")
+            ),
+        )
+
+        result["subject"] = next(
+            (
+                subject.get("key")
+                for subject in get_subjects()
+                if subject.get("name") == result.get("subject")
+            ),
+        )
+
+        result["teacher"] = next(
+            (
+                teacher.get("key")
+                for teacher in get_teachers()
+                if teacher.get("name") == result.get("teacher")
             ),
         )
 
@@ -469,6 +585,7 @@ def get_stack_create_form(master: tkinter.Frame) -> None:
 
         set_difficulties(difficulties=load_difficulties())
         set_priorities(priorities=load_priorities())
+        set_stacks(stacks=load_stacks())
         set_subjects(subjects=load_subjects())
         set_teachers(teachers=load_teachers())
 
@@ -491,7 +608,30 @@ def get_stack_create_form(master: tkinter.Frame) -> None:
         raise Exception(f"Failed to get stack create form: {e}") from e
 
 
-def get_subjects() -> list[str]:
+def get_stacks() -> list[dict[str, Any]]:
+    """
+    Get the stacks.
+
+    Args:
+        None
+
+    Returns:
+        list[dict[str, Any]]: The stacks.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    if is_list_empty(list_=STACKS):
+        log_warning(
+            message="Stacks are empty. Check the logs for additional warnings. StudyFrog will still function though.",
+            name=NAME,
+        )
+
+    return STACKS
+
+
+def get_subjects() -> list[dict[str, Any]]:
     """
     Get the subjects.
 
@@ -499,7 +639,7 @@ def get_subjects() -> list[str]:
         None
 
     Returns:
-        list[str]: The subjects.
+        list[dict[str, Any]]: The subjects.
 
     Raises:
         Exception: If an error occurs.
@@ -514,7 +654,7 @@ def get_subjects() -> list[str]:
     return SUBJECTS
 
 
-def get_teachers() -> list[str]:
+def get_teachers() -> list[dict[str, Any]]:
     """
     Get the teachers.
 
@@ -522,7 +662,7 @@ def get_teachers() -> list[str]:
         None
 
     Returns:
-        list[str]: The teachers.
+        list[dict[str, Any]]: The teachers.
 
     Raises:
         Exception: If an error occurs.
@@ -537,7 +677,7 @@ def get_teachers() -> list[str]:
     return TEACHERS
 
 
-def load_difficulties() -> list[str]:
+def load_difficulties() -> list[dict[str, Any]]:
     """
     Load the difficulties.
 
@@ -545,7 +685,7 @@ def load_difficulties() -> list[str]:
         None
 
     Returns:
-        list[str]: The difficulties.
+        list[dict[str, Any]]: The difficulties.
 
     Raises:
         Exception: If an error occurs.
@@ -568,7 +708,7 @@ def load_difficulties() -> list[str]:
         raise Exception(f"Failed to load difficulties: {e}") from e
 
 
-def load_priorities() -> list[str]:
+def load_priorities() -> list[dict[str, Any]]:
     """
     Load the priorities.
 
@@ -576,7 +716,7 @@ def load_priorities() -> list[str]:
         None
 
     Returns:
-        list[str]: The priorities.
+        list[dict[str, Any]]: The priorities.
 
     Raises:
         Exception: If an error occurs.
@@ -599,7 +739,38 @@ def load_priorities() -> list[str]:
         raise Exception(f"Failed to load priorities: {e}") from e
 
 
-def load_subjects() -> list[str]:
+def load_stacks() -> list[dict[str, Any]]:
+    """
+    Load the stacks.
+
+    Args:
+        None
+
+    Returns:
+        list[dict[str, Any]]: The stacks.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+    try:
+        return list(
+            publish_event(
+                event=GET_ALL_STACKS,
+                namespace="GLOBAL",
+            )
+            .get("get_all_entries")[0]
+            .get("result")
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to load stacks",
+            name=NAME,
+        )
+        raise Exception(f"Failed to load stacks: {e}") from e
+
+
+def load_subjects() -> list[dict[str, Any]]:
     """
     Load the subjects.
 
@@ -607,7 +778,7 @@ def load_subjects() -> list[str]:
         None
 
     Returns:
-        list[str]: The subjects.
+        list[dict[str, Any]]: The subjects.
 
     Raises:
         Exception: If an error occurs.
@@ -630,7 +801,7 @@ def load_subjects() -> list[str]:
         raise Exception(f"Failed to load subjects: {e}") from e
 
 
-def load_teachers() -> list[str]:
+def load_teachers() -> list[dict[str, Any]]:
     """
     Load the teachers.
 
@@ -638,7 +809,7 @@ def load_teachers() -> list[str]:
         None
 
     Returns:
-        list[str]: The teachers.
+        list[dict[str, Any]]: The teachers.
 
     Raises:
         Exception: If an error occurs.
@@ -686,6 +857,126 @@ def on_get_form() -> dict[str, Any]:
         raise Exception(f"Failed to handle get form event: {e}") from e
 
 
+def on_subject_combobox_return(
+    combobox: ttk.Combobox,
+    value: str,
+) -> None:
+    """
+    Handle the subject combobox return event.
+
+    Args:
+        combobox (ttk.Combobox): The combobox.
+        value (str): The value.
+
+    Returns:
+        None
+    """
+
+    try:
+        if is_item_in_list(
+            item=value,
+            list_=[subject["name"] for subject in get_subjects()],
+        ):
+            return
+
+        append_subject(
+            subject=publish_event(
+                event=GET_SUBJECT,
+                namespace="GLOBAL",
+                entry_id=publish_event(
+                    event=ADD_SUBJECT,
+                    namespace="GLOBAL",
+                    entry=get_subject_model(
+                        difficulty=next(
+                            filter(
+                                lambda difficulty: difficulty["name"] == "medium",
+                                DIFFICULTIES,
+                            )
+                        )["key"],
+                        name=value,
+                        priority=next(
+                            filter(
+                                lambda priority: priority["name"] == "medium",
+                                PRIORITIES,
+                            )
+                        )["key"],
+                        teacher=None,
+                    ),
+                )["add_entry"][0]["result"],
+            )["get_entry"][0]["result"],
+        )
+
+        combobox.set("")
+
+        combobox["values"] = [subject["name"] for subject in get_subjects()]
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to handle subject combobox return event",
+            name=NAME,
+        )
+        raise Exception(f"Failed to handle subject combobox return event: {e}") from e
+
+
+def on_teacher_combobox_return(
+    combobox: ttk.Combobox,
+    value: str,
+) -> None:
+    """
+    Handle the teacher combobox return event.
+
+    Args:
+        combobox (ttk.Combobox): The combobox.
+        value (str): The value.
+
+    Returns:
+        None
+    """
+
+    try:
+        if is_item_in_list(
+            item=value,
+            list_=[teacher["name"] for teacher in get_teachers()],
+        ):
+            return
+
+        append_teacher(
+            teacher=publish_event(
+                event=GET_TEACHER,
+                namespace="GLOBAL",
+                entry_id=publish_event(
+                    event=ADD_TEACHER,
+                    namespace="GLOBAL",
+                    entry=get_teacher_model(
+                        difficulty=next(
+                            filter(
+                                lambda difficulty: difficulty["name"] == "medium",
+                                DIFFICULTIES,
+                            )
+                        )["key"],
+                        name=value,
+                        priority=next(
+                            filter(
+                                lambda priority: priority["name"] == "medium",
+                                PRIORITIES,
+                            )
+                        )["key"],
+                        subjects=None,
+                    ),
+                )["add_entry"][0]["result"],
+            )["get_entry"][0]["result"],
+        )
+
+        combobox["values"] = [teacher["name"] for teacher in get_teachers()]
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to handle teacher combobox return event",
+            name=NAME,
+        )
+        raise Exception(f"Failed to handle teacher combobox return event: {e}") from e
+
+
 def set_difficulties(difficulties: list[dict[str, Any]]) -> None:
     """
     Set the difficulties.
@@ -712,6 +1003,20 @@ def set_priorities(priorities: list[dict[str, Any]]) -> None:
     """
 
     PRIORITIES.extend(priorities)
+
+
+def set_stacks(stacks: list[dict[str, Any]]) -> None:
+    """
+    Set the stacks.
+
+    Args:
+        stacks (list[dict[str, Any]]): The stacks.
+
+    Returns:
+        None
+    """
+
+    STACKS.extend(stacks)
 
 
 def set_subjects(subjects: list[dict[str, Any]]) -> None:

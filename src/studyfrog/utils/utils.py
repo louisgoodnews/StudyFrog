@@ -425,6 +425,32 @@ def get_uuid_str() -> str:
     return str(get_uuid())
 
 
+def get_widget_child(
+    widget: tkinter.Widget,
+    **kwargs,
+) -> Optional[tkinter.Widget]:
+    """
+    Returns the child of a widget.
+
+    Args:
+        widget (tkinter.Widget): The widget who's child should be returned.
+        **kwargs: Keyword arguments.
+
+    Returns:
+        Optional[tkinter.Widget]: The child of the passed widget or None if no child was found.
+    """
+
+    for widget in get_widget_children(widget=widget):
+        if not all(
+            (widget[key] == kwargs[key] for key in kwargs),
+        ):
+            continue
+
+        return widget
+
+    return None
+
+
 def get_widget_children(widget: tkinter.Widget) -> list[tkinter.Widget]:
     """
     Returns the children of a widget.

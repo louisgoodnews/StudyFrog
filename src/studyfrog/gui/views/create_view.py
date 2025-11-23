@@ -442,8 +442,12 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
             padx=5,
             pady=5,
             row=1,
-            rowspan=2,
             sticky=NSEW,
+        )
+
+        scrolled_frame["container"].grid_columnconfigure(
+            index=0,
+            weight=1,
         )
 
         set_container_frame(frame=scrolled_frame["container"])
