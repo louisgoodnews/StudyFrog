@@ -5,7 +5,7 @@ Date: 2025-11-16
 
 import tkinter
 
-from typing import Any, Callable, Final, Literal, Type
+from typing import Any, Callable, Final, Literal, TypeAlias
 
 from common.events import (
     ADDED_FLASHCARD,
@@ -14,6 +14,7 @@ from common.events import (
     ADDED_STACK,
     ADDED_SUBJECT,
     ADDED_TEACHER,
+    CALL_FUNCTION,
     GET_FORM,
 )
 from core.models import (
@@ -50,6 +51,7 @@ from gui.views.forms.teacher_create_form import get_teacher_create_form
 from utils.utils import (
     is_dict_empty,
     is_key_in_dict,
+    log_debug,
     log_exception,
     log_info,
     publish_event,
@@ -58,16 +60,7 @@ from utils.utils import (
 
 # ---------- Types ---------- #
 
-WhatType: Type[
-    Literal[
-        "flashcard",
-        "note",
-        "question",
-        "stack",
-        "subject",
-        "teacher",
-    ]
-] = Literal[
+WhatType: TypeAlias = Literal[
     "flashcard",
     "note",
     "question",
@@ -194,7 +187,11 @@ def on_cancel_button_click() -> None:
     """
 
     try:
-        pass
+        publish_event(
+            function="destroy",
+            event=CALL_FUNCTION,
+            namespace="CREATE_VIEW",
+        )
     except Exception as e:
         log_exception(
             exception=e,
@@ -223,6 +220,23 @@ def on_combobox_change(
     """
 
     try:
+        previous_what: WhatType = publish_event(
+            event=CALL_FUNCTION,
+            namespace="CREATE_VIEW",
+            function="get_what",
+        )["on_call_function"][0]["result"]
+
+        log_debug(
+            message=f"Previous what: {previous_what}",
+            name=NAME,
+        )
+
+        publish_event(
+            event=CALL_FUNCTION,
+            namespace=f"{previous_what.upper()}_CREATE_FORM",
+            function="handle_destruction",
+        )
+
         get_form_getter(what=value.lower())(master=master)
     except Exception as e:
         log_exception(
@@ -248,30 +262,24 @@ def on_create_button_click() -> None:
     """
 
     try:
+        what_type: WhatType = publish_event(
+            event=CALL_FUNCTION,
+            namespace="CREATE_VIEW",
+            function="get_what",
+        )["on_call_function"][0]["result"]
+
         form_data: dict[str, Any] = next(
             (
                 dictionary
                 for dictionary in publish_event(
                     event=GET_FORM,
-                    namespace=NAMESPACE,
+                    namespace=f"{what_type.upper()}_CREATE_FORM",
                 )["on_get_form"]
             ),
             {},
         ).get(
             "result",
             {},
-        )
-
-        what: Literal[
-            "flashcard",
-            "note",
-            "question",
-            "stack",
-            "subject",
-            "teacher",
-        ] = form_data.pop(
-            "what",
-            "flashcard",
         )
 
         if is_dict_empty(dictionary=form_data):
@@ -289,26 +297,26 @@ def on_create_button_click() -> None:
         ):
             form_data["priority"] = get_priority(entry_id=5).get("key")
 
-        id: int = WHAT_TYPE_TO_DATABASE_ADDER[what](
-            entry=WHAT_TYPE_TO_MODEL_GETTER[what](**form_data)
+        id: int = WHAT_TYPE_TO_DATABASE_ADDER[what_type](
+            entry=WHAT_TYPE_TO_MODEL_GETTER[what_type](**form_data)
         )
 
         log_info(
-            message=f"{what.title()} created successfully",
+            message=f"{what_type.title()} created successfully",
             name=NAME,
         )
 
         get_success_toast(
-            message=f"{what.title()} created successfully",
-            title=f"{what.title()} created successfully",
+            message=f"{what_type.title()} created successfully",
+            title=f"{what_type.title()} created successfully",
         )
 
         publish_event(
-            event=WHAT_TYPE_TO_ADDED_EVENT[what],
+            event=WHAT_TYPE_TO_ADDED_EVENT[what_type],
             namespace="GLOBAL",
             **{
-                "what": what,
-                "model": WHAT_TYPE_TO_DATABASE_GETTER[what](entry_id=id),
+                "what": what_type,
+                "model": WHAT_TYPE_TO_DATABASE_GETTER[what_type](entry_id=id),
             },
         )
     except Exception as e:
@@ -318,8 +326,8 @@ def on_create_button_click() -> None:
             name=NAME,
         )
         get_error_toast(
-            message=f"Failed to create {what.title()}: {e}",
-            title=f"Failed to create {what.title()}",
+            message=f"Failed to create {what_type.title()}: {e}",
+            title=f"Failed to create {what_type.title()}",
         )
         raise Exception(f"Failed to handle create button click event: {e}") from e
 

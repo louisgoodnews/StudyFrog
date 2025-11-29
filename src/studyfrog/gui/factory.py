@@ -6,7 +6,7 @@ Date: 2025-11-16
 import tkinter
 
 from tkinter import ttk
-from tkinter.constants import ALL, BOTH, NSEW, NW, TOP, VERTICAL, YES
+from tkinter.constants import ALL, BOTH, NS, NSEW, NW, TOP, VERTICAL, YES
 from typing import Any, Final, Literal, Optional
 
 from gui.constants import COLOR_CONFIG, TOAST_GEOMETRY
@@ -540,6 +540,89 @@ def get_scrolled_frame(
             name=NAME,
         )
         raise Exception(f"Failed to get scrolled frame: {e}") from e
+
+
+def get_scrolled_text(
+    master: tkinter.Widget,
+    *args,
+    **kwargs,
+) -> dict[str, tkinter.Widget]:
+    """
+    Creates a scrolled text widget.
+
+    Args:
+        master: The parent widget.
+        *args: Additional positional arguments for the text widget.
+        **kwargs: Additional keyword arguments for the text widget.
+
+    Returns:
+        A dictionary containing the text widget and its scrollbar.
+    """
+
+    try:
+        result: dict[str, tkinter.Widget] = {}
+
+        result["root"] = get_frame(
+            master=master,
+            *args,
+            **kwargs,
+        )
+
+        result["root"].grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        result["root"].grid_columnconfigure(
+            index=1,
+            weight=0,
+        )
+
+        result["root"].grid_rowconfigure(
+            index=0,
+            weight=1,
+        )
+
+        result["text"] = get_text(
+            master=result["root"],
+            *args,
+            **kwargs,
+        )
+
+        result["text"].grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        result["scrollbar"] = get_scrollbar(
+            command=result["text"].yview,
+            master=result["root"],
+            orient=VERTICAL,
+            *args,
+            **kwargs,
+        )
+
+        result["scrollbar"].grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NS,
+        )
+
+        result["text"].config(yscrollcommand=result["scrollbar"].set)
+
+        return result
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to get scrolled text",
+            name=NAME,
+        )
+        raise Exception(f"Failed to get scrolled text: {e}") from e
 
 
 def get_success_toast(

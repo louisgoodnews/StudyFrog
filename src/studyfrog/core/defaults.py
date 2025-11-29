@@ -11,42 +11,42 @@ from core.models import get_difficulty_model, get_priority_model, get_user_model
 # ---------- Constants ---------- #
 
 EASY_DIFFICULTY: Final[dict[str, Any]] = get_difficulty_model(
-    name="easy",
+    name="Easy",
     value=1,
 )
 
 MEDIUM_DIFFICULTY: Final[dict[str, Any]] = get_difficulty_model(
-    name="medium",
+    name="Medium",
     value=2,
 )
 
 HARD_DIFFICULTY: Final[dict[str, Any]] = get_difficulty_model(
-    name="hard",
+    name="Hard",
     value=3,
 )
 
 LOWEST_PRIORITY: Final[dict[str, Any]] = get_priority_model(
-    name="lowest",
+    name="Lowest",
     value=1,
 )
 
 LOW_PRIORITY: Final[dict[str, Any]] = get_priority_model(
-    name="low",
+    name="Low",
     value=2,
 )
 
 MEDIUM_PRIORITY: Final[dict[str, Any]] = get_priority_model(
-    name="medium",
+    name="Medium",
     value=3,
 )
 
 HIGH_PRIORITY: Final[dict[str, Any]] = get_priority_model(
-    name="high",
+    name="High",
     value=4,
 )
 
 HIGHEST_PRIORITY: Final[dict[str, Any]] = get_priority_model(
-    name="highest",
+    name="Highest",
     value=5,
 )
 
@@ -59,5 +59,13 @@ STUDY_FROG_USER: Final[dict[str, Any]] = get_user_model(
 
 # Auto-export all non-private symbols
 __all__: Final[list[str]] = [
-    name for name in globals() if not name.startswith("_") and name.isidentifier()
+    "EASY_DIFFICULTY",
+    "HARD_DIFFICULTY",
+    "HIGH_PRIORITY",
+    "HIGHEST_PRIORITY",
+    "LOW_PRIORITY",
+    "LOWEST_PRIORITY",
+    "MEDIUM_DIFFICULTY",
+    "MEDIUM_PRIORITY",
+    "STUDY_FROG_USER",
 ]

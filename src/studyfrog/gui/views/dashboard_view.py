@@ -226,6 +226,10 @@ def configure_top_frame_grid() -> None:
     try:
         get_top_frame().grid_columnconfigure(
             index=0,
+            weight=0,
+        )
+        get_top_frame().grid_columnconfigure(
+            index=1,
             weight=1,
         )
         get_top_frame().grid_rowconfigure(
@@ -553,6 +557,43 @@ def on_added_stack(**kwargs) -> None:
             name=NAME,
         )
         raise e
+
+
+def on_call_function(
+    function: str,
+    *args,
+    **kwargs,
+) -> Any:
+    """
+    Handle the call function event.
+
+    Args:
+        function (str): The function.
+
+    Returns:
+        Any: The result.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        value: Any = globals().get(function)
+
+        if not callable(value):
+            raise Exception(f"Function {function} is not callable")
+
+        return value(
+            *args,
+            **kwargs,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to handle call function event",
+            name=NAME,
+        )
+        raise Exception(f"Failed to handle call function event: {e}") from e
 
 
 def set_container(frame: tkinter.Frame) -> None:

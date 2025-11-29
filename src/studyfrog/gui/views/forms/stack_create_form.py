@@ -7,11 +7,12 @@ import tkinter
 
 from tkinter import ttk
 from tkinter.constants import NSEW
-from typing import Any, Final, Literal, Optional
+from typing import Any, Final, Literal, Union
 
 from common.events import (
     ADD_SUBJECT,
     ADD_TEACHER,
+    CALL_FUNCTION,
     GET_ALL_DIFFICULTIES,
     GET_ALL_PRIORITIES,
     GET_ALL_STACKS,
@@ -23,12 +24,11 @@ from common.events import (
 )
 from core.models import get_subject_model, get_teacher_model
 from gui.constants import READONLY
-from gui.factory import get_combobox, get_entry, get_label, get_text
+from gui.factory import get_combobox, get_entry, get_label, get_scrolled_text
 from utils.utils import (
     destroy_widget_children,
     is_item_in_list,
     is_list_empty,
-    log_debug,
     log_exception,
     log_info,
     log_warning,
@@ -42,9 +42,11 @@ from utils.utils import (
 
 DIFFICULTIES: Final[list[dict[str, Any]]] = []
 
-FORM_VARIABLES: Final[dict[str, tkinter.Widget]] = {}
+FORM_VARIABLES: Final[dict[str, dict[str, Union[bool, tkinter.Variable]]]] = {}
 
 NAME: Final[Literal["gui.views.forms.stack_create_form"]] = "gui.views.forms.stack_create_form"
+
+NAMESPACE: Final[Literal["STACK_CREATE_FORM"]] = "STACK_CREATE_FORM"
 
 PRIORITIES: Final[list[dict[str, Any]]] = []
 
@@ -52,7 +54,7 @@ STACKS: Final[list[dict[str, Any]]] = []
 
 SUBJECTS: Final[list[dict[str, Any]]] = []
 
-SUBSCRIPTION: Optional[str] = None
+SUBSCRIPTIONS: Final[list[str]] = []
 
 TEACHERS: Final[list[dict[str, Any]]] = []
 
@@ -194,7 +196,10 @@ def create_widgets(master: tkinter.Frame) -> None:
             sticky=NSEW,
         )
 
-        FORM_VARIABLES["name"] = name_var
+        FORM_VARIABLES["name"] = {
+            "value": name_var,
+            "is_required": True,
+        }
 
         description_var: tkinter.StringVar = tkinter.StringVar()
 
@@ -211,11 +216,9 @@ def create_widgets(master: tkinter.Frame) -> None:
             sticky=NSEW,
         )
 
-        description_text: tkinter.Text = get_text(
-            master=master,
-        )
+        description_text: dict[str, tkinter.Widget] = get_scrolled_text(master=master)
 
-        description_text.grid(
+        description_text["root"].grid(
             column=1,
             padx=5,
             pady=5,
@@ -223,9 +226,11 @@ def create_widgets(master: tkinter.Frame) -> None:
             sticky=NSEW,
         )
 
-        description_text.bind(
+        description_text["text"].configure(height=10)
+
+        description_text["text"].bind(
             func=lambda event: description_var.set(
-                value=description_text.get(
+                value=description_text["text"].get(
                     "1.0",
                     "end-1c",
                 )
@@ -233,7 +238,10 @@ def create_widgets(master: tkinter.Frame) -> None:
             sequence="<KeyRelease>",
         )
 
-        FORM_VARIABLES["description"] = description_var
+        FORM_VARIABLES["description"] = {
+            "value": description_var,
+            "is_required": False,
+        }
 
         difficulty_var: tkinter.StringVar = tkinter.StringVar()
 
@@ -252,6 +260,7 @@ def create_widgets(master: tkinter.Frame) -> None:
 
         difficulty_combobox: ttk.Combobox = get_combobox(
             master=master,
+            state=READONLY,
             textvariable=difficulty_var,
             values=[difficulty["name"] for difficulty in get_difficulties()],
         )
@@ -269,7 +278,10 @@ def create_widgets(master: tkinter.Frame) -> None:
             sequence="<<ComboboxSelected>>",
         )
 
-        FORM_VARIABLES["difficulty"] = difficulty_var
+        FORM_VARIABLES["difficulty"] = {
+            "value": difficulty_var,
+            "is_required": True,
+        }
 
         priority_var: tkinter.StringVar = tkinter.StringVar()
 
@@ -288,6 +300,7 @@ def create_widgets(master: tkinter.Frame) -> None:
 
         priority_combobox: ttk.Combobox = get_combobox(
             master=master,
+            state=READONLY,
             textvariable=priority_var,
             values=[priority["name"] for priority in get_priorities()],
         )
@@ -305,7 +318,10 @@ def create_widgets(master: tkinter.Frame) -> None:
             sequence="<<ComboboxSelected>>",
         )
 
-        FORM_VARIABLES["priority"] = priority_var
+        FORM_VARIABLES["priority"] = {
+            "value": priority_var,
+            "is_required": True,
+        }
 
         subject_var: tkinter.StringVar = tkinter.StringVar()
 
@@ -349,7 +365,10 @@ def create_widgets(master: tkinter.Frame) -> None:
             sequence="<Return>",
         )
 
-        FORM_VARIABLES["subject"] = subject_var
+        FORM_VARIABLES["subject"] = {
+            "value": subject_var,
+            "is_required": False,
+        }
 
         teacher_var: tkinter.StringVar = tkinter.StringVar()
 
@@ -393,7 +412,10 @@ def create_widgets(master: tkinter.Frame) -> None:
             sequence="<Return>",
         )
 
-        FORM_VARIABLES["teacher"] = teacher_var
+        FORM_VARIABLES["teacher"] = {
+            "value": teacher_var,
+            "is_required": False,
+        }
 
         stack_var: tkinter.StringVar = tkinter.StringVar()
 
@@ -430,7 +452,10 @@ def create_widgets(master: tkinter.Frame) -> None:
             sequence="<<ComboboxSelected>>",
         )
 
-        FORM_VARIABLES["stack"] = stack_var
+        FORM_VARIABLES["stack"] = {
+            "value": stack_var,
+            "is_required": False,
+        }
     except Exception as e:
         log_exception(
             exception=e,
@@ -477,11 +502,11 @@ def get_form() -> dict[str, Any]:
     """
 
     try:
-        result: dict[str, Any] = {"what": "stack"}
+        result: dict[str, Any] = {}
 
         result.update(
             {
-                key: value.get()
+                key: value["value"].get()
                 for (
                     key,
                     value,
@@ -495,6 +520,7 @@ def get_form() -> dict[str, Any]:
                 for difficulty in get_difficulties()
                 if difficulty.get("name") == result.get("difficulty")
             ),
+            None,
         )
 
         result["priority"] = next(
@@ -503,6 +529,7 @@ def get_form() -> dict[str, Any]:
                 for priority in get_priorities()
                 if priority.get("name") == result.get("priority")
             ),
+            None,
         )
 
         result["stack"] = next(
@@ -511,6 +538,7 @@ def get_form() -> dict[str, Any]:
                 for stack in get_stacks()
                 if stack.get("name") == result.get("stack")
             ),
+            None,
         )
 
         result["subject"] = next(
@@ -519,6 +547,7 @@ def get_form() -> dict[str, Any]:
                 for subject in get_subjects()
                 if subject.get("name") == result.get("subject")
             ),
+            None,
         )
 
         result["teacher"] = next(
@@ -527,6 +556,7 @@ def get_form() -> dict[str, Any]:
                 for teacher in get_teachers()
                 if teacher.get("name") == result.get("teacher")
             ),
+            None,
         )
 
         return result
@@ -574,8 +604,6 @@ def get_stack_create_form(master: tkinter.Frame) -> None:
     Raises:
         Exception: If an error occurs.
     """
-
-    global SUBSCRIPTION
 
     try:
         log_info(
@@ -675,6 +703,40 @@ def get_teachers() -> list[dict[str, Any]]:
         )
 
     return TEACHERS
+
+
+def handle_destruction() -> None:
+    """
+    Handles the destruction of the form.
+
+    This function is called when the form is destroyed.
+    It unsubscribes from the events and clears the variables.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        DIFFICULTIES.clear()
+        FORM_VARIABLES.clear()
+        PRIORITIES.clear()
+        STACKS.clear()
+        SUBJECTS.clear()
+        TEACHERS.clear()
+        unsubscribe()
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to handle destruction",
+            name=NAME,
+        )
+        raise Exception(f"Failed to handle destruction: {e}") from e
 
 
 def load_difficulties() -> list[dict[str, Any]]:
@@ -830,6 +892,88 @@ def load_teachers() -> list[dict[str, Any]]:
             name=NAME,
         )
         raise Exception(f"Failed to load teachers: {e}") from e
+
+
+def on_call_function(
+    function: str,
+    *args,
+    **kwargs,
+) -> Any:
+    """
+    Handle the call function event.
+
+    Calls a function by name with the provided arguments.
+
+    Args:
+        function (str): The function name to call.
+
+    Returns:
+        Any: The result.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        value: Any = globals().get(function)
+
+        if not callable(value):
+            raise Exception(f"Attribute '{function}' is not callable")
+
+        return value(
+            *args,
+            **kwargs,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to handle call function event",
+            name=NAME,
+        )
+        raise Exception(f"Failed to handle call function event: {e}") from e
+
+
+def on_call_functions(
+    functions: list[str],
+    *args,
+    **kwargs,
+) -> list[Any]:
+    """
+    Handle the call functions event.
+
+    Calls multiple functions sequentially.
+
+    Args:
+        functions (list[str]): The list of function names to call.
+        *args: Positional arguments to pass to each function.
+        **kwargs: Keyword arguments to pass to each function.
+
+    Returns:
+        list[Any]: The list of results from each function call.
+
+    Raises:
+        Exception: If an error occurs during function execution.
+    """
+
+    try:
+        results: list[Any] = []
+
+        for function in functions:
+            result: Any = on_call_function(
+                function=function,
+                *args,
+                **kwargs,
+            )
+
+            results.append(result)
+        return results
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to call functions",
+            name=NAME,
+        )
+        raise Exception(f"Failed to call functions: {e}") from e
 
 
 def on_get_form() -> dict[str, Any]:
@@ -1049,7 +1193,7 @@ def set_teachers(teachers: list[dict[str, Any]]) -> None:
 
 def subscribe() -> None:
     """
-    Subscribe to the get form event.
+    Subscribe to various events.
 
     Args:
         None
@@ -1061,14 +1205,22 @@ def subscribe() -> None:
         Exception: If an error occurs.
     """
 
-    global SUBSCRIPTION
-
     try:
-        SUBSCRIPTION = register_subscription(
-            event=GET_FORM,
-            function=on_get_form,
-            namespace="CREATE_FORMS",
-            persistent=False,
+        SUBSCRIPTIONS.append(
+            register_subscription(
+                event=GET_FORM,
+                function=on_get_form,
+                namespace="STACK_CREATE_FORM",
+                persistent=False,
+            )
+        )
+        SUBSCRIPTIONS.append(
+            register_subscription(
+                event=CALL_FUNCTION,
+                function=on_call_function,
+                namespace="STACK_CREATE_FORM",
+                persistent=True,
+            )
         )
     except Exception as e:
         log_exception(
@@ -1081,7 +1233,7 @@ def subscribe() -> None:
 
 def unsubscribe() -> None:
     """
-    Unsubscribe from the get form event.
+    Unsubscribe from various events.
 
     Args:
         None
@@ -1093,11 +1245,10 @@ def unsubscribe() -> None:
         Exception: If an error occurs.
     """
 
-    global SUBSCRIPTION
-
     try:
-        unsubscribe_subscription(uuid=SUBSCRIPTION)
-        SUBSCRIPTION = None
+        for subscription in SUBSCRIPTIONS:
+            unsubscribe_subscription(uuid=subscription)
+        SUBSCRIPTIONS.clear()
     except Exception as e:
         log_exception(
             exception=e,

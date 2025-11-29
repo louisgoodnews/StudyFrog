@@ -8,7 +8,7 @@ import tkinter
 from tkinter.constants import NSEW
 from typing import Final, Optional
 
-from gui.constants import COLOR_CONFIG, DARK_PRIMARY, DEFAULT_FONT, WINDOW_GEOMETRY, WINDOW_TITLE
+from gui.constants import COLOR_CONFIG, DARK_PRIMARY, WINDOW_GEOMETRY, WINDOW_TITLE
 from gui.factory import get_color_mode, get_frame
 
 
@@ -137,7 +137,6 @@ def get_edit_menu() -> tkinter.Menu:
         return EDIT_MENU
 
     EDIT_MENU = tkinter.Menu(
-        font=DEFAULT_FONT,
         master=get_menu(),
         **COLOR_CONFIG["menu"][get_color_mode()],
     )
@@ -169,7 +168,6 @@ def get_file_menu() -> tkinter.Menu:
         return FILE_MENU
 
     FILE_MENU = tkinter.Menu(
-        font=DEFAULT_FONT,
         master=get_menu(),
         **COLOR_CONFIG["menu"][get_color_mode()],
     )
@@ -201,7 +199,6 @@ def get_menu() -> tkinter.Menu:
         return MENU
 
     MENU = tkinter.Menu(
-        font=DEFAULT_FONT,
         master=get_root(),
         **COLOR_CONFIG["menu"][get_color_mode()],
     )
@@ -318,7 +315,6 @@ def get_view_menu() -> tkinter.Menu:
         return VIEW_MENU
 
     VIEW_MENU = tkinter.Menu(
-        font=DEFAULT_FONT,
         master=get_menu(),
         **COLOR_CONFIG["menu"][get_color_mode()],
     )

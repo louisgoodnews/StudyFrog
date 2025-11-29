@@ -7,8 +7,9 @@ import tkinter
 
 from tkinter import ttk
 from tkinter.constants import E, NSEW, W
-from typing import Final, Literal, Optional, Type
+from typing import Any, Final, Literal, Optional, TypeAlias
 
+from common.events import CALL_FUNCTION, CALL_FUNCTIONS
 from gui.constants import DEFAULT_FONT, LARGE_BOLD_FONT, READONLY, TOPLEVEL_GEOMETRY
 from gui.factory import (
     get_button,
@@ -16,7 +17,6 @@ from gui.factory import (
     get_frame,
     get_label,
     get_scrolled_frame,
-    get_success_toast,
 )
 from gui.views.logic.create_view_logic import (
     get_form_getter,
@@ -24,21 +24,18 @@ from gui.views.logic.create_view_logic import (
     on_combobox_change,
     on_create_button_click,
 )
-from utils.utils import destroy_widget_children, log_exception, log_info
+from utils.utils import (
+    destroy_widget_children,
+    log_exception,
+    log_info,
+    register_subscription,
+    unsubscribe_subscription,
+)
 
 
 # ---------- Types ---------- #
 
-WhatType: Type[
-    Literal[
-        "flashcard",
-        "note",
-        "question",
-        "stack",
-        "subject",
-        "teacher",
-    ]
-] = Literal[
+WhatType: TypeAlias = Literal[
     "flashcard",
     "note",
     "question",
@@ -59,6 +56,10 @@ CONTAINER_FRAME: Optional[tkinter.Frame] = None
 MASTER: Optional[tkinter.Toplevel] = None
 
 NAME: Final[Literal["gui.views.views.create_view"]] = "gui.views.views.create_view"
+
+NAMESPACE: Final[Literal["CREATE_VIEW"]] = "CREATE_VIEW"
+
+SUBSCRIPTIONS: list[str] = []
 
 TITLE_LABEL: Optional[tkinter.Label] = None
 
@@ -403,6 +404,8 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
         )
 
         what_values: list[str] = [
+            "Flashcard",
+            "Note",
             "Stack",
             "Subject",
             "Tag",
@@ -544,6 +547,37 @@ def create_widgets() -> None:
         raise Exception(f"Failed to create widgets: {e}") from e
 
 
+def destroy() -> None:
+    """
+    Destroys the create view.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    global BOTTOM_FRAME, CENTER_FRAME, CONTAINER_FRAME, MASTER, TITLE_LABEL, TOP_FRAME
+
+    if MASTER is None:
+        return
+
+    MASTER.destroy()
+
+    MASTER = None
+
+    BOTTOM_FRAME = None
+    CENTER_FRAME = None
+    CONTAINER_FRAME = None
+    TITLE_LABEL = None
+    TOP_FRAME = None
+
+    make_master_none_if_possible()
+
+    unsubscribe()
+
+
 def get_bottom_frame() -> tkinter.Frame:
     """
     Returns the bottom frame.
@@ -661,16 +695,12 @@ def get_create_view(
 
         get_form_getter(what=what)(master=get_container_frame())
 
+        subscribe()
+
         log_info(
             message="Got create view successfully",
             name=NAME,
         )
-
-        get_success_toast(
-            message="Create view loaded successfully",
-            title="Success",
-        )
-
     except Exception as e:
         log_exception(
             exception=e,
@@ -774,6 +804,102 @@ def get_what() -> WhatType:
     return WHAT
 
 
+def make_master_none_if_possible() -> None:
+    """
+    Makes the master none if possible.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    global MASTER
+
+    if MASTER is None:
+        return
+
+    MASTER = None
+
+
+def on_call_function(
+    function: str,
+    *args,
+    **kwargs,
+) -> Any:
+    """
+    Handle the call function event.
+
+    Args:
+        function (str): The function.
+
+    Returns:
+        Any: The result.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        value: Any = globals().get(function)
+
+        if not callable(value):
+            raise Exception(f"Attribute '{function}' is not callable")
+
+        return value(
+            *args,
+            **kwargs,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to handle call function event",
+            name=NAME,
+        )
+        raise Exception(f"Failed to handle call function event: {e}") from e
+
+
+def on_call_functions(
+    functions: list[str],
+    *args,
+    **kwargs,
+) -> list[Any]:
+    """
+    Handle the call functions event.
+
+    Args:
+        functions (list[str]): The functions.
+
+    Returns:
+        list[Any]: The results.
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        result: list[Any] = []
+
+        for function in functions:
+            result.append(
+                on_call_function(
+                    function=function,
+                    *args,
+                    **kwargs,
+                )
+            )
+
+        return result
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to handle call functions event",
+            name=NAME,
+        )
+        raise Exception(f"Failed to handle call functions event: {e}") from e
+
+
 def set_container_frame(frame: tkinter.Frame) -> None:
     """
     Sets the container frame.
@@ -858,6 +984,73 @@ def set_what(what: WhatType) -> None:
     global WHAT
 
     WHAT = what
+
+
+def subscribe() -> None:
+    """
+    Subscribe to various events.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        SUBSCRIPTIONS.append(
+            register_subscription(
+                event=CALL_FUNCTION,
+                function=on_call_function,
+                namespace=NAMESPACE,
+                persistent=True,
+            )
+        )
+        SUBSCRIPTIONS.append(
+            register_subscription(
+                event=CALL_FUNCTIONS,
+                function=on_call_functions,
+                namespace=NAMESPACE,
+                persistent=True,
+            )
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to subscribe",
+            name=NAME,
+        )
+        raise Exception(f"Failed to subscribe: {e}") from e
+
+
+def unsubscribe() -> None:
+    """
+    Unsubscribe from various events.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        for subscription in SUBSCRIPTIONS:
+            unsubscribe_subscription(uuid=subscription)
+        SUBSCRIPTIONS.clear()
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to unsubscribe",
+            name=NAME,
+        )
+        raise Exception(f"Failed to unsubscribe: {e}") from e
 
 
 # ---------- Auto-Export ---------- #

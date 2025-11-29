@@ -73,12 +73,14 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
             "activeforeground": WHITE,
             "background": DARK_PRIMARY,
             "bg": DARK_PRIMARY,
-            "foreground": WHITE,
             "fg": WHITE,
+            "font": DEFAULT_FONT,
+            "foreground": WHITE,
         },
         "light": {
             "background": WHITE,
             "bg": WHITE,
+            "font": DEFAULT_FONT,
         },
     },
     "canvas": {
@@ -133,8 +135,9 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
             "activeforeground": WHITE,
             "background": DARK_SECONDARY,
             "bg": DARK_SECONDARY,
-            "foreground": WHITE,
             "fg": WHITE,
+            "font": DEFAULT_FONT,
+            "foreground": WHITE,
         },
         "light": {
             "background": WHITE,

@@ -19,6 +19,9 @@ def _get_object_dict(**kwargs) -> dict[str, Any]:
     """
     Returns a dictionary containing an object's attributes.
 
+    This function ensures that all required fields are present in the returned dictionary,
+    including timestamps, metadata, and a default UUID.
+
     Args:
         **kwargs (dict[str, Any]): Additional keywords to pass to the object's attributes.
 
@@ -32,6 +35,15 @@ def _get_object_dict(**kwargs) -> dict[str, Any]:
     if "created_on" not in kwargs:
         kwargs["created_on"] = get_today_str()
 
+    if "id" not in kwargs:
+        kwargs["id"] = None
+
+    if "key" not in kwargs:
+        kwargs["key"] = None
+
+    if "metadata" not in kwargs:
+        kwargs["metadata"] = {}
+
     if "updated_at" not in kwargs:
         kwargs["updated_at"] = get_now_str()
 
@@ -40,6 +52,8 @@ def _get_object_dict(**kwargs) -> dict[str, Any]:
 
     if "uuid" not in kwargs:
         kwargs["uuid"] = get_uuid_str()
+
+    kwargs["fields"] = list(kwargs.keys())
 
     return dict(sorted(kwargs.items()))
 
@@ -191,9 +205,10 @@ def get_difficulty_model(
 def get_flashcard_model(
     back_text: str,
     front_text: str,
-    difficulty: Optional[str] = None,
-    priority: Optional[str] = None,
     customfields: Optional[dict[str, Any]] = None,
+    difficulty: Optional[str] = None,
+    last_viewed_at: Optional[str] = None,
+    priority: Optional[str] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
@@ -204,6 +219,7 @@ def get_flashcard_model(
         customfields (Optional[dict[str, Any]]): The flashcard's custom fields.
         difficulty (Optional[str]): The flashcard's difficulty.
         front_text (str): The flashcard's front text.
+        last_viewed_at (Optional[str]): The datetime when the flashcard was last viewed.
         priority (Optional[str]): The flashcard's priority.
         **kwargs (dict[str, Any]): Additional keywords to pass to the flashcard's attributes.
 
@@ -222,6 +238,7 @@ def get_flashcard_model(
         difficulty = ""
 
     kwargs["difficulty"] = difficulty
+    kwargs["last_viewed_at"] = last_viewed_at
 
     if not priority:
         priority = ""
@@ -449,6 +466,7 @@ def get_stack_model(
     contents: Optional[dict[str, Any]] = None,
     customfields: Optional[dict[str, Any]] = None,
     description: Optional[str] = None,
+    due_date: Optional[str] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
@@ -459,6 +477,7 @@ def get_stack_model(
         customfields (Optional[dict[str, Any]]): The stack's custom fields.
         description (Optional[str]): The stack's description.
         difficulty (str): The stack's difficulty.
+        due_date (Optional[str]): The stack's due date.
         name (str): The stack's name.
         priority (str): The stack's priority.
         **kwargs (dict[str, Any]): Additional keywords to pass to the stack's attributes.
@@ -478,6 +497,7 @@ def get_stack_model(
     kwargs["customfields"] = customfields
     kwargs["description"] = description
     kwargs["difficulty"] = difficulty
+    kwargs["due_date"] = due_date
     kwargs["name"] = name
     kwargs["priority"] = priority
     kwargs["type"] = "STACK"

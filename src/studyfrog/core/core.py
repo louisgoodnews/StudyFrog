@@ -1038,7 +1038,6 @@ def run_post_start_tasks() -> None:
             name=NAME,
         )
         publish_event(event=APPLICATION_STARTED)
-        get_root().mainloop()
     except Exception as e:
         log_exception(
             name=NAME,
@@ -1189,6 +1188,8 @@ def start() -> None:
             message="Application started.",
             name=NAME,
         )
+
+        get_root().mainloop()
     except Exception as e:
         log_exception(
             name=NAME,
