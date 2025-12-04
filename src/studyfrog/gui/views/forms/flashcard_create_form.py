@@ -17,7 +17,6 @@ from common.events import (
     GET_ALL_SUBJECTS,
     GET_ALL_TEACHERS,
     GET_FORM,
-    GET_STACK,
 )
 from gui.constants import READONLY
 from gui.factory import get_combobox, get_label, get_scrolled_text
@@ -571,120 +570,6 @@ def get_priorities() -> list[dict[str, Any]]:
         )
 
     return PRIORITIES
-
-
-def get_stack_create_form(master: tkinter.Frame) -> None:
-    """
-    Get the stack create form.
-
-    Args:
-        master (tkinter.Frame): The master frame.
-
-    Returns:
-        None
-
-    Raises:
-        Exception: If an error occurs.
-    """
-
-    try:
-        log_info(
-            message="Getting stack create form",
-            name=NAME,
-        )
-
-        set_difficulties(difficulties=load_difficulties())
-        set_priorities(priorities=load_priorities())
-        set_stacks(stacks=load_stacks())
-        set_subjects(subjects=load_subjects())
-        set_teachers(teachers=load_teachers())
-
-        clear_master_frame(master=master)
-        configure_master_grid(master=master)
-        create_widgets(master=master)
-
-        subscribe()
-
-        log_info(
-            message="Got stack create form successfully",
-            name=NAME,
-        )
-    except Exception as e:
-        log_exception(
-            exception=e,
-            message="Failed to get stack create form",
-            name=NAME,
-        )
-        raise Exception(f"Failed to get stack create form: {e}") from e
-
-
-def get_stacks() -> list[dict[str, Any]]:
-    """
-    Get the stacks.
-
-    Args:
-        None
-
-    Returns:
-        list[dict[str, Any]]: The stacks.
-
-    Raises:
-        Exception: If an error occurs.
-    """
-
-    if is_list_empty(list_=STACKS):
-        log_warning(
-            message="Stacks are empty. Check the logs for additional warnings. StudyFrog will still function though.",
-            name=NAME,
-        )
-
-    return STACKS
-
-
-def get_subjects() -> list[dict[str, Any]]:
-    """
-    Get the subjects.
-
-    Args:
-        None
-
-    Returns:
-        list[dict[str, Any]]: The subjects.
-
-    Raises:
-        Exception: If an error occurs.
-    """
-
-    if is_list_empty(list_=SUBJECTS):
-        log_warning(
-            message="Subjects are empty. Check the logs for additional warnings. StudyFrog will still function though.",
-            name=NAME,
-        )
-
-    return SUBJECTS
-
-
-def get_teachers() -> list[dict[str, Any]]:
-    """
-    Get the teachers.
-
-    Args:
-        None
-
-    Returns:
-        list[dict[str, Any]]: The teachers.
-
-    Raises:
-        Exception: If an error occurs.
-    """
-
-    if is_list_empty(list_=TEACHERS):
-        log_warning(
-            "Teachers are empty. Check the logs for additional warnings. StudyFrog will still function though.",
-            name=NAME,
-        )
-
-    return TEACHERS
 
 
 def get_stacks() -> list[dict[str, Any]]:

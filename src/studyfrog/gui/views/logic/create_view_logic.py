@@ -15,8 +15,10 @@ from common.events import (
     ADDED_SUBJECT,
     ADDED_TEACHER,
     CALL_FUNCTION,
+    FILTER_QUESTIONS,
     FILTER_STACKS,
     GET_FORM,
+    UPDATE_QUESTION,
     UPDATE_STACK,
 )
 from core.models import (
@@ -149,6 +151,62 @@ WHAT_TYPE_TO_MODEL_GETTER: dict[
 
 
 # ---------- Functions ---------- #
+
+
+def append_to_question(
+    answer: dict[str, Any],
+    question_key: str,
+) -> None:
+    """
+    Appends the answer to the question.
+
+    Args:
+        answer (dict[str, Any]): The answer to append.
+        question_key (str): The key of the question to append to.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        question: dict[str, Any] = (
+            publish_event(
+                event=FILTER_QUESTIONS,
+                namespace="GLOBAL",
+                **{"key": question_key},
+            )
+            .get(
+                "filter_entries",
+                {},
+            )[0]
+            .get(
+                "result",
+                {},
+            )[0]
+        )
+
+        question["answers"]["items"].append(answer["key"])
+
+        question["answers"]["total"] += 1
+
+        publish_event(
+            event=UPDATE_QUESTION,
+            namespace="GLOBAL",
+            **{
+                "entry": question,
+                "entry_id": question["id"],
+            },
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to append to question",
+            name=NAME,
+        )
+        raise Exception(f"Failed to append to question: {e}") from e
 
 
 def append_to_stack(
@@ -385,6 +443,11 @@ def handle_note_creation() -> None:
             name=NAME,
         )
 
+        append_to_stack(
+            item=WHAT_TYPE_TO_DATABASE_GETTER["note"](entry_id=id),
+            stack_key=form["stack"],
+        )
+
         get_success_toast(
             message=f"Note created successfully",
             title=f"Note created successfully",
@@ -449,6 +512,11 @@ def handle_question_creation() -> None:
         log_info(
             message=f"Question created successfully",
             name=NAME,
+        )
+
+        append_to_stack(
+            item=WHAT_TYPE_TO_DATABASE_GETTER["question"](entry_id=id),
+            stack_key=form["stack"],
         )
 
         get_success_toast(
@@ -516,6 +584,12 @@ def handle_stack_creation() -> None:
             message=f"Stack created successfully",
             name=NAME,
         )
+
+        if form.get("stack", None):
+            append_to_stack(
+                item=WHAT_TYPE_TO_DATABASE_GETTER["stack"](entry_id=id),
+                stack_key=form["stack"],
+            )
 
         get_success_toast(
             message=f"Stack created successfully",

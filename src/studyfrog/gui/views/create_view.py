@@ -403,15 +403,7 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
             weight=1,
         )
 
-        what_values: list[str] = [
-            "Flashcard",
-            "Note",
-            "Stack",
-            "Subject",
-            "Tag",
-            "Teacher",
-            "User",
-        ]
+        what_values: list[str] = [what_type.title() for what_type in WhatType.__args__]
 
         what_combobox: ttk.Combobox = get_combobox(
             master=frame,
@@ -802,8 +794,6 @@ def get_what() -> WhatType:
     Raises:
         ValueError: If the what is not set. Call 'set_what' first.
     """
-
-    global WHAT
 
     if WHAT is None:
         raise ValueError("What not set. Call 'set_what' first.")

@@ -1209,7 +1209,11 @@ def write_file_json(
     try:
         with LOCK:
             path.write_text(
-                data=json.dumps(data),
+                data=json.dumps(
+                    data,
+                    indent=4,
+                    sort_keys=True,
+                ),
                 encoding="utf-8",
             )
         return True
