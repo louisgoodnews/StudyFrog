@@ -141,7 +141,10 @@ def create_widgets(master: tkinter.Frame) -> None:
 
         title_var: tkinter.StringVar = tkinter.StringVar()
 
-        FORM_VARIABLES["title"] = title_var
+        FORM_VARIABLES["title"] = {
+            "is_required": True,
+            "variable": title_var,
+        }
 
         title_entry: tkinter.Entry = get_entry(
             master=master,
@@ -171,7 +174,10 @@ def create_widgets(master: tkinter.Frame) -> None:
 
         text_var: tkinter.StringVar = tkinter.StringVar()
 
-        FORM_VARIABLES["text"] = text_var
+        FORM_VARIABLES["text"] = {
+            "is_required": True,
+            "variable": text_var,
+        }
 
         text_entry: dict[str, tkinter.Widget] = get_scrolled_text(master=master)
 
@@ -245,15 +251,16 @@ def get_form() -> dict[str, Any]:
     try:
         result: dict[str, Any] = {}
 
-        result.update(
-            {
-                key: value.get()
-                for (
-                    key,
-                    value,
-                ) in FORM_VARIABLES.items()
-            }
-        )
+        for (
+            key,
+            value,
+        ) in FORM_VARIABLES.items():
+            variable_value: str = value["variable"].get()
+
+            if value["is_required"] and not variable_value:
+                raise ValueError(f"Required field '{key}' is empty")
+
+            result[key] = variable_value
 
         result["difficulty"] = next(
             (
@@ -312,6 +319,8 @@ def get_note_create_form(master: tkinter.Frame) -> None:
         clear_master_frame(master=master)
         configure_master_grid(master=master)
         create_widgets(master=master)
+
+        subscribe()
 
         log_info(
             message="Got note create form successfully",
@@ -690,9 +699,10 @@ def subscribe() -> None:
                 event=GET_FORM,
                 function=on_get_form,
                 namespace="NOTE_CREATE_FORM",
-                persistent=False,
+                persistent=True,
             )
         )
+
         SUBSCRIPTIONS.append(
             register_subscription(
                 event=CALL_FUNCTION,

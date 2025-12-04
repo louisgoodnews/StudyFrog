@@ -10,6 +10,7 @@ from gui.factory import get_toplevel
 from gui.gui import get_root
 from gui.views.create_view import get_create_view
 from gui.views.edit_view import get_edit_view
+from gui.views.view_view import get_view_view
 from utils.utils import log_exception
 
 
@@ -138,7 +139,7 @@ def on_view_button_click() -> None:
     """
 
     try:
-        pass
+        get_view_view(master=get_toplevel(master=get_root()))
     except Exception as e:
         log_exception(
             exception=e,

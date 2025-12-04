@@ -5,10 +5,11 @@ Date: 2025-11-16
 
 import tkinter
 
-from tkinter.constants import NSEW
+from tkinter.constants import NSEW, W
 from typing import Any, Final, Literal, Optional
 
 from common.events import ADDED_STACK
+from gui.constants import LARGE_FONT
 from gui.factory import get_button, get_frame, get_label, get_scrolled_frame, get_success_toast
 from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
 from gui.views.logic.dashboard_view_logic import (
@@ -356,6 +357,8 @@ def create_dashboard_view_item(
         )
 
         get_label(
+            anchor=W,
+            font=LARGE_FONT,
             master=frame,
             text=stack["name"],
         ).grid(

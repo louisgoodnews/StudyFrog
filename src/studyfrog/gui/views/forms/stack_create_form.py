@@ -197,7 +197,7 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["name"] = {
-            "value": name_var,
+            "variable": name_var,
             "is_required": True,
         }
 
@@ -239,7 +239,7 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["description"] = {
-            "value": description_var,
+            "variable": description_var,
             "is_required": False,
         }
 
@@ -279,7 +279,7 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["difficulty"] = {
-            "value": difficulty_var,
+            "variable": difficulty_var,
             "is_required": True,
         }
 
@@ -319,7 +319,7 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["priority"] = {
-            "value": priority_var,
+            "variable": priority_var,
             "is_required": True,
         }
 
@@ -366,7 +366,7 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["subject"] = {
-            "value": subject_var,
+            "variable": subject_var,
             "is_required": False,
         }
 
@@ -413,7 +413,7 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["teacher"] = {
-            "value": teacher_var,
+            "variable": teacher_var,
             "is_required": False,
         }
 
@@ -453,7 +453,7 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["stack"] = {
-            "value": stack_var,
+            "variable": stack_var,
             "is_required": False,
         }
     except Exception as e:
@@ -504,15 +504,16 @@ def get_form() -> dict[str, Any]:
     try:
         result: dict[str, Any] = {}
 
-        result.update(
-            {
-                key: value["value"].get()
-                for (
-                    key,
-                    value,
-                ) in FORM_VARIABLES.items()
-            }
-        )
+        for (
+            key,
+            value,
+        ) in FORM_VARIABLES.items():
+            variable_value: str = value["variable"].get()
+
+            if value["is_required"] and not variable_value:
+                raise ValueError(f"Required field '{key}' is empty")
+
+            result[key] = variable_value
 
         result["difficulty"] = next(
             (

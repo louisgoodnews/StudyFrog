@@ -57,6 +57,48 @@ TEACHERS: Final[list[dict[str, Any]]] = []
 # ---------- Functions ---------- #
 
 
+def append_stack(stack: dict[str, Any]) -> None:
+    """
+    Append the stack.
+
+    Args:
+        stack (dict[str, Any]): The stack.
+
+    Returns:
+        None
+    """
+
+    STACKS.append(stack)
+
+
+def append_subject(subject: dict[str, Any]) -> None:
+    """
+    Append the subject.
+
+    Args:
+        subject (dict[str, Any]): The subject.
+
+    Returns:
+        None
+    """
+
+    SUBJECTS.append(subject)
+
+
+def append_teacher(teacher: dict[str, Any]) -> None:
+    """
+    Append the teacher.
+
+    Args:
+        teacher (dict[str, Any]): The teacher.
+
+    Returns:
+        None
+    """
+
+    TEACHERS.append(teacher)
+
+
 def clear_master_frame(master: tkinter.Frame) -> None:
     """
     Clear the master frame.
@@ -177,7 +219,87 @@ def create_widgets(master: tkinter.Frame) -> None:
         )
 
         FORM_VARIABLES["stack"] = {
-            "value": stack_var,
+            "variable": stack_var,
+            "is_required": True,
+        }
+
+        difficulty_var: tkinter.StringVar = tkinter.StringVar()
+
+        difficulty_label: tkinter.Label = get_label(
+            master=master,
+            text="Difficulty*: ",
+        )
+
+        difficulty_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
+
+        difficulty_combobox: ttk.Combobox = get_combobox(
+            master=master,
+            state=READONLY,
+            textvariable=difficulty_var,
+            values=[difficulty["name"] for difficulty in get_difficulties()],
+        )
+
+        difficulty_combobox.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=1,
+            sticky=NSEW,
+        )
+
+        difficulty_combobox.bind(
+            func=lambda event: difficulty_var.set(value=difficulty_combobox.get()),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        FORM_VARIABLES["difficulty"] = {
+            "variable": difficulty_var,
+            "is_required": True,
+        }
+
+        priority_var: tkinter.StringVar = tkinter.StringVar()
+
+        priority_label: tkinter.Label = get_label(
+            master=master,
+            text="Priority*: ",
+        )
+
+        priority_label.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
+
+        priority_combobox: ttk.Combobox = get_combobox(
+            master=master,
+            state=READONLY,
+            textvariable=priority_var,
+            values=[priority["name"] for priority in get_priorities()],
+        )
+
+        priority_combobox.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=2,
+            sticky=NSEW,
+        )
+
+        priority_combobox.bind(
+            func=lambda event: priority_var.set(value=priority_combobox.get()),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        FORM_VARIABLES["priority"] = {
+            "variable": priority_var,
             "is_required": True,
         }
 
@@ -190,13 +312,16 @@ def create_widgets(master: tkinter.Frame) -> None:
             column=0,
             padx=5,
             pady=5,
-            row=1,
+            row=3,
             sticky=NSEW,
         )
 
         front_text_var: tkinter.StringVar = tkinter.StringVar()
 
-        FORM_VARIABLES["front_text"] = front_text_var
+        FORM_VARIABLES["front_text"] = {
+            "variable": front_text_var,
+            "is_required": True,
+        }
 
         front_text_entry: dict[str, tkinter.Widget] = get_scrolled_text(master=master)
 
@@ -204,7 +329,7 @@ def create_widgets(master: tkinter.Frame) -> None:
             column=1,
             padx=5,
             pady=5,
-            row=1,
+            row=3,
             sticky=NSEW,
         )
 
@@ -232,13 +357,16 @@ def create_widgets(master: tkinter.Frame) -> None:
             column=0,
             padx=5,
             pady=5,
-            row=2,
+            row=4,
             sticky=NSEW,
         )
 
         back_text_var: tkinter.StringVar = tkinter.StringVar()
 
-        FORM_VARIABLES["back_text"] = back_text_var
+        FORM_VARIABLES["back_text"] = {
+            "variable": back_text_var,
+            "is_required": True,
+        }
 
         back_text_entry: dict[str, tkinter.Widget] = get_scrolled_text(master=master)
 
@@ -246,7 +374,7 @@ def create_widgets(master: tkinter.Frame) -> None:
             column=1,
             padx=5,
             pady=5,
-            row=2,
+            row=4,
             sticky=NSEW,
         )
 
@@ -325,6 +453,8 @@ def get_flashcard_create_form(master: tkinter.Frame) -> None:
         configure_master_grid(master=master)
         create_widgets(master=master)
 
+        subscribe()
+
         log_info(
             message="Got flashcard create form successfully",
             name=NAME,
@@ -355,15 +485,16 @@ def get_form() -> dict[str, Any]:
     try:
         result: dict[str, Any] = {}
 
-        result.update(
-            {
-                key: value.get()
-                for (
-                    key,
-                    value,
-                ) in FORM_VARIABLES.items()
-            }
-        )
+        for (
+            key,
+            value,
+        ) in FORM_VARIABLES.items():
+            variable_value: str = value["variable"].get()
+
+            if value["is_required"] and not variable_value:
+                raise ValueError(f"Required field '{key}' is empty")
+
+            result[key] = variable_value
 
         result["difficulty"] = next(
             (
@@ -371,6 +502,7 @@ def get_form() -> dict[str, Any]:
                 for difficulty in get_difficulties()
                 if difficulty.get("name") == result.get("difficulty")
             ),
+            None,
         )
 
         result["priority"] = next(
@@ -379,6 +511,7 @@ def get_form() -> dict[str, Any]:
                 for priority in get_priorities()
                 if priority.get("name") == result.get("priority")
             ),
+            None,
         )
 
         result["stack"] = next(
@@ -387,6 +520,7 @@ def get_form() -> dict[str, Any]:
                 for stack in get_stacks()
                 if stack.get("name") == result.get("stack")
             ),
+            None,
         )
 
         result["subject"] = next(
@@ -395,6 +529,7 @@ def get_form() -> dict[str, Any]:
                 for subject in get_subjects()
                 if subject.get("name") == result.get("subject")
             ),
+            None,
         )
 
         result["teacher"] = next(
@@ -403,6 +538,7 @@ def get_form() -> dict[str, Any]:
                 for teacher in get_teachers()
                 if teacher.get("name") == result.get("teacher")
             ),
+            None,
         )
 
         return result
@@ -1010,9 +1146,10 @@ def subscribe() -> None:
                 event=GET_FORM,
                 function=on_get_form,
                 namespace="FLASHCARD_CREATE_FORM",
-                persistent=False,
+                persistent=True,
             )
         )
+
         SUBSCRIPTIONS.append(
             register_subscription(
                 event=CALL_FUNCTION,

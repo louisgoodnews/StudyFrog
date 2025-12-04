@@ -21,7 +21,7 @@ CENTER_FRAME: Optional[tkinter.Frame] = None
 
 MASTER: Optional[tkinter.Toplevel] = None
 
-NAME: Final[Literal["gui.views.views.edit_view"]] = "gui.views.views.edit_view"
+NAME: Final[Literal["gui.views.views.delete_view"]] = "gui.views.views.delete_view"
 
 TOP_FRAME: Optional[tkinter.Frame] = None
 
@@ -297,9 +297,9 @@ def get_center_frame() -> tkinter.Frame:
     return CENTER_FRAME
 
 
-def get_edit_view(master: tkinter.Toplevel) -> None:
+def get_delete_view(master: tkinter.Toplevel) -> None:
     """
-    Returns the edit view.
+    Returns the delete view.
 
     Args:
         master (tkinter.Toplevel): The master window.
@@ -319,7 +319,7 @@ def get_edit_view(master: tkinter.Toplevel) -> None:
 
 def get_master() -> tkinter.Toplevel:
     """
-    Returns the master of the edit view.
+    Returns the master of the delete view.
 
     Args:
         None
@@ -370,7 +370,7 @@ def get_top_frame() -> tkinter.Frame:
 
 def set_master(master: tkinter.Toplevel) -> None:
     """
-    Sets the master of the edit view.
+    Sets the master of the delete view.
 
     Args:
         master (tkinter.Toplevel): The master window.

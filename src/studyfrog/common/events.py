@@ -87,6 +87,23 @@ ApplicationEvent: TypeAlias = Literal[
     "create_button_clicked",
     "destroy_widget",
     "destroy_widget_children",
+    "filter_answers",
+    "filter_associations",
+    "filter_customfields",
+    "filter_difficulties",
+    "filter_flashcards",
+    "filter_images",
+    "filter_notes",
+    "filter_options",
+    "filter_priorities",
+    "filter_questions",
+    "filter_rehearsal_runs",
+    "filter_rehearsal_run_items",
+    "filter_stacks",
+    "filter_subjects",
+    "filter_tags",
+    "filter_teachers",
+    "filter_users",
     "get_all_answers",
     "get_all_associations",
     "get_all_customfields",
@@ -368,6 +385,40 @@ DESTROY_WIDGET: Final[ApplicationEvent] = "destroy_widget"
 
 DESTROY_WIDGET_CHILDREN: Final[ApplicationEvent] = "destroy_widget_children"
 
+FILTER_ANSWERS: Final[ApplicationEvent] = "filter_answers"
+
+FILTER_ASSOCIATIONS: Final[ApplicationEvent] = "filter_associations"
+
+FILTER_CUSTOMFIELDS: Final[ApplicationEvent] = "filter_customfields"
+
+FILTER_DIFFICULTIES: Final[ApplicationEvent] = "filter_difficulties"
+
+FILTER_FLASHCARDS: Final[ApplicationEvent] = "filter_flashcards"
+
+FILTER_IMAGES: Final[ApplicationEvent] = "filter_images"
+
+FILTER_NOTES: Final[ApplicationEvent] = "filter_notes"
+
+FILTER_OPTIONS: Final[ApplicationEvent] = "filter_options"
+
+FILTER_PRIORITIES: Final[ApplicationEvent] = "filter_priorities"
+
+FILTER_QUESTIONS: Final[ApplicationEvent] = "filter_questions"
+
+FILTER_REHEARSAL_RUNS: Final[ApplicationEvent] = "filter_rehearsal_runs"
+
+FILTER_REHEARSAL_RUN_ITEMS: Final[ApplicationEvent] = "filter_rehearsal_run_items"
+
+FILTER_STACKS: Final[ApplicationEvent] = "filter_stacks"
+
+FILTER_SUBJECTS: Final[ApplicationEvent] = "filter_subjects"
+
+FILTER_TAGS: Final[ApplicationEvent] = "filter_tags"
+
+FILTER_TEACHERS: Final[ApplicationEvent] = "filter_teachers"
+
+FILTER_USERS: Final[ApplicationEvent] = "filter_users"
+
 GET_ALL_ANSWERS: Final[ApplicationEvent] = "get_all_answers"
 
 GET_ALL_ASSOCIATIONS: Final[ApplicationEvent] = "get_all_associations"
@@ -629,6 +680,9 @@ def get_answer_events() -> tuple[ApplicationEvent, ...]:
     return (
         ADD_ANSWER,
         ADD_ANSWERS,
+        FILTER_ANSWERS,
+        GET_ANSWER,
+        GET_ANSWERS,
         REMOVE_ANSWER,
         REMOVE_ANSWERS,
         UPDATE_ANSWER,
@@ -647,6 +701,9 @@ def get_customfield_events() -> tuple[ApplicationEvent, ...]:
     return (
         ADD_CUSTOMFIELD,
         ADD_CUSTOMFIELDS,
+        FILTER_CUSTOMFIELDS,
+        GET_CUSTOMFIELD,
+        GET_CUSTOMFIELDS,
         REMOVE_CUSTOMFIELD,
         REMOVE_CUSTOMFIELDS,
         UPDATE_CUSTOMFIELD,
@@ -665,6 +722,9 @@ def get_difficulty_events() -> tuple[ApplicationEvent, ...]:
     return (
         ADD_DIFFICULTY,
         ADD_DIFFICULTIES,
+        FILTER_DIFFICULTIES,
+        GET_DIFFICULTY,
+        GET_DIFFICULTIES,
         REMOVE_DIFFICULTY,
         REMOVE_DIFFICULTIES,
         UPDATE_DIFFICULTY,
@@ -730,6 +790,9 @@ def get_flashcard_events() -> tuple[ApplicationEvent, ...]:
     return (
         ADD_FLASHCARD,
         ADD_FLASHCARDS,
+        FILTER_FLASHCARDS,
+        GET_FLASHCARD,
+        GET_FLASHCARDS,
         REMOVE_FLASHCARD,
         REMOVE_FLASHCARDS,
         UPDATE_FLASHCARD,
@@ -748,6 +811,9 @@ def get_image_events() -> tuple[ApplicationEvent, ...]:
     return (
         ADD_IMAGE,
         ADD_IMAGES,
+        FILTER_IMAGES,
+        GET_IMAGE,
+        GET_IMAGES,
         REMOVE_IMAGE,
         REMOVE_IMAGES,
         UPDATE_IMAGE,
@@ -766,6 +832,9 @@ def get_note_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_NOTE,
         ADD_NOTES,
+        FILTER_NOTES,
+        GET_NOTE,
+        GET_NOTES,
         REMOVE_NOTE,
         REMOVE_NOTES,
         UPDATE_NOTE,
@@ -784,6 +853,9 @@ def get_option_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_OPTION,
         ADD_OPTIONS,
+        FILTER_OPTIONS,
+        GET_OPTION,
+        GET_OPTIONS,
         REMOVE_OPTION,
         REMOVE_OPTIONS,
         UPDATE_OPTION,
@@ -802,6 +874,9 @@ def get_priority_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_PRIORITY,
         ADD_PRIORITIES,
+        FILTER_PRIORITIES,
+        GET_PRIORITY,
+        GET_PRIORITIES,
         REMOVE_PRIORITY,
         REMOVE_PRIORITIES,
         UPDATE_PRIORITY,
@@ -820,6 +895,9 @@ def get_question_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_QUESTION,
         ADD_QUESTIONS,
+        FILTER_QUESTIONS,
+        GET_QUESTION,
+        GET_QUESTIONS,
         REMOVE_QUESTION,
         REMOVE_QUESTIONS,
         UPDATE_QUESTION,
@@ -838,6 +916,9 @@ def get_rehearsal_run_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_REHEARSAL_RUN,
         ADD_REHEARSAL_RUNS,
+        FILTER_REHEARSAL_RUNS,
+        GET_REHEARSAL_RUN,
+        GET_REHEARSAL_RUNS,
         REMOVE_REHEARSAL_RUN,
         REMOVE_REHEARSAL_RUNS,
         UPDATE_REHEARSAL_RUN,
@@ -856,6 +937,9 @@ def get_rehearsal_run_item_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_REHEARSAL_RUN_ITEM,
         ADD_REHEARSAL_RUN_ITEMS,
+        FILTER_REHEARSAL_RUN_ITEMS,
+        GET_REHEARSAL_RUN_ITEM,
+        GET_REHEARSAL_RUN_ITEMS,
         REMOVE_REHEARSAL_RUN_ITEM,
         REMOVE_REHEARSAL_RUN_ITEMS,
         UPDATE_REHEARSAL_RUN_ITEM,
@@ -874,6 +958,9 @@ def get_stack_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_STACK,
         ADD_STACKS,
+        FILTER_STACKS,
+        GET_STACK,
+        GET_STACKS,
         REMOVE_STACK,
         REMOVE_STACKS,
         UPDATE_STACK,
@@ -892,6 +979,9 @@ def get_subject_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_SUBJECT,
         ADD_SUBJECTS,
+        FILTER_SUBJECTS,
+        GET_SUBJECT,
+        GET_SUBJECTS,
         REMOVE_SUBJECT,
         REMOVE_SUBJECTS,
         UPDATE_SUBJECT,
@@ -910,6 +1000,9 @@ def get_tag_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_TAG,
         ADD_TAGS,
+        FILTER_TAGS,
+        GET_TAG,
+        GET_TAGS,
         REMOVE_TAG,
         REMOVE_TAGS,
         UPDATE_TAG,
@@ -928,6 +1021,9 @@ def get_teacher_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_TEACHER,
         ADD_TEACHERS,
+        FILTER_TEACHERS,
+        GET_TEACHER,
+        GET_TEACHERS,
         REMOVE_TEACHER,
         REMOVE_TEACHERS,
         UPDATE_TEACHER,
@@ -946,6 +1042,9 @@ def get_user_events() -> tuple[..., ApplicationEvent]:
     return (
         ADD_USER,
         ADD_USERS,
+        FILTER_USERS,
+        GET_USER,
+        GET_USERS,
         REMOVE_USER,
         REMOVE_USERS,
         UPDATE_USER,
@@ -1034,6 +1133,23 @@ __all__: Final[list[str]] = [
     "CREATE_BUTTON_CLICKED",
     "DESTROY_WIDGET",
     "DESTROY_WIDGET_CHILDREN",
+    "FILTER_ANSWERS",
+    "FILTER_ASSOCIATIONS",
+    "FILTER_CUSTOMFIELDS",
+    "FILTER_DIFFICULTIES",
+    "FILTER_FLASHCARDS",
+    "FILTER_IMAGES",
+    "FILTER_NOTES",
+    "FILTER_OPTIONS",
+    "FILTER_PRIORITIES",
+    "FILTER_QUESTIONS",
+    "FILTER_REHEARSAL_RUNS",
+    "FILTER_REHEARSAL_RUN_ITEMS",
+    "FILTER_STACKS",
+    "FILTER_SUBJECTS",
+    "FILTER_TAGS",
+    "FILTER_TEACHERS",
+    "FILTER_USERS",
     "GET_ALL_ANSWERS",
     "GET_ALL_ASSOCIATIONS",
     "GET_ALL_CUSTOMFIELDS",

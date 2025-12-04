@@ -761,7 +761,7 @@ def log(
     )
 
     print(
-        f"{color}{get_now_str()} - [{level.upper()}] - [{name.upper()}]: {message}{COLORIZATION["DEFAULT"]};"
+        f"{color}{get_now_str()} - [{level.upper()}] - [{name.upper()}]: {message};{COLORIZATION["DEFAULT"]}"
     )
 
 

@@ -29,31 +29,32 @@ def _get_object_dict(**kwargs) -> dict[str, Any]:
         dict[str, Any]: A dictionary containing an object's attributes.
     """
 
-    if "created_at" not in kwargs:
-        kwargs["created_at"] = get_now_str()
+    defaults_for_arguments: dict[str, Any] = {
+        "created_at": get_now_str(),
+        "created_on": get_today_str(),
+        "id": None,
+        "key": None,
+        "metadata": {},
+        "updated_at": get_now_str(),
+        "updated_on": get_today_str(),
+        "uuid": get_uuid_str(),
+    }
 
-    if "created_on" not in kwargs:
-        kwargs["created_on"] = get_today_str()
+    for (
+        key,
+        value,
+    ) in defaults_for_arguments.items():
+        if key in kwargs:
+            continue
 
-    if "id" not in kwargs:
-        kwargs["id"] = None
+        kwargs[key] = value
 
-    if "key" not in kwargs:
-        kwargs["key"] = None
+    fields_list: list[str] = sorted(list(kwargs.keys()))
 
-    if "metadata" not in kwargs:
-        kwargs["metadata"] = {}
-
-    if "updated_at" not in kwargs:
-        kwargs["updated_at"] = get_now_str()
-
-    if "updated_on" not in kwargs:
-        kwargs["updated_on"] = get_today_str()
-
-    if "uuid" not in kwargs:
-        kwargs["uuid"] = get_uuid_str()
-
-    kwargs["fields"] = list(kwargs.keys())
+    kwargs["fields"] = {
+        "fields": fields_list,
+        "total": len(fields_list),
+    }
 
     return dict(sorted(kwargs.items()))
 
@@ -78,7 +79,7 @@ def get_answer_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["text"] = text
     kwargs["type"] = "ANSWER"
 
@@ -165,7 +166,7 @@ def get_customfield_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["name"] = name
     kwargs["type"] = "CUSTOMFIELD"
 
@@ -194,7 +195,7 @@ def get_difficulty_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["name"] = name
     kwargs["type"] = "DIFFICULTY"
     kwargs["value"] = value
@@ -230,7 +231,7 @@ def get_flashcard_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["back_text"] = back_text
     kwargs["front_text"] = front_text
 
@@ -267,7 +268,7 @@ def get_image_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["type"] = "IMAGE"
 
     return _get_object_dict(**kwargs)
@@ -295,7 +296,7 @@ def get_note_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["text"] = text
     kwargs["title"] = title
     kwargs["type"] = "NOTE"
@@ -330,7 +331,7 @@ def get_option_model(
     if not customfields:
         customfields = []
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["name"] = name
     kwargs["type"] = "OPTION"
     kwargs["value"] = value
@@ -360,7 +361,7 @@ def get_priority_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["name"] = name
     kwargs["type"] = "PRIORITY"
     kwargs["value"] = value
@@ -396,7 +397,7 @@ def get_question_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["question_type"] = question_type
     kwargs["text"] = text
     kwargs["type"] = "QUESTION"
@@ -424,7 +425,7 @@ def get_rehearsal_run_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
 
     if not rehearsal_run_items:
         rehearsal_run_items = []
@@ -453,7 +454,7 @@ def get_rehearsal_run_item_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["type"] = "REHEARSAL_RUN_ITEM"
 
     return _get_object_dict(**kwargs)
@@ -463,21 +464,21 @@ def get_stack_model(
     difficulty: str,
     name: str,
     priority: str,
-    contents: Optional[dict[str, Any]] = None,
     customfields: Optional[dict[str, Any]] = None,
     description: Optional[str] = None,
     due_date: Optional[str] = None,
+    items: Optional[list[str]] = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
     Returns a dictionary containing a stack's attributes.
 
     Args:
-        contents (Optional[dict[str, Any]]): The stack's contents.
         customfields (Optional[dict[str, Any]]): The stack's custom fields.
         description (Optional[str]): The stack's description.
         difficulty (str): The stack's difficulty.
         due_date (Optional[str]): The stack's due date.
+        items (Optional[list[str]]): The stack's items.
         name (str): The stack's name.
         priority (str): The stack's priority.
         **kwargs (dict[str, Any]): Additional keywords to pass to the stack's attributes.
@@ -486,18 +487,25 @@ def get_stack_model(
         dict[str, Any]: A dictionary containing a stack's attributes.
     """
 
-    if not contents:
-        contents = {}
-
-    kwargs["contents"] = contents
-
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {
+        "customfields": customfields,
+        "total": len(customfields),
+    }
+
     kwargs["description"] = description
     kwargs["difficulty"] = difficulty
     kwargs["due_date"] = due_date
+
+    if not items:
+        items = []
+
+    kwargs["items"] = {
+        "items": items,
+        "total": len(items),
+    }
     kwargs["name"] = name
     kwargs["priority"] = priority
     kwargs["type"] = "STACK"
@@ -531,7 +539,7 @@ def get_subject_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["difficulty"] = difficulty
     kwargs["name"] = name
     kwargs["priority"] = priority
@@ -560,7 +568,7 @@ def get_tag_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["name"] = name
     kwargs["type"] = "TAG"
 
@@ -593,7 +601,7 @@ def get_teacher_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["difficulty"] = difficulty
     kwargs["name"] = name
     kwargs["priority"] = priority
@@ -627,7 +635,7 @@ def get_user_model(
     if not customfields:
         customfields = {}
 
-    kwargs["customfields"] = customfields
+    kwargs["customfields"] = {"customfields": customfields, "total": len(customfields)}
     kwargs["name"] = name
     kwargs["type"] = "USER"
 

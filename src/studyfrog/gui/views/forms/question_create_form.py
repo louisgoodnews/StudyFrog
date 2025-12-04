@@ -158,6 +158,8 @@ def get_question_create_form(master: tkinter.Frame) -> None:
         configure_master_grid(master=master)
         create_widgets(master=master)
 
+        subscribe()
+
         log_info(
             message="Got question create form successfully",
             name=NAME,
@@ -302,9 +304,10 @@ def subscribe() -> None:
                 event=GET_FORM,
                 function=on_get_form,
                 namespace="QUESTION_CREATE_FORM",
-                persistent=False,
+                persistent=True,
             )
         )
+
         SUBSCRIPTIONS.append(
             register_subscription(
                 event=CALL_FUNCTION,

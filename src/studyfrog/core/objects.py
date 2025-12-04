@@ -8,6 +8,7 @@ from typing import Any, Callable, Final, Literal, Union
 from core.storage import (
     add_table_entries,
     add_table_entry,
+    filter_table_entries,
     get_all_table_entries,
     get_table_entries,
     get_table_entry,
@@ -20,6 +21,7 @@ from utils.utils import log_exception
 
 
 # ---------- Constants ---------- #
+
 
 ANSWERS: Final[Literal["answers"]] = "answers"
 
@@ -139,6 +141,46 @@ def _make_add_entry(table_name: str) -> Callable[[dict[str, Any]], int]:
             raise Exception(f"Failed to add entry to table {table_name}: {e}") from e
 
     return add_entry
+
+
+def _make_filter_entries(table_name: str) -> Callable[[...], list[dict[str, Any]]]:
+    """
+    Make a function to filter entries from the table.
+
+    Args:
+        table_name (str): Name of the table.
+
+    Returns:
+        Callable[[...], list[dict[str, Any]]]: Function to filter entries from the table.
+    """
+
+    def filter_entries(**kwargs: Any) -> list[dict[str, Any]]:
+        """
+        Filter entries from the table.
+
+        Args:
+            **kwargs (Any): Keyword arguments to filter entries by.
+
+        Returns:
+            list[dict[str, Any]]: List of filtered entries.
+
+        Raises:
+            Exception: If the entries were not filtered.
+        """
+        try:
+            return filter_table_entries(
+                table_name=table_name,
+                **kwargs,
+            )
+        except Exception as e:
+            log_exception(
+                exception=e,
+                message=f"Failed to filter entries from table {table_name}",
+                name=NAME,
+            )
+            raise Exception(f"Failed to filter entries from table {table_name}: {e}") from e
+
+    return filter_entries
 
 
 def _make_get_all_entries(table_name: str) -> Callable[[None], list[dict[str, Any]]]:
@@ -486,6 +528,41 @@ add_subjects: Callable[[list[dict[str, Any]]], list[int]] = _make_add_entries(ta
 add_tags: Callable[[list[dict[str, Any]]], list[int]] = _make_add_entries(table_name=TAGS)
 add_teachers: Callable[[list[dict[str, Any]]], list[int]] = _make_add_entries(table_name=TEACHERS)
 add_users: Callable[[list[dict[str, Any]]], list[int]] = _make_add_entries(table_name=USERS)
+
+
+# ---------- Filter ---------- #
+
+filter_answers: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=ANSWERS)
+filter_associations: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(
+    table_name=ASSOCIATIONS
+)
+filter_customfields: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(
+    table_name=CUSTOMFIELDS
+)
+filter_difficulties: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(
+    table_name=DIFFICULTIES
+)
+filter_flashcards: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(
+    table_name=FLASHCARDS
+)
+filter_images: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=IMAGES)
+filter_notes: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=NOTES)
+filter_options: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=OPTIONS)
+filter_priorities: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(
+    table_name=PRIORITIES
+)
+filter_questions: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=QUESTIONS)
+filter_rehearsal_runs: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(
+    table_name=REHEARSAL_RUNS
+)
+filter_rehearsal_run_items: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(
+    table_name=REHEARSAL_RUN_ITEMS
+)
+filter_stacks: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=STACKS)
+filter_subjects: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=SUBJECTS)
+filter_tags: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=TAGS)
+filter_teachers: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=TEACHERS)
+filter_users: Callable[[...], list[dict[str, Any]]] = _make_filter_entries(table_name=USERS)
 
 
 # ---------- Get All ---------- #

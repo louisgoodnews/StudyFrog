@@ -430,6 +430,13 @@ def create_center_frame_widgets(master: tkinter.Frame) -> None:
         what_combobox.current(what_values.index(get_what().title()))
 
         what_combobox.bind(
+            add="+",
+            func=lambda event: set_what(what=what_combobox.get()),
+            sequence="<<ComboboxSelected>>",
+        )
+
+        what_combobox.bind(
+            add="+",
             func=lambda event: on_combobox_change(
                 master=get_container_frame(),
                 value=what_combobox.get(),
