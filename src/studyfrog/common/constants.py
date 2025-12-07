@@ -14,6 +14,35 @@ PROJECT_NAME: Final[Literal["StudyFrog"]] = "StudyFrog"
 PROJECT_VERSION: Final[Literal["0.1.0"]] = "0.1.0"
 
 
+# ---------- ANSI-Color Constants ---------- #
+
+ANSI_BLACK: Final[Literal[""]] = ""
+
+ANSI_BLUE: Final[Literal["\033[36m"]] = "\033[36m"
+
+ANSI_BOLD: Final[Literal["\033[1m"]] = "\033[1m"
+
+ANSI_CYAN: Final[Literal["\033[36m"]] = "\033[36m"
+
+ANSI_DEFAULT: Final[Literal["\033[0m"]] = "\033[0m"
+
+ANSI_GREEN: Final[Literal["\033[32m"]] = "\033[32m"
+
+ANSI_GREY: Final[Literal["\033[34m"]] = "\033[34m"
+
+ANSI_ITALIC: Final[Literal["\033[3m"]] = "\033[3m"
+
+ANSI_MAGENTA: Final[Literal["\033[35m"]] = "\033[35m"
+
+ANSI_RED: Final[Literal["\033[31m"]] = "\033[31m"
+
+ANSI_UNDERLINED: Final[Literal["\033[4m"]] = "\033[4m"
+
+ANSI_WHITE: Final[Literal["\033[37m"]] = "\033[37m"
+
+ANSI_YELLOW: Final[Literal["\033[33m"]] = "\033[33m"
+
+
 # ---------- Path-Constants ---------- #
 
 CWD: Final[Path] = Path.cwd()

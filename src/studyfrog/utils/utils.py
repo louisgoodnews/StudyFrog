@@ -14,20 +14,27 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Callable, Final, Literal, Optional
 
+from common.constants import (
+    ANSI_BLUE,
+    ANSI_CYAN,
+    ANSI_DEFAULT,
+    ANSI_GREEN,
+    ANSI_MAGENTA,
+    ANSI_RED,
+    ANSI_YELLOW,
+)
+
 
 # ---------- Constants ---------- #
 
 COLORIZATION: Final[dict[str, str]] = {
-    "BOLD": "\033[1m",
-    "CRITICAL": "\033[35m",
-    "DEBUG": "\033[36m",
-    "DEFAULT": "\033[0m",
-    "ERROR": "\033[31m",
-    "INFO": "\033[32m",
-    "ITALIC": "\033[3m",
-    "TRACE": "\033[34m",
-    "UNDERLINED": "\033[4m",
-    "WARNING": "\033[33m",
+    "CRITICAL": ANSI_MAGENTA,
+    "DEBUG": ANSI_BLUE,
+    "DEFAULT": ANSI_DEFAULT,
+    "ERROR": ANSI_RED,
+    "INFO": ANSI_GREEN,
+    "TRACE": ANSI_CYAN,
+    "WARNING": ANSI_YELLOW,
 }
 
 LOCK: Final[threading.Lock] = threading.Lock()
@@ -1278,7 +1285,12 @@ def string_to_human_case(string: str) -> str:
     """
 
     if "_" in string:
-        return string.replace("_", " ").title()
+        string.replace("_", " ")
+
+    if "-" in string:
+        string.replace("-", " ")
+
+    return string.title()
 
 
 def string_to_snake_case(string: str) -> str:
