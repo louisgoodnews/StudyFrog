@@ -360,7 +360,7 @@ def create_dashboard_view_item(
             anchor=W,
             font=LARGE_FONT,
             master=frame,
-            text=stack["name"],
+            text=f"{stack["name"]} ({stack["key"]})",
         ).grid(
             column=0,
             padx=5,
@@ -551,7 +551,7 @@ def on_added_stack(**kwargs) -> None:
     try:
         create_dashboard_view_item(
             master=get_container(),
-            stack=kwargs["model"],
+            stack=kwargs["stack"],
         )
     except Exception as e:
         log_exception(

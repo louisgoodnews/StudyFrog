@@ -10,6 +10,7 @@ from typing import Any, Callable, Final, Literal, Optional, TypeAlias, Union
 from common.events import (
     ADD_ANSWER,
     ADD_QUESTION,
+    ADD_STACK,
     ADDED_ANSWER,
     ADDED_FLASHCARD,
     ADDED_NOTE,
@@ -24,6 +25,8 @@ from common.events import (
     GET_ANSWER_MODEL,
     GET_FORM,
     GET_QUESTION,
+    GET_STACK,
+    GET_STACK_MODEL,
     UPDATE_QUESTION,
     UPDATE_STACK,
 )
@@ -717,33 +720,82 @@ def handle_stack_creation() -> None:
                 f"Form data is empty - no data was retrieved from the form event. Check if the form event was published correctly and the namespace is correct. Received form: {form}"
             )
 
-        id: int = WHAT_TYPE_TO_DATABASE_ADDER["stack"](
-            entry=WHAT_TYPE_TO_MODEL_GETTER["stack"](**form)
+        model: ModelDict = (
+            publish_event(
+                event=GET_STACK_MODEL,
+                namespace="GLOBAL",
+                **form,
+            )
+            .get(
+                "get_stack_model",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                {},
+            )
         )
 
+        id: Optional[int] = (
+            publish_event(
+                entry=model,
+                event=ADD_STACK,
+                namespace="GLOBAL",
+            )
+            .get(
+                "add_entry",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                None,
+            )
+        )
+
+        if not id:
+            raise Exception(
+                f"Stack ID is empty - no ID was retrieved from the add stack event. Check if the add stack event was published correctly and the namespace is correct. Received form: {form}"
+            )
+
         log_info(
-            message=f"Stack created successfully",
+            message=f"Stack with ID: {id} created successfully",
             name=NAME,
         )
 
-        if form.get("stack", None):
+        stack: dict[str, Any] = (
+            publish_event(
+                entry_id=id,
+                event=GET_STACK,
+                namespace="GLOBAL",
+            )
+            .get(
+                "get_entry",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                {},
+            )
+        )
+
+        if form.get(
+            "stack",
+            None,
+        ):
             append_to_stack(
-                item=WHAT_TYPE_TO_DATABASE_GETTER["stack"](entry_id=id),
+                item=stack,
                 stack_key=form["stack"],
             )
 
         get_success_toast(
-            message=f"Stack created successfully",
-            title=f"Stack created successfully",
+            message=f"Stack with ID {id} created successfully",
+            title=f"Stack created",
         )
 
         publish_event(
-            event=WHAT_TYPE_TO_ADDED_EVENT["stack"],
+            event=ADDED_STACK,
             namespace="GLOBAL",
-            **{
-                "what": "stack",
-                "model": WHAT_TYPE_TO_DATABASE_GETTER["stack"](entry_id=id),
-            },
+            stack=stack,
         )
     except Exception as e:
         log_exception(

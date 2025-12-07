@@ -162,6 +162,10 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
             "fg": BLACK,
         },
     },
+    "radiobutton": {
+        "dark": {},
+        "light": {},
+    },
     "scrollbar": {
         "dark": {"background": DARK_SECONDARY},
         "light": {"background": WHITE},

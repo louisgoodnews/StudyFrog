@@ -7,7 +7,7 @@ import tkinter
 
 from tkinter import ttk
 from tkinter.constants import NSEW
-from typing import Any, Final, Literal, Optional, TypeAlias, Union
+from typing import Any, Callable, Final, Literal, Optional, TypeAlias, Union
 
 from common.events import (
     CALL_FUNCTION,
@@ -26,6 +26,7 @@ from gui.factory import (
     get_entry,
     get_frame,
     get_label,
+    get_radiobutton,
     get_scrolled_text,
 )
 from utils.utils import (
@@ -37,6 +38,8 @@ from utils.utils import (
     log_warning,
     publish_event,
     register_subscription,
+    string_to_human_case,
+    string_to_snake_case,
     unsubscribe_subscription,
 )
 
@@ -317,6 +320,7 @@ def create_multiple_choice_answer_widgets(master: tkinter.Frame) -> None:
     Raises:
         Exception: If an error occurs.
     """
+
     try:
         get_button(
             command=create_multiple_choice_answer_item,
@@ -335,6 +339,60 @@ def create_multiple_choice_answer_widgets(master: tkinter.Frame) -> None:
             name=NAME,
         )
         raise Exception(f"Failed to create multiple choice answer widgets: {e}") from e
+
+
+def create_true_false_answer_widgets(master: tkinter.Frame) -> None:
+    """
+    Create the true false answer widgets.
+
+    Args:
+        master (tkinter.Frame): The master frame.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        answer_var: tkinter.BooleanVar = tkinter.BooleanVar()
+
+        get_radiobutton(
+            master=master,
+            variable=answer_var,
+        ).grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        get_radiobutton(
+            master=master,
+            variable=answer_var,
+        ).grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        ANSWERS.append(
+            {
+                "is_correct": answer_var,
+                "variable": answer_var,
+            }
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to create true false answer widgets",
+            name=NAME,
+        )
+        raise Exception(f"Failed to create true false answer widgets: {e}") from e
 
 
 def create_widgets(master: tkinter.Frame) -> None:
@@ -370,7 +428,7 @@ def create_widgets(master: tkinter.Frame) -> None:
             master=master,
             state=READONLY,
             textvariable=stack_var,
-            values=[stack["name"] for stack in get_stacks()],
+            values=[f"{stack["name"]} ({stack["key"]})" for stack in get_stacks()],
         )
 
         stack_combobox.grid(
@@ -532,7 +590,12 @@ def create_widgets(master: tkinter.Frame) -> None:
         question_type_var: tkinter.StringVar = tkinter.StringVar()
 
         question_type_values: list[str] = [
-            question_type.title() for question_type in QuestionType.__args__
+            "Multiple Choice",
+            "Multiple Select",
+            "Open Ended",
+            "Single Choice",
+            "Single Select",
+            "True False",
         ]
 
         question_type_combobox: ttk.Combobox = get_combobox(
@@ -550,7 +613,9 @@ def create_widgets(master: tkinter.Frame) -> None:
             sticky=NSEW,
         )
 
-        question_type_combobox.current(question_type_values.index(get_question_type().title()))
+        question_type_combobox.current(
+            question_type_values.index(string_to_human_case(string=get_question_type()))
+        )
 
         question_type_combobox.bind(
             func=lambda event: question_type_var.set(value=question_type_combobox.get()),
@@ -1207,7 +1272,31 @@ def on_question_type_change(question_type: QuestionType) -> None:
 
         clear_container_frame()
 
+        question_type = string_to_snake_case(string=question_type)
+
         set_question_type(question_type=question_type)
+
+        question_type_to_widget_creator: dict[QuestionType, Callable[[tkinter.Frame], None]] = {
+            "multiple_choice": create_multiple_choice_answer_widgets,
+            "true_false": create_true_false_answer_widgets,
+        }
+
+        widget_creator: Optional[Callable[[tkinter.Frame], None]] = (
+            question_type_to_widget_creator.get(
+                question_type,
+                None,
+            )
+        )
+
+        if not widget_creator:
+            log_warning(
+                message=f"Failed to get widget creator for unsupported question type: {question_type}.",
+                name=NAME,
+            )
+
+            return
+
+        widget_creator(master=get_container_frame())
     except Exception as e:
         log_exception(
             exception=e,

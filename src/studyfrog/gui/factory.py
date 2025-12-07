@@ -395,6 +395,42 @@ def get_label(
         raise Exception(f"Failed to get label: {e}") from e
 
 
+def get_radiobutton(
+    master: tkinter.Widget,
+    *args,
+    **kwargs,
+) -> tkinter.Radiobutton:
+    """
+    Returns a tkinter.Radiobutton widget.
+
+    Args:
+        master (tkinter.Widget): The master of the tkinter.Radiobutton widget to be created.
+        *args: Additional arguments passed to the tkinter.Radiobutton constructor.
+        **kwargs: Additional keyword arguments passed to the tkinter.Radiobutton constructor.
+
+    Returns:
+        tkinter.Radiobutton: The tkinter.Radiobutton widget.
+    """
+
+    try:
+        keyword_arguments: dict[str, Any] = dict(COLOR_CONFIG["radiobutton"][get_color_mode()])
+
+        keyword_arguments.update(kwargs)
+
+        return tkinter.Radiobutton(
+            master=master,
+            *args,
+            **keyword_arguments,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to get radiobutton",
+            name=NAME,
+        )
+        raise Exception(f"Failed to get radiobutton: {e}") from e
+
+
 def get_scrollbar(
     master: tkinter.Widget,
     *args,

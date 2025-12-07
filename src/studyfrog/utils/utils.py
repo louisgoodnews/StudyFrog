@@ -1266,6 +1266,49 @@ def str_to_datetime(datetime_string: str) -> Optional[datetime]:
         return None
 
 
+def string_to_human_case(string: str) -> str:
+    """
+    Converts a given string to human case.
+
+    Args:
+        string (str): The string to convert to human case.
+
+    Returns:
+        str: The human case version of the input string.
+    """
+
+    if "_" in string:
+        return string.replace("_", " ").title()
+
+
+def string_to_snake_case(string: str) -> str:
+    """
+    Converts a given string to snake case.
+
+    Args:
+        string (str): The string to convert to snake case.
+
+    Returns:
+        str: The snake case version of the input string.
+    """
+
+    result: str = ""
+
+    for (
+        index,
+        char,
+    ) in enumerate(iterable=string):
+        if char == " ":
+            continue
+
+        if char.isupper() and index > 0:
+            result += "_"
+
+        result += char.lower()
+
+    return result
+
+
 def unsubscribe_subscription(uuid: str) -> bool:
     """
     Unsubscribes from an event.

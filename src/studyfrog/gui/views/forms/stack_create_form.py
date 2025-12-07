@@ -436,7 +436,7 @@ def create_widgets(master: tkinter.Frame) -> None:
             master=master,
             state=READONLY,
             textvariable=stack_var,
-            values=[stack["name"] for stack in get_stacks()],
+            values=[f"{stack["name"]} ({stack["key"]})" for stack in get_stacks()],
         )
 
         stack_combobox.grid(
