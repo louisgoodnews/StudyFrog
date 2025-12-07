@@ -8,6 +8,7 @@ import tkinter
 from typing import Any, Callable, Final, Literal, Optional, TypeAlias, Union
 
 from common.events import (
+    ADD_ANSWER,
     ADD_QUESTION,
     ADDED_ANSWER,
     ADDED_FLASHCARD,
@@ -19,12 +20,15 @@ from common.events import (
     CALL_FUNCTION,
     FILTER_QUESTIONS,
     FILTER_STACKS,
+    GET_ANSWER,
+    GET_ANSWER_MODEL,
     GET_FORM,
     GET_QUESTION,
     UPDATE_QUESTION,
     UPDATE_STACK,
 )
 from core.models import (
+    ModelDict,
     get_answer_model,
     get_flashcard_model,
     get_note_model,
@@ -318,20 +322,76 @@ def handle_answer_creation(form: dict[str, Any]) -> dict[str, Any]:
     """
 
     try:
-        id: int = WHAT_TYPE_TO_DATABASE_ADDER["answer"](
-            entry=WHAT_TYPE_TO_MODEL_GETTER["answer"](**form)
+        model: ModelDict = (
+            publish_event(
+                event=GET_ANSWER_MODEL,
+                namespace="GLOBAL",
+                **form,
+            )
+            .get(
+                "get_answer_model",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                {},
+            )
         )
+
+        id: Optional[int] = (
+            publish_event(
+                entry=model,
+                event=ADD_ANSWER,
+                namespace="GLOBAL",
+            )
+            .get(
+                "add_answer",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                None,
+            )
+        )
+
+        if not id:
+            raise Exception(
+                f"Answer ID is empty - no ID was retrieved from the add answer event. Check if the add answer event was published correctly and the namespace is correct. Received form: {form}"
+            )
 
         publish_event(
-            event=WHAT_TYPE_TO_ADDED_EVENT["answer"],
+            answer=publish_event(
+                entry_id=id,
+                event=GET_ANSWER,
+                namespace="GLOBAL",
+            )
+            .get(
+                "get_answer",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                {},
+            ),
+            event=ADDED_ANSWER,
             namespace="GLOBAL",
-            **{
-                "what": "answer",
-                "model": WHAT_TYPE_TO_DATABASE_GETTER["answer"](entry_id=id),
-            },
         )
 
-        return WHAT_TYPE_TO_DATABASE_GETTER["answer"](entry_id=id)
+        return (
+            publish_event(
+                entry_id=id,
+                event=GET_ANSWER,
+                namespace="GLOBAL",
+            )
+            .get(
+                "get_answer",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                {},
+            )
+        )
     except Exception as e:
         log_exception(
             exception=e,

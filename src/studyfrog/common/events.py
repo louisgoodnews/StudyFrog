@@ -122,41 +122,58 @@ ApplicationEvent: TypeAlias = Literal[
     "get_all_teachers",
     "get_all_users",
     "get_answer",
+    "get_answer_model",
     "get_answers",
     "get_association",
+    "get_association_model",
     "get_associations",
     "get_attribute",
     "get_attributes",
     "get_customfield",
+    "get_customfield_model",
     "get_customfields",
     "get_difficulty",
+    "get_difficulty_model",
     "get_difficulties",
     "get_flashcard",
+    "get_flashcard_model",
     "get_flashcards",
     "get_form",
     "get_image",
+    "get_image_model",
     "get_images",
     "get_note",
+    "get_note_model",
     "get_notes",
     "get_option",
+    "get_option_model",
     "get_options",
     "get_priority",
+    "get_priority_model",
     "get_priorities",
     "get_question",
+    "get_question_model",
     "get_questions",
     "get_rehearsal_run",
+    "get_rehearsal_run_model",
     "get_rehearsal_runs",
     "get_rehearsal_run_item",
+    "get_rehearsal_run_item_model",
     "get_rehearsal_run_items",
     "get_stack",
+    "get_stack_model",
     "get_stacks",
     "get_subject",
+    "get_subject_model",
     "get_subjects",
     "get_tag",
+    "get_tag_model",
     "get_tags",
     "get_teacher",
+    "get_teacher_model",
     "get_teachers",
     "get_user",
+    "get_user_model",
     "get_users",
     "ok_button_clicked",
     "remove_answer",
@@ -455,9 +472,13 @@ GET_ALL_USERS: Final[ApplicationEvent] = "get_all_users"
 
 GET_ANSWER: Final[ApplicationEvent] = "get_answer"
 
+GET_ANSWER_MODEL: Final[ApplicationEvent] = "get_answer_model"
+
 GET_ANSWERS: Final[ApplicationEvent] = "get_answers"
 
 GET_ASSOCIATION: Final[ApplicationEvent] = "get_association"
+
+GET_ASSOCIATION_MODEL: Final[ApplicationEvent] = "get_association_model"
 
 GET_ASSOCIATIONS: Final[ApplicationEvent] = "get_associations"
 
@@ -467,13 +488,19 @@ GET_ATTRIBUTES: Final[ApplicationEvent] = "get_attributes"
 
 GET_CUSTOMFIELD: Final[ApplicationEvent] = "get_customfield"
 
+GET_CUSTOMFIELD_MODEL: Final[ApplicationEvent] = "get_customfield_model"
+
 GET_CUSTOMFIELDS: Final[ApplicationEvent] = "get_customfields"
 
 GET_DIFFICULTY: Final[ApplicationEvent] = "get_difficulty"
 
+GET_DIFFICULTY_MODEL: Final[ApplicationEvent] = "get_difficulty_model"
+
 GET_DIFFICULTIES: Final[ApplicationEvent] = "get_difficulties"
 
 GET_FLASHCARD: Final[ApplicationEvent] = "get_flashcard"
+
+GET_FLASHCARD_MODEL: Final[ApplicationEvent] = "get_flashcard_model"
 
 GET_FLASHCARDS: Final[ApplicationEvent] = "get_flashcards"
 
@@ -481,25 +508,37 @@ GET_FORM: Final[ApplicationEvent] = "get_form"
 
 GET_IMAGE: Final[ApplicationEvent] = "get_image"
 
+GET_IMAGE_MODEL: Final[ApplicationEvent] = "get_image_model"
+
 GET_IMAGES: Final[ApplicationEvent] = "get_images"
 
 GET_NOTE: Final[ApplicationEvent] = "get_note"
+
+GET_NOTE_MODEL: Final[ApplicationEvent] = "get_note_model"
 
 GET_NOTES: Final[ApplicationEvent] = "get_notes"
 
 GET_OPTION: Final[ApplicationEvent] = "get_option"
 
+GET_OPTION_MODEL: Final[ApplicationEvent] = "get_option_model"
+
 GET_OPTIONS: Final[ApplicationEvent] = "get_options"
 
 GET_PRIORITY: Final[ApplicationEvent] = "get_priority"
+
+GET_PRIORITY_MODEL: Final[ApplicationEvent] = "get_priority_model"
 
 GET_PRIORITIES: Final[ApplicationEvent] = "get_priorities"
 
 GET_QUESTION: Final[ApplicationEvent] = "get_question"
 
+GET_QUESTION_MODEL: Final[ApplicationEvent] = "get_question_model"
+
 GET_QUESTIONS: Final[ApplicationEvent] = "get_questions"
 
 GET_REHEARSAL_RUN: Final[ApplicationEvent] = "get_rehearsal_run"
+
+GET_REHEARSAL_RUN_MODEL: Final[ApplicationEvent] = "get_rehearsal_run_model"
 
 GET_REHEARSAL_RUNS: Final[ApplicationEvent] = "get_rehearsal_runs"
 
@@ -507,23 +546,37 @@ GET_REHEARSAL_RUN_ITEM: Final[ApplicationEvent] = "get_rehearsal_run_item"
 
 GET_REHEARSAL_RUN_ITEMS: Final[ApplicationEvent] = "get_rehearsal_run_items"
 
+GET_REHEARSAL_RUN_ITEM_MODEL: Final[ApplicationEvent] = "get_rehearsal_run_item_model"
+
+GET_REHEARSAL_RUN_MODEL: Final[ApplicationEvent] = "get_rehearsal_run_model"
+
 GET_STACK: Final[ApplicationEvent] = "get_stack"
+
+GET_STACK_MODEL: Final[ApplicationEvent] = "get_stack_model"
 
 GET_STACKS: Final[ApplicationEvent] = "get_stacks"
 
 GET_SUBJECT: Final[ApplicationEvent] = "get_subject"
 
+GET_SUBJECT_MODEL: Final[ApplicationEvent] = "get_subject_model"
+
 GET_SUBJECTS: Final[ApplicationEvent] = "get_subjects"
 
 GET_TAG: Final[ApplicationEvent] = "get_tag"
+
+GET_TAG_MODEL: Final[ApplicationEvent] = "get_tag_model"
 
 GET_TAGS: Final[ApplicationEvent] = "get_tags"
 
 GET_TEACHER: Final[ApplicationEvent] = "get_teacher"
 
+GET_TEACHER_MODEL: Final[ApplicationEvent] = "get_teacher_model"
+
 GET_TEACHERS: Final[ApplicationEvent] = "get_teachers"
 
 GET_USER: Final[ApplicationEvent] = "get_user"
+
+GET_USER_MODEL: Final[ApplicationEvent] = "get_user_model"
 
 GET_USERS: Final[ApplicationEvent] = "get_users"
 
@@ -682,6 +735,7 @@ def get_answer_events() -> tuple[ApplicationEvent, ...]:
         ADD_ANSWERS,
         FILTER_ANSWERS,
         GET_ANSWER,
+        GET_ANSWER_MODEL,
         GET_ANSWERS,
         REMOVE_ANSWER,
         REMOVE_ANSWERS,
@@ -703,6 +757,7 @@ def get_customfield_events() -> tuple[ApplicationEvent, ...]:
         ADD_CUSTOMFIELDS,
         FILTER_CUSTOMFIELDS,
         GET_CUSTOMFIELD,
+        GET_CUSTOMFIELD_MODEL,
         GET_CUSTOMFIELDS,
         REMOVE_CUSTOMFIELD,
         REMOVE_CUSTOMFIELDS,
@@ -724,6 +779,7 @@ def get_difficulty_events() -> tuple[ApplicationEvent, ...]:
         ADD_DIFFICULTIES,
         FILTER_DIFFICULTIES,
         GET_DIFFICULTY,
+        GET_DIFFICULTY_MODEL,
         GET_DIFFICULTIES,
         REMOVE_DIFFICULTY,
         REMOVE_DIFFICULTIES,
@@ -792,6 +848,7 @@ def get_flashcard_events() -> tuple[ApplicationEvent, ...]:
         ADD_FLASHCARDS,
         FILTER_FLASHCARDS,
         GET_FLASHCARD,
+        GET_FLASHCARD_MODEL,
         GET_FLASHCARDS,
         REMOVE_FLASHCARD,
         REMOVE_FLASHCARDS,
@@ -813,6 +870,7 @@ def get_image_events() -> tuple[ApplicationEvent, ...]:
         ADD_IMAGES,
         FILTER_IMAGES,
         GET_IMAGE,
+        GET_IMAGE_MODEL,
         GET_IMAGES,
         REMOVE_IMAGE,
         REMOVE_IMAGES,
@@ -834,6 +892,7 @@ def get_note_events() -> tuple[..., ApplicationEvent]:
         ADD_NOTES,
         FILTER_NOTES,
         GET_NOTE,
+        GET_NOTE_MODEL,
         GET_NOTES,
         REMOVE_NOTE,
         REMOVE_NOTES,
@@ -855,6 +914,7 @@ def get_option_events() -> tuple[..., ApplicationEvent]:
         ADD_OPTIONS,
         FILTER_OPTIONS,
         GET_OPTION,
+        GET_OPTION_MODEL,
         GET_OPTIONS,
         REMOVE_OPTION,
         REMOVE_OPTIONS,
@@ -876,6 +936,7 @@ def get_priority_events() -> tuple[..., ApplicationEvent]:
         ADD_PRIORITIES,
         FILTER_PRIORITIES,
         GET_PRIORITY,
+        GET_PRIORITY_MODEL,
         GET_PRIORITIES,
         REMOVE_PRIORITY,
         REMOVE_PRIORITIES,
@@ -897,6 +958,7 @@ def get_question_events() -> tuple[..., ApplicationEvent]:
         ADD_QUESTIONS,
         FILTER_QUESTIONS,
         GET_QUESTION,
+        GET_QUESTION_MODEL,
         GET_QUESTIONS,
         REMOVE_QUESTION,
         REMOVE_QUESTIONS,
@@ -960,6 +1022,7 @@ def get_stack_events() -> tuple[..., ApplicationEvent]:
         ADD_STACKS,
         FILTER_STACKS,
         GET_STACK,
+        GET_STACK_MODEL,
         GET_STACKS,
         REMOVE_STACK,
         REMOVE_STACKS,
@@ -981,6 +1044,7 @@ def get_subject_events() -> tuple[..., ApplicationEvent]:
         ADD_SUBJECTS,
         FILTER_SUBJECTS,
         GET_SUBJECT,
+        GET_SUBJECT_MODEL,
         GET_SUBJECTS,
         REMOVE_SUBJECT,
         REMOVE_SUBJECTS,
@@ -1002,6 +1066,7 @@ def get_tag_events() -> tuple[..., ApplicationEvent]:
         ADD_TAGS,
         FILTER_TAGS,
         GET_TAG,
+        GET_TAG_MODEL,
         GET_TAGS,
         REMOVE_TAG,
         REMOVE_TAGS,
@@ -1023,6 +1088,7 @@ def get_teacher_events() -> tuple[..., ApplicationEvent]:
         ADD_TEACHERS,
         FILTER_TEACHERS,
         GET_TEACHER,
+        GET_TEACHER_MODEL,
         GET_TEACHERS,
         REMOVE_TEACHER,
         REMOVE_TEACHERS,
@@ -1044,6 +1110,7 @@ def get_user_events() -> tuple[..., ApplicationEvent]:
         ADD_USERS,
         FILTER_USERS,
         GET_USER,
+        GET_USER_MODEL,
         GET_USERS,
         REMOVE_USER,
         REMOVE_USERS,
@@ -1168,41 +1235,57 @@ __all__: Final[list[str]] = [
     "GET_ALL_TEACHERS",
     "GET_ALL_USERS",
     "GET_ANSWER",
+    "GET_ANSWER_MODEL",
     "GET_ANSWERS",
     "GET_ASSOCIATION",
     "GET_ASSOCIATIONS",
     "GET_ATTRIBUTE",
     "GET_ATTRIBUTES",
     "GET_CUSTOMFIELD",
+    "GET_CUSTOMFIELD_MODEL",
     "GET_CUSTOMFIELDS",
     "GET_DIFFICULTY",
+    "GET_DIFFICULTY_MODEL",
     "GET_DIFFICULTIES",
     "GET_FLASHCARD",
+    "GET_FLASHCARD_MODEL",
     "GET_FLASHCARDS",
     "GET_FORM",
     "GET_IMAGE",
+    "GET_IMAGE_MODEL",
     "GET_IMAGES",
     "GET_NOTE",
+    "GET_NOTE_MODEL",
     "GET_NOTES",
     "GET_OPTION",
+    "GET_OPTION_MODEL",
     "GET_OPTIONS",
     "GET_PRIORITY",
+    "GET_PRIORITY_MODEL",
     "GET_PRIORITIES",
     "GET_QUESTION",
+    "GET_QUESTION_MODEL",
     "GET_QUESTIONS",
     "GET_REHEARSAL_RUN",
+    "GET_REHEARSAL_RUN_MODEL",
     "GET_REHEARSAL_RUNS",
     "GET_REHEARSAL_RUN_ITEM",
+    "GET_REHEARSAL_RUN_ITEM_MODEL",
     "GET_REHEARSAL_RUN_ITEMS",
     "GET_STACK",
+    "GET_STACK_MODEL",
     "GET_STACKS",
     "GET_SUBJECT",
+    "GET_SUBJECT_MODEL",
     "GET_SUBJECTS",
     "GET_TAG",
+    "GET_TAG_MODEL",
     "GET_TAGS",
     "GET_TEACHER",
+    "GET_TEACHER_MODEL",
     "GET_TEACHERS",
     "GET_USER",
+    "GET_USER_MODEL",
     "GET_USERS",
     "OK_BUTTON_CLICKED",
     "REMOVE_ANSWER",
