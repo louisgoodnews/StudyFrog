@@ -35,6 +35,7 @@ from common.exceptions import (
 )
 from utils.utils import (
     ensure_json,
+    generate_model_key,
     get_file_content_json,
     get_now_str,
     get_today_str,
@@ -143,7 +144,7 @@ def add_table_entry(
         entry["created_at"] = get_now_str()
         entry["created_on"] = get_today_str()
         entry["id"] = new_id
-        entry["key"] = f"{entry['type'].upper()}_{new_id}"
+        entry["key"] = generate_model_key(name=entry["type"], index=new_id)
         table["metadata"]["next_id"] = new_id + 1
         entry["updated_at"] = get_now_str()
         entry["updated_on"] = get_today_str()

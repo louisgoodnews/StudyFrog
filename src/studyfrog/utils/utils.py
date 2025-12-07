@@ -130,6 +130,30 @@ def ensure_json(path: Path) -> bool:
         return False
 
 
+def generate_model_key(
+    name: str,
+    index: int,
+) -> str:
+    """
+    Generates a key for a model.
+
+    Args:
+        name (str): The name of the model.
+        index (int): The index of the model.
+
+    Returns:
+        str: The generated key.
+
+    Raises:
+        ValueError: If the name is empty.
+    """
+
+    if is_string_empty(string=name):
+        raise ValueError("Name cannot be empty.")
+
+    return f"{name.upper()}_{index}"
+
+
 def get_cwd() -> Path:
     """
     Returns the current working directory.
@@ -465,6 +489,84 @@ def get_widget_children(widget: tkinter.Widget) -> list[tkinter.Widget]:
     return widget.winfo_children()
 
 
+def get_widget_children_count(widget: tkinter.Widget) -> int:
+    """
+    Returns the number of children of a widget.
+
+    Args:
+        widget (tkinter.Widget): The widget who's children count should be returned.
+
+    Returns:
+        int: The number of children of the passed widget.
+    """
+
+    return len(get_widget_children(widget=widget))
+
+
+def get_widget_height(widget: tkinter.Widget) -> int:
+    """
+    Returns the height of a widget.
+
+    Args:
+        widget (tkinter.Widget): The widget who's height should be returned.
+
+    Returns:
+        int: The height of the passed widget.
+    """
+
+    widget.update_idletasks()
+
+    return widget.winfo_height()
+
+
+def get_widget_required_height(widget: tkinter.Widget) -> int:
+    """
+    Returns the required height of a widget.
+
+    Args:
+        widget (tkinter.Widget): The widget who's required height should be returned.
+
+    Returns:
+        int: The required height of the passed widget.
+    """
+
+    widget.update_idletasks()
+
+    return widget.winfo_reqheight()
+
+
+def get_widget_width(widget: tkinter.Widget) -> int:
+    """
+    Returns the width of a widget.
+
+    Args:
+        widget (tkinter.Widget): The widget who's width should be returned.
+
+    Returns:
+        int: The width of the passed widget.
+    """
+
+    widget.update_idletasks()
+
+    return widget.winfo_width()
+
+
+def get_widget_required_width(widget: tkinter.Widget) -> int:
+    """
+    Returns the required width of a widget.
+
+    Args:
+        widget (tkinter.Widget): The widget who's required width should be returned.
+
+    Returns:
+        int: The required width of the passed widget.
+    """
+
+    widget.update_idletasks()
+
+    return widget.winfo_reqwidth()
+
+
 def invert_dict(dictionary: dict[str, Any]) -> dict[Any, str]:
     """
     Returns the inverse of a dictionary.
@@ -722,6 +824,20 @@ def is_not_equal(
     return value != other
 
 
+def is_string_empty(string: str) -> bool:
+    """
+    Returns True if the string is empty, False otherwise.
+
+    Args:
+        string (str): The string to check.
+
+    Returns:
+        bool: True if the string is empty, False otherwise.
+    """
+
+    return not string
+
+
 def is_tuple_empty(tuple_: tuple[Any, ...]) -> bool:
     """
     Returns True if the tuple is empty, False otherwise.
@@ -737,7 +853,7 @@ def is_tuple_empty(tuple_: tuple[Any, ...]) -> bool:
 
 
 def log(
-    message: str,
+    message: Any,
     name: str,
     level: str = "DEFAULT",
 ) -> None:
@@ -746,7 +862,7 @@ def log(
 
     Args:
         level (str): The level at which to log the message. Influences colorized display. Defaults to "DEFAULT"
-        message (str): The message to log.
+        message (Any): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -760,20 +876,26 @@ def log(
         COLORIZATION.get("DEFAULT"),
     )
 
+    if not isinstance(
+        message,
+        str,
+    ):
+        message = str(message)
+
     print(
         f"{color}{get_now_str()} - [{level.upper()}] - [{name.upper()}]: {message};{COLORIZATION["DEFAULT"]}"
     )
 
 
 def log_critical(
-    message: str,
+    message: Any,
     name: str,
 ) -> None:
     """
     Logs a message at the "CRITICAL" level.
 
     Args:
-        message (str): The message to log.
+        message (Any): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -788,14 +910,14 @@ def log_critical(
 
 
 def log_debug(
-    message: str,
+    message: Any,
     name: str,
 ) -> None:
     """
     Logs a message at the "DEBUG" level.
 
     Args:
-        message (str): The message to log.
+        message (Any): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -810,14 +932,14 @@ def log_debug(
 
 
 def log_error(
-    message: str,
+    message: Any,
     name: str,
 ) -> None:
     """
     Logs a message at the "ERROR" level.
 
     Args:
-        message (str): The message to log.
+        message (Any): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -833,7 +955,7 @@ def log_error(
 
 def log_exception(
     exception: Exception,
-    message: str,
+    message: Any,
     name: str,
 ) -> None:
     """
@@ -841,7 +963,7 @@ def log_exception(
 
     Args:
         exception (Exception): The exception to log.
-        message (str): The message to log.
+        message (Any): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -856,14 +978,14 @@ def log_exception(
 
 
 def log_info(
-    message: str,
+    message: Any,
     name: str,
 ) -> None:
     """
     Logs a message at the "INFO" level.
 
     Args:
-        message (str): The message to log.
+        message (Any): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -878,14 +1000,14 @@ def log_info(
 
 
 def log_trace(
-    message: str,
+    message: Any,
     name: str,
 ) -> None:
     """
     Logs a message at the "TRACE" level.
 
     Args:
-        message (str): The message to log.
+        message (Any): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -900,14 +1022,14 @@ def log_trace(
 
 
 def log_warning(
-    message: str,
+    message: Any,
     name: str,
 ) -> None:
     """
     Logs a message at the "WARNING" level.
 
     Args:
-        message (str): The message to log.
+        message (Any): The message to log.
         name (str): The name under which to log.
 
     Returns:
@@ -965,6 +1087,11 @@ def publish_event(
 
     result: dict[str, Any] = {}
 
+    result["event"] = event
+    result["namespace"] = namespace
+    result["args"] = args
+    result["kwargs"] = kwargs
+
     if not is_key_in_dict(
         key=event,
         dictionary=SUBSCRIPTIONS,
@@ -976,6 +1103,9 @@ def publish_event(
         dictionary=SUBSCRIPTIONS[event],
     ):
         return result
+
+    result["start"] = get_now()
+    result["subscribers"] = len(SUBSCRIPTIONS[event][namespace])
 
     for subscription in list(
         sorted(
@@ -1000,6 +1130,7 @@ def publish_event(
                         *args,
                         **kwargs,
                     ),
+                    "success": True,
                 }
             )
 
@@ -1012,6 +1143,20 @@ def publish_event(
                 name=NAME,
                 message=f"Failed to publish event: {event}",
             )
+
+            result[function.__name__].append(
+                {
+                    "uuid": subscription["uuid"],
+                    "result": None,
+                    "success": False,
+                }
+            )
+
+    result["end"] = get_now()
+    result["duration"] = f"{(result["end"] - result["start"]).total_seconds()} seconds"
+
+    result["start"] = result["start"].isoformat()
+    result["end"] = result["end"].isoformat()
 
     return result
 

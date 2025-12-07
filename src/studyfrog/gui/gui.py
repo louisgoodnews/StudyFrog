@@ -57,13 +57,13 @@ def _none_root() -> None:
 
 def get_bottom_frame() -> tkinter.Frame:
     """
-
+    Returns the 'bottom frame' tkinter.Frame widget.
 
     Args:
-            None
+        None
 
     Returns:
-            tkinter.Frame: The 'bottom frame' tkinter.Frame widget.def get_bottom_frame() -> tkinter.Frame:
+        tkinter.Frame: The 'bottom frame' tkinter.Frame widget.def get_bottom_frame() -> tkinter.Frame:
     """
 
     global BOTTOM_FRAME
@@ -88,15 +88,47 @@ def get_bottom_frame() -> tkinter.Frame:
     return BOTTOM_FRAME
 
 
-def get_center_frame() -> tkinter.Frame:
+def get_bottom_frame_height() -> int:
     """
-
+    Returns the height of the bottom frame.
 
     Args:
-            None
+        None
 
     Returns:
-            tkinter.Frame: The 'center frame' tkinter.Frame widget.
+        int: The height of the bottom frame.
+    """
+
+    get_bottom_frame().update_idletasks()
+
+    return get_bottom_frame().winfo_height()
+
+
+def get_bottom_frame_width() -> int:
+    """
+    Returns the width of the bottom frame.
+
+    Args:
+        None
+
+    Returns:
+        int: The width of the bottom frame.
+    """
+
+    get_bottom_frame().update_idletasks()
+
+    return get_bottom_frame().winfo_width()
+
+
+def get_center_frame() -> tkinter.Frame:
+    """
+    Returns the 'center frame' tkinter.Frame widget.
+
+    Args:
+        None
+
+    Returns:
+        tkinter.Frame: The 'center frame' tkinter.Frame widget.
     """
 
     global CENTER_FRAME
@@ -120,15 +152,47 @@ def get_center_frame() -> tkinter.Frame:
     return CENTER_FRAME
 
 
-def get_edit_menu() -> tkinter.Menu:
+def get_center_frame_height() -> int:
     """
-
+    Returns the height of the center frame.
 
     Args:
-            None
+        None
 
     Returns:
-            tkinter.Menu: The 'edit menu' tkinter.Menu widget.
+        int: The height of the center frame.
+    """
+
+    get_center_frame().update_idletasks()
+
+    return get_center_frame().winfo_height()
+
+
+def get_center_frame_width() -> int:
+    """
+    Returns the width of the center frame.
+
+    Args:
+        None
+
+    Returns:
+        int: The width of the center frame.
+    """
+
+    get_center_frame().update_idletasks()
+
+    return get_center_frame().winfo_width()
+
+
+def get_edit_menu() -> tkinter.Menu:
+    """
+    Returns the 'edit menu' tkinter.Menu widget.
+
+    Args:
+        None
+
+    Returns:
+        tkinter.Menu: The 'edit menu' tkinter.Menu widget.
     """
 
     global EDIT_MENU
@@ -153,13 +217,13 @@ def get_edit_menu() -> tkinter.Menu:
 
 def get_file_menu() -> tkinter.Menu:
     """
-
+    Returns the 'file menu' tkinter.Menu widget.
 
     Args:
-            None
+        None
 
     Returns:
-            tkinter.Menu: The 'file menu' tkinter.Menu widget.
+        tkinter.Menu: The 'file menu' tkinter.Menu widget.
     """
 
     global FILE_MENU
@@ -184,13 +248,13 @@ def get_file_menu() -> tkinter.Menu:
 
 def get_menu() -> tkinter.Menu:
     """
-
+    Returns the tkinter.Menu widget.
 
     Args:
-            None
+        None
 
     Returns:
-            tkinter.Menu: The tkinter.Menu widget.
+        tkinter.Menu: The tkinter.Menu widget.
     """
 
     global MENU
@@ -210,13 +274,13 @@ def get_menu() -> tkinter.Menu:
 
 def get_root() -> tkinter.Tk:
     """
-
+    Returns the root window tkinter.Tk widget.
 
     Args:
-            None
+        None
 
     Returns:
-            tkinter.Tk: The root window tkinter.Tk widget.
+        tkinter.Tk: The root window tkinter.Tk widget.
     """
 
     global ROOT
@@ -260,15 +324,47 @@ def get_root() -> tkinter.Tk:
     return ROOT
 
 
-def get_top_frame() -> tkinter.Frame:
+def get_root_height() -> int:
     """
-
+    Returns the height of the root window.
 
     Args:
-            None
+        None
 
     Returns:
-            tkinter.Frame: The 'top frame' tkinter.Frame widget.
+        int: The height of the root window.
+    """
+
+    get_root().update_idletasks()
+
+    return get_root().winfo_height()
+
+
+def get_root_width() -> int:
+    """
+    Returns the width of the root window.
+
+    Args:
+        None
+
+    Returns:
+        int: The width of the root window.
+    """
+
+    get_root().update_idletasks()
+
+    return get_root().winfo_width()
+
+
+def get_top_frame() -> tkinter.Frame:
+    """
+    Returns the 'top frame' tkinter.Frame widget.
+
+    Args:
+        None
+
+    Returns:
+        tkinter.Frame: The 'top frame' tkinter.Frame widget.
     """
 
     global TOP_FRAME
@@ -298,15 +394,47 @@ def get_top_frame() -> tkinter.Frame:
     return TOP_FRAME
 
 
-def get_view_menu() -> tkinter.Menu:
+def get_top_frame_height() -> int:
     """
-
+    Returns the height of the top frame.
 
     Args:
-            None
+        None
 
     Returns:
-            tkinter.Menu: The 'view menu' tkinter.Menu widget.
+        int: The height of the top frame.
+    """
+
+    get_top_frame().update_idletasks()
+
+    return get_top_frame().winfo_height()
+
+
+def get_top_frame_width() -> int:
+    """
+    Returns the width of the top frame.
+
+    Args:
+        None
+
+    Returns:
+        int: The width of the top frame.
+    """
+
+    get_top_frame().update_idletasks()
+
+    return get_top_frame().winfo_width()
+
+
+def get_view_menu() -> tkinter.Menu:
+    """
+    Returns the 'view menu' tkinter.Menu widget.
+
+    Args:
+        None
+
+    Returns:
+        tkinter.Menu: The 'view menu' tkinter.Menu widget.
     """
 
     global VIEW_MENU

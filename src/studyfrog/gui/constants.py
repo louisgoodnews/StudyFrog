@@ -80,12 +80,27 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         "light": {
             "background": WHITE,
             "bg": WHITE,
+            "fg": BLACK,
             "font": DEFAULT_FONT,
+            "foreground": BLACK,
         },
     },
     "canvas": {
         "dark": {"background": DARK_SECONDARY},
         "light": {"background": WHITE},
+    },
+    "checkbutton": {
+        "dark": {
+            "background": DARK_PRIMARY,
+            "bg": DARK_PRIMARY,
+            "fg": WHITE,
+            "font": DEFAULT_FONT,
+            "foreground": WHITE,
+        },
+        "light": {
+            "font": DEFAULT_FONT,
+            "fg": BLACK,
+        },
     },
     "combobox": {
         "dark": {"font": DEFAULT_FONT},
@@ -127,6 +142,7 @@ COLOR_CONFIG: dict[str, dict[str, dict[str, str]]] = {
         },
         "light": {
             "font": DEFAULT_FONT,
+            "fg": BLACK,
         },
     },
     "menu": {

@@ -94,6 +94,42 @@ def get_canvas(
         raise Exception(f"Failed to get canvas: {e}") from e
 
 
+def get_checkbutton(
+    master: tkinter.Widget,
+    *args,
+    **kwargs,
+) -> tkinter.Checkbutton:
+    """
+    Returns a tkinter.Checkbutton widget.
+
+    Args:
+        master (tkinter.Widget): The master of the tkinter.Checkbutton widget to be created.
+        *args: Additional arguments passed to the tkinter.Checkbutton constructor.
+        **kwargs: Additional keyword arguments passed to the tkinter.Checkbutton constructor.
+
+    Returns:
+        tkinter.Checkbutton: The tkinter.Checkbutton widget.
+    """
+
+    try:
+        keyword_arguments: dict[str, Any] = dict(COLOR_CONFIG["checkbutton"][get_color_mode()])
+
+        keyword_arguments.update(kwargs)
+
+        return tkinter.Checkbutton(
+            master=master,
+            *args,
+            **keyword_arguments,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to get checkbutton",
+            name=NAME,
+        )
+        raise Exception(f"Failed to get checkbutton: {e}") from e
+
+
 def get_color_mode() -> Literal[
     "dark",
     "light",

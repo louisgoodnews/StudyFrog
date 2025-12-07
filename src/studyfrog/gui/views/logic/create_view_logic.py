@@ -5,9 +5,11 @@ Date: 2025-11-16
 
 import tkinter
 
-from typing import Any, Callable, Final, Literal, TypeAlias, Union
+from typing import Any, Callable, Final, Literal, Optional, TypeAlias, Union
 
 from common.events import (
+    ADD_QUESTION,
+    ADDED_ANSWER,
     ADDED_FLASHCARD,
     ADDED_NOTE,
     ADDED_QUESTION,
@@ -18,10 +20,12 @@ from common.events import (
     FILTER_QUESTIONS,
     FILTER_STACKS,
     GET_FORM,
+    GET_QUESTION,
     UPDATE_QUESTION,
     UPDATE_STACK,
 )
 from core.models import (
+    get_answer_model,
     get_flashcard_model,
     get_note_model,
     get_question_model,
@@ -30,6 +34,7 @@ from core.models import (
     get_teacher_model,
 )
 from core.objects import (
+    add_answer,
     add_flashcard,
     add_note,
     add_question,
@@ -37,6 +42,7 @@ from core.objects import (
     add_subject,
     add_teacher,
     filter_stacks,
+    get_answer,
     get_difficulty,
     get_flashcard,
     get_note,
@@ -45,6 +51,7 @@ from core.objects import (
     get_stack,
     get_subject,
     get_teacher,
+    update_question,
     update_stack,
 )
 from gui.factory import get_error_toast, get_success_toast
@@ -67,6 +74,7 @@ from utils.utils import (
 # ---------- Types ---------- #
 
 WhatType: TypeAlias = Literal[
+    "answer",
     "flashcard",
     "note",
     "question",
@@ -85,6 +93,7 @@ NAMESPACE: Final[Literal["CREATE_FORMS"]] = "CREATE_FORMS"
 WHAT_TYPE_TO_ADDED_EVENT: dict[
     WhatType,
     Literal[
+        "added_answer",
         "added_flashcard",
         "added_note",
         "added_question",
@@ -93,6 +102,7 @@ WHAT_TYPE_TO_ADDED_EVENT: dict[
         "added_teacher",
     ],
 ] = {
+    "answer": ADDED_ANSWER,
     "flashcard": ADDED_FLASHCARD,
     "note": ADDED_NOTE,
     "question": ADDED_QUESTION,
@@ -117,6 +127,7 @@ WHAT_TYPE_TO_DATABASE_ADDER: dict[
     WhatType,
     Callable[[dict[str, Any]], int],
 ] = {
+    "answer": add_answer,
     "flashcard": add_flashcard,
     "note": add_note,
     "question": add_question,
@@ -129,6 +140,7 @@ WHAT_TYPE_TO_DATABASE_GETTER: dict[
     WhatType,
     Callable[[Union[int, str]], dict[str, Any]],
 ] = {
+    "answer": get_answer,
     "flashcard": get_flashcard,
     "note": get_note,
     "question": get_question,
@@ -141,6 +153,7 @@ WHAT_TYPE_TO_MODEL_GETTER: dict[
     WhatType,
     Callable[[Any], dict[str, Any]],
 ] = {
+    "answer": get_answer_model,
     "flashcard": get_flashcard_model,
     "note": get_note_model,
     "question": get_question_model,
@@ -492,7 +505,7 @@ def handle_question_creation() -> None:
             )
             .get(
                 "on_get_form",
-                {},
+                [{}],
             )[0]
             .get(
                 "result",
@@ -505,9 +518,31 @@ def handle_question_creation() -> None:
                 f"Form data is empty - no data was retrieved from the form event. Check if the form event was published correctly and the namespace is correct. Received form: {form}"
             )
 
-        id: int = WHAT_TYPE_TO_DATABASE_ADDER["question"](
-            entry=WHAT_TYPE_TO_MODEL_GETTER["question"](**form)
+        answers: list[dict[str, Any]] = []
+
+        for answer in form.pop("answers"):
+            answers.append(handle_answer_creation(form=answer))
+
+        id: Optional[int] = (
+            publish_event(
+                entry=get_question_model(**form),
+                event=ADD_QUESTION,
+                namespace="GLOBAL",
+            )
+            .get(
+                "add_entry",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                None,
+            )
         )
+
+        if not id:
+            raise Exception(
+                f"Question ID is empty - no ID was retrieved from the add question event. Check if the add question event was published correctly and the namespace is correct. Received form: {form}"
+            )
 
         log_info(
             message=f"Question created successfully",
@@ -515,9 +550,43 @@ def handle_question_creation() -> None:
         )
 
         append_to_stack(
-            item=WHAT_TYPE_TO_DATABASE_GETTER["question"](entry_id=id),
+            item=publish_event(
+                entry_id=id,
+                event=GET_QUESTION,
+                namespace="GLOBAL",
+            )
+            .get(
+                "get_entry",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                "",
+            ),
             stack_key=form["stack"],
         )
+
+        question_key: str = (
+            publish_event(
+                entry_id=id,
+                event=GET_QUESTION,
+                namespace="GLOBAL",
+            )
+            .get(
+                "get_entry",
+                [{}],
+            )[0]
+            .get(
+                "result",
+                "",
+            )
+        )
+
+        for answer in answers:
+            append_to_question(
+                answer=answer,
+                question_key=question_key,
+            )
 
         get_success_toast(
             message=f"Question created successfully",
@@ -525,11 +594,23 @@ def handle_question_creation() -> None:
         )
 
         publish_event(
-            event=WHAT_TYPE_TO_ADDED_EVENT["question"],
+            event=ADDED_QUESTION,
             namespace="GLOBAL",
             **{
                 "what": "question",
-                "model": WHAT_TYPE_TO_DATABASE_GETTER["question"](entry_id=id),
+                "model": publish_event(
+                    entry_id=id,
+                    event=GET_QUESTION,
+                    namespace="GLOBAL",
+                )
+                .get(
+                    "get_entry",
+                    [{}],
+                )[0]
+                .get(
+                    "result",
+                    "",
+                ),
             },
         )
     except Exception as e:
@@ -563,7 +644,7 @@ def handle_stack_creation() -> None:
             )
             .get(
                 "on_get_form",
-                {},
+                [{}],
             )[0]
             .get(
                 "result",

@@ -19,9 +19,18 @@ from common.events import (
     GET_FORM,
 )
 from gui.constants import READONLY
-from gui.factory import get_combobox, get_label, get_scrolled_text
+from gui.factory import (
+    get_button,
+    get_checkbutton,
+    get_combobox,
+    get_entry,
+    get_frame,
+    get_label,
+    get_scrolled_text,
+)
 from utils.utils import (
     destroy_widget_children,
+    get_widget_children_count,
     is_list_empty,
     log_exception,
     log_info,
@@ -44,6 +53,8 @@ QuestionType: TypeAlias = Literal[
 ]
 
 # ---------- Constants ---------- #
+
+ANSWERS: Final[list[dict[str, Any]]] = []
 
 CONTAINER: Optional[tkinter.Frame] = None
 
@@ -111,6 +122,24 @@ def append_teacher(teacher: dict[str, Any]) -> None:
     """
 
     TEACHERS.append(teacher)
+
+
+def clear_container_frame() -> None:
+    """
+    Clear the container frame.
+
+    Returns:
+        None
+    """
+    try:
+        destroy_widget_children(widget=get_container_frame())
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to clear container frame",
+            name=NAME,
+        )
+        raise Exception(f"Failed to clear container frame: {e}") from e
 
 
 def clear_master_frame(master: tkinter.Frame) -> None:
@@ -190,6 +219,122 @@ def configure_master_grid(master: tkinter.Frame) -> None:
             name=NAME,
         )
         raise Exception(f"Failed to configure master grid: {e}") from e
+
+
+def create_multiple_choice_answer_item() -> None:
+    """
+    Create the multiple choice answer item.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+
+    try:
+        frame: tkinter.Frame = get_frame(master=get_container_frame())
+
+        frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
+
+        frame.grid_columnconfigure(
+            index=0,
+            weight=0,
+        )
+
+        frame.grid_rowconfigure(
+            index=0,
+            weight=0,
+        )
+
+        frame.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=get_widget_children_count(widget=get_container_frame()),
+            sticky=NSEW,
+        )
+
+        answer_var: tkinter.StringVar = tkinter.StringVar()
+
+        entry: tkinter.Entry = get_entry(
+            master=frame,
+            textvariable=answer_var,
+        )
+
+        entry.grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        is_correct_var: tkinter.BooleanVar = tkinter.BooleanVar()
+
+        checkbutton: tkinter.Checkbutton = get_checkbutton(
+            master=frame,
+            text="Correct",
+            variable=is_correct_var,
+        )
+
+        checkbutton.grid(
+            column=1,
+            padx=5,
+            pady=5,
+            row=0,
+            sticky=NSEW,
+        )
+
+        ANSWERS.append(
+            {
+                "is_correct": is_correct_var,
+                "variable": answer_var,
+            }
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to create multiple choice answer item",
+            name=NAME,
+        )
+        raise Exception(f"Failed to create multiple choice answer item: {e}") from e
+
+
+def create_multiple_choice_answer_widgets(master: tkinter.Frame) -> None:
+    """
+    Create the multiple choice answer widgets.
+
+    Args:
+        master (tkinter.Frame): The master frame.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an error occurs.
+    """
+    try:
+        get_button(
+            command=create_multiple_choice_answer_item,
+            master=master,
+            text="Add Answer",
+        ).grid(
+            column=0,
+            padx=5,
+            pady=5,
+            row=0,
+        )
+    except Exception as e:
+        log_exception(
+            exception=e,
+            message="Failed to create multiple choice answer widgets",
+            name=NAME,
+        )
+        raise Exception(f"Failed to create multiple choice answer widgets: {e}") from e
 
 
 def create_widgets(master: tkinter.Frame) -> None:
@@ -341,7 +486,7 @@ def create_widgets(master: tkinter.Frame) -> None:
 
         question_text_var: tkinter.StringVar = tkinter.StringVar()
 
-        FORM_VARIABLES["question_text"] = {
+        FORM_VARIABLES["text"] = {
             "variable": question_text_var,
             "is_required": True,
         }
@@ -422,7 +567,12 @@ def create_widgets(master: tkinter.Frame) -> None:
             "is_required": True,
         }
 
-        frame: tkinter.Frame = tkinter.Frame(master=master)
+        frame: tkinter.Frame = get_frame(master=master)
+
+        frame.grid_columnconfigure(
+            index=0,
+            weight=1,
+        )
 
         frame.grid(
             column=0,
@@ -433,7 +583,9 @@ def create_widgets(master: tkinter.Frame) -> None:
             sticky=NSEW,
         )
 
-        set_container(frame=frame)
+        set_container_frame(frame=frame)
+
+        create_multiple_choice_answer_widgets(master=get_container_frame())
     except Exception as e:
         log_exception(
             exception=e,
@@ -443,7 +595,7 @@ def create_widgets(master: tkinter.Frame) -> None:
         raise Exception(f"Failed to create widgets: {e}") from e
 
 
-def get_container() -> tkinter.Frame:
+def get_container_frame() -> tkinter.Frame:
     """
     Get the container.
 
@@ -515,6 +667,14 @@ def get_form() -> dict[str, Any]:
 
             result[key] = variable_value
 
+        result["answers"] = [
+            {
+                "is_correct": answer["is_correct"].get(),
+                "text": answer["variable"].get(),
+            }
+            for answer in ANSWERS
+        ]
+
         result["difficulty"] = next(
             (
                 difficulty.get("key")
@@ -532,6 +692,8 @@ def get_form() -> dict[str, Any]:
             ),
             None,
         )
+
+        result["question_type"] = get_question_type()
 
         result["stack"] = next(
             (
@@ -1041,7 +1203,10 @@ def on_question_type_change(question_type: QuestionType) -> None:
     """
 
     try:
-        destroy_widget_children(master=CONTAINER)
+        ANSWERS.clear()
+
+        clear_container_frame()
+
         set_question_type(question_type=question_type)
     except Exception as e:
         log_exception(
@@ -1052,7 +1217,7 @@ def on_question_type_change(question_type: QuestionType) -> None:
         raise Exception(f"Failed to handle question type change: {e}") from e
 
 
-def set_container(frame: tkinter.Frame) -> None:
+def set_container_frame(frame: tkinter.Frame) -> None:
     """
     Set the container.
 
