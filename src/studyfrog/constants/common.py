@@ -17,6 +17,7 @@ __all__: Final[list[str]] = [
     "GLOBAL",
     "PATTERNS",
     "PLATFORM",
+    "QUESTION_TYPES",
 ]
 
 
@@ -44,3 +45,9 @@ PATTERNS: Final[dict[str, re.Pattern[str]]] = {
 }
 
 PLATFORM: Final[str] = sys.platform
+
+QUESTION_TYPES: Final[list[str]] = [
+    "Multiple or single choice answer",
+    "Open answer",
+    "True or false",
+]

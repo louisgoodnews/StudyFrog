@@ -3,7 +3,7 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
-import tkinter as tk
+import tkinter
 
 from typing import Final
 
@@ -24,6 +24,7 @@ __all__: Final[list[str]] = [
     "reset_center_frame_grid",
     "reset_frame_grids",
     "reset_top_frame_grid",
+    "reset_widget_grid",
 ]
 
 
@@ -88,12 +89,12 @@ def clear_top_frame() -> None:
     destroy_widget_children(widget=get_top_frame())
 
 
-def count_widget_children(widget: tk.Widget) -> int:
+def count_widget_children(widget: tkinter.Widget) -> int:
     """
     Counts the number of children of a tkinter widget.
 
     Args:
-        widget (tk.Widget): The tkinter widget to count children from.
+        widget (tkinter.Widget): The tkinter widget to count children from.
 
     Returns:
         int: The number of children of the tkinter widget.
@@ -102,12 +103,12 @@ def count_widget_children(widget: tk.Widget) -> int:
     return len(get_widget_children(widget=widget))
 
 
-def destroy_widget_children(widget: tk.Widget) -> None:
+def destroy_widget_children(widget: tkinter.Widget) -> None:
     """
     Destroys all children of a tkinter widget.
 
     Args:
-        widget (tk.Widget): The tkinter widget to destroy children from.
+        widget (tkinter.Widget): The tkinter widget to destroy children from.
 
     Returns:
         None
@@ -117,15 +118,15 @@ def destroy_widget_children(widget: tk.Widget) -> None:
         child.destroy()
 
 
-def get_widget_children(widget: tk.Widget) -> list[tk.Widget]:
+def get_widget_children(widget: tkinter.Widget) -> list[tkinter.Widget]:
     """
     Returns a list of all children of a tkinter widget.
 
     Args:
-        widget (tk.Widget): The tkinter widget to get children from.
+        widget (tkinter.Widget): The tkinter widget to get children from.
 
     Returns:
-        list[tk.Widget]: A list of all children of the tkinter widget.
+        list[tkinter.Widget]: A list of all children of the tkinter widget.
     """
 
     return widget.winfo_children()
@@ -229,6 +230,44 @@ def reset_top_frame_grid() -> None:
 
     for row in range(rows):
         get_top_frame().grid_rowconfigure(
+            index=row,
+            weight=0,
+        )
+
+
+def reset_widget_grid(widget: tkinter.Widget) -> None:
+    """
+    Resets the grid configuration of the passed widget.
+
+    Args:
+        widget (tkinter.Widget): The tkinter widget to reset the grid configuration of.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the widget is not a tkinter widget.
+    """
+
+    if not isinstance(
+        widget,
+        tkinter.Widget,
+    ):
+        raise ValueError("Widget must be a tkinter widget.")
+
+    (
+        columns,
+        rows,
+    ) = widget.grid_size()
+
+    for column in range(columns):
+        widget.grid_columnconfigure(
+            index=column,
+            weight=0,
+        )
+
+    for row in range(rows):
+        widget.grid_rowconfigure(
             index=row,
             weight=0,
         )

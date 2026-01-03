@@ -50,7 +50,11 @@ from constants.files import (
     TEACHERS_DB_JSON,
     USERS_DB_JSON,
 )
-from gui.forms.answer_create_form import get_answer_create_form
+from gui.forms.answer_create_form import (
+    get_answer_choice_create_form,
+    get_answer_open_ended_create_form,
+    get_answer_true_false_create_form,
+)
 from gui.forms.flashcard_create_form import get_flashcard_create_form
 from gui.forms.note_create_form import get_note_create_form
 from gui.forms.question_create_form import get_question_create_form
@@ -195,8 +199,22 @@ def _get_get_create_form_subscriptions() -> list[dict[str, Any]]:
 
     subscriptions: list[dict[str, Any]] = [
         {
-            "event": GET_ANSWER_CREATE_FORM,
-            "function": get_answer_create_form,
+            "event": GET_ANSWER_CHOICE_CREATE_FORM,
+            "function": get_answer_choice_create_form,
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
+        },
+        {
+            "event": GET_ANSWER_OPEN_ENDED_CREATE_FORM,
+            "function": get_answer_open_ended_create_form,
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
+        },
+        {
+            "event": GET_ANSWER_TRUE_FALSE_CREATE_FORM,
+            "function": get_answer_true_false_create_form,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,

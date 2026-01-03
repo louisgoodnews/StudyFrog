@@ -122,7 +122,7 @@ def _filter_stack_items_by_difficulty(difficulty_key: str) -> None:
         response: Optional[ModelDict] = (
             dispatch(
                 event=model_type_to_event[model_type],
-                id=search_string(
+                id_=search_string(
                     pattern=PATTERNS["MODEL_ID"],
                     string=item_key,
                 ),
@@ -183,7 +183,7 @@ def _filter_stack_items_by_priority(priority_key: str) -> None:
         response: Optional[ModelDict] = (
             dispatch(
                 event=model_type_to_event[model_type],
-                id=search_string(
+                id_=search_string(
                     pattern=PATTERNS["MODEL_ID"],
                     string=item_key,
                 ),
@@ -224,7 +224,7 @@ def _get_stack_items(key: str) -> list[str]:
     response: Optional[dict[str, Any]] = (
         dispatch(
             event=GET_STACK_FROM_DB,
-            id=search_string(
+            id_=search_string(
                 pattern=PATTERNS["MODEL_ID"],
                 string=key,
             ),
@@ -290,7 +290,7 @@ def _load_stack_item_from_db(stack_item_key: str) -> ModelDict:
     return (
         dispatch(
             event=model_type_to_get_event[model_type],
-            id=model_id,
+            id_=model_id,
             namespace=GLOBAL,
             table_name=pluralize_word(word=model_type),
         )
@@ -447,7 +447,7 @@ def on_easy_button_click() -> None:
     model_dict: ModelDict = (
         dispatch(
             event=model_type_to_get_event[model_type],
-            id=model_id,
+            id_=model_id,
             namespace=GLOBAL,
             table_name=pluralize_word(word=model_type),
         )
@@ -573,7 +573,7 @@ def on_hard_button_click() -> None:
     model_dict: ModelDict = (
         dispatch(
             event=model_type_to_get_event[model_type],
-            id=model_id,
+            id_=model_id,
             namespace=GLOBAL,
             table_name=pluralize_word(word=model_type),
         )
@@ -682,7 +682,7 @@ def on_medium_button_click() -> None:
     model_dict: ModelDict = (
         dispatch(
             event=model_type_to_get_event[model_type],
-            id=model_id,
+            id_=model_id,
             namespace=GLOBAL,
             table_name=pluralize_word(word=model_type),
         )
@@ -790,7 +790,7 @@ def on_next_button_click() -> None:
     model_dict: ModelDict = (
         dispatch(
             event=model_type_to_event[model_type],
-            id=model_id,
+            id_=model_id,
             namespace=GLOBAL,
             table_name=pluralize_word(word=model_type),
         )
@@ -890,7 +890,7 @@ def on_previous_button_click() -> None:
     model_dict: ModelDict = (
         dispatch(
             event=model_type_to_event[model_type],
-            id=model_id,
+            id_=model_id,
             namespace=GLOBAL,
             table_name=pluralize_word(word=model_type),
         )

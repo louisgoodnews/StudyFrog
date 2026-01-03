@@ -7,7 +7,7 @@ Description: The create view of the application.
 import customtkinter as ctk
 
 from tkinter.constants import NSEW, W
-from typing import Any, Final, Optional
+from typing import Any, Final, Optional, Union
 
 from constants.common import GLOBAL
 from constants.events import (
@@ -19,6 +19,7 @@ from constants.events import (
     GET_CREATE_FORM,
     GET_STACK_CREATE_FORM,
     STACK_ADDED,
+    STACKS_ADDED,
 )
 from constants.gui import READONLY, TOPLEVEL_GEOMETRY, WINDOW_TITLE
 from gui.logic.create_view_logic import (
@@ -27,6 +28,7 @@ from gui.logic.create_view_logic import (
     on_type_combobox_select,
 )
 from models.models import ModelDict
+from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.logging import log_error, log_info
 
@@ -38,24 +40,265 @@ __all__: Final[list[str]] = ["get_create_view"]
 
 # ---------- Constants ---------- #
 
-BOTTOM_FRAME: Optional[ctk.CTkFrame] = None
+_BOTTOM_FRAME: Optional[ctk.CTkFrame] = None
 
-CENTER_FRAME: Optional[ctk.CTkFrame] = None
+_CENTER_FRAME: Optional[ctk.CTkFrame] = None
 
-CREATE_VIEW_FORM_CONTAINER: Optional[ctk.CTkScrollableFrame] = None
+_CREATE_VIEW_FORM_CONTAINER: Optional[ctk.CTkScrollableFrame] = None
 
-FORM: Final[dict[str, Any]] = {}
+_FORM: Final[dict[str, Any]] = {}
 
-MASTER: Optional[ctk.CTkToplevel] = None
+_MASTER: Optional[ctk.CTkToplevel] = None
 
-STACKS: Final[list[str]] = [""]
+_STACKS: Final[list[str]] = [""]
 
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
-TOP_FRAME: Optional[ctk.CTkFrame] = None
+_TOP_FRAME: Optional[ctk.CTkFrame] = None
 
 
 # ---------- Helper Functions ---------- #
+
+
+def _get_bottom_frame() -> ctk.CTkFrame:
+    """
+    Returns the 'bottom' frame of the create view.
+
+    Args:
+        None
+
+    Returns:
+        ctk.CTkFrame: The 'bottom' frame of the create view.
+
+    Raises:
+        ValueError: If the 'bottom' frame has not been initialized.
+    """
+
+    if not exists(value=_BOTTOM_FRAME):
+        raise ValueError(
+            "'bottom' frame does not exist. Call the '_set_bottom_frame' method first."
+        )
+
+    return _BOTTOM_FRAME
+
+
+def _get_center_frame() -> ctk.CTkFrame:
+    """
+    Returns the 'center' frame of the create view.
+
+    Args:
+        None
+
+    Returns:
+        ctk.CTkFrame: The 'center' frame of the create view.
+
+    Raises:
+        ValueError: If the 'center' frame has not been initialized.
+    """
+
+    if not exists(value=_CENTER_FRAME):
+        raise ValueError(
+            "'center' frame does not exist. Call the '_set_center_frame' method first."
+        )
+
+    return _CENTER_FRAME
+
+
+def _get_create_view_form_container() -> ctk.CTkScrollableFrame:
+    """
+    Returns the 'create view form container' of the create view.
+
+    Args:
+        None
+
+    Returns:
+        ctk.CTkScrollableFrame: The 'create view form container' of the create view.
+
+    Raises:
+        ValueError: If the 'create view form container' has not been initialized.
+    """
+
+    if not exists(value=_CREATE_VIEW_FORM_CONTAINER):
+        raise ValueError(
+            "'create view form container' does not exist. Call the '_set_create_view_form_container' method first."
+        )
+
+    return _CREATE_VIEW_FORM_CONTAINER
+
+
+def _get_form() -> dict[str, Any]:
+    """
+    Returns the underlying dictionary 'serializing' the UI form.
+
+    Args:
+        None
+
+    Returns:
+        dict[str, Any]: The underlying dictionary 'serializing' the UI form.
+    """
+
+    return _FORM
+
+
+def _get_master() -> ctk.CTkToplevel:
+    """
+    Returns the toplevel window of the create view.
+
+    Args:
+        None
+
+    Returns:
+        ctk.CTkToplevel: The toplevel window of the create view.
+
+    Raises:
+        ValueError: If the master widget has not been initialized yet.
+    """
+
+    if not exists(value=_MASTER):
+        raise ValueError("The master widget does not exist. Call the '_set_master' method first.")
+
+    return _MASTER
+
+
+def _get_stacks_list() -> list[str]:
+    """
+    Returns the list of stack names.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: The list of stack names.
+    """
+
+    return _STACKS
+
+
+def _get_top_frame() -> ctk.CTkFrame:
+    """
+    Returns the 'top' frame of the create view.
+
+    Args:
+        None
+
+    Returns:
+        ctk.CTkFrame: The 'top' frame of the create view.
+
+    Raises:
+        ValueError: If the 'top' frame has not been initialized.
+    """
+
+    if not exists(value=_TOP_FRAME):
+        raise ValueError("'top' frame does not exist. Call the '_set_top_frame' method first.")
+
+    return _TOP_FRAME
+
+
+def _set_bottom_frame(frame: ctk.CTkFrame) -> None:
+    """
+    Sets the 'bottom' frame of the create view.
+
+    Args:
+        frame (ctk.CTkFrame): The 'bottom' frame of the create view.
+
+    Returns:
+        None
+    """
+
+    global _BOTTOM_FRAME
+
+    _BOTTOM_FRAME = frame
+
+
+def _set_center_frame(frame: ctk.CTkFrame) -> None:
+    """
+    Sets the 'center' frame of the create view.
+
+    Args:
+        frame (ctk.CTkFrame): The 'center' frame of the create view.
+
+    Returns:
+        None
+    """
+
+    global _CENTER_FRAME
+
+    _CENTER_FRAME = frame
+
+
+def _set_create_view_form_container(scrollable_frame: ctk.CTkScrollableFrame) -> None:
+    """
+    Sets the 'create view form container' of the create view.
+
+    Args:
+        scrollable_frame (ctk.CTkScrollableFrame): The 'create view form container' of the create view.
+
+    Returns:
+        None
+    """
+
+    global _CREATE_VIEW_FORM_CONTAINER
+
+    _CREATE_VIEW_FORM_CONTAINER = scrollable_frame
+
+
+def _set_master(toplevel: ctk.CTkToplevel) -> None:
+    """
+    Sets the master widget for the create view.
+
+    Args:
+        toplevel (ctk.CTkToplevel): The master window of the create view.
+
+    Returns:
+        None
+    """
+
+    global _MASTER
+
+    _MASTER = toplevel
+
+
+def _set_top_frame(frame: ctk.CTkFrame) -> None:
+    """
+    Sets the 'top' frame of the create view.
+
+    Args:
+        frame (ctk.CTkFrame): The 'top' frame of the create view.
+
+    Returns:
+        None
+    """
+
+    global _TOP_FRAME
+
+    _TOP_FRAME = frame
+
+
+def _update_form(
+    key: Union[list[str], str],
+    value: Any,
+) -> None:
+    """
+    Updates the underlying dictionary 'serializing' the UI form with the passed key and value pairs.
+
+    Args:
+        key (Union[list[str], str]): The key(s) to update with the passed value.
+        value (Any): The value to update the passed key(s) with.
+
+    Returns:
+        None
+    """
+
+    if isinstance(
+        key,
+        list,
+    ):
+        for _key in key:
+            _get_form()[_key] = value
+
+        return
+
+    _get_form()[key] = value
 
 
 # ---------- Private Functions ---------- #
@@ -194,7 +437,6 @@ def _create_widgets() -> None:
     )
 
     _set_bottom_frame(frame=bottom_frame)
-
     _create_bottom_frame_widgets()
 
     center_frame: ctk.CTkFrame = ctk.CTkFrame(
@@ -211,7 +453,6 @@ def _create_widgets() -> None:
     )
 
     _set_center_frame(frame=center_frame)
-
     _create_center_frame_widgets()
 
     top_frame: ctk.CTkFrame = ctk.CTkFrame(
@@ -228,7 +469,6 @@ def _create_widgets() -> None:
     )
 
     _set_top_frame(frame=top_frame)
-
     _create_top_frame_widgets()
 
 
@@ -243,15 +483,18 @@ def _create_bottom_frame_widgets() -> None:
         None
     """
 
-    FORM["create_another"] = {
-        "is_required": False,
-        "variable": ctk.BooleanVar(),
-    }
+    _update_form(
+        key="create_another",
+        value={
+            "is_required": False,
+            "variable": ctk.BooleanVar(),
+        },
+    )
 
     ctk.CTkCheckBox(
         master=_get_bottom_frame(),
         text="Create another item",
-        variable=FORM["create_another"]["variable"],
+        variable=_get_form()["create_another"]["variable"],
     ).grid(
         column=0,
         padx=5,
@@ -370,7 +613,7 @@ def _create_top_frame_widgets() -> None:
         sticky=NSEW,
     )
 
-    STACKS.extend(
+    _get_stacks_list().extend(
         [
             stack.get(
                 "name",
@@ -394,16 +637,19 @@ def _create_top_frame_widgets() -> None:
         ]
     )
 
-    FORM["stack"] = {
-        "is_required": True,
-        "variable": ctk.StringVar(),
-    }
+    _update_form(
+        key="stack",
+        value={
+            "is_required": True,
+            "variable": ctk.StringVar(),
+        },
+    )
 
     stack_combobox: ctk.CTkComboBox = ctk.CTkComboBox(
         master=_get_top_frame(),
         state=READONLY,
-        values=STACKS,
-        variable=FORM["stack"]["variable"],
+        values=_get_stacks_list(),
+        variable=_get_form()["stack"]["variable"],
     )
 
     stack_combobox.grid(
@@ -431,10 +677,13 @@ def _create_top_frame_widgets() -> None:
         sticky=NSEW,
     )
 
-    FORM["type"] = {
-        "is_required": True,
-        "variable": ctk.StringVar(),
-    }
+    _update_form(
+        key="type",
+        value={
+            "is_required": True,
+            "variable": ctk.StringVar(),
+        },
+    )
 
     type_combobox: ctk.CTkComboBox = ctk.CTkComboBox(
         command=lambda value: on_type_combobox_select(
@@ -449,7 +698,7 @@ def _create_top_frame_widgets() -> None:
             "Question",
             "Stack",
         ],
-        variable=FORM["type"]["variable"],
+        variable=_get_form()["type"]["variable"],
     )
 
     type_combobox.set(value="Stack")
@@ -479,10 +728,13 @@ def _create_top_frame_widgets() -> None:
         sticky=NSEW,
     )
 
-    FORM["difficulty"] = {
-        "is_required": True,
-        "variable": ctk.StringVar(),
-    }
+    _update_form(
+        key="difficulty",
+        value={
+            "is_required": True,
+            "variable": ctk.StringVar(),
+        },
+    )
 
     difficulty_names: list[str] = [
         difficulty["display_name"]
@@ -507,7 +759,7 @@ def _create_top_frame_widgets() -> None:
         master=_get_top_frame(),
         state=READONLY,
         values=difficulty_names,
-        variable=FORM["difficulty"]["variable"],
+        variable=_get_form()["difficulty"]["variable"],
     )
 
     difficulty_combobox.grid(
@@ -535,10 +787,13 @@ def _create_top_frame_widgets() -> None:
         sticky=NSEW,
     )
 
-    FORM["priority"] = {
-        "is_required": True,
-        "variable": ctk.StringVar(),
-    }
+    _update_form(
+        key="priority",
+        value={
+            "is_required": True,
+            "variable": ctk.StringVar(),
+        },
+    )
 
     priority_names: list[str] = [
         priority["display_name"]
@@ -563,7 +818,7 @@ def _create_top_frame_widgets() -> None:
         master=_get_top_frame(),
         state=READONLY,
         values=priority_names,
-        variable=FORM["priority"]["variable"],
+        variable=_get_form()["priority"]["variable"],
     )
 
     priority_combobox.grid(
@@ -575,121 +830,9 @@ def _create_top_frame_widgets() -> None:
     )
 
 
-def _get_bottom_frame() -> ctk.CTkFrame:
-    """
-    Returns the bottom frame of the create view.
-
-    Args:
-        None
-
-    Returns:
-        ctk.CTkFrame: The bottom frame of the create view.
-
-    Raises:
-        ValueError: If the bottom frame has not been initialized yet.
-    """
-
-    if BOTTOM_FRAME is None:
-        raise ValueError(
-            "The bottom frame has not been initialized yet."
-            "The method '_set_bottom_frame' must be executed first."
-        )
-
-    return BOTTOM_FRAME
-
-
-def _get_center_frame() -> ctk.CTkFrame:
-    """
-    Returns the center frame of the create view.
-
-    Args:
-        None
-
-    Returns:
-        ctk.CTkFrame: The center frame of the create view.
-
-    Raises:
-        ValueError: If the center frame has not been initialized yet.
-    """
-
-    if CENTER_FRAME is None:
-        raise ValueError(
-            "The center frame has not been initialized yet."
-            "The method '_set_center_frame' must be executed first."
-        )
-
-    return CENTER_FRAME
-
-
-def _get_create_view_form_container() -> ctk.CTkScrollableFrame:
-    """
-    Retrieves the main scrollable container for create view forms.
-
-    Raises:
-        ValueError: If the container has not been initialized yet.
-
-    Returns:
-        ctk.CTkScrollableFrame: The scrollable frame instance.
-    """
-
-    if CREATE_VIEW_FORM_CONTAINER is None:
-        raise ValueError(
-            "The Create View Form Container has not yet been initialized."
-            "The method '_set_create_view_form_container' must be executed first."
-        )
-
-    return CREATE_VIEW_FORM_CONTAINER
-
-
-def _get_master() -> ctk.CTkToplevel:
-    """
-    Returns the toplevel window of the create view.
-
-    Args:
-        None
-
-    Returns:
-        ctk.CTkToplevel: The toplevel window of the create view.
-
-    Raises:
-        ValueError: If the master widget has not been initialized yet.
-    """
-
-    if MASTER is None:
-        raise ValueError(
-            "The master widget has not been initialized yet."
-            "The method '_set_master' must be executed first."
-        )
-
-    return MASTER
-
-
-def _get_top_frame() -> ctk.CTkFrame:
-    """
-    Returns the top frame of the create view.
-
-    Args:
-        None
-
-    Returns:
-        ctk.CTkFrame: The top frame of the create view.
-
-    Raises:
-        ValueError: If the top frame has not been initialized yet.
-    """
-
-    if TOP_FRAME is None:
-        raise ValueError(
-            "The top frame has not been initialized yet."
-            "The method '_set_top_frame' must be executed first."
-        )
-
-    return TOP_FRAME
-
-
 def _on_clear_create_form() -> None:
     """
-    Handles the 'CLEAR_CREATE_FORM' event.
+    Handles the 'CLEAR_CREATE__FORM' event.
 
     Args:
         None
@@ -698,7 +841,7 @@ def _on_clear_create_form() -> None:
         None
     """
 
-    for value in FORM.values():
+    for value in _get_form().values():
         if isinstance(
             value["variable"],
             ctk.StringVar,
@@ -722,22 +865,22 @@ def _on_destroy() -> None:
         None
     """
 
-    global BOTTOM_FRAME, CENTER_FRAME, CREATE_VIEW_FORM_CONTAINER, MASTER, TOP_FRAME
+    global _BOTTOM_FRAME, _CENTER_FRAME, _CREATE_VIEW__FORM_CONTAINER, _MASTER, _TOP_FRAME
 
     _unsubscribe_from_events()
 
     _get_master().destroy()
 
-    FORM.clear()
+    _get_form().clear()
 
-    STACKS.clear()
-    STACKS.append("")
+    _get_stacks_list().clear()
+    _get_stacks_list().append("")
 
-    BOTTOM_FRAME = None
-    CENTER_FRAME = None
-    CREATE_VIEW_FORM_CONTAINER = None
-    MASTER = None
-    TOP_FRAME = None
+    _BOTTOM_FRAME = None
+    _CENTER_FRAME = None
+    _CREATE_VIEW__FORM_CONTAINER = None
+    _MASTER = None
+    _TOP_FRAME = None
 
 
 def _on_get_create_form() -> dict[str, Any]:
@@ -752,14 +895,17 @@ def _on_get_create_form() -> dict[str, Any]:
     """
 
     return {
-        key: {
-            "is_required": value["is_required"],
-            "value": value["variable"].get(),
-        }
-        for (
-            key,
-            value,
-        ) in FORM.items()
+        "form_content": {
+            key: {
+                "is_required": value["is_required"],
+                "value": value["variable"].get(),
+            }
+            for (
+                key,
+                value,
+            ) in _get_form().items()
+        },
+        "origin": "create_view",
     }
 
 
@@ -774,87 +920,21 @@ def _on_stack_added(stack: ModelDict) -> None:
         None
     """
 
-    STACKS.append(stack["metadata"]["name"])
+    _get_stacks_list().append(stack["metadata"]["name"])
 
 
-def _set_bottom_frame(frame: ctk.CTkFrame) -> None:
+def _on_stacks_added(stacks: list[ModelDict]) -> None:
     """
-    Sets the bottom frame widget of the create view.
+    Handles the 'STACKS_ADDED' event.
 
     Args:
-        frame (ctk.CTkFrame): The frame to set as the bottom frame of the create view.
+        stacks (list[ModelDict]): The stacks to handle.
 
     Returns:
         None
     """
 
-    global BOTTOM_FRAME
-
-    BOTTOM_FRAME = frame
-
-
-def _set_center_frame(frame: ctk.CTkFrame) -> None:
-    """
-    Sets the center frame widget of the create view.
-
-    Args:
-        frame (ctk.CTkFrame): The frame to set as the center frame of the create view.
-
-    Returns:
-        None
-    """
-
-    global CENTER_FRAME
-
-    CENTER_FRAME = frame
-
-
-def _set_create_view_form_container(scrollable_frame: ctk.CTkScrollableFrame) -> None:
-    """
-    Sets the main scrollable container for create view items.
-
-    Args:
-        scrollable_frame (ctk.CTkScrollableFrame): The CTkScrollableFrame instance to be set.
-
-    Returns:
-        None
-    """
-
-    global CREATE_VIEW_FORM_CONTAINER
-
-    CREATE_VIEW_FORM_CONTAINER = scrollable_frame
-
-
-def _set_master(toplevel: ctk.CTkToplevel) -> None:
-    """
-    Sets the master widget for the create view.
-
-    Args:
-        toplevel (ctk.CTkToplevel): The master window of the create view.
-
-    Returns:
-        None
-    """
-
-    global MASTER
-
-    MASTER = toplevel
-
-
-def _set_top_frame(frame: ctk.CTkFrame) -> None:
-    """
-    Sets the top frame widget of the create view.
-
-    Args:
-        frame (ctk.CTkFrame): The frame to set as the top frame of the create view.
-
-    Returns:
-        None
-    """
-
-    global TOP_FRAME
-
-    TOP_FRAME = frame
+    _get_stacks_list().extend([stack["metadata"]["name"] for stack in stacks])
 
 
 def _subscribe_to_events() -> None:
@@ -897,10 +977,17 @@ def _subscribe_to_events() -> None:
             "persistent": True,
             "priority": 100,
         },
+        {
+            "event": STACKS_ADDED,
+            "function": _on_stacks_added,
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
+        },
     ]
 
     for subscription in subscriptions:
-        SUBSCRIPTION_IDS.append(
+        _SUBSCRIPTION_IDS.append(
             subscribe(
                 event=subscription["event"],
                 function=subscription["function"],
@@ -924,12 +1011,12 @@ def _unsubscribe_from_events() -> None:
         None
     """
 
-    for uuid in SUBSCRIPTION_IDS:
+    for uuid in _SUBSCRIPTION_IDS:
         unsubscribe(uuid=uuid)
 
     log_info(message="Unsubscribed from all events for the create view.")
 
-    SUBSCRIPTION_IDS.clear()
+    _SUBSCRIPTION_IDS.clear()
 
 
 # ---------- Public Functions ---------- #

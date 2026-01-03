@@ -10,6 +10,7 @@ from constants.common import PATTERNS
 from constants.directories import DATA_DIR
 from constants.events import *
 from utils.common import (
+    exists,
     generate_model_key,
     generate_uuid4_str,
     get_now_str,
@@ -685,7 +686,7 @@ def _insert_table_entry(entry_data: dict[str, Any], table_data: dict[str, Any]) 
 
     entry_data["metadata"]["id"] = table_data["metadata"]["next_id"]
     entry_data["metadata"]["key"] = generate_model_key(
-        id=entry_data["metadata"]["id"],
+        id_=entry_data["metadata"]["id"],
         name=entry_data["metadata"]["type"],
     )
 
@@ -717,6 +718,7 @@ def _save_table_data(table_data: dict[str, Any], table_name: str) -> None:
 
     try:
         file: Path = DATA_DIR / table_name
+
         write_file_json(
             data=table_data,
             file=file,
@@ -751,6 +753,7 @@ def _update_metadata_field_list(table_data: dict[str, Any], entry: dict[str, Any
 
     if "metadata" not in table_data:
         table_data["metadata"] = {}
+
     if "fields" not in table_data["metadata"]:
         table_data["metadata"]["fields"] = {"fields": [], "total": 0}
 
@@ -876,7 +879,7 @@ def add_entry_if_not_exist(
             **unique_criteria,
         )
 
-        if existing_entries:
+        if exists(value=existing_entries):
             log_info(
                 message=f"Skipping adding entry to '{table_name}' table: Duplicate found based on criteria: {unique_criteria}"
             )
@@ -915,7 +918,7 @@ def add_entries(
     """
 
     try:
-        if not entries:
+        if not exists(value=entries):
             log_info(message=f"Attempted to add 0 entries to '{table_name}' table. Aborting...")
             return []
 
@@ -933,10 +936,12 @@ def add_entries(
                 entry_data=entry,
                 table_data=table_data,
             )
+
             added_ids.append(entry["metadata"]["id"])
+
             _increment_table_counters(table_data=table_data)
 
-            if not model_type:
+            if not exists(value=model_type):
                 model_type = entry["metadata"]["type"]
 
         _update_table_timestamps(table_data=table_data)
@@ -950,7 +955,7 @@ def add_entries(
             message=f"Successfully added {len(entries)} entries to '{table_name}' table. IDs: {added_ids}"
         )
 
-        if model_type:
+        if exists(value=model_type):
             dispatch(
                 event=_get_bulk_add_event(model_type=model_type),
                 **{
@@ -1005,14 +1010,15 @@ def add_entries_if_not_exist(
                 **unique_criteria,
             )
 
-            if not existing_entries:
-                entries_to_add.append(entry)
-            else:
+            if exists(value=existing_entries):
                 log_info(
                     message=f"Skipping adding entry to '{table_name}' table: Duplicate found based on criteria: {unique_criteria}"
                 )
+                continue
 
-        if not entries_to_add:
+            entries_to_add.append(entry)
+
+        if not exists(value=entries_to_add):
             return []
 
         return add_entries(
@@ -1049,6 +1055,7 @@ def count_entries(table_name: str) -> int:
         file: Path = DATA_DIR / table_name
 
         table_data: dict[str, Any] = read_file_json(file=file)
+
         count: int = table_data["entries"]["total"]
 
         log_info(message=f"Successfully retrieved total count ({count}) for '{table_name}' table")
@@ -1085,13 +1092,20 @@ def delete_all_entries(table_name: str) -> bool:
         file: Path = DATA_DIR / table_name
 
         model_type: Optional[str] = None
+
         if does_file_have_content(file=file):
             try:
                 table_data: dict[str, Any] = read_file_json(file=file)
-                if table_data["entries"]["total"] > 0:
-                    first_entry = next(iter(table_data["entries"]["entries"].values()), None)
-                    if first_entry:
-                        model_type = first_
+
+                if not table_data["entries"]["total"] > 0:
+                    return
+
+                first_entry = next(iter(table_data["entries"]["entries"].values()), None)
+
+                if not exists(value=first_entry):
+                    return
+
+                model_type = first_entry["metadata"]["type"]
             except Exception:
                 pass
 
@@ -1099,7 +1113,7 @@ def delete_all_entries(table_name: str) -> bool:
 
         log_info(message=f"Successfully deleted all entries and reset table '{table_name}'.")
 
-        if model_type:
+        if exists(value=model_type):
             dispatch(
                 event=_get_delete_all_event(model_type=model_type),
                 kwargs={},
@@ -1136,7 +1150,7 @@ def delete_entries(
     """
 
     try:
-        if not ids:
+        if not exists(value=ids):
             log_info(
                 message=f"Attempted to delete 0 entries from '{table_name}' table. Aborting..."
             )
@@ -1145,11 +1159,13 @@ def delete_entries(
         _ensure_table_json(table_name=table_name)
 
         entry_id_strs: list[str] = [str(i) for i in ids]
+
         file: Path = DATA_DIR / table_name
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
         deleted_entries: list[dict[str, Any]] = []
+
         model_type: str = ""
 
         all_entries: dict[str, Any] = table_data["entries"]["entries"]
@@ -1157,10 +1173,15 @@ def delete_entries(
         for id_str in entry_id_strs:
             deleted_entry: Optional[dict[str, Any]] = all_entries.pop(id_str, None)
 
-            if deleted_entry:
-                deleted_entries.append(deleted_entry)
-                if not model_type:
-                    model_type = deleted_entry["metadata"]["type"]
+            if not exists(value=deleted_entry):
+                continue
+
+            deleted_entries.append(deleted_entry)
+
+            if not exists(value=model_type):
+                continue
+
+            model_type = deleted_entry["metadata"]["type"]
 
         count_deleted: int = len(deleted_entries)
 
@@ -1183,7 +1204,7 @@ def delete_entries(
             message=f"Successfully deleted {count_deleted} entries from '{table_name}' table. IDs deleted: {[e['id'] for e in deleted_entries]}"
         )
 
-        if model_type:
+        if exists(value=model_type):
             dispatch(
                 event=_get_bulk_delete_event(model_type=model_type),
                 **{
@@ -1200,7 +1221,7 @@ def delete_entries(
 
 
 def delete_entry(
-    id: Union[int, str],
+    id_: Union[int, str],
     table_name: str,
 ) -> bool:
     """
@@ -1212,7 +1233,7 @@ def delete_entry(
     A successful deletion dispatches a notification event.
 
     Args:
-        id (Union[int, str]): The unique ID (primary key) of the entry to delete.
+        id_ (Union[int, str]): The unique ID (primary key) of the entry to delete.
         table_name (str): The name of the table/collection where the entry is stored.
 
     Returns:
@@ -1225,7 +1246,8 @@ def delete_entry(
     try:
         _ensure_table_json(table_name=table_name)
 
-        entry_id_str: str = str(id)
+        entry_id_str: str = str(id_)
+
         file: Path = DATA_DIR / table_name
 
         table_data: dict[str, Any] = read_file_json(file=file)
@@ -1234,35 +1256,36 @@ def delete_entry(
             entry_id_str, None
         )
 
-        if deleted_entry:
-            _decrement_table_counters(table_data=table_data)
-            _update_table_timestamps(table_data=table_data)
-
-            write_file_json(
-                data=table_data,
-                file=file,
-            )
-
-            log_info(
-                message=f"Successfully deleted entry '{entry_id_str}' from '{table_name}' table"
-            )
-
-            model_type: str = deleted_entry["metadata"]["type"]
-            dispatch(
-                event=_get_delete_event(model_type=model_type),
-                **{
-                    model_type.lower(): deleted_entry,
-                },
-            )
-            return True
-        else:
+        if not exists(value=deleted_entry):
             log_info(
                 message=f"Attempted to delete entry with ID '{entry_id_str}' from '{table_name}' table, but it was not found."
             )
             return False
+
+        _decrement_table_counters(table_data=table_data)
+
+        _update_table_timestamps(table_data=table_data)
+
+        write_file_json(
+            data=table_data,
+            file=file,
+        )
+
+        log_info(message=f"Successfully deleted entry '{entry_id_str}' from '{table_name}' table")
+
+        model_type: str = deleted_entry["metadata"]["type"]
+
+        dispatch(
+            event=_get_delete_event(model_type=model_type),
+            **{
+                model_type.lower(): deleted_entry,
+            },
+        )
+
+        return True
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to delete entry '{id}' from '{table_name}' table: {e}"
+            message=f"Caught an exception while attempting to delete entry '{id_}' from '{table_name}' table: {e}"
         )
         raise e
 
@@ -1327,7 +1350,7 @@ def filter_entries(
     try:
         all_entries: Optional[list[dict[str, Any]]] = get_all_entries(table_name=table_name)
 
-        if not all_entries:
+        if not exists(value=all_entries):
             return []
 
         filtered_entries = list(
@@ -1346,6 +1369,7 @@ def filter_entries(
             log_info(
                 message=f"No entries found in '{table_name}' table matching filter criteria: {kwargs}"
             )
+
             return []
 
         model_type: str = filtered_entries[0]["metadata"]["type"]
@@ -1356,6 +1380,7 @@ def filter_entries(
 
         if count == 1:
             entry = filtered_entries[0]
+
             dispatch(
                 event=_get_get_event(model_type=model_type),
                 **{
@@ -1406,28 +1431,28 @@ def get_all_entries(table_name: str) -> Optional[list[dict[str, Any]]]:
         table_data: dict[str, Any] = read_file_json(file=file)
 
         all_entries_dict: dict[str, Any] = table_data["entries"]["entries"]
+
         retrieved_entries: list[dict[str, Any]] = list(all_entries_dict.values())
 
         count: int = len(retrieved_entries)
 
-        if count > 0:
-            model_type: str = retrieved_entries[0]["metadata"]["type"]
-
-            log_info(
-                message=f"Successfully retrieved all {count} entries from '{table_name}' table"
-            )
-
-            dispatch(
-                event=_get_get_all_event(model_type=model_type),
-                **{
-                    f"all_{pluralize_word(word=model_type).lower()}": retrieved_entries,
-                },
-            )
-
-            return retrieved_entries
-        else:
+        if count <= 0:
             log_info(message=f"Table '{table_name}' contains no entries. Returning empty list.")
+
             return []
+
+        model_type: str = retrieved_entries[0]["metadata"]["type"]
+
+        log_info(message=f"Successfully retrieved all {count} entries from '{table_name}' table")
+
+        dispatch(
+            event=_get_get_all_event(model_type=model_type),
+            **{
+                f"all_{pluralize_word(word=model_type).lower()}": retrieved_entries,
+            },
+        )
+
+        return retrieved_entries
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to get all entries from '{table_name}' table: {e}"
@@ -1460,51 +1485,62 @@ def get_entries(
     """
 
     try:
-        if not ids:
+        if not exists(value=ids):
             log_info(
                 message=f"Attempted to get 0 entries from '{table_name}' table. Returning empty list."
             )
+
             return []
 
         _ensure_table_json(table_name=table_name)
 
-        entry_id_strs: list[str] = [str(i) for i in ids]
+        entry_id_strs: list[str] = [str(id_) for id_ in ids]
 
         file: Path = DATA_DIR / table_name
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
         retrieved_entries: list[dict[str, Any]] = []
+
         model_type: str = ""
 
         all_entries: dict[str, Any] = table_data["entries"]["entries"]
 
         for id_str in entry_id_strs:
             entry = all_entries.get(id_str)
-            if entry:
-                retrieved_entries.append(entry)
-                if not model_type:
-                    model_type = entry["metadata"]["type"]
+
+            if not exists(value=entry):
+                continue
+
+            retrieved_entries.append(entry)
+
+            if exists(value=model_type):
+
+                continue
+
+            model_type = entry["metadata"]["type"]
 
         count: int = len(retrieved_entries)
 
-        if count > 0:
-            log_info(
-                message=f"Successfully retrieved {count} out of {len(ids)} requested entries from '{table_name}' table"
+        if count <= 0:
+            log_info(message=f"No entries found for the requested IDs in '{table_name}' table")
+
+            return []
+
+        log_info(
+            message=f"Successfully retrieved {count} out of {len(ids)} requested entries from '{table_name}' table"
+        )
+
+        if exists(value=model_type):
+
+            dispatch(
+                event=_get_bulk_get_event(model_type=model_type),
+                **{
+                    pluralize_word(word=model_type).lower(): retrieved_entries,
+                },
             )
 
-            if model_type:
-                dispatch(
-                    event=_get_bulk_get_event(model_type=model_type),
-                    **{
-                        pluralize_word(word=model_type).lower(): retrieved_entries,
-                    },
-                )
-
-            return retrieved_entries
-        else:
-            log_info(message=f"No entries found for the requested IDs in '{table_name}' table")
-            return []
+        return retrieved_entries
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to get entries from '{table_name}' table: {e}"
@@ -1555,7 +1591,7 @@ def get_entries_by_keys(
 
 
 def get_entry(
-    id: Union[int, str],
+    id_: Union[int, str],
     table_name: str,
 ) -> Optional[dict[str, Any]]:
     """
@@ -1566,7 +1602,7 @@ def get_entry(
     A successful retrieval dispatches a notification event.
 
     Args:
-        id (Union[int, str]): The unique ID (primary key) of the entry to retrieve.
+        id_ (Union[int, str]): The unique ID (primary key) of the entry to retrieve.
         table_name (str): The name of the table/collection where the entry is stored.
 
     Returns:
@@ -1579,7 +1615,7 @@ def get_entry(
     try:
         _ensure_table_json(table_name=table_name)
 
-        entry_id_str: str = str(id)
+        entry_id_str: str = str(id_)
 
         file: Path = DATA_DIR / table_name
 
@@ -1587,25 +1623,26 @@ def get_entry(
 
         entry: Optional[dict[str, Any]] = table_data["entries"]["entries"].get(entry_id_str)
 
-        if entry:
-            log_info(
-                message=f"Successfully retrieved entry '{entry_id_str}' from '{table_name}' table"
-            )
-
-            model_type: str = entry["metadata"]["type"]
-            dispatch(
-                event=_get_get_event(model_type=model_type),
-                **{
-                    model_type.lower(): entry,
-                },
-            )
-            return entry
-        else:
+        if not exists(value=entry):
             log_info(message=f"Entry with ID '{entry_id_str}' not found in '{table_name}' table")
+
             return None
+
+        log_info(message=f"Successfully retrieved entry '{entry_id_str}' from '{table_name}' table")
+
+        model_type: str = entry["metadata"]["type"]
+
+        dispatch(
+            event=_get_get_event(model_type=model_type),
+            **{
+                model_type.lower(): entry,
+            },
+        )
+
+        return entry
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to get entry '{id}' from '{table_name}' table: {e}"
+            message=f"Caught an exception while attempting to get entry '{id_}' from '{table_name}' table: {e}"
         )
         raise e
 
@@ -1634,7 +1671,7 @@ def get_entry_by_key(
 
     try:
         return get_entry(
-            id=search_string(
+            id_=search_string(
                 pattern=PATTERNS["MODEL_ID"],
                 string=key,
             ),
@@ -1681,6 +1718,7 @@ def update_entry(
         _ensure_table_json(table_name=table_name)
 
         entry_id_str: str = str(entry["metadata"]["id"])
+
         file: Path = DATA_DIR / table_name
 
         table_data: dict[str, Any] = read_file_json(file=file)
@@ -1710,12 +1748,14 @@ def update_entry(
         log_info(message=f"Successfully updated entry '{entry_id_str}' in '{table_name}' table")
 
         model_type: str = entry["metadata"]["type"]
+
         dispatch(
             event=_get_update_event(model_type=model_type),
             **{
                 model_type.lower(): entry,
             },
         )
+
         return entry
     except Exception as e:
         log_error(
@@ -1764,6 +1804,7 @@ def update_entries(
         all_entries: dict[str, Any] = table_data["entries"]["entries"]
 
         updated_entries: list[dict[str, Any]] = []
+
         model_type: str = ""
 
         for entry in entries:
@@ -1774,26 +1815,31 @@ def update_entries(
 
             entry_id_str: str = str(entry["metadata"]["id"])
 
-            if entry_id_str in all_entries:
-                all_entries[entry_id_str] = entry
-                updated_entries.append(entry)
-
-                _update_metadata_field_list(
-                    entry=entry,
-                    table_data=table_data,
-                )
-
-                if not model_type:
-                    model_type = entry["metadata"]["type"]
-            else:
+            if entry_id_str not in all_entries:
                 log_info(
                     message=f"Entry with ID '{entry_id_str}' skipped during batch update for '{table_name}' table, as it was not found."
                 )
+                continue
+
+            all_entries[entry_id_str] = entry
+
+            updated_entries.append(entry)
+
+            _update_metadata_field_list(
+                entry=entry,
+                table_data=table_data,
+            )
+
+            if exists(value=model_type):
+                continue
+
+            model_type = entry["metadata"]["type"]
 
         count_updated: int = len(updated_entries)
 
         if count_updated == 0:
             log_info(message=f"No existing entries were updated in '{table_name}' table.")
+
             return []
 
         _update_table_timestamps(table_data=table_data)
@@ -1805,7 +1851,7 @@ def update_entries(
 
         log_info(message=f"Successfully updated {count_updated} entries in '{table_name}' table.")
 
-        if model_type:
+        if exists(value=model_type):
             dispatch(
                 event=_get_bulk_update_event(model_type=model_type),
                 **{

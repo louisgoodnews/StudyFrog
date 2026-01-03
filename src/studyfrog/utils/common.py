@@ -3,12 +3,13 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+import json
 import random
 import re
 import uuid
 
 from datetime import date, datetime
-from typing import Any, Final, Optional
+from typing import Any, Final, Optional, Union
 
 
 # ---------- Exports ---------- #
@@ -16,6 +17,7 @@ from typing import Any, Final, Optional
 __all__: Final[list[str]] = [
     "create_rgb_bg_color",
     "create_rgb_fg_color",
+    "exists",
     "find_string",
     "generate_model_key",
     "generate_uuid4",
@@ -33,7 +35,10 @@ __all__: Final[list[str]] = [
     "pluralize_word",
     "search_string",
     "shuffle_list",
+    "simple_dict_to_string",
+    "simple_string_to_dict",
     "singularize_word",
+    "string_to_snake_case",
 ]
 
 
@@ -72,6 +77,25 @@ def create_rgb_fg_color(r: int, g: int, b: int) -> str:
     return f"\033[38;2;{r};{g};{b}m"
 
 
+def exists(value: Any) -> bool:
+    """
+    Returns True if the given value exists, False otherwise.
+
+    A value exists if it is not None and is not an empty string.
+    If the value is 0 or False, it is considered to exist.
+
+    Args:
+        value (Any): The value to check.
+
+    Returns:
+        bool: True if the value exists, False otherwise.
+    """
+
+    if value == 0 or value is False:
+        return True
+    return bool(value)
+
+
 def find_string(
     string: str,
     pattern: str,
@@ -102,21 +126,21 @@ def find_string(
 
 
 def generate_model_key(
-    id: int,
+    id_: int,
     name: str,
 ) -> str:
     """
     Returns a model key based on a specified name and ID.
 
     Args:
-        id (int): The ID to generate the model key with.
+        id_ (int): The ID to generate the model key with.
         name (str): The name to generate the model key with.
 
     Returns:
         str: The generated model key in the format "NAME_ID".
     """
 
-    return f"{name.upper()}_{id}"
+    return f"{name.upper()}_{id_}"
 
 
 def generate_uuid4() -> uuid.UUID:
@@ -404,6 +428,37 @@ def shuffle_list(list_: list[Any]) -> None:
     random.shuffle(list_)
 
 
+def simple_dict_to_string(dict_or_list: Union[dict[str, Any], list[Any]]) -> str:
+    """
+    Converts a given dictionary or list into a string.
+
+    Args:
+        dict_or_list (Union[dict[str, Any], list[Any]]): The dictionary or list to convert.
+
+    Returns:
+        str: The converted string.
+    """
+
+    return json.dumps(dict_or_list)
+
+
+def simple_string_to_dict(string: str) -> Optional[Union[dict[str, Any], list[Any]]]:
+    """
+    Attempts to convert a string into a dicionary or list and returns if upon success.
+
+    Args:
+        string (str): The string to attempt the conversion on.
+
+    Returns:
+        Optional[Union[dict[str, Any], list[Any]]]: The converted dictionary or list.
+    """
+
+    try:
+        return json.loads(string)
+    except ValueError:
+        return None
+
+
 def singularize_word(word: str) -> str:
     """
     Singularizes an English word based on simplified rules (reversing pluralize_word).
@@ -426,3 +481,17 @@ def singularize_word(word: str) -> str:
             return word[:-1]
 
     return word
+
+
+def string_to_snake_case(string: str) -> str:
+    """
+    Returns a snake case representation of the passed string.
+
+    Args:
+        string (str): The string to convert to snake case.
+
+    Returns:
+        str: The snake case representation of the passed string.
+    """
+
+    return string.replace(" ", "_").lower()

@@ -7,7 +7,7 @@ Description: The stack create form of the application.
 import customtkinter as ctk
 
 from tkinter.constants import NSEW, W
-from typing import Any, Final
+from typing import Any, Final, Union
 
 from constants.events import (
     CLEAR_CREATE_FORM,
@@ -31,14 +31,55 @@ __all__: Final[list[str]] = ["get_stack_create_form"]
 # ---------- Constants ---------- #
 
 
-FORM: Final[dict[str, Any]] = {}
+_FORM: Final[dict[str, Any]] = {}
 
-MASTER: Final[ctk.CTkScrollableFrame] = None
+_MASTER: Final[ctk.CTkScrollableFrame] = None
 
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
+
+
+def _get_form() -> dict[str, Any]:
+    """
+    Returns the underlying dictionary 'serializing' the UI form.
+
+    Args:
+        None
+
+    Returns:
+        dict[str, Any]: The underlying dictionary 'serializing' the UI form.
+    """
+
+    return _FORM
+
+
+def _update_form(
+    key: Union[list[str], str],
+    value: Any,
+) -> None:
+    """
+    Updates the underlying dictionary 'serializing' the UI form with the passed key and value pairs.
+
+    Args:
+        key (Union[list[str], str]): The key(s) to update with the passed value.
+        value (Any): The value to update the passed key(s) with.
+
+    Returns:
+        None
+    """
+
+    if isinstance(
+        key,
+        list,
+    ):
+        for _key in key:
+            _get_form()[_key] = value
+
+        return
+
+    _get_form()[key] = value
 
 
 # ---------- Private Functions ---------- #
@@ -111,15 +152,18 @@ def _create_widgets() -> None:
         sticky=NSEW,
     )
 
-    FORM["name"] = {
-        "is_required": True,
-        "variable": ctk.StringVar(),
-    }
+    _update_form(
+        key="name",
+        value={
+            "is_required": True,
+            "variable": ctk.StringVar(),
+        },
+    )
 
     ctk.CTkEntry(
         master=_get_master(),
         placeholder_text="Enter stack name here...",
-        textvariable=FORM["name"]["variable"],
+        textvariable=_get_form()["name"]["variable"],
     ).grid(
         column=1,
         padx=5,
@@ -145,10 +189,13 @@ def _create_widgets() -> None:
         sticky=NSEW,
     )
 
-    FORM["description"] = {
-        "is_required": False,
-        "variable": ctk.StringVar(),
-    }
+    _update_form(
+        key="description",
+        value={
+            "is_required": False,
+            "variable": ctk.StringVar(),
+        },
+    )
 
     description_textbox: ctk.CTkTextbox = ctk.CTkTextbox(master=_get_master())
 
@@ -161,7 +208,7 @@ def _create_widgets() -> None:
     )
 
     description_textbox.bind(
-        command=lambda event: FORM["description"]["variable"].set(
+        command=lambda event: _get_form()["description"]["variable"].set(
             value=description_textbox.get(
                 index1="1.0",
                 index2="end-1c",
@@ -209,16 +256,19 @@ def _create_widgets() -> None:
         )
     ]
 
-    FORM["subject"] = {
-        "is_required": True,
-        "variable": ctk.StringVar(),
-    }
+    _update_form(
+        key="subject",
+        value={
+            "is_required": True,
+            "variable": ctk.StringVar(),
+        },
+    )
 
     subject_combobox: ctk.CTkComboBox = ctk.CTkComboBox(
         master=_get_master(),
         state=READONLY,
         values=subject_names,
-        variable=FORM["subject"]["variable"],
+        variable=_get_form()["subject"]["variable"],
     )
 
     subject_combobox.grid(
@@ -268,16 +318,19 @@ def _create_widgets() -> None:
         )
     ]
 
-    FORM["teacher"] = {
-        "is_required": True,
-        "variable": ctk.StringVar(),
-    }
+    _update_form(
+        key="teacher",
+        value={
+            "is_required": True,
+            "variable": ctk.StringVar(),
+        },
+    )
 
     teacher_combobox: ctk.CTkComboBox = ctk.CTkComboBox(
         master=_get_master(),
         state=READONLY,
         values=teacher_names,
-        variable=FORM["teacher"]["variable"],
+        variable=_get_form()["teacher"]["variable"],
     )
 
     teacher_combobox.grid(
@@ -300,13 +353,13 @@ def _get_master() -> ctk.CTkScrollableFrame:
         ctk.CTkScrollableFrame: The master frame widget.
     """
 
-    if MASTER is None:
+    if _MASTER is None:
         raise ValueError(
             "The master frame has not been initialized yet."
             "The method '_set_master' must be executed first."
         )
 
-    return MASTER
+    return _MASTER
 
 
 def _on_clear_create_form() -> None:
@@ -320,7 +373,7 @@ def _on_clear_create_form() -> None:
         None
     """
 
-    for value in FORM.values():
+    for value in _get_form().values():
         if isinstance(
             value["variable"],
             ctk.StringVar,
@@ -348,9 +401,9 @@ def _on_destroy() -> None:
 
     _clear_master()
 
-    FORM.clear()
+    _get_form().clear()
 
-    MASTER = None
+    _MASTER = None
 
 
 def _on_get_create_form() -> dict[str, Any]:
@@ -365,14 +418,17 @@ def _on_get_create_form() -> dict[str, Any]:
     """
 
     return {
-        key: {
-            "is_required": value["is_required"],
-            "value": value["variable"].get(),
-        }
-        for (
-            key,
-            value,
-        ) in FORM.items()
+        "form_content": {
+            key: {
+                "is_required": value["is_required"],
+                "value": value["variable"].get(),
+            }
+            for (
+                key,
+                value,
+            ) in _get_form().items()
+        },
+        "origin": "stack_create_form",
     }
 
 
@@ -387,9 +443,9 @@ def _set_master(scrollable_frame: ctk.CTkScrollableFrame) -> None:
         None
     """
 
-    global MASTER
+    global _MASTER
 
-    MASTER = scrollable_frame
+    _MASTER = scrollable_frame
 
 
 def _subscribe_to_events() -> None:
@@ -428,7 +484,7 @@ def _subscribe_to_events() -> None:
     ]
 
     for subscription in subscriptions:
-        SUBSCRIPTION_IDS.append(
+        _SUBSCRIPTION_IDS.append(
             subscribe(
                 event=subscription["event"],
                 function=subscription["function"],
@@ -450,12 +506,12 @@ def _unsubscribe_from_events() -> None:
         None
     """
 
-    for uuid in SUBSCRIPTION_IDS:
+    for uuid in _SUBSCRIPTION_IDS:
         unsubscribe(uuid=uuid)
 
     log_info(message="Unsubscribed from all events for the stack create form.")
 
-    SUBSCRIPTION_IDS.clear()
+    _SUBSCRIPTION_IDS.clear()
 
 
 # ---------- Public Functions ---------- #

@@ -393,7 +393,7 @@ def on_start_button_click() -> None:
         namespace=GLOBAL,
         rehearsal_run=dispatch(
             event=GET_REHEARSAL_RUN_FROM_DB,
-            id=id,
+            id_=id,
             namespace=GLOBAL,
             table_name="rehearsal_runs",
         )
