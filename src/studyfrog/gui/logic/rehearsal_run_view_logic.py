@@ -33,6 +33,7 @@ from constants.events import (
 )
 from models.models import ModelDict
 from utils.common import (
+    exists,
     get_now,
     model_key_to_model_type,
     pluralize_word,
@@ -139,7 +140,7 @@ def _filter_stack_items_by_difficulty(difficulty_key: str) -> None:
             )
         )
 
-        if response is None:
+        if not exists(value=response):
             log_warning(
                 message=f"Failed to retrieve {model_type} with ID {search_string(pattern=PATTERNS['MODEL_ID'], string=item_key)}"
             )
@@ -200,7 +201,7 @@ def _filter_stack_items_by_priority(priority_key: str) -> None:
             )
         )
 
-        if response is None:
+        if not exists(value=response):
             log_warning(
                 message=f"Failed to retrieve {model_type} with ID {search_string(pattern=PATTERNS['MODEL_ID'], string=item_key)}"
             )
@@ -241,6 +242,13 @@ def _get_stack_items(key: str) -> list[str]:
         )
     )
 
+    if not exists(value=response):
+        log_warning(
+            message=f"Failed to retrieve stack with ID {search_string(pattern=PATTERNS['MODEL_ID'], string=key)}"
+        )
+
+        return []
+
     return response.get("items", [])
 
 
@@ -257,11 +265,12 @@ def _load_stack_item_from_db(stack_item_key: str) -> ModelDict:
 
     model_type: Optional[str] = model_key_to_model_type(model_key=stack_item_key)
 
-    if not model_type:
+    if not exists(value=model_type):
         log_warning(message=f"Failed to retrieve model type from stack item key {stack_item_key}")
+
         return {}
-    else:
-        model_type = model_type.lower()
+
+    model_type = model_type.lower()
 
     model_type_to_get_event: dict[
         Literal[
@@ -281,11 +290,12 @@ def _load_stack_item_from_db(stack_item_key: str) -> ModelDict:
         string=stack_item_key,
     )
 
-    if not model_id:
+    if not exists(value=model_id):
         log_warning(message=f"Failed to retrieve model ID from stack item key {stack_item_key}")
+
         return {}
-    else:
-        model_id = model_id.lower()
+
+    model_id = model_id.lower()
 
     return (
         dispatch(
@@ -341,7 +351,10 @@ def end_rehearsal_run(rehearsal_run: ModelDict) -> None:
 
     rehearsal_run["end"] = get_now()
 
-    rehearsal_run["duration"] = (rehearsal_run["end"] - rehearsal_run["start"]).total_seconds()
+    rehearsal_run["duration"] = {
+        "minutes": (rehearsal_run["end"] - rehearsal_run["start"]).total_seconds() // 60,
+        "seconds": (rehearsal_run["end"] - rehearsal_run["start"]).total_seconds(),
+    }
 
     rehearsal_run["end"] = rehearsal_run["end"].isoformat()
 
@@ -426,23 +439,25 @@ def on_easy_button_click() -> None:
         string=STACK_ITEM_KEYS[CURRENT_INDEX],
     )
 
-    if not model_id:
+    if not exists(value=model_id):
         log_warning(
             message=f"Failed to retrieve model ID from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_id = model_id.lower()
+
+    model_id = model_id.lower()
 
     model_type: Optional[str] = model_key_to_model_type(model_key=STACK_ITEM_KEYS[CURRENT_INDEX])
 
-    if not model_type:
+    if not exists(value=model_type):
         log_warning(
             message=f"Failed to retrieve model type from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_type = model_type.lower()
+
+    model_type = model_type.lower()
 
     model_dict: ModelDict = (
         dispatch(
@@ -552,23 +567,25 @@ def on_hard_button_click() -> None:
         string=STACK_ITEM_KEYS[CURRENT_INDEX],
     )
 
-    if not model_id:
+    if not exists(value=model_id):
         log_warning(
             message=f"Failed to retrieve model ID from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_id = model_id.lower()
+
+    model_id = model_id.lower()
 
     model_type: Optional[str] = model_key_to_model_type(model_key=STACK_ITEM_KEYS[CURRENT_INDEX])
 
-    if not model_type:
+    if not exists(value=model_type):
         log_warning(
             message=f"Failed to retrieve model type from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_type = model_type.lower()
+
+    model_type = model_type.lower()
 
     model_dict: ModelDict = (
         dispatch(
@@ -661,23 +678,25 @@ def on_medium_button_click() -> None:
         string=STACK_ITEM_KEYS[CURRENT_INDEX],
     )
 
-    if not model_id:
+    if not exists(value=model_id):
         log_warning(
             message=f"Failed to retrieve model ID from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_id = model_id.lower()
+
+    model_id = model_id.lower()
 
     model_type: Optional[str] = model_key_to_model_type(model_key=STACK_ITEM_KEYS[CURRENT_INDEX])
 
-    if not model_type:
+    if not exists(value=model_type):
         log_warning(
             message=f"Failed to retrieve model type from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_type = model_type.lower()
+
+    model_type = model_type.lower()
 
     model_dict: ModelDict = (
         dispatch(
@@ -769,23 +788,25 @@ def on_next_button_click() -> None:
         string=STACK_ITEM_KEYS[CURRENT_INDEX],
     )
 
-    if not model_id:
+    if not exists(value=model_id):
         log_warning(
             message=f"Failed to retrieve model ID from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_id = model_id.lower()
+
+    model_id = model_id.lower()
 
     model_type: Optional[str] = model_key_to_model_type(model_key=STACK_ITEM_KEYS[CURRENT_INDEX])
 
-    if not model_type:
+    if not exists(value=model_type):
         log_warning(
             message=f"Failed to retrieve model type from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_type = model_type.lower()
+
+    model_type = model_type.lower()
 
     model_dict: ModelDict = (
         dispatch(
@@ -869,23 +890,25 @@ def on_previous_button_click() -> None:
         string=STACK_ITEM_KEYS[CURRENT_INDEX],
     )
 
-    if not model_id:
+    if not exists(value=model_id):
         log_warning(
             message=f"Failed to retrieve model ID from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_id = model_id.lower()
+
+    model_id = model_id.lower()
 
     model_type: Optional[str] = model_key_to_model_type(model_key=STACK_ITEM_KEYS[CURRENT_INDEX])
 
-    if not model_type:
+    if not exists(value=model_type):
         log_warning(
             message=f"Failed to retrieve model type from stack item key {STACK_ITEM_KEYS[CURRENT_INDEX]}"
         )
+
         return
-    else:
-        model_type = model_type.lower()
+
+    model_type = model_type.lower()
 
     model_dict: ModelDict = (
         dispatch(
@@ -941,15 +964,15 @@ def start_rehearsal_run(rehearsal_run: ModelDict) -> None:
         for key in _get_stack_items(key=stack):
             _add_to_stack_items(key=key)
 
-    if rehearsal_run["configuration"]["filter_by_difficulty_enabled"]:
+    if exists(value=rehearsal_run["configuration"]["filter_by_difficulty_enabled"]):
         _filter_stack_items_by_difficulty(
             difficulty_key=rehearsal_run["configuration"]["difficulty"]
         )
 
-    if rehearsal_run["configuration"]["filter_by_priority_enabled"]:
+    if exists(value=rehearsal_run["configuration"]["filter_by_priority_enabled"]):
         _filter_stack_items_by_priority(priority_key=rehearsal_run["configuration"]["priority"])
 
-    if rehearsal_run["configuration"]["item_order_randomization_enabled"]:
+    if exists(value=rehearsal_run["configuration"]["item_order_randomization_enabled"]):
         shuffle_list(list_=STACK_ITEM_KEYS)
 
     dispatch(

@@ -26,6 +26,7 @@ __all__: Final[list[str]] = [
     "get_now_str",
     "get_today",
     "get_today_str",
+    "is_empty",
     "is_none",
     "is_none_or_empty",
     "is_not_none",
@@ -93,6 +94,7 @@ def exists(value: Any) -> bool:
 
     if value == 0 or value is False:
         return True
+
     return bool(value)
 
 
@@ -119,7 +121,7 @@ def find_string(
         string=string,
     )
 
-    if not match:
+    if not exists(value=match):
         return None
 
     return match
@@ -227,6 +229,26 @@ def get_today_str() -> str:
     return get_today().isoformat()
 
 
+def is_empty(obj: Any) -> bool:
+    """
+    Returns true if the passed object is empty, False otherwise.
+
+    Args:
+        obj (Any): The object to check.
+
+    Returns:
+        bool: True if the object is empty, False otherwise.
+    """
+
+    if hasattr(
+        obj,
+        "__len__",
+    ):
+        return len(obj) == 0
+
+    return False
+
+
 def is_none(obj: Any) -> bool:
     """
     Returns true if the passed object is None, False otherwise.
@@ -310,6 +332,7 @@ def is_not_none_or_empty(obj: Any) -> None:
         ),
     ):
         return is_not_none(obj=obj) and len(obj) > 0
+
     return is_not_none(obj=obj)
 
 
@@ -336,7 +359,7 @@ def match_string(
         string=string,
     )
 
-    if match is None:
+    if not exists(value=match):
         return None
 
     return match.group()
@@ -408,7 +431,7 @@ def search_string(
         string=string,
     )
 
-    if match is None:
+    if not exists(value=match):
         return None
 
     return match.group()
@@ -477,8 +500,10 @@ def singularize_word(word: str) -> str:
         return word[:-2]
 
     if word.endswith("s") and len(word) > 1:
-        if not word.endswith(("es", "ies")):
-            return word[:-1]
+        if word.endswith(("es", "ies")):
+            return word
+
+        return word[:-1]
 
     return word
 
