@@ -3,7 +3,7 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
-from typing import Any, Callable, Final
+from typing import Any, Callable, Final, Optional
 
 from constants.common import GLOBAL
 from utils.common import get_now, generate_uuid4_str
@@ -174,8 +174,10 @@ def dispatch(
 
     result: dict[str, Any] = {}
 
+    report: Optional[dict[str, Any]] = None
+
     if event not in SUBSCRIBERS:
-        report: dict[str, Any] = {
+        report = {
             "message": f"Event '{event}' not found. Aborting...",
             "status": "WARNING",
         }
@@ -188,7 +190,7 @@ def dispatch(
         return report
 
     if namespace not in SUBSCRIBERS[event]:
-        report: dict[str, Any] = {
+        report = {
             "message": f"Namespace '{namespace}' not found. Aborting...",
             "status": "WARNING",
         }
@@ -231,7 +233,7 @@ def dispatch(
                 }
             )
         except Exception as e:
-            report: dict[str, Any] = {
+            report = {
                 "exception": e,
                 "message": f"Function '{subscription["function"]["name"]}' failed. Aborting...",
                 "status": "ERROR",

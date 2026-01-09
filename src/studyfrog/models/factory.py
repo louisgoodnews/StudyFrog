@@ -9,7 +9,6 @@ import uuid
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Final, Optional, Union
-import uuid
 
 from models.models import (
     Answer,
@@ -43,7 +42,6 @@ __all__: Final[list[str]] = [
     "get_difficulty_model",
     "get_flashcard_model",
     "get_image_model",
-    "get_model_model",
     "get_note_model",
     "get_option_model",
     "get_priority_model",
@@ -423,7 +421,7 @@ def get_image_model(
     return Image(**parameters)
 
 
-def _get_note_model(
+def get_note_model(
     text: str,
     title: str,
     author: Optional[str] = None,
@@ -670,7 +668,7 @@ def get_rehearsal_action_model(
     return RehearsalAction(**parameters)
 
 
-def get_rehearsal_run_item(
+def get_rehearsal_run_item_model(
     item: str,
     actions: Optional[list[str]] = None,
     completed_at: Optional[Union[datetime, str]] = None,

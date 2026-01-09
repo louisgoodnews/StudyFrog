@@ -12,4 +12,13 @@ from typing import Final
 __all__: Final[list[str]] = []
 
 
-# ---------- Functions ---------- #
+# ---------- Constants ---------- #
+
+
+# ---------- Helper Functions ---------- #
+
+
+# ---------- Private Functions ---------- #
+
+
+# ---------- Public Functions ---------- #
