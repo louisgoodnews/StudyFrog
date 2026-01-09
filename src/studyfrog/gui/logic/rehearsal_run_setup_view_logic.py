@@ -19,7 +19,7 @@ from constants.events import (
     GET_REHEARSAL_RUN_SETUP_FORM,
     GET_REHEARSAL_RUN_VIEW,
 )
-from models.models import ModelDict
+from models.factories import ModelDict
 from utils.dispatcher import dispatch
 from utils.logging import log_debug, log_error
 

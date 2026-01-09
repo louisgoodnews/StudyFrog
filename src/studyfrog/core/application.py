@@ -6,6 +6,7 @@ Date: 2025-12-10
 from datetime import datetime
 from typing import Final, Optional
 
+from constants.common import GLOBAL
 from constants.events import (
     APPLICATION_STARTED,
     APPLICATION_STARTING,
@@ -22,7 +23,7 @@ from core.bootstrap import (
     unsubscribe_from_events,
 )
 from gui.gui import get_root
-from utils.common import get_now
+from utils.common import exists, get_now
 from utils.dispatcher import dispatch
 from utils.logging import log_error, log_info, log_trace
 
@@ -86,7 +87,7 @@ def _get_start() -> Optional[datetime]:
         ValueError: If the start timestamp has not been set. Call '_set_start' first.
     """
 
-    if START is None:
+    if not exists(value=START):
         raise ValueError("The start timestamp has not been set. Call '_set_start' first.")
 
     return START
@@ -106,7 +107,7 @@ def _get_stop() -> Optional[datetime]:
         ValueError: If the stop timestamp has not been set. Call '_set_stop' first.
     """
 
-    if STOP is None:
+    if not exists(value=STOP):
         raise ValueError("The stop timestamp has not been set. Call '_set_stop' first.")
 
     return STOP
@@ -125,7 +126,7 @@ def _set_start(timestamp: datetime) -> None:
 
     global START
 
-    if START is not None:
+    if exists(value=START):
         return
 
     START = timestamp
@@ -144,7 +145,7 @@ def _set_stop(timestamp: datetime) -> None:
 
     global STOP
 
-    if STOP is not None:
+    if exists(value=STOP):
         return
 
     STOP = timestamp
@@ -169,8 +170,14 @@ def run_post_start_tasks() -> None:
 
     try:
         initialize_gui()
-        dispatch(event=APPLICATION_STARTED)
-        dispatch(event=GET_DASHBOARD_VIEW)
+        dispatch(
+            event=APPLICATION_STARTED,
+            namespace=GLOBAL,
+        )
+        dispatch(
+            event=GET_DASHBOARD_VIEW,
+            namespace=GLOBAL,
+        )
     except Exception as e:
         log_error(message=f"Caught an exception while running post start tasks: {e}")
         raise e
@@ -191,7 +198,10 @@ def run_post_stop_tasks() -> None:
     """
 
     try:
-        dispatch(event=APPLICATION_STOPPED)
+        dispatch(
+            event=APPLICATION_STOPPED,
+            namespace=GLOBAL,
+        )
         unsubscribe_from_events()
     except Exception as e:
         log_error(message=f"Caught an exception while running post stop tasks: {e}")
@@ -217,7 +227,10 @@ def run_pre_start_tasks() -> None:
         ensure_files()
         ensure_defaults()
         subscribe_to_events()
-        dispatch(event=APPLICATION_STARTING)
+        dispatch(
+            event=APPLICATION_STARTING,
+            namespace=GLOBAL,
+        )
     except Exception as e:
         log_error(message=f"Caught an exception while running pre start tasks: {e}")
         raise e
@@ -238,7 +251,10 @@ def run_pre_stop_tasks() -> None:
     """
 
     try:
-        dispatch(event=APPLICATION_STOPPING)
+        dispatch(
+            event=APPLICATION_STOPPING,
+            namespace=GLOBAL,
+        )
     except Exception as e:
         log_error(message=f"Caught an exception while running pre stop tasks: {e}")
         raise e

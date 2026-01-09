@@ -31,7 +31,7 @@ from constants.events import (
     UPDATE_QUESTION_IN_DB,
     UPDATE_REHEARSAL_RUN_IN_DB,
 )
-from models.models import ModelDict
+from models.factories import ModelDict
 from utils.common import (
     exists,
     get_now,

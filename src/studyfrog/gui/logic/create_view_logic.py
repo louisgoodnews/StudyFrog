@@ -47,6 +47,8 @@ from constants.events import (
     GET_STACK_FROM_DB,
     GET_SUBJECT_FROM_DB,
     GET_TEACHER_FROM_DB,
+    RESET_CREATE_FORM,
+    SET_CREATE_FORM,
     UPDATE_ANSWER_IN_DB,
     UPDATE_FLASHCARD_IN_DB,
     UPDATE_NOTE_IN_DB,
@@ -64,7 +66,7 @@ from constants.storage import (
     SUBJECTS,
     TEACHERS,
 )
-from models.models import ModelDict
+from models.factories import ModelDict
 from utils.common import exists, pluralize_word, search_string, generate_model_key
 from utils.dispatcher import bulk_dispatch, dispatch
 from utils.logging import log_debug, log_error, log_info, log_warning
@@ -72,7 +74,12 @@ from utils.logging import log_debug, log_error, log_info, log_warning
 
 # ---------- Exports ---------- #
 
-__all__: Final[list[str]] = []
+__all__: Final[list[str]] = [
+    "on_cancel_button_click",
+    "on_create_button_click",
+    "on_stack_combobox_select",
+    "on_type_combobox_select",
+]
 
 
 # ---------- Constants ---------- #
@@ -130,24 +137,16 @@ def _add_to_database(model_dict: ModelDict) -> Optional[int]:
                 table_name=_get_table_name(type_=type_),
             )
             .get(
-                "add_entry",
+                "add_entry_if_not_exist",
                 [{}],
             )[0]
             .get(
                 "result",
-                {},
-            )
-            .get(
-                "metadata",
-                {},
-            )
-            .get(
-                "id",
                 None,
             )
         )
 
-        if result is not None:
+        if exists(value=result):
             _update_last_created(
                 id_=result,
                 type_=model_dict["metadata"]["type"].lower(),
@@ -593,8 +592,12 @@ def _inherit_metadata_from_stack(dictionary: dict[str, Any]) -> None:
     try:
         has_stack_parent: bool = exists(value=dictionary["stack"])
 
+        stack_parent: Optional[dict[str, Any]] = None
+
+        type_: str = dictionary.pop("type").lower()
+
         if has_stack_parent:
-            stack_parent: Optional[dict[str, Any]] = _get_from_database(key=dictionary["stack"])
+            stack_parent = _get_from_database(key=dictionary["stack"])
 
         if exists(value=dictionary["subject"]):
             dictionary["subject"] = _filter_subject(name=dictionary["subject"])["metadata"]["key"]
@@ -611,6 +614,16 @@ def _inherit_metadata_from_stack(dictionary: dict[str, Any]) -> None:
             dictionary["teacher"] = stack_parent["teacher"]
         else:
             log_warning(message="Teacher metadata could not be inherited. Parent stack not found.")
+
+        if type_ == "stack":
+            if exists(value=stack_parent):
+                dictionary["parent"] = stack_parent["metadata"]["key"]
+
+            dictionary.pop("stack")
+        elif exists(value=stack_parent):
+            dictionary["stack"] = stack_parent["metadata"]["key"]
+        else:
+            log_warning(message="Stack metadata could not be inherited. Parent stack not found.")
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to inherit metadata from stack: {e}"
@@ -803,8 +816,6 @@ def _validate_form(form: dict[str, Any]) -> dict[str, Any]:
 
     result: dict[str, Any] = {}
 
-    form_type: str = form.pop("type", {}).get("value", "").lower()
-
     for (
         key,
         value_dict,
@@ -884,7 +895,8 @@ def _handle_flashcard_creation(form: dict[str, Any]) -> None:
                 "stack",
                 "type",
             )
-        }
+        },
+        type_="flashcard",
     )
 
     if flashcard_model is None:
@@ -1047,45 +1059,6 @@ def _handle_stack_creation(form: dict[str, Any]) -> None:
 
     _inherit_metadata_from_stack(dictionary=kwargs)
 
-    kwargs["difficulty"] = (
-        _filter_difficulty(display_name=kwargs["difficulty"])
-        .get(
-            "metadata",
-            {},
-        )
-        .get(
-            "key",
-            None,
-        )
-    )
-
-    kwargs["priority"] = (
-        _filter_priority(display_name=kwargs["priority"])
-        .get(
-            "metadata",
-            {},
-        )
-        .get(
-            "key",
-            None,
-        )
-    )
-
-    if exists(value=kwargs["stack"]):
-        kwargs["parent"] = (
-            _filter_stack(name=kwargs.pop("stack"))
-            .get(
-                "metadata",
-                {},
-            )
-            .get(
-                "key",
-                None,
-            )
-        )
-    else:
-        kwargs.pop("stack")
-
     stack_model: Optional[ModelDict] = _get_model_dict(
         data=kwargs,
         type_="stack",
@@ -1103,12 +1076,15 @@ def _handle_stack_creation(form: dict[str, Any]) -> None:
 
         return
 
-    parent_stack: Optional[ModelDict] = _get_from_database(
-        key=generate_model_key(
-            id_=stack_model["parent"],
-            name="stack",
-        ),
-    )
+    if not exists(
+        value=stack_model.get(
+            "parent",
+            None,
+        )
+    ):
+        return
+
+    parent_stack: Optional[ModelDict] = _get_from_database(key=stack_model["parent"])
 
     if not exists(value=parent_stack):
         log_warning(
@@ -1245,6 +1221,46 @@ def on_create_button_click() -> None:
     dispatch(
         event=CLEAR_CREATE_FORM,
         namespace=GLOBAL,
+    )
+
+
+def on_stack_combobox_select(value: str) -> None:
+    """
+    Handles the stack combobox's <<ComboboxSelected>> event.
+
+    Args:
+        value (str): The value of the combobox.
+
+    Returns:
+        None
+    """
+
+    if not exists(value=value):
+        log_warning(message="Received empty value. Aborting...")
+
+        dispatch(
+            event=RESET_CREATE_FORM,
+            namespace=GLOBAL,
+        )
+
+        return
+
+    stack: Optional[ModelDict] = _filter_stack(name=value)
+
+    if not exists(value=stack):
+        log_warning(message=f"Failed to get stack with name {value}. Aborting...")
+
+        dispatch(
+            event=RESET_CREATE_FORM,
+            namespace=GLOBAL,
+        )
+
+        return
+
+    dispatch(
+        event=SET_CREATE_FORM,
+        namespace=GLOBAL,
+        **stack,
     )
 
 

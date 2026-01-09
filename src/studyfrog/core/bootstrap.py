@@ -62,6 +62,8 @@ from gui.forms.stack_create_form import get_stack_create_form
 from gui.gui import get_bottom_frame, get_center_frame, get_root, get_top_frame
 from gui.views.create_view import get_create_view
 from gui.views.dashboard_view import get_dashboard_view
+from gui.views.edit_view import get_edit_view
+from gui.views.delete_confirmation_view import get_delete_confirmation_view
 from gui.views.flashcard_rehearsal_view import get_flashcard_rehearsal_view
 from gui.views.note_rehearsal_view import get_note_rehearsal_view
 from gui.views.question_rehearsal_view import get_question_rehearsal_view
@@ -69,7 +71,7 @@ from gui.views.rehearsal_run_view import get_rehearsal_run_view
 from gui.views.rehearsal_run_result_view import get_rehearsal_run_result_view
 from gui.views.rehearsal_run_setup_view import get_rehearsal_run_setup_view
 from gui.widgets import get_error_toast, get_info_toast, get_success_toast, get_warning_toast
-from models.models import (
+from models.factories import (
     get_answer_model_dict,
     get_flashcard_model_dict,
     get_note_model_dict,
@@ -281,6 +283,20 @@ def _get_get_view_form_subscriptions() -> list[dict[str, Any]]:
             {
                 "event": GET_DASHBOARD_VIEW,
                 "function": get_dashboard_view,
+                "namespace": GLOBAL,
+                "persistent": True,
+                "priority": 100,
+            },
+            {
+                "event": GET_EDIT_VIEW,
+                "function": get_edit_view,
+                "namespace": GLOBAL,
+                "persistent": True,
+                "priority": 100,
+            },
+            {
+                "event": GET_DELETE_CONFIRMATION_VIEW,
+                "function": get_delete_confirmation_view,
                 "namespace": GLOBAL,
                 "persistent": True,
                 "priority": 100,

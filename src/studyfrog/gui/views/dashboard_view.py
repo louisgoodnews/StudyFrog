@@ -9,10 +9,12 @@ import customtkinter as ctk
 from tkinter.constants import NSEW, TOP, VERTICAL, W, X, YES
 from typing import Any, Final, Optional
 
+from constants.common import GLOBAL
 from constants.events import (
     DESTROY_DASHBOARD_VIEW,
     GET_ALL_STACKS_FROM_DB,
     STACK_ADDED,
+    STACK_DELETED,
     STACKS_ADDED,
 )
 from gui.gui import (
@@ -27,14 +29,16 @@ from gui.logic.dashboard_view_logic import (
     on_rehearse_button_click,
     on_view_button_click,
 )
+from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.gui import (
     clear_bottom_frame,
     clear_center_frame,
+    clear_frames,
     clear_top_frame,
-    count_widget_children,
+    reset_frame_grids,
 )
-from utils.logging import log_error, log_info
+from utils.logging import log_debug, log_error, log_info
 
 
 # ---------- Exports ---------- #
@@ -44,45 +48,85 @@ __all__: Final[list[str]] = ["get_dashboard_view"]
 
 # ---------- Constants ---------- #
 
-DASHBOARD_ITEM_CONTAINER: Optional[ctk.CTkScrollableFrame] = None
+_DASHBOARD_ITEM_CONTAINER: Optional[ctk.CTkScrollableFrame] = None
 
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_DASHBOARD_ITEMS: dict[str, ctk.CTkFrame] = {}
+
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
 
 
-def _get_dashboard_item_container_children_count() -> int:
+def _get_dashboard_item_container() -> ctk.CTkScrollableFrame:
     """
-    Retrieves the number of children in the dashboard item container.
+    Retrieves the main scrollable container for dashboard items.
 
-    Args:
-        None
+    Raises:
+        ValueError: If the container has not been initialized yet.
 
     Returns:
-        int: The number of children in the dashboard item container.
+        ctk.CTkScrollableFrame: The scrollable frame instance.
     """
 
-    return count_widget_children(widget=_get_dashboard_item_container())
+    if not exists(value=_DASHBOARD_ITEM_CONTAINER):
+        raise ValueError(
+            "The Dashboard Item Container has not yet been initialized."
+            "The method '_set_dashboard_item_container' must be executed first."
+        )
+
+    return _DASHBOARD_ITEM_CONTAINER
+
+
+def _register_dashboard_item(frame: ctk.CTkFrame, key: str) -> None:
+    """
+    Registers a dashboard item.
+
+    Args:
+        frame (ctk.CTkFrame): The dashboard item to register.
+        key (str): The key under which to register the passed ctk.CTkFrame object.
+
+    Retturns:
+        None
+    """
+
+    _DASHBOARD_ITEMS[key] = frame
+
+
+def _set_dashboard_item_container(scrollable_frame: ctk.CTkScrollableFrame) -> None:
+    """
+    Sets the main scrollable frame for dashboard items.
+
+    Args:
+        scrollable_frame (ctk.CTkScrollableFrame): The CTkScrollableFrame instance to be set.
+
+    Returns:
+        None
+    """
+
+    global _DASHBOARD_ITEM_CONTAINER
+
+    if exists(value=_DASHBOARD_ITEM_CONTAINER):
+        return
+
+    _DASHBOARD_ITEM_CONTAINER = scrollable_frame
+
+
+def _unregister_dashboard_item(key: str) -> None:
+    """
+    Unregisters a dashboard item.
+
+    Args:
+        key (str): The key under which the dashboard item is registered.
+
+    Retturns:
+        None
+    """
+
+    _DASHBOARD_ITEMS.pop(key, None)
 
 
 # ---------- Private Functions ---------- #
-
-
-def _clear_widgets() -> None:
-    """
-    Clears all widgets from the dashboard view.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-
-    clear_bottom_frame()
-    clear_center_frame()
-    clear_top_frame()
 
 
 def _configure_widget_grids() -> None:
@@ -162,7 +206,18 @@ def _configure_top_frame_grid() -> None:
         None
     """
 
-    pass
+    get_top_frame().grid_columnconfigure(
+        index=0,
+        weight=0,
+    )
+    get_top_frame().grid_columnconfigure(
+        index=1,
+        weight=1,
+    )
+    get_top_frame().grid_rowconfigure(
+        index=0,
+        weight=1,
+    )
 
 
 def _create_widgets() -> None:
@@ -192,7 +247,14 @@ def _create_bottom_frame_widgets() -> None:
         None
     """
 
-    pass
+    get_bottom_frame().grid_columnconfigure(
+        index=0,
+        weight=1,
+    )
+    get_bottom_frame().grid_rowconfigure(
+        index=0,
+        weight=1,
+    )
 
 
 def _create_center_frame_widgets() -> None:
@@ -222,7 +284,7 @@ def _create_center_frame_widgets() -> None:
     _set_dashboard_item_container(scrollable_frame=scrollable_frame)
 
 
-def _create_dashboard_item_widgets(stack: dict[str, Any]) -> None:
+def _create_dashboard_item_widgets(stack: dict[str, Any]) -> ctk.CTkFrame:
     """
     Creates the dashboard item widgets.
 
@@ -230,7 +292,7 @@ def _create_dashboard_item_widgets(stack: dict[str, Any]) -> None:
         stack (dict[str, Any]): The stack to create the dashboard item widgets for.
 
     Returns:
-        None
+        ctk.CTkFrame: The created dashboard item frame.
     """
 
     frame: ctk.CTkFrame = ctk.CTkFrame(master=_get_dashboard_item_container())
@@ -324,6 +386,8 @@ def _create_dashboard_item_widgets(stack: dict[str, Any]) -> None:
         row=1,
     )
 
+    return frame
+
 
 def _create_top_frame_widgets() -> None:
     """
@@ -341,31 +405,11 @@ def _create_top_frame_widgets() -> None:
         master=get_top_frame(),
         text="Create",
     ).grid(
-        column=1,
+        column=0,
         padx=5,
         pady=5,
         row=0,
     )
-
-
-def _get_dashboard_item_container() -> ctk.CTkScrollableFrame:
-    """
-    Retrieves the main scrollable container for dashboard items.
-
-    Raises:
-        ValueError: If the container has not been initialized yet.
-
-    Returns:
-        ctk.CTkScrollableFrame: The scrollable frame instance.
-    """
-
-    if DASHBOARD_ITEM_CONTAINER is None:
-        raise ValueError(
-            "The Dashboard Item Container has not yet been initialized."
-            "The method '_set_dashboard_item_container' must be executed first."
-        )
-
-    return DASHBOARD_ITEM_CONTAINER
 
 
 def _load_stacks() -> None:
@@ -382,7 +426,7 @@ def _load_stacks() -> None:
     stacks: Optional[list[dict[str, Any]]] = (
         dispatch(
             event=GET_ALL_STACKS_FROM_DB,
-            namespace="GLOBAL",
+            namespace=GLOBAL,
             table_name="stacks",
         )
         .get(
@@ -395,7 +439,7 @@ def _load_stacks() -> None:
         )
     )
 
-    if not stacks:
+    if not exists(value=stacks):
         return
 
     for stack in stacks:
@@ -413,12 +457,13 @@ def _on_destroy() -> None:
         None
     """
 
-    global DASHBOARD_ITEM_CONTAINER
+    global _DASHBOARD_ITEM_CONTAINER
 
-    _clear_widgets()
     _unsubscribe_from_events()
 
-    DASHBOARD_ITEM_CONTAINER = None
+    _DASHBOARD_ITEMS.clear()
+
+    _DASHBOARD_ITEM_CONTAINER = None
 
 
 def _on_stack_added(stack: dict[str, Any]) -> None:
@@ -432,7 +477,28 @@ def _on_stack_added(stack: dict[str, Any]) -> None:
         None
     """
 
-    _create_dashboard_item_widgets(stack=stack)
+    frame: ctk.CTkFrame = _create_dashboard_item_widgets(stack=stack)
+
+    _register_dashboard_item(
+        frame=frame,
+        key=stack["metadata"]["key"],
+    )
+
+
+def _on_stack_deleted(stack: dict[str, Any]) -> None:
+    """
+    Handler for the 'STACK_DELETED' event.
+
+    Args:
+        stack (dict[str, Any]): The stack that was added.
+
+    Returns:
+        None
+    """
+
+    _DASHBOARD_ITEMS[stack["metadata"]["key"]].destroy()
+
+    _unregister_dashboard_item(key=stack["metadata"]["key"])
 
 
 def _on_stacks_added(stacks: list[dict[str, Any]]) -> None:
@@ -447,23 +513,12 @@ def _on_stacks_added(stacks: list[dict[str, Any]]) -> None:
     """
 
     for stack in stacks:
-        _create_dashboard_item_widgets(stack=stack)
+        frame: ctk.CTkFrame = _create_dashboard_item_widgets(stack=stack)
 
-
-def _set_dashboard_item_container(scrollable_frame: ctk.CTkScrollableFrame) -> None:
-    """
-    Sets the main scrollable frame for dashboard items.
-
-    Args:
-        scrollable_frame (ctk.CTkScrollableFrame): The CTkScrollableFrame instance to be set.
-
-    Returns:
-        None
-    """
-
-    global DASHBOARD_ITEM_CONTAINER
-
-    DASHBOARD_ITEM_CONTAINER = scrollable_frame
+        _register_dashboard_item(
+            frame=frame,
+            key=stack["metadata"]["key"],
+        )
 
 
 def _subscribe_to_events() -> None:
@@ -481,28 +536,35 @@ def _subscribe_to_events() -> None:
         {
             "event": DESTROY_DASHBOARD_VIEW,
             "function": _on_destroy,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
             "persistent": False,
             "priority": 100,
         },
         {
             "event": STACK_ADDED,
             "function": _on_stack_added,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": STACKS_ADDED,
             "function": _on_stacks_added,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
+        },
+        {
+            "event": STACK_DELETED,
+            "function": _on_stack_deleted,
+            "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
         },
     ]
 
     for subscription in subscriptions:
-        SUBSCRIPTION_IDS.append(
+        _SUBSCRIPTION_IDS.append(
             subscribe(
                 event=subscription["event"],
                 function=subscription["function"],
@@ -526,12 +588,12 @@ def _unsubscribe_from_events() -> None:
         None
     """
 
-    for uuid in SUBSCRIPTION_IDS:
+    for uuid in _SUBSCRIPTION_IDS:
         unsubscribe(uuid=uuid)
 
     log_info(message="Unsubscribed from all events for the dashboard view.")
 
-    SUBSCRIPTION_IDS.clear()
+    _SUBSCRIPTION_IDS.clear()
 
 
 # ---------- Public Functions ---------- #
@@ -549,7 +611,9 @@ def get_dashboard_view() -> None:
     """
 
     try:
-        _clear_widgets()
+        clear_frames()
+        reset_frame_grids()
+
         _configure_widget_grids()
         _create_widgets()
         _subscribe_to_events()

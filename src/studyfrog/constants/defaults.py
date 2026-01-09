@@ -6,7 +6,7 @@ Date: 2025-12-12
 from typing import Any, Final
 
 from constants.common import APP_NAME
-from models.models import get_difficulty_model_dict, get_priority_model_dict, get_user_model_dict
+from models.factories import get_difficulty_model_dict, get_priority_model_dict, get_user_model_dict
 
 
 # ---------- Exports ---------- #

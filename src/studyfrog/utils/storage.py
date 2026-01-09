@@ -52,6 +52,81 @@ __all__: Final[list[str]] = [
 # ---------- Helper Functions ---------- #
 
 
+def _convert_for_database(model: dict[str, Any]) -> None:
+    """
+    Converts a model dictionary to a compatible database storage format.
+
+    This function is used internally to update the database storage format of
+    entries. It is not intended to be used externally.
+
+    The function checks if the 'metadata' dictionary of the entry contains an
+    'id_' key and if so, replaces it with an 'id' key. It also checks if
+    the 'metadata' dictionary contains a 'uuid_' key and if so, replaces it
+    with a 'uuid' key.
+
+    Args:
+        model (dict[str, Any]): The model dictionary to convert.
+
+    Returns:
+        None
+    """
+
+    if exists(
+        value=model.get("metadata", {}).get(
+            "id_",
+            None,
+        )
+    ):
+        model["metadata"]["id"] = model["metadata"].pop("id_")
+
+    if exists(
+        value=model.get(
+            "metadata",
+            {},
+        ).get(
+            "uuid_",
+            None,
+        )
+    ):
+        model["metadata"]["uuid"] = model["metadata"].pop("uuid_")
+
+
+def _convert_from_database(model: dict[str, Any]) -> None:
+    """
+    Converts a model dictionary from the database storage format to a compatible format.
+
+    This function is used internally to convert the database storage format of
+    entries to a compatible format. It is not intended to be used externally.
+
+    The function checks if the 'metadata' dictionary of the entry contains an
+    'id' key and if so, replaces it with an 'id_' key. It also checks if
+    the 'metadata' dictionary contains a 'uuid' key and if so, replaces it
+    with a 'uuid_' key.
+
+    Args:
+        model (dict[str, Any]): The model dictionary to convert.
+
+    Returns:
+        None
+    """
+
+    if exists(
+        value=model.get("metadata", {}).get(
+            "id",
+            None,
+        )
+    ):
+        model["metadata"]["id_"] = model["metadata"].pop("id")
+
+    if exists(
+        value=model.get("metadata", {}).get(
+            "uuid",
+            None,
+        )
+    ):
+        model["metadata"]["uuid_"] = model["metadata"].pop("uuid")
+
+
 def _decrement_table_counters(table_data: dict[str, Any]) -> None:
     """
     Decrements the table's 'next_id' and 'total' counters.
@@ -94,7 +169,9 @@ def _ensure_table_json_with_content(table_name: str) -> None:
     """
 
     try:
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         if does_file_have_content(file=file):
             return
@@ -149,7 +226,9 @@ def _ensure_table_json(table_name: str) -> None:
     """
 
     try:
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         ensure_file(file=file)
 
@@ -717,7 +796,9 @@ def _save_table_data(table_data: dict[str, Any], table_name: str) -> None:
     """
 
     try:
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         write_file_json(
             data=table_data,
@@ -809,7 +890,9 @@ def add_entry(
     try:
         _ensure_table_json(table_name=table_name)
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -924,7 +1007,9 @@ def add_entries(
 
         _ensure_table_json(table_name=table_name)
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -1052,7 +1137,9 @@ def count_entries(table_name: str) -> int:
     try:
         _ensure_table_json(table_name=table_name)
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -1089,7 +1176,9 @@ def delete_all_entries(table_name: str) -> bool:
     try:
         _ensure_table_json(table_name=table_name)
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         model_type: Optional[str] = None
 
@@ -1160,7 +1249,9 @@ def delete_entries(
 
         entry_id_strs: list[str] = [str(i) for i in ids]
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -1248,7 +1339,9 @@ def delete_entry(
 
         entry_id_str: str = str(id_)
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -1260,6 +1353,7 @@ def delete_entry(
             log_info(
                 message=f"Attempted to delete entry with ID '{entry_id_str}' from '{table_name}' table, but it was not found."
             )
+
             return False
 
         _decrement_table_counters(table_data=table_data)
@@ -1426,7 +1520,9 @@ def get_all_entries(table_name: str) -> Optional[list[dict[str, Any]]]:
     try:
         _ensure_table_json(table_name=table_name)
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -1496,7 +1592,9 @@ def get_entries(
 
         entry_id_strs: list[str] = [str(id_) for id_ in ids]
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -1617,7 +1715,9 @@ def get_entry(
 
         entry_id_str: str = str(id_)
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -1719,7 +1819,9 @@ def update_entry(
 
         entry_id_str: str = str(entry["metadata"]["id"])
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
@@ -1797,7 +1899,9 @@ def update_entries(
 
         _ensure_table_json(table_name=table_name)
 
-        file: Path = DATA_DIR / table_name
+        file: Path = DATA_DIR / (
+            f"{table_name}.json" if not table_name.endswith(".json") else table_name
+        )
 
         table_data: dict[str, Any] = read_file_json(file=file)
 

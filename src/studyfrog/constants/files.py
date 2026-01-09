@@ -35,38 +35,38 @@ __all__: Final[list[str]] = [
 
 # ---------- Constants ---------- #
 
-ANSWERS_DB_JSON: Final[Path] = DATA_DIR / "answers"
+ANSWERS_DB_JSON: Final[Path] = DATA_DIR / "answers.json"
 
-ASSOCIATIONS_DB_JSON: Final[Path] = DATA_DIR / "associations"
+ASSOCIATIONS_DB_JSON: Final[Path] = DATA_DIR / "associations.json"
 
-CONFIG_DB_JSON: Final[Path] = CONFIG_DIR / "config"
+CONFIG_DB_JSON: Final[Path] = CONFIG_DIR / "config.json"
 
-CUSTOMFIELDS_DB_JSON: Final[Path] = DATA_DIR / "customfields"
+CUSTOMFIELDS_DB_JSON: Final[Path] = DATA_DIR / "customfields.json"
 
-DIFFICULTIES_DB_JSON: Final[Path] = DATA_DIR / "difficulties"
+DIFFICULTIES_DB_JSON: Final[Path] = DATA_DIR / "difficulties.json"
 
-FLASHCARDS_DB_JSON: Final[Path] = DATA_DIR / "flashcards"
+FLASHCARDS_DB_JSON: Final[Path] = DATA_DIR / "flashcards.json"
 
-IMAGES_DB_JSON: Final[Path] = DATA_DIR / "images"
+IMAGES_DB_JSON: Final[Path] = DATA_DIR / "images.json"
 
-NOTES_DB_JSON: Final[Path] = DATA_DIR / "notes"
+NOTES_DB_JSON: Final[Path] = DATA_DIR / "notes.json"
 
-OPTIONS_DB_JSON: Final[Path] = DATA_DIR / "options"
+OPTIONS_DB_JSON: Final[Path] = DATA_DIR / "options.json"
 
-PRIORITIES_DB_JSON: Final[Path] = DATA_DIR / "priorities"
+PRIORITIES_DB_JSON: Final[Path] = DATA_DIR / "priorities.json"
 
-QUESTIONS_DB_JSON: Final[Path] = DATA_DIR / "questions"
+QUESTIONS_DB_JSON: Final[Path] = DATA_DIR / "questions.json"
 
-REHEARSAL_RUN_DB_JSON: Final[Path] = DATA_DIR / "rehearsal_runs"
+REHEARSAL_RUN_DB_JSON: Final[Path] = DATA_DIR / "rehearsal_runs.json"
 
-REHEARSAL_RUN_ITEM_DB_JSON: Final[Path] = DATA_DIR / "rehearsal_run_item"
+REHEARSAL_RUN_ITEM_DB_JSON: Final[Path] = DATA_DIR / "rehearsal_run_items.json"
 
-STACKS_DB_JSON: Final[Path] = DATA_DIR / "stacks"
+STACKS_DB_JSON: Final[Path] = DATA_DIR / "stacks.json"
 
-SUBJECTS_DB_JSON: Final[Path] = DATA_DIR / "subjects"
+SUBJECTS_DB_JSON: Final[Path] = DATA_DIR / "subjects.json"
 
-TAGS_DB_JSON: Final[Path] = DATA_DIR / "tags"
+TAGS_DB_JSON: Final[Path] = DATA_DIR / "tags.json"
 
-TEACHERS_DB_JSON: Final[Path] = DATA_DIR / "teachers"
+TEACHERS_DB_JSON: Final[Path] = DATA_DIR / "teachers.json"
 
-USERS_DB_JSON: Final[Path] = DATA_DIR / "users"
+USERS_DB_JSON: Final[Path] = DATA_DIR / "users.json"

@@ -395,6 +395,10 @@ __all__: Final[list[str]] = [
     "REHEARSAL_RUN_ITEM_UPDATED",
     "REHEARSAL_RUN_RETRIEVED",
     "REHEARSAL_RUN_UPDATED",
+    "RESET_CREATE_FORM",
+    "SET_CREATE_FORM",
+    "SET_EDIT_FORM",
+    "SET_VIEW_FORM",
     "STACKS_ADDED",
     "STACKS_DELETED",
     "STACKS_RETRIEVED",
@@ -922,8 +926,12 @@ DESTROY_ANSWER_TRUE_FALSE_CREATE_FORM: Final[str] = (
 
 CLEAR_CREATE_FORM: Final[str] = "broadcast:request:clear_create_form"
 GET_CREATE_FORM: Final[str] = "broadcast:request:get_create_form"
+RESET_CREATE_FORM: Final[str] = "broadcast:request:reset_create_form"
+SET_CREATE_FORM: Final[str] = "broadcast:request:set_create_form"
 GET_EDIT_FORM: Final[str] = "broadcast:request:get_edit_form"
+SET_EDIT_FORM: Final[str] = "broadcast:request:set_edit_form"
 GET_VIEW_FORM: Final[str] = "broadcast:request:get_view_form"
+SET_VIEW_FORM: Final[str] = "broadcast:request:set_view_form"
 
 DESTROY_CREATE_VIEW: Final[str] = "broadcast:request:destroy_create_view"
 GET_CREATE_VIEW: Final[str] = "broadcast:request:get_create_view"

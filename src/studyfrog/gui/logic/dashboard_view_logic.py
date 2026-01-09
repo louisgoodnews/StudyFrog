@@ -8,7 +8,9 @@ import customtkinter as ctk
 
 from typing import Any, Final
 
+from constants.common import GLOBAL
 from constants.events import (
+    DESTROY_DASHBOARD_VIEW,
     GET_CREATE_VIEW,
     GET_DELETE_CONFIRMATION_VIEW,
     GET_EDIT_VIEW,
@@ -46,6 +48,7 @@ def on_create_button_click() -> None:
     try:
         dispatch(
             event=GET_CREATE_VIEW,
+            namespace=GLOBAL,
             toplevel=ctk.CTkToplevel(),
         )
     except Exception as e:
@@ -67,7 +70,9 @@ def on_delete_button_click(stack: dict[str, Any]) -> None:
     try:
         dispatch(
             event=GET_DELETE_CONFIRMATION_VIEW,
-            stack=stack,
+            namespace=GLOBAL,
+            model_dict=stack,
+            toplevel=ctk.CTkToplevel(),
         )
     except Exception as e:
         log_error(message=f"Caught an exception while attempting to create a new stack: {e}")
@@ -88,7 +93,9 @@ def on_edit_button_click(stack: dict[str, Any]) -> None:
     try:
         dispatch(
             event=GET_EDIT_VIEW,
-            stack=stack,
+            obj=stack,
+            namespace=GLOBAL,
+            toplevel=ctk.CTkToplevel(),
         )
     except Exception as e:
         log_error(message=f"Caught an exception while attempting to create a new stack: {e}")
@@ -108,7 +115,12 @@ def on_rehearse_button_click(stack: dict[str, Any]) -> None:
 
     try:
         dispatch(
+            event=DESTROY_DASHBOARD_VIEW,
+            namespace=GLOBAL,
+        )
+        dispatch(
             event=GET_REHEARSAL_RUN_SETUP_VIEW,
+            namespace=GLOBAL,
             stack=stack,
         )
     except Exception as e:
@@ -130,7 +142,9 @@ def on_view_button_click(stack: dict[str, Any]) -> None:
     try:
         dispatch(
             event=GET_VIEW_VIEW,
+            namespace=GLOBAL,
             stack=stack,
+            toplevel=ctk.CTkToplevel(),
         )
     except Exception as e:
         log_error(message=f"Caught an exception while attempting to create a new stack: {e}")

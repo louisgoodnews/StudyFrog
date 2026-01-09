@@ -11,7 +11,7 @@ from typing import Any, Final, Optional
 from constants.common import GLOBAL
 from constants.events import DESTROY_REHEARSAL_RUN_RESULT_VIEW
 from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
-from models.models import ModelDict
+from models.factories import ModelDict
 from utils.dispatcher import subscribe, unsubscribe
 from utils.gui import clear_frames, reset_frame_grids
 from utils.logging import log_debug, log_error, log_info, log_warning

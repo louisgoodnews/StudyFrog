@@ -18,6 +18,8 @@ from constants.events import (
     GET_ALL_STACKS_FROM_DB,
     GET_CREATE_FORM,
     GET_STACK_CREATE_FORM,
+    RESET_CREATE_FORM,
+    SET_CREATE_FORM,
     STACK_ADDED,
     STACKS_ADDED,
 )
@@ -25,9 +27,10 @@ from constants.gui import READONLY, TOPLEVEL_GEOMETRY, WINDOW_TITLE
 from gui.logic.create_view_logic import (
     on_create_button_click,
     on_cancel_button_click,
+    on_stack_combobox_select,
     on_type_combobox_select,
 )
-from models.models import ModelDict
+from models.factories import ModelDict
 from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.logging import log_error, log_info
@@ -646,6 +649,7 @@ def _create_top_frame_widgets() -> None:
     )
 
     stack_combobox: ctk.CTkComboBox = ctk.CTkComboBox(
+        command=on_stack_combobox_select,
         master=_get_top_frame(),
         state=READONLY,
         values=_get_stacks_list(),
@@ -909,6 +913,42 @@ def _on_get_create_form() -> dict[str, Any]:
     }
 
 
+def _on_reset_create_form() -> None:
+    """
+    Handles the 'RESET_CREATE_FORM' event.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    _get_form()["difficulty"]["variable"].set(value="")
+    _get_form()["priority"]["variable"].set(value="")
+
+
+def _on_set_create_form(**kwargs) -> None:
+    """
+    Handles the 'SET_CREATE_FORM' event.
+
+    Args:
+        **kwargs: The keyword arguments to set the create form with.
+
+    Returns:
+        None
+    """
+
+    for (
+        key,
+        value,
+    ) in kwargs.items():
+        if not key in _get_form():
+            continue
+
+        _get_form()[key]["variable"].set(value=value)
+
+
 def _on_stack_added(stack: ModelDict) -> None:
     """
     Handles the 'STACK_ADDED' event.
@@ -920,7 +960,7 @@ def _on_stack_added(stack: ModelDict) -> None:
         None
     """
 
-    _get_stacks_list().append(stack["metadata"]["name"])
+    _get_stacks_list().append(stack["name"])
 
 
 def _on_stacks_added(stacks: list[ModelDict]) -> None:
@@ -934,7 +974,7 @@ def _on_stacks_added(stacks: list[ModelDict]) -> None:
         None
     """
 
-    _get_stacks_list().extend([stack["metadata"]["name"] for stack in stacks])
+    _get_stacks_list().extend([stack["name"] for stack in stacks])
 
 
 def _subscribe_to_events() -> None:
@@ -966,6 +1006,20 @@ def _subscribe_to_events() -> None:
         {
             "event": GET_CREATE_FORM,
             "function": _on_get_create_form,
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
+        },
+        {
+            "event": RESET_CREATE_FORM,
+            "function": _on_reset_create_form,
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
+        },
+        {
+            "event": SET_CREATE_FORM,
+            "function": _on_set_create_form,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
@@ -1037,6 +1091,11 @@ def get_create_view(toplevel: ctk.CTkToplevel) -> None:
         toplevel.geometry(geometry_string=TOPLEVEL_GEOMETRY)
 
         toplevel.title(string=WINDOW_TITLE)
+
+        toplevel.protocol(
+            func=_on_destroy,
+            name="WM_DELETE_WINDOW",
+        )
 
         _set_master(toplevel=toplevel)
         _create_widgets()

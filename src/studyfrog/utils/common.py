@@ -4,6 +4,7 @@ Date: 2025-12-10
 """
 
 import json
+from pathlib import Path
 import random
 import re
 import uuid
@@ -18,6 +19,8 @@ __all__: Final[list[str]] = [
     "create_rgb_bg_color",
     "create_rgb_fg_color",
     "exists",
+    "date_from_string",
+    "datetime_from_string",
     "find_string",
     "generate_model_key",
     "generate_uuid4",
@@ -33,6 +36,7 @@ __all__: Final[list[str]] = [
     "is_not_none_or_empty",
     "match_string",
     "model_key_to_model_type",
+    "path_from_string",
     "pluralize_word",
     "search_string",
     "shuffle_list",
@@ -40,6 +44,7 @@ __all__: Final[list[str]] = [
     "simple_string_to_dict",
     "singularize_word",
     "string_to_snake_case",
+    "uuid_from_string",
 ]
 
 
@@ -76,6 +81,40 @@ def create_rgb_fg_color(r: int, g: int, b: int) -> str:
     """
 
     return f"\033[38;2;{r};{g};{b}m"
+
+
+def date_from_string(string: str) -> Optional[date]:
+    """
+    Attempts to convert a given string into a date object and returns it if conversion was successfull.
+
+    Args:
+        string (str): The string to attempt conversion on.
+
+    Returns:
+        Optional[date]: The converted date object if conversion was successfull, otherwise None.
+    """
+
+    try:
+        return date.fromisoformat(string)
+    except Exception:
+        return None
+
+
+def datetime_from_string(string: str) -> Optional[datetime]:
+    """
+    Attempts to convert a given string into a datetime object and returns it if conversion was successfull.
+
+    Args:
+        string (str): The string to attempt conversion on.
+
+    Returns:
+        Optional[datetime]: The converted datetime object if conversion was successfull, otherwise None.
+    """
+
+    try:
+        return datetime.fromisoformat(string)
+    except Exception:
+        return None
 
 
 def exists(value: Any) -> bool:
@@ -388,6 +427,28 @@ def model_key_to_model_type(
     )
 
 
+def path_from_string(string: str) -> Optional[Path]:
+    """
+    Attempts to convert a given string into a resolved Path object.
+
+    Args:
+        string (str): The string to attempt conversion on.
+
+    Returns:
+        Optional[Path]: The resolved Path object if conversion was successful, otherwise None.
+
+    Raises:
+        Exception: If an exception is caught while attempting to convert the string into a Path.
+    """
+
+    try:
+        path: Path = Path(string)
+
+        return path.resolve()
+    except Exception:
+        return None
+
+
 def pluralize_word(word: str) -> str:
     """
     Pluralizes an English word based on simplified rules.
@@ -520,3 +581,23 @@ def string_to_snake_case(string: str) -> str:
     """
 
     return string.replace(" ", "_").lower()
+
+
+def uuid_from_string(string: str) -> Optional[uuid.UUID]:
+    """
+    Attempts to convert a given string into a UUID object.
+
+    Args:
+        string (str): The string to convert into a UUID object.
+
+    Returns:
+        Optional[uuid.UUID]: The UUID object if the conversion was successful, None otherwise.
+    """
+
+    try:
+        return uuid.UUID(
+            hex=string,
+            version=4,
+        )
+    except (ValueError, AttributeError, TypeError):
+        return None

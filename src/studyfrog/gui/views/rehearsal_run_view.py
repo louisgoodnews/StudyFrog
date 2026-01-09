@@ -30,7 +30,7 @@ from gui.logic.rehearsal_run_view_logic import (
     on_previous_button_click,
     start_rehearsal_run,
 )
-from models.models import ModelDict
+from models.factories import ModelDict
 from gui.views.flashcard_rehearsal_view import get_flashcard_rehearsal_view, set_flip_side
 from gui.views.note_rehearsal_view import get_note_rehearsal_view
 from gui.views.question_rehearsal_view import get_question_rehearsal_view
