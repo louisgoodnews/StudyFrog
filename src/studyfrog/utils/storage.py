@@ -71,6 +71,17 @@ def _convert_for_database(model: dict[str, Any]) -> None:
         None
     """
 
+    for (
+        key,
+        value,
+    ) in model.items():
+        if not key.startswith("_"):
+            continue
+
+        model[key[1:]] = value
+
+        del model[key]
+
     if exists(
         value=model.get("metadata", {}).get(
             "id_",

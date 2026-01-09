@@ -92,7 +92,10 @@ def _convert_to_dict(model: Model) -> dict[str, Any]:
     ) in model.__dict__.items():
         if isinstance(
             value,
-            Model,
+            (
+                ModelIdentifiable,
+                ModelMetadata,
+            ),
         ):
             result[key] = value.to_dict()
 
@@ -2058,6 +2061,19 @@ class ModelMetadata:
         """
 
         return self._updated_on
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Returns a dictionary representation of the model.
+
+        Args:
+            None
+
+        Returns:
+            dict[str, Any]: The dictionary representation of the model.
+        """
+
+        return _convert_to_dict(self)
 
 
 class Note:

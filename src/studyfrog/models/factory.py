@@ -4,7 +4,10 @@ Date: 2026-01-09
 Description: This module contains the factory methods for creating model instances
 """
 
+import uuid
+
 from datetime import date, datetime
+from pathlib import Path
 from typing import Any, Final, Optional, Union
 import uuid
 
@@ -702,7 +705,7 @@ def get_rehearsal_run_item(
         started_at (Optional[str]): ISO-formatted timestamp of when the item was started.
         updated_at (Optional[str]): ISO-formatted last update timestamp.
         updated_on (Optional[str]): ISO-formatted last update date.
-        uuid_ (Optional[str]): Universally unique identifier string.
+        uuid_ (Optional[Union[str, uuid.UUID]]): Universally unique identifier.
 
     Returns:
         RehearsalRunItem: A fully initialized instance of the RehearsalRunItem class.
@@ -733,7 +736,7 @@ def get_rehearsal_run_model(
     started_on: Optional[Union[date, str]] = None,
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
-    uuid_: Optional[Uninon[str, uid.UUID]] = None,
+    uuid_: Optional[Union[str, uuid.UUID]] = None,
 ) -> RehearsalRun:
     """
     Creates and returns an instance of the RehearsalRun model.
@@ -790,7 +793,7 @@ def get_stack_model(
     priority: Optional[str] = None,
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
-    uuid_: Optional[Uninon[str, uid.UUID]] = None,
+    uuid_: Optional[Union[str, uuid.UUID]] = None,
 ) -> Stack:
     """
     Creates and returns an instance of the Stack model.
@@ -817,7 +820,7 @@ def get_stack_model(
         priority (Optional[str]): Reference key for the associated priority level.
         updated_at (Optional[Union[datetime, str]]): ISO-formatted last update timestamp.
         updated_on (Optional[Union[date, str]]): ISO-formatted last update date.
-        uuid_ (Optional[Uninon[str, uid.UUID]]): Universally unique identifier.
+        uuid_ (Optional[Union[str, uuid.UUID]]): Universally unique identifier.
 
     Returns:
         Stack: A fully initialized instance of the Stack class.
@@ -839,7 +842,7 @@ def get_subject_model(
     priority: Optional[str] = None,
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
-    uuid_: Optional[Uninon[str, uid.UUID]] = None,
+    uuid_: Optional[Union[str, uuid.UUID]] = None,
 ) -> Subject:
     """
     Creates and returns an instance of the Subject model.
@@ -864,7 +867,7 @@ def get_subject_model(
             assigned to this subject.
         updated_at (Optional[Union[datetime, str]]): ISO-formatted last update timestamp.
         updated_on (Optional[Union[date, str]]): ISO-formatted last update date.
-        uuid_ (Optional[Uninon[str, uid.UUID]]): Universally unique identifier.
+        uuid_ (Optional[Union[str, uuid.UUID]]): Universally unique identifier.
 
     Returns:
         Subject: A fully initialized instance of the Subject class.
@@ -883,7 +886,7 @@ def get_tag_model(
     key: Optional[str] = None,
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
-    uuid_: Optional[Uninon[str, uid.UUID]] = None,
+    uuid_: Optional[Union[str, uuid.UUID]] = None,
 ) -> Tag:
     """
     Creates and returns an instance of the Tag model.
@@ -902,7 +905,7 @@ def get_tag_model(
         key (Optional[str]): Unique model key identifier.
         updated_at (Optional[Union[datetime, str]]): ISO-formatted last update timestamp.
         updated_on (Optional[Union[date, str]]): ISO-formatted last update date.
-        uuid_ (Optional[Uninon[str, uid.UUID]]): Universally unique identifier.
+        uuid_ (Optional[Union[str, uuid.UUID]]): Universally unique identifier.
 
     Returns:
         Tag: A fully initialized instance of the Tag class.
@@ -925,7 +928,7 @@ def get_teacher_model(
     subjects: Optional[list[str]] = None,
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
-    uuid_: Optional[Uninon[str, uid.UUID]] = None,
+    uuid_: Optional[Union[str, uuid.UUID]] = None,
 ) -> Teacher:
     """
     Creates and returns an instance of the Teacher model.
@@ -952,7 +955,7 @@ def get_teacher_model(
             this teacher is associated with.
         updated_at (Optional[Union[datetime, str]]): ISO-formatted last update timestamp.
         updated_on (Optional[Union[date, str]]): ISO-formatted last update date.
-        uuid_ (Optional[Uninon[str, uid.UUID]]): Universally unique identifier.
+        uuid_ (Optional[Union[str, uuid.UUID]]): Universally unique identifier.
 
     Returns:
         Teacher: A fully initialized instance of the Teacher class.
@@ -971,7 +974,7 @@ def get_user_model(
     key: Optional[str] = None,
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
-    uuid_: Optional[Uninon[str, uid.UUID]] = None,
+    uuid_: Optional[Union[str, uuid.UUID]] = None,
 ) -> User:
     """
     Creates and returns an instance of the User model.
@@ -990,7 +993,7 @@ def get_user_model(
         key (Optional[str]): Unique model key identifier used for references.
         updated_at (Optional[Union[datetime, str]]): ISO-formatted last update timestamp.
         updated_on (Optional[Union[date, str]]): ISO-formatted last update date.
-        uuid_ (Optional[Uninon[str, uid.UUID]]): Universally unique identifier.
+        uuid_ (Optional[Union[str, uuid.UUID]]): Universally unique identifier.
 
     Returns:
         User: A fully initialized instance of the User class.
