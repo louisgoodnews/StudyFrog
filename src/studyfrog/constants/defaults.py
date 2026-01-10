@@ -1,6 +1,7 @@
 """
 Author: Louis Goodnews
 Date: 2025-12-12
+Description: This module holds default values for the application.
 """
 
 from typing import Any, Final
