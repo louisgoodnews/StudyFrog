@@ -371,7 +371,7 @@ def _create_widgets() -> None:
 
     _update_form(
         key="teacher",
-        vlaue={
+        value={
             "is_required": True,
             "variable": ctk.StringVar(),
         },
