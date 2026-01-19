@@ -254,12 +254,12 @@ __all__: Final[list[str]] = [
     "GET_ANSWERS_FROM_DB",
     "GET_ANSWER_EDIT_FORM",
     "GET_ANSWER_FROM_DB",
-    "GET_ANSWER_MODEL_DICT",
+    "GET_ANSWER_MODEL",
     "GET_ANSWER_OPEN_ENDED_CREATE_FORM",
     "GET_ANSWER_TRUE_FALSE_CREATE_FORM",
     "GET_ANSWER_VIEW_FORM",
     "GET_ASSOCIATION_FROM_DB",
-    "GET_ASSOCIATION_MODEL_DICT",
+    "GET_ASSOCIATION_MODEL",
     "GET_ASSOCIATIONS_FROM_DB",
     "GET_CREATE_FORM",
     "GET_CREATE_VIEW",
@@ -276,7 +276,7 @@ __all__: Final[list[str]] = [
     "GET_FLASHCARD_CREATE_FORM",
     "GET_FLASHCARD_EDIT_FORM",
     "GET_FLASHCARD_FROM_DB",
-    "GET_FLASHCARD_MODEL_DICT",
+    "GET_FLASHCARD_MODEL",
     "GET_FLASHCARD_REHEARSAL_VIEW",
     "GET_FLASHCARD_VIEW_FORM",
     "GET_IMAGES_FROM_DB",
@@ -286,9 +286,10 @@ __all__: Final[list[str]] = [
     "GET_NOTE_CREATE_FORM",
     "GET_NOTE_EDIT_FORM",
     "GET_NOTE_FROM_DB",
-    "GET_NOTE_MODEL_DICT",
+    "GET_NOTE_MODEL",
     "GET_NOTE_REHEARSAL_VIEW",
     "GET_NOTE_VIEW_FORM",
+    "GET_OBSERVABLE_MODEL",
     "GET_OPTIONS_FROM_DB",
     "GET_OPTION_FROM_DB",
     "GET_PRIORITIES_FROM_DB",
@@ -297,15 +298,15 @@ __all__: Final[list[str]] = [
     "GET_QUESTION_CREATE_FORM",
     "GET_QUESTION_EDIT_FORM",
     "GET_QUESTION_FROM_DB",
-    "GET_QUESTION_MODEL_DICT",
+    "GET_QUESTION_MODEL",
     "GET_QUESTION_REHEARSAL_VIEW",
     "GET_QUESTION_VIEW_FORM",
-    "GET_REHEARSAL_RUN_MODEL_DICT",
+    "GET_REHEARSAL_RUN_MODEL",
     "GET_REHEARSAL_RUNS_FROM_DB",
     "GET_REHEARSAL_RUN_FROM_DB",
     "GET_REHEARSAL_RUN_ITEMS_FROM_DB",
     "GET_REHEARSAL_RUN_ITEM_FROM_DB",
-    "GET_REHEARSAL_RUN_ITEM_MODEL_DICT",
+    "GET_REHEARSAL_RUN_ITEM_MODEL",
     "GET_REHEARSAL_RUN_RESULT_VIEW",
     "GET_REHEARSAL_RUN_SETUP_FORM",
     "GET_REHEARSAL_RUN_SETUP_VIEW",
@@ -315,7 +316,7 @@ __all__: Final[list[str]] = [
     "GET_STACK_CREATE_FORM",
     "GET_STACK_EDIT_FORM",
     "GET_STACK_FROM_DB",
-    "GET_STACK_MODEL_DICT",
+    "GET_STACK_MODEL",
     "GET_STACK_VIEW_FORM",
     "GET_STACKS_FROM_DB",
     "GET_SUBJECTS_FROM_DB",
@@ -396,8 +397,10 @@ __all__: Final[list[str]] = [
     "REHEARSAL_RUN_RETRIEVED",
     "REHEARSAL_RUN_UPDATED",
     "RESET_CREATE_FORM",
+    "RESET_OBSERVABLE_MODEL",
     "SET_CREATE_FORM",
     "SET_EDIT_FORM",
+    "SET_OBSERVABLE_MODEL",
     "SET_VIEW_FORM",
     "STACKS_ADDED",
     "STACKS_DELETED",
@@ -445,6 +448,7 @@ __all__: Final[list[str]] = [
     "UPDATE_IMAGE_IN_DB",
     "UPDATE_NOTES_IN_DB",
     "UPDATE_NOTE_IN_DB",
+    "UPDATE_OBSERVABLE_MODEL",
     "UPDATE_OPTIONS_IN_DB",
     "UPDATE_OPTION_IN_DB",
     "UPDATE_PRIORITIES_IN_DB",
@@ -503,7 +507,7 @@ ADD_ANSWER_TO_DB: Final[str] = "broadcast:request:add_answer_to_db"
 ADD_ANSWERS_TO_DB: Final[str] = "broadcast:request:add_answers_to_db"
 FILTER_ANSWERS_FROM_DB: Final[str] = "broadcast:request:filter_answers_from_db"
 GET_ANSWER_FROM_DB: Final[str] = "broadcast:request:get_answer_from_db"
-GET_ANSWER_MODEL_DICT: Final[str] = "broadcast:request:get_answer_model_dict"
+GET_ANSWER_MODEL: Final[str] = "broadcast:request:get_answer_model"
 GET_ANSWERS_FROM_DB: Final[str] = "broadcast:request:get_answers_from_db"
 GET_ALL_ANSWERS_FROM_DB: Final[str] = "broadcast:request:get_all_answers_from_db"
 DELETE_ANSWER_FROM_DB: Final[str] = "broadcast:request:delete_answer_from_db"
@@ -526,7 +530,7 @@ ADD_ASSOCIATION_TO_DB: Final[str] = "broadcast:request:add_association_to_db"
 ADD_ASSOCIATIONS_TO_DB: Final[str] = "broadcast:request:add_associations_to_db"
 FILTER_ASSOCIATIONS_FROM_DB: Final[str] = "broadcast:request:filter_associations_from_db"
 GET_ASSOCIATION_FROM_DB: Final[str] = "broadcast:request:get_association_from_db"
-GET_ASSOCIATION_MODEL_DICT: Final[str] = "broadcast:request:get_association_model_dict"
+GET_ASSOCIATION_MODEL: Final[str] = "broadcast:request:get_association_model"
 GET_ASSOCIATIONS_FROM_DB: Final[str] = "broadcast:request:get_associations_from_db"
 GET_ALL_ASSOCIATIONS_FROM_DB: Final[str] = "broadcast:request:get_all_associations_from_db"
 DELETE_ASSOCIATION_FROM_DB: Final[str] = "broadcast:request:delete_association_from_db"
@@ -593,7 +597,7 @@ ADD_FLASHCARD_TO_DB: Final[str] = "broadcast:request:add_flashcard_to_db"
 ADD_FLASHCARDS_TO_DB: Final[str] = "broadcast:request:add_flashcards_to_db"
 FILTER_FLASHCARDS_FROM_DB: Final[str] = "broadcast:request:filter_flashcards_from_db"
 GET_FLASHCARD_FROM_DB: Final[str] = "broadcast:request:get_flashcard_from_db"
-GET_FLASHCARD_MODEL_DICT: Final[str] = "broadcast:request:get_flashcard_model_dict"
+GET_FLASHCARD_MODEL: Final[str] = "broadcast:request:get_flashcard_model"
 GET_FLASHCARDS_FROM_DB: Final[str] = "broadcast:request:get_flashcards_from_db"
 GET_ALL_FLASHCARDS_FROM_DB: Final[str] = "broadcast:request:get_all_flashcards_from_db"
 DELETE_FLASHCARD_FROM_DB: Final[str] = "broadcast:request:delete_flashcard_from_db"
@@ -638,7 +642,7 @@ ADD_NOTE_TO_DB: Final[str] = "broadcast:request:add_note_to_db"
 ADD_NOTES_TO_DB: Final[str] = "broadcast:request:add_notes_to_db"
 FILTER_NOTES_FROM_DB: Final[str] = "broadcast:request:filter_notes_from_db"
 GET_NOTE_FROM_DB: Final[str] = "broadcast:request:get_note_from_db"
-GET_NOTE_MODEL_DICT: Final[str] = "broadcast:request:get_note_model_dict"
+GET_NOTE_MODEL: Final[str] = "broadcast:request:get_note_model"
 GET_NOTES_FROM_DB: Final[str] = "broadcast:request:get_notes_from_db"
 GET_ALL_NOTES_FROM_DB: Final[str] = "broadcast:request:get_all_notes_from_db"
 DELETE_NOTE_FROM_DB: Final[str] = "broadcast:request:delete_note_from_db"
@@ -705,7 +709,7 @@ ADD_QUESTION_TO_DB: Final[str] = "broadcast:request:add_question_to_db"
 ADD_QUESTIONS_TO_DB: Final[str] = "broadcast:request:add_questions_to_db"
 FILTER_QUESTIONS_FROM_DB: Final[str] = "broadcast:request:filter_questions_from_db"
 GET_QUESTION_FROM_DB: Final[str] = "broadcast:request:get_question_from_db"
-GET_QUESTION_MODEL_DICT: Final[str] = "broadcast:request:get_question_model_dict"
+GET_QUESTION_MODEL: Final[str] = "broadcast:request:get_question_model"
 GET_QUESTIONS_FROM_DB: Final[str] = "broadcast:request:get_questions_from_db"
 GET_ALL_QUESTIONS_FROM_DB: Final[str] = "broadcast:request:get_all_questions_from_db"
 DELETE_QUESTION_FROM_DB: Final[str] = "broadcast:request:delete_question_from_db"
@@ -764,13 +768,11 @@ DELETE_REHEARSAL_RUN_ITEM_FROM_DB: Final[str] = (
 DELETE_REHEARSAL_RUN_ITEMS_FROM_DB: Final[str] = (
     "broadcast:request:delete_rehearsal_run_items_from_db"
 )
-GET_REHEARSAL_RUN_ITEM_MODEL_DICT: Final[str] = (
-    "broadcast:request:get_rehearsal_run_item_model_dict"
-)
+GET_REHEARSAL_RUN_ITEM_MODEL: Final[str] = "broadcast:request:get_rehearsal_run_item_model"
 DELETE_ALL_REHEARSAL_RUN_ITEMS_FROM_DB: Final[str] = (
     "broadcast:request:delete_all_rehearsal_run_items_from_db"
 )
-GET_REHEARSAL_RUN_MODEL_DICT: Final[str] = "broadcast:request:get_rehearsal_run_model_dict"
+GET_REHEARSAL_RUN_MODEL: Final[str] = "broadcast:request:get_rehearsal_run_model"
 UPDATE_REHEARSAL_RUN_ITEM_IN_DB: Final[str] = "broadcast:request:update_rehearsal_run_item_in_db"
 UPDATE_REHEARSAL_RUN_ITEMS_IN_DB: Final[str] = "broadcast:request:update_rehearsal_run_items_in_db"
 REHEARSAL_RUN_ITEM_ADDED: Final[str] = "broadcast:notification:rehearsal_run_item_added"
@@ -792,7 +794,7 @@ ADD_STACK_TO_DB: Final[str] = "broadcast:request:add_stack_to_db"
 ADD_STACKS_TO_DB: Final[str] = "broadcast:request:add_stacks_to_db"
 FILTER_STACKS_FROM_DB: Final[str] = "broadcast:request:filter_stacks_from_db"
 GET_STACK_FROM_DB: Final[str] = "broadcast:request:get_stack_from_db"
-GET_STACK_MODEL_DICT: Final[str] = "broadcast:request:get_stack_model_dict"
+GET_STACK_MODEL: Final[str] = "broadcast:request:get_stack_model"
 GET_STACKS_FROM_DB: Final[str] = "broadcast:request:get_stacks_from_db"
 GET_ALL_STACKS_FROM_DB: Final[str] = "broadcast:request:get_all_stacks_from_db"
 DELETE_STACK_FROM_DB: Final[str] = "broadcast:request:delete_stack_from_db"
@@ -923,6 +925,11 @@ GET_ANSWER_TRUE_FALSE_CREATE_FORM: Final[str] = (
 DESTROY_ANSWER_TRUE_FALSE_CREATE_FORM: Final[str] = (
     "broadcast:request:destroy_answer_true_false_create_form"
 )
+
+GET_OBSERVABLE_MODEL: Final[str] = "broadcast:request:get_observable_model"
+RESET_OBSERVABLE_MODEL: Final[str] = "broadcast:request:reset_observable_model"
+SET_OBSERVABLE_MODEL: Final[str] = "broadcast:request:set_observable_model"
+UPDATE_OBSERVABLE_MODEL: Final[str] = "broadcast:request:update_observable_model"
 
 CLEAR_CREATE_FORM: Final[str] = "broadcast:request:clear_create_form"
 GET_CREATE_FORM: Final[str] = "broadcast:request:get_create_form"

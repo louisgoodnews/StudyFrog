@@ -361,7 +361,7 @@ def end_rehearsal_run(rehearsal_run: ModelDict) -> None:
     rehearsal_run["start"] = rehearsal_run["start"].isoformat()
 
     dispatch(
-        entry=rehearsal_run,
+        model=rehearsal_run,
         event=UPDATE_REHEARSAL_RUN_IN_DB,
         namespace=GLOBAL,
         table_name="rehearsal_runs",
@@ -492,7 +492,7 @@ def on_easy_button_click() -> None:
     model_dict["difficulty"] = difficulty["metadata"]["key"]
 
     dispatch(
-        entry=model_dict,
+        model=model_dict,
         event=model_type_to_update_event[model_type],
         namespace=GLOBAL,
         table_name=pluralize_word(word=model_type),
@@ -620,7 +620,7 @@ def on_hard_button_click() -> None:
     model_dict["difficulty"] = difficulty["metadata"]["key"]
 
     dispatch(
-        entry=model_dict,
+        model=model_dict,
         event=model_type_to_update_event[model_type],
         namespace=GLOBAL,
         table_name=pluralize_word(word=model_type),
@@ -731,7 +731,7 @@ def on_medium_button_click() -> None:
     model_dict["difficulty"] = difficulty["metadata"]["key"]
 
     dispatch(
-        entry=model_dict,
+        model=model_dict,
         event=model_type_to_update_event[model_type],
         namespace=GLOBAL,
         table_name=pluralize_word(word=model_type),

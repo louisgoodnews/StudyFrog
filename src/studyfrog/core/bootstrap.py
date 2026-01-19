@@ -71,15 +71,16 @@ from gui.views.rehearsal_run_view import get_rehearsal_run_view
 from gui.views.rehearsal_run_result_view import get_rehearsal_run_result_view
 from gui.views.rehearsal_run_setup_view import get_rehearsal_run_setup_view
 from gui.widgets import get_error_toast, get_info_toast, get_success_toast, get_warning_toast
-from models.factories import (
-    get_answer_model_dict,
-    get_flashcard_model_dict,
-    get_note_model_dict,
-    get_question_model_dict,
-    get_rehearsal_run_model_dict,
-    get_rehearsal_run_item_model_dict,
-    get_stack_model_dict,
+from models.factory import (
+    get_answer_model,
+    get_flashcard_model,
+    get_note_model,
+    get_question_model,
+    get_rehearsal_run_model,
+    get_rehearsal_run_item_model,
+    get_stack_model,
 )
+from models.models import Model
 from utils.common import pluralize_word
 from utils.directories import ensure_directory
 from utils.dispatcher import subscribe, unsubscribe
@@ -123,13 +124,13 @@ APPLICATION_DIRECTORIES: Final[tuple[Path]] = (
     TEMP_DIR,
 )
 
-DEFAULT_DIFFICULTY_MODEL_DICTS: Final[tuple[dict[str, Any]]] = (
+DEFAULT_DIFFICULTY_MODELS: Final[tuple[Model]] = (
     DEFAULT_EASY_DIFFICULTY,
     DEFAULT_HARD_DIFFICULTY,
     DEFAULT_MEDIUM_DIFFICULTY,
 )
 
-DEFAULT_PRIORITY_MODEL_DICTS: Final[tuple[dict[str, Any]]] = (
+DEFAULT_PRIORITY_MODELS: Final[tuple[Model]] = (
     DEFAULT_HIGH_PRIORITY,
     DEFAULT_HIGHEST_PRIORITY,
     DEFAULT_LOW_PRIORITY,
@@ -137,12 +138,12 @@ DEFAULT_PRIORITY_MODEL_DICTS: Final[tuple[dict[str, Any]]] = (
     DEFAULT_MEDIUM_PRIORITY,
 )
 
-DEFAULT_USER_MODEL_DICT: Final[dict[str, Any]] = DEFAULT_USER
+DEFAULT_USER_MODEL: Final[Model] = DEFAULT_USER
 
-DEFAULT_MODEL_DICTS: Final[tuple[dict[str, Any]]] = (
-    *DEFAULT_DIFFICULTY_MODEL_DICTS,
-    *DEFAULT_PRIORITY_MODEL_DICTS,
-    DEFAULT_USER_MODEL_DICT,
+DEFAULT_MODELS: Final[tuple[Model]] = (
+    *DEFAULT_DIFFICULTY_MODELS,
+    *DEFAULT_PRIORITY_MODELS,
+    DEFAULT_USER_MODEL,
 )
 
 STORAGE_FILES: Final[tuple[Path]] = (
@@ -363,50 +364,50 @@ def _get_model_event_subscriptions() -> list[dict[str, Any]]:
 
     subscriptions: list[dict[str, Any]] = [
         {
-            "event": GET_ANSWER_MODEL_DICT,
-            "function": get_answer_model_dict,
+            "event": GET_ANSWER_MODEL,
+            "function": get_answer_model,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
         },
         {
-            "event": GET_FLASHCARD_MODEL_DICT,
-            "function": get_flashcard_model_dict,
+            "event": GET_FLASHCARD_MODEL,
+            "function": get_flashcard_model,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
         },
         {
-            "event": GET_NOTE_MODEL_DICT,
-            "function": get_note_model_dict,
+            "event": GET_NOTE_MODEL,
+            "function": get_note_model,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
         },
         {
-            "event": GET_QUESTION_MODEL_DICT,
-            "function": get_question_model_dict,
+            "event": GET_QUESTION_MODEL,
+            "function": get_question_model,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
         },
         {
-            "event": GET_REHEARSAL_RUN_MODEL_DICT,
-            "function": get_rehearsal_run_model_dict,
+            "event": GET_REHEARSAL_RUN_MODEL,
+            "function": get_rehearsal_run_model,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
         },
         {
-            "event": GET_REHEARSAL_RUN_ITEM_MODEL_DICT,
-            "function": get_rehearsal_run_item_model_dict,
+            "event": GET_REHEARSAL_RUN_ITEM_MODEL,
+            "function": get_rehearsal_run_item_model,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
         },
         {
-            "event": GET_STACK_MODEL_DICT,
-            "function": get_stack_model_dict,
+            "event": GET_STACK_MODEL,
+            "function": get_stack_model,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
@@ -610,10 +611,10 @@ def ensure_defaults() -> None:
     """
 
     try:
-        for default_model_dict in DEFAULT_MODEL_DICTS:
+        for default_model in DEFAULT_MODELS:
             add_entry_if_not_exist(
-                entry=default_model_dict,
-                table_name=pluralize_word(word=default_model_dict["metadata"]["type"].lower()),
+                model=default_model,
+                table_name=pluralize_word(word=default_model.type_.lower()),
             )
     except Exception as e:
         log_error(message=f"Caught an exception while ensuring default difficulty models: {e}")

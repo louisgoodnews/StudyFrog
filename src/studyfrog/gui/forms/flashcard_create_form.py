@@ -6,8 +6,8 @@ Description: The flashcard create form of the application.
 
 import customtkinter as ctk
 
-from tkinter.constants import NSEW, W
-from typing import Any, Final, Union
+from tkinter.constants import NORMAL, NSEW, W
+from typing import Any, Final, Optional, Union
 
 from constants.events import (
     CLEAR_CREATE_FORM,
@@ -15,8 +15,11 @@ from constants.events import (
     GET_ALL_SUBJECTS_FROM_DB,
     GET_ALL_TEACHERS_FROM_DB,
     GET_CREATE_FORM,
+    GET_OBSERVABLE_MODEL,
 )
 from constants.gui import READONLY
+from models.observables import FlashcardObservableModel, ObservableModel
+from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.gui import destroy_widget_children
 from utils.logging import log_error, log_info
@@ -32,9 +35,8 @@ __all__: Final[list[str]] = ["get_flashcard_create_form"]
 
 
 _FORM: Final[dict[str, Any]] = {}
-
-_MASTER: Final[ctk.CTkScrollableFrame] = None
-
+_MASTER: Optional[ctk.CTkScrollableFrame] = None
+_OBSERVABLE_MODEL: Optional[FlashcardObservableModel] = None
 _SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
@@ -75,6 +77,29 @@ def _get_master() -> ctk.CTkScrollableFrame:
     return _MASTER
 
 
+def _get_observable_model() -> FlashcardObservableModel:
+    """
+    Returns the observable model for the flashcard create form.
+
+    Args:
+        None
+
+    Returns:
+        FlashcardObservableModel: The observable model for the flashcard create form.
+
+    Raises:
+        ValueError: If the observable model has not been initialized yet.
+    """
+
+    if not exists(value=_OBSERVABLE_MODEL):
+        raise ValueError(
+            "The observable model has not been initialized yet."
+            "The method '_set_observable_model' must be executed first."
+        )
+
+    return _OBSERVABLE_MODEL
+
+
 def _set_master(scrollable_frame: ctk.CTkScrollableFrame) -> None:
     """
     Sets the master frame widget.
@@ -88,7 +113,29 @@ def _set_master(scrollable_frame: ctk.CTkScrollableFrame) -> None:
 
     global _MASTER
 
+    if exists(value=_MASTER):
+        return
+
     _MASTER = scrollable_frame
+
+
+def _set_observable_model(observable_model: FlashcardObservableModel) -> None:
+    """
+    Sets the observable model for the flashcard create form.
+
+    Args:
+        observable_model (FlashcardObservableModel): The observable model to set.
+
+    Returns:
+        None
+    """
+
+    global _OBSERVABLE_MODEL
+
+    if exists(value=_OBSERVABLE_MODEL):
+        return
+
+    _OBSERVABLE_MODEL = observable_model
 
 
 def _update_form(
@@ -108,14 +155,14 @@ def _update_form(
 
     if isinstance(
         key,
-        list,
+        str,
     ):
-        for _key in key:
-            _get_form()[_key] = value
+        _get_form()[key] = value
 
         return
 
-    _get_form()[key] = value
+    for _key in key:
+        _get_form()[_key] = value
 
 
 # ---------- Private Functions ---------- #
@@ -204,7 +251,7 @@ def _create_widgets() -> None:
         key="front",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().front,
         },
     )
 
@@ -251,7 +298,7 @@ def _create_widgets() -> None:
         key="back",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().back,
         },
     )
 
@@ -318,13 +365,13 @@ def _create_widgets() -> None:
         key="subject",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().subject,
         },
     )
 
     ctk.CTkComboBox(
         master=_get_master(),
-        state=READONLY,
+        state=NORMAL,
         values=subject_names,
         variable=_get_form()["subject"]["variable"],
     ).grid(
@@ -378,13 +425,13 @@ def _create_widgets() -> None:
         key="teacher",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().teacher,
         },
     )
 
     ctk.CTkComboBox(
         master=_get_master(),
-        state=READONLY,
+        state=NORMAL,
         values=teacher_names,
         variable=_get_form()["teacher"]["variable"],
     ).grid(
@@ -431,6 +478,8 @@ def _on_destroy() -> None:
         None
     """
 
+    global _MASTER, _OBSERVABLE_MODEL
+
     _unsubscribe_from_events()
 
     _clear_master()
@@ -438,6 +487,8 @@ def _on_destroy() -> None:
     _get_form().clear()
 
     _MASTER = None
+
+    _OBSERVABLE_MODEL = None
 
 
 def _on_get_create_form() -> dict[str, Any]:
@@ -464,6 +515,20 @@ def _on_get_create_form() -> dict[str, Any]:
         },
         "origin": "flashcard_create_form",
     }
+
+
+def _on_get_observable_model() -> ObservableModel:
+    """
+    Handles the 'GET_OBSERVABLE_MODEL' event.
+
+    Args:
+        None
+
+    Returns:
+        ObservableModel: The observable model.
+    """
+
+    return _get_observable_model()
 
 
 def _subscribe_to_events() -> None:
@@ -496,6 +561,13 @@ def _subscribe_to_events() -> None:
             "event": GET_CREATE_FORM,
             "namespace": "GLOBAL",
             "function": _on_get_create_form,
+            "persistent": True,
+            "priority": 1,
+        },
+        {
+            "event": GET_OBSERVABLE_MODEL,
+            "namespace": "GLOBAL",
+            "function": _on_get_observable_model,
             "persistent": True,
             "priority": 1,
         },
@@ -551,6 +623,7 @@ def get_flashcard_create_form(scrollable_frame: ctk.CTkScrollableFrame) -> None:
 
     try:
         _set_master(scrollable_frame)
+        _set_observable_model(observable_model=FlashcardObservableModel())
         _clear_master()
         _create_widgets()
         _configure_grid()

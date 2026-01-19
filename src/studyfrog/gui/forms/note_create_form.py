@@ -6,17 +6,21 @@ Description: The note create form of the application.
 
 import customtkinter as ctk
 
-from tkinter.constants import NSEW, W
-from typing import Any, Final, Union
+from tkinter.constants import NORMAL, NSEW, W
+from typing import Any, Final, Optional, Union
 
+from constants.common import GLOBAL
 from constants.events import (
     CLEAR_CREATE_FORM,
     DESTROY_NOTE_CREATE_FORM,
     GET_ALL_SUBJECTS_FROM_DB,
     GET_ALL_TEACHERS_FROM_DB,
     GET_CREATE_FORM,
+    GET_OBSERVABLE_MODEL,
 )
 from constants.gui import READONLY
+from models.observables import NoteObservableModel, ObservableModel
+from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.gui import destroy_widget_children
 from utils.logging import log_error, log_info
@@ -32,9 +36,8 @@ __all__: Final[list[str]] = ["get_note_create_form"]
 
 
 _FORM: Final[dict[str, Any]] = {}
-
 _MASTER: Final[ctk.CTkScrollableFrame] = None
-
+_OBSERVABLE_MODEL: Optional[NoteObservableModel] = None
 _SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
@@ -66,13 +69,33 @@ def _get_master() -> ctk.CTkScrollableFrame:
         ctk.CTkScrollableFrame: The master frame widget.
     """
 
-    if _MASTER is None:
+    if not exists(value=_MASTER):
         raise ValueError(
             "The master frame has not been initialized yet."
             "The method '_set_master' must be executed first."
         )
 
     return _MASTER
+
+
+def _get_observable_model() -> NoteObservableModel:
+    """
+    Returns the observable model for the note create form.
+
+    Args:
+        None
+
+    Returns:
+        NoteObservableModel: The observable model for the note create form.
+    """
+
+    if not exists(value=_OBSERVABLE_MODEL):
+        raise ValueError(
+            "The observable model has not been initialized yet."
+            "The method '_set_observable_model' must be executed first."
+        )
+
+    return _OBSERVABLE_MODEL
 
 
 def _set_master(scrollable_frame: ctk.CTkScrollableFrame) -> None:
@@ -88,7 +111,29 @@ def _set_master(scrollable_frame: ctk.CTkScrollableFrame) -> None:
 
     global _MASTER
 
+    if exists(value=_MASTER):
+        return
+
     _MASTER = scrollable_frame
+
+
+def _set_observable_model(observable_model: NoteObservableModel) -> None:
+    """
+    Sets the observable model for the note create form.
+
+    Args:
+        observable_model (NoteObservableModel): The observable model for the note create form.
+
+    Returns:
+        None
+    """
+
+    global _OBSERVABLE_MODEL
+
+    if exists(value=_OBSERVABLE_MODEL):
+        return
+
+    _OBSERVABLE_MODEL = observable_model
 
 
 def _update_form(
@@ -204,7 +249,7 @@ def _create_widgets() -> None:
         key="title",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().title,
         },
     )
 
@@ -241,7 +286,7 @@ def _create_widgets() -> None:
         key="text",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().text,
         },
     )
 
@@ -311,13 +356,13 @@ def _create_widgets() -> None:
         key="subject",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().subject,
         },
     )
 
     subject_combobox: ctk.CTkComboBox = ctk.CTkComboBox(
         master=_get_master(),
-        state=READONLY,
+        state=NORMAL,
         values=subject_names,
         variable=_get_form()["subject"]["variable"],
     )
@@ -373,13 +418,13 @@ def _create_widgets() -> None:
         key="teacher",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().teacher,
         },
     )
 
     ctk.CTkComboBox(
         master=_get_master(),
-        state=READONLY,
+        state=NORMAL,
         values=teacher_names,
         variable=_get_form()["teacher"]["variable"],
     ).grid(
@@ -417,7 +462,7 @@ def _on_clear_create_form() -> None:
 
 def _on_destroy() -> None:
     """
-    Handles the 'DESTROY_FLASHCARD_CREATE_FORM' event.
+    Handles the 'DESTROY_NOTE_CREATE_FORM' event.
 
     Args:
         None
@@ -426,6 +471,8 @@ def _on_destroy() -> None:
         None
     """
 
+    global _MASTER, _OBSERVABLE_MODEL
+
     _unsubscribe_from_events()
 
     _clear_master()
@@ -433,6 +480,8 @@ def _on_destroy() -> None:
     _get_form().clear()
 
     _MASTER = None
+
+    _OBSERVABLE_MODEL = None
 
 
 def _on_get_create_form() -> dict[str, Any]:
@@ -461,6 +510,20 @@ def _on_get_create_form() -> dict[str, Any]:
     }
 
 
+def _on_get_observable_model() -> ObservableModel:
+    """
+    Handles the 'GET_OBSERVABLE_MODEL' event.
+
+    Args:
+        None
+
+    Returns:
+        ObservableModel: The observable model.
+    """
+
+    return _get_observable_model()
+
+
 def _subscribe_to_events() -> None:
     """
     Subscribes to events.
@@ -475,24 +538,31 @@ def _subscribe_to_events() -> None:
     subscriptions: list[dict[str, Any]] = [
         {
             "event": CLEAR_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
             "function": _on_clear_create_form,
             "persistent": True,
             "priority": 1,
         },
         {
             "event": DESTROY_NOTE_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
             "function": _on_destroy,
             "persistent": True,
             "priority": 1,
         },
         {
             "event": GET_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
             "function": _on_get_create_form,
             "persistent": True,
             "priority": 1,
+        },
+        {
+            "event": GET_OBSERVABLE_MODEL,
+            "function": _on_get_observable_model,
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
         },
     ]
 
@@ -546,6 +616,7 @@ def get_note_create_form(scrollable_frame: ctk.CTkScrollableFrame) -> None:
 
     try:
         _set_master(scrollable_frame)
+        _set_observable_model(observable_model=NoteObservableModel())
         _clear_master()
         _create_widgets()
         _configure_grid()

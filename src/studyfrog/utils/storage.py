@@ -3,14 +3,21 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+import uuid
+
 from pathlib import Path
 from typing import Any, Final, Optional, Union
 
 from constants.common import PATTERNS
 from constants.directories import DATA_DIR
 from constants.events import *
+from models.factory import get_model
+from models.models import Model
 from utils.common import (
+    date_from_string,
+    datetime_from_string,
     exists,
+    flatten_dictionary,
     generate_model_key,
     generate_uuid4_str,
     get_now_str,
@@ -25,7 +32,7 @@ from utils.files import (
     read_file_json,
     write_file_json,
 )
-from utils.logging import log_error, log_info
+from utils.logging import log_debug, log_error, log_info
 
 
 # ---------- Exports ---------- #
@@ -52,7 +59,7 @@ __all__: Final[list[str]] = [
 # ---------- Helper Functions ---------- #
 
 
-def _convert_for_database(model: dict[str, Any]) -> None:
+def _convert_for_database(model: dict[str, Any]) -> dict[str, Any]:
     """
     Converts a model dictionary to a compatible database storage format.
 
@@ -68,43 +75,93 @@ def _convert_for_database(model: dict[str, Any]) -> None:
         model (dict[str, Any]): The model dictionary to convert.
 
     Returns:
-        None
+        dict[str, Any]: The converted model dictionary.
     """
+
+    to_delete: list[str] = []
+
+    result: dict[str, Any] = {}
 
     for (
         key,
         value,
     ) in model.items():
-        if not key.startswith("_"):
-            continue
+        result[key] = value
 
-        model[key[1:]] = value
-
-        del model[key]
+        to_delete.append(key)
 
     if exists(
-        value=model.get("metadata", {}).get(
+        value=model.get(
+            "identifiable",
+            {},
+        ).get(
             "id_",
             None,
         )
     ):
-        model["metadata"]["id"] = model["metadata"].pop("id_")
+        result["identifiable"]["id"] = model["identifiable"]["id"]
 
     if exists(
         value=model.get(
-            "metadata",
+            "identifiable",
             {},
         ).get(
             "uuid_",
             None,
         )
     ):
-        model["metadata"]["uuid"] = model["metadata"].pop("uuid_")
+        result["identifiable"]["uuid"] = model["identifiable"]["uuid"]
+
+    if exists(
+        value=model.get(
+            "metadata",
+            {},
+        ).get(
+            "created_at",
+            None,
+        )
+    ):
+        result["metadata"]["created_at"] = model["metadata"]["created_at"]
+
+    if exists(
+        value=model.get(
+            "metadata",
+            {},
+        ).get(
+            "created_on",
+            None,
+        )
+    ):
+        result["metadata"]["created_on"] = model["metadata"]["created_on"]
+
+    if exists(
+        value=model.get(
+            "metadata",
+            {},
+        ).get(
+            "updated_at",
+            None,
+        )
+    ):
+        result["metadata"]["updated_at"] = model["metadata"]["updated_at"]
+
+    if exists(
+        value=model.get(
+            "metadata",
+            {},
+        ).get(
+            "updated_on",
+            None,
+        )
+    ):
+        result["metadata"]["updated_on"] = model["metadata"]["updated_on"]
+
+    return result
 
 
-def _convert_from_database(model: dict[str, Any]) -> None:
+def _convert_from_database(dictionary: dict[str, Any]) -> None:
     """
-    Converts a model dictionary from the database storage format to a compatible format.
+    Converts a dictionary from the database storage format to a compatible format.
 
     This function is used internally to convert the database storage format of
     entries to a compatible format. It is not intended to be used externally.
@@ -115,27 +172,57 @@ def _convert_from_database(model: dict[str, Any]) -> None:
     with a 'uuid_' key.
 
     Args:
-        model (dict[str, Any]): The model dictionary to convert.
+        dictionary (dict[str, Any]): The dictionary to convert.
 
     Returns:
         None
     """
 
     if exists(
-        value=model.get("metadata", {}).get(
+        value=dictionary.get(
+            "identifiable",
+            {},
+        ).get(
             "id",
             None,
         )
     ):
-        model["metadata"]["id_"] = model["metadata"].pop("id")
+        dictionary["identifiable"]["id_"] = dictionary["identifiable"].pop("id")
 
     if exists(
-        value=model.get("metadata", {}).get(
+        value=dictionary.get(
+            "identifiable",
+            {},
+        ).get(
             "uuid",
             None,
         )
     ):
-        model["metadata"]["uuid_"] = model["metadata"].pop("uuid")
+        dictionary["identifiable"]["uuid_"] = uuid.UUID(hex=dictionary["identifiable"].pop("uuid"))
+
+    keys: list[str] = [
+        "created_at",
+        "created_on",
+        "updated_at",
+        "updated_on",
+    ]
+
+    for key in keys:
+        does_exist: bool = exists(
+            value=dictionary.get(
+                "metadata",
+                {},
+            ).get(
+                key,
+                None,
+            )
+        )
+
+        if does_exist and key.endswith("_at"):
+            dictionary["metadata"][key] = datetime_from_string(string=dictionary["metadata"][key])
+
+        if does_exist and key.endswith("_on"):
+            dictionary["metadata"][key] = date_from_string(string=dictionary["metadata"][key])
 
 
 def _decrement_table_counters(table_data: dict[str, Any]) -> None:
@@ -195,6 +282,7 @@ def _ensure_table_json_with_content(table_name: str) -> None:
                 "total": 0,
             },
             "metadata": {
+                "available_ids": [],
                 "fields": {
                     "fields": [],
                     "total": 0,
@@ -671,13 +759,13 @@ def _get_get_event(model_type: str) -> str:
         raise e
 
 
-def _get_entry_unique_criteria(entry: dict[str, Any]) -> dict[str, Any]:
+def _get_entry_unique_criteria(model: Model) -> dict[str, Any]:
     """
-    Extract all fields from the entry that are to be used for duplicate detection
-    (everything except ‘metadata’).
+    Extract all fields from the model that are to be used for duplicate detection
+    (everything except 'identifiable' and 'metadata').
 
     Args:
-        entry (dict[str, Any]): The entry to be checked.
+        model (Model): The model to be checked.
 
     Returns:
         dict[str, Any]: The fields that define uniqueness.
@@ -688,8 +776,12 @@ def _get_entry_unique_criteria(entry: dict[str, Any]) -> dict[str, Any]:
         for (
             key,
             value,
-        ) in entry.items()
-        if key != "metadata"
+        ) in model.to_dict().items()
+        if key
+        not in {
+            "identifiable",
+            "metadata",
+        }
     }
 
 
@@ -758,37 +850,47 @@ def _increment_table_counters(table_data: dict[str, Any]) -> None:
     table_data["entries"]["total"] += 1
 
 
-def _insert_table_entry(entry_data: dict[str, Any], table_data: dict[str, Any]) -> None:
+def _insert_table_entry(
+    model_data: dict[str, Any],
+    table_data: dict[str, Any],
+) -> None:
     """
-    Assigns an ID and key to the entry and inserts it into the table's entries dictionary.
+    Assigns an ID and key to the model and inserts it into the table's entries dictionary.
 
     The ID is derived from the table's current 'next_id' counter.
 
     Args:
-        entry_data (dict[str, Any]): The entry dictionary to be inserted.
+        model_data (dict[str, Any]): The model dictionary to be inserted.
                                      The 'id' and 'key' fields are added/overwritten here.
         table_data (dict[str, Any]): The parent table data dictionary where the
-                                     entry will be stored under the 'entries' key.
+                                     model will be stored under the 'entries' key.
 
     Returns:
         None
     """
 
-    entry_data["metadata"]["id"] = table_data["metadata"]["next_id"]
-    entry_data["metadata"]["key"] = generate_model_key(
-        id_=entry_data["metadata"]["id"],
-        name=entry_data["metadata"]["type"],
+    model_data["identifiable"]["id"] = table_data["metadata"]["next_id"]
+    model_data["identifiable"]["key"] = generate_model_key(
+        id_=model_data["identifiable"]["id"],
+        name=model_data["metadata"]["type"],
     )
 
-    table_data["entries"]["entries"][str(entry_data["metadata"]["id"])] = entry_data
+    table_data["entries"]["entries"][str(model_data["identifiable"]["id"])] = _convert_for_database(
+        model=model_data
+    )
+
+    _increment_table_counters(table_data=table_data)
 
     _update_metadata_field_list(
-        entry=entry_data,
+        model=model_data,
         table_data=table_data,
     )
 
 
-def _save_table_data(table_data: dict[str, Any], table_name: str) -> None:
+def _save_table_data(
+    table_data: dict[str, Any],
+    table_name: str,
+) -> None:
     """
     Saves the table data dictionary to the corresponding JSON file.
 
@@ -811,6 +913,8 @@ def _save_table_data(table_data: dict[str, Any], table_name: str) -> None:
             f"{table_name}.json" if not table_name.endswith(".json") else table_name
         )
 
+        _update_table_timestamps(table_data=table_data)
+
         write_file_json(
             data=table_data,
             file=file,
@@ -826,7 +930,10 @@ def _save_table_data(table_data: dict[str, Any], table_name: str) -> None:
         raise e
 
 
-def _update_metadata_field_list(table_data: dict[str, Any], entry: dict[str, Any]) -> None:
+def _update_metadata_field_list(
+    model: dict[str, Any],
+    table_data: dict[str, Any],
+) -> None:
     """
     Updates the list of fields that have ever been stored in this table,
     located in the table's 'metadata' block.
@@ -836,8 +943,8 @@ def _update_metadata_field_list(table_data: dict[str, Any], entry: dict[str, Any
     sorted list of all keys found in all entries added so far.
 
     Args:
+        model (dict[str, Any]): The model whose fields are to be added.
         table_data (dict[str, Any]): The current table data dictionary.
-        entry (dict[str, Any]): The new entry whose fields are to be added.
 
     Returns:
         None
@@ -851,7 +958,9 @@ def _update_metadata_field_list(table_data: dict[str, Any], entry: dict[str, Any
 
     current_fields_set: set[str] = set(table_data["metadata"]["fields"]["fields"])
 
-    new_fields: set[str] = set([key for key in entry.keys() if key != "metadata"])
+    new_fields: set[str] = set(
+        [key for key in model.keys() if key not in {"identifiable", "metadata"}]
+    )
 
     updated_fields_set: set[str] = current_fields_set.union(new_fields)
 
@@ -881,14 +990,14 @@ def _update_table_timestamps(table_data: dict[str, Any]) -> None:
 
 
 def add_entry(
-    entry: dict[str, Any],
+    model: Model,
     table_name: str,
 ) -> Optional[int]:
     """
     Adds an entry to the table.
 
     Args:
-        entry (dict[str, Any]): The entry to add to the table.
+        model (Model): The model to add to the table.
         table_name (str): The name of the table to which to add the entry to.
 
     Returns:
@@ -907,12 +1016,12 @@ def add_entry(
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
+        model_data: dict[str, Any] = _convert_for_database(model=model.to_json())
+
         _insert_table_entry(
-            entry_data=entry,
+            model_data=model_data,
             table_data=table_data,
         )
-        _increment_table_counters(table_data=table_data)
-        _update_table_timestamps(table_data=table_data)
 
         _save_table_data(
             table_data=table_data,
@@ -920,17 +1029,20 @@ def add_entry(
         )
 
         log_info(
-            message=f"Successfully added entry '{entry["metadata"]["key"]}' to '{table_name}' table"
+            message=f"Successfully added entry '{model_data["identifiable"]["key"]}' to '{table_name}' table"
         )
 
         dispatch(
-            event=_get_add_event(model_type=entry["metadata"]["type"]),
+            event=_get_add_event(model_type=model_data["metadata"]["type"]),
             **{
-                entry["metadata"]["type"].lower(): entry,
+                model_data["metadata"]["type"].lower(): get_model(
+                    type_=model_data["metadata"]["type"],
+                    **model_data,
+                ),
             },
         )
 
-        return entry["metadata"]["id"]
+        return model_data["identifiable"]["id"]
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to add entry to '{table_name}' table: {e}"
@@ -939,21 +1051,21 @@ def add_entry(
 
 
 def add_entry_if_not_exist(
-    entry: dict[str, Any],
+    model: Model,
     table_name: str,
     force: bool = False,
-) -> Optional[dict[str, Any]]:
+) -> Optional[Model]:
     """
     Adds a single entry to the table only if no duplicate
     (based on all non-metadata fields) already exists.
 
     Args:
-        entry (dict[str, Any]): The entry to be added.
-        force (bool): Whether to force the addition of the entry even if a duplicate is found.
+        model (Model): The model to be added.
+        force (bool): Whether to force the addition of the model even if a duplicate is found.
         table_name (str): The name of the table (e.g., ‘flashcards’).
 
     Returns:
-        Optional[dict[str, Any]]: The added entry (with metadata) or None if a duplicate was found.
+        Optional[Model]: The added model (with metadata) or None if a duplicate was found.
 
     Raises:
         Exception: If an exception is caught while adding the entry.
@@ -962,11 +1074,11 @@ def add_entry_if_not_exist(
     try:
         if force:
             return add_entry(
-                entry=entry,
+                model=model,
                 table_name=table_name,
             )
 
-        unique_criteria: dict[str, Any] = _get_entry_unique_criteria(entry=entry)
+        unique_criteria: dict[str, Any] = _get_entry_unique_criteria(model=model)
 
         existing_entries: list[dict[str, Any]] = filter_entries(
             table_name=table_name,
@@ -980,7 +1092,7 @@ def add_entry_if_not_exist(
             return None
 
         return add_entry(
-            entry=entry,
+            model=model,
             table_name=table_name,
         )
     except Exception as e:
@@ -991,29 +1103,29 @@ def add_entry_if_not_exist(
 
 
 def add_entries(
-    entries: list[dict[str, Any]],
+    models: list[Model],
     table_name: str,
 ) -> Optional[list[int]]:
     """
-    Adds multiple entries to the table in a single atomic operation.
+    Adds multiple models to the table in a single atomic operation.
 
-    This function processes a batch of entries, assigns unique IDs and keys to each,
+    This function processes a batch of models, assigns unique IDs and keys to each,
     updates the table metadata counters, and saves the changes back to the JSON file.
 
     Args:
-        entries (list[dict[str, Any]]): A list of entry dictionaries to add to the table.
-        table_name (str): The name of the table to which to add the entries.
+        models (list[Model]): A list of models to add to the table.
+        table_name (str): The name of the table to which to add the models.
 
     Returns:
-        Optional[list[int]]: A list of IDs of the successfully added entries.
+        Optional[list[int]]: A list of IDs of the successfully added models.
 
     Raises:
         Exception: If an exception is caught while processing or saving the entries.
     """
 
     try:
-        if not exists(value=entries):
-            log_info(message=f"Attempted to add 0 entries to '{table_name}' table. Aborting...")
+        if not exists(value=models):
+            log_info(message=f"Attempted to add 0 models to '{table_name}' table. Aborting...")
             return []
 
         _ensure_table_json(table_name=table_name)
@@ -1027,20 +1139,18 @@ def add_entries(
         added_ids: list[int] = []
         model_type: str = ""
 
-        for entry in entries:
+        for model in models:
+            model_data: dict[str, Any] = model.to_json()
+
             _insert_table_entry(
-                entry_data=entry,
+                model_data=model_data,
                 table_data=table_data,
             )
 
-            added_ids.append(entry["metadata"]["id"])
-
-            _increment_table_counters(table_data=table_data)
+            added_ids.append(model_data["identifiable"]["id"])
 
             if not exists(value=model_type):
-                model_type = entry["metadata"]["type"]
-
-        _update_table_timestamps(table_data=table_data)
+                model_type = model_data["metadata"]["type"]
 
         _save_table_data(
             table_data=table_data,
@@ -1048,37 +1158,44 @@ def add_entries(
         )
 
         log_info(
-            message=f"Successfully added {len(entries)} entries to '{table_name}' table. IDs: {added_ids}"
+            message=f"Successfully added {len(models)} models to '{table_name}' table. IDs: {added_ids}"
         )
 
         if exists(value=model_type):
+            model_datas: list[dict[str, Any]] = [model.to_json() for model in models]
             dispatch(
                 event=_get_bulk_add_event(model_type=model_type),
                 **{
-                    pluralize_word(word=model_type).lower(): entries,
+                    pluralize_word(word=model_type).lower(): [
+                        get_model(
+                            type_=model_type,
+                            **model_data,
+                        )
+                        for model_data in model_datas
+                    ],
                 },
             )
 
         return added_ids
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to add {len(entries)} entries to '{table_name}' table: {e}"
+            message=f"Caught an exception while attempting to add {len(models)} models to '{table_name}' table: {e}"
         )
         raise e
 
 
 def add_entries_if_not_exist(
-    entries: list[dict[str, Any]],
+    models: list[Model],
     table_name: str,
     force: bool = False,
-) -> list[dict[str, Any]]:
+) -> list[Model]:
     """
-    Adds a list of entries to the table only if no duplicate
-    (based on all non-metadata fields) for the respective entry
+    Adds a list of models to the table only if no duplicate
+    (based on all non-metadata fields) for the respective model
     already exists.
 
     Args:
-        entries (list[dict[str, Any]]): The list of entries to be added.
+        models (list[Model]): The list of models to be added.
         force (bool): Whether to force the addition of the entries even if a duplicate is found.
         table_name (str): The name of the table (e.g., ‘flashcards’).
 
@@ -1092,38 +1209,39 @@ def add_entries_if_not_exist(
     try:
         if force:
             return add_entries(
-                entries=entries,
+                models=models,
                 table_name=table_name,
             )
 
-        entries_to_add: list[dict[str, Any]] = []
+        models_to_add: list[Model] = []
 
-        for entry in entries:
-            unique_criteria: dict[str, Any] = _get_entry_unique_criteria(entry=entry)
+        for model in models:
+            unique_criteria: dict[str, Any] = _get_entry_unique_criteria(model=model)
 
-            existing_entries: list[dict[str, Any]] = filter_entries(
+            existing_models: list[Model] = filter_entries(
                 table_name=table_name,
                 **unique_criteria,
             )
 
-            if exists(value=existing_entries):
+            if exists(value=existing_models):
                 log_info(
-                    message=f"Skipping adding entry to '{table_name}' table: Duplicate found based on criteria: {unique_criteria}"
+                    message=f"Skipping adding model to '{table_name}' table: Duplicate found based on criteria: {unique_criteria}"
                 )
+
                 continue
 
-            entries_to_add.append(entry)
+            models_to_add.append(model)
 
-        if not exists(value=entries_to_add):
+        if not exists(value=models_to_add):
             return []
 
         return add_entries(
-            entries=entries_to_add,
+            models=models_to_add,
             table_name=table_name,
         )
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to add entries to '{table_name}' table: {e}"
+            message=f"Caught an exception while attempting to add models to '{table_name}' table: {e}"
         )
         raise e
 
@@ -1200,12 +1318,32 @@ def delete_all_entries(table_name: str) -> bool:
                 if not table_data["entries"]["total"] > 0:
                     return
 
-                first_entry = next(iter(table_data["entries"]["entries"].values()), None)
+                first_entry: Optional[dict[str, Any]] = next(
+                    iter(table_data["entries"]["entries"].values()),
+                    None,
+                )
 
                 if not exists(value=first_entry):
                     return
 
                 model_type = first_entry["metadata"]["type"]
+
+                table_data["entries"] = {
+                    "entries": {},
+                    "total": 0,
+                }
+
+                table_data["metadata"]["fields"] = {
+                    "fields": [],
+                    "total": 0,
+                }
+
+                table_data["next_id"] = 0
+
+                _save_table_data(
+                    table_data=table_data,
+                    table_name=table_name,
+                )
             except Exception:
                 pass
 
@@ -1272,6 +1410,12 @@ def delete_entries(
 
         all_entries: dict[str, Any] = table_data["entries"]["entries"]
 
+        available_ids: list[str] = (
+            table_data["metadata"]["available_ids"]
+            if exists(value=table_data["metadata"]["available_ids"])
+            else []
+        )
+
         for id_str in entry_id_strs:
             deleted_entry: Optional[dict[str, Any]] = all_entries.pop(id_str, None)
 
@@ -1279,6 +1423,8 @@ def delete_entries(
                 continue
 
             deleted_entries.append(deleted_entry)
+
+            available_ids.append(id_str)
 
             if not exists(value=model_type):
                 continue
@@ -1295,7 +1441,8 @@ def delete_entries(
 
         for _ in range(count_deleted):
             _decrement_table_counters(table_data=table_data)
-        _update_table_timestamps(table_data=table_data)
+
+        table_data["metadata"]["available_ids"] = available_ids
 
         _save_table_data(
             table_data=table_data,
@@ -1357,7 +1504,14 @@ def delete_entry(
         table_data: dict[str, Any] = read_file_json(file=file)
 
         deleted_entry: Optional[dict[str, Any]] = table_data["entries"]["entries"].pop(
-            entry_id_str, None
+            entry_id_str,
+            None,
+        )
+
+        available_ids: list[str] = (
+            table_data["metadata"]["available_ids"]
+            if exists(value=table_data["metadata"]["available_ids"])
+            else []
         )
 
         if not exists(value=deleted_entry):
@@ -1367,13 +1521,15 @@ def delete_entry(
 
             return False
 
+        available_ids.append(entry_id_str)
+
+        table_data["metadata"]["available_ids"] = available_ids
+
         _decrement_table_counters(table_data=table_data)
 
-        _update_table_timestamps(table_data=table_data)
-
-        write_file_json(
-            data=table_data,
-            file=file,
+        _save_table_data(
+            table_data=table_data,
+            table_name=table_name,
         )
 
         log_info(message=f"Successfully deleted entry '{entry_id_str}' from '{table_name}' table")
@@ -1398,7 +1554,7 @@ def delete_entry(
 def filter_entries(
     table_name: str,
     **kwargs: Any,
-) -> Optional[list[dict[str, Any]]]:
+) -> Optional[list[Model]]:
     """
     Retrieves entries from a table that match specific criteria provided as keyword arguments.
 
@@ -1412,9 +1568,9 @@ def filter_entries(
                   An entry must match ALL criteria to be included. Matching is case-insensitive.
 
     Returns:
-        Optional[list[dict[str, Any]]]: A list of dictionary objects containing the matching entries,
+        Optional[list[Model]]: A list of model objects containing the matching models,
                                         or None if the table file cannot be read. Returns an
-                                        empty list if no entries match the criteria.
+                                        empty list if no models match the criteria.
 
     Raises:
         Exception: If an exception is caught while accessing or reading the table file.
@@ -1422,7 +1578,7 @@ def filter_entries(
 
     def _matches_filter(
         criteria: dict[str, Any],
-        entry: dict[str, Any],
+        entry: Model,
     ) -> bool:
         """
         Internal helper function to check if a single entry matches all filtering criteria.
@@ -1432,7 +1588,7 @@ def filter_entries(
 
         Args:
             criteria (dict[str, Any]): The filtering criteria.
-            entry (dict[str, Any]): The entry to check against the criteria.
+            entry (Model): The entry to check against the criteria.
 
         Returns:
             bool: True if the entry matches all criteria, False otherwise.
@@ -1442,18 +1598,18 @@ def filter_entries(
             outer_key,
             outer_value,
         ) in criteria.items():
-            if outer_key in ["table_name"]:
+            if outer_key.lower() == "table_name":
                 continue
 
-            if outer_key not in entry:
+            if outer_key not in entry.to_json().keys():
                 return False
 
-            entry_value = entry[outer_key]
+            entry_value = entry.to_json()[outer_key]
 
             return str(entry_value).lower() == str(outer_value).lower()
 
     try:
-        all_entries: Optional[list[dict[str, Any]]] = get_all_entries(table_name=table_name)
+        all_entries: Optional[list[Model]] = get_all_entries(table_name=table_name)
 
         if not exists(value=all_entries):
             return []
@@ -1477,7 +1633,7 @@ def filter_entries(
 
             return []
 
-        model_type: str = filtered_entries[0]["metadata"]["type"]
+        model_type: str = filtered_entries[0].type_
 
         log_info(
             message=f"Successfully filtered {count} entries from '{table_name}' table matching criteria: {kwargs}"
@@ -1508,21 +1664,21 @@ def filter_entries(
         raise e
 
 
-def get_all_entries(table_name: str) -> Optional[list[dict[str, Any]]]:
+def get_all_entries(table_name: str) -> Optional[list[Model]]:
     """
-    Retrieves all entries contained within a specified table.
+    Retrieves all models contained within a specified table.
 
-    The function reads the entire table file and returns all entries found in the
+    The function reads the entire table file and returns all models found in the
     'entries' dictionary structure as a list. A successful retrieval dispatches
     the 'ALL_..._RETRIEVED' notification event.
 
     Args:
-        table_name (str): The name of the table/collection from which to retrieve all entries.
+        table_name (str): The name of the table/collection from which to retrieve all models.
 
     Returns:
-        Optional[list[dict[str, Any]]]: A list of all entry dictionaries from the table,
+        Optional[list[Model]]: A list of all model objects from the table,
                                         or None if the table file cannot be read. Returns an
-                                        empty list if the table contains no entries.
+                                        empty list if the table contains no models.
 
     Raises:
         Exception: If an exception is caught while accessing or reading the table file.
@@ -1552,14 +1708,25 @@ def get_all_entries(table_name: str) -> Optional[list[dict[str, Any]]]:
 
         log_info(message=f"Successfully retrieved all {count} entries from '{table_name}' table")
 
+        for entry in retrieved_entries:
+            _convert_from_database(dictionary=entry)
+
+        results: list[Model] = [
+            get_model(
+                type_=model_type,
+                **flatten_dictionary(dictionary=entry),
+            )
+            for entry in retrieved_entries
+        ]
+
         dispatch(
             event=_get_get_all_event(model_type=model_type),
             **{
-                f"all_{pluralize_word(word=model_type).lower()}": retrieved_entries,
+                f"all_{pluralize_word(word=model_type).lower()}": results,
             },
         )
 
-        return retrieved_entries
+        return results
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to get all entries from '{table_name}' table: {e}"
@@ -1570,22 +1737,22 @@ def get_all_entries(table_name: str) -> Optional[list[dict[str, Any]]]:
 def get_entries(
     ids: list[Union[int, str]],
     table_name: str,
-) -> Optional[list[dict[str, Any]]]:
+) -> Optional[list[Model]]:
     """
-    Retrieves multiple entries from a specified table based on a list of unique IDs.
+    Retrieves multiple models from a specified table based on a list of unique IDs.
 
-    The function reads the entire table file, filters for entries whose IDs match
-    those in the provided list, and returns the resulting list of entry data.
-    If entries are successfully retrieved, a bulk notification event is dispatched.
+    The function reads the entire table file, filters for models whose IDs match
+    those in the provided list, and returns the resulting list of model objects.
+    If models are successfully retrieved, a bulk notification event is dispatched.
 
     Args:
-        ids (list[Union[int, str]]): A list of unique IDs (primary keys) of the entries to retrieve.
-        table_name (str): The name of the table/collection where the entries are stored.
+        ids (list[Union[int, str]]): A list of unique IDs (primary keys) of the models to retrieve.
+        table_name (str): The name of the table/collection where the models are stored.
 
     Returns:
-        Optional[list[dict[str, Any]]]: A list of dictionary objects containing the entry data,
+        Optional[list[Model]]: A list of model objects containing the model data,
                                         or None if the table file cannot be read. Returns an
-                                        empty list if no entries match the provided IDs.
+                                        empty list if no models match the provided IDs.
 
     Raises:
         Exception: If an exception is caught while accessing or reading the table file.
@@ -1613,10 +1780,10 @@ def get_entries(
 
         model_type: str = ""
 
-        all_entries: dict[str, Any] = table_data["entries"]["entries"]
+        all_entries_dict: dict[str, Any] = dict(table_data["entries"]["entries"])
 
         for id_str in entry_id_strs:
-            entry = all_entries.get(id_str)
+            entry: Optional[dict[str, Any]] = all_entries_dict.get(id_str)
 
             if not exists(value=entry):
                 continue
@@ -1624,7 +1791,6 @@ def get_entries(
             retrieved_entries.append(entry)
 
             if exists(value=model_type):
-
                 continue
 
             model_type = entry["metadata"]["type"]
@@ -1641,15 +1807,26 @@ def get_entries(
         )
 
         if exists(value=model_type):
-
             dispatch(
                 event=_get_bulk_get_event(model_type=model_type),
                 **{
-                    pluralize_word(word=model_type).lower(): retrieved_entries,
+                    pluralize_word(word=model_type).lower(): [
+                        get_model(
+                            type_=model_type,
+                            **_convert_from_database(model=entry),
+                        )
+                        for entry in retrieved_entries
+                    ],
                 },
             )
 
-        return retrieved_entries
+        return [
+            get_model(
+                type_=model_type,
+                **_convert_from_database(model=entry),
+            )
+            for entry in retrieved_entries
+        ]
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to get entries from '{table_name}' table: {e}"
@@ -1660,22 +1837,22 @@ def get_entries(
 def get_entries_by_keys(
     keys: list[str],
     table_name: str,
-) -> Optional[list[dict[str, Any]]]:
+) -> Optional[list[Model]]:
     """
-    Retrieves multiple entries from a specified table based on a list of unique keys.
+    Retrieves multiple models from a specified table based on a list of unique keys.
 
-    The function reads the entire table file, filters for entries whose keys match
-    those in the provided list, and returns the resulting list of entry data.
-    If entries are successfully retrieved, a bulk notification event is dispatched.
+    The function reads the entire table file, filters for models whose keys match
+    those in the provided list, and returns the resulting list of model objects.
+    If models are successfully retrieved, a bulk notification event is dispatched.
 
     Args:
-        keys (list[Union[int, str]]): A list of unique keys (primary keys) of the entries to retrieve.
-        table_name (str): The name of the table/collection where the entries are stored.
+        keys (list[Union[int, str]]): A list of unique keys (primary keys) of the models to retrieve.
+        table_name (str): The name of the table/collection where the models are stored.
 
     Returns:
-        Optional[list[dict[str, Any]]]: A list of dictionary objects containing the entry data,
+        Optional[list[Model]]: A list of model objects containing the model data,
                                         or None if the table file cannot be read. Returns an
-                                        empty list if no entries match the provided keys.
+                                        empty list if no models match the provided keys.
 
     Raises:
         Exception: If an exception is caught while accessing or reading the table file.
@@ -1702,20 +1879,20 @@ def get_entries_by_keys(
 def get_entry(
     id_: Union[int, str],
     table_name: str,
-) -> Optional[dict[str, Any]]:
+) -> Optional[Model]:
     """
-    Retrieves a single entry from a specified table by its unique ID.
+    Retrieves a single model from a specified table by its unique ID.
 
-    The function reads the entire table file, searches for the entry corresponding
-    to the given ID (stored as a string key), and returns the entry data if found.
+    The function reads the entire table file, searches for the model corresponding
+    to the given ID (stored as a string key), and returns the model object if found.
     A successful retrieval dispatches a notification event.
 
     Args:
-        id_ (Union[int, str]): The unique ID (primary key) of the entry to retrieve.
-        table_name (str): The name of the table/collection where the entry is stored.
+        id_ (Union[int, str]): The unique ID (primary key) of the model to retrieve.
+        table_name (str): The name of the table/collection where the model is stored.
 
     Returns:
-        Optional[dict[str, Any]]: The dictionary containing the entry data, or None if the entry is not found.
+        Optional[dict[str, Any]]: The dictionary containing the model data, or None if the model is not found.
 
     Raises:
         Exception: If an exception is caught while accessing or reading the table file.
@@ -1746,11 +1923,17 @@ def get_entry(
         dispatch(
             event=_get_get_event(model_type=model_type),
             **{
-                model_type.lower(): entry,
+                model_type.lower(): get_model(
+                    type_=model_type,
+                    **_convert_from_database(model=entry),
+                ),
             },
         )
 
-        return entry
+        return get_model(
+            type_=model_type,
+            **_convert_from_database(model=entry),
+        )
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to get entry '{id_}' from '{table_name}' table: {e}"
@@ -1761,20 +1944,20 @@ def get_entry(
 def get_entry_by_key(
     key: str,
     table_name: str,
-) -> Optional[dict[str, Any]]:
+) -> Optional[Model]:
     """
-    Retrieves a single entry from a specified table by its unique key.
+    Retrieves a single model from a specified table by its unique key.
 
-    The function reads the entire table file, searches for the entry corresponding
-    to the given key (stored as a string key), and returns the entry data if found.
+    The function reads the entire table file, searches for the model corresponding
+    to the given key (stored as a string key), and returns the model object if found.
     A successful retrieval dispatches a notification event.
 
     Args:
-        key (str): The unique key of the entry to retrieve.
-        table_name (str): The name of the table/collection where the entry is stored.
+        key (str): The unique key of the model to retrieve.
+        table_name (str): The name of the table/collection where the model is stored.
 
     Returns:
-        Optional[dict[str, Any]]: The dictionary containing the entry data, or None if the entry is not found.
+        Optional[Model]: The model object containing the model data, or None if the model is not found.
 
     Raises:
         Exception: If an exception is caught while accessing or reading the table file.
@@ -1796,39 +1979,37 @@ def get_entry_by_key(
 
 
 def update_entry(
-    entry: dict[str, Any],
+    model: Model,
     table_name: str,
-) -> Optional[dict[str, Any]]:
+) -> Optional[Model]:
     """
-    Updates an existing entry in the specified table.
+    Updates an existing model in the specified table.
 
-    The function reads the entire table file, validates that the entry ID exists,
-    overwrites the old entry data with the provided updated 'entry' dictionary,
+    The function reads the entire table file, validates that the model ID exists,
+    overwrites the old model data with the provided updated 'model' dictionary,
     updates the table metadata timestamp, and saves the changes back to the JSON file.
     A successful update dispatches a notification event.
 
     Args:
-        entry (dict[str, Any]): The complete dictionary of the updated entry data.
+        model (Model): The complete model of the updated model data.
                                 This dictionary MUST contain the 'id' field.
-        table_name (str): The name of the table/collection where the entry is stored.
+        table_name (str): The name of the table/collection where the model is stored.
 
     Returns:
-        Optional[dict[str, Any]]: The updated entry dictionary, or None if the entry ID was not found in the table.
+        Optional[Model]: The updated model, or None if the model ID was not found in the table.
 
     Raises:
-        ValueError: If the 'entry' dictionary is missing the required 'id' key.
+        ValueError: If the 'model' dictionary is missing the required 'id' key.
         Exception: If an exception is caught while accessing, reading, or writing the table file.
     """
 
     try:
-        if "id" not in entry["metadata"]:
-            raise ValueError(
-                "The provided entry dictionary must contain an 'id' key for update operations."
-            )
+        if not exists(value=model.id_):
+            raise ValueError("The provided model must contain an 'id' key for update operations.")
 
         _ensure_table_json(table_name=table_name)
 
-        entry_id_str: str = str(entry["metadata"]["id"])
+        entry_id_str: str = str(model.id_)
 
         file: Path = DATA_DIR / (
             f"{table_name}.json" if not table_name.endswith(".json") else table_name
@@ -1844,14 +2025,7 @@ def update_entry(
             )
             return None
 
-        all_entries[entry_id_str] = entry
-
-        _update_metadata_field_list(
-            entry=entry,
-            table_data=table_data,
-        )
-
-        _update_table_timestamps(table_data=table_data)
+        all_entries[entry_id_str] = _convert_for_database(model=model.to_json())
 
         _save_table_data(
             table_data=table_data,
@@ -1860,51 +2034,57 @@ def update_entry(
 
         log_info(message=f"Successfully updated entry '{entry_id_str}' in '{table_name}' table")
 
-        model_type: str = entry["metadata"]["type"]
+        model_type: str = model.to_json()["metadata"]["type"]
 
         dispatch(
             event=_get_update_event(model_type=model_type),
             **{
-                model_type.lower(): entry,
+                model_type.lower(): get_model(
+                    type_=model_type,
+                    **model.to_json(),
+                ),
             },
         )
 
-        return entry
+        return get_model(
+            type_=model_type,
+            **model.to_json(),
+        )
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to update entry '{entry.get('id', 'N/A')}' in '{table_name}' table: {e}"
+            message=f"Caught an exception while attempting to update entry '{model.id_}' in '{table_name}' table: {e}"
         )
         raise e
 
 
 def update_entries(
-    entries: list[dict[str, Any]],
+    models: list[Model],
     table_name: str,
-) -> Optional[list[dict[str, Any]]]:
+) -> Optional[list[Model]]:
     """
-    Updates multiple existing entries in the specified table in a single atomic operation.
+    Updates multiple existing models in the specified table in a single atomic operation.
 
-    The function reads the entire table file, validates that all entry IDs exist,
-    overwrites the old entry data with the provided updated 'entry' dictionaries,
+    The function reads the entire table file, validates that all model IDs exist,
+    overwrites the old model data with the provided updated 'model' dictionaries,
     updates the table metadata timestamp, and saves the changes back to the JSON file.
     A successful batch update dispatches a bulk notification event.
 
     Args:
-        entries (list[dict[str, Any]]): A list of complete dictionaries of the updated entry data.
+        models (list[Model]): A list of complete models of the updated model data.
                                         Each dictionary MUST contain the 'id' field.
-        table_name (str): The name of the table/collection where the entries are stored.
+        table_name (str): The name of the table/collection where the models are stored.
 
     Returns:
-        Optional[list[dict[str, Any]]]: A list of the successfully updated entry dictionaries.
-                                        Returns an empty list if no valid entries were provided or found.
+        Optional[list[Model]]: A list of the successfully updated models.
+                                        Returns an empty list if no valid models were provided or found.
 
     Raises:
-        ValueError: If any entry dictionary in the list is missing the required 'id' key.
+        ValueError: If any model in the list is missing the required 'id' key.
         Exception: If an exception is caught while accessing, reading, or writing the table file.
     """
 
     try:
-        if not entries:
+        if not exists(value=models):
             log_info(message=f"Attempted to update 0 entries in '{table_name}' table. Aborting...")
             return []
 
@@ -1918,65 +2098,68 @@ def update_entries(
 
         all_entries: dict[str, Any] = table_data["entries"]["entries"]
 
-        updated_entries: list[dict[str, Any]] = []
+        updated_models: list[Model] = []
 
         model_type: str = ""
 
-        for entry in entries:
-            if "id" not in entry["metadata"]:
-                raise ValueError(
-                    "An entry dictionary in the batch update list must contain an 'id' key."
-                )
+        for model in models:
+            if not exists(value=model.id_):
+                raise ValueError("A model in the batch update list must contain an 'id' key.")
 
-            entry_id_str: str = str(entry["metadata"]["id"])
+            model_id_str: str = str(model.id_)
 
-            if entry_id_str not in all_entries:
+            if model_id_str not in all_entries:
                 log_info(
-                    message=f"Entry with ID '{entry_id_str}' skipped during batch update for '{table_name}' table, as it was not found."
+                    message=f"Model with ID '{model_id_str}' skipped during batch update for '{table_name}' table, as it was not found."
                 )
                 continue
 
-            all_entries[entry_id_str] = entry
+            all_entries[model_id_str] = _convert_for_database(model=model.to_json())
 
-            updated_entries.append(entry)
-
-            _update_metadata_field_list(
-                entry=entry,
-                table_data=table_data,
-            )
+            updated_models.append(model)
 
             if exists(value=model_type):
                 continue
 
-            model_type = entry["metadata"]["type"]
+            model_type = model.type_
 
-        count_updated: int = len(updated_entries)
+        count_updated: int = len(updated_models)
 
         if count_updated == 0:
-            log_info(message=f"No existing entries were updated in '{table_name}' table.")
+            log_info(message=f"No existing models were updated in '{table_name}' table.")
 
             return []
-
-        _update_table_timestamps(table_data=table_data)
 
         _save_table_data(
             table_data=table_data,
             table_name=table_name,
         )
 
-        log_info(message=f"Successfully updated {count_updated} entries in '{table_name}' table.")
+        log_info(message=f"Successfully updated {count_updated} models in '{table_name}' table.")
 
         if exists(value=model_type):
             dispatch(
                 event=_get_bulk_update_event(model_type=model_type),
                 **{
-                    pluralize_word(word=model_type).lower(): updated_entries,
+                    pluralize_word(word=model_type).lower(): [
+                        get_model(
+                            type_=model_type,
+                            **model.to_json(),
+                        )
+                        for model in updated_models
+                    ],
                 },
             )
 
-        return updated_entries
+        return [
+            get_model(
+                type_=model_type,
+                **model.to_json(),
+            )
+            for model in updated_models
+        ]
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to update batch entries in '{table_name}' table: {e}"
+            message=f"Caught an exception while attempting to update batch models in '{table_name}' table: {e}"
         )
         raise e

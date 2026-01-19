@@ -29,16 +29,16 @@ from constants.events import (
     FILTER_SUBJECTS_FROM_DB,
     FILTER_TEACHERS_FROM_DB,
     GET_ANSWER_FROM_DB,
-    GET_ANSWER_MODEL_DICT,
+    GET_ANSWER_MODEL,
     GET_CREATE_FORM,
     GET_ERROR_TOAST,
     GET_FLASHCARD_FROM_DB,
-    GET_FLASHCARD_MODEL_DICT,
+    GET_FLASHCARD_MODEL,
     GET_NOTE_FROM_DB,
-    GET_NOTE_MODEL_DICT,
-    GET_QUESTION_MODEL_DICT,
+    GET_NOTE_MODEL,
+    GET_QUESTION_MODEL,
     GET_STACK_FROM_DB,
-    GET_STACK_MODEL_DICT,
+    GET_STACK_MODEL,
     GET_FLASHCARD_CREATE_FORM,
     GET_NOTE_CREATE_FORM,
     GET_QUESTION_CREATE_FORM,
@@ -66,7 +66,7 @@ from constants.storage import (
     SUBJECTS,
     TEACHERS,
 )
-from models.factories import ModelDict
+from models.models import Model
 from utils.common import exists, pluralize_word, search_string, generate_model_key
 from utils.dispatcher import bulk_dispatch, dispatch
 from utils.logging import log_debug, log_error, log_info, log_warning
@@ -115,23 +115,23 @@ _LAST_UPDATED: dict[
 # ---------- Helper Functions ---------- #
 
 
-def _add_to_database(model_dict: ModelDict) -> Optional[int]:
+def _add_to_database(model: Model) -> Optional[int]:
     """
     Adds the passed model dictionay to the database.
 
     Args:
-        model_dict (ModelDict): The model dictionary to add to the database.
+        model (Model): The model to add to the database.
 
     Returns:
         Optional[int]: The ID of the added model, or None if the model could not be added.
     """
 
     try:
-        type_: str = model_dict["metadata"]["type"].lower()
+        type_: str = model.type_.lower()
 
         result: Optional[int] = (
             dispatch(
-                entry=model_dict,
+                model=model,
                 event=_get_add_event(type_=type_),
                 namespace=GLOBAL,
                 table_name=_get_table_name(type_=type_),
@@ -149,19 +149,19 @@ def _add_to_database(model_dict: ModelDict) -> Optional[int]:
         if exists(value=result):
             _update_last_created(
                 id_=result,
-                type_=model_dict["metadata"]["type"].lower(),
+                type_=model.type_.lower(),
             )
 
         return result
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to add '{model_dict['metadata']['type']}' to the database: {e}"
+            message=f"Caught an exception while attempting to add '{model.type_}' to the database: {e}"
         )
 
         return None
 
 
-def _filter_difficulty(**kwargs) -> dict[str, Any]:
+def _filter_difficulty(**kwargs) -> Model:
     """
     Returns a difficulty matching the given criteria from the database.
 
@@ -169,10 +169,10 @@ def _filter_difficulty(**kwargs) -> dict[str, Any]:
         **kwargs: The criteria to filter the difficulty by.
 
     Returns:
-        dict[str, Any]: The difficulty matching the given criteria.
+        Model: The difficulty matching the given criteria.
     """
 
-    difficulties: Optional[list[dict[str, Any]]] = (
+    difficulties: Optional[list[Model]] = (
         dispatch(
             event=FILTER_DIFFICULTIES_FROM_DB,
             namespace=GLOBAL,
@@ -195,7 +195,7 @@ def _filter_difficulty(**kwargs) -> dict[str, Any]:
     return difficulties[0]
 
 
-def _filter_priority(**kwargs) -> dict[str, Any]:
+def _filter_priority(**kwargs) -> Model:
     """
     Returns a priority matching the given criteria from the database.
 
@@ -203,10 +203,10 @@ def _filter_priority(**kwargs) -> dict[str, Any]:
         **kwargs: The criteria to filter the priority by.
 
     Returns:
-        dict[str, Any]: The priority matching the given criteria.
+        Model: The priority matching the given criteria.
     """
 
-    priorities: Optional[list[dict[str, Any]]] = (
+    priorities: Optional[list[Model]] = (
         dispatch(
             event=FILTER_PRIORITIES_FROM_DB,
             namespace=GLOBAL,
@@ -229,7 +229,7 @@ def _filter_priority(**kwargs) -> dict[str, Any]:
     return priorities[0]
 
 
-def _filter_stack(**kwargs) -> dict[str, Any]:
+def _filter_stack(**kwargs) -> Model:
     """
     Returns a stack matching the given criteria from the database.
 
@@ -237,10 +237,10 @@ def _filter_stack(**kwargs) -> dict[str, Any]:
         **kwargs: The criteria to filter the stack by.
 
     Returns:
-        dict[str, Any]: The stack matching the given criteria.
+        Model: The stack matching the given criteria.
     """
 
-    stacks: Optional[list[dict[str, Any]]] = (
+    stacks: Optional[list[Model]] = (
         dispatch(
             event=FILTER_STACKS_FROM_DB,
             namespace=GLOBAL,
@@ -263,7 +263,7 @@ def _filter_stack(**kwargs) -> dict[str, Any]:
     return stacks[0]
 
 
-def _filter_subject(**kwargs) -> dict[str, Any]:
+def _filter_subject(**kwargs) -> Model:
     """
     Returns a subject matching the given criteria from the database.
 
@@ -271,10 +271,10 @@ def _filter_subject(**kwargs) -> dict[str, Any]:
         **kwargs: The criteria to filter the subject by.
 
     Returns:
-        dict[str, Any]: The subject matching the given criteria.
+        Model: The subject matching the given criteria.
     """
 
-    subjects: Optional[list[dict[str, Any]]] = (
+    subjects: Optional[list[Model]] = (
         dispatch(
             event=FILTER_SUBJECTS_FROM_DB,
             namespace=GLOBAL,
@@ -297,7 +297,7 @@ def _filter_subject(**kwargs) -> dict[str, Any]:
     return subjects[0]
 
 
-def _filter_teacher(**kwargs) -> dict[str, Any]:
+def _filter_teacher(**kwargs) -> Model:
     """
     Returns a teacher matching the given criteria from the database.
 
@@ -305,10 +305,10 @@ def _filter_teacher(**kwargs) -> dict[str, Any]:
         **kwargs: The criteria to filter the teacher by.
 
     Returns:
-        dict[str, Any]: The teacher matching the given criteria.
+        Model: The teacher matching the given criteria.
     """
 
-    teachers: Optional[list[dict[str, Any]]] = (
+    teachers: Optional[list[Model]] = (
         dispatch(
             event=FILTER_TEACHERS_FROM_DB,
             namespace=GLOBAL,
@@ -433,7 +433,7 @@ def _get_get_from_db_event(
     }[type_]
 
 
-def _get_get_model_dict_event(
+def _get_get_model_event(
     type_: Literal[
         "answer",
         "flashcard",
@@ -453,15 +453,15 @@ def _get_get_model_dict_event(
     """
 
     return {
-        "answer": GET_ANSWER_MODEL_DICT,
-        "flashcard": GET_FLASHCARD_MODEL_DICT,
-        "note": GET_NOTE_MODEL_DICT,
-        "question": GET_QUESTION_MODEL_DICT,
-        "stack": GET_STACK_MODEL_DICT,
+        "answer": GET_ANSWER_MODEL,
+        "flashcard": GET_FLASHCARD_MODEL,
+        "note": GET_NOTE_MODEL,
+        "question": GET_QUESTION_MODEL,
+        "stack": GET_STACK_MODEL,
     }[type_]
 
 
-def _get_model_dict(
+def _get_model(
     data: dict[str, Any],
     type_: Literal[
         "answer",
@@ -470,7 +470,7 @@ def _get_model_dict(
         "question",
         "stack",
     ],
-) -> Optional[ModelDict]:
+) -> Optional[Model]:
     """
     Returns a model dictionary containing the passed data.
 
@@ -478,18 +478,18 @@ def _get_model_dict(
         data (dict[str, Any]): The data to convert to a model dictionary.
 
     Returns:
-        Optional[ModelDict]: The model dictionary containing the passed data.
+        Optional[Model]: The model containing the passed data.
     """
 
     try:
-        response: Optional[ModelDict] = (
+        response: Optional[Model] = (
             dispatch(
-                event=_get_get_model_dict_event(type_=type_),
+                event=_get_get_model_event(type_=type_),
                 namespace=GLOBAL,
                 **data,
             )
             .get(
-                f"get_{type_}_model_dict",
+                f"get_{type_.lower()}_model",
                 [{}],
             )[0]
             .get(
@@ -592,7 +592,7 @@ def _inherit_metadata_from_stack(dictionary: dict[str, Any]) -> None:
     try:
         has_stack_parent: bool = exists(value=dictionary["stack"])
 
-        stack_parent: Optional[dict[str, Any]] = None
+        stack_parent: Optional[Model] = None
 
         type_: str = dictionary.pop("type").lower()
 
@@ -654,7 +654,7 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
             "question",
         ]:
             if exists(value=dictionary.get(key)):
-                response: Optional[ModelDict] = _get_from_database(key=dictionary[key])
+                response: Optional[Model] = _get_from_database(key=dictionary[key])
 
                 if not exists(value=response):
                     log_warning(message=f"Failed to resolve metadata key for '{key}'")
@@ -663,7 +663,7 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
                 dictionary[key] = response["metadata"]["key"]
 
         if exists(value=dictionary.get("subject")):
-            response: Optional[ModelDict] = _filter_subject(name=dictionary["subject"])
+            response: Optional[Model] = _filter_subject(name=dictionary["subject"])
 
             if not exists(value=response):
                 log_warning(message="Failed to resolve metadata key for 'subject'")
@@ -671,7 +671,7 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
                 dictionary["subject"] = response.get("metadata", {}).get("key")
 
         if exists(value=dictionary.get("teacher")):
-            response: Optional[ModelDict] = _filter_teacher(name=dictionary["teacher"])
+            response: Optional[Model] = _filter_teacher(name=dictionary["teacher"])
 
             if not exists(value=response):
                 log_warning(message="Failed to resolve metadata key for 'teacher'")
@@ -679,7 +679,7 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
                 dictionary["teacher"] = response.get("metadata", {}).get("key")
 
         if exists(value=dictionary.get("stack")):
-            response: Optional[ModelDict] = _filter_stack(name=dictionary["stack"])
+            response: Optional[Model] = _filter_stack(name=dictionary["stack"])
 
             if not exists(value=response):
                 log_warning(message="Failed to resolve metadata key for 'stack'")
@@ -691,23 +691,23 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
         raise e
 
 
-def _update_in_database(model_dict: ModelDict) -> Optional[int]:
+def _update_in_database(model: Model) -> Optional[int]:
     """
-    Updates the passed model dictionay to the database.
+    Updates the passed model to the database.
 
     Args:
-        model_dict (ModelDict): The model dictionary to update to the database.
+        model (Model): The model to update to the database.
 
     Returns:
         Optional[int]: The ID of the added model, or None if the model could not be added.
     """
 
     try:
-        type_: str = model_dict["metadata"]["type"].lower()
+        type_: str = model.type_.lower()
 
         result: Optional[int] = (
             dispatch(
-                entry=model_dict,
+                model=model,
                 event=_get_update_in_db_event(type_=type_),
                 namespace=GLOBAL,
                 table_name=_get_table_name(type_=type_),
@@ -733,13 +733,13 @@ def _update_in_database(model_dict: ModelDict) -> Optional[int]:
         if result is not None:
             _update_last_updated(
                 id_=result,
-                type_=model_dict["metadata"]["type"].lower(),
+                type_=model.type_.lower(),
             )
 
         return result
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to update '{model_dict['metadata']['type']}' to the database: {e}"
+            message=f"Caught an exception while attempting to update '{model.type_}' to the database: {e}"
         )
 
         return None
@@ -882,7 +882,7 @@ def _handle_flashcard_creation(form: dict[str, Any]) -> None:
 
     _inherit_metadata_from_stack(dictionary=kwargs)
 
-    flashcard_model: Optional[dict[str, Any]] = _get_model_dict(
+    flashcard_model: Optional[Model] = _get_model(
         data={
             key: value
             for (
@@ -911,14 +911,14 @@ def _handle_flashcard_creation(form: dict[str, Any]) -> None:
 
         return
 
-    stack: Optional[dict[str, Any]] = _get_from_database(key=kwargs["stack"])
+    stack: Optional[Model] = _get_from_database(key=kwargs["stack"])
 
     if stack is None:
         log_warning(message="Failed to get stack. Aborting...")
 
         return
 
-    stack["items"].append(
+    stack.items.append(
         generate_model_key(
             id_=id_,
             name="FLASHCARD",
@@ -945,7 +945,7 @@ def _handle_note_creation(form: dict[str, Any]) -> None:
 
     _inherit_metadata_from_stack(dictionary=kwargs)
 
-    note_model: Optional[dict[str, Any]] = _get_model_dict(
+    note_model: Optional[Model] = _get_model(
         data={
             key: value
             for (
@@ -966,23 +966,28 @@ def _handle_note_creation(form: dict[str, Any]) -> None:
 
         return
 
-    id_: Optional[int] = _add_to_database(model_dict=note_model)
+    id_: Optional[int] = _add_to_database(model=note_model)
 
     if id_ is None:
         log_warning(message="Failed to add note to database. Aborting...")
 
         return
 
-    stack: dict[str, Any] = _filter_stack(metadata={"key": kwargs["stack"]})
+    stack: Optional[Model] = _filter_stack(metadata={"key": kwargs["stack"]})
 
-    stack["items"].append(
+    if not exists(value=stack):
+        log_warning(message="Failed to get stack. Aborting...")
+
+        return
+
+    stack.items.append(
         generate_model_key(
             id_=id_,
             name="NOTE",
         ),
     )
 
-    _update_in_database(model_dict=stack)
+    _update_in_database(model=stack)
 
 
 def _handle_question_creation(form: dict[str, Any]) -> None:
@@ -1002,7 +1007,7 @@ def _handle_question_creation(form: dict[str, Any]) -> None:
 
     _inherit_metadata_from_stack(dictionary=kwargs)
 
-    question_model: Optional[dict[str, Any]] = _get_model_dict(
+    question_model: Optional[Model] = _get_model(
         data={
             key: value
             for (
@@ -1023,23 +1028,28 @@ def _handle_question_creation(form: dict[str, Any]) -> None:
 
         return
 
-    id_: Optional[int] = _add_to_database(model_dict=question_model)
+    id_: Optional[int] = _add_to_database(model=question_model)
 
     if id_ is None:
         log_warning(message="Failed to add question to database. Aborting...")
 
         return
 
-    stack: dict[str, Any] = _filter_stack(metadata={"key": kwargs["stack"]})
+    stack: Optional[Model] = _filter_stack(metadata={"key": kwargs["stack"]})
 
-    stack["items"].append(
+    if not exists(value=stack):
+        log_warning(message="Failed to get stack. Aborting...")
+
+        return
+
+    stack.items.append(
         generate_model_key(
             id_=id_,
             name="question",
         ),
     )
 
-    _update_in_database(model_dict=stack)
+    _update_in_database(model=stack)
 
 
 def _handle_stack_creation(form: dict[str, Any]) -> None:
@@ -1059,7 +1069,7 @@ def _handle_stack_creation(form: dict[str, Any]) -> None:
 
     _inherit_metadata_from_stack(dictionary=kwargs)
 
-    stack_model: Optional[ModelDict] = _get_model_dict(
+    stack_model: Optional[Model] = _get_model(
         data=kwargs,
         type_="stack",
     )
@@ -1069,38 +1079,31 @@ def _handle_stack_creation(form: dict[str, Any]) -> None:
 
         return
 
-    id_: Optional[int] = _add_to_database(model_dict=stack_model)
+    id_: Optional[int] = _add_to_database(model=stack_model)
 
     if not exists(value=id_):
         log_warning(message="Failed to add stack to database. Aborting...")
 
         return
 
-    if not exists(
-        value=stack_model.get(
-            "parent",
-            None,
-        )
-    ):
+    if not exists(value=stack_model.parent):
         return
 
-    parent_stack: Optional[ModelDict] = _get_from_database(key=stack_model["parent"])
+    parent_stack: Optional[Model] = _get_from_database(key=stack_model.parent)
 
     if not exists(value=parent_stack):
-        log_warning(
-            message=f"Failed to get parent stack with ID {stack_model['parent']}. Aborting..."
-        )
+        log_warning(message=f"Failed to get parent stack with ID {stack_model.parent}. Aborting...")
 
         return
 
-    parent_stack["children"].append(
+    parent_stack.children.append(
         generate_model_key(
             id_=id_,
             name="STACK",
         )
     )
 
-    _update_in_database(model_dict=parent_stack)
+    _update_in_database(model=parent_stack)
 
 
 # ---------- Public Functions ---------- #
@@ -1134,7 +1137,7 @@ def on_create_button_click() -> None:
         None
     """
 
-    reponses: Optional[list[dict[str, Any]]] = dispatch(
+    reponses: Optional[list[Model]] = dispatch(
         event=GET_CREATE_FORM,
         namespace=GLOBAL,
     ).get(
@@ -1155,7 +1158,7 @@ def on_create_button_click() -> None:
             "question",
             "stack",
         ],
-        Callable[[dict[str, Any]], None],
+        Callable[[dict[str, Any], None]],
     ] = {
         "answer": _handle_answer_creation,
         "flashcard": _handle_flashcard_creation,
@@ -1198,6 +1201,8 @@ def on_create_button_click() -> None:
         value,
     ) in form.items():
         if key not in handlers:
+            log_warning(message=f"Received unknown key '{key}'. Aborting...")
+
             continue
 
         if not exists(value=value):
@@ -1245,7 +1250,7 @@ def on_stack_combobox_select(value: str) -> None:
 
         return
 
-    stack: Optional[ModelDict] = _filter_stack(name=value)
+    stack: Optional[Model] = _filter_stack(name=value)
 
     if not exists(value=stack):
         log_warning(message=f"Failed to get stack with name {value}. Aborting...")
@@ -1260,7 +1265,7 @@ def on_stack_combobox_select(value: str) -> None:
     dispatch(
         event=SET_CREATE_FORM,
         namespace=GLOBAL,
-        **stack,
+        **stack.to_json(),
     )
 
 

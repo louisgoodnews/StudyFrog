@@ -15,11 +15,12 @@ from constants.events import (
     FILTER_STACKS_FROM_DB,
     GET_DASHBOARD_VIEW,
     GET_REHEARSAL_RUN_FROM_DB,
-    GET_REHEARSAL_RUN_MODEL_DICT,
+    GET_REHEARSAL_RUN_MODEL,
     GET_REHEARSAL_RUN_SETUP_FORM,
     GET_REHEARSAL_RUN_VIEW,
 )
-from models.factories import ModelDict
+from models.factory import Model
+from utils.common import exists
 from utils.dispatcher import dispatch
 from utils.logging import log_debug, log_error
 
@@ -38,7 +39,7 @@ __all__: Final[list[str]] = [
 # ---------- Helper Functions ---------- #
 
 
-def _filter_difficulty(**kwargs) -> ModelDict:
+def _filter_difficulty(**kwargs) -> Model:
     """
     Returns a difficulty matching the given criteria from the database.
 
@@ -46,10 +47,10 @@ def _filter_difficulty(**kwargs) -> ModelDict:
         **kwargs: The criteria to filter the difficulty by.
 
     Returns:
-        ModelDict: The difficulty matching the given criteria.
+        Model: The difficulty matching the given criteria.
     """
 
-    difficulties: Optional[list[ModelDict]] = (
+    difficulties: Optional[list[Model]] = (
         dispatch(
             event=FILTER_DIFFICULTIES_FROM_DB,
             namespace=GLOBAL,
@@ -72,7 +73,7 @@ def _filter_difficulty(**kwargs) -> ModelDict:
     return difficulties[0]
 
 
-def _filter_priority(**kwargs) -> ModelDict:
+def _filter_priority(**kwargs) -> Model:
     """
     Returns a priority matching the given criteria from the database.
 
@@ -80,10 +81,10 @@ def _filter_priority(**kwargs) -> ModelDict:
         **kwargs: The criteria to filter the priority by.
 
     Returns:
-        ModelDict: The priority matching the given criteria.
+        Model: The priority matching the given criteria.
     """
 
-    priorities: Optional[list[ModelDict]] = (
+    priorities: Optional[list[Model]] = (
         dispatch(
             event=FILTER_PRIORITIES_FROM_DB,
             namespace=GLOBAL,
@@ -106,7 +107,7 @@ def _filter_priority(**kwargs) -> ModelDict:
     return priorities[0]
 
 
-def _filter_stack(**kwargs) -> ModelDict:
+def _filter_stack(**kwargs) -> Model:
     """
     Returns a stack matching the given criteria from the database.
 
@@ -114,10 +115,10 @@ def _filter_stack(**kwargs) -> ModelDict:
         **kwargs: The criteria to filter the stack by.
 
     Returns:
-        ModelDict: The stack matching the given criteria.
+        Model: The stack matching the given criteria.
     """
 
-    stacks: Optional[list[ModelDict]] = (
+    stacks: Optional[list[Model]] = (
         dispatch(
             event=FILTER_STACKS_FROM_DB,
             namespace=GLOBAL,
@@ -216,7 +217,7 @@ def _handle_stacks_data(data: str) -> list[str]:
             data = [data]
 
         for name in data:
-            stack: Optional[ModelDict] = _filter_stack(name=name)
+            stack: Optional[Model] = _filter_stack(name=name)
 
             if stack is None:
                 raise ValueError(f"Stack '{name}' not found.")
@@ -247,12 +248,12 @@ def _handle_stacks_data(data: str) -> list[str]:
         raise e
 
 
-def _verify_form_data(data: ModelDict) -> None:
+def _verify_form_data(data: Model) -> None:
     """
     Verifies the form data for completeness.
 
     Args:
-        data (ModelDict): The form data.
+        data (Model): The form data.
 
     Returns:
         None
@@ -268,7 +269,7 @@ def _verify_form_data(data: ModelDict) -> None:
         ) in data.items():
             is_required: bool = value["is_required"]
 
-            if is_required and value.get("value", None) is None:
+            if is_required and not exists(value=value.get("value")):
                 raise ValueError(
                     f"Form data is invalid. Missing value for '{key}' (got '{value.get('value', None)}' instead)."
                 )
@@ -347,12 +348,12 @@ def on_start_button_click() -> None:
                     response["item_order_randomization_enabled"]["value"]
                 ),
             },
-            event=GET_REHEARSAL_RUN_MODEL_DICT,
+            event=GET_REHEARSAL_RUN_MODEL,
             namespace=GLOBAL,
             stacks=response["stacks"]["value"],
         )
         .get(
-            "get_rehearsal_run_model_dict",
+            "get_rehearsal_run_model",
             [{}],
         )[0]
         .get(
@@ -363,7 +364,7 @@ def on_start_button_click() -> None:
 
     id: Optional[int] = (
         dispatch(
-            entry=rehearsal_run_model,
+            model=rehearsal_run_model,
             event=ADD_REHEARSAL_RUN_TO_DB,
             force=True,
             namespace=GLOBAL,

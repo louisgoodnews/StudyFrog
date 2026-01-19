@@ -8,30 +8,36 @@ import uuid
 
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Final, Optional, Union
+from typing import Any, Callable, Final, Literal, Optional, Type, Union
 
 from models.models import (
-    Answer,
-    Association,
-    Customfield,
-    Difficulty,
-    Flashcard,
-    Image,
+    AnswerModel,
+    AssociationModel,
+    CustomfieldModel,
+    DifficultyModel,
+    FlashcardModel,
+    ImageModel,
     Model,
-    Note,
-    Option,
-    Priority,
-    Question,
-    RehearsalAction,
-    RehearsalRun,
-    RehearsalRunItem,
-    Stack,
-    Subject,
-    Tag,
-    Teacher,
-    User,
+    NoteModel,
+    OptionModel,
+    PriorityModel,
+    QuestionModel,
+    RehearsalActionModel,
+    RehearsalRunModel,
+    RehearsalRunItemModel,
+    StackModel,
+    SubjectModel,
+    TagModel,
+    TeacherModel,
+    UserModel,
 )
-from utils.common import date_from_string, datetime_from_string, exists, uuid_from_string
+from utils.common import (
+    date_from_string,
+    datetime_from_string,
+    filter_and_call,
+    uuid_from_string,
+)
+from utils.logging import log_error
 
 # ---------- Exports ---------- #
 
@@ -42,6 +48,7 @@ __all__: Final[list[str]] = [
     "get_difficulty_model",
     "get_flashcard_model",
     "get_image_model",
+    "get_model",
     "get_note_model",
     "get_option_model",
     "get_priority_model",
@@ -77,51 +84,28 @@ def _convert_parameters(**kwargs) -> dict[str, Any]:
         dict[str, Any]: The updated dictionary with converted values.
     """
 
+    checks_for_type: dict[str, list[Type, Callable]] = {
+        "created_at": [datetime, datetime_from_string],
+        "created_on": [date, date_from_string],
+        "updated_at": [datetime, date_from_string],
+        "updated_on": [date, date_from_string],
+        "uuid_": [uuid.UUID, uuid_from_string],
+    }
+
     for (
         key,
         value,
     ) in kwargs.items():
-        if key in {
-            "created_at",
-            "updated_at",
-        }:
-            if not exists(value=value):
-                continue
+        if key not in checks_for_type:
+            continue
 
-            if isinstance(
-                value,
-                datetime,
-            ):
-                continue
+        if isinstance(
+            value,
+            checks_for_type[key][0],
+        ):
+            continue
 
-            kwargs[key] = datetime_from_string(string=value)
-
-        elif key in {
-            "created_on",
-            "updated_on",
-        }:
-            if not exists(value=value):
-                continue
-
-            if isinstance(
-                value,
-                date,
-            ):
-                continue
-
-            kwargs[key] = date_from_string(string=value)
-
-        elif key == "uuid_":
-            if not exists(value=value):
-                continue
-
-            if isinstance(
-                value,
-                uuid.UUID,
-            ):
-                continue
-
-            kwargs[key] = uuid_from_string(string=value)
+        kwargs[key] = checks_for_type[key][1](value)
 
     return kwargs
 
@@ -168,7 +152,7 @@ def get_answer_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Answer(**parameters)
+    return AnswerModel(**parameters)
 
 
 def get_association_model(
@@ -194,7 +178,7 @@ def get_association_model(
     updated_on: Optional[Union[date, str]] = None,
     user: Optional[Union[int, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Association:
+) -> Model:
     """
     Creates and returns an instance of the Association model.
 
@@ -232,7 +216,7 @@ def get_association_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Association(**parameters)
+    return AssociationModel(**parameters)
 
 
 def get_customfield_model(
@@ -245,7 +229,7 @@ def get_customfield_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Customfield:
+) -> Model:
     """
     Creates and returns an instance of the Customfield model.
 
@@ -272,7 +256,7 @@ def get_customfield_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Customfield(**parameters)
+    return CustomfieldModel(**parameters)
 
 
 def get_difficulty_model(
@@ -286,7 +270,7 @@ def get_difficulty_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Difficulty:
+) -> Model:
     """
     Creates and returns an instance of the Difficulty model.
 
@@ -314,7 +298,7 @@ def get_difficulty_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Difficulty(**parameters)
+    return DifficultyModel(**parameters)
 
 
 def get_flashcard_model(
@@ -338,7 +322,7 @@ def get_flashcard_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Flashcard:
+) -> Model:
     """
     Creates and returns an instance of the Flashcard model with comprehensive metadata.
 
@@ -376,7 +360,7 @@ def get_flashcard_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Flashcard(**parameters)
+    return FlashcardModel(**parameters)
 
 
 def get_image_model(
@@ -390,7 +374,7 @@ def get_image_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Image:
+) -> Model:
     """
     Creates and returns an instance of the Image model.
 
@@ -418,7 +402,73 @@ def get_image_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Image(**parameters)
+    return ImageModel(**parameters)
+
+
+def get_model(
+    type_: Literal[
+        "answer",
+        "association",
+        "customfield",
+        "difficulty",
+        "flashcard",
+        "image",
+        "note",
+        "option",
+        "priority",
+        "question",
+        "rehearsal_action",
+        "rehearsal_run",
+        "rehearsal_run_item",
+        "stack",
+        "subject",
+        "tag",
+        "teacher",
+        "user",
+    ],
+    **kwargs,
+) -> Optional[Model]:
+    """
+    Creates and returns an instance of a model based on the specified type.
+
+    Args:
+        type_ (Literal): The type of model to create.
+        **kwargs: Additional keyword arguments to pass to the model constructor.
+
+    Returns:
+        Optional[Model]: An instance of the specified model, or None if the type is invalid.
+    """
+
+    try:
+        dictionary: dict[str, Callable] = {
+            "answer": get_answer_model,
+            "association": get_association_model,
+            "customfield": get_customfield_model,
+            "difficulty": get_difficulty_model,
+            "flashcard": get_flashcard_model,
+            "image": get_image_model,
+            "note": get_note_model,
+            "option": get_option_model,
+            "priority": get_priority_model,
+            "question": get_question_model,
+            "rehearsal_action": get_rehearsal_action_model,
+            "rehearsal_run": get_rehearsal_run_model,
+            "rehearsal_run_item": get_rehearsal_run_item_model,
+            "stack": get_stack_model,
+            "subject": get_subject_model,
+            "tag": get_tag_model,
+            "teacher": get_teacher_model,
+            "user": get_user_model,
+        }
+
+        return filter_and_call(
+            function=dictionary[type_.lower()],
+            **kwargs,
+        )
+    except KeyError as ke:
+        log_error(message=f"Invalid model type: {type_}: {ke}")
+    except Exception as e:
+        log_error(message=f"Failed to create model: {e}")
 
 
 def get_note_model(
@@ -442,7 +492,7 @@ def get_note_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Note:
+) -> Model:
     """
     Creates and returns an instance of the Note model.
 
@@ -480,7 +530,7 @@ def get_note_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Note(**parameters)
+    return NoteModel(**parameters)
 
 
 def get_option_model(
@@ -492,7 +542,7 @@ def get_option_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Option:
+) -> Model:
     """
     Creates and returns an instance of the Option model.
 
@@ -517,7 +567,7 @@ def get_option_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Option(**parameters)
+    return OptionModel(**parameters)
 
 
 def get_priority_model(
@@ -531,7 +581,7 @@ def get_priority_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Priority:
+) -> Model:
     """
     Creates and returns an instance of the Priority model.
 
@@ -559,7 +609,7 @@ def get_priority_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Priority(**parameters)
+    return PriorityModel(**parameters)
 
 
 def get_question_model(
@@ -583,7 +633,7 @@ def get_question_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Question:
+) -> Model:
     """
     Creates and returns an instance of the Question model.
 
@@ -622,7 +672,7 @@ def get_question_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Question(**parameters)
+    return QuestionModel(**parameters)
 
 
 def get_rehearsal_action_model(
@@ -636,7 +686,7 @@ def get_rehearsal_action_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> RehearsalAction:
+) -> Model:
     """
     Creates and returns an instance of the RehearsalAction model.
 
@@ -665,7 +715,7 @@ def get_rehearsal_action_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return RehearsalAction(**parameters)
+    return RehearsalActionModel(**parameters)
 
 
 def get_rehearsal_run_item_model(
@@ -681,7 +731,7 @@ def get_rehearsal_run_item_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> RehearsalRunItem:
+) -> Model:
     """
     Creates and returns an instance of the RehearsalRunItem model.
 
@@ -711,7 +761,7 @@ def get_rehearsal_run_item_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return RehearsalRunItem(**parameters)
+    return RehearsalRunItemModel(**parameters)
 
 
 def get_rehearsal_run_model(
@@ -735,7 +785,7 @@ def get_rehearsal_run_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> RehearsalRun:
+) -> Model:
     """
     Creates and returns an instance of the RehearsalRun model.
 
@@ -773,7 +823,7 @@ def get_rehearsal_run_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return RehearsalRun(**parameters)
+    return RehearsalRunModel(**parameters)
 
 
 def get_stack_model(
@@ -783,6 +833,7 @@ def get_stack_model(
     created_at: Optional[Union[datetime, str]] = None,
     created_on: Optional[Union[date, str]] = None,
     customfields: Optional[list[dict[str, Any]]] = None,
+    description: Optional[str] = None,
     difficulty: Optional[str] = None,
     id_: Optional[Union[int, str]] = None,
     items: Optional[list[str]] = None,
@@ -792,7 +843,7 @@ def get_stack_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Stack:
+) -> Model:
     """
     Creates and returns an instance of the Stack model.
 
@@ -809,6 +860,7 @@ def get_stack_model(
         created_at (Optional[Union[datetime, str]]): ISO-formatted creation timestamp.
         created_on (Optional[Union[date, str]]): ISO-formatted creation date.
         customfields (Optional[list[dict[str, Any]]]): A list of custom metadata dictionaries.
+        description (Optional[str]): Description of the stack.
         difficulty (Optional[str]): Reference key for the associated difficulty level.
         id_ (Optional[Union[int, str]]): Internal database identifier.
         items (Optional[list[str]]): A list of keys referring to the learning units
@@ -826,7 +878,7 @@ def get_stack_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Stack(**parameters)
+    return StackModel(**parameters)
 
 
 def get_subject_model(
@@ -841,7 +893,7 @@ def get_subject_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Subject:
+) -> Model:
     """
     Creates and returns an instance of the Subject model.
 
@@ -873,7 +925,7 @@ def get_subject_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Subject(**parameters)
+    return SubjectModel(**parameters)
 
 
 def get_tag_model(
@@ -885,7 +937,7 @@ def get_tag_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Tag:
+) -> Model:
     """
     Creates and returns an instance of the Tag model.
 
@@ -911,7 +963,7 @@ def get_tag_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Tag(**parameters)
+    return TagModel(**parameters)
 
 
 def get_teacher_model(
@@ -927,7 +979,7 @@ def get_teacher_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> Teacher:
+) -> Model:
     """
     Creates and returns an instance of the Teacher model.
 
@@ -961,7 +1013,7 @@ def get_teacher_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return Teacher(**parameters)
+    return TeacherModel(**parameters)
 
 
 def get_user_model(
@@ -973,7 +1025,7 @@ def get_user_model(
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
-) -> User:
+) -> Model:
     """
     Creates and returns an instance of the User model.
 
@@ -999,4 +1051,4 @@ def get_user_model(
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
 
-    return User(**parameters)
+    return UserModel(**parameters)

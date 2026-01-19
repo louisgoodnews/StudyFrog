@@ -44,19 +44,12 @@ __all__: Final[list[str]] = ["get_create_view"]
 # ---------- Constants ---------- #
 
 _BOTTOM_FRAME: Optional[ctk.CTkFrame] = None
-
 _CENTER_FRAME: Optional[ctk.CTkFrame] = None
-
 _CREATE_VIEW_FORM_CONTAINER: Optional[ctk.CTkScrollableFrame] = None
-
 _FORM: Final[dict[str, Any]] = {}
-
 _MASTER: Optional[ctk.CTkToplevel] = None
-
 _STACKS: Final[list[str]] = [""]
-
 _SUBSCRIPTION_IDS: Final[list[str]] = []
-
 _TOP_FRAME: Optional[ctk.CTkFrame] = None
 
 
@@ -618,10 +611,7 @@ def _create_top_frame_widgets() -> None:
 
     _get_stacks_list().extend(
         [
-            stack.get(
-                "name",
-                None,
-            )
+            stack.name
             for stack in (
                 dispatch(
                     event=GET_ALL_STACKS_FROM_DB,
@@ -741,7 +731,7 @@ def _create_top_frame_widgets() -> None:
     )
 
     difficulty_names: list[str] = [
-        difficulty["display_name"]
+        difficulty.display_name
         for difficulty in (
             dispatch(
                 event=GET_ALL_DIFFICULTIES_FROM_DB,
@@ -800,7 +790,7 @@ def _create_top_frame_widgets() -> None:
     )
 
     priority_names: list[str] = [
-        priority["display_name"]
+        priority.display_name
         for priority in (
             dispatch(
                 event=GET_ALL_PRIORITIES_FROM_DB,

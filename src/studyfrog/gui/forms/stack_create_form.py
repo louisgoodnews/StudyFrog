@@ -6,17 +6,21 @@ Description: The stack create form of the application.
 
 import customtkinter as ctk
 
-from tkinter.constants import NSEW, W
-from typing import Any, Final, Union
+from tkinter.constants import NORMAL, NSEW, W
+from typing import Any, Final, Optional, Union
 
+from constants.common import GLOBAL
 from constants.events import (
     CLEAR_CREATE_FORM,
     DESTROY_STACK_CREATE_FORM,
     GET_ALL_SUBJECTS_FROM_DB,
     GET_ALL_TEACHERS_FROM_DB,
     GET_CREATE_FORM,
+    GET_OBSERVABLE_MODEL,
 )
 from constants.gui import READONLY
+from models.observables import ObservableModel, StackObservableModel
+from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.gui import destroy_widget_children
 from utils.logging import log_error, log_info
@@ -32,9 +36,8 @@ __all__: Final[list[str]] = ["get_stack_create_form"]
 
 
 _FORM: Final[dict[str, Any]] = {}
-
 _MASTER: Final[ctk.CTkScrollableFrame] = None
-
+_OBSERVABLE_MODEL: Optional[StackObservableModel] = None
 _SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
@@ -53,6 +56,87 @@ def _get_form() -> dict[str, Any]:
     """
 
     return _FORM
+
+
+def _get_master() -> ctk.CTkScrollableFrame:
+    """
+    Returns the master frame widget.
+
+    Args:
+        None
+
+    Returns:
+        ctk.CTkScrollableFrame: The master frame widget.
+    """
+
+    if not exists(value=_MASTER):
+        raise ValueError(
+            "The master frame has not been initialized yet."
+            "The method '_set_master' must be executed first."
+        )
+
+    return _MASTER
+
+
+def _get_observable_model() -> StackObservableModel:
+    """
+    Returns the observable model for the stack create form.
+
+    Args:
+        None
+
+    Returns:
+        StackObservableModel: The observable model for the stack create form.
+
+    Raises:
+        ValueError: If the observable model has not been initialized yet.
+    """
+
+    if not exists(value=_OBSERVABLE_MODEL):
+        raise ValueError(
+            "The observable model has not been initialized yet."
+            "The method '_set_observable_model' must be executed first."
+        )
+
+    return _OBSERVABLE_MODEL
+
+
+def _set_master(scrollable_frame: ctk.CTkScrollableFrame) -> None:
+    """
+    Sets the master frame widget.
+
+    Args:
+        scrollable_frame (ctk.CTkScrollableFrame): The scrollable frame to add the form to.
+
+    Returns:
+        None
+    """
+
+    global _MASTER
+
+    if exists(value=_MASTER):
+        return
+
+    _MASTER = scrollable_frame
+
+
+def _set_observable_model(observable_model: StackObservableModel) -> None:
+    """
+    Sets the observable model for the stack create form.
+
+    Args:
+        observable_model (StackObservableModel): The observable model to set.
+
+    Returns:
+        None
+    """
+
+    global _OBSERVABLE_MODEL
+
+    if exists(value=_OBSERVABLE_MODEL):
+        return
+
+    _OBSERVABLE_MODEL = observable_model
 
 
 def _update_form(
@@ -193,7 +277,7 @@ def _create_widgets() -> None:
         key="description",
         value={
             "is_required": False,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().description,
         },
     )
 
@@ -260,13 +344,13 @@ def _create_widgets() -> None:
         key="subject",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().subject,
         },
     )
 
     subject_combobox: ctk.CTkComboBox = ctk.CTkComboBox(
         master=_get_master(),
-        state=READONLY,
+        state=NORMAL,
         values=subject_names,
         variable=_get_form()["subject"]["variable"],
     )
@@ -322,13 +406,13 @@ def _create_widgets() -> None:
         key="teacher",
         value={
             "is_required": True,
-            "variable": ctk.StringVar(),
+            "variable": _get_observable_model().teacher,
         },
     )
 
     teacher_combobox: ctk.CTkComboBox = ctk.CTkComboBox(
         master=_get_master(),
-        state=READONLY,
+        state=NORMAL,
         values=teacher_names,
         variable=_get_form()["teacher"]["variable"],
     )
@@ -340,26 +424,6 @@ def _create_widgets() -> None:
         row=3,
         sticky=NSEW,
     )
-
-
-def _get_master() -> ctk.CTkScrollableFrame:
-    """
-    Returns the master frame widget.
-
-    Args:
-        None
-
-    Returns:
-        ctk.CTkScrollableFrame: The master frame widget.
-    """
-
-    if _MASTER is None:
-        raise ValueError(
-            "The master frame has not been initialized yet."
-            "The method '_set_master' must be executed first."
-        )
-
-    return _MASTER
 
 
 def _on_clear_create_form() -> None:
@@ -397,6 +461,8 @@ def _on_destroy() -> None:
         None
     """
 
+    global _MASTER, _OBSERVABLE_MODEL
+
     _unsubscribe_from_events()
 
     _clear_master()
@@ -404,6 +470,8 @@ def _on_destroy() -> None:
     _get_form().clear()
 
     _MASTER = None
+
+    _OBSERVABLE_MODEL = None
 
 
 def _on_get_create_form() -> dict[str, Any]:
@@ -432,20 +500,18 @@ def _on_get_create_form() -> dict[str, Any]:
     }
 
 
-def _set_master(scrollable_frame: ctk.CTkScrollableFrame) -> None:
+def _on_get_observable_model() -> ObservableModel:
     """
-    Sets the master frame widget.
+    Handles the 'GET_OBSERVABLE_MODEL' event.
 
     Args:
-        scrollable_frame (ctk.CTkScrollableFrame): The scrollable frame to add the form to.
+        None
 
     Returns:
-        None
+        ObservableModel: The observable model.
     """
 
-    global _MASTER
-
-    _MASTER = scrollable_frame
+    return _get_observable_model()
 
 
 def _subscribe_to_events() -> None:
@@ -462,24 +528,31 @@ def _subscribe_to_events() -> None:
     subscriptions: list[dict[str, Any]] = [
         {
             "event": CLEAR_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
             "function": _on_clear_create_form,
             "persistent": True,
             "priority": 1,
         },
         {
             "event": DESTROY_STACK_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
             "function": _on_destroy,
             "persistent": True,
             "priority": 1,
         },
         {
             "event": GET_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL,
             "function": _on_get_create_form,
             "persistent": True,
             "priority": 1,
+        },
+        {
+            "event": GET_OBSERVABLE_MODEL,
+            "function": _on_get_observable_model,
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
         },
     ]
 
@@ -533,6 +606,7 @@ def get_stack_create_form(scrollable_frame: ctk.CTkScrollableFrame) -> None:
 
     try:
         _set_master(scrollable_frame)
+        _set_observable_model(observable_model=StackObservableModel())
         _clear_master()
         _create_widgets()
         _configure_grid()

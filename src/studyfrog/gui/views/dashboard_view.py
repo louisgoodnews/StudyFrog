@@ -29,6 +29,7 @@ from gui.logic.dashboard_view_logic import (
     on_rehearse_button_click,
     on_view_button_click,
 )
+from models.models import Model
 from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.gui import (
@@ -284,12 +285,12 @@ def _create_center_frame_widgets() -> None:
     _set_dashboard_item_container(scrollable_frame=scrollable_frame)
 
 
-def _create_dashboard_item_widgets(stack: dict[str, Any]) -> ctk.CTkFrame:
+def _create_dashboard_item_widgets(stack: Model) -> ctk.CTkFrame:
     """
     Creates the dashboard item widgets.
 
     Args:
-        stack (dict[str, Any]): The stack to create the dashboard item widgets for.
+        stack (Model): The stack to create the dashboard item widgets for.
 
     Returns:
         ctk.CTkFrame: The created dashboard item frame.
@@ -329,7 +330,7 @@ def _create_dashboard_item_widgets(stack: dict[str, Any]) -> ctk.CTkFrame:
     ctk.CTkLabel(
         anchor=W,
         master=frame,
-        text=stack["name"],
+        text=stack.name,
     ).grid(
         column=0,
         padx=5,
@@ -423,7 +424,7 @@ def _load_stacks() -> None:
         None
     """
 
-    stacks: Optional[list[dict[str, Any]]] = (
+    stacks: Optional[list[Model]] = (
         dispatch(
             event=GET_ALL_STACKS_FROM_DB,
             namespace=GLOBAL,
@@ -466,12 +467,12 @@ def _on_destroy() -> None:
     _DASHBOARD_ITEM_CONTAINER = None
 
 
-def _on_stack_added(stack: dict[str, Any]) -> None:
+def _on_stack_added(stack: Model) -> None:
     """
     Handler for the 'STACK_ADDED' event.
 
     Args:
-        stack (dict[str, Any]): The stack that was added.
+        stack (Model): The stack that was added.
 
     Returns:
         None
@@ -481,32 +482,32 @@ def _on_stack_added(stack: dict[str, Any]) -> None:
 
     _register_dashboard_item(
         frame=frame,
-        key=stack["metadata"]["key"],
+        key=stack.key,
     )
 
 
-def _on_stack_deleted(stack: dict[str, Any]) -> None:
+def _on_stack_deleted(stack: Model) -> None:
     """
     Handler for the 'STACK_DELETED' event.
 
     Args:
-        stack (dict[str, Any]): The stack that was added.
+        stack (Model): The stack that was added.
 
     Returns:
         None
     """
 
-    _DASHBOARD_ITEMS[stack["metadata"]["key"]].destroy()
+    _DASHBOARD_ITEMS[stack.key].destroy()
 
-    _unregister_dashboard_item(key=stack["metadata"]["key"])
+    _unregister_dashboard_item(key=stack.key)
 
 
-def _on_stacks_added(stacks: list[dict[str, Any]]) -> None:
+def _on_stacks_added(stacks: list[Model]) -> None:
     """
     Handler for the 'STACKS_ADDED' event.
 
     Args:
-        stacks (list[dict[str, Any]]): The stacks that were added.
+        stacks (list[Model]): The stacks that were added.
 
     Returns:
         None
@@ -517,7 +518,7 @@ def _on_stacks_added(stacks: list[dict[str, Any]]) -> None:
 
         _register_dashboard_item(
             frame=frame,
-            key=stack["metadata"]["key"],
+            key=stack.key,
         )
 
 

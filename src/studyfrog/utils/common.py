@@ -3,6 +3,7 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+import inspect
 import json
 from pathlib import Path
 import random
@@ -10,7 +11,7 @@ import re
 import uuid
 
 from datetime import date, datetime
-from typing import Any, Final, Optional, Union
+from typing import Any, Callable, Final, Optional, Union
 
 
 # ---------- Exports ---------- #
@@ -21,7 +22,9 @@ __all__: Final[list[str]] = [
     "exists",
     "date_from_string",
     "datetime_from_string",
+    "filter_and_call",
     "find_string",
+    "flatten_dictionary",
     "generate_model_key",
     "generate_uuid4",
     "generate_uuid4_str",
@@ -137,6 +140,41 @@ def exists(value: Any) -> bool:
     return bool(value)
 
 
+def filter_and_call(
+    function: Callable,
+    **kwargs,
+) -> Optional[Any]:
+    """
+    Calls the given function with filtered arguments and keyword arguments.
+
+    Filters the arguments and keyword arguments based on the parameters of the given function.
+
+    Args:
+        function (Callable): The function to call.
+        **kwargs: The keyword arguments to pass to the function.
+
+    Returns:
+        Optional[Any]: The result of calling the function with the filtered arguments and keyword arguments.
+    """
+
+    filtered_kwargs: dict[str, Any] = {}
+
+    parameters: list[str] = list(inspect.signature(function).parameters.keys())
+
+    filtered_kwargs.update(
+        {
+            key: value
+            for (
+                key,
+                value,
+            ) in kwargs.items()
+            if key in parameters
+        }
+    )
+
+    return function(**filtered_kwargs)
+
+
 def find_string(
     string: str,
     pattern: str,
@@ -164,6 +202,37 @@ def find_string(
         return None
 
     return match
+
+
+def flatten_dictionary(dictionary: dict[str, Any]) -> dict[str, Any]:
+    """
+    Flattens a dictionary by iterating through it and its nested dictionaries.
+
+    Args:
+        dictionary (dict[str, Any]): The dictionary to flatten.
+
+    Returns:
+        dict[str, Any]: The flattened dictionary.
+    """
+
+    flattened_dictionary: dict[str, Any] = {}
+
+    def _flatten_dictionary(_dictionary: dict[str, Any]) -> None:
+        for (
+            key,
+            value,
+        ) in _dictionary.items():
+            if isinstance(
+                value,
+                dict,
+            ):
+                _flatten_dictionary(value)
+            else:
+                flattened_dictionary[key] = value
+
+    _flatten_dictionary(dictionary)
+
+    return flattened_dictionary
 
 
 def generate_model_key(

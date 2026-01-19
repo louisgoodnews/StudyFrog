@@ -24,49 +24,47 @@ from utils.common import (
 # ---------- Exports ---------- #
 
 __all__: Final[list[str]] = [
-    "Answer",
-    "Association",
-    "Customfield",
-    "Difficulty",
-    "Flashcard",
-    "Image",
+    "AnswerModel",
+    "AssociationModel",
+    "CustomfieldModel",
+    "DifficultyModel",
+    "FlashcardModel",
+    "ImageModel",
     "Model",
-    "Note",
-    "Option",
-    "Priority",
-    "Question",
-    "RehearsalRunItem",
-    "RehearsalRun",
-    "Stack",
-    "Subject",
-    "Tag",
-    "Teacher",
-    "User",
+    "NoteModel",
+    "OptionModel",
+    "PriorityModel",
+    "QuestionModel",
+    "RehearsalRunItemModel",
+    "RehearsalRunModel",
+    "StackModel",
+    "SubjectModel",
+    "TagModel",
+    "TeacherModel",
+    "UserModel",
 ]
 
 
 # ---------- Constant ---------- #
 
 Model: TypeAlias = Union[
-    "Answer",
-    "Association",
-    "Customfield",
-    "Difficulty",
-    "Flashcard",
-    "Image",
-    "ModelIdentifiable",
-    "ModelMetadata",
-    "Note",
-    "Option",
-    "Priority",
-    "Question",
-    "RehearsalRunItem",
-    "RehearsalRun",
-    "Stack",
-    "Subject",
-    "Tag",
-    "Teacher",
-    "User",
+    "AnswerModel",
+    "AssociationModel",
+    "CustomfieldModel",
+    "DifficultyModel",
+    "FlashcardModel",
+    "ImageModel",
+    "NoteModel",
+    "OptionModel",
+    "PriorityModel",
+    "QuestionModel",
+    "RehearsalRunItemModel",
+    "RehearsalRunModel",
+    "StackModel",
+    "SubjectModel",
+    "TagModel",
+    "TeacherModel",
+    "UserModel",
 ]
 
 
@@ -97,19 +95,83 @@ def _convert_to_dict(model: Model) -> dict[str, Any]:
                 ModelMetadata,
             ),
         ):
-            result[key] = value.to_dict()
+            result[key.strip("_")] = value.to_dict()
 
             continue
 
-        result[key] = value
+        result[key.strip("_")] = value
 
-    return result
+    return dict(sorted(result.items()))
+
+
+def _convert_to_json(model: Model) -> dict[str, Any]:
+    """
+    Converts a passed Model instance into a JSON dictionary.
+
+    Args:
+        model (Model): The model instance to convert.
+
+    Returns:
+        dict[str, Any]: The JSON dictionary representation of the model.
+    """
+
+    result: dict[str, Any] = {}
+
+    for (
+        key,
+        value,
+    ) in model.__dict__.items():
+        if not isinstance(
+            value,
+            (
+                datetime,
+                date,
+                ModelIdentifiable,
+                ModelMetadata,
+                Path,
+                uuid.UUID,
+            ),
+        ):
+            result[key.strip("_")] = value
+
+            continue
+
+        if isinstance(
+            value,
+            datetime,
+        ):
+            result[key.strip("_")] = value.isoformat()
+        elif isinstance(
+            value,
+            date,
+        ):
+            result[key.strip("_")] = value.isoformat()
+        elif isinstance(
+            value,
+            (
+                ModelIdentifiable,
+                ModelMetadata,
+            ),
+        ):
+            result[key.strip("_")] = value.to_json()
+        elif isinstance(
+            value,
+            Path,
+        ):
+            result[key.strip("_")] = str(value)
+        elif isinstance(
+            value,
+            uuid.UUID,
+        ):
+            result[key.strip("_")] = str(value)
+
+    return dict(sorted(result.items()))
 
 
 # ---------- Classes ---------- #
 
 
-class Answer:
+class AnswerModel:
     """
     Represents an answer entity within the application.
 
@@ -163,8 +225,8 @@ class Answer:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="ANSWER",
             updated_at=updated_at,
@@ -235,7 +297,7 @@ class Answer:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the answer.
 
@@ -243,7 +305,7 @@ class Answer:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -311,7 +373,7 @@ class Answer:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the answer.
 
@@ -319,7 +381,7 @@ class Answer:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -334,8 +396,21 @@ class Answer:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Association:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class AssociationModel:
     """
     Represents an association entity within the application.
 
@@ -403,8 +478,8 @@ class Association:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="ASSOCIATION",
             updated_at=updated_at,
@@ -527,7 +602,7 @@ class Association:
         self._flashcard = value
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the association.
 
@@ -535,7 +610,7 @@ class Association:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -779,7 +854,7 @@ class Association:
         self._user = value
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the association.
 
@@ -787,7 +862,7 @@ class Association:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -802,8 +877,21 @@ class Association:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Customfield:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class CustomfieldModel:
     """
     Represents a custom field entity within the application.
 
@@ -851,8 +939,8 @@ class Customfield:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="CUSTOMFIELD",
             updated_at=updated_at,
@@ -895,7 +983,7 @@ class Customfield:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the customfield.
 
@@ -903,7 +991,7 @@ class Customfield:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -995,7 +1083,7 @@ class Customfield:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the customfield.
 
@@ -1003,7 +1091,7 @@ class Customfield:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -1018,8 +1106,21 @@ class Customfield:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Difficulty:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class DifficultyModel:
     """
     Represents a difficulty level entity within the application.
 
@@ -1070,8 +1171,8 @@ class Difficulty:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="DIFFICULTY",
             updated_at=updated_at,
@@ -1125,7 +1226,7 @@ class Difficulty:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the difficulty.
 
@@ -1133,7 +1234,7 @@ class Difficulty:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -1190,7 +1291,7 @@ class Difficulty:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the difficulty.
 
@@ -1198,7 +1299,7 @@ class Difficulty:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     @property
     def value(self) -> float:
@@ -1224,8 +1325,21 @@ class Difficulty:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Flashcard:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class FlashcardModel:
     """
     Represents a flashcard entity within the application.
 
@@ -1303,8 +1417,8 @@ class Flashcard:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="FLASHCARD",
             updated_at=updated_at,
@@ -1451,7 +1565,7 @@ class Flashcard:
         self._front = value
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the flashcard.
 
@@ -1459,7 +1573,7 @@ class Flashcard:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def is_assigned_to_stack(self) -> bool:
@@ -1635,7 +1749,7 @@ class Flashcard:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the flashcard.
 
@@ -1643,7 +1757,7 @@ class Flashcard:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -1658,8 +1772,21 @@ class Flashcard:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Image:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class ImageModel:
     """
     Represents an image entity within the application.
 
@@ -1710,8 +1837,8 @@ class Image:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="IMAGE",
             updated_at=updated_at,
@@ -1754,7 +1881,7 @@ class Image:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the image.
 
@@ -1762,7 +1889,7 @@ class Image:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -1830,7 +1957,7 @@ class Image:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the image.
 
@@ -1838,7 +1965,7 @@ class Image:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -1852,6 +1979,19 @@ class Image:
         """
 
         return _convert_to_dict(self)
+
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
+
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
 
 
 class ModelIdentifiable:
@@ -1886,10 +2026,18 @@ class ModelIdentifiable:
 
         self._id: Final[Union[int, str]] = id_
         self._key: Final[str] = key
-        self._uuid: Final[uuid.UUID] = uuid.UUID(uuid_) if exists(value=uuid_) else generate_uuid4()
+        self._uuid: Final[uuid.UUID] = (
+            uuid_
+            if exists(value=uuid_) and isinstance(uuid_, uuid.UUID)
+            else (
+                uuid.UUID(hex=uuid_)
+                if exists(value=uuid_) and isinstance(uuid_, str)
+                else generate_uuid4()
+            )
+        )
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the model.
 
@@ -1911,7 +2059,7 @@ class ModelIdentifiable:
         return self._key
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the model.
 
@@ -1933,6 +2081,19 @@ class ModelIdentifiable:
         """
 
         return _convert_to_dict(self)
+
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
+
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
 
 
 class ModelMetadata:
@@ -2075,8 +2236,21 @@ class ModelMetadata:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Note:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class NoteModel:
     """
     Represents a note entity within the application.
 
@@ -2140,8 +2314,8 @@ class Note:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="NOTE",
             updated_at=updated_at,
@@ -2254,7 +2428,7 @@ class Note:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the note.
 
@@ -2262,7 +2436,7 @@ class Note:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def is_assigned_to_stack(self) -> bool:
@@ -2474,7 +2648,7 @@ class Note:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the note.
 
@@ -2482,7 +2656,7 @@ class Note:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -2497,8 +2671,21 @@ class Note:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Option:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class OptionModel:
     """
     Represents an individual option within a customfield or setting.
 
@@ -2544,8 +2731,8 @@ class Option:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="OPTION",
             updated_at=updated_at,
@@ -2587,7 +2774,7 @@ class Option:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the option.
 
@@ -2595,7 +2782,7 @@ class Option:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -2641,7 +2828,7 @@ class Option:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the option.
 
@@ -2649,7 +2836,7 @@ class Option:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     @property
     def value(self) -> Any:
@@ -2682,8 +2869,21 @@ class Option:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Priority:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class PriorityModel:
     """
     Represents a priority level entity within the application.
 
@@ -2734,8 +2934,8 @@ class Priority:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="PRIORITY",
             updated_at=updated_at,
@@ -2789,7 +2989,7 @@ class Priority:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the priority.
 
@@ -2797,7 +2997,7 @@ class Priority:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -2854,7 +3054,7 @@ class Priority:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the priority.
 
@@ -2862,7 +3062,7 @@ class Priority:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     @property
     def value(self) -> float:
@@ -2888,8 +3088,21 @@ class Priority:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Question:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class QuestionModel:
     """
     Represents a question entity within the application.
 
@@ -2964,8 +3177,8 @@ class Question:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="QUESTION",
             updated_at=updated_at,
@@ -3069,14 +3282,14 @@ class Question:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the question.
 
         Returns:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def is_assigned_to_stack(self) -> bool:
@@ -3255,14 +3468,14 @@ class Question:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the question.
 
         Returns:
             uuid.UUID: The instance's UUID.
         """
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -3277,8 +3490,21 @@ class Question:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class RehearsalAction:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class RehearsalActionModel:
     """
     Represents a single performed action within a study session.
 
@@ -3334,8 +3560,8 @@ class RehearsalAction:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="REHEARSAL_ACTION",
             updated_at=updated_at,
@@ -3374,14 +3600,14 @@ class RehearsalAction:
         return self._metadata.created_on
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the rehearsal action.
 
         Returns:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -3444,14 +3670,14 @@ class RehearsalAction:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the rehearsal action.
 
         Returns:
             uuid.UUID: The instance's UUID.
         """
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -3466,8 +3692,21 @@ class RehearsalAction:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class RehearsalRunItem:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class RehearsalRunItemModel:
     """
     Represents an individual item within a rehearsal session.
 
@@ -3526,8 +3765,8 @@ class RehearsalRunItem:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="REHEARSAL_RUN_ITEM",
             updated_at=updated_at,
@@ -3593,14 +3832,14 @@ class RehearsalRunItem:
         return self._metadata.created_on
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the rehearsal run item.
 
         Returns:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def item(self) -> str:
@@ -3687,14 +3926,14 @@ class RehearsalRunItem:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the rehearsal run item.
 
         Returns:
             uuid.UUID: The instance's UUID.
         """
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -3709,8 +3948,21 @@ class RehearsalRunItem:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class RehearsalRun:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class RehearsalRunModel:
     """
     Represents a specific rehearsal session or study run.
 
@@ -3783,8 +4035,8 @@ class RehearsalRun:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="REHEARSAL_RUN",
             updated_at=updated_at,
@@ -3888,14 +4140,14 @@ class RehearsalRun:
         self._finished_at = value
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the rehearsal run.
 
         Returns:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def is_finished(self) -> bool:
@@ -4014,14 +4266,14 @@ class RehearsalRun:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the rehearsal run.
 
         Returns:
             uuid.UUID: The instance's UUID.
         """
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -4036,8 +4288,21 @@ class RehearsalRun:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Stack:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class StackModel:
     """
     Represents a collection or container (stack) of study materials.
 
@@ -4056,6 +4321,7 @@ class Stack:
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         customfields: Optional[list[dict[str, Any]]] = None,
+        description: Optional[str] = None,
         difficulty: Optional[str] = None,
         id_: Optional[Union[int, str]] = None,
         items: Optional[list[str]] = None,
@@ -4076,6 +4342,7 @@ class Stack:
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             customfields (Optional[list[dict[str, Any]]]): List of custom data fields.
+            description (Optional[str]): Description of the stack.
             difficulty (Optional[str]): Difficulty level key associated with this stack.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
             key (Optional[str]): Unique model key identifier.
@@ -4098,6 +4365,7 @@ class Stack:
         self._author: Optional[str] = author
         self._children: list[str] = children or []
         self._customfields: list[dict[str, Any]] = customfields or []
+        self._description: Optional[str] = description
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
             key=key,
@@ -4107,8 +4375,8 @@ class Stack:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="STACK",
             updated_at=updated_at,
@@ -4214,6 +4482,23 @@ class Stack:
         self._customfields.extend(value)
 
     @property
+    def description(self) -> Optional[str]:
+        """
+        Returns the description of the stack.
+
+        Returns:
+            Optional[str]: The description of the stack.
+        """
+        return self._description
+
+    @description.setter
+    def description(
+        self,
+        value: str,
+    ) -> None:
+        self._description = value
+
+    @property
     def difficulty(self) -> Optional[str]:
         """
         Returns the difficulty key associated with the stack.
@@ -4241,14 +4526,14 @@ class Stack:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the stack.
 
         Returns:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -4433,14 +4718,14 @@ class Stack:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the stack.
 
         Returns:
             uuid.UUID: The instance's UUID.
         """
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -4455,8 +4740,21 @@ class Stack:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Subject:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class SubjectModel:
     """
     Represents a subject entity within the application.
 
@@ -4510,8 +4808,8 @@ class Subject:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="SUBJECT",
             updated_at=updated_at,
@@ -4601,7 +4899,7 @@ class Subject:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the subject.
 
@@ -4609,7 +4907,7 @@ class Subject:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -4692,10 +4990,10 @@ class Subject:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
 
-class Tag:
+class TagModel:
     """
     Represents a tag entity within the application.
 
@@ -4741,8 +5039,8 @@ class Tag:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="TAG",
             updated_at=updated_at,
@@ -4784,7 +5082,7 @@ class Tag:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the tag.
 
@@ -4792,7 +5090,7 @@ class Tag:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -4838,7 +5136,7 @@ class Tag:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the tag.
 
@@ -4846,7 +5144,7 @@ class Tag:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     @property
     def value(self) -> str:
@@ -4872,8 +5170,21 @@ class Tag:
 
         return _convert_to_dict(self)
 
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
 
-class Teacher:
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)
+
+
+class TeacherModel:
     """
     Represents a teacher entity within the application.
 
@@ -4929,8 +5240,8 @@ class Teacher:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="TEACHER",
             updated_at=updated_at,
@@ -5021,7 +5332,7 @@ class Teacher:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the teacher.
 
@@ -5029,7 +5340,7 @@ class Teacher:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -5141,10 +5452,10 @@ class Teacher:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
 
-class User:
+class UserModel:
     """
     Represents a user entity within the application.
 
@@ -5191,8 +5502,8 @@ class User:
             created_at=created_at,
             created_on=created_on,
             fields={
-                "total": len(list(locals().keys())),
-                "values": list(locals().keys()),
+                "total": len(locals().keys()),
+                "values": [key.strip("_") for key in locals().keys()],
             },
             type_="USER",
             updated_at=updated_at,
@@ -5234,7 +5545,7 @@ class User:
         return dict(self._metadata.fields)
 
     @property
-    def id_(self) -> Optional[Union[int, str]]:
+    def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the user.
 
@@ -5242,7 +5553,7 @@ class User:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
 
-        return self._identifiable.id_
+        return self._identifiable.id
 
     @property
     def key(self) -> Optional[str]:
@@ -5299,7 +5610,7 @@ class User:
         return self._metadata.updated_on
 
     @property
-    def uuid_(self) -> uuid.UUID:
+    def uuid(self) -> uuid.UUID:
         """
         Returns the universally unique identifier (UUID) of the user.
 
@@ -5307,7 +5618,7 @@ class User:
             uuid.UUID: The instance's UUID.
         """
 
-        return self._identifiable.uuid_
+        return self._identifiable.uuid
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -5321,3 +5632,16 @@ class User:
         """
 
         return _convert_to_dict(self)
+
+    def to_json(self) -> dict[str, Any]:
+        """
+        Returns a JSON dictionary representation of the model.
+
+        Args:
+            None
+
+        Returns:
+           dict[str, Any]: The JSON dictionary representation of the model.
+        """
+
+        return _convert_to_json(self)

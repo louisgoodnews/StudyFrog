@@ -15,12 +15,15 @@ from constants.events import (
     DESTROY_ANSWER_CREATE_FORM,
     DESTROY_QUESTION_CREATE_FORM,
     GET_CREATE_FORM,
+    GET_OBSERVABLE_MODEL,
 )
 from gui.forms.answer_create_form import (
     get_answer_choice_create_form,
     get_answer_open_ended_create_form,
     get_answer_true_false_create_form,
 )
+from models.observables import ObservableModel, QuestionObservableModel
+from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.gui import destroy_widget_children, reset_widget_grid
 from utils.logging import log_error, log_info
@@ -35,11 +38,9 @@ __all__: Final[list[str]] = ["get_question_create_form"]
 # ---------- Constants ---------- #
 
 _ANSWER_FRAME: Optional[ctk.CTkFrame] = None
-
 _FORM: Final[dict[str, Any]] = {}
-
 _MASTER: Optional[ctk.CTkScrollableFrame] = None
-
+_OBSERVABLE_MODEL: Optional[QuestionObservableModel] = None
 _SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
@@ -57,7 +58,7 @@ def _get_answer_frame() -> ctk.CTkFrame:
         ctk.CTkFrame: The answer frame widget.
     """
 
-    if _ANSWER_FRAME is None:
+    if not exists(value=_ANSWER_FRAME):
         raise ValueError(
             "Answer frame is None. Please provide an answer frame (call '_set_answer_frame' function first)."
         )
@@ -79,7 +80,7 @@ def _get_form() -> dict[str, Any]:
         ValueError: If the form is None.
     """
 
-    if _FORM is None:
+    if not exists(value=_FORM):
         raise ValueError(
             "Form is None. This should never happen and likely is the result of a serious error."
         )
@@ -98,12 +99,34 @@ def _get_master() -> ctk.CTkScrollableFrame:
         ctk.CTkScrollableFrame: The master frame widget.
     """
 
-    if _MASTER is None:
+    if not exists(value=_MASTER):
         raise ValueError(
             "Master is None. Please provide a master frame (call '_set_master' function first)."
         )
 
     return _MASTER
+
+
+def _get_observable_model() -> QuestionObservableModel:
+    """
+    Returns the observable model.
+
+    Args:
+        None
+
+    Returns:
+        QuestionObservableModel: The observable model.
+
+    Raises:
+        ValueError: If the observable model is None. Please provide an observable model (call '_set_observable_model' function first).
+    """
+
+    if not exists(value=_OBSERVABLE_MODEL):
+        raise ValueError(
+            "Observable model is None. Please provide an observable model (call '_set_observable_model' function first)."
+        )
+
+    return _OBSERVABLE_MODEL
 
 
 def _set_answer_frame(frame: ctk.CTkFrame) -> None:
@@ -118,6 +141,9 @@ def _set_answer_frame(frame: ctk.CTkFrame) -> None:
     """
 
     global _ANSWER_FRAME
+
+    if exists(value=_ANSWER_FRAME):
+        return
 
     _ANSWER_FRAME = frame
 
@@ -137,9 +163,33 @@ def _set_master(scrollable_frame: ctk.CTkScrollableFrame) -> None:
 
     global _MASTER
 
+    if exists(value=_MASTER):
+        return
+
     _MASTER = scrollable_frame
 
     log_info(message="ctk.CTkScrollableFrame master widget set successfully.")
+
+
+def _set_observable_model(observable_model: QuestionObservableModel) -> None:
+    """
+    Sets the observable model for the question create form.
+
+    Args:
+        observable_model (QuestionObservableModel): The observable model to set.
+
+    Returns:
+        None
+    """
+
+    global _OBSERVABLE_MODEL
+
+    if exists(value=_OBSERVABLE_MODEL):
+        return
+
+    _OBSERVABLE_MODEL = observable_model
+
+    log_info(message="Observable model set successfully.")
 
 
 def _update_form(
@@ -159,14 +209,15 @@ def _update_form(
 
     if isinstance(
         key,
-        list,
+        str,
     ):
-        for _key in key:
-            _get_form()[_key] = value
+
+        _get_form()[key] = value
 
         return
 
-    _get_form()[key] = value
+    for _key in key:
+        _get_form()[_key] = value
 
 
 # ---------- Private Functions ---------- #
@@ -404,11 +455,17 @@ def _on_destroy() -> None:
         None
     """
 
-    global _MASTER
+    global _MASTER, _OBSERVABLE_MODEL
 
     _unsubscribe_from_events()
 
+    _clear_master()
+
+    _get_form().clear()
+
     _MASTER = None
+
+    _OBSERVABLE_MODEL = None
 
 
 def _on_get_create_form() -> dict[str, Any]:
@@ -437,6 +494,20 @@ def _on_get_create_form() -> dict[str, Any]:
     }
 
 
+def _on_get_observable_model() -> ObservableModel:
+    """
+    Handles the 'GET_OBSERVABLE_MODEL' event.
+
+    Args:
+        None
+
+    Returns:
+        ObservableModel: The observable model.
+    """
+
+    return _get_observable_model()
+
+
 def _subscribe_to_events() -> None:
     """
     Subscribes to events for the question create form.
@@ -459,6 +530,13 @@ def _subscribe_to_events() -> None:
         {
             "event": GET_CREATE_FORM,
             "function": _on_get_create_form,
+            "namespace": GLOBAL,
+            "persistent": True,
+            "priority": 100,
+        },
+        {
+            "event": GET_OBSERVABLE_MODEL,
+            "function": _on_get_observable_model,
             "namespace": GLOBAL,
             "persistent": True,
             "priority": 100,
@@ -515,6 +593,7 @@ def get_question_create_form(scrollable_frame: ctk.CTkScrollableFrame) -> None:
 
     try:
         _set_master(scrollable_frame=scrollable_frame)
+        _set_observable_model(observable_model=QuestionObservableModel())
         _clear_master()
         _configure_grid()
         _create_widgets()
