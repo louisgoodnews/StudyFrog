@@ -4328,6 +4328,8 @@ class StackModel:
         key: Optional[str] = None,
         parent: Optional[str] = None,
         priority: Optional[str] = None,
+        subject: Optional[str] = None,
+        teacher: Optional[str] = None,
         updated_at: Optional[datetime] = None,
         updated_on: Optional[date] = None,
         uuid_: Optional[uuid.UUID] = None,
@@ -4363,14 +4365,15 @@ class StackModel:
         """
 
         self._author: Optional[str] = author
-        self._children: list[str] = children or []
-        self._customfields: list[dict[str, Any]] = customfields or []
+        self._children: list[str] = children if children else []
+        self._customfields: list[dict[str, Any]] = customfields if customfields else []
         self._description: Optional[str] = description
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
             key=key,
             uuid_=uuid_,
         )
+        self._items: list[str] = items if items else []
         self._metadata: Final[ModelMetadata] = ModelMetadata(
             created_at=created_at,
             created_on=created_on,
@@ -4384,6 +4387,8 @@ class StackModel:
         )
         self._name: str = name
         self._parent: Optional[str] = parent
+        self._subject: Optional[str] = subject
+        self._teacher: Optional[str] = teacher
 
     @property
     def author(self) -> Optional[str]:
@@ -4534,6 +4539,26 @@ class StackModel:
             Optional[Union[int, str]]: The database ID if assigned, otherwise None.
         """
         return self._identifiable.id
+
+    @property
+    def items(self) -> list[str]:
+        """
+        Returns the list of items associated with the stack.
+
+        Returns:
+            list[str]: A list containing item keys.
+        """
+        return self._items
+
+    @items.setter
+    def items(
+        self,
+        value: Union[list[str], str],
+    ) -> None:
+        if isinstance(value, list):
+            self._items.extend(value)
+            return
+        self._items.append(value)
 
     @property
     def key(self) -> Optional[str]:

@@ -840,6 +840,8 @@ def get_stack_model(
     key: Optional[str] = None,
     parent: Optional[str] = None,
     priority: Optional[str] = None,
+    subject: Optional[str] = None,
+    teacher: Optional[str] = None,
     updated_at: Optional[Union[datetime, str]] = None,
     updated_on: Optional[Union[date, str]] = None,
     uuid_: Optional[Union[str, uuid.UUID]] = None,
@@ -868,6 +870,8 @@ def get_stack_model(
         key (Optional[str]): Unique model key identifier.
         parent (Optional[str]): Reference key to a parent stack, if applicable.
         priority (Optional[str]): Reference key for the associated priority level.
+        subject (Optional[str]): Reference key for the associated subject.
+        teacher (Optional[str]): Reference key for the associated teacher.
         updated_at (Optional[Union[datetime, str]]): ISO-formatted last update timestamp.
         updated_on (Optional[Union[date, str]]): ISO-formatted last update date.
         uuid_ (Optional[Union[str, uuid.UUID]]): Universally unique identifier.

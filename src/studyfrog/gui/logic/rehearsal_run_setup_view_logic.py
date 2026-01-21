@@ -4,7 +4,7 @@ Date: 2025-12-19
 Description: The logic of the rehearsal run setup view of the application.
 """
 
-from typing import Final, Optional
+from typing import Any, Final, Optional
 
 from constants.common import GLOBAL
 from constants.events import (
@@ -19,10 +19,10 @@ from constants.events import (
     GET_REHEARSAL_RUN_SETUP_FORM,
     GET_REHEARSAL_RUN_VIEW,
 )
-from models.factory import Model
+from models.models import Model
 from utils.common import exists
 from utils.dispatcher import dispatch
-from utils.logging import log_debug, log_error
+from utils.logging import log_error
 
 
 # ---------- Exports ---------- #
@@ -153,17 +153,7 @@ def _handle_difficulty_data(data: str) -> str:
     """
 
     try:
-        return (
-            _filter_difficulty(display_name=data)
-            .get(
-                "metadata",
-                {},
-            )
-            .get(
-                "key",
-                None,
-            )
-        )
+        return _filter_difficulty(display_name=data).key
     except Exception as e:
         log_error(message=f"Failed to handle difficulty data: {e}")
         raise e
@@ -181,17 +171,7 @@ def _handle_priority_data(data: str) -> str:
     """
 
     try:
-        return (
-            _filter_priority(display_name=data)
-            .get(
-                "metadata",
-                {},
-            )
-            .get(
-                "key",
-                None,
-            )
-        )
+        return _filter_priority(display_name=data).key
     except Exception as e:
         log_error(message=f"Failed to handle priority data: {e}")
         raise e
@@ -219,22 +199,12 @@ def _handle_stacks_data(data: str) -> list[str]:
         for name in data:
             stack: Optional[Model] = _filter_stack(name=name)
 
-            if stack is None:
+            if not exists(value=stack):
                 raise ValueError(f"Stack '{name}' not found.")
 
-            key: Optional[str] = (
-                _filter_stack(name=name)
-                .get(
-                    "metadata",
-                    {},
-                )
-                .get(
-                    "key",
-                    None,
-                )
-            )
+            key: Optional[str] = stack.key
 
-            if key is None:
+            if not exists(value=key):
                 raise ValueError(f"Failed to get key from metadata in stack '{name}'.")
 
             result.append(key)
@@ -312,7 +282,7 @@ def on_start_button_click() -> None:
         None
     """
 
-    response: Optional[ModelDict] = (
+    response: Optional[dict[str, Any]] = (
         dispatch(
             event=GET_REHEARSAL_RUN_SETUP_FORM,
             namespace=GLOBAL,
@@ -327,7 +297,7 @@ def on_start_button_click() -> None:
         )
     )
 
-    if response is None:
+    if not exists(value=response):
         log_error(message="Failed to get rehearsal run setup form")
         return
 
@@ -337,7 +307,7 @@ def on_start_button_click() -> None:
     response["priority"]["value"] = _handle_priority_data(data=response["priority"]["value"])
     response["stacks"]["value"] = _handle_stacks_data(data=response["stacks"]["value"])
 
-    rehearsal_run_model: ModelDict = (
+    rehearsal_run_model: Model = (
         dispatch(
             configuration={
                 "filter_by_difficulty_enabled": bool(response["difficulty"]["value"]),
@@ -380,7 +350,7 @@ def on_start_button_click() -> None:
         )
     )
 
-    if id is None:
+    if not exists(value=id):
         log_error(message="Failed to add rehearsal run to database")
         return
 

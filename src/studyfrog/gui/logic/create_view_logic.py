@@ -85,30 +85,40 @@ __all__: Final[list[str]] = [
 # ---------- Constants ---------- #
 
 
-_LAST_CREATED: dict[
-    Literal[
-        "answer",
-        "flashcard",
-        "note",
-        "question",
-        "stack",
-        "subject",
-        "teacher",
-    ],
-    tuple[Optional[int], Optional[str]],
+_LAST_CREATED: Final[
+    dict[
+        Literal[
+            "answer",
+            "flashcard",
+            "note",
+            "question",
+            "stack",
+            "subject",
+            "teacher",
+        ],
+        tuple[
+            Optional[int],
+            Optional[str],
+        ],
+    ]
 ] = {}
 
-_LAST_UPDATED: dict[
-    Literal[
-        "answer",
-        "flashcard",
-        "note",
-        "question",
-        "stack",
-        "subject",
-        "teacher",
-    ],
-    tuple[Optional[int], Optional[str]],
+_LAST_UPDATED: Final[
+    dict[
+        Literal[
+            "answer",
+            "flashcard",
+            "note",
+            "question",
+            "stack",
+            "subject",
+            "teacher",
+        ],
+        tuple[
+            Optional[int],
+            Optional[str],
+        ],
+    ]
 ] = {}
 
 

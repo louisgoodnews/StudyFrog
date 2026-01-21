@@ -71,7 +71,7 @@ def on_delete_button_click(stack: Model) -> None:
     """
 
     try:
-        log_info(message=f"Getting view to delete stack: '{stack.name} ({stack.id_})'")
+        log_info(message=f"Getting view to delete stack: '{stack.name} ({stack.id})'")
 
         dispatch(
             event=GET_DELETE_CONFIRMATION_VIEW,
@@ -96,7 +96,7 @@ def on_edit_button_click(stack: Model) -> None:
     """
 
     try:
-        log_info(message=f"Getting view to edit stack: '{stack.name} ({stack.id_})'")
+        log_info(message=f"Getting view to edit stack: '{stack.name} ({stack.id})'")
 
         dispatch(
             event=GET_EDIT_VIEW,
@@ -121,7 +121,7 @@ def on_rehearse_button_click(stack: Model) -> None:
     """
 
     try:
-        log_info(message=f"Getting view to rehearse stack: '{stack.name} ({stack.id_})'")
+        log_info(message=f"Getting view to rehearse stack: '{stack.name} ({stack.id})'")
 
         dispatch(
             event=DESTROY_DASHBOARD_VIEW,
@@ -149,7 +149,7 @@ def on_view_button_click(stack: Model) -> None:
     """
 
     try:
-        log_info(message=f"Getting view to view stack: '{stack.name} ({stack.id_})'")
+        log_info(message=f"Getting view to view stack: '{stack.name} ({stack.id})'")
 
         dispatch(
             event=GET_VIEW_VIEW,

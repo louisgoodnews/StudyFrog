@@ -134,10 +134,7 @@ def exists(value: Any) -> bool:
         bool: True if the value exists, False otherwise.
     """
 
-    if value == 0 or value is False:
-        return True
-
-    return bool(value)
+    return value is not None
 
 
 def filter_and_call(

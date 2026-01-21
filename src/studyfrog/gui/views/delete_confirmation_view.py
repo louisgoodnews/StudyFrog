@@ -13,6 +13,7 @@ from constants.common import GLOBAL
 from constants.events import DESTROY_DELETE_CONFIRMATION_VIEW
 from constants.gui import TOPLEVEL_GEOMETRY, WINDOW_TITLE
 from gui.logic.delete_confirmation_view_logic import on_cancel_button_click, on_okay_button_click
+from models.models import Model
 from utils.common import exists
 from utils.dispatcher import subscribe, unsubscribe
 from utils.logging import log_error, log_info
@@ -26,15 +27,10 @@ __all__: Final[list[str]] = ["get_delete_confirmation_view"]
 # ---------- Constants ---------- #
 
 _BOTTOM_FRAME: Optional[ctk.CTkFrame] = None
-
 _CENTER_FRAME: Optional[ctk.CTkFrame] = None
-
 _MASTER: Optional[ctk.CTkToplevel] = None
-
-_OBJECT: Optional[dict[str, Any]] = None
-
+_MODEL: Optional[Model] = None
 _SUBSCRIPTION_IDS: Final[list[str]] = []
-
 _TOP_FRAME: Optional[ctk.CTkFrame] = None
 
 
@@ -105,24 +101,24 @@ def _get_master() -> ctk.CTkToplevel:
     return _MASTER
 
 
-def _get_object() -> Optional[dict[str, Any]]:
+def _get_model() -> Optional[Model]:
     """
-    Returns the object to be deleted.
+    Returns the model to be deleted.
 
     Args:
         None
 
     Returns:
-        Optional[dict[str, Any]]: The object to be deleted.
+        Optional[Model]: The model to be deleted.
 
     Raises:
-        ValueError: If the object does not exist.
+        ValueError: If the model does not exist.
     """
 
-    if not exists(value=_OBJECT):
-        raise ValueError("object does not exist. Call the '_set_object' method first.")
+    if not exists(value=_MODEL):
+        raise ValueError("model does not exist. Call the '_set_model' method first.")
 
-    return _OBJECT
+    return _MODEL
 
 
 def _get_subscription_ids() -> list[str]:
@@ -216,23 +212,23 @@ def _set_master(toplevel: ctk.CTkToplevel) -> None:
     _MASTER = toplevel
 
 
-def _set_object(obj: Any) -> None:
+def _set_model(model: Model) -> None:
     """
-    Sets the object to be deleted.
+    Sets the model to be deleted.
 
     Args:
-        obj (Any): The object to be deleted.
+        model (Model): The model to be deleted.
 
     Returns:
         None
     """
 
-    global _OBJECT
+    global _MODEL
 
-    if exists(value=_OBJECT):
+    if exists(value=_MODEL):
         return
 
-    _OBJECT = obj
+    _MODEL = model
 
 
 def _set_top_frame(frame: ctk.CTkFrame) -> None:
@@ -384,7 +380,7 @@ def _create_bottom_frame_widgets() -> None:
     )
 
     ctk.CTkButton(
-        command=lambda: on_okay_button_click(obj=_get_object()),
+        command=lambda: on_okay_button_click(model=_get_model()),
         master=_get_bottom_frame(),
         text="Okay",
     ).grid(
@@ -413,7 +409,7 @@ def _create_center_frame_widgets() -> None:
             24,
         ),
         master=_get_center_frame(),
-        text=f"Do you really want to delete this {_get_object()['metadata']['type'].title()} with ID {_get_object()['metadata']['id']}?",
+        text=f"Do you really want to delete this {_get_model().type_.title()} with ID {_get_model().id}?",
     ).grid(
         column=0,
         padx=5,
@@ -521,7 +517,7 @@ def _on_destroy() -> None:
         None
     """
 
-    global _BOTTOM_FRAME, _CENTER_FRAME, _MASTER, _OBJECT, _TOP_FRAME
+    global _BOTTOM_FRAME, _CENTER_FRAME, _MASTER, _MODEL, _TOP_FRAME
 
     _MASTER.destroy()
 
@@ -530,7 +526,7 @@ def _on_destroy() -> None:
     _BOTTOM_FRAME = None
     _CENTER_FRAME = None
     _MASTER = None
-    _OBJECT = None
+    _MODEL = None
     _TOP_FRAME = None
 
 
@@ -593,7 +589,7 @@ def _unsubscribe_from_events() -> None:
 
 def get_delete_confirmation_view(
     toplevel: ctk.CTkToplevel,
-    obj: Optional[dict[str, Any]] = None,
+    model: Optional[Model] = None,
 ) -> None:
     """
     Gets the delete confirmation view.
@@ -620,7 +616,7 @@ def get_delete_confirmation_view(
         )
 
         _set_master(toplevel=toplevel)
-        _set_object(obj=obj)
+        _set_model(model=model)
         _create_widgets()
         _configure_grid()
         _subscribe_to_events()

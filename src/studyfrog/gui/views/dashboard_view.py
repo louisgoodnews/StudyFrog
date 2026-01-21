@@ -39,7 +39,7 @@ from utils.gui import (
     clear_top_frame,
     reset_frame_grids,
 )
-from utils.logging import log_debug, log_error, log_info
+from utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #
@@ -79,7 +79,10 @@ def _get_dashboard_item_container() -> ctk.CTkScrollableFrame:
     return _DASHBOARD_ITEM_CONTAINER
 
 
-def _register_dashboard_item(frame: ctk.CTkFrame, key: str) -> None:
+def _register_dashboard_item(
+    frame: ctk.CTkFrame,
+    key: str,
+) -> None:
     """
     Registers a dashboard item.
 
@@ -486,20 +489,23 @@ def _on_stack_added(stack: Model) -> None:
     )
 
 
-def _on_stack_deleted(stack: Model) -> None:
+def _on_stack_deleted(stack: dict[str, Any]) -> None:
     """
     Handler for the 'STACK_DELETED' event.
 
+    This method is called when a stack is deleted from the database.
+    It removes the stack from the dashboard view and unregisters it.
+
     Args:
-        stack (Model): The stack that was added.
+        stack (dict[str, Any]): A dictionary representing the stack that was deleted.
 
     Returns:
         None
     """
 
-    _DASHBOARD_ITEMS[stack.key].destroy()
+    _DASHBOARD_ITEMS[stack["identifiable"]["key"]].destroy()
 
-    _unregister_dashboard_item(key=stack.key)
+    _unregister_dashboard_item(key=stack["identifiable"]["key"])
 
 
 def _on_stacks_added(stacks: list[Model]) -> None:

@@ -20,6 +20,8 @@ from constants.events import (
 )
 from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
 from gui.logic.rehearsal_run_setup_view_logic import on_cancel_button_click, on_start_button_click
+from models.models import Model
+from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.gui import (
     clear_bottom_frame,
@@ -38,9 +40,8 @@ __all__: Final[list[str]] = ["get_rehearsal_run_setup_view"]
 
 # ---------- Constants ---------- #
 
-FORM: Final[dict[str, Any]] = {}
-
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_FORM: Final[dict[str, Any]] = {}
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
@@ -57,7 +58,7 @@ def _on_time_limit_enabled_checkbox_click(frame: ctk.CTkFrame) -> None:
         None
     """
 
-    if FORM["time_limit_enabled"]["variable"].get():
+    if _FORM["time_limit_enabled"]["variable"].get():
         frame.pack(
             expand=YES,
             fill=X,
@@ -270,7 +271,7 @@ def _create_difficulty_form_widgets(master: ctk.CTkScrollableFrame) -> None:
         None
     """
 
-    FORM["difficulty"] = {
+    _FORM["difficulty"] = {
         "is_required": False,
         "variable": ctk.StringVar(),
     }
@@ -335,7 +336,7 @@ def _create_difficulty_form_widgets(master: ctk.CTkScrollableFrame) -> None:
     ctk.CTkComboBox(
         master=frame,
         values=difficulties,
-        variable=FORM["difficulty"]["variable"],
+        variable=_FORM["difficulty"]["variable"],
     ).grid(
         column=1,
         padx=5,
@@ -368,7 +369,7 @@ def _create_priority_form_widgets(master: ctk.CTkScrollableFrame) -> None:
         None
     """
 
-    FORM["priority"] = {
+    _FORM["priority"] = {
         "is_required": False,
         "variable": ctk.StringVar(),
     }
@@ -433,7 +434,7 @@ def _create_priority_form_widgets(master: ctk.CTkScrollableFrame) -> None:
     ctk.CTkComboBox(
         master=frame,
         values=priorities,
-        variable=FORM["priority"]["variable"],
+        variable=_FORM["priority"]["variable"],
     ).grid(
         column=1,
         padx=5,
@@ -466,7 +467,7 @@ def _create_randomization_form_widgets(master: ctk.CTkScrollableFrame) -> None:
         None
     """
 
-    FORM["item_order_randomization_enabled"] = {
+    _FORM["item_order_randomization_enabled"] = {
         "is_required": False,
         "variable": ctk.BooleanVar(),
     }
@@ -512,7 +513,7 @@ def _create_randomization_form_widgets(master: ctk.CTkScrollableFrame) -> None:
     ctk.CTkCheckBox(
         master=frame,
         text="",
-        variable=FORM["item_order_randomization_enabled"]["variable"],
+        variable=_FORM["item_order_randomization_enabled"]["variable"],
     ).grid(
         column=1,
         padx=5,
@@ -552,7 +553,7 @@ def _create_stack_selection_form_widgets(master: ctk.CTkScrollableFrame) -> None
         )
     ]
 
-    selected: list[str] = FORM["stacks"]["variable"].get().split(", ")
+    selected: list[str] = _FORM["stacks"]["variable"].get().split(", ")
 
     outer_frame: ctk.CTkFrame = ctk.CTkFrame(master=master)
 
@@ -621,7 +622,7 @@ def _create_stack_selection_form_widgets(master: ctk.CTkScrollableFrame) -> None
         ctk.CTkComboBox(
             command=lambda value: (
                 selected.append(value),
-                FORM["stacks"]["variable"].set(value=", ".join(list(set(selected)))),
+                _FORM["stacks"]["variable"].set(value=", ".join(list(set(selected)))),
             ),
             master=inner_frame,
             values=stacks,
@@ -663,7 +664,7 @@ def _create_time_counter_selection_form_widgets(master: ctk.CTkScrollableFrame) 
         None
     """
 
-    FORM["time_counter_enabled"] = {
+    _FORM["time_counter_enabled"] = {
         "is_required": True,
         "variable": ctk.BooleanVar(value=False),
     }
@@ -709,7 +710,7 @@ def _create_time_counter_selection_form_widgets(master: ctk.CTkScrollableFrame) 
     ctk.CTkCheckBox(
         master=frame,
         text="",
-        variable=FORM["time_counter_enabled"]["variable"],
+        variable=_FORM["time_counter_enabled"]["variable"],
     ).grid(
         column=1,
         padx=5,
@@ -730,7 +731,7 @@ def _create_time_limit_selection_form_widgets(master: ctk.CTkScrollableFrame) ->
         None
     """
 
-    FORM["time_limit_enabled"] = {
+    _FORM["time_limit_enabled"] = {
         "is_required": True,
         "variable": ctk.BooleanVar(value=False),
     }
@@ -800,7 +801,7 @@ def _create_time_limit_selection_form_widgets(master: ctk.CTkScrollableFrame) ->
         command=lambda: _on_time_limit_enabled_checkbox_click(frame=container),
         master=frame,
         text="",
-        variable=FORM["time_limit_enabled"]["variable"],
+        variable=_FORM["time_limit_enabled"]["variable"],
     ).grid(
         column=1,
         padx=5,
@@ -832,9 +833,9 @@ def _create_time_limit_form_widgets(master: ctk.CTkFrame) -> None:
             None
         """
 
-        label.configure(text=f"{FORM['time_limit']['variable'].get()} minutes")
+        label.configure(text=f"{_FORM['time_limit']['variable'].get()} minutes")
 
-    FORM["time_limit"] = {
+    _FORM["time_limit"] = {
         "is_required": False,
         "variable": ctk.IntVar(value=60),
     }
@@ -852,7 +853,7 @@ def _create_time_limit_form_widgets(master: ctk.CTkFrame) -> None:
 
     label: ctk.CTkLabel = ctk.CTkLabel(
         master=master,
-        text=f"{FORM['time_limit']['variable'].get()} minutes",
+        text=f"{_FORM['time_limit']['variable'].get()} minutes",
     )
 
     label.grid(
@@ -868,7 +869,7 @@ def _create_time_limit_form_widgets(master: ctk.CTkFrame) -> None:
         master=master,
         number_of_steps=8,
         to=480,
-        variable=FORM["time_limit"]["variable"],
+        variable=_FORM["time_limit"]["variable"],
     ).grid(
         column=1,
         padx=5,
@@ -904,7 +905,7 @@ def _create_top_frame_widgets() -> None:
     ctk.CTkLabel(
         anchor=W,
         master=get_top_frame(),
-        text=f"Rehearsal run setup for {FORM['stacks']['variable'].get()}",
+        text=f"Rehearsal run setup for {_FORM['stacks']['variable'].get()}",
     ).grid(
         column=0,
         padx=5,
@@ -925,7 +926,7 @@ def _on_clear_rehearsal_run_setup_form() -> None:
         None
     """
 
-    FORM.clear()
+    _FORM.clear()
 
 
 def _on_destroy() -> None:
@@ -941,7 +942,7 @@ def _on_destroy() -> None:
 
     _unsubscribe_from_events()
 
-    FORM.clear()
+    _FORM.clear()
 
 
 def _on_get_rehearsal_run_setup_form() -> dict[str, Any]:
@@ -963,7 +964,7 @@ def _on_get_rehearsal_run_setup_form() -> dict[str, Any]:
         for (
             key,
             value,
-        ) in FORM.items()
+        ) in _FORM.items()
     }
 
 
@@ -1003,7 +1004,7 @@ def _subscribe_to_events() -> None:
     ]
 
     for subscription in subscriptions:
-        SUBSCRIPTION_IDS.append(
+        _SUBSCRIPTION_IDS.append(
             subscribe(
                 event=subscription["event"],
                 function=subscription["function"],
@@ -1025,49 +1026,49 @@ def _unsubscribe_from_events() -> None:
         None
     """
 
-    for uuid in SUBSCRIPTION_IDS:
+    for uuid in _SUBSCRIPTION_IDS:
         unsubscribe(uuid=uuid)
 
     log_info(message="Unsubscribed from all events for the rehearsal run setup view.")
 
-    SUBSCRIPTION_IDS.clear()
+    _SUBSCRIPTION_IDS.clear()
 
 
 # ---------- Public Functions ---------- #
 
 
 def get_rehearsal_run_setup_view(
-    stack: Optional[dict[str, Any]] = None,
-    stacks: Optional[list[dict[str, Any]]] = None,
+    stack: Optional[Model] = None,
+    stacks: Optional[list[Model]] = None,
 ) -> None:
     """
     Gets the rehearsal run setup view of the application.
 
     Args:
-        stack (Optional[dict[str, Any]], optional): The stack to rehearse. Defaults to None.
-        stacks (Optional[list[dict[str, Any]]], optional): The stacks to rehearse. Defaults to None.
+        stack (Optional[Model], optional): The stack to rehearse. Defaults to None.
+        stacks (Optional[list[Model]], optional): The stacks to rehearse. Defaults to None.
 
     Returns:
         None
     """
 
     try:
-        if stack is not None:
-            FORM["stacks"] = {
+        if exists(value=stack):
+            _FORM["stacks"] = {
                 "is_required": True,
-                "variable": ctk.StringVar(value=stack["name"]),
+                "variable": ctk.StringVar(value=stack.name),
             }
 
-        elif stacks is not None:
-            FORM["stacks"] = {
+        elif exists(value=stacks):
+            _FORM["stacks"] = {
                 "is_required": True,
                 "variable": ctk.StringVar(
-                    value=", ".join(list(set([stack["name"] for stack in stacks])))
+                    value=", ".join(list(set([stack.name for stack in stacks])))
                 ),
             }
 
         else:
-            FORM["stacks"] = {
+            _FORM["stacks"] = {
                 "is_required": True,
                 "variable": ctk.StringVar(value=""),
             }

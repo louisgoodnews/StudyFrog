@@ -15,6 +15,7 @@ from constants.events import (
     DESTROY_DELETE_CONFIRMATION_VIEW,
     GET_INFO_TOAST,
 )
+from models.models import Model
 from utils.common import exists, pluralize_word, string_to_snake_case
 from utils.dispatcher import dispatch
 
@@ -36,23 +37,18 @@ __all__: Final[list[str]] = [
 # ---------- Private Functions ---------- #
 
 
-def _has_sub_models(dictionary: dict[str, Any]) -> bool:
+def _has_sub_models(model: Model) -> bool:
     """
-    Determines if a passed module dictionary has any sub modules, such as items.
+    Determines if a passed model object has any sub models, such as items.
 
     Args:
-        dictionary (dict[str, Any]): The dictionary to check.
+        model (Model): The model to check.
 
     Returns:
-        bool: True if the dictionary has sub modules, False otherwise.
+        bool: True if the model has sub models, False otherwise.
     """
 
-    if not exists(
-        value=dictionary.get(
-            "items",
-            None,
-        )
-    ):
+    if not exists(value=model.items):
         return False
 
     return True
@@ -78,12 +74,12 @@ def on_cancel_button_click() -> None:
     )
 
 
-def on_okay_button_click(obj: dict[str, Any]) -> None:
+def on_okay_button_click(model: Model) -> None:
     """
     Handles the 'okay' button click.
 
     Args:
-        obj (dict[str, Any]): The object of which the deletion to perform.
+        model (Model): The model of which the deletion to perform.
 
     Returns:
         None
@@ -100,14 +96,14 @@ def on_okay_button_click(obj: dict[str, Any]) -> None:
         "stack": DELETE_STACK_FROM_DB,
     }
 
-    if _has_sub_models(dictionary=obj):
+    if _has_sub_models(model=model):
         pass
     else:
         dispatch(
-            event=type_to_delete_event[string_to_snake_case(string=obj["metadata"]["type"])],
-            id_=obj["metadata"]["id"],
+            event=type_to_delete_event[string_to_snake_case(string=model.type_)],
+            id_=model.id,
             namespace=GLOBAL,
-            table_name=pluralize_word(word=string_to_snake_case(string=obj["metadata"]["type"])),
+            table_name=pluralize_word(word=string_to_snake_case(string=model.type_)),
         )
 
     dispatch(
@@ -117,7 +113,7 @@ def on_okay_button_click(obj: dict[str, Any]) -> None:
 
     dispatch(
         event=GET_INFO_TOAST,
-        message=f"{obj['metadata']['key']} deleted successfully",
+        message=f"{model.key} deleted successfully",
         namespace=GLOBAL,
-        title=f"{obj['metadata']['type'].title()} Deleted",
+        title=f"{model.type_.title()} Deleted",
     )
