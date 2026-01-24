@@ -11,7 +11,8 @@ from typing import Any, Final, Optional
 from constants.common import GLOBAL
 from constants.events import DESTROY_REHEARSAL_RUN_RESULT_VIEW
 from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
-from models.factories import ModelDict
+from models.models import Model
+from utils.common import exists
 from utils.dispatcher import subscribe, unsubscribe
 from utils.gui import clear_frames, reset_frame_grids
 from utils.logging import log_debug, log_error, log_info, log_warning
@@ -24,11 +25,46 @@ __all__: Final[list[str]] = []
 
 # ---------- Constants ---------- #
 
-REHEARSAL_RUN: Optional[ModelDict] = None
-
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_REHEARSAL_RUN: Optional[Model] = None
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 # ---------- Helper Functions ---------- #
+
+
+def _get_rehearsal_run() -> Model:
+    """
+    Returns the rehearsal run of the rehearsal run result view.
+
+    Args:
+        None
+
+    Returns:
+        Model: The rehearsal run of the rehearsal run result view.
+
+    Raises:
+        ValueError: If the rehearsal run is not set.
+    """
+
+    if not exists(value=_REHEARSAL_RUN):
+        raise ValueError("Rehearsal is not set. Run '_set_rehearsal_run' method first.")
+
+    return _REHEARSAL_RUN
+
+
+def _set_rehearsal_run(rehearsal_run: Model) -> None:
+    """
+    Sets the rehearsal run for the rehearsal run result view.
+
+    Args:
+        rehearsal_run (Model): The rehearsal run to be set.
+
+    Returns:
+        None
+    """
+
+    global _REHEARSAL_RUN
+
+    _REHEARSAL_RUN = rehearsal_run
 
 
 # ---------- Private Functions ---------- #
@@ -150,26 +186,6 @@ def _create_widgets() -> None:
     _create_top_frame_widgets()
 
 
-def _get_rehearsal_run() -> ModelDict:
-    """
-    Returns the rehearsal run of the rehearsal run result view.
-
-    Args:
-        None
-
-    Returns:
-        ModelDict: The rehearsal run of the rehearsal run result view.
-
-    Raises:
-        ValueError: If the rehearsal run is not set.
-    """
-
-    if REHEARSAL_RUN is None:
-        raise ValueError("Rehearsal is not set. Run '_set_rehearsal_run' method first.")
-
-    return REHEARSAL_RUN
-
-
 def _on_destroy() -> None:
     """
     Handles the 'DESTROY_REHEARSAL_RUN_VIEW' event.
@@ -183,23 +199,7 @@ def _on_destroy() -> None:
 
     _unsubscribe_from_events()
 
-    SUBSCRIPTION_IDS.clear()
-
-
-def _set_rehearsal_run(model_dict: ModelDict) -> None:
-    """
-    Sets the rehearsal run for the rehearsal run result view.
-
-    Args:
-        model_dict (ModelDict): The rehearsal run to be set.
-
-    Returns:
-        None
-    """
-
-    global REHEARSAL_RUN
-
-    REHEARSAL_RUN = model_dict
+    _SUBSCRIPTION_IDS.clear()
 
 
 def _subscribe_to_events() -> None:
@@ -224,7 +224,7 @@ def _subscribe_to_events() -> None:
     ]
 
     for subscription in subscriptions:
-        SUBSCRIPTION_IDS.append(
+        _SUBSCRIPTION_IDS.append(
             subscribe(
                 event=subscription["event"],
                 function=subscription["function"],
@@ -248,7 +248,7 @@ def _unsubscribe_from_events() -> None:
         None
     """
 
-    for uuid in SUBSCRIPTION_IDS:
+    for uuid in _SUBSCRIPTION_IDS:
         unsubscribe(uuid=uuid)
 
     log_info(message="Unsubscribed from all events in the rehearsal run result view.")
@@ -257,19 +257,19 @@ def _unsubscribe_from_events() -> None:
 # ---------- Public Functions ---------- #
 
 
-def get_rehearsal_run_result_view(rehearsal_run: ModelDict) -> None:
+def get_rehearsal_run_result_view(rehearsal_run: Model) -> None:
     """
     Gets the rehearsal run result view of the application.
 
     Args:
-        rehearsal_run (ModelDict): The rehearsal run to be displayed.
+        rehearsal_run (Model): The rehearsal run to be displayed.
 
     Returns:
         None
     """
 
     try:
-        _set_rehearsal_run(model_dict=rehearsal_run)
+        _set_rehearsal_run(rehearsal_run=rehearsal_run)
 
         clear_frames()
         reset_frame_grids()

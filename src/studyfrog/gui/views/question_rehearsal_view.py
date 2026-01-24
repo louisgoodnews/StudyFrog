@@ -10,6 +10,8 @@ from tkinter.constants import NSEW
 from typing import Any, Final, Literal, Optional
 
 from gui.gui import get_center_frame
+from models.models import Model
+from utils.common import exists
 from utils.gui import clear_center_frame, reset_center_frame_grid
 from utils.logging import log_error, log_info
 
@@ -21,14 +23,50 @@ __all__: Final[list[str]] = ["get_question_rehearsal_view"]
 
 # ---------- Constants ---------- #
 
-QUESTION: Optional[dict[str, Any]] = None
-
-FLIP_SIDE: Literal["front", "back"] = "front"
-
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_QUESTION: Optional[Model] = None
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
+
+
+def _get_question() -> Model:
+    """
+    Returns the question.
+
+    Args:
+        None
+
+    Returns:
+        Model: The question.
+
+    Raises:
+        ValueError: If the question is None.
+    """
+
+    if not exists(value=_QUESTION):
+        raise ValueError(
+            "Question is None. Please provide a question to be rehearsed.",
+            "",
+        )
+
+    return _QUESTION
+
+
+def _set_question(question: Model) -> None:
+    """
+    Sets the question.
+
+    Args:
+        question (Model): The question to be rehearsed.
+
+    Returns:
+        None
+    """
+
+    global _QUESTION
+
+    _QUESTION = question
 
 
 # ---------- Private Functions ---------- #
@@ -198,54 +236,15 @@ def _create_widgets() -> None:
     _create_top_frame_widgets(master=top_frame)
 
 
-def _get_question() -> dict[str, Any]:
-    """
-    Returns the question.
-
-    Args:
-        None
-
-    Returns:
-        dict[str, Any]: The question.
-
-    Raises:
-        ValueError: If the question is None.
-    """
-
-    if QUESTION is None:
-        raise ValueError(
-            "Question is None. Please provide a question to be rehearsed.",
-            "",
-        )
-
-    return QUESTION
-
-
-def _set_question(question: dict[str, Any]) -> None:
-    """
-    Sets the question.
-
-    Args:
-        question (dict[str, Any]): The question to be rehearsed.
-
-    Returns:
-        None
-    """
-
-    global QUESTION
-
-    QUESTION = question
-
-
 # ---------- Public Functions ---------- #
 
 
-def get_question_rehearsal_view(question: dict[str, Any]) -> None:
+def get_question_rehearsal_view(question: Model) -> None:
     """
     Gets the question rehearsal view of the application.
 
     Args:
-        question (dict[str, Any]): The question to be rehearsed.
+        question (Model): The question to be rehearsed.
 
     Returns:
         None

@@ -17,8 +17,9 @@ from gui.logic.edit_view_logic import (
     on_delete_button_click,
     on_save_button_click,
 )
-from utils.dispatcher import subscribe, unsubscribe
+from models.models import Model
 from utils.common import exists
+from utils.dispatcher import subscribe, unsubscribe
 from utils.logging import log_error
 
 
@@ -30,17 +31,11 @@ __all__: Final[list[str]] = ["get_edit_view"]
 # ---------- Constants ---------- #
 
 _BOTTOM_FRAME: Optional[ctk.CTkFrame] = None
-
 _CENTER_FRAME: Optional[ctk.CTkFrame] = None
-
 _MASTER: Optional[ctk.CTkScrollableFrame] = None
-
-_OBJECT: Optional[dict[str, Any]] = None
-
+_MODEL: Optional[dict[str, Any]] = None
 _SUBSCRIPTION_IDS: Final[list[str]] = []
-
 _TABVIEW: Optional[ctk.CTkTabview] = None
-
 _TOP_FRAME: Optional[ctk.CTkFrame] = None
 
 
@@ -140,24 +135,24 @@ def _get_master() -> ctk.CTkToplevel:
     return _MASTER
 
 
-def _get_object() -> dict[str, Any]:
+def _get_model() -> Model:
     """
-    Returns the object that is being edited in the edit view.
+    Returns the model that is being edited in the edit view.
 
     Args:
         None
 
     Returns:
-        dict[str, Any]: The object that is being edited in the edit view.
+        Model: The model that is being edited in the edit view.
 
     Raises:
-        ValueError: If the object has not been initialized yet. Call '_set_object' first.
+        ValueError: If the model has not been initialized yet. Call '_set_model' first.
     """
 
-    if not exists(value=_OBJECT):
-        raise ValueError("Object has not been initialized yet. Call '_set_object' first.")
+    if not exists(value=_MODEL):
+        raise ValueError("Model has not been initialized yet. Call '_set_model' first.")
 
-    return _OBJECT
+    return _MODEL
 
 
 def _get_subscription_ids() -> list[str]:
@@ -226,12 +221,12 @@ def _reset_constants() -> None:
         None
     """
 
-    global _BOTTOM_FRAME, _CENTER_FRAME, _MASTER, _OBJECT, _TABVIEW, _TOP_FRAME
+    global _BOTTOM_FRAME, _CENTER_FRAME, _MASTER, _MODEL, _TABVIEW, _TOP_FRAME
 
     _BOTTOM_FRAME = None
     _CENTER_FRAME = None
     _MASTER = None
-    _OBJECT = None
+    _MODEL = None
     _TABVIEW = None
     _TOP_FRAME = None
 
@@ -293,23 +288,23 @@ def _set_master(toplevel: ctk.CTkToplevel) -> None:
     _MASTER = toplevel
 
 
-def _set_object(dictionary: dict[str, Any]) -> None:
+def _set_model(model: Model) -> None:
     """
-    Sets the object to be edited.
+    Sets the model to be edited.
 
     Args:
-        dictionary (dict[str, Any]): The object to be edited.
+        model (Model): The model to be edited.
 
     Returns:
         None
     """
 
-    global _OBJECT
+    global _MODEL
 
-    if exists(value=_OBJECT):
+    if exists(value=_MODEL):
         return
 
-    _OBJECT = dictionary
+    _MODEL = model
 
 
 def _set_tabview(tabview: ctk.CTkTabview) -> None:
@@ -537,7 +532,7 @@ def _create_top_frame_widgets() -> None:
             24,
         ),
         master=_get_top_frame(),
-        text=f"Edit {_get_object()['metadata']['type'].title()} with ID ({_get_object()['metadata']['id']})",
+        text=f"Edit {_get_model().type_.title()} with ID ({_get_model().id})",
     ).grid(
         column=0,
         padx=5,
@@ -547,7 +542,7 @@ def _create_top_frame_widgets() -> None:
     )
 
     ctk.CTkButton(
-        command=lambda: on_delete_button_click(obj=_get_object()),
+        command=lambda: on_delete_button_click(obj=_get_model()),
         master=_get_top_frame(),
         text="Delete",
     ).grid(
@@ -693,14 +688,14 @@ def _unsubscribe_from_events() -> None:
 
 
 def get_edit_view(
-    obj: dict[str, Any],
+    model: Model,
     toplevel: ctk.CTkToplevel,
 ) -> ctk.CTkFrame:
     """
     Gets the edit view of the application.
 
     Args:
-        obj (dict[str, Any]): The object to edit.
+        model (Model): The model to edit.
         toplevel (ctk.CTkToplevel): The toplevel window of the application.
 
     Returns:
@@ -715,7 +710,7 @@ def get_edit_view(
         toplevel.title(string=WINDOW_TITLE)
 
         _set_master(toplevel=toplevel)
-        _set_object(dictionary=obj)
+        _set_model(model=model)
 
         _create_widgets()
         _configure_grid()

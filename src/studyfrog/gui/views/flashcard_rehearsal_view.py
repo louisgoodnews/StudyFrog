@@ -12,6 +12,8 @@ from typing import Any, Final, Literal, Optional
 from constants.common import GLOBAL
 from constants.events import FLASHCARD_FLIPPED
 from gui.gui import get_center_frame
+from models.models import Model
+from utils.common import exists
 from utils.dispatcher import dispatch
 from utils.gui import clear_center_frame, reset_center_frame_grid
 from utils.logging import log_error
@@ -27,14 +29,35 @@ __all__: Final[list[str]] = [
 
 # ---------- Constants ---------- #
 
-FLASHCARD: Optional[dict[str, Any]] = None
-
-FLIP_SIDE: Literal["front", "back"] = "front"
-
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_FLASHCARD: Optional[Model] = None
+_FLIP_SIDE: Literal["front", "back"] = "front"
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
+
+
+def _get_flashcard() -> Model:
+    """
+    Returns the flashcard.
+
+    Args:
+        None
+
+    Returns:
+        Model: The flashcard.
+
+    Raises:
+        ValueError: If the flashcard is None.
+    """
+
+    if not exists(value=_FLASHCARD):
+        raise ValueError(
+            "Flashcard is None. Please provide a flashcard to be rehearsed.",
+            "",
+        )
+
+    return _FLASHCARD
 
 
 def _toggle_flip_side() -> Literal["front", "back"]:
@@ -48,11 +71,27 @@ def _toggle_flip_side() -> Literal["front", "back"]:
         Literal["front", "back"]: The new side.
     """
 
-    global FLIP_SIDE
+    global _FLIP_SIDE
 
-    FLIP_SIDE = "front" if FLIP_SIDE == "back" else "back"
+    _FLIP_SIDE = "front" if _FLIP_SIDE == "back" else "back"
 
-    return FLIP_SIDE
+    return _FLIP_SIDE
+
+
+def _set_flashcard(flashcard: Model) -> None:
+    """
+    Sets the flashcard.
+
+    Args:
+        flashcard (Model): The flashcard to be rehearsed.
+
+    Returns:
+        None
+    """
+
+    global _FLASHCARD
+
+    _FLASHCARD = flashcard
 
 
 # ---------- Private Functions ---------- #
@@ -174,7 +213,7 @@ def _create_center_frame_widgets(master: ctk.CTkFrame) -> None:
 
         _toggle_flip_side()
 
-        label.configure(text=_get_flashcard()[FLIP_SIDE])
+        label.configure(text=_get_flashcard()[_FLIP_SIDE])
 
         dispatch(
             event=FLASHCARD_FLIPPED,
@@ -183,7 +222,7 @@ def _create_center_frame_widgets(master: ctk.CTkFrame) -> None:
 
     label: ctk.CTkLabel = ctk.CTkLabel(
         master=master,
-        text=_get_flashcard()[FLIP_SIDE],
+        text=_get_flashcard()[_FLIP_SIDE],
     )
 
     label.grid(
@@ -271,54 +310,16 @@ def _create_widgets() -> None:
     _create_top_frame_widgets(master=top_frame)
 
 
-def _get_flashcard() -> dict[str, Any]:
-    """
-    Returns the flashcard.
-
-    Args:
-        None
-
-    Returns:
-        dict[str, Any]: The flashcard.
-
-    Raises:
-        ValueError: If the flashcard is None.
-    """
-
-    if FLASHCARD is None:
-        raise ValueError(
-            "Flashcard is None. Please provide a flashcard to be rehearsed.",
-            "",
-        )
-
-    return FLASHCARD
-
-
-def _set_flashcard(flashcard: dict[str, Any]) -> None:
-    """
-    Sets the flashcard.
-
-    Args:
-        flashcard (dict[str, Any]): The flashcard to be rehearsed.
-
-    Returns:
-        None
-    """
-
-    global FLASHCARD
-
-    FLASHCARD = flashcard
-
 
 # ---------- Public Functions ---------- #
 
 
-def get_flashcard_rehearsal_view(flashcard: dict[str, Any]) -> None:
+def get_flashcard_rehearsal_view(flashcard: Model) -> None:
     """
     Gets the flashcard rehearsal view of the application.
 
     Args:
-        flashcard (dict[str, Any]): The flashcard to be rehearsed.
+        flashcard (Model): The flashcard to be rehearsed.
 
     Returns:
         None
@@ -341,17 +342,17 @@ def get_flashcard_rehearsal_view(flashcard: dict[str, Any]) -> None:
         raise e
 
 
-def set_flip_side(flip_side: Optional[Literal["back", "front"]] = "back") -> None:
+def set_flip_side(flip_side: Literal["back", "front"] = "back") -> None:
     """
     Sets the flip side of the flashcard rehearsal view.
 
     Args:
-        flip_side (Optional[Literal["back", "front"]], optional): The flip side to set. Defaults to "back".
+        flip_side (Literal["back", "front"], optional): The flip side to set. Defaults to "back".
 
     Returns:
         None
     """
 
-    global FLIP_SIDE
+    global _FLIP_SIDE
 
-    FLIP_SIDE = flip_side
+    _FLIP_SIDE = flip_side

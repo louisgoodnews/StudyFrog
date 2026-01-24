@@ -7,9 +7,11 @@ Description: The note rehearsal view of the application.
 import customtkinter as ctk
 
 from tkinter.constants import DISABLED, NSEW
-from typing import Any, Final, Literal, Optional
+from typing import Final, Optional
 
 from gui.gui import get_center_frame
+from models.models import Model
+from utils.common import exists
 from utils.gui import clear_center_frame, reset_center_frame_grid
 from utils.logging import log_error, log_info
 
@@ -21,14 +23,50 @@ __all__: Final[list[str]] = ["get_note_rehearsal_view"]
 
 # ---------- Constants ---------- #
 
-NOTE: Optional[dict[str, Any]] = None
-
-FLIP_SIDE: Literal["front", "back"] = "front"
-
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_NOTE: Optional[Model] = None
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
+
+
+def _get_note() -> Model:
+    """
+    Returns the note.
+
+    Args:
+        None
+
+    Returns:
+        Model: The note.
+
+    Raises:
+        ValueError: If the note is None.
+    """
+
+    if not exists(value=_NOTE):
+        raise ValueError(
+            "Note is None. Please provide a note to be rehearsed.",
+            "",
+        )
+
+    return _NOTE
+
+
+def _set_note(note: Model) -> None:
+    """
+    Sets the note.
+
+    Args:
+        note (Model): The note to be rehearsed.
+
+    Returns:
+        None
+    """
+
+    global _NOTE
+
+    _NOTE = note
 
 
 # ---------- Private Functions ---------- #
@@ -225,54 +263,15 @@ def _create_widgets() -> None:
     _create_top_frame_widgets(master=top_frame)
 
 
-def _get_note() -> dict[str, Any]:
-    """
-    Returns the note.
-
-    Args:
-        None
-
-    Returns:
-        dict[str, Any]: The note.
-
-    Raises:
-        ValueError: If the note is None.
-    """
-
-    if NOTE is None:
-        raise ValueError(
-            "Note is None. Please provide a note to be rehearsed.",
-            "",
-        )
-
-    return NOTE
-
-
-def _set_note(note: dict[str, Any]) -> None:
-    """
-    Sets the note.
-
-    Args:
-        note (dict[str, Any]): The note to be rehearsed.
-
-    Returns:
-        None
-    """
-
-    global NOTE
-
-    NOTE = note
-
-
 # ---------- Public Functions ---------- #
 
 
-def get_note_rehearsal_view(note: dict[str, Any]) -> None:
+def get_note_rehearsal_view(note: Model) -> None:
     """
     Gets the note rehearsal view of the application.
 
     Args:
-        note (dict[str, Any]): The note to be rehearsed.
+        note (Model): The note to be rehearsed.
 
     Returns:
         None

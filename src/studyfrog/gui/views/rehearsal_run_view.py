@@ -30,7 +30,7 @@ from gui.logic.rehearsal_run_view_logic import (
     on_previous_button_click,
     start_rehearsal_run,
 )
-from models.factories import ModelDict
+from models.models import Model
 from gui.views.flashcard_rehearsal_view import get_flashcard_rehearsal_view, set_flip_side
 from gui.views.note_rehearsal_view import get_note_rehearsal_view
 from gui.views.question_rehearsal_view import get_question_rehearsal_view
@@ -47,19 +47,13 @@ __all__: Final[list[str]] = ["get_rehearsal_run_view"]
 
 # ---------- Constants ---------- #
 
-EASY_BUTTON: Optional[ctk.CTkButton] = None
-
-HARD_BUTTON: Optional[ctk.CTkButton] = None
-
-MEDIUM_BUTTON: Optional[ctk.CTkButton] = None
-
-NEXT_BUTTON: Optional[ctk.CTkButton] = None
-
-PREVIOUS_BUTTON: Optional[ctk.CTkButton] = None
-
-REHEARSAL_RUN: Optional[dict[str, Any]] = None
-
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_EASY_BUTTON: Optional[ctk.CTkButton] = None
+_HARD_BUTTON: Optional[ctk.CTkButton] = None
+_MEDIUM_BUTTON: Optional[ctk.CTkButton] = None
+_NEXT_BUTTON: Optional[ctk.CTkButton] = None
+_PREVIOUS_BUTTON: Optional[ctk.CTkButton] = None
+_REHEARSAL_RUN: Optional[dict[str, Any]] = None
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
@@ -216,7 +210,7 @@ def _create_bottom_frame_widgets() -> None:
         None
     """
 
-    global EASY_BUTTON, HARD_BUTTON, MEDIUM_BUTTON, NEXT_BUTTON, PREVIOUS_BUTTON
+    global _EASY_BUTTON, _HARD_BUTTON, _MEDIUM_BUTTON, _NEXT_BUTTON, _PREVIOUS_BUTTON
 
     previous_button: ctk.CTkButton = ctk.CTkButton(
         command=on_previous_button_click,
@@ -232,7 +226,7 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    PREVIOUS_BUTTON = previous_button
+    _PREVIOUS_BUTTON = previous_button
 
     easy_button: ctk.CTkButton = ctk.CTkButton(
         command=on_easy_button_click,
@@ -247,7 +241,7 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    EASY_BUTTON = easy_button
+    _EASY_BUTTON = easy_button
 
     medium_button: ctk.CTkButton = ctk.CTkButton(
         command=on_medium_button_click,
@@ -262,7 +256,7 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    MEDIUM_BUTTON = medium_button
+    _MEDIUM_BUTTON = medium_button
 
     hard_button: ctk.CTkButton = ctk.CTkButton(
         command=on_hard_button_click,
@@ -277,7 +271,7 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    HARD_BUTTON = hard_button
+    _HARD_BUTTON = hard_button
 
     next_button: ctk.CTkButton = ctk.CTkButton(
         command=on_next_button_click,
@@ -292,7 +286,7 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    NEXT_BUTTON = next_button
+    _NEXT_BUTTON = next_button
 
 
 def _create_center_frame_widgets() -> None:
@@ -382,11 +376,11 @@ def _get_rehearsal_run() -> dict[str, Any]:
         dict[str, Any]: The rehearsal run.
     """
 
-    return dict(REHEARSAL_RUN)
+    return dict(_REHEARSAL_RUN)
 
 
 def _load_rehearsal_view_form(
-    model_dict: ModelDict,
+    model: Model,
     model_type: Literal[
         "flashcard",
         "note",
@@ -410,7 +404,7 @@ def _load_rehearsal_view_form(
             "note",
             "question",
         ],
-        Callable[[ModelDict], None],
+        Callable[[Model], None],
     ] = {
         "flashcard": get_flashcard_rehearsal_view,
         "note": get_note_rehearsal_view,
@@ -420,12 +414,12 @@ def _load_rehearsal_view_form(
     if model_type == "flashcard":
         set_flip_side(flip_side="front")
 
-    model_type_to_rehearsal_form_getter[model_type](**{model_type: model_dict})
+    model_type_to_rehearsal_form_getter[model_type](**{model_type: model})
 
 
 def _on_destroy() -> None:
     """
-    Handles the 'DESTROY_REHEARSAL_RUN_VIEW' event.
+    Handles the 'DESTROY__REHEARSAL_RUN_VIEW' event.
 
     Args:
         None
@@ -434,55 +428,55 @@ def _on_destroy() -> None:
         None
     """
 
-    global EASY_BUTTON, HARD_BUTTON, MEDIUM_BUTTON, NEXT_BUTTON, PREVIOUS_BUTTON, REHEARSAL_RUN
+    global _EASY_BUTTON, _HARD_BUTTON, _MEDIUM_BUTTON, _NEXT_BUTTON, _PREVIOUS_BUTTON, _REHEARSAL_RUN
 
     _clear_widgets()
     _unsubscribe_from_events()
 
-    SUBSCRIPTION_IDS.clear()
+    _SUBSCRIPTION_IDS.clear()
 
-    EASY_BUTTON = None
+    _EASY_BUTTON = None
 
-    HARD_BUTTON = None
+    _HARD_BUTTON = None
 
-    MEDIUM_BUTTON = None
+    _MEDIUM_BUTTON = None
 
-    NEXT_BUTTON = None
+    _NEXT_BUTTON = None
 
-    PREVIOUS_BUTTON = None
+    _PREVIOUS_BUTTON = None
 
-    REHEARSAL_RUN = None
+    _REHEARSAL_RUN = None
 
 
-def _on_load_rehearsal_view_form(model_dict: ModelDict) -> None:
+def _on_load_rehearsal_view_form(model: Model) -> None:
     """
     Handles the 'LOAD_REHEARSAL_VIEW_FORM' event.
 
     Args:
-        model_dict (ModelDict): The model dictionary to load the rehearsal view form for.
+        model (Model): The model to load the rehearsal view form for.
 
     Returns:
         None
     """
 
     for button in (
-        EASY_BUTTON,
-        HARD_BUTTON,
-        MEDIUM_BUTTON,
-        NEXT_BUTTON,
-        PREVIOUS_BUTTON,
+        _EASY_BUTTON,
+        _HARD_BUTTON,
+        _MEDIUM_BUTTON,
+        _NEXT_BUTTON,
+        _PREVIOUS_BUTTON,
     ):
         button.configure(state=NORMAL)
 
     _load_rehearsal_view_form(
-        model_dict=model_dict,
-        model_type=model_dict["metadata"]["type"].lower(),
+        model=model,
+        model_type=model.type_.lower(),
     )
 
 
 def _on_rehearsal_run_index_decremented() -> None:
     """
-    Handles the 'REHEARSAL_RUN_INDEX_DECREMENTED' event.
+    Handles the '_REHEARSAL_RUN_INDEX_DECREMENTED' event.
 
     Args:
         None
@@ -491,13 +485,13 @@ def _on_rehearsal_run_index_decremented() -> None:
         None
     """
 
-    NEXT_BUTTON.configure(state=NORMAL)
-    PREVIOUS_BUTTON.configure(state=NORMAL)
+    _NEXT_BUTTON.configure(state=NORMAL)
+    _PREVIOUS_BUTTON.configure(state=NORMAL)
 
 
 def _on_rehearsal_run_index_incremented() -> None:
     """
-    Handles the 'REHEARSAL_RUN_INDEX_INCREMENTED' event.
+    Handles the '_REHEARSAL_RUN_INDEX_INCREMENTED' event.
 
     Args:
         None
@@ -506,13 +500,13 @@ def _on_rehearsal_run_index_incremented() -> None:
         None
     """
 
-    NEXT_BUTTON.configure(state=NORMAL)
-    PREVIOUS_BUTTON.configure(state=NORMAL)
+    _NEXT_BUTTON.configure(state=NORMAL)
+    _PREVIOUS_BUTTON.configure(state=NORMAL)
 
 
 def _on_rehearsal_run_max_index_reached() -> None:
     """
-    Handles the 'REHEARSAL_RUN_INDEX_MAX_REACHED' event.
+    Handles the '_REHEARSAL_RUN_INDEX_MAX_REACHED' event.
 
     Args:
         None
@@ -521,14 +515,14 @@ def _on_rehearsal_run_max_index_reached() -> None:
         None
     """
 
-    NEXT_BUTTON.configure(state=DISABLED)
+    _NEXT_BUTTON.configure(state=DISABLED)
 
     end_rehearsal_run(rehearsal_run=_get_rehearsal_run())
 
 
 def _on_rehearsal_run_min_index_reached() -> None:
     """
-    Handles the 'REHEARSAL_RUN_INDEX_MIN_REACHED' event.
+    Handles the '_REHEARSAL_RUN_INDEX_MIN_REACHED' event.
 
     Args:
         None
@@ -537,7 +531,7 @@ def _on_rehearsal_run_min_index_reached() -> None:
         None
     """
 
-    PREVIOUS_BUTTON.configure(state=DISABLED)
+    _PREVIOUS_BUTTON.configure(state=DISABLED)
 
 
 def _set_rehearsal_run(rehearsal_run: dict[str, Any]) -> None:
@@ -551,9 +545,9 @@ def _set_rehearsal_run(rehearsal_run: dict[str, Any]) -> None:
         None
     """
 
-    global REHEARSAL_RUN
+    global _REHEARSAL_RUN
 
-    REHEARSAL_RUN = rehearsal_run
+    _REHEARSAL_RUN = rehearsal_run
 
 
 def _subscribe_to_events() -> None:
@@ -613,7 +607,7 @@ def _subscribe_to_events() -> None:
     ]
 
     for subscription in subscriptions:
-        SUBSCRIPTION_IDS.append(
+        _SUBSCRIPTION_IDS.append(
             subscribe(
                 event=subscription["event"],
                 function=subscription["function"],
@@ -637,7 +631,7 @@ def _unsubscribe_from_events() -> None:
         None
     """
 
-    for uuid in SUBSCRIPTION_IDS:
+    for uuid in _SUBSCRIPTION_IDS:
         unsubscribe(uuid=uuid)
 
     log_info(message="Unsubscribed from all events in the rehearsal run view.")

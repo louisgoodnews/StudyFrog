@@ -10,6 +10,8 @@ from tkinter.constants import NSEW
 from typing import Any, Final, Optional
 
 from gui.gui import get_center_frame
+from models.models import Model
+from utils.common import exists
 from utils.gui import clear_center_frame, reset_center_frame_grid
 from utils.logging import log_error, log_info
 
@@ -21,12 +23,50 @@ __all__: Final[list[str]] = ["get_answer_rehearsal_view"]
 
 # ---------- Constants ---------- #
 
-ANSWER: Optional[dict[str, Any]] = None
-
-SUBSCRIPTION_IDS: Final[list[str]] = []
+_ANSWER: Optional[Model] = None
+_SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
+
+
+def _get_answer() -> Model:
+    """
+    Returns the answer.
+
+    Args:
+        None
+
+    Returns:
+        dict[str, Any]: The answer.
+
+    Raises:
+        ValueError: If the answer is None.
+    """
+
+    if not exists(value=_ANSWER):
+        raise ValueError(
+            "Answer is None. Please provide a answer to be rehearsed.",
+            "",
+        )
+
+    return _ANSWER
+
+
+def _set_answer(answer: Model) -> None:
+    """
+    Sets the answer.
+
+    Args:
+        answer (Model): The answer to be rehearsed.
+
+    Returns:
+        None
+    """
+
+    global _ANSWER
+
+    _ANSWER = answer
 
 
 # ---------- Private Functions ---------- #
@@ -196,54 +236,15 @@ def _create_widgets() -> None:
     _create_top_frame_widgets(master=top_frame)
 
 
-def _get_answer() -> dict[str, Any]:
-    """
-    Returns the answer.
-
-    Args:
-        None
-
-    Returns:
-        dict[str, Any]: The answer.
-
-    Raises:
-        ValueError: If the answer is None.
-    """
-
-    if ANSWER is None:
-        raise ValueError(
-            "Answer is None. Please provide a answer to be rehearsed.",
-            "",
-        )
-
-    return ANSWER
-
-
-def _set_answer(answer: dict[str, Any]) -> None:
-    """
-    Sets the answer.
-
-    Args:
-        answer (dict[str, Any]): The answer to be rehearsed.
-
-    Returns:
-        None
-    """
-
-    global ANSWER
-
-    ANSWER = answer
-
-
 # ---------- Public Functions ---------- #
 
 
-def get_answer_rehearsal_view(answer: dict[str, Any]) -> None:
+def get_answer_rehearsal_view(answer: Model) -> None:
     """
     Gets the answer rehearsal view of the application.
 
     Args:
-        answer (dict[str, Any]): The answer to be rehearsed.
+        answer (Model): The answer to be rehearsed.
 
     Returns:
         None
