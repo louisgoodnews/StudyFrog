@@ -4,7 +4,7 @@ Date: 2025-12-10
 """
 
 from pathlib import Path
-from typing import Any, Callable, Final
+from typing import Any, Callable, Final, Optional
 
 from constants.common import GLOBAL
 from constants.defaults import (
@@ -81,11 +81,11 @@ from models.factory import (
     get_stack_model,
 )
 from models.models import Model
-from utils.common import pluralize_word
+from utils.common import exists, pluralize_word
 from utils.directories import ensure_directory
 from utils.dispatcher import subscribe, unsubscribe
 from utils.files import ensure_file
-from utils.logging import log_error, log_info
+from utils.logging import log_error, log_info, log_warning
 from utils.storage import (
     add_entries_if_not_exist,
     add_entry_if_not_exist,
@@ -612,9 +612,16 @@ def ensure_defaults() -> None:
 
     try:
         for default_model in DEFAULT_MODELS:
-            add_entry_if_not_exist(
+            id_: Optional[int] = add_entry_if_not_exist(
                 model=default_model,
                 table_name=pluralize_word(word=default_model.type_.lower()),
+            )
+
+            if exists(value=id_):
+                continue
+
+            log_warning(
+                message=f"Did not add default model '{default_model.name}' to '{default_model.type_}' table. It might have existed beforehand. Check the '{default_model.type_}' table to confirm"
             )
     except Exception as e:
         log_error(message=f"Caught an exception while ensuring default difficulty models: {e}")

@@ -31,7 +31,7 @@ from constants.events import (
     UPDATE_QUESTION_IN_DB,
     UPDATE_REHEARSAL_RUN_IN_DB,
 )
-from models.factories import ModelDict
+from models.models import Model
 from utils.common import (
     exists,
     get_now,
@@ -120,7 +120,7 @@ def _filter_stack_items_by_difficulty(difficulty_key: str) -> None:
             "question",
         ] = model_key_to_model_type(model_key=item_key)
 
-        response: Optional[ModelDict] = (
+        response: Optional[Model] = (
             dispatch(
                 event=model_type_to_event[model_type],
                 id_=search_string(
@@ -146,7 +146,7 @@ def _filter_stack_items_by_difficulty(difficulty_key: str) -> None:
             )
             continue
 
-        if response["difficulty"] != difficulty_key:
+        if response.difficulty != difficulty_key:
             _remove_from_stack_item_keys(key=item_key)
 
 
@@ -181,7 +181,7 @@ def _filter_stack_items_by_priority(priority_key: str) -> None:
             "question",
         ] = model_key_to_model_type(model_key=item_key)
 
-        response: Optional[ModelDict] = (
+        response: Optional[Model] = (
             dispatch(
                 event=model_type_to_event[model_type],
                 id_=search_string(
@@ -207,7 +207,7 @@ def _filter_stack_items_by_priority(priority_key: str) -> None:
             )
             continue
 
-        if response["priority"] != priority_key:
+        if response.priority != priority_key:
             _remove_from_stack_item_keys(key=item_key)
 
 
@@ -222,7 +222,7 @@ def _get_stack_items(key: str) -> list[str]:
         list[str]: The keys of the stack items.
     """
 
-    response: Optional[dict[str, Any]] = (
+    response: Optional[Model] = (
         dispatch(
             event=GET_STACK_FROM_DB,
             id_=search_string(
@@ -249,10 +249,10 @@ def _get_stack_items(key: str) -> list[str]:
 
         return []
 
-    return response.get("items", [])
+    return response.items
 
 
-def _load_stack_item_from_db(stack_item_key: str) -> ModelDict:
+def _load_stack_item_from_db(stack_item_key: str) -> Model:
     """
     Loads the stack item corresponding to the passed stack item key from the database.
 
@@ -338,41 +338,41 @@ def _remove_from_stack_item_keys(key: str) -> None:
 # ---------- Public Functions ---------- #
 
 
-def end_rehearsal_run(rehearsal_run: ModelDict) -> None:
+def end_rehearsal_run(model: Model) -> None:
     """
     Handles the end of the rehearsal run.
 
     Args:
-        rehearsal_run (ModelDict): The rehearsal run to end.
+        model (Model): The model to end.
 
     Returns:
         None
     """
 
-    rehearsal_run["end"] = get_now()
+    model.end = get_now()
 
-    rehearsal_run["duration"] = {
-        "minutes": (rehearsal_run["end"] - rehearsal_run["start"]).total_seconds() // 60,
-        "seconds": (rehearsal_run["end"] - rehearsal_run["start"]).total_seconds(),
+    model.duration = {
+        "minutes": (model.end - model.start).total_seconds() // 60,
+        "seconds": (model.end - model.start).total_seconds(),
     }
 
-    rehearsal_run["end"] = rehearsal_run["end"].isoformat()
+    model.end = model.end.isoformat()
 
-    rehearsal_run["start"] = rehearsal_run["start"].isoformat()
+    model.start = model.start.isoformat()
 
     dispatch(
-        model=rehearsal_run,
+        model=model,
         event=UPDATE_REHEARSAL_RUN_IN_DB,
         namespace=GLOBAL,
         table_name="rehearsal_runs",
     )
 
-    log_debug(message=f"Ending rehearsal run: {rehearsal_run}")
+    log_debug(message=f"Ending rehearsal run: {model.key}")
 
     dispatch(
         event=GET_REHEARSAL_RUN_RESULT_VIEW,
+        model=model,
         namespace=GLOBAL,
-        rehearsal_run=rehearsal_run,
     )
 
 
@@ -404,7 +404,7 @@ def on_easy_button_click() -> None:
         None
     """
 
-    difficulty: ModelDict = (
+    difficulty: Model = (
         dispatch(
             event=FILTER_DIFFICULTIES_FROM_DB,
             name="easy",
@@ -459,7 +459,7 @@ def on_easy_button_click() -> None:
 
     model_type = model_type.lower()
 
-    model_dict: ModelDict = (
+    model: Model = (
         dispatch(
             event=model_type_to_get_event[model_type],
             id_=model_id,
@@ -489,10 +489,10 @@ def on_easy_button_click() -> None:
         "question": UPDATE_QUESTION_IN_DB,
     }
 
-    model_dict["difficulty"] = difficulty["metadata"]["key"]
+    model.difficulty = difficulty.key
 
     dispatch(
-        model=model_dict,
+        model=model,
         event=model_type_to_update_event[model_type],
         namespace=GLOBAL,
         table_name=pluralize_word(word=model_type),
@@ -532,7 +532,7 @@ def on_hard_button_click() -> None:
         None
     """
 
-    difficulty: ModelDict = (
+    difficulty: Model = (
         dispatch(
             event=FILTER_DIFFICULTIES_FROM_DB,
             name="hard",
@@ -587,7 +587,7 @@ def on_hard_button_click() -> None:
 
     model_type = model_type.lower()
 
-    model_dict: ModelDict = (
+    model: Model = (
         dispatch(
             event=model_type_to_get_event[model_type],
             id_=model_id,
@@ -617,10 +617,10 @@ def on_hard_button_click() -> None:
         "question": UPDATE_QUESTION_IN_DB,
     }
 
-    model_dict["difficulty"] = difficulty["metadata"]["key"]
+    model.difficulty = difficulty.key
 
     dispatch(
-        model=model_dict,
+        model=model,
         event=model_type_to_update_event[model_type],
         namespace=GLOBAL,
         table_name=pluralize_word(word=model_type),
@@ -643,7 +643,7 @@ def on_medium_button_click() -> None:
         None
     """
 
-    difficulty: ModelDict = (
+    difficulty: Model = (
         dispatch(
             event=FILTER_DIFFICULTIES_FROM_DB,
             name="medium",
@@ -698,7 +698,7 @@ def on_medium_button_click() -> None:
 
     model_type = model_type.lower()
 
-    model_dict: ModelDict = (
+    model: Model = (
         dispatch(
             event=model_type_to_get_event[model_type],
             id_=model_id,
@@ -728,10 +728,10 @@ def on_medium_button_click() -> None:
         "question": UPDATE_QUESTION_IN_DB,
     }
 
-    model_dict["difficulty"] = difficulty["metadata"]["key"]
+    model.difficulty = difficulty.key
 
     dispatch(
-        model=model_dict,
+        model=model,
         event=model_type_to_update_event[model_type],
         namespace=GLOBAL,
         table_name=pluralize_word(word=model_type),
@@ -808,7 +808,7 @@ def on_next_button_click() -> None:
 
     model_type = model_type.lower()
 
-    model_dict: ModelDict = (
+    model: Model = (
         dispatch(
             event=model_type_to_event[model_type],
             id_=model_id,
@@ -829,7 +829,7 @@ def on_next_button_click() -> None:
         event=CLICKED_NEXT_BUTTON,
         namespace=GLOBAL,
         **{
-            model_type.lower(): model_dict,
+            model_type.lower(): model,
         },
     )
 
@@ -910,7 +910,7 @@ def on_previous_button_click() -> None:
 
     model_type = model_type.lower()
 
-    model_dict: ModelDict = (
+    model: Model = (
         dispatch(
             event=model_type_to_event[model_type],
             id_=model_id,
@@ -931,7 +931,7 @@ def on_previous_button_click() -> None:
         event=CLICKED_PREVIOUS_BUTTON,
         namespace=GLOBAL,
         **{
-            model_type: model_dict,
+            model_type: model,
         },
     )
 
@@ -947,32 +947,30 @@ def on_previous_button_click() -> None:
     )
 
 
-def start_rehearsal_run(rehearsal_run: ModelDict) -> None:
+def start_rehearsal_run(model: Model) -> None:
     """
     Handles the start of the rehearsal run.
 
     Args:
-        rehearsal_run (ModelDict): The rehearsal run to start.
+        model (Model): The model to start.
 
     Returns:
         None
     """
 
-    rehearsal_run["start"] = get_now()
+    model.start = get_now()
 
-    for stack in rehearsal_run["stacks"]:
+    for stack in model.stacks:
         for key in _get_stack_items(key=stack):
             _add_to_stack_items(key=key)
 
-    if exists(value=rehearsal_run["configuration"]["filter_by_difficulty_enabled"]):
-        _filter_stack_items_by_difficulty(
-            difficulty_key=rehearsal_run["configuration"]["difficulty"]
-        )
+    if exists(value=model.configuration["filter_by_difficulty_enabled"]):
+        _filter_stack_items_by_difficulty(difficulty_key=model.configuration["difficulty"])
 
-    if exists(value=rehearsal_run["configuration"]["filter_by_priority_enabled"]):
-        _filter_stack_items_by_priority(priority_key=rehearsal_run["configuration"]["priority"])
+    if exists(value=model.configuration["filter_by_priority_enabled"]):
+        _filter_stack_items_by_priority(priority_key=model.configuration["priority"])
 
-    if exists(value=rehearsal_run["configuration"]["item_order_randomization_enabled"]):
+    if exists(value=model.configuration["item_order_randomization_enabled"]):
         shuffle_list(list_=STACK_ITEM_KEYS)
 
     dispatch(

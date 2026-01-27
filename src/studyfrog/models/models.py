@@ -4044,6 +4044,7 @@ class RehearsalRunModel:
         )
         self._scheduled_at: Optional[datetime] = scheduled_at
         self._scheduled_on: Optional[date] = scheduled_on
+        self._stacks: list[str] = stacks or []
         self._started_at: Optional[datetime] = started_at
         self._started_on: Optional[date] = started_on
 
@@ -4063,6 +4064,23 @@ class RehearsalRunModel:
         value: str,
     ) -> None:
         self._author = value
+
+    @property
+    def configuration(self) -> dict[str, Any]:
+        """
+        Returns the configuration of the rehearsal run.
+
+        Returns:
+            dict[str, Any]: The configuration of the rehearsal run.
+        """
+        return dict(self._configuration)
+
+    @configuration.setter
+    def configuration(
+        self,
+        **kwargs,
+    ) -> None:
+        self._configuration.update(kwargs)
 
     @property
     def created_at(self) -> datetime:
@@ -4217,6 +4235,31 @@ class RehearsalRunModel:
         value: datetime,
     ) -> None:
         self._scheduled_at = value
+
+    @property
+    def stacks(self) -> list[str]:
+        """
+        Returns the list of stacks associated with the rehearsal run.
+
+        Returns:
+            list[str]: The list of stacks.
+        """
+        return self._stacks
+
+    @stacks.setter
+    def stacks(
+        self,
+        value: Union[list[str], str],
+    ) -> None:
+        if isinstance(
+            value,
+            str,
+        ):
+            self._stacks.append(value)
+
+            return
+
+        self._stacks.extend(value)
 
     @property
     def started_at(self) -> Optional[datetime]:

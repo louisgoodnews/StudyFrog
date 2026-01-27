@@ -159,7 +159,7 @@ def _convert_for_database(model: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _convert_from_database(dictionary: dict[str, Any]) -> None:
+def _convert_from_database(model: dict[str, Any]) -> None:
     """
     Converts a dictionary from the database storage format to a compatible format.
 
@@ -179,7 +179,7 @@ def _convert_from_database(dictionary: dict[str, Any]) -> None:
     """
 
     if exists(
-        value=dictionary.get(
+        value=model.get(
             "identifiable",
             {},
         ).get(
@@ -187,10 +187,10 @@ def _convert_from_database(dictionary: dict[str, Any]) -> None:
             None,
         )
     ):
-        dictionary["identifiable"]["id_"] = dictionary["identifiable"].pop("id")
+        model["identifiable"]["id_"] = model["identifiable"].pop("id")
 
     if exists(
-        value=dictionary.get(
+        value=model.get(
             "identifiable",
             {},
         ).get(
@@ -198,7 +198,7 @@ def _convert_from_database(dictionary: dict[str, Any]) -> None:
             None,
         )
     ):
-        dictionary["identifiable"]["uuid_"] = uuid.UUID(hex=dictionary["identifiable"].pop("uuid"))
+        model["identifiable"]["uuid_"] = uuid.UUID(hex=model["identifiable"].pop("uuid"))
 
     keys: list[str] = [
         "created_at",
@@ -209,7 +209,7 @@ def _convert_from_database(dictionary: dict[str, Any]) -> None:
 
     for key in keys:
         does_exist: bool = exists(
-            value=dictionary.get(
+            value=model.get(
                 "metadata",
                 {},
             ).get(
@@ -219,10 +219,10 @@ def _convert_from_database(dictionary: dict[str, Any]) -> None:
         )
 
         if does_exist and key.endswith("_at"):
-            dictionary["metadata"][key] = datetime_from_string(string=dictionary["metadata"][key])
+            model["metadata"][key] = datetime_from_string(string=model["metadata"][key])
 
         if does_exist and key.endswith("_on"):
-            dictionary["metadata"][key] = date_from_string(string=dictionary["metadata"][key])
+            model["metadata"][key] = date_from_string(string=model["metadata"][key])
 
 
 def _decrement_table_counters(table_data: dict[str, Any]) -> None:
@@ -1614,7 +1614,7 @@ def filter_entries(
         if not exists(value=all_entries):
             return []
 
-        filtered_entries = list(
+        filtered_entries: list[Model] = list(
             filter(
                 lambda entry: _matches_filter(
                     criteria=kwargs,
@@ -1640,12 +1640,10 @@ def filter_entries(
         )
 
         if count == 1:
-            entry = filtered_entries[0]
-
             dispatch(
                 event=_get_get_event(model_type=model_type),
                 **{
-                    pluralize_word(word=model_type).lower(): entry,
+                    pluralize_word(word=model_type).lower(): filtered_entries[0],
                 },
             )
         elif count > 1:
@@ -1709,7 +1707,7 @@ def get_all_entries(table_name: str) -> Optional[list[Model]]:
         log_info(message=f"Successfully retrieved all {count} entries from '{table_name}' table")
 
         for entry in retrieved_entries:
-            _convert_from_database(dictionary=entry)
+            _convert_from_database(model=entry)
 
         results: list[Model] = [
             get_model(

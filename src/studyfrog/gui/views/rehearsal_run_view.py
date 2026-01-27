@@ -34,6 +34,7 @@ from models.models import Model
 from gui.views.flashcard_rehearsal_view import get_flashcard_rehearsal_view, set_flip_side
 from gui.views.note_rehearsal_view import get_note_rehearsal_view
 from gui.views.question_rehearsal_view import get_question_rehearsal_view
+from utils.common import exists
 from utils.dispatcher import subscribe, unsubscribe
 from utils.gui import clear_bottom_frame, clear_center_frame, clear_top_frame
 from utils.logging import log_error, log_info
@@ -52,11 +53,44 @@ _HARD_BUTTON: Optional[ctk.CTkButton] = None
 _MEDIUM_BUTTON: Optional[ctk.CTkButton] = None
 _NEXT_BUTTON: Optional[ctk.CTkButton] = None
 _PREVIOUS_BUTTON: Optional[ctk.CTkButton] = None
-_REHEARSAL_RUN: Optional[dict[str, Any]] = None
+_REHEARSAL_RUN: Optional[Model] = None
 _SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
 # ---------- Helper Functions ---------- #
+
+
+def _get_rehearsal_run() -> Model:
+    """
+    Returns the rehearsal run.
+
+    Args:
+        None
+
+    Returns:
+        Model: The rehearsal run.
+    """
+
+    if not exists(value=_REHEARSAL_RUN):
+        raise ValueError("Rehearsal run not found. Call 'set_rehearsal_run' first.")
+
+    return _REHEARSAL_RUN
+
+
+def _set_rehearsal_run(model: Model) -> None:
+    """
+    Sets the rehearsal run.
+
+    Args:
+        model (Model): The model to set.
+
+    Returns:
+        None
+    """
+
+    global _REHEARSAL_RUN
+
+    _REHEARSAL_RUN = model
 
 
 # ---------- Private Functions ---------- #
@@ -365,20 +399,6 @@ def _create_widgets() -> None:
     _create_top_frame_widgets()
 
 
-def _get_rehearsal_run() -> dict[str, Any]:
-    """
-    Returns the rehearsal run.
-
-    Args:
-        None
-
-    Returns:
-        dict[str, Any]: The rehearsal run.
-    """
-
-    return dict(_REHEARSAL_RUN)
-
-
 def _load_rehearsal_view_form(
     model: Model,
     model_type: Literal[
@@ -534,22 +554,6 @@ def _on_rehearsal_run_min_index_reached() -> None:
     _PREVIOUS_BUTTON.configure(state=DISABLED)
 
 
-def _set_rehearsal_run(rehearsal_run: dict[str, Any]) -> None:
-    """
-    Sets the rehearsal run.
-
-    Args:
-        rehearsal_run (dict[str, Any]): The rehearsal run to set.
-
-    Returns:
-        None
-    """
-
-    global _REHEARSAL_RUN
-
-    _REHEARSAL_RUN = rehearsal_run
-
-
 def _subscribe_to_events() -> None:
     """
     Subscribes to events in the rehearsal run view.
@@ -640,26 +644,26 @@ def _unsubscribe_from_events() -> None:
 # ---------- Public Functions ---------- #
 
 
-def get_rehearsal_run_view(rehearsal_run: dict[str, Any]) -> None:
+def get_rehearsal_run_view(model: Model) -> None:
     """
     Gets the rehearsal run view of the application.
 
     Args:
-        rehearsal_run (dict[str, Any]): The rehearsal run to display.
+        model (Model): The model to display.
 
     Returns:
         None
     """
 
     try:
-        _set_rehearsal_run(rehearsal_run=rehearsal_run)
+        _set_rehearsal_run(model=model)
 
         _clear_widgets()
         _configure_grid()
         _create_widgets()
         _subscribe_to_events()
 
-        start_rehearsal_run(rehearsal_run=rehearsal_run)
+        start_rehearsal_run(model=model)
     except Exception as e:
         log_error(message=f"Failed to get rehearsal run view: {e}")
         raise e

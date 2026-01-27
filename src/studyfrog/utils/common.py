@@ -134,6 +134,18 @@ def exists(value: Any) -> bool:
         bool: True if the value exists, False otherwise.
     """
 
+    if isinstance(
+        value,
+        (dict, list, set, tuple),
+    ):
+        return len(value) > 0
+
+    elif isinstance(
+        value,
+        str,
+    ):
+        return value != ""
+
     return value is not None
 
 

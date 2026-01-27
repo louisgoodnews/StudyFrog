@@ -694,7 +694,7 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
             if not exists(value=response):
                 log_warning(message="Failed to resolve metadata key for 'stack'")
             else:
-                dictionary["stack"] = response.get("metadata", {}).get("key")
+                dictionary["stack"] = response.key
 
     except Exception as e:
         log_error(message=f"Caught an exception while attempting to resolve metadata keys: {e}")
@@ -914,7 +914,7 @@ def _handle_flashcard_creation(form: dict[str, Any]) -> None:
 
         return
 
-    id_: Optional[int] = _add_to_database(model_dict=flashcard_model)
+    id_: Optional[int] = _add_to_database(model=flashcard_model)
 
     if id_ is None:
         log_warning(message="Failed to add flashcard to database. Aborting...")
@@ -935,7 +935,7 @@ def _handle_flashcard_creation(form: dict[str, Any]) -> None:
         ),
     )
 
-    _update_in_database(model_dict=stack)
+    _update_in_database(model=stack)
 
 
 def _handle_note_creation(form: dict[str, Any]) -> None:

@@ -315,7 +315,7 @@ def _create_difficulty_form_widgets(master: ctk.CTkScrollableFrame) -> None:
     )
 
     difficulties: list[str] = [" "] + [
-        difficulty["display_name"]
+        difficulty.display_name
         for difficulty in (
             dispatch(
                 event=GET_ALL_DIFFICULTIES_FROM_DB,
@@ -413,7 +413,7 @@ def _create_priority_form_widgets(master: ctk.CTkScrollableFrame) -> None:
     )
 
     priorities: list[str] = [" "] + [
-        priority["display_name"]
+        priority.display_name
         for priority in (
             dispatch(
                 event=GET_ALL_PRIORITIES_FROM_DB,
@@ -535,7 +535,7 @@ def _create_stack_selection_form_widgets(master: ctk.CTkScrollableFrame) -> None
     """
 
     stacks: list[str] = [" "] + [
-        stack["name"]
+        stack.name
         for stack in (
             dispatch(
                 event=GET_ALL_STACKS_FROM_DB,
@@ -1038,32 +1038,32 @@ def _unsubscribe_from_events() -> None:
 
 
 def get_rehearsal_run_setup_view(
-    stack: Optional[Model] = None,
-    stacks: Optional[list[Model]] = None,
+    model: Optional[Model] = None,
+    models: Optional[list[Model]] = None,
 ) -> None:
     """
     Gets the rehearsal run setup view of the application.
 
     Args:
-        stack (Optional[Model], optional): The stack to rehearse. Defaults to None.
-        stacks (Optional[list[Model]], optional): The stacks to rehearse. Defaults to None.
+        model (Optional[Model], optional): The model to rehearse. Defaults to None.
+        models (Optional[list[Model]], optional): The models to rehearse. Defaults to None.
 
     Returns:
         None
     """
 
     try:
-        if exists(value=stack):
+        if exists(value=model):
             _FORM["stacks"] = {
                 "is_required": True,
-                "variable": ctk.StringVar(value=stack.name),
+                "variable": ctk.StringVar(value=model.name),
             }
 
-        elif exists(value=stacks):
+        elif exists(value=models):
             _FORM["stacks"] = {
                 "is_required": True,
                 "variable": ctk.StringVar(
-                    value=", ".join(list(set([stack.name for stack in stacks])))
+                    value=", ".join(list(set([model.name for model in models])))
                 ),
             }
 

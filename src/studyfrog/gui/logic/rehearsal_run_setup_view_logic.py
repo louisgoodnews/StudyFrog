@@ -22,7 +22,7 @@ from constants.events import (
 from models.models import Model
 from utils.common import exists
 from utils.dispatcher import dispatch
-from utils.logging import log_error
+from utils.logging import log_debug, log_error
 
 
 # ---------- Exports ---------- #
@@ -153,7 +153,12 @@ def _handle_difficulty_data(data: str) -> str:
     """
 
     try:
-        return _filter_difficulty(display_name=data).key
+        dificulty_data: list[Model] = _filter_difficulty(display_name=data)
+
+        if not dificulty_data:
+            return ""
+
+        return dificulty_data[0].key
     except Exception as e:
         log_error(message=f"Failed to handle difficulty data: {e}")
         raise e
@@ -171,7 +176,12 @@ def _handle_priority_data(data: str) -> str:
     """
 
     try:
-        return _filter_priority(display_name=data).key
+        priority_data: list[Model] = _filter_priority(display_name=data)
+
+        if not priority_data:
+            return ""
+
+        return priority_data[0].key
     except Exception as e:
         log_error(message=f"Failed to handle priority data: {e}")
         raise e
@@ -209,8 +219,8 @@ def _handle_stacks_data(data: str) -> list[str]:
 
             result.append(key)
 
-            if stack["children"]:
-                result.extend(stack["children"])
+            if stack.children:
+                result.extend(stack.children)
 
         return result
     except Exception as e:
