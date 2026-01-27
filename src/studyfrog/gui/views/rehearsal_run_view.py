@@ -60,6 +60,91 @@ _SUBSCRIPTION_IDS: Final[list[str]] = []
 # ---------- Helper Functions ---------- #
 
 
+def _get_easy_button() -> Optional[ctk.CTkButton]:
+    """
+    Returns the easy button.
+
+    Args:
+        None
+
+    Returns:
+        Optional[ctk.CTkButton]: The easy button.
+    """
+
+    if not exists(value=_EASY_BUTTON):
+        raise ValueError("Easy button not found. Call 'set_easy_button' first.")
+
+    return _EASY_BUTTON
+
+
+def _get_hard_button() -> Optional[ctk.CTkButton]:
+    """
+    Returns the hard button.
+
+    Args:
+        None
+
+    Returns:
+        Optional[ctk.CTkButton]: The hard button.
+    """
+
+    if not exists(value=_HARD_BUTTON):
+        raise ValueError("Hard button not found. Call 'set_hard_button' first.")
+
+    return _HARD_BUTTON
+
+
+def _get_medium_button() -> Optional[ctk.CTkButton]:
+    """
+    Returns the medium button.
+
+    Args:
+        None
+
+    Returns:
+        Optional[ctk.CTkButton]: The medium button.
+    """
+
+    if not exists(value=_MEDIUM_BUTTON):
+        raise ValueError("Medium button not found. Call 'set_medium_button' first.")
+
+    return _MEDIUM_BUTTON
+
+
+def _get_next_button() -> Optional[ctk.CTkButton]:
+    """
+    Returns the next button.
+
+    Args:
+        None
+
+    Returns:
+        Optional[ctk.CTkButton]: The next button.
+    """
+
+    if not exists(value=_NEXT_BUTTON):
+        raise ValueError("Next button not found. Call 'set_next_button' first.")
+
+    return _NEXT_BUTTON
+
+
+def _get_previous_button() -> Optional[ctk.CTkButton]:
+    """
+    Returns the previous button.
+
+    Args:
+        None
+
+    Returns:
+        Optional[ctk.CTkButton]: The previous button.
+    """
+
+    if not exists(value=_PREVIOUS_BUTTON):
+        raise ValueError("Previous button not found. Call 'set_previous_button' first.")
+
+    return _PREVIOUS_BUTTON
+
+
 def _get_rehearsal_run() -> Model:
     """
     Returns the rehearsal run.
@@ -75,6 +160,101 @@ def _get_rehearsal_run() -> Model:
         raise ValueError("Rehearsal run not found. Call 'set_rehearsal_run' first.")
 
     return _REHEARSAL_RUN
+
+
+def _set_easy_button(button: ctk.CTkButton) -> None:
+    """
+    Sets the easy button.
+
+    Args:
+        button (ctk.CTkButton): The button to set.
+
+    Returns:
+        None
+    """
+
+    global _EASY_BUTTON
+
+    if exists(value=_EASY_BUTTON):
+        return
+
+    _EASY_BUTTON = button
+
+
+def _set_hard_button(button: ctk.CTkButton) -> None:
+    """
+    Sets the hard button.
+
+    Args:
+        button (ctk.CTkButton): The button to set.
+
+    Returns:
+        None
+    """
+
+    global _HARD_BUTTON
+
+    if exists(value=_HARD_BUTTON):
+        return
+
+    _HARD_BUTTON = button
+
+
+def _set_medium_button(button: ctk.CTkButton) -> None:
+    """
+    Sets the medium button.
+
+    Args:
+        button (ctk.CTkButton): The button to set.
+
+    Returns:
+        None
+    """
+
+    global _MEDIUM_BUTTON
+
+    if exists(value=_MEDIUM_BUTTON):
+        return
+
+    _MEDIUM_BUTTON = button
+
+
+def _set_next_button(button: ctk.CTkButton) -> None:
+    """
+    Sets the next button.
+
+    Args:
+        button (ctk.CTkButton): The button to set.
+
+    Returns:
+        None
+    """
+
+    global _NEXT_BUTTON
+
+    if exists(value=_NEXT_BUTTON):
+        return
+
+    _NEXT_BUTTON = button
+
+
+def _set_previous_button(button: ctk.CTkButton) -> None:
+    """
+    Sets the previous button.
+
+    Args:
+        button (ctk.CTkButton): The button to set.
+
+    Returns:
+        None
+    """
+
+    global _PREVIOUS_BUTTON
+
+    if exists(value=_PREVIOUS_BUTTON):
+        return
+
+    _PREVIOUS_BUTTON = button
 
 
 def _set_rehearsal_run(model: Model) -> None:
@@ -260,10 +440,13 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    _PREVIOUS_BUTTON = previous_button
+    _set_previous_button(button=previous_button)
 
     easy_button: ctk.CTkButton = ctk.CTkButton(
-        command=on_easy_button_click,
+        command=lambda: (
+            _on_difficulty_button_click(difficulty="easy"),
+            on_easy_button_click(),
+        ),
         master=get_bottom_frame(),
         text="Easy",
     )
@@ -275,10 +458,13 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    _EASY_BUTTON = easy_button
+    _set_easy_button(button=easy_button)
 
     medium_button: ctk.CTkButton = ctk.CTkButton(
-        command=on_medium_button_click,
+        command=lambda: (
+            _on_difficulty_button_click(difficulty="medium"),
+            on_medium_button_click(),
+        ),
         master=get_bottom_frame(),
         text="Medium",
     )
@@ -290,10 +476,13 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    _MEDIUM_BUTTON = medium_button
+    _set_medium_button(button=medium_button)
 
     hard_button: ctk.CTkButton = ctk.CTkButton(
-        command=on_hard_button_click,
+        command=lambda: (
+            _on_difficulty_button_click(difficulty="hard"),
+            on_hard_button_click(),
+        ),
         master=get_bottom_frame(),
         text="Hard",
     )
@@ -305,7 +494,7 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    _HARD_BUTTON = hard_button
+    _set_hard_button(button=hard_button)
 
     next_button: ctk.CTkButton = ctk.CTkButton(
         command=on_next_button_click,
@@ -320,7 +509,7 @@ def _create_bottom_frame_widgets() -> None:
         row=0,
     )
 
-    _NEXT_BUTTON = next_button
+    _set_next_button(button=next_button)
 
 
 def _create_center_frame_widgets() -> None:
@@ -418,6 +607,8 @@ def _load_rehearsal_view_form(
         None
     """
 
+    _reset_buttons()
+
     model_type_to_rehearsal_form_getter: dict[
         Literal[
             "flashcard",
@@ -456,16 +647,53 @@ def _on_destroy() -> None:
     _SUBSCRIPTION_IDS.clear()
 
     _EASY_BUTTON = None
-
     _HARD_BUTTON = None
-
     _MEDIUM_BUTTON = None
-
     _NEXT_BUTTON = None
-
     _PREVIOUS_BUTTON = None
-
     _REHEARSAL_RUN = None
+
+
+def _on_difficulty_button_click(
+    difficulty: Literal[
+        "easy",
+        "hard",
+        "medium",
+    ],
+) -> None:
+    """
+    Handles any difficulty button click.
+
+    This method disables the clicked button and enables the other buttons.
+
+    Args:
+        difficulty (Literal["easy", "hard", "medium"]: The difficulty of the clicked button.
+
+    Returns:
+        None
+    """
+
+    difficulty_to_button: dict[
+        Literal[
+            "easy",
+            "hard",
+            "medium",
+        ],
+        ctk.CTkButton,
+    ] = {
+        "easy": _get_easy_button(),
+        "hard": _get_hard_button(),
+        "medium": _get_medium_button(),
+    }
+
+    for (
+        key,
+        value,
+    ) in difficulty_to_button.items():
+        if key != difficulty:
+            value.configure(state=NORMAL)
+        else:
+            value.configure(state=DISABLED)
 
 
 def _on_load_rehearsal_view_form(model: Model) -> None:
@@ -505,8 +733,8 @@ def _on_rehearsal_run_index_decremented() -> None:
         None
     """
 
-    _NEXT_BUTTON.configure(state=NORMAL)
-    _PREVIOUS_BUTTON.configure(state=NORMAL)
+    _get_next_button().configure(state=NORMAL)
+    _get_previous_button().configure(state=NORMAL)
 
 
 def _on_rehearsal_run_index_incremented() -> None:
@@ -520,8 +748,8 @@ def _on_rehearsal_run_index_incremented() -> None:
         None
     """
 
-    _NEXT_BUTTON.configure(state=NORMAL)
-    _PREVIOUS_BUTTON.configure(state=NORMAL)
+    _get_next_button().configure(state=NORMAL)
+    _get_previous_button().configure(state=NORMAL)
 
 
 def _on_rehearsal_run_max_index_reached() -> None:
@@ -535,9 +763,9 @@ def _on_rehearsal_run_max_index_reached() -> None:
         None
     """
 
-    _NEXT_BUTTON.configure(state=DISABLED)
+    _get_next_button().configure(state=DISABLED)
 
-    end_rehearsal_run(rehearsal_run=_get_rehearsal_run())
+    end_rehearsal_run(model=_get_rehearsal_run())
 
 
 def _on_rehearsal_run_min_index_reached() -> None:
@@ -551,7 +779,28 @@ def _on_rehearsal_run_min_index_reached() -> None:
         None
     """
 
-    _PREVIOUS_BUTTON.configure(state=DISABLED)
+    _get_previous_button().configure(state=DISABLED)
+
+
+def _reset_buttons() -> None:
+    """
+    Resets the states of the buttons.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    for button in (
+        _get_easy_button(),
+        _get_hard_button(),
+        _get_medium_button(),
+        _get_next_button(),
+        _get_previous_button(),
+    ):
+        button.configure(state=NORMAL)
 
 
 def _subscribe_to_events() -> None:
