@@ -32,7 +32,7 @@ from utils.files import (
     read_file_json,
     write_file_json,
 )
-from utils.logging import log_debug, log_error, log_info
+from utils.logging import log_debug, log_error, log_info, log_warning
 
 
 # ---------- Exports ---------- #
@@ -157,72 +157,6 @@ def _convert_for_database(model: dict[str, Any]) -> dict[str, Any]:
         result["metadata"]["updated_on"] = model["metadata"]["updated_on"]
 
     return result
-
-
-def _convert_from_database(model: dict[str, Any]) -> None:
-    """
-    Converts a dictionary from the database storage format to a compatible format.
-
-    This function is used internally to convert the database storage format of
-    entries to a compatible format. It is not intended to be used externally.
-
-    The function checks if the 'metadata' dictionary of the entry contains an
-    'id' key and if so, replaces it with an 'id_' key. It also checks if
-    the 'metadata' dictionary contains a 'uuid' key and if so, replaces it
-    with a 'uuid_' key.
-
-    Args:
-        dictionary (dict[str, Any]): The dictionary to convert.
-
-    Returns:
-        None
-    """
-
-    if exists(
-        value=model.get(
-            "identifiable",
-            {},
-        ).get(
-            "id",
-            None,
-        )
-    ):
-        model["identifiable"]["id_"] = model["identifiable"].pop("id")
-
-    if exists(
-        value=model.get(
-            "identifiable",
-            {},
-        ).get(
-            "uuid",
-            None,
-        )
-    ):
-        model["identifiable"]["uuid_"] = uuid.UUID(hex=model["identifiable"].pop("uuid"))
-
-    keys: list[str] = [
-        "created_at",
-        "created_on",
-        "updated_at",
-        "updated_on",
-    ]
-
-    for key in keys:
-        does_exist: bool = exists(
-            value=model.get(
-                "metadata",
-                {},
-            ).get(
-                key,
-                None,
-            )
-        )
-
-        if does_exist and key.endswith("_at"):
-            model["metadata"][key] = datetime_from_string(string=model["metadata"][key])
-
-        if does_exist and key.endswith("_on"):
-            model["metadata"][key] = date_from_string(string=model["metadata"][key])
 
 
 def _decrement_table_counters(table_data: dict[str, Any]) -> None:
@@ -1706,25 +1640,20 @@ def get_all_entries(table_name: str) -> Optional[list[Model]]:
 
         log_info(message=f"Successfully retrieved all {count} entries from '{table_name}' table")
 
-        for entry in retrieved_entries:
-            _convert_from_database(model=entry)
-
-        results: list[Model] = [
+        models: list[Model] = [
             get_model(
                 type_=model_type,
-                **flatten_dictionary(dictionary=entry),
+                **entry,
             )
             for entry in retrieved_entries
         ]
 
         dispatch(
             event=_get_get_all_event(model_type=model_type),
-            **{
-                f"all_{pluralize_word(word=model_type).lower()}": results,
-            },
+            **{f"all_{pluralize_word(word=model_type).lower()}": models},
         )
 
-        return results
+        return models
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to get all entries from '{table_name}' table: {e}"
@@ -1804,27 +1733,21 @@ def get_entries(
             message=f"Successfully retrieved {count} out of {len(ids)} requested entries from '{table_name}' table"
         )
 
-        if exists(value=model_type):
-            dispatch(
-                event=_get_bulk_get_event(model_type=model_type),
-                **{
-                    pluralize_word(word=model_type).lower(): [
-                        get_model(
-                            type_=model_type,
-                            **_convert_from_database(model=entry),
-                        )
-                        for entry in retrieved_entries
-                    ],
-                },
-            )
-
-        return [
+        models: list[Model] = [
             get_model(
                 type_=model_type,
-                **_convert_from_database(model=entry),
+                **entry,
             )
             for entry in retrieved_entries
         ]
+
+        if exists(value=model_type):
+            dispatch(
+                event=_get_bulk_get_event(model_type=model_type),
+                **{pluralize_word(word=model_type).lower(): models},
+            )
+
+        return models
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to get entries from '{table_name}' table: {e}"
@@ -1918,20 +1841,17 @@ def get_entry(
 
         model_type: str = entry["metadata"]["type"]
 
-        dispatch(
-            event=_get_get_event(model_type=model_type),
-            **{
-                model_type.lower(): get_model(
-                    type_=model_type,
-                    **_convert_from_database(model=entry),
-                ),
-            },
+        model: Model = get_model(
+            type_=model_type,
+            **flatten_dictionary(dictionary=entry),
         )
 
-        return get_model(
-            type_=model_type,
-            **_convert_from_database(model=entry),
+        dispatch(
+            event=_get_get_event(model_type=model_type),
+            **{model_type.lower(): model},
         )
+
+        return model
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to get entry '{id_}' from '{table_name}' table: {e}"

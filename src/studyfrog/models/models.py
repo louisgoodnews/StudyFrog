@@ -2026,15 +2026,7 @@ class ModelIdentifiable:
 
         self._id: Final[Union[int, str]] = id_
         self._key: Final[str] = key
-        self._uuid: Final[uuid.UUID] = (
-            uuid_
-            if exists(value=uuid_) and isinstance(uuid_, uuid.UUID)
-            else (
-                uuid.UUID(hex=uuid_)
-                if exists(value=uuid_) and isinstance(uuid_, str)
-                else generate_uuid4()
-            )
-        )
+        self._uuid: Final[uuid.UUID] = uuid_ if exists(value=uuid_) else generate_uuid4()
 
     @property
     def id(self) -> Optional[Union[int, str]]:
@@ -2135,12 +2127,8 @@ class ModelMetadata:
             None
         """
 
-        self._created_at: Final[datetime] = (
-            datetime_from_string(string=created_at) if exists(value=created_at) else get_now()
-        )
-        self._created_on: Final[date] = (
-            date_from_string(string=created_on) if exists(value=created_on) else get_today()
-        )
+        self._created_at: Final[datetime] = created_at if exists(value=created_at) else get_now()
+        self._created_on: Final[date] = created_on if exists(value=created_on) else get_today()
         self._fields: Final[dict[str, Any]] = (
             fields
             if exists(value=fields)
@@ -2150,12 +2138,8 @@ class ModelMetadata:
             }
         )
         self._type: Final[str] = type_.upper()
-        self._updated_at: Final[datetime] = (
-            datetime_from_string(string=updated_at) if exists(value=updated_at) else get_now()
-        )
-        self._updated_on: Final[date] = (
-            date_from_string(string=updated_on) if exists(value=updated_on) else get_today()
-        )
+        self._updated_at: Final[datetime] = updated_at if exists(value=updated_at) else get_now()
+        self._updated_on: Final[date] = updated_on if exists(value=updated_on) else get_today()
 
     @property
     def created_at(self) -> datetime:
@@ -3983,6 +3967,8 @@ class RehearsalRunModel:
         created_on: Optional[date] = None,
         customfields: Optional[list[dict[str, Any]]] = None,
         duration: Optional[dict[str, float]] = None,
+        finished_at: Optional[datetime] = None,
+        finished_on: Optional[date] = None,
         id_: Optional[Union[int, str]] = None,
         is_finished: bool = False,
         items: Optional[dict[str, str]] = None,
@@ -4004,6 +3990,7 @@ class RehearsalRunModel:
             created_on (Optional[date]): The date of creation.
             customfields (Optional[list[dict[str, Any]]]): A list of custom metadata fields.
             finished_at (Optional[datetime]): The timestamp when the rehearsal was completed.
+            finished_on (Optional[date]): The date when the rehearsal was completed.
             id_ (Optional[Union[int, str]]): The internal database ID.
             is_finished (bool): Indicates whether the rehearsal run is marked as completed.
             items (Optional[dict[str, str]]): A mapping of item keys to their corresponding order number included in this run.
@@ -4024,6 +4011,8 @@ class RehearsalRunModel:
         self._configuration: Final[dict[str, Any]] = configuration
         self._customfields: list[dict[str, Any]] = customfields or []
         self._duration: Optional[dict[str, float]] = duration or {}
+        self._finished_at: Optional[datetime] = finished_at
+        self._finished_on: Optional[date] = finished_on
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
             key=key,
@@ -4158,6 +4147,23 @@ class RehearsalRunModel:
         self._finished_at = value
 
     @property
+    def finished_on(self) -> Optional[date]:
+        """
+        Returns the date when the rehearsal was finished.
+
+        Returns:
+            Optional[date]: The completion date if finished, otherwise None.
+        """
+        return self._finished_on
+
+    @finished_on.setter
+    def finished_on(
+        self,
+        value: date,
+    ) -> None:
+        self._finished_on = value
+
+    @property
     def id(self) -> Optional[Union[int, str]]:
         """
         Returns the internal database ID of the rehearsal run.
@@ -4277,6 +4283,23 @@ class RehearsalRunModel:
         value: datetime,
     ) -> None:
         self._started_at = value
+
+    @property
+    def started_on(self) -> Optional[date]:
+        """
+        Returns the date when the rehearsal started.
+
+        Returns:
+            Optional[date]: The starting date.
+        """
+        return self._started_on
+
+    @started_on.setter
+    def started_on(
+        self,
+        value: date,
+    ) -> None:
+        self._started_on = value
 
     @property
     def type_(self) -> str:

@@ -35,6 +35,7 @@ from models.models import Model
 from utils.common import (
     exists,
     get_now,
+    get_today,
     model_key_to_model_type,
     pluralize_word,
     search_string,
@@ -349,16 +350,18 @@ def end_rehearsal_run(model: Model) -> None:
         None
     """
 
-    model.end = get_now()
+    model.finished_at = get_now()
+    model.finished_on = model.finished_at.date()
 
     model.duration = {
-        "minutes": (model.end - model.start).total_seconds() // 60,
-        "seconds": (model.end - model.start).total_seconds(),
+        "minutes": (model.finished_at - model.started_at).total_seconds() // 60,
+        "seconds": (model.finished_at - model.started_at).total_seconds(),
     }
 
-    model.end = model.end.isoformat()
-
-    model.start = model.start.isoformat()
+    model.finished_at = model.finished_at.isoformat()
+    model.finished_on = model.finished_on.isoformat()
+    model.started_at = model.started_at.isoformat()
+    model.started_on = model.started_on.isoformat()
 
     dispatch(
         model=model,
@@ -958,7 +961,8 @@ def start_rehearsal_run(model: Model) -> None:
         None
     """
 
-    model.start = get_now()
+    model.started_at = get_now()
+    model.started_on = get_today()
 
     for stack in model.stacks:
         for key in _get_stack_items(key=stack):

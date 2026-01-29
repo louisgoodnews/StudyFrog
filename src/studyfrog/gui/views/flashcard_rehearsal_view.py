@@ -310,7 +310,6 @@ def _create_widgets() -> None:
     _create_top_frame_widgets(master=top_frame)
 
 
-
 # ---------- Public Functions ---------- #
 
 

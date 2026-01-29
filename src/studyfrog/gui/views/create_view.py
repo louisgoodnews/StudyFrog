@@ -30,7 +30,7 @@ from gui.logic.create_view_logic import (
     on_stack_combobox_select,
     on_type_combobox_select,
 )
-from models.factories import ModelDict
+from models.models import Model
 from utils.common import exists
 from utils.dispatcher import dispatch, subscribe, unsubscribe
 from utils.logging import log_error, log_info
@@ -939,32 +939,32 @@ def _on_set_create_form(**kwargs) -> None:
         _get_form()[key]["variable"].set(value=value)
 
 
-def _on_stack_added(stack: ModelDict) -> None:
+def _on_stack_added(stack: Model) -> None:
     """
     Handles the 'STACK_ADDED' event.
 
     Args:
-        stack (ModelDict): The stack to handle.
+        stack (Model): The stack to handle.
 
     Returns:
         None
     """
 
-    _get_stacks_list().append(stack["name"])
+    _get_stacks_list().append(stack.name)
 
 
-def _on_stacks_added(stacks: list[ModelDict]) -> None:
+def _on_stacks_added(stacks: list[Model]) -> None:
     """
     Handles the 'STACKS_ADDED' event.
 
     Args:
-        stacks (list[ModelDict]): The stacks to handle.
+        stacks (list[Model]): The stacks to handle.
 
     Returns:
         None
     """
 
-    _get_stacks_list().extend([stack["name"] for stack in stacks])
+    _get_stacks_list().extend([stack.name for stack in stacks])
 
 
 def _subscribe_to_events() -> None:

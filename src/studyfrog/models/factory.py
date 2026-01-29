@@ -34,10 +34,11 @@ from models.models import (
 from utils.common import (
     date_from_string,
     datetime_from_string,
+    exists,
     filter_and_call,
     uuid_from_string,
 )
-from utils.logging import log_error
+from utils.logging import log_debug, log_error, log_warning
 
 # ---------- Exports ---------- #
 
@@ -87,7 +88,7 @@ def _convert_parameters(**kwargs) -> dict[str, Any]:
     checks_for_type: dict[str, list[Type, Callable]] = {
         "created_at": [datetime, datetime_from_string],
         "created_on": [date, date_from_string],
-        "updated_at": [datetime, date_from_string],
+        "updated_at": [datetime, datetime_from_string],
         "updated_on": [date, date_from_string],
         "uuid_": [uuid.UUID, uuid_from_string],
     }
@@ -105,7 +106,26 @@ def _convert_parameters(**kwargs) -> dict[str, Any]:
         ):
             continue
 
-        kwargs[key] = checks_for_type[key][1](value)
+        if not exists(value=kwargs[key]):
+            log_warning(
+                message=f"Skipped present key '{key}' as it was not associated with any value."
+            )
+            continue
+
+        if key == "uuid":
+            kwargs["uuid_"] = kwargs.pop("uuid")
+
+            continue
+
+        try:
+            kwargs[key] = checks_for_type[key][1](string=value)
+        except Exception as e:
+            log_error(
+                message=f"Failed to convert '{key}' from string '{value}': {e}",
+                name="models.factory._convert_parameters",
+            )
+
+            continue
 
     return kwargs
 
@@ -467,6 +487,8 @@ def get_model(
         )
     except KeyError as ke:
         log_error(message=f"Invalid model type: {type_}: {ke}")
+    except ValueError as ve:
+        log_error(message=f"Failed to create model: {type_}: {ve}")
     except Exception as e:
         log_error(message=f"Failed to create model: {e}")
 

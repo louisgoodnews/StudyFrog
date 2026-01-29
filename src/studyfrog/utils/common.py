@@ -86,7 +86,7 @@ def create_rgb_fg_color(r: int, g: int, b: int) -> str:
     return f"\033[38;2;{r};{g};{b}m"
 
 
-def date_from_string(string: str) -> Optional[date]:
+def date_from_string(string: str) -> date:
     """
     Attempts to convert a given string into a date object and returns it if conversion was successfull.
 
@@ -94,16 +94,19 @@ def date_from_string(string: str) -> Optional[date]:
         string (str): The string to attempt conversion on.
 
     Returns:
-        Optional[date]: The converted date object if conversion was successfull, otherwise None.
+        date: The converted date object if conversion was successfull.
+
+    Raises:
+        ValueError: If the string cannot be converted to a date object.
     """
 
     try:
         return date.fromisoformat(string)
-    except Exception:
-        return None
+    except ValueError as ve:
+        raise ve
 
 
-def datetime_from_string(string: str) -> Optional[datetime]:
+def datetime_from_string(string: str) -> datetime:
     """
     Attempts to convert a given string into a datetime object and returns it if conversion was successfull.
 
@@ -111,13 +114,16 @@ def datetime_from_string(string: str) -> Optional[datetime]:
         string (str): The string to attempt conversion on.
 
     Returns:
-        Optional[datetime]: The converted datetime object if conversion was successfull, otherwise None.
+        datetime: The converted datetime object if conversion was successfull.
+
+    Raises:
+        ValueError: If the string cannot be converted to a datetime object.
     """
 
     try:
         return datetime.fromisoformat(string)
-    except Exception:
-        return None
+    except ValueError as ve:
+        raise ve
 
 
 def exists(value: Any) -> bool:
