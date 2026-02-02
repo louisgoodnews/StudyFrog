@@ -950,7 +950,7 @@ def add_entry(
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
-        model_data: dict[str, Any] = _convert_for_database(model=model.to_json())
+        model_data: dict[str, Any] = _convert_for_database(model=model.to_json_dict())
 
         _insert_table_entry(
             model_data=model_data,
@@ -1074,7 +1074,7 @@ def add_entries(
         model_type: str = ""
 
         for model in models:
-            model_data: dict[str, Any] = model.to_json()
+            model_data: dict[str, Any] = model.to_json_dict()
 
             _insert_table_entry(
                 model_data=model_data,
@@ -1096,7 +1096,7 @@ def add_entries(
         )
 
         if exists(value=model_type):
-            model_datas: list[dict[str, Any]] = [model.to_json() for model in models]
+            model_datas: list[dict[str, Any]] = [model.to_json_dict() for model in models]
             dispatch(
                 event=_get_bulk_add_event(model_type=model_type),
                 **{
@@ -1535,10 +1535,10 @@ def filter_entries(
             if outer_key.lower() == "table_name":
                 continue
 
-            if outer_key not in entry.to_json().keys():
+            if outer_key not in entry.to_json_dict().keys():
                 return False
 
-            entry_value = entry.to_json()[outer_key]
+            entry_value = entry.to_json_dict()[outer_key]
 
             return str(entry_value).lower() == str(outer_value).lower()
 
@@ -1943,7 +1943,7 @@ def update_entry(
             )
             return None
 
-        all_entries[entry_id_str] = _convert_for_database(model=model.to_json())
+        all_entries[entry_id_str] = _convert_for_database(model=model.to_json_dict())
 
         _save_table_data(
             table_data=table_data,
@@ -1952,21 +1952,21 @@ def update_entry(
 
         log_info(message=f"Successfully updated entry '{entry_id_str}' in '{table_name}' table")
 
-        model_type: str = model.to_json()["metadata"]["type"]
+        model_type: str = model.to_json_dict()["metadata"]["type"]
 
         dispatch(
             event=_get_update_event(model_type=model_type),
             **{
                 model_type.lower(): get_model(
                     type_=model_type,
-                    **model.to_json(),
+                    **model.to_json_dict(),
                 ),
             },
         )
 
         return get_model(
             type_=model_type,
-            **model.to_json(),
+            **model.to_json_dict(),
         )
     except Exception as e:
         log_error(
@@ -2032,7 +2032,7 @@ def update_entries(
                 )
                 continue
 
-            all_entries[model_id_str] = _convert_for_database(model=model.to_json())
+            all_entries[model_id_str] = _convert_for_database(model=model.to_json_dict())
 
             updated_models.append(model)
 
@@ -2062,7 +2062,7 @@ def update_entries(
                     pluralize_word(word=model_type).lower(): [
                         get_model(
                             type_=model_type,
-                            **model.to_json(),
+                            **model.to_json_dict(),
                         )
                         for model in updated_models
                     ],
@@ -2072,7 +2072,7 @@ def update_entries(
         return [
             get_model(
                 type_=model_type,
-                **model.to_json(),
+                **model.to_json_dict(),
             )
             for model in updated_models
         ]

@@ -4,6 +4,7 @@ Date: 2026-01-04
 Description: This module contains the definitions of the various models used in the application
 """
 
+import json
 import uuid
 
 from pathlib import Path
@@ -153,7 +154,7 @@ def _convert_to_json(model: Model) -> dict[str, Any]:
                 ModelMetadata,
             ),
         ):
-            result[key.strip("_")] = value.to_json()
+            result[key.strip("_")] = value.to_json_dict()
         elif isinstance(
             value,
             Path,
@@ -171,7 +172,67 @@ def _convert_to_json(model: Model) -> dict[str, Any]:
 # ---------- Classes ---------- #
 
 
-class AnswerModel:
+class BaseModel:
+
+    def __eq__(
+        self,
+        other: BaseModel,
+    ) -> bool:
+        if not isinstance(
+            other,
+            BaseModel,
+        ):
+            return False
+
+        return self.to_dict() == other.to_dict()
+
+    def __repr__(self) -> str:
+        return str(self.to_dict())
+
+    def __str__(self) -> str:
+        return self.to_json_str()
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Returns the dictionary representation of the model.
+
+        Args:
+            None
+
+        Returns:
+            dict[str, Any]: The dictionary representation of the model.
+        """
+        return _convert_to_dict(self)
+
+    def to_json_dict(self) -> dict[str, Any]:
+        """
+        Retuns a JSON representation of the model as a dictionary.
+
+        Args:
+            None
+
+        Returns:
+            dict[str, Any]: The JSON dictionary representation of the model.
+        """
+        return _convert_to_json(self)
+
+    def to_json_str(self) -> str:
+        """
+        Returns a JSON representation of the model as string.
+
+        Args:
+            None
+
+        Returns:
+            str: The JSON string representation of the model.
+        """
+        return json.dumps(
+            obj=self.to_json_dict(),
+            indent=4,
+        )
+
+
+class AnswerModel(BaseModel):
     """
     Represents an answer entity within the application.
 
@@ -185,6 +246,7 @@ class AnswerModel:
         self,
         is_correct: bool,
         text: str,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         customfields: Optional[list[dict[str, Any]]] = None,
@@ -198,12 +260,14 @@ class AnswerModel:
         Initializes an Answer instance.
 
         Args:
-            is_correct (bool): Flag indicating if this answer is correct.
-            text (str): The actual text content of the answer.
+            author (Optional[str]): The author of the answer.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
+            customfields (Optional[list[dict[str, Any]]]): Custom fields associated with the answer.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
+            is_correct (bool): Flag indicating if this answer is correct.
             key (Optional[str]): Unique model key identifier.
+            text (str): The actual text content of the answer.
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
@@ -211,6 +275,8 @@ class AnswerModel:
         Returns:
             None
         """
+
+        super().__init__()
 
         self._customfields: list[dict[str, Any]] = (
             customfields if exists(value=customfields) else []
@@ -222,6 +288,7 @@ class AnswerModel:
         )
         self._is_correct: Final[bool] = is_correct
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -383,34 +450,8 @@ class AnswerModel:
 
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class AssociationModel:
+class AssociationModel(BaseModel):
     """
     Represents an association entity within the application.
 
@@ -423,6 +464,7 @@ class AssociationModel:
     def __init__(
         self,
         answer: Optional[Union[int, str]] = None,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         customfield: Optional[Union[int, str]] = None,
@@ -450,6 +492,7 @@ class AssociationModel:
 
         Args:
             answer (Optional[Union[int, str]]): The ID or key of the associated answer.
+            author (Optional[str]): The author of the association.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
@@ -464,6 +507,8 @@ class AssociationModel:
             None
         """
 
+        super().__init__()
+
         self._answer: Optional[Union[int, str]] = answer
         self._customfield: Optional[Union[int, str]] = customfield
         self._difficulty: Optional[Union[int, str]] = difficulty
@@ -475,6 +520,7 @@ class AssociationModel:
         )
         self._image: Optional[Union[int, str]] = image
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -864,34 +910,8 @@ class AssociationModel:
 
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class CustomfieldModel:
+class CustomfieldModel(BaseModel):
     """
     Represents a custom field entity within the application.
 
@@ -904,6 +924,7 @@ class CustomfieldModel:
     def __init__(
         self,
         name: str,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         id_: Optional[Union[int, str]] = None,
@@ -917,11 +938,12 @@ class CustomfieldModel:
         Initializes a Customfield instance.
 
         Args:
-            name (str): The name or label of the custom field.
+            author (Optional[str]): The author of the custom field.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
             key (Optional[str]): Unique model key identifier.
+            name (str): The name or label of the custom field.
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
@@ -930,12 +952,15 @@ class CustomfieldModel:
             None
         """
 
+        super().__init__()
+
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
             key=key,
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -1093,34 +1118,8 @@ class CustomfieldModel:
 
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class DifficultyModel:
+class DifficultyModel(BaseModel):
     """
     Represents a difficulty level entity within the application.
 
@@ -1134,6 +1133,7 @@ class DifficultyModel:
         display_name: str,
         name: str,
         value: float,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         id_: Optional[Union[int, str]] = None,
@@ -1146,20 +1146,23 @@ class DifficultyModel:
         Initializes a Difficulty instance.
 
         Args:
-            display_name (str): The human-readable name of the difficulty level.
-            name (str): The internal technical name of the difficulty level.
-            value (float): The numerical weight or value of this difficulty.
+            author (Optional[str]): The author of the difficulty level.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
+            display_name (str): The human-readable name of the difficulty level.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
             key (Optional[str]): Unique model key identifier.
+            name (str): The internal technical name of the difficulty level.
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
+            value (float): The numerical weight or value of this difficulty.
 
         Returns:
             None
         """
+
+        super().__init__()
 
         self._display_name: Final[str] = display_name
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
@@ -1168,6 +1171,7 @@ class DifficultyModel:
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -1312,34 +1316,8 @@ class DifficultyModel:
 
         return self._value
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class FlashcardModel:
+class FlashcardModel(BaseModel):
     """
     Represents a flashcard entity within the application.
 
@@ -1400,7 +1378,8 @@ class FlashcardModel:
             None
         """
 
-        self._author: Optional[str] = author
+        super().__init__()
+
         self._back: str = back
         self._front: str = front
         self._customfields: list[dict[str, Any]] = customfields or []
@@ -1414,6 +1393,7 @@ class FlashcardModel:
         self._last_viewed_at: Optional[datetime] = last_viewed_at
         self._last_viewed_on: Optional[datetime] = last_viewed_on
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -1429,24 +1409,6 @@ class FlashcardModel:
         self._subject: Optional[str] = subject
         self._tags: list[str] = tags or []
         self._teacher: Optional[str] = teacher
-
-    @property
-    def author(self) -> Optional[str]:
-        """
-        Returns the author of the flashcard.
-
-        Returns:
-            Optional[str]: The name or identifier of the flashcard's author.
-        """
-
-        return self._author
-
-    @author.setter
-    def author(
-        self,
-        value: str,
-    ) -> None:
-        self._author = value
 
     @property
     def back(self) -> str:
@@ -1759,34 +1721,8 @@ class FlashcardModel:
 
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class ImageModel:
+class ImageModel(BaseModel):
     """
     Represents an image entity within the application.
 
@@ -1800,6 +1736,7 @@ class ImageModel:
         self,
         name: str,
         path: Path,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         fields: Optional[dict[str, Any]] = None,
@@ -1813,13 +1750,14 @@ class ImageModel:
         Initializes an Image instance.
 
         Args:
-            name (str): The descriptive name of the image.
-            path (Path): The filesystem path where the image is stored.
+            author (Optional[str]): The creator of the image.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             fields (Optional[dict[str, Any]]): Additional dynamic metadata fields.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
             key (Optional[str]): Unique model key identifier.
+            name (str): The descriptive name of the image.
+            path (Path): The filesystem path where the image is stored.
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
@@ -1828,12 +1766,15 @@ class ImageModel:
             None
         """
 
+        super().__init__()
+
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
             key=key,
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -1967,34 +1908,8 @@ class ImageModel:
 
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class ModelIdentifiable:
+class ModelIdentifiable(BaseModel):
     """
     Provides identification properties for a model dictionary.
 
@@ -2023,6 +1938,8 @@ class ModelIdentifiable:
         Returns:
             None
         """
+
+        super().__init__()
 
         self._id: Final[Union[int, str]] = id_
         self._key: Final[str] = key
@@ -2061,34 +1978,8 @@ class ModelIdentifiable:
 
         return self._uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class ModelMetadata:
+class ModelMetadata(BaseModel):
     """
     Represents the metadata associated with a model dictionary.
 
@@ -2101,6 +1992,7 @@ class ModelMetadata:
     def __init__(
         self,
         type_: str,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         fields: Optional[dict[str, Any]] = None,
@@ -2127,6 +2019,9 @@ class ModelMetadata:
             None
         """
 
+        super().__init__()
+
+        self._author: Final[str] = author if exists(value=author) else ""
         self._created_at: Final[datetime] = created_at if exists(value=created_at) else get_now()
         self._created_on: Final[date] = created_on if exists(value=created_on) else get_today()
         self._fields: Final[dict[str, Any]] = (
@@ -2140,6 +2035,16 @@ class ModelMetadata:
         self._type: Final[str] = type_.upper()
         self._updated_at: Final[datetime] = updated_at if exists(value=updated_at) else get_now()
         self._updated_on: Final[date] = updated_on if exists(value=updated_on) else get_today()
+
+    @property
+    def author(self) -> str:
+        """
+        Returns the author of the model.
+
+        Returns:
+            str: The author of the model.
+        """
+        return self._author
 
     @property
     def created_at(self) -> datetime:
@@ -2207,34 +2112,8 @@ class ModelMetadata:
 
         return self._updated_on
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class NoteModel:
+class NoteModel(BaseModel):
     """
     Represents a note entity within the application.
 
@@ -2283,7 +2162,9 @@ class NoteModel:
         Returns:
             None
         """
-        self._author: Optional[str] = author
+
+        super().__init__()
+
         self._customfields: list[dict[str, Any]] = customfields or []
         self._difficulty: Optional[str] = difficulty
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
@@ -2295,6 +2176,7 @@ class NoteModel:
         self._last_viewed_at: Optional[datetime] = last_viewed_at
         self._last_viewed_on: Optional[datetime] = last_viewed_on
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -2312,24 +2194,6 @@ class NoteModel:
         self._teacher: Optional[str] = teacher
         self._text: str = text
         self._title: str = title
-
-    @property
-    def author(self) -> Optional[str]:
-        """
-        Returns the author of the note.
-
-        Returns:
-            Optional[str]: The name or identifier of the note's author.
-        """
-
-        return self._author
-
-    @author.setter
-    def author(
-        self,
-        value: str,
-    ) -> None:
-        self._author = value
 
     @property
     def created_at(self) -> datetime:
@@ -2642,34 +2506,8 @@ class NoteModel:
 
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class OptionModel:
+class OptionModel(BaseModel):
     """
     Represents an individual option within a customfield or setting.
 
@@ -2681,6 +2519,7 @@ class OptionModel:
     def __init__(
         self,
         value: Any,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         id_: Optional[Union[int, str]] = None,
@@ -2693,7 +2532,7 @@ class OptionModel:
         Initializes an Option instance.
 
         Args:
-            value (Any): The value of the option.
+            author (Optional[str]): The creator of the option.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
@@ -2701,10 +2540,13 @@ class OptionModel:
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
+            value (Any): The value of the option.
 
         Returns:
             None
         """
+
+        super().__init__()
 
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
@@ -2712,6 +2554,7 @@ class OptionModel:
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -2840,34 +2683,8 @@ class OptionModel:
     ) -> None:
         self._value = value
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class PriorityModel:
+class PriorityModel(BaseModel):
     """
     Represents a priority level entity within the application.
 
@@ -2881,6 +2698,7 @@ class PriorityModel:
         display_name: str,
         name: str,
         value: float,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         id_: Optional[Union[int, str]] = None,
@@ -2893,20 +2711,23 @@ class PriorityModel:
         Initializes a Priority instance.
 
         Args:
-            display_name (str): The human-readable name of the priority level.
-            name (str): The internal technical name of the priority level.
-            value (float): The numerical weight or value of this priority.
+            author (Optional[str]): The creator of the priority.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
+            display_name (str): The human-readable name of the priority level.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
             key (Optional[str]): Unique model key identifier.
+            name (str): The internal technical name of the priority level.
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
+            value (float): The numerical weight or value of this priority.
 
         Returns:
             None
         """
+
+        super().__init__()
 
         self._display_name: Final[str] = display_name
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
@@ -2915,6 +2736,7 @@ class PriorityModel:
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -3059,34 +2881,8 @@ class PriorityModel:
 
         return self._value
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class QuestionModel:
+class QuestionModel(BaseModel):
     """
     Represents a question entity within the application.
 
@@ -3124,7 +2920,6 @@ class QuestionModel:
         Initializes a Question instance.
 
         Args:
-            text (str): The actual text content of the question.
             author (Optional[str]): The creator of the question.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
@@ -3140,6 +2935,7 @@ class QuestionModel:
             subject (Optional[str]): Associated subject key.
             tags (Optional[list[str]]): List of associated tags.
             teacher (Optional[str]): Associated teacher key.
+            text (str): The actual text content of the question.
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
@@ -3148,8 +2944,9 @@ class QuestionModel:
             None
         """
 
+        super().__init__()
+
         self._answers: Optional[list[str]] = answers or []
-        self._author: Optional[str] = author
         self._customfields: Optional[list[dict[str, Any]]] = customfields or []
         self._difficulty: Final[Optional[str]] = difficulty
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
@@ -3158,6 +2955,7 @@ class QuestionModel:
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -3173,23 +2971,6 @@ class QuestionModel:
         self._tags: Optional[list[str]] = tags
         self._teacher: Optional[str] = teacher
         self._text: Final[str] = text
-
-    @property
-    def author(self) -> Optional[str]:
-        """
-        Returns the author of the question.
-
-        Returns:
-            Optional[str]: The name or identifier of the question's author.
-        """
-        return self._author
-
-    @author.setter
-    def author(
-        self,
-        value: str,
-    ) -> None:
-        self._author = value
 
     @property
     def created_at(self) -> datetime:
@@ -3461,34 +3242,8 @@ class QuestionModel:
         """
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class RehearsalActionModel:
+class RehearsalActionModel(BaseModel):
     """
     Represents a single performed action within a study session.
 
@@ -3503,6 +3258,7 @@ class RehearsalActionModel:
         action_data: dict[str, Any],
         message: str,
         timestamp: datetime,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         id_: Optional[Union[int, str]] = None,
@@ -3515,15 +3271,15 @@ class RehearsalActionModel:
         Initializes a RehearsalAction instance.
 
         Args:
-            item (str): The key of the model being practiced.
-            rehearsal_run (str): The key of the RehearsalRun this action belongs to.
             author (Optional[str]): The identifier of the user performing the action.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             customfields (Optional[list[dict[str, Any]]]): Custom metadata for this action.
             duration (Optional[int]): Time spent on this action in seconds.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
+            item (str): The key of the model being practiced.
             key (Optional[str]): Unique model key identifier for the action itself.
+            rehearsal_run (str): The key of the RehearsalRun this action belongs to.
             result (Optional[str]): The outcome of the action (e.g., success level).
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
@@ -3533,6 +3289,8 @@ class RehearsalActionModel:
             None
         """
 
+        super().__init__()
+
         self._action_data: Final[dict[str, Any]] = action_data
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
@@ -3541,6 +3299,7 @@ class RehearsalActionModel:
         )
         self._message: Final[str] = message
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -3663,34 +3422,8 @@ class RehearsalActionModel:
         """
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class RehearsalRunItemModel:
+class RehearsalRunItemModel(BaseModel):
     """
     Represents an individual item within a rehearsal session.
 
@@ -3704,6 +3437,7 @@ class RehearsalRunItemModel:
         self,
         item: str,
         actions: Optional[list[str]] = None,
+        author: Optional[str] = None,
         completed_at: Optional[datetime] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
@@ -3719,15 +3453,15 @@ class RehearsalRunItemModel:
         Initializes a RehearsalRunItem instance.
 
         Args:
-            item (str): The key of the model being rehearsed (e.g., Flashcard key).
-            rehearsal_run (str): The key of the associated RehearsalRun.
             author (Optional[str]): The identifier of the user performing the action.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             customfields (Optional[list[dict[str, Any]]]): Custom metadata for this action.
             duration (Optional[int]): Time spent on this item in seconds.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
+            item (str): The key of the model being rehearsed (e.g., Flashcard key).
             key (Optional[str]): Unique model key identifier.
+            rehearsal_run (str): The key of the associated RehearsalRun.
             result (Optional[str]): The outcome of the rehearsal (e.g., 'correct', 'wrong').
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
@@ -3736,6 +3470,8 @@ class RehearsalRunItemModel:
         Returns:
             None
         """
+
+        super().__init__()
 
         self._actions: list[str] = actions if exists(value=actions) else []
         self._completed_at: Optional[datetime] = completed_at
@@ -3746,6 +3482,7 @@ class RehearsalRunItemModel:
         )
         self._item: Final[str] = item
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -3919,34 +3656,8 @@ class RehearsalRunItemModel:
         """
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class RehearsalRunModel:
+class RehearsalRunModel(BaseModel):
     """
     Represents a specific rehearsal session or study run.
 
@@ -4005,7 +3716,8 @@ class RehearsalRunModel:
             None
         """
 
-        self._author: Optional[str] = author
+        super().__init__()
+
         self._completed_at: Optional[datetime] = completed_at
         self._completed_on: Optional[datetime] = completed_on
         self._configuration: Final[dict[str, Any]] = configuration
@@ -4021,6 +3733,7 @@ class RehearsalRunModel:
         self._is_finished: bool = is_finished
         self._items: list[dict[str, str]] = items or {}
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -4036,23 +3749,6 @@ class RehearsalRunModel:
         self._stacks: list[str] = stacks or []
         self._started_at: Optional[datetime] = started_at
         self._started_on: Optional[date] = started_on
-
-    @property
-    def author(self) -> Optional[str]:
-        """
-        Returns the author of the rehearsal run.
-
-        Returns:
-            Optional[str]: The name or identifier of the author.
-        """
-        return self._author
-
-    @author.setter
-    def author(
-        self,
-        value: str,
-    ) -> None:
-        self._author = value
 
     @property
     def configuration(self) -> dict[str, Any]:
@@ -4341,34 +4037,8 @@ class RehearsalRunModel:
         """
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class StackModel:
+class StackModel(BaseModel):
     """
     Represents a collection or container (stack) of study materials.
 
@@ -4430,7 +4100,8 @@ class StackModel:
             None
         """
 
-        self._author: Optional[str] = author
+        super().__init__()
+
         self._children: list[str] = children if children else []
         self._customfields: list[dict[str, Any]] = customfields if customfields else []
         self._description: Optional[str] = description
@@ -4441,6 +4112,7 @@ class StackModel:
         )
         self._items: list[str] = items if items else []
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -4455,23 +4127,6 @@ class StackModel:
         self._parent: Optional[str] = parent
         self._subject: Optional[str] = subject
         self._teacher: Optional[str] = teacher
-
-    @property
-    def author(self) -> Optional[str]:
-        """
-        Returns the author of the stack.
-
-        Returns:
-            Optional[str]: The name or identifier of the stack's author.
-        """
-        return self._author
-
-    @author.setter
-    def author(
-        self,
-        value: str,
-    ) -> None:
-        self._author = value
 
     @property
     def children(self) -> list[str]:
@@ -4818,34 +4473,8 @@ class StackModel:
         """
         return self._identifiable.uuid
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class SubjectModel:
+class SubjectModel(BaseModel):
     """
     Represents a subject entity within the application.
 
@@ -4857,6 +4486,7 @@ class SubjectModel:
     def __init__(
         self,
         name: str,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         customfields: Optional[list[dict[str, Any]]] = None,
@@ -4872,13 +4502,14 @@ class SubjectModel:
         Initializes a Subject instance.
 
         Args:
-            name (str): The string name of the subject.
+            author (Optional[str]): The author of the subject.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             customfields (Optional[list[dict[str, Any]]]): List of custom data fields.
             difficulty (Optional[str]): Difficulty level key.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
             key (Optional[str]): Unique model key identifier.
+            name (str): The string name of the subject.
             priority (Optional[str]): Priority level key.
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
@@ -4888,6 +4519,8 @@ class SubjectModel:
             None
         """
 
+        super().__init__()
+
         self._customfields: Optional[list[dict[str, Any]]] = customfields or []
         self._difficulty: Final[Optional[str]] = difficulty
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
@@ -4896,6 +4529,7 @@ class SubjectModel:
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -5084,7 +4718,7 @@ class SubjectModel:
         return self._identifiable.uuid
 
 
-class TagModel:
+class TagModel(BaseModel):
     """
     Represents a tag entity within the application.
 
@@ -5096,6 +4730,7 @@ class TagModel:
     def __init__(
         self,
         value: str,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         id_: Optional[Union[int, str]] = None,
@@ -5108,7 +4743,7 @@ class TagModel:
         Initializes a Tag instance.
 
         Args:
-            value (str): The string value of the tag.
+            author (Optional[str]): The author of the tag.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
@@ -5116,10 +4751,13 @@ class TagModel:
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
+            value (str): The string value of the tag.
 
         Returns:
             None
         """
+
+        super().__init__()
 
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
@@ -5127,6 +4765,7 @@ class TagModel:
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -5248,34 +4887,8 @@ class TagModel:
 
         return self._value
 
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
 
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)
-
-
-class TeacherModel:
+class TeacherModel(BaseModel):
     """
     Represents a teacher entity within the application.
 
@@ -5287,6 +4900,7 @@ class TeacherModel:
     def __init__(
         self,
         name: str,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         customfields: Optional[list[dict[str, Any]]] = None,
@@ -5303,13 +4917,14 @@ class TeacherModel:
         Initializes a Teacher instance.
 
         Args:
-            name (str): The string name of the teacher.
+            author (Optional[str]): The author of the teacher.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             customfields (Optional[list[dict[str, Any]]]): List of custom data fields.
             difficulty (Optional[str]): Difficulty level key.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
             key (Optional[str]): Unique model key identifier.
+            name (str): The string name of the teacher.
             priority (Optional[str]): Priority level key.
             subjects (Optional[list[str]]): List of subject keys this teacher is associated with.
             updated_at (Optional[datetime]): Timestamp of the last update.
@@ -5320,6 +4935,8 @@ class TeacherModel:
             None
         """
 
+        super().__init__()
+
         self._customfields: Optional[list[dict[str, Any]]] = customfields or []
         self._difficulty: Final[Optional[str]] = difficulty
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
@@ -5328,6 +4945,7 @@ class TeacherModel:
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -5546,7 +5164,7 @@ class TeacherModel:
         return self._identifiable.uuid
 
 
-class UserModel:
+class UserModel(BaseModel):
     """
     Represents a user entity within the application.
 
@@ -5559,6 +5177,7 @@ class UserModel:
     def __init__(
         self,
         name: str,
+        author: Optional[str] = None,
         created_at: Optional[datetime] = None,
         created_on: Optional[date] = None,
         id_: Optional[Union[int, str]] = None,
@@ -5571,11 +5190,12 @@ class UserModel:
         Initializes a User instance.
 
         Args:
-            name (str): The string name of the user.
+            author (Optional[str]): The author of the user.
             created_at (Optional[datetime]): Specific timestamp of creation.
             created_on (Optional[date]): Specific date of creation.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
             key (Optional[str]): Unique model key identifier.
+            name (str): The string name of the user.
             updated_at (Optional[datetime]): Timestamp of the last update.
             updated_on (Optional[date]): Date of the last update.
             uuid_ (Optional[uuid.UUID]): Universally unique identifier.
@@ -5584,12 +5204,15 @@ class UserModel:
             None
         """
 
+        super().__init__()
+
         self._identifiable: Final[ModelIdentifiable] = ModelIdentifiable(
             id_=id_,
             key=key,
             uuid_=uuid_,
         )
         self._metadata: Final[ModelMetadata] = ModelMetadata(
+            author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
@@ -5710,29 +5333,3 @@ class UserModel:
         """
 
         return self._identifiable.uuid
-
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-            dict[str, Any]: The dictionary representation of the model.
-        """
-
-        return _convert_to_dict(self)
-
-    def to_json(self) -> dict[str, Any]:
-        """
-        Returns a JSON dictionary representation of the model.
-
-        Args:
-            None
-
-        Returns:
-           dict[str, Any]: The JSON dictionary representation of the model.
-        """
-
-        return _convert_to_json(self)

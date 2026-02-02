@@ -372,7 +372,7 @@ def _get_add_event(
     }[type_]
 
 
-def _get_from_database(key: str) -> Optional[ModelDict]:
+def _get_from_database(key: str) -> Optional[Model]:
     """
     Retrieves the model dictionary corresponding to the passed key.
 
@@ -380,7 +380,7 @@ def _get_from_database(key: str) -> Optional[ModelDict]:
         key (str): The key of the model dictionary to retrieve.
 
     Returns:
-        Optional[ModelDict]: The model dictionary corresponding to the passed key.
+        Optional[Model]: The model corresponding to the passed key.
     """
 
     try:
@@ -672,27 +672,48 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
 
                 dictionary[key] = response["metadata"]["key"]
 
-        if exists(value=dictionary.get("subject")):
+        if exists(
+            value=dictionary.get(
+                "subject",
+                None,
+            )
+        ):
             response: Optional[Model] = _filter_subject(name=dictionary["subject"])
 
             if not exists(value=response):
-                log_warning(message="Failed to resolve metadata key for 'subject'")
+                log_warning(
+                    message=f"Failed to resolve metadata key for 'subject' ({dictionary['subject']})"
+                )
             else:
                 dictionary["subject"] = response.get("metadata", {}).get("key")
 
-        if exists(value=dictionary.get("teacher")):
+        if exists(
+            value=dictionary.get(
+                "teacher",
+                None,
+            )
+        ):
             response: Optional[Model] = _filter_teacher(name=dictionary["teacher"])
 
             if not exists(value=response):
-                log_warning(message="Failed to resolve metadata key for 'teacher'")
+                log_warning(
+                    message=f"Failed to resolve metadata key for 'teacher' ({dictionary['teacher']})"
+                )
             else:
                 dictionary["teacher"] = response.get("metadata", {}).get("key")
 
-        if exists(value=dictionary.get("stack")):
+        if exists(
+            value=dictionary.get(
+                "stack",
+                None,
+            )
+        ):
             response: Optional[Model] = _filter_stack(name=dictionary["stack"])
 
             if not exists(value=response):
-                log_warning(message="Failed to resolve metadata key for 'stack'")
+                log_warning(
+                    message=f"Failed to resolve metadata key for 'stack' ({dictionary['stack']})"
+                )
             else:
                 dictionary["stack"] = response.key
 
@@ -920,6 +941,8 @@ def _handle_flashcard_creation(form: dict[str, Any]) -> None:
         log_warning(message="Failed to add flashcard to database. Aborting...")
 
         return
+
+    log_debug(message=f"Stack key: {kwargs["stack"]}")
 
     stack: Optional[Model] = _get_from_database(key=kwargs["stack"])
 
@@ -1275,7 +1298,7 @@ def on_stack_combobox_select(value: str) -> None:
     dispatch(
         event=SET_CREATE_FORM,
         namespace=GLOBAL,
-        **stack.to_json(),
+        **stack.to_json_dict(),
     )
 
 

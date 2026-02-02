@@ -38,7 +38,7 @@ from utils.common import (
     filter_and_call,
     uuid_from_string,
 )
-from utils.logging import log_debug, log_error, log_warning
+from utils.logging import log_error, log_warning
 
 # ---------- Exports ---------- #
 
