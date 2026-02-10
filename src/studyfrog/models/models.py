@@ -13,8 +13,6 @@ from datetime import date, datetime
 from typing import Any, Final, Optional, TypeAlias, Union
 
 from utils.common import (
-    date_from_string,
-    datetime_from_string,
     exists,
     generate_uuid4,
     get_now,
@@ -187,10 +185,10 @@ class BaseModel:
         return self.to_dict() == other.to_dict()
 
     def __repr__(self) -> str:
-        return str(self.to_dict())
+        return f"<{self.__class__.__name__}({self.to_json_str()})>"
 
     def __str__(self) -> str:
-        return self.to_json_str()
+        return self.__repr__()
 
     def to_dict(self) -> dict[str, Any]:
         """

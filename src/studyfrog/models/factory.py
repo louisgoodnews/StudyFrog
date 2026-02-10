@@ -108,8 +108,10 @@ def _convert_parameters(**kwargs) -> dict[str, Any]:
 
         if not exists(value=kwargs[key]):
             log_warning(
-                message=f"Skipped present key '{key}' as it was not associated with any value."
+                message=f"Skipped present key '{key}' as it was not associated with any value.",
+                name="models.factory._convert_parameters",
             )
+
             continue
 
         if key == "uuid":

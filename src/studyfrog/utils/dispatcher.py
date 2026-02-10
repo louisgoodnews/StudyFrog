@@ -184,7 +184,7 @@ def dispatch(
 
         log_warning(
             message=report,
-            name="DISPATCHER",
+            name="utils.dispatcher.dispatch",
         )
 
         return report
@@ -197,7 +197,7 @@ def dispatch(
 
         log_warning(
             message=report,
-            name="DISPATCHER",
+            name="utils.dispatcher.dispatch",
         )
 
         return report
@@ -241,7 +241,7 @@ def dispatch(
 
             log_error(
                 message=report,
-                name="DISPATCHER",
+                name="utils.dispatcher.dispatch",
             )
 
         if not subscription["persistent"]:
@@ -311,7 +311,7 @@ def subscribe(
 
     log_info(
         message=f"Subscribed to event '{event}' in namespace '{namespace}' with UUID '{subscription['uuid']}'.",
-        name="DISPATCHER",
+        name="utils.dispatcher.subscribe",
     )
 
     return subscription["uuid"]
@@ -329,6 +329,10 @@ def unsubscribe(uuid: str) -> bool:
     """
 
     if uuid not in UUIDS:
+        log_warning(
+            message=f"UUID '{uuid}' not found. Aborting...",
+            name="utils.dispatcher.unsubscribe",
+        )
         return False
 
     event: str = UUIDS[uuid]["event"]
@@ -346,7 +350,7 @@ def unsubscribe(uuid: str) -> bool:
 
     log_info(
         message=f"Unsubscribed from event '{event}' in namespace '{namespace}' with UUID '{uuid}'.",
-        name="DISPATCHER",
+        name="utils.dispatcher.unsubscribe",
     )
 
     return True
