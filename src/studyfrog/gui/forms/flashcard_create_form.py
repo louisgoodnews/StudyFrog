@@ -4,12 +4,14 @@ Date: 2025-12-13
 Description: The flashcard create form of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NORMAL, NSEW, W
 from typing import Any, Final, Optional, Union
 
-from constants.events import (
+from studyfrog.constants.events import (
     CLEAR_CREATE_FORM,
     DESTROY_FLASHCARD_CREATE_FORM,
     GET_ALL_SUBJECTS_FROM_DB,
@@ -17,12 +19,12 @@ from constants.events import (
     GET_CREATE_FORM,
     GET_OBSERVABLE_MODEL,
 )
-from constants.gui import READONLY
-from models.observables import FlashcardObservableModel, ObservableModel
-from utils.common import exists
-from utils.dispatcher import dispatch, subscribe, unsubscribe
-from utils.gui import destroy_widget_children
-from utils.logging import log_error, log_info
+from studyfrog.constants.gui import READONLY
+from studyfrog.models.observables import FlashcardObservableModel, ObservableModel
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import dispatch, subscribe, unsubscribe
+from studyfrog.utils.gui import destroy_widget_children
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

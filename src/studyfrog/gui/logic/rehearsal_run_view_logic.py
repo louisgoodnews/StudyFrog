@@ -4,10 +4,12 @@ Date: 2025-12-12
 Description: The logic of the rehearsal run view of the application.
 """
 
+from __future__ import annotations
+
 from typing import Any, Final, Literal, Optional
 
-from constants.common import GLOBAL, PATTERNS
-from constants.events import (
+from studyfrog.constants.common import GLOBAL, PATTERNS
+from studyfrog.constants.events import (
     CLICKED_EASY_BUTTON,
     CLICKED_EDIT_BUTTON,
     CLICKED_HARD_BUTTON,
@@ -31,8 +33,8 @@ from constants.events import (
     UPDATE_QUESTION_IN_DB,
     UPDATE_REHEARSAL_RUN_IN_DB,
 )
-from models.models import Model
-from utils.common import (
+from studyfrog.models.models import Model
+from studyfrog.utils.common import (
     exists,
     get_now,
     get_today,
@@ -41,8 +43,8 @@ from utils.common import (
     search_string,
     shuffle_list,
 )
-from utils.dispatcher import dispatch
-from utils.logging import log_debug, log_info, log_warning
+from studyfrog.utils.dispatcher import dispatch
+from studyfrog.utils.logging import log_debug, log_info, log_warning
 
 
 # ---------- Exports ---------- #

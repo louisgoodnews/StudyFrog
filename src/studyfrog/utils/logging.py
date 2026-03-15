@@ -4,12 +4,14 @@ Date: 2025-12-08
 Description: This module holds the logg functions for the application.
 """
 
+from __future__ import annotations
+
 import sys
 
 from typing import Any, Final, Literal, Optional, TypeAlias
 
-from constants.common import APP_NAME
-from constants.logging import (
+from studyfrog.constants.common import APP_NAME
+from studyfrog.constants.logging import (
     CRITICAL_FG,
     DEBUG_FG,
     ERROR_FG,
@@ -19,7 +21,7 @@ from constants.logging import (
     TRACE_FG,
     WARNING_FG,
 )
-from utils.common import get_now_str
+from studyfrog.utils.common import get_now_str
 
 
 # ---------- Exports ---------- #

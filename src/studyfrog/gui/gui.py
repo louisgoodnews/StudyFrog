@@ -3,13 +3,15 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NSEW
 
 from typing import Final, Optional
 
-from constants.gui import WINDOW_GEOMETRY, WINDOW_TITLE
+from studyfrog.constants.gui import WINDOW_GEOMETRY, WINDOW_TITLE
 
 
 # ---------- Exports ---------- #

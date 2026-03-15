@@ -4,16 +4,18 @@ Date: 2025-12-21
 Description: The question rehearsal view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NSEW
 from typing import Any, Final, Literal, Optional
 
-from gui.gui import get_center_frame
-from models.models import Model
-from utils.common import exists
-from utils.gui import clear_center_frame, reset_center_frame_grid
-from utils.logging import log_error, log_info
+from studyfrog.gui.gui import get_center_frame
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.gui import clear_center_frame, reset_center_frame_grid
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

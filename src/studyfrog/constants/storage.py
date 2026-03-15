@@ -3,6 +3,8 @@ Author: Louis Goodnews
 Date: 2026-01-01
 """
 
+from __future__ import annotations
+
 from typing import Final, Literal
 
 

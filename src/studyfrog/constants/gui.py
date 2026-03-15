@@ -3,9 +3,11 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 from typing import Final, Literal
 
-from constants.common import APP_NAME, APP_VERSION
+from studyfrog.constants.common import APP_NAME, APP_VERSION
 
 
 # ---------- Exports ---------- #

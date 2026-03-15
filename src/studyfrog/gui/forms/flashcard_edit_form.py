@@ -4,15 +4,17 @@ Date: 2026-01-10
 Description: The flashcard edit form of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from typing import Any, Final, Optional
 
-from constants.common import GLOBAL
-from constants.events import DESTROY_FLASHCARD_EDIT_FORM
-from utils.common import exists
-from utils.dispatcher import subscribe, unsubscribe
-from utils.logging import log_error
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import DESTROY_FLASHCARD_EDIT_FORM
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import subscribe, unsubscribe
+from studyfrog.utils.logging import log_error
 
 
 # ---------- Exports ---------- #

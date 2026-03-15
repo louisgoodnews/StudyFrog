@@ -4,12 +4,14 @@ Date: 2025-12-13
 Description: The logic of the create view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from typing import Any, Callable, Final, Literal, Optional
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     ADD_ANSWER_TO_DB,
     ADD_FLASHCARD_TO_DB,
     ADD_NOTE_TO_DB,
@@ -55,7 +57,7 @@ from constants.events import (
     UPDATE_QUESTION_IN_DB,
     UPDATE_STACK_IN_DB,
 )
-from constants.storage import (
+from studyfrog.constants.storage import (
     ANSWERS,
     DIFFICULTIES,
     FLASHCARDS,
@@ -66,10 +68,10 @@ from constants.storage import (
     SUBJECTS,
     TEACHERS,
 )
-from models.models import Model
-from utils.common import exists, pluralize_word, search_string, generate_model_key
-from utils.dispatcher import bulk_dispatch, dispatch
-from utils.logging import log_debug, log_error, log_info, log_warning
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists, pluralize_word, search_string, generate_model_key
+from studyfrog.utils.dispatcher import bulk_dispatch, dispatch
+from studyfrog.utils.logging import log_debug, log_error, log_info, log_warning
 
 
 # ---------- Exports ---------- #

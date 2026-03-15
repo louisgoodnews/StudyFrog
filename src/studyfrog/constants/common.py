@@ -3,6 +3,8 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 import re
 import sys
 

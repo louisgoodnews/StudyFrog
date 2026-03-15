@@ -4,19 +4,21 @@ Date: 2025-12-21
 Description: The flashcard rehearsal view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NSEW
 from typing import Any, Final, Literal, Optional
 
-from constants.common import GLOBAL
-from constants.events import FLASHCARD_FLIPPED
-from gui.gui import get_center_frame
-from models.models import Model
-from utils.common import exists
-from utils.dispatcher import dispatch
-from utils.gui import clear_center_frame, reset_center_frame_grid
-from utils.logging import log_error
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import FLASHCARD_FLIPPED
+from studyfrog.gui.gui import get_center_frame
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import dispatch
+from studyfrog.utils.gui import clear_center_frame, reset_center_frame_grid
+from studyfrog.utils.logging import log_error
 
 
 # ---------- Exports ---------- #

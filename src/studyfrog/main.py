@@ -3,8 +3,10 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
-from core.application import start_application, stop_application
-from utils.logging import log_error
+from __future__ import annotations
+
+from studyfrog.core.application import start_application, stop_application
+from studyfrog.utils.logging import log_error
 
 
 def main() -> None:

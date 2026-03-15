@@ -4,10 +4,12 @@ Date: 2025-12-12
 Description: This module holds default values for the application.
 """
 
+from __future__ import annotations
+
 from typing import Final
 
-from constants.common import APP_NAME
-from models.factory import Model, get_difficulty_model, get_priority_model, get_user_model
+from studyfrog.constants.common import APP_NAME
+from studyfrog.models.factory import Model, get_difficulty_model, get_priority_model, get_user_model
 
 
 # ---------- Exports ---------- #

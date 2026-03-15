@@ -4,19 +4,21 @@ Date: 2026-01-05
 Description: The delete confirmation view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import CENTER, NSEW, W
 from typing import Any, Final, Optional
 
-from constants.common import GLOBAL
-from constants.events import DESTROY_DELETE_CONFIRMATION_VIEW
-from constants.gui import TOPLEVEL_GEOMETRY, WINDOW_TITLE
-from gui.logic.delete_confirmation_view_logic import on_cancel_button_click, on_okay_button_click
-from models.models import Model
-from utils.common import exists
-from utils.dispatcher import subscribe, unsubscribe
-from utils.logging import log_error, log_info
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import DESTROY_DELETE_CONFIRMATION_VIEW
+from studyfrog.constants.gui import TOPLEVEL_GEOMETRY, WINDOW_TITLE
+from studyfrog.gui.logic.delete_confirmation_view_logic import on_cancel_button_click, on_okay_button_click
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import subscribe, unsubscribe
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

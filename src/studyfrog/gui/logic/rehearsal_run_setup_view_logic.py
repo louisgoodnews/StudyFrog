@@ -4,10 +4,12 @@ Date: 2025-12-19
 Description: The logic of the rehearsal run setup view of the application.
 """
 
+from __future__ import annotations
+
 from typing import Any, Final, Optional
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     ADD_REHEARSAL_RUN_TO_DB,
     DESTROY_REHEARSAL_RUN_SETUP_VIEW,
     FILTER_DIFFICULTIES_FROM_DB,
@@ -19,10 +21,10 @@ from constants.events import (
     GET_REHEARSAL_RUN_SETUP_FORM,
     GET_REHEARSAL_RUN_VIEW,
 )
-from models.models import Model
-from utils.common import exists
-from utils.dispatcher import dispatch
-from utils.logging import log_debug, log_error
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import dispatch
+from studyfrog.utils.logging import log_debug, log_error
 
 
 # ---------- Exports ---------- #
@@ -211,6 +213,8 @@ def _handle_stacks_data(data: str) -> list[str]:
 
             if not exists(value=stack):
                 raise ValueError(f"Stack '{name}' not found.")
+
+            log_debug(message=f"Stack '{name}' found. ({stack.to_json_dict()})")
 
             key: Optional[str] = stack.key
 

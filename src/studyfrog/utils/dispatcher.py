@@ -3,11 +3,13 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 from typing import Any, Callable, Final, Optional
 
-from constants.common import GLOBAL
-from utils.common import get_now, generate_uuid4_str
-from utils.logging import log_error, log_info, log_warning
+from studyfrog.constants.common import GLOBAL
+from studyfrog.utils.common import get_now, generate_uuid4_str
+from studyfrog.utils.logging import log_error, log_info, log_warning
 
 
 # ---------- Exports ---------- #

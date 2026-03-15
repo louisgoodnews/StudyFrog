@@ -4,13 +4,15 @@ Date: 2025-12-12
 Description: The create view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NSEW, W
 from typing import Any, Final, Optional, Union
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     CLEAR_CREATE_FORM,
     DESTROY_CREATE_VIEW,
     GET_ALL_DIFFICULTIES_FROM_DB,
@@ -23,17 +25,17 @@ from constants.events import (
     STACK_ADDED,
     STACKS_ADDED,
 )
-from constants.gui import READONLY, TOPLEVEL_GEOMETRY, WINDOW_TITLE
-from gui.logic.create_view_logic import (
+from studyfrog.constants.gui import READONLY, TOPLEVEL_GEOMETRY, WINDOW_TITLE
+from studyfrog.gui.logic.create_view_logic import (
     on_create_button_click,
     on_cancel_button_click,
     on_stack_combobox_select,
     on_type_combobox_select,
 )
-from models.models import Model
-from utils.common import exists
-from utils.dispatcher import dispatch, subscribe, unsubscribe
-from utils.logging import log_error, log_info
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import dispatch, subscribe, unsubscribe
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

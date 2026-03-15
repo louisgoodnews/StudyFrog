@@ -4,18 +4,20 @@ Date: 2025-12-31
 Description: The rehearsal run result view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from typing import Any, Final, Optional
 
-from constants.common import GLOBAL
-from constants.events import DESTROY_REHEARSAL_RUN_RESULT_VIEW
-from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
-from models.models import Model
-from utils.common import exists
-from utils.dispatcher import subscribe, unsubscribe
-from utils.gui import clear_frames, reset_frame_grids
-from utils.logging import log_debug, log_error, log_info, log_warning
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import DESTROY_REHEARSAL_RUN_RESULT_VIEW
+from studyfrog.gui.gui import get_bottom_frame, get_center_frame, get_top_frame
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import subscribe, unsubscribe
+from studyfrog.utils.gui import clear_frames, reset_frame_grids
+from studyfrog.utils.logging import log_debug, log_error, log_info, log_warning
 
 
 # ---------- Exports ---------- #

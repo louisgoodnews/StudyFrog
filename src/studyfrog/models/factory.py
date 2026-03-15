@@ -4,13 +4,15 @@ Date: 2026-01-09
 Description: This module contains the factory methods for creating model instances
 """
 
+from __future__ import annotations
+
 import uuid
 
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Callable, Final, Literal, Optional, Type, Union
 
-from models.models import (
+from studyfrog.models.models import (
     AnswerModel,
     AssociationModel,
     CustomfieldModel,
@@ -31,14 +33,14 @@ from models.models import (
     TeacherModel,
     UserModel,
 )
-from utils.common import (
+from studyfrog.utils.common import (
     date_from_string,
     datetime_from_string,
     exists,
     filter_and_call,
     uuid_from_string,
 )
-from utils.logging import log_error, log_warning
+from studyfrog.utils.logging import log_error, log_warning
 
 # ---------- Exports ---------- #
 

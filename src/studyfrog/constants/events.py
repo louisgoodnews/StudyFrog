@@ -4,6 +4,8 @@ Date: 2025-12-10
 Description: The events module holds all the events used in the application defined as Final[str] objects.
 """
 
+from __future__ import annotations
+
 from typing import Callable, Final, Optional
 
 

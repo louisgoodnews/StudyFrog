@@ -4,13 +4,15 @@ Date: 2026-01-09
 Description: The logic of the edit view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from typing import Any, Final
 
-from constants.common import GLOBAL
-from constants.events import DESTROY_EDIT_VIEW, GET_DELETE_CONFIRMATION_VIEW
-from utils.dispatcher import dispatch
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import DESTROY_EDIT_VIEW, GET_DELETE_CONFIRMATION_VIEW
+from studyfrog.utils.dispatcher import dispatch
 
 # ---------- Exports ---------- #
 

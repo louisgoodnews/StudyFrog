@@ -3,11 +3,13 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 import tkinter
 
 from typing import Final
 
-from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
+from studyfrog.gui.gui import get_bottom_frame, get_center_frame, get_top_frame
 
 
 # ---------- Exports ---------- #

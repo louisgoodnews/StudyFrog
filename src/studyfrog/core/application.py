@@ -3,18 +3,20 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Final, Optional
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     APPLICATION_STARTED,
     APPLICATION_STARTING,
     APPLICATION_STOPPED,
     APPLICATION_STOPPING,
     GET_DASHBOARD_VIEW,
 )
-from core.bootstrap import (
+from studyfrog.core.bootstrap import (
     ensure_directories,
     ensure_files,
     ensure_defaults,
@@ -22,10 +24,10 @@ from core.bootstrap import (
     subscribe_to_events,
     unsubscribe_from_events,
 )
-from gui.gui import get_root
-from utils.common import exists, get_now
-from utils.dispatcher import dispatch
-from utils.logging import log_error, log_info, log_trace
+from studyfrog.gui.gui import get_root
+from studyfrog.utils.common import exists, get_now
+from studyfrog.utils.dispatcher import dispatch
+from studyfrog.utils.logging import log_error, log_info, log_trace
 
 
 # ---------- Exports ---------- #

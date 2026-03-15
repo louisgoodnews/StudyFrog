@@ -4,9 +4,11 @@ Date: 2025-12-12
 Description: This module holds common functions for the application.
 """
 
+from __future__ import annotations
+
 from typing import Final
 
-from constants.defaults import (
+from studyfrog.constants.defaults import (
     DEFAULT_EASY_DIFFICULTY,
     DEFAULT_HARD_DIFFICULTY,
     DEFAULT_MEDIUM_DIFFICULTY,
@@ -17,7 +19,7 @@ from constants.defaults import (
     DEFAULT_MEDIUM_PRIORITY,
     DEFAULT_USER,
 )
-from models.models import Model
+from studyfrog.models.models import Model
 
 
 # ---------- Exports ---------- #

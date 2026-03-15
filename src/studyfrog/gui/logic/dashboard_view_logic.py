@@ -4,12 +4,14 @@ Date: 2025-12-12
 Description: The logic of the dashboard view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from typing import Final
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     DESTROY_DASHBOARD_VIEW,
     GET_CREATE_VIEW,
     GET_DELETE_CONFIRMATION_VIEW,
@@ -17,9 +19,9 @@ from constants.events import (
     GET_REHEARSAL_RUN_SETUP_VIEW,
     GET_VIEW_VIEW,
 )
-from models.models import Model
-from utils.dispatcher import dispatch
-from utils.logging import log_error, log_info
+from studyfrog.models.models import Model
+from studyfrog.utils.dispatcher import dispatch
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

@@ -4,6 +4,8 @@ Date: 2026-01-04
 Description: This module contains the definitions of the various models used in the application
 """
 
+from __future__ import annotations
+
 import json
 import uuid
 
@@ -12,7 +14,7 @@ from datetime import date, datetime
 
 from typing import Any, Final, Optional, TypeAlias, Union
 
-from utils.common import (
+from studyfrog.utils.common import (
     exists,
     generate_uuid4,
     get_now,

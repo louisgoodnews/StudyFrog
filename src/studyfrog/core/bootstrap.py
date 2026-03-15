@@ -3,11 +3,13 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any, Callable, Final, Optional
 
-from constants.common import GLOBAL
-from constants.defaults import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.defaults import (
     DEFAULT_EASY_DIFFICULTY,
     DEFAULT_HARD_DIFFICULTY,
     DEFAULT_HIGH_PRIORITY,
@@ -18,7 +20,7 @@ from constants.defaults import (
     DEFAULT_MEDIUM_PRIORITY,
     DEFAULT_USER,
 )
-from constants.directories import (
+from studyfrog.constants.directories import (
     ASSETS_DIR,
     CONFIG_DIR,
     DATA_DIR,
@@ -29,8 +31,8 @@ from constants.directories import (
     RESOURCES_DIR,
     TEMP_DIR,
 )
-from constants.events import *
-from constants.files import (
+from studyfrog.constants.events import *
+from studyfrog.constants.files import (
     ANSWERS_DB_JSON,
     ASSOCIATIONS_DB_JSON,
     CONFIG_DB_JSON,
@@ -50,28 +52,28 @@ from constants.files import (
     TEACHERS_DB_JSON,
     USERS_DB_JSON,
 )
-from gui.forms.answer_create_form import (
+from studyfrog.gui.forms.answer_create_form import (
     get_answer_choice_create_form,
     get_answer_open_ended_create_form,
     get_answer_true_false_create_form,
 )
-from gui.forms.flashcard_create_form import get_flashcard_create_form
-from gui.forms.note_create_form import get_note_create_form
-from gui.forms.question_create_form import get_question_create_form
-from gui.forms.stack_create_form import get_stack_create_form
-from gui.gui import get_bottom_frame, get_center_frame, get_root, get_top_frame
-from gui.views.create_view import get_create_view
-from gui.views.dashboard_view import get_dashboard_view
-from gui.views.edit_view import get_edit_view
-from gui.views.delete_confirmation_view import get_delete_confirmation_view
-from gui.views.flashcard_rehearsal_view import get_flashcard_rehearsal_view
-from gui.views.note_rehearsal_view import get_note_rehearsal_view
-from gui.views.question_rehearsal_view import get_question_rehearsal_view
-from gui.views.rehearsal_run_view import get_rehearsal_run_view
-from gui.views.rehearsal_run_result_view import get_rehearsal_run_result_view
-from gui.views.rehearsal_run_setup_view import get_rehearsal_run_setup_view
-from gui.widgets import get_error_toast, get_info_toast, get_success_toast, get_warning_toast
-from models.factory import (
+from studyfrog.gui.forms.flashcard_create_form import get_flashcard_create_form
+from studyfrog.gui.forms.note_create_form import get_note_create_form
+from studyfrog.gui.forms.question_create_form import get_question_create_form
+from studyfrog.gui.forms.stack_create_form import get_stack_create_form
+from studyfrog.gui.gui import get_bottom_frame, get_center_frame, get_root, get_top_frame
+from studyfrog.gui.views.create_view import get_create_view
+from studyfrog.gui.views.dashboard_view import get_dashboard_view
+from studyfrog.gui.views.edit_view import get_edit_view
+from studyfrog.gui.views.delete_confirmation_view import get_delete_confirmation_view
+from studyfrog.gui.views.flashcard_rehearsal_view import get_flashcard_rehearsal_view
+from studyfrog.gui.views.note_rehearsal_view import get_note_rehearsal_view
+from studyfrog.gui.views.question_rehearsal_view import get_question_rehearsal_view
+from studyfrog.gui.views.rehearsal_run_view import get_rehearsal_run_view
+from studyfrog.gui.views.rehearsal_run_result_view import get_rehearsal_run_result_view
+from studyfrog.gui.views.rehearsal_run_setup_view import get_rehearsal_run_setup_view
+from studyfrog.gui.widgets import get_error_toast, get_info_toast, get_success_toast, get_warning_toast
+from studyfrog.models.factory import (
     get_answer_model,
     get_flashcard_model,
     get_note_model,
@@ -80,13 +82,13 @@ from models.factory import (
     get_rehearsal_run_item_model,
     get_stack_model,
 )
-from models.models import Model
-from utils.common import exists, pluralize_word
-from utils.directories import ensure_directory
-from utils.dispatcher import subscribe, unsubscribe
-from utils.files import ensure_file
-from utils.logging import log_error, log_info, log_warning
-from utils.storage import (
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists, pluralize_word
+from studyfrog.utils.directories import ensure_directory
+from studyfrog.utils.dispatcher import subscribe, unsubscribe
+from studyfrog.utils.files import ensure_file
+from studyfrog.utils.logging import log_error, log_info, log_warning
+from studyfrog.utils.storage import (
     add_entries_if_not_exist,
     add_entry_if_not_exist,
     delete_all_entries,

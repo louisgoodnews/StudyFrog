@@ -4,23 +4,25 @@ Date: 2026-01-08
 Description: The edit view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NSEW, W
 from typing import Any, Final, Optional
 
-from constants.common import GLOBAL
-from constants.events import DESTROY_EDIT_VIEW
-from constants.gui import WINDOW_GEOMETRY, WINDOW_TITLE
-from gui.logic.edit_view_logic import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import DESTROY_EDIT_VIEW
+from studyfrog.constants.gui import WINDOW_GEOMETRY, WINDOW_TITLE
+from studyfrog.gui.logic.edit_view_logic import (
     on_cancel_button_click,
     on_delete_button_click,
     on_save_button_click,
 )
-from models.models import Model
-from utils.common import exists
-from utils.dispatcher import subscribe, unsubscribe
-from utils.logging import log_error
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import subscribe, unsubscribe
+from studyfrog.utils.logging import log_error
 
 
 # ---------- Exports ---------- #

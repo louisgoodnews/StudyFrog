@@ -4,16 +4,18 @@ Date: 2025-12-13
 Description: The answer create form of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import BOTTOM, CENTER, FALSE, NONE, NSEW, TOP, W, X, YES
 from typing import Any, Final, Optional, Union
 
-from constants.common import GLOBAL
-from constants.events import DESTROY_ANSWER_CREATE_FORM, GET_CREATE_FORM
-from utils.dispatcher import subscribe, unsubscribe
-from utils.gui import destroy_widget_children, reset_widget_grid
-from utils.logging import log_error, log_info
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import DESTROY_ANSWER_CREATE_FORM, GET_CREATE_FORM
+from studyfrog.utils.dispatcher import subscribe, unsubscribe
+from studyfrog.utils.gui import destroy_widget_children, reset_widget_grid
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

@@ -3,12 +3,14 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 import json
 
 from pathlib import Path
 from typing import Any, Final, Optional
 
-from utils.directories import create_directory
+from studyfrog.utils.directories import create_directory
 
 
 # ---------- Exports ---------- #

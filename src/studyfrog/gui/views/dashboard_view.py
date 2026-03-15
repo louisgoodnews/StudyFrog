@@ -4,42 +4,44 @@ Date: 2025-12-12
 Description: The dashboard view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NSEW, TOP, VERTICAL, W, X, YES
 from typing import Any, Final, Optional
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     DESTROY_DASHBOARD_VIEW,
     GET_ALL_STACKS_FROM_DB,
     STACK_ADDED,
     STACK_DELETED,
     STACKS_ADDED,
 )
-from gui.gui import (
+from studyfrog.gui.gui import (
     get_bottom_frame,
     get_center_frame,
     get_top_frame,
 )
-from gui.logic.dashboard_view_logic import (
+from studyfrog.gui.logic.dashboard_view_logic import (
     on_create_button_click,
     on_delete_button_click,
     on_edit_button_click,
     on_rehearse_button_click,
     on_view_button_click,
 )
-from models.models import Model
-from utils.common import exists
-from utils.dispatcher import dispatch, subscribe, unsubscribe
-from utils.gui import (
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import dispatch, subscribe, unsubscribe
+from studyfrog.utils.gui import (
     clear_bottom_frame,
     clear_center_frame,
     clear_frames,
     clear_top_frame,
     reset_frame_grids,
 )
-from utils.logging import log_error, log_info
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

@@ -4,9 +4,11 @@ Date: 2025-12-10
 Description: This module defines constants for the logging module.
 """
 
+from __future__ import annotations
+
 from typing import Final, Literal
 
-from utils.common import create_rgb_fg_color
+from studyfrog.utils.common import create_rgb_fg_color
 
 # ---------- Exports ---------- #
 

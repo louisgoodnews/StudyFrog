@@ -4,13 +4,15 @@ Date: 2025-12-13
 Description: Custom widgets of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NSEW
 from typing import Any, Callable, Final, Literal, Optional
 
-from constants.gui import TOAST_GEOMETRY
-from utils.common import generate_uuid4_str
+from studyfrog.constants.gui import TOAST_GEOMETRY
+from studyfrog.utils.common import generate_uuid4_str
 
 
 # ---------- Exports ---------- #

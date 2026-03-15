@@ -4,29 +4,31 @@ Date: 2025-12-13
 Description: The question create form of the application.
 """
 
+from __future__ import annotations
+
 import tkinter
 import customtkinter as ctk
 
 from tkinter.constants import NSEW, W
 from typing import Any, Callable, Final, Literal, Optional, Union
 
-from constants.common import GLOBAL, QUESTION_TYPES
-from constants.events import (
+from studyfrog.constants.common import GLOBAL, QUESTION_TYPES
+from studyfrog.constants.events import (
     DESTROY_ANSWER_CREATE_FORM,
     DESTROY_QUESTION_CREATE_FORM,
     GET_CREATE_FORM,
     GET_OBSERVABLE_MODEL,
 )
-from gui.forms.answer_create_form import (
+from studyfrog.gui.forms.answer_create_form import (
     get_answer_choice_create_form,
     get_answer_open_ended_create_form,
     get_answer_true_false_create_form,
 )
-from models.observables import ObservableModel, QuestionObservableModel
-from utils.common import exists
-from utils.dispatcher import dispatch, subscribe, unsubscribe
-from utils.gui import destroy_widget_children, reset_widget_grid
-from utils.logging import log_error, log_info
+from studyfrog.models.observables import ObservableModel, QuestionObservableModel
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import dispatch, subscribe, unsubscribe
+from studyfrog.utils.gui import destroy_widget_children, reset_widget_grid
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

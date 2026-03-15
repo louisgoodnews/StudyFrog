@@ -4,20 +4,22 @@ Date: 2026-01-05
 Description: The logic of the delete confirmation view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from typing import Any, Final, Literal
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     DELETE_FLASHCARD_FROM_DB,
     DELETE_STACK_FROM_DB,
     DESTROY_DELETE_CONFIRMATION_VIEW,
     GET_INFO_TOAST,
 )
-from models.models import Model
-from utils.common import exists, pluralize_word, string_to_snake_case
-from utils.dispatcher import dispatch
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists, pluralize_word, string_to_snake_case
+from studyfrog.utils.dispatcher import dispatch
 
 
 # ---------- Exports ---------- #

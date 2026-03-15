@@ -3,17 +3,19 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 import uuid
 
 from pathlib import Path
 from typing import Any, Final, Optional, Union
 
-from constants.common import PATTERNS
-from constants.directories import DATA_DIR
-from constants.events import *
-from models.factory import get_model
-from models.models import Model
-from utils.common import (
+from studyfrog.constants.common import PATTERNS
+from studyfrog.constants.directories import DATA_DIR
+from studyfrog.constants.events import *
+from studyfrog.models.factory import get_model
+from studyfrog.models.models import Model
+from studyfrog.utils.common import (
     date_from_string,
     datetime_from_string,
     exists,
@@ -25,14 +27,14 @@ from utils.common import (
     pluralize_word,
     search_string,
 )
-from utils.dispatcher import dispatch
-from utils.files import (
+from studyfrog.utils.dispatcher import dispatch
+from studyfrog.utils.files import (
     does_file_have_content,
     ensure_file,
     read_file_json,
     write_file_json,
 )
-from utils.logging import log_debug, log_error, log_info, log_warning
+from studyfrog.utils.logging import log_debug, log_error, log_info, log_warning
 
 
 # ---------- Exports ---------- #

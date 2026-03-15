@@ -3,10 +3,12 @@ Author: Louis Goodnews
 Date: 2025-12-10
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Final
 
-from constants.directories import CONFIG_DIR, DATA_DIR
+from studyfrog.constants.directories import CONFIG_DIR, DATA_DIR
 
 
 # ---------- Exports ---------- #

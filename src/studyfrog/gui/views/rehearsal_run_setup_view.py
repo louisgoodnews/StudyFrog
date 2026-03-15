@@ -4,13 +4,15 @@ Date: 2025-12-19
 Description: The rehearsal run setup view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import NSEW, TOP, VERTICAL, W, X, YES
 from typing import Any, Final, Optional
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     CLEAR_REHEARSAL_RUN_SETUP_FORM,
     DESTROY_REHEARSAL_RUN_SETUP_VIEW,
     GET_ALL_DIFFICULTIES_FROM_DB,
@@ -18,19 +20,19 @@ from constants.events import (
     GET_ALL_STACKS_FROM_DB,
     GET_REHEARSAL_RUN_SETUP_FORM,
 )
-from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
-from gui.logic.rehearsal_run_setup_view_logic import on_cancel_button_click, on_start_button_click
-from models.models import Model
-from utils.common import exists
-from utils.dispatcher import dispatch, subscribe, unsubscribe
-from utils.gui import (
+from studyfrog.gui.gui import get_bottom_frame, get_center_frame, get_top_frame
+from studyfrog.gui.logic.rehearsal_run_setup_view_logic import on_cancel_button_click, on_start_button_click
+from studyfrog.models.models import Model
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import dispatch, subscribe, unsubscribe
+from studyfrog.utils.gui import (
     clear_bottom_frame,
     clear_center_frame,
     clear_top_frame,
     count_widget_children,
     destroy_widget_children,
 )
-from utils.logging import log_error, log_info
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

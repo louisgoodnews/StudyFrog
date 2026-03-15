@@ -4,13 +4,15 @@ Date: 2025-12-12
 Description: The rehearsal run view of the application.
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 
 from tkinter.constants import DISABLED, NORMAL, NSEW, W
 from typing import Any, Callable, Final, Literal, Optional
 
-from constants.common import GLOBAL
-from constants.events import (
+from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.events import (
     DESTROY_REHEARSAL_RUN_VIEW,
     LOAD_REHEARSAL_VIEW_FORM,
     REHEARSAL_RUN_INDEX_DECREMENTED,
@@ -18,8 +20,8 @@ from constants.events import (
     REHEARSAL_RUN_INDEX_MAX_REACHED,
     REHEARSAL_RUN_INDEX_MIN_REACHED,
 )
-from gui.gui import get_bottom_frame, get_center_frame, get_top_frame
-from gui.logic.rehearsal_run_view_logic import (
+from studyfrog.gui.gui import get_bottom_frame, get_center_frame, get_top_frame
+from studyfrog.gui.logic.rehearsal_run_view_logic import (
     end_rehearsal_run,
     on_cancel_button_click,
     on_easy_button_click,
@@ -30,14 +32,14 @@ from gui.logic.rehearsal_run_view_logic import (
     on_previous_button_click,
     start_rehearsal_run,
 )
-from models.models import Model
-from gui.views.flashcard_rehearsal_view import get_flashcard_rehearsal_view, set_flip_side
-from gui.views.note_rehearsal_view import get_note_rehearsal_view
-from gui.views.question_rehearsal_view import get_question_rehearsal_view
-from utils.common import exists
-from utils.dispatcher import subscribe, unsubscribe
-from utils.gui import clear_bottom_frame, clear_center_frame, clear_top_frame
-from utils.logging import log_error, log_info
+from studyfrog.models.models import Model
+from studyfrog.gui.views.flashcard_rehearsal_view import get_flashcard_rehearsal_view, set_flip_side
+from studyfrog.gui.views.note_rehearsal_view import get_note_rehearsal_view
+from studyfrog.gui.views.question_rehearsal_view import get_question_rehearsal_view
+from studyfrog.utils.common import exists
+from studyfrog.utils.dispatcher import subscribe, unsubscribe
+from studyfrog.utils.gui import clear_bottom_frame, clear_center_frame, clear_top_frame
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #

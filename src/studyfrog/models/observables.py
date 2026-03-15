@@ -4,12 +4,14 @@ Date: 2026-01-04
 Description: This module contains the definitions of the various observable models used in the application
 """
 
+from __future__ import annotations
+
 import customtkinter as ctk
 import uuid
 
 from typing import Any, Final, Optional, TypeAlias, Union
 
-from utils.common import exists
+from studyfrog.utils.common import exists
 
 
 # ---------- Exports ---------- #
