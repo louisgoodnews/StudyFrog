@@ -55,6 +55,29 @@ def _get_answer() -> Model:
     return _ANSWER
 
 
+def _get_answer_dict() -> dict[str, Any]:
+    """
+    Returns the answer as a dictionary.
+
+    Args:
+        None
+
+    Returns:
+        dict[str, Any]: The answer as a dictionary.
+
+    Raises:
+        ValueError: If the answer is None.
+    """
+
+    if not exists(value=_ANSWER):
+        raise ValueError(
+            "Answer is None. Please provide a answer to be rehearsed.",
+            "",
+        )
+
+    return _get_answer().to_dict()
+
+
 def _set_answer(answer: Model) -> None:
     """
     Sets the answer.

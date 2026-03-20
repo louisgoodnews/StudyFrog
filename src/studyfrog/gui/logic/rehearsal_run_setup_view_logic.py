@@ -214,8 +214,6 @@ def _handle_stacks_data(data: str) -> list[str]:
             if not exists(value=stack):
                 raise ValueError(f"Stack '{name}' not found.")
 
-            log_debug(message=f"Stack '{name}' found. ({stack.to_json_dict()})")
-
             key: Optional[str] = stack.key
 
             if not exists(value=key):
@@ -323,16 +321,14 @@ def on_start_button_click() -> None:
 
     rehearsal_run_model: Model = (
         dispatch(
-            configuration={
-                "filter_by_difficulty_enabled": bool(response["difficulty"]["value"]),
-                "filter_by_difficulty": response["difficulty"]["value"],
-                "filter_by_priority_enabled": bool(response["priority"]["value"]),
-                "filter_by_priority": response["priority"]["value"],
-                "item_order_randomization_enabled": bool(
-                    response["item_order_randomization_enabled"]["value"]
-                ),
-            },
             event=GET_REHEARSAL_RUN_MODEL,
+            filter_by_difficulty_enabled=bool(response["difficulty"]["value"]),
+            filter_by_difficulty=response["difficulty"]["value"],
+            filter_by_priority_enabled=bool(response["priority"]["value"]),
+            filter_by_priority=response["priority"]["value"],
+            item_order_randomization_enabled=bool(
+                response["item_order_randomization_enabled"]["value"]
+            ),
             namespace=GLOBAL,
             stacks=response["stacks"]["value"],
         )
@@ -375,8 +371,7 @@ def on_start_button_click() -> None:
 
     dispatch(
         event=GET_REHEARSAL_RUN_VIEW,
-        namespace=GLOBAL,
-        rehearsal_run=dispatch(
+        model=dispatch(
             event=GET_REHEARSAL_RUN_FROM_DB,
             id_=id,
             namespace=GLOBAL,
@@ -390,4 +385,5 @@ def on_start_button_click() -> None:
             "result",
             {},
         ),
+        namespace=GLOBAL,
     )

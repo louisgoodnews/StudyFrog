@@ -55,6 +55,29 @@ def _get_question() -> Model:
     return _QUESTION
 
 
+def _get_question_dict() -> dict[str, Any]:
+    """
+    Returns the question as a dictionary.
+
+    Args:
+        None
+
+    Returns:
+        dict[str, Any]: The question as a dictionary.
+
+    Raises:
+        ValueError: If the question is None.
+    """
+
+    if not exists(value=_QUESTION):
+        raise ValueError(
+            "Question is None. Please provide a question to be rehearsed.",
+            "",
+        )
+
+    return _get_question().to_dict()
+
+
 def _set_question(question: Model) -> None:
     """
     Sets the question.

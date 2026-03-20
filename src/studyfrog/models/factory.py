@@ -40,7 +40,7 @@ from studyfrog.utils.common import (
     filter_and_call,
     uuid_from_string,
 )
-from studyfrog.utils.logging import log_error, log_warning
+from studyfrog.utils.logging import log_debug, log_error, log_warning
 
 # ---------- Exports ---------- #
 
@@ -100,6 +100,7 @@ def _convert_parameters(**kwargs) -> dict[str, Any]:
         value,
     ) in kwargs.items():
         if key not in checks_for_type:
+
             continue
 
         if isinstance(
@@ -113,11 +114,6 @@ def _convert_parameters(**kwargs) -> dict[str, Any]:
                 message=f"Skipped present key '{key}' as it was not associated with any value.",
                 name="models.factory._convert_parameters",
             )
-
-            continue
-
-        if key == "uuid":
-            kwargs["uuid_"] = kwargs.pop("uuid")
 
             continue
 
@@ -485,6 +481,36 @@ def get_model(
             "user": get_user_model,
         }
 
+        if exists(
+            value=kwargs.get(
+                "identifiable",
+                None,
+            )
+        ):
+            identifiable: Optional[dict[str, str]] = kwargs.pop(
+                "identifiable",
+                {},
+            )
+
+            identifiable["id_"] = identifiable.pop("id")
+
+            identifiable["uuid_"] = identifiable.pop("uuid")
+
+            kwargs.update(**identifiable)
+
+        if exists(
+            value=kwargs.get(
+                "metadata",
+                None,
+            )
+        ):
+            metadata: Optional[dict[str, str]] = kwargs.pop(
+                "metadata",
+                {},
+            )
+
+            kwargs.update(**metadata)
+
         return filter_and_call(
             function=dictionary[type_.lower()],
             **kwargs,
@@ -792,7 +818,6 @@ def get_rehearsal_run_item_model(
 
 def get_rehearsal_run_model(
     stacks: list[str],
-    configuration: dict[str, Any],
     author: Optional[str] = None,
     completed_at: Optional[Union[datetime, str]] = None,
     completed_on: Optional[Union[date, str]] = None,
@@ -800,8 +825,13 @@ def get_rehearsal_run_model(
     created_on: Optional[Union[date, str]] = None,
     customfields: Optional[list[dict[str, Any]]] = None,
     duration: Optional[dict[str, float]] = None,
+    filter_by_difficulty: Optional[str] = None,
+    filter_by_difficulty_enabled: bool = False,
+    filter_by_priority: Optional[str] = None,
+    filter_by_priority_enabled: bool = False,
     id_: Optional[Union[int, str]] = None,
     is_finished: bool = False,
+    item_order_randomization_enabled: bool = False,
     items: Optional[dict[str, str]] = None,
     key: Optional[str] = None,
     scheduled_at: Optional[Union[datetime, str]] = None,
@@ -823,7 +853,6 @@ def get_rehearsal_run_model(
 
     Args:
         stacks (list[str]): A list of keys referring to the Stacks included in this run.
-        configuration (dict[str, Any]): Dictionary containing session-specific settings.
         author (Optional[str]): Identifier of the user who initiated the run.
         completed_at (Optional[str]): ISO-formatted timestamp of session completion.
         completed_on (Optional[str]): ISO-formatted date of session completion.
@@ -831,8 +860,13 @@ def get_rehearsal_run_model(
         created_on (Optional[str]): ISO-formatted creation date.
         customfields (Optional[list[dict[str, Any]]]): List of custom metadata dictionaries.
         duration (Optional[dict[str, float]]): Dictionary tracking time spent in the session.
+        filter_by_difficulty (Optional[str]): Difficulty to filter by in the session.
+        filter_by_difficulty_enabled (bool): Whether difficulty filtering is enabled.
+        filter_by_priority (Optional[str]): Priority to filter by in the session.
+        filter_by_priority_enabled (bool): Whether priority filtering is enabled.
         id_ (Optional[Union[int, str]]): Internal database identifier.
         is_finished (bool): Flag indicating if the rehearsal session has ended.
+        item_order_randomization_enabled (bool): Whether item order randomization is enabled.
         items (Optional[dict[str, str]]): Mapping of RehearsalRunItem keys within this run.
         key (Optional[str]): Unique model key identifier.
         scheduled_at (Optional[str]): ISO-formatted timestamp for the scheduled start.
@@ -848,6 +882,14 @@ def get_rehearsal_run_model(
     """
 
     parameters: dict[str, Any] = _convert_parameters(**locals().copy())
+
+    parameters["configuration"] = {
+        "filter_by_difficulty": parameters.pop("filter_by_difficulty"),
+        "filter_by_difficulty_enabled": parameters.pop("filter_by_difficulty_enabled"),
+        "filter_by_priority": parameters.pop("filter_by_priority"),
+        "filter_by_priority_enabled": parameters.pop("filter_by_priority_enabled"),
+        "item_order_randomization_enabled": parameters.pop("item_order_randomization_enabled"),
+    }
 
     return RehearsalRunModel(**parameters)
 

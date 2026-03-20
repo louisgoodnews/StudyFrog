@@ -62,6 +62,29 @@ def _get_flashcard() -> Model:
     return _FLASHCARD
 
 
+def _get_flashcard_dict() -> dict[str, Any]:
+    """
+    Returns the flashcard as a dictionary.
+
+    Args:
+        None
+
+    Returns:
+        dict[str, Any]: The flashcard as a dictionary.
+
+    Raises:
+        ValueError: If the flashcard is None.
+    """
+
+    if not exists(value=_FLASHCARD):
+        raise ValueError(
+            "Flashcard is None. Please provide a flashcard to be rehearsed.",
+            "",
+        )
+
+    return _get_flashcard().to_dict()
+
+
 def _toggle_flip_side() -> Literal["front", "back"]:
     """
     Toggles the flip side and returns the new side.
@@ -215,7 +238,7 @@ def _create_center_frame_widgets(master: ctk.CTkFrame) -> None:
 
         _toggle_flip_side()
 
-        label.configure(text=_get_flashcard()[_FLIP_SIDE])
+        label.configure(text=_get_flashcard_dict()[_FLIP_SIDE])
 
         dispatch(
             event=FLASHCARD_FLIPPED,
@@ -224,7 +247,7 @@ def _create_center_frame_widgets(master: ctk.CTkFrame) -> None:
 
     label: ctk.CTkLabel = ctk.CTkLabel(
         master=master,
-        text=_get_flashcard()[_FLIP_SIDE],
+        text=_get_flashcard_dict()[_FLIP_SIDE],
     )
 
     label.grid(

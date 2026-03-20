@@ -61,106 +61,6 @@ __all__: Final[list[str]] = [
 # ---------- Helper Functions ---------- #
 
 
-def _convert_for_database(model: dict[str, Any]) -> dict[str, Any]:
-    """
-    Converts a model dictionary to a compatible database storage format.
-
-    This function is used internally to update the database storage format of
-    entries. It is not intended to be used externally.
-
-    The function checks if the 'metadata' dictionary of the entry contains an
-    'id_' key and if so, replaces it with an 'id' key. It also checks if
-    the 'metadata' dictionary contains a 'uuid_' key and if so, replaces it
-    with a 'uuid' key.
-
-    Args:
-        model (dict[str, Any]): The model dictionary to convert.
-
-    Returns:
-        dict[str, Any]: The converted model dictionary.
-    """
-
-    to_delete: list[str] = []
-
-    result: dict[str, Any] = {}
-
-    for (
-        key,
-        value,
-    ) in model.items():
-        result[key] = value
-
-        to_delete.append(key)
-
-    if exists(
-        value=model.get(
-            "identifiable",
-            {},
-        ).get(
-            "id_",
-            None,
-        )
-    ):
-        result["identifiable"]["id"] = model["identifiable"]["id"]
-
-    if exists(
-        value=model.get(
-            "identifiable",
-            {},
-        ).get(
-            "uuid_",
-            None,
-        )
-    ):
-        result["identifiable"]["uuid"] = model["identifiable"]["uuid"]
-
-    if exists(
-        value=model.get(
-            "metadata",
-            {},
-        ).get(
-            "created_at",
-            None,
-        )
-    ):
-        result["metadata"]["created_at"] = model["metadata"]["created_at"]
-
-    if exists(
-        value=model.get(
-            "metadata",
-            {},
-        ).get(
-            "created_on",
-            None,
-        )
-    ):
-        result["metadata"]["created_on"] = model["metadata"]["created_on"]
-
-    if exists(
-        value=model.get(
-            "metadata",
-            {},
-        ).get(
-            "updated_at",
-            None,
-        )
-    ):
-        result["metadata"]["updated_at"] = model["metadata"]["updated_at"]
-
-    if exists(
-        value=model.get(
-            "metadata",
-            {},
-        ).get(
-            "updated_on",
-            None,
-        )
-    ):
-        result["metadata"]["updated_on"] = model["metadata"]["updated_on"]
-
-    return result
-
-
 def _decrement_table_counters(table_data: dict[str, Any]) -> None:
     """
     Decrements the table's 'next_id' and 'total' counters.
@@ -811,9 +711,7 @@ def _insert_table_entry(
         name=model_data["metadata"]["type"],
     )
 
-    table_data["entries"]["entries"][str(model_data["identifiable"]["id"])] = _convert_for_database(
-        model=model_data
-    )
+    table_data["entries"]["entries"][str(model_data["identifiable"]["id"])] = model_data
 
     _increment_table_counters(table_data=table_data)
 
@@ -952,7 +850,7 @@ def add_entry(
 
         table_data: dict[str, Any] = read_file_json(file=file)
 
-        model_data: dict[str, Any] = _convert_for_database(model=model.to_json_dict())
+        model_data: dict[str, Any] = model.to_json_dict()
 
         _insert_table_entry(
             model_data=model_data,
@@ -978,7 +876,7 @@ def add_entry(
             },
         )
 
-        return model_data["identifiable"]["id"]
+        return model_data["identifiable"]["id_"]
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to add entry to '{table_name}' table: {e}"
@@ -1640,8 +1538,6 @@ def get_all_entries(table_name: str) -> Optional[list[Model]]:
 
         model_type: str = retrieved_entries[0]["metadata"]["type"]
 
-        log_info(message=f"Successfully retrieved all {count} entries from '{table_name}' table")
-
         models: list[Model] = [
             get_model(
                 type_=model_type,
@@ -1945,7 +1841,7 @@ def update_entry(
             )
             return None
 
-        all_entries[entry_id_str] = _convert_for_database(model=model.to_json_dict())
+        all_entries[entry_id_str] = model.to_json_dict()
 
         _save_table_data(
             table_data=table_data,
@@ -2034,7 +1930,7 @@ def update_entries(
                 )
                 continue
 
-            all_entries[model_id_str] = _convert_for_database(model=model.to_json_dict())
+            all_entries[model_id_str] = model.to_json_dict()
 
             updated_models.append(model)
 

@@ -35,7 +35,7 @@ from studyfrog.gui.logic.create_view_logic import (
 from studyfrog.models.models import Model
 from studyfrog.utils.common import exists
 from studyfrog.utils.dispatcher import dispatch, subscribe, unsubscribe
-from studyfrog.utils.logging import log_error, log_info
+from studyfrog.utils.logging import log_debug, log_error, log_info
 
 
 # ---------- Exports ---------- #
@@ -939,6 +939,8 @@ def _on_set_create_form(**kwargs) -> None:
             continue
 
         _get_form()[key]["variable"].set(value=value)
+
+        log_info(message=f"Updated create view form field '{key}' with value '{value}'")
 
 
 def _on_stack_added(stack: Model) -> None:

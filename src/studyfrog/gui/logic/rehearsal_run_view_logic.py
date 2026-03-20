@@ -963,6 +963,8 @@ def start_rehearsal_run(model: Model) -> None:
         None
     """
 
+    global CURRENT_INDEX
+
     model.started_at = get_now()
     model.started_on = get_today()
 
@@ -970,14 +972,18 @@ def start_rehearsal_run(model: Model) -> None:
         for key in _get_stack_items(key=stack):
             _add_to_stack_items(key=key)
 
-    if exists(value=model.configuration["filter_by_difficulty_enabled"]):
-        _filter_stack_items_by_difficulty(difficulty_key=model.configuration["difficulty"])
+    if model.configuration.get("filter_by_difficulty_enabled", False):
+        _filter_stack_items_by_difficulty(
+            difficulty_key=model.configuration.get("filter_by_difficulty")
+        )
 
-    if exists(value=model.configuration["filter_by_priority_enabled"]):
-        _filter_stack_items_by_priority(priority_key=model.configuration["priority"])
+    if model.configuration.get("filter_by_priority_enabled", False):
+        _filter_stack_items_by_priority(priority_key=model.configuration.get("filter_by_priority"))
 
-    if exists(value=model.configuration["item_order_randomization_enabled"]):
+    if model.configuration.get("item_order_randomization_enabled", False):
         shuffle_list(list_=STACK_ITEM_KEYS)
+
+    CURRENT_INDEX = 0
 
     dispatch(
         _load_stack_item_from_db(stack_item_key=STACK_ITEM_KEYS[CURRENT_INDEX]),

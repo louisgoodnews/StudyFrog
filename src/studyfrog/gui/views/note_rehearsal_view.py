@@ -9,7 +9,7 @@ from __future__ import annotations
 import customtkinter as ctk
 
 from tkinter.constants import DISABLED, NSEW
-from typing import Final, Optional
+from typing import Any, Final, Optional
 
 from studyfrog.gui.gui import get_center_frame
 from studyfrog.models.models import Model
@@ -53,6 +53,29 @@ def _get_note() -> Model:
         )
 
     return _NOTE
+
+
+def _get_note_dict() -> dict[str, Any]:
+    """
+    Returns the note as a dictionary.
+
+    Args:
+        None
+
+    Returns:
+        dict[str, Any]: The note as a dictionary.
+
+    Raises:
+        ValueError: If the note is None.
+    """
+
+    if not exists(value=_NOTE):
+        raise ValueError(
+            "Note is None. Please provide a note to be rehearsed.",
+            "",
+        )
+
+    return _get_note().to_dict()
 
 
 def _set_note(note: Model) -> None:

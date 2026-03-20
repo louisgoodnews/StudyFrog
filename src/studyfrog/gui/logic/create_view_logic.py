@@ -615,7 +615,7 @@ def _inherit_metadata_from_stack(dictionary: dict[str, Any]) -> None:
             dictionary["subject"] = _filter_subject(name=dictionary["subject"])["metadata"]["key"]
 
         elif not exists(value=dictionary["subject"]) and has_stack_parent:
-            dictionary["subject"] = stack_parent["subject"]
+            dictionary["subject"] = stack_parent.subject
         else:
             log_warning(message="Subject metadata could not be inherited. Parent stack not found.")
 
@@ -623,17 +623,17 @@ def _inherit_metadata_from_stack(dictionary: dict[str, Any]) -> None:
             dictionary["teacher"] = _filter_teacher(name=dictionary["teacher"])["metadata"]["key"]
 
         elif not exists(value=dictionary["teacher"]) and has_stack_parent:
-            dictionary["teacher"] = stack_parent["teacher"]
+            dictionary["teacher"] = stack_parent.teacher
         else:
             log_warning(message="Teacher metadata could not be inherited. Parent stack not found.")
 
         if type_ == "stack":
             if exists(value=stack_parent):
-                dictionary["parent"] = stack_parent["metadata"]["key"]
+                dictionary["parent"] = stack_parent.key
 
             dictionary.pop("stack")
         elif exists(value=stack_parent):
-            dictionary["stack"] = stack_parent["metadata"]["key"]
+            dictionary["stack"] = stack_parent.key
         else:
             log_warning(message="Stack metadata could not be inherited. Parent stack not found.")
     except Exception as e:
@@ -672,7 +672,7 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
                     log_warning(message=f"Failed to resolve metadata key for '{key}'")
                     continue
 
-                dictionary[key] = response["metadata"]["key"]
+                dictionary[key] = response.key
 
         if exists(
             value=dictionary.get(
@@ -687,7 +687,7 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
                     message=f"Failed to resolve metadata key for 'subject' ({dictionary['subject']})"
                 )
             else:
-                dictionary["subject"] = response.get("metadata", {}).get("key")
+                dictionary["subject"] = response.key
 
         if exists(
             value=dictionary.get(
@@ -702,7 +702,7 @@ def _resolve_metadata_keys(dictionary: dict[str, Any]) -> None:
                     message=f"Failed to resolve metadata key for 'teacher' ({dictionary['teacher']})"
                 )
             else:
-                dictionary["teacher"] = response.get("metadata", {}).get("key")
+                dictionary["teacher"] = response.key
 
         if exists(
             value=dictionary.get(
