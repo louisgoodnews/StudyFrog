@@ -278,6 +278,7 @@ def start_application() -> None:
 
     try:
         _set_start(timestamp=get_now())
+        log_trace(message=f"Starting the application at ({_get_start().isoformat()}).")
         log_info(message="Starting the application...")
         run_pre_start_tasks()
         log_info(message="Application started. Hello!")
@@ -304,6 +305,7 @@ def stop_application() -> None:
 
     try:
         _set_stop(timestamp=get_now())
+        log_trace(message=f"Stopping the application at ({_get_stop().isoformat()}).")
         log_info(message="Stopping the application...")
         run_pre_stop_tasks()
         run_post_stop_tasks()

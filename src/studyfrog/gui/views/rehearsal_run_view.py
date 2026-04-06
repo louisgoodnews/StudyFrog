@@ -39,7 +39,7 @@ from studyfrog.gui.views.question_rehearsal_view import get_question_rehearsal_v
 from studyfrog.utils.common import exists
 from studyfrog.utils.dispatcher import subscribe, unsubscribe
 from studyfrog.utils.gui import clear_bottom_frame, clear_center_frame, clear_top_frame
-from studyfrog.utils.logging import log_error, log_info
+from studyfrog.utils.logging import log_error, log_info, log_warning
 
 
 # ---------- Exports ---------- #
@@ -718,10 +718,13 @@ def _on_load_rehearsal_view_form(model: Model) -> None:
     ):
         button.configure(state=NORMAL)
 
-    _load_rehearsal_view_form(
-        model=model,
-        model_type=model.type_.lower(),
-    )
+    try:
+        _load_rehearsal_view_form(
+            model=model,
+            model_type=model.type_.lower(),
+        )
+    except Exception as e:
+        log_error(message=f"Failed to load rehearsal view form for model {model.type_}: {e}")
 
 
 def _on_rehearsal_run_index_decremented() -> None:
@@ -767,7 +770,7 @@ def _on_rehearsal_run_max_index_reached() -> None:
 
     _get_next_button().configure(state=DISABLED)
 
-    end_rehearsal_run(model=_get_rehearsal_run())
+    end_rehearsal_run(rehearsal_run=_get_rehearsal_run())
 
 
 def _on_rehearsal_run_min_index_reached() -> None:

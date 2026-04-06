@@ -5,11 +5,16 @@ Date: 2025-12-10
 
 from __future__ import annotations
 
+from typing import Final
+
 from studyfrog.core.application import start_application, stop_application
 from studyfrog.utils.logging import log_error
 
 
-def main() -> None:
+__NAME__: Final[str] = "src.main.main"
+
+
+def main() -> int:
     """
     Primary entry point for the application.
 
@@ -27,17 +32,20 @@ def main() -> None:
         None
 
     Returns:
-        None
+        int: The exit code of the application. (0 for success, 1 for failure)
     """
 
     try:
         start_application()
         stop_application()
-        exit(0)
+        return 0
     except Exception as e:
-        log_error(message=f"Caught an exception while running the application: {e}")
-        exit(1)
+        log_error(
+            message=f"Caught an exception while running the application: {e}",
+            name=__NAME__,
+        )
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -2,24 +2,24 @@
 
 ## Current State
 
-StudyFrog has a meaningful amount of application code already in place:
+StudyFrog has a substantial amount of application code already in place:
 
 - A domain model layer for flashcards, notes, questions, answers, stacks, priorities, difficulties, and related entities
 - JSON-backed storage utilities
 - An event-dispatch architecture
 - A CustomTkinter GUI structure with multiple views and forms
 - Basic project scaffolding for packaging, docs, and CI
+- Working package imports and basic test coverage
 
 At the same time, the project is not yet in a dependable release-ready state.
 
 Key issues confirmed during review:
 
-- Package imports are not install-safe and currently break `import studyfrog...`
-- Automated tests are effectively absent
-- Several GUI flows still contain placeholder `pass` implementations
+- Import-time side effects create noisy warnings and make startup behavior harder to reason about
+- Several GUI flows still contain placeholder `pass` implementations, particularly in rehearsal views
 - Some destructive workflows such as deleting nested models are incomplete
 - README and docs are still mostly scaffold-level
-- Import-time side effects create noisy warnings and make startup behavior harder to reason about
+- Test coverage exists but is limited to smoke-level imports and basic model creation
 
 This roadmap is organized to first stabilize the project, then make it fully usable as an MVP, and finally expand it into a stronger study product.
 
@@ -36,32 +36,32 @@ Goal: make the application runnable, debuggable, and safe to change.
 
 ### Must complete
 
-- Fix all package import paths so the project works as `studyfrog` from `src`
+- Clean up import-time side effects, especially default model creation and warning spam from models.factory
 - Ensure a supported entrypoint works consistently, ideally `python -m studyfrog.main`
 - Verify startup and shutdown flows behave correctly once dependencies are installed
-- Reduce import-time side effects, especially default model creation and warning spam
-- Make CI meaningful by adding at least smoke-level tests
+- Make CI meaningful by expanding beyond smoke-level tests
+- Complete placeholder GUI implementations, particularly in rehearsal views
+- Finish deletion confirmation behavior for models with sub-items
 - Rewrite README setup instructions so a new developer can install and run the app
 - Expand docs from placeholder text into a basic project overview
 
 ### Deliverables
 
-- Working package imports throughout `src/studyfrog`
+- Clean startup without warning spam from models.factory
 - A documented local run command
-- Smoke tests for:
-  - package imports
-  - model factory creation
-  - storage initialization
-  - application bootstrap behavior where possible
-- Updated `README.md`
-- Updated `docs/index.rst`
+- Expanded test coverage including:
+  - GUI view behavior tests
+  - Storage and model CRUD tests
+  - Application bootstrap behavior tests
+- Updated `README.md` with actual setup instructions
+- Updated `docs/index.rst` with project overview
 
 ### Suggested task order
 
-1. Fix import paths across `main`, `core`, `models`, `utils`, `gui`, and `constants`
-2. Add one import smoke test that fails if package structure breaks again
-3. Add storage and model tests
-4. Clean up startup logging and side effects
+1. Clean up models.factory warning spam during import
+2. Complete placeholder implementations in rehearsal views
+3. Add GUI behavior and CRUD tests
+4. Verify startup and shutdown flows work correctly
 5. Refresh docs and onboarding material
 
 ## Phase 2: Deliver a Usable MVP
@@ -81,12 +81,11 @@ Goal: make StudyFrog function as a coherent study app for day-to-day use.
 
 ### Known implementation gaps to finish
 
-- Answer rehearsal view
-- Question rehearsal view
-- Note rehearsal view
-- Rehearsal run result view
-- Flashcard edit form
+- Complete all rehearsal view implementations (answer, flashcard, note, question rehearsal views)
+- Complete rehearsal run result view implementation
+- Complete flashcard edit form
 - Delete confirmation behavior for models with sub-items
+- Fix placeholder `pass` implementations in GUI widget creation functions
 
 ### MVP quality bar
 
@@ -209,8 +208,8 @@ Goal: expand usefulness and polish once the core product is dependable.
 
 If work starts now, the highest-leverage next steps are:
 
-1. Fix package-relative imports across the project.
-2. Add a minimum test suite so CI validates something real.
-3. Implement or temporarily hide placeholder GUI flows.
-4. Finish deletion and edit behavior for nested data.
-5. Rewrite README and docs to match the actual project.
+1. Clean up models.factory warning spam during import to improve startup experience.
+2. Complete placeholder implementations in rehearsal views to make the app functional.
+3. Add comprehensive tests for GUI behavior and CRUD operations.
+4. Finish deletion and edit behavior for nested data models.
+5. Rewrite README and docs to match the actual project state and provide real setup instructions.

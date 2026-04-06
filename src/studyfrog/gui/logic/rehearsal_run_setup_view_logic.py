@@ -197,7 +197,7 @@ def _handle_stacks_data(data: str) -> list[str]:
         data (str): The stack data to handle.
 
     Returns:
-        list[str]: The processed stack data.
+        list[str]: The processed stack data (i.e. the keys of the stacks).
     """
 
     try:

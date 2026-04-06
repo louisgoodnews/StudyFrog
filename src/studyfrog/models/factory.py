@@ -40,7 +40,7 @@ from studyfrog.utils.common import (
     filter_and_call,
     uuid_from_string,
 )
-from studyfrog.utils.logging import log_debug, log_error, log_warning
+from studyfrog.utils.logging import log_error, log_warning
 
 # ---------- Exports ---------- #
 
@@ -66,6 +66,9 @@ __all__: Final[list[str]] = [
     "get_user_model",
 ]
 
+# ---------- Constants ---------- #
+
+__NAME__: Final[str] = "src.models.factory"
 
 # ---------- Helper Functions ---------- #
 
@@ -112,7 +115,7 @@ def _convert_parameters(**kwargs) -> dict[str, Any]:
         if not exists(value=kwargs[key]):
             log_warning(
                 message=f"Skipped present key '{key}' as it was not associated with any value.",
-                name="models.factory._convert_parameters",
+                name=f"{__NAME__}._convert_parameters",
             )
 
             continue
@@ -122,7 +125,7 @@ def _convert_parameters(**kwargs) -> dict[str, Any]:
         except Exception as e:
             log_error(
                 message=f"Failed to convert '{key}' from string '{value}': {e}",
-                name="models.factory._convert_parameters",
+                name=f"{__NAME__}._convert_parameters",
             )
 
             continue
@@ -487,16 +490,7 @@ def get_model(
                 None,
             )
         ):
-            identifiable: Optional[dict[str, str]] = kwargs.pop(
-                "identifiable",
-                {},
-            )
-
-            identifiable["id_"] = identifiable.pop("id")
-
-            identifiable["uuid_"] = identifiable.pop("uuid")
-
-            kwargs.update(**identifiable)
+            kwargs.update(**kwargs.pop("identifiable"))
 
         if exists(
             value=kwargs.get(
@@ -504,23 +498,52 @@ def get_model(
                 None,
             )
         ):
-            metadata: Optional[dict[str, str]] = kwargs.pop(
-                "metadata",
-                {},
-            )
+            kwargs.update(**kwargs.pop("metadata"))
 
-            kwargs.update(**metadata)
+        if exists(
+            value=kwargs.get(
+                "id",
+                None,
+            )
+        ):
+            kwargs["id_"] = kwargs.pop("id")
+
+        if exists(
+            value=kwargs.get(
+                "uuid",
+                None,
+            )
+        ):
+            kwargs["uuid_"] = kwargs.pop("uuid")
+
+        handler: Optional[Callable[[...], Any]] = dictionary.get(type_.lower())
+
+        if not exists(value=handler):
+            log_error(
+                message=f"Found no handler function for model type '{type_}'",
+                name="models.factory.get_model",
+            )
+            return None
 
         return filter_and_call(
-            function=dictionary[type_.lower()],
+            function=handler,
             **kwargs,
         )
     except KeyError as ke:
-        log_error(message=f"Invalid model type: {type_}: {ke}")
+        log_error(
+            message=f"Invalid model type: {type_}: {ke}",
+            name="models.factory.get_model",
+        )
     except ValueError as ve:
-        log_error(message=f"Failed to create model: {type_}: {ve}")
+        log_error(
+            message=f"Failed to create model: {type_}: {ve}",
+            name="models.factory.get_model",
+        )
     except Exception as e:
-        log_error(message=f"Failed to create model: {e}")
+        log_error(
+            message=f"Failed to create model: {e}",
+            name="models.factory.get_model",
+        )
 
 
 def get_note_model(
@@ -904,8 +927,8 @@ def get_stack_model(
     description: Optional[str] = None,
     difficulty: Optional[str] = None,
     id_: Optional[Union[int, str]] = None,
-    items: Optional[list[str]] = None,
-    key: Optional[str] = None,
+    items: Optional[dict[str, Any]] = None,
+    key: Optional[dict[str, Any]] = None,
     parent: Optional[str] = None,
     priority: Optional[str] = None,
     subject: Optional[str] = None,
@@ -933,7 +956,7 @@ def get_stack_model(
         description (Optional[str]): Description of the stack.
         difficulty (Optional[str]): Reference key for the associated difficulty level.
         id_ (Optional[Union[int, str]]): Internal database identifier.
-        items (Optional[list[str]]): A list of keys referring to the learning units
+        items (Optional[dict[str, Any]]): A dictionary of keys referring to the learning units
             (e.g., Flashcards) within this stack.
         key (Optional[str]): Unique model key identifier.
         parent (Optional[str]): Reference key to a parent stack, if applicable.

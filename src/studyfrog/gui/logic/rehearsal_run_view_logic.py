@@ -252,7 +252,7 @@ def _get_stack_items(key: str) -> list[str]:
 
         return []
 
-    return response.items
+    return response.items["items"]
 
 
 def _load_stack_item_from_db(stack_item_key: str) -> Model:
@@ -341,43 +341,47 @@ def _remove_from_stack_item_keys(key: str) -> None:
 # ---------- Public Functions ---------- #
 
 
-def end_rehearsal_run(model: Model) -> None:
+def end_rehearsal_run(rehearsal_run: Model) -> None:
     """
     Handles the end of the rehearsal run.
 
     Args:
-        model (Model): The model to end.
+        rehearsal_run (Model): The model to end.
 
     Returns:
         None
     """
 
-    model.finished_at = get_now()
-    model.finished_on = model.finished_at.date()
+    log_info(message=f"Ending rehearsal run: {rehearsal_run.key}")
 
-    model.duration = {
-        "minutes": (model.finished_at - model.started_at).total_seconds() // 60,
-        "seconds": (model.finished_at - model.started_at).total_seconds(),
+    rehearsal_run.finished_at = get_now()
+    rehearsal_run.finished_on = rehearsal_run.finished_at.date()
+
+    rehearsal_run.duration = {
+        "minutes": (rehearsal_run.finished_at - rehearsal_run.started_at).total_seconds() // 60,
+        "seconds": (rehearsal_run.finished_at - rehearsal_run.started_at).total_seconds(),
     }
 
-    model.finished_at = model.finished_at.isoformat()
-    model.finished_on = model.finished_on.isoformat()
-    model.started_at = model.started_at.isoformat()
-    model.started_on = model.started_on.isoformat()
+    rehearsal_run.finished_at = rehearsal_run.finished_at.isoformat()
+    rehearsal_run.finished_on = rehearsal_run.finished_on.isoformat()
+    rehearsal_run.started_at = rehearsal_run.started_at.isoformat()
+    rehearsal_run.started_on = rehearsal_run.started_on.isoformat()
+
+    log_info(message=f"Updating rehearsal run: {rehearsal_run.key}")
 
     dispatch(
-        model=model,
         event=UPDATE_REHEARSAL_RUN_IN_DB,
+        model=rehearsal_run,
         namespace=GLOBAL,
         table_name="rehearsal_runs",
     )
 
-    log_debug(message=f"Ending rehearsal run: {model.key}")
+    log_info(message=f"Loading rehearsal run result view for rehearsal run {rehearsal_run.key}...")
 
     dispatch(
         event=GET_REHEARSAL_RUN_RESULT_VIEW,
-        model=model,
         namespace=GLOBAL,
+        rehearsal_run=rehearsal_run,
     )
 
 
@@ -830,6 +834,18 @@ def on_next_button_click() -> None:
         )
     )
 
+    if not exists(value=model):
+        log_warning(
+            message=f"Failed to load stack item from database for key {STACK_ITEM_KEYS[CURRENT_INDEX]}. Aborting..."
+        )
+
+        dispatch(
+            event=REHEARSAL_RUN_INDEX_MAX_REACHED,
+            namespace=GLOBAL,
+        )
+
+        return
+
     dispatch(
         event=CLICKED_NEXT_BUTTON,
         namespace=GLOBAL,
@@ -844,7 +860,7 @@ def on_next_button_click() -> None:
     )
 
     dispatch(
-        _load_stack_item_from_db(stack_item_key=STACK_ITEM_KEYS[CURRENT_INDEX]),
+        model=model,
         event=LOAD_REHEARSAL_VIEW_FORM,
         namespace=GLOBAL,
     )
@@ -969,7 +985,12 @@ def start_rehearsal_run(model: Model) -> None:
     model.started_on = get_today()
 
     for stack in model.stacks:
-        for key in _get_stack_items(key=stack):
+        stack_items: list[str] = _get_stack_items(key=stack)
+
+        if not stack_items:
+            continue
+
+        for key in stack_items:
             _add_to_stack_items(key=key)
 
     if model.configuration.get("filter_by_difficulty_enabled", False):

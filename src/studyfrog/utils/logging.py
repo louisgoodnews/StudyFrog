@@ -21,7 +21,7 @@ from studyfrog.constants.logging import (
     TRACE_FG,
     WARNING_FG,
 )
-from studyfrog.utils.common import get_now_str
+from studyfrog.utils.common import get_now_iso_str
 
 
 # ---------- Exports ---------- #
@@ -54,9 +54,11 @@ LogLevel: TypeAlias = Literal[
 
 
 def log(
+    *args,
     message: Any,
     level: LogLevel = "TRACE",
     name: Optional[str] = None,
+    **kwargs,
 ) -> None:
     """
     Prints a log message to the console.
@@ -84,7 +86,7 @@ def log(
     }
 
     log_string: str = (
-        f"{level_to_color.get(level, RESET)}{get_now_str()} - [{level}]{f' - [{name.upper()}] ' if name else f' - [{APP_NAME}] '}- {str(message)};{RESET}\n"
+        f"{level_to_color.get(level, RESET)}{get_now_iso_str()} - [{level}]{f' - [{name.upper()}] ' if name else f' - [{APP_NAME}] '}- {str(message)}{'' if not args else ' ' + ' '.join([str(arg) for arg in args])}{'' if not kwargs else ' ' + ' '.join([f'{k}={v}' for k, v in kwargs.items()])};{RESET}\n"
     )
 
     if level not in [

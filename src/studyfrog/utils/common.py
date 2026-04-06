@@ -12,7 +12,7 @@ import random
 import re
 import uuid
 
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Any, Callable, Final, Optional, Union
 
 
@@ -30,10 +30,13 @@ __all__: Final[list[str]] = [
     "generate_model_key",
     "generate_uuid4",
     "generate_uuid4_str",
+    "get_date_from_string",
+    "get_datetime_from_string",
+    "get_time_from_string",
     "get_now",
-    "get_now_str",
+    "get_now_iso_str",
     "get_today",
-    "get_today_str",
+    "get_today_iso_str",
     "is_empty",
     "is_none",
     "is_none_or_empty",
@@ -172,6 +175,9 @@ def filter_and_call(
 
     Returns:
         Optional[Any]: The result of calling the function with the filtered arguments and keyword arguments.
+
+    Raises:
+        Exception: If any errors occur.
     """
 
     filtered_kwargs: dict[str, Any] = {}
@@ -189,7 +195,10 @@ def filter_and_call(
         }
     )
 
-    return function(**filtered_kwargs)
+    try:
+        return function(**filtered_kwargs)
+    except Exception as e:
+        raise e
 
 
 def find_string(
@@ -298,6 +307,48 @@ def generate_uuid4_str() -> str:
     return str(generate_uuid4())
 
 
+def get_date_from_string(string: str) -> date:
+    """
+    Returns a date object from a string.
+
+    Args:
+        string (str): The string to convert to a date object.
+
+    Returns:
+        date: The date object.
+    """
+
+    return date.fromisoformat(string)
+
+
+def get_datetime_from_string(string: str) -> datetime:
+    """
+    Returns a datetime object from a string.
+
+    Args:
+        string (str): The string to convert to a datetime object.
+
+    Returns:
+        datetime: The datetime object.
+    """
+
+    return datetime.fromisoformat(string)
+
+
+def get_time_from_string(string: str) -> time:
+    """
+    Returns a time object from a string.
+
+    Args:
+        string (str): The string to convert to a time object.
+
+    Returns:
+        time: The time object.
+    """
+
+    return time.fromisoformat(string)
+
+
 def get_now() -> datetime:
     """
     Returns the current date and time as datetime object.
@@ -312,7 +363,7 @@ def get_now() -> datetime:
     return datetime.now()
 
 
-def get_now_str() -> str:
+def get_now_iso_str() -> str:
     """
     Returns the current date and time as an ISO format string.
 
@@ -324,6 +375,20 @@ def get_now_str() -> str:
     """
 
     return get_now().isoformat()
+
+
+def get_now_str(format: str) -> str:
+    """
+    Returns the current date and time as an ISO format string.
+
+    Args:
+        None
+
+    Returns:
+        str: The current date and time as an ISO format string.
+    """
+
+    return get_now().strftime(format)
 
 
 def get_today() -> date:
@@ -340,7 +405,7 @@ def get_today() -> date:
     return get_now().date()
 
 
-def get_today_str() -> str:
+def get_today_iso_str() -> str:
     """
     Returns the current date as an ISO format string.
 
@@ -352,6 +417,20 @@ def get_today_str() -> str:
     """
 
     return get_today().isoformat()
+
+
+def get_today_str(format: str) -> str:
+    """
+    Returns the current date as a formatted string.
+
+    Args:
+        format (str): The format string to use.
+
+    Returns:
+        str: The current date as a formatted string.
+    """
+
+    return get_today().strftime(format)
 
 
 def is_empty(obj: Any) -> bool:

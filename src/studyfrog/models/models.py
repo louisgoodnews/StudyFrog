@@ -4060,7 +4060,7 @@ class StackModel(BaseModel):
         description: Optional[str] = None,
         difficulty: Optional[str] = None,
         id_: Optional[Union[int, str]] = None,
-        items: Optional[list[str]] = None,
+        items: Optional[dict[str, Any]] = None,
         key: Optional[str] = None,
         parent: Optional[str] = None,
         priority: Optional[str] = None,
@@ -4083,6 +4083,7 @@ class StackModel(BaseModel):
             description (Optional[str]): Description of the stack.
             difficulty (Optional[str]): Difficulty level key associated with this stack.
             id_ (Optional[Union[int, str]]): Database ID for the entity.
+            items (Optional[dict[str, Any]]): Items in the stack.
             key (Optional[str]): Unique model key identifier.
             last_viewed_at (Optional[datetime]): Last time the stack was accessed.
             last_viewed_on (Optional[date]): Last date the stack was accessed.
@@ -4102,6 +4103,15 @@ class StackModel(BaseModel):
 
         super().__init__()
 
+        if not isinstance(
+            items,
+            dict,
+        ):
+            items = {
+                "items": items,
+                "total": len(items) if items else 0,
+            }
+
         self._children: list[str] = children if children else []
         self._customfields: list[dict[str, Any]] = customfields if customfields else []
         self._description: Optional[str] = description
@@ -4110,14 +4120,17 @@ class StackModel(BaseModel):
             key=key,
             uuid_=uuid_,
         )
-        self._items: list[str] = items if items else []
+        self._items: dict[str, Any] = {
+            "items": items["items"] if exists(value=items) else [],
+            "total": len(items["items"]) if exists(value=items) else 0,
+        }
         self._metadata: Final[ModelMetadata] = ModelMetadata(
             author=author,
             created_at=created_at,
             created_on=created_on,
             fields={
                 "total": len(locals().keys()),
-                "values": [key.strip("_") for key in locals().keys()],
+                "fields": [key.strip("_") for key in locals().keys()],
             },
             type_="STACK",
             updated_at=updated_at,
@@ -4262,12 +4275,12 @@ class StackModel(BaseModel):
         return self._identifiable.id
 
     @property
-    def items(self) -> list[str]:
+    def items(self) -> dict[str, Any]:
         """
         Returns the list of items associated with the stack.
 
         Returns:
-            list[str]: A list containing item keys.
+            dict[str, Any]: A dictionary containing item information.
         """
         return self._items
 
@@ -4277,9 +4290,12 @@ class StackModel(BaseModel):
         value: Union[list[str], str],
     ) -> None:
         if isinstance(value, list):
-            self._items.extend(value)
+            self._items["items"].extend(value)
+            self._items["total"] = len(self._items["items"])
             return
-        self._items.append(value)
+
+        self._items["items"].append(value)
+        self._items["total"] = len(self._items["items"])
 
     @property
     def key(self) -> Optional[str]:

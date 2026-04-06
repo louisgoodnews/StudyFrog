@@ -22,8 +22,8 @@ from studyfrog.utils.common import (
     flatten_dictionary,
     generate_model_key,
     generate_uuid4_str,
-    get_now_str,
-    get_today_str,
+    get_now_iso_str,
+    get_today_iso_str,
     pluralize_word,
     search_string,
 )
@@ -57,6 +57,10 @@ __all__: Final[list[str]] = [
     "update_entries",
 ]
 
+
+# ---------- Exports ---------- #
+
+__NAME__: Final[str] = "src.utils.storage"
 
 # ---------- Helper Functions ---------- #
 
@@ -111,8 +115,8 @@ def _ensure_table_json_with_content(table_name: str) -> None:
             return
 
         data: dict[str, Any] = {
-            "created_at": get_now_str(),
-            "created_on": get_today_str(),
+            "created_at": get_now_iso_str(),
+            "created_on": get_today_iso_str(),
             "entries": {
                 "entries": {},
                 "total": 0,
@@ -126,8 +130,8 @@ def _ensure_table_json_with_content(table_name: str) -> None:
                 "next_id": 0,
                 "schema": {},
             },
-            "updated_at": get_now_str(),
-            "updated_on": get_today_str(),
+            "updated_at": get_now_iso_str(),
+            "updated_on": get_today_iso_str(),
             "uuid": generate_uuid4_str(),
         }
 
@@ -137,7 +141,8 @@ def _ensure_table_json_with_content(table_name: str) -> None:
         )
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to ensure '{table_name}' table JSON file with content: {e}"
+            message=f"Caught an exception while attempting to ensure '{table_name}' table JSON file with content: {e}",
+            name=f"{__NAME__}._ensure_table_json_with_content",
         )
         dispatch(
             event=DB_OPERATION_FAILURE,
@@ -170,7 +175,8 @@ def _ensure_table_json(table_name: str) -> None:
         _ensure_table_json_with_content(table_name=table_name)
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to ensure '{table_name}' table JSON file: {e}"
+            message=f"Caught an exception while attempting to ensure '{table_name}' table JSON file: {e}",
+            name=f"{__NAME__}._ensure_table_json",
         )
         dispatch(
             event=DB_OPERATION_FAILURE,
@@ -220,7 +226,8 @@ def _get_add_event(model_type: str) -> str:
         }[model_type.lower()]
     except KeyError as e:
         log_error(
-            message=f"Caught a KeyError while attempting to get add event for '{model_type}' model: {e}"
+            message=f"Caught a KeyError while attempting to get add event for '{model_type}' model: {e}",
+            name=f"{__NAME__}._get_add_event",
         )
         log_error(message=f"No add event defined for '{model_type}' model")
         raise e
@@ -267,7 +274,8 @@ def _get_bulk_add_event(model_type: str) -> str:
         }[model_type.lower()]
     except KeyError as e:
         log_error(
-            message=f"Caught a KeyError while attempting to get add event for '{model_type}' model: {e}"
+            message=f"Caught a KeyError while attempting to get add event for '{model_type}' model: {e}",
+            name=f"{__NAME__}._get_bulk_add_event",
         )
         log_error(message=f"No add event defined for '{model_type}' model")
         raise e
@@ -313,7 +321,8 @@ def _get_bulk_delete_event(model_type: str) -> str:
         }[model_type.lower()]
     except KeyError as e:
         log_error(
-            message=f"Caught a KeyError while attempting to get bulk delete event for '{model_type}' model: {e}"
+            message=f"Caught a KeyError while attempting to get bulk delete event for '{model_type}' model: {e}",
+            name=f"{__NAME__}._get_bulk_delete_event",
         )
         log_error(message=f"No bulk delete event defined for '{model_type}' model")
         raise e
@@ -816,8 +825,8 @@ def _update_table_timestamps(table_data: dict[str, Any]) -> None:
         None
     """
 
-    table_data["updated_at"] = get_now_str()
-    table_data["updated_on"] = get_today_str()
+    table_data["updated_at"] = get_now_iso_str()
+    table_data["updated_on"] = get_today_iso_str()
 
 
 # ---------- Functions ---------- #
@@ -876,7 +885,7 @@ def add_entry(
             },
         )
 
-        return model_data["identifiable"]["id_"]
+        return model_data["identifiable"]["id"]
     except Exception as e:
         log_error(
             message=f"Caught an exception while attempting to add entry to '{table_name}' table: {e}"

@@ -5,8 +5,15 @@ Date: 2025-12-10
 
 from __future__ import annotations
 
+from typing import Final
 
-def debug() -> None:
+from studyfrog.utils.logging import log_error
+
+
+__NAME__: Final[str] = "src.debug.debug"
+
+
+def debug() -> int:
     """
     Entry point for running debugging, testing, or temporary development code.
 
@@ -19,11 +26,18 @@ def debug() -> None:
         None
 
     Returns:
-        None
+        int: The exit code of the debugging process. (0 for success, 1 for failure)
     """
 
-    pass
+    try:
+        return 0
+    except Exception as e:
+        log_error(
+            message=f"Caught an exception while running the debugging process: {e}",
+            name=__NAME__,
+        )
+        return 1
 
 
 if __name__ == "__main__":
-    debug()
+    raise SystemExit(debug())
