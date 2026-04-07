@@ -11,7 +11,6 @@ import customtkinter as ctk
 from tkinter.constants import NORMAL, NSEW, W
 from typing import Any, Final, Optional, Union
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     CLEAR_CREATE_FORM,
     DESTROY_NOTE_CREATE_FORM,
@@ -20,6 +19,7 @@ from studyfrog.constants.events import (
     GET_CREATE_FORM,
     GET_OBSERVABLE_MODEL,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.constants.gui import READONLY
 from studyfrog.models.observables import NoteObservableModel, ObservableModel
 from studyfrog.utils.common import exists
@@ -340,7 +340,7 @@ def _create_widgets() -> None:
         for subject in (
             dispatch(
                 event=GET_ALL_SUBJECTS_FROM_DB,
-                namespace="GLOBAL",
+                namespace=GLOBAL_NAMESPACE,
                 table_name="subjects",
             )
             .get(
@@ -402,7 +402,7 @@ def _create_widgets() -> None:
         for teacher in (
             dispatch(
                 event=GET_ALL_TEACHERS_FROM_DB,
-                namespace="GLOBAL",
+                namespace=GLOBAL_NAMESPACE,
                 table_name="teachers",
             )
             .get(

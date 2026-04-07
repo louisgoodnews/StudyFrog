@@ -8,7 +8,6 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     APPLICATION_STARTED,
     APPLICATION_STARTING,
@@ -16,6 +15,7 @@ from studyfrog.constants.events import (
     APPLICATION_STOPPING,
     GET_DASHBOARD_VIEW,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.core.bootstrap import (
     ensure_directories,
     ensure_files,
@@ -174,11 +174,11 @@ def run_post_start_tasks() -> None:
         initialize_gui()
         dispatch(
             event=APPLICATION_STARTED,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
         dispatch(
             event=GET_DASHBOARD_VIEW,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
     except Exception as e:
         log_error(message=f"Caught an exception while running post start tasks: {e}")
@@ -202,7 +202,7 @@ def run_post_stop_tasks() -> None:
     try:
         dispatch(
             event=APPLICATION_STOPPED,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
         unsubscribe_from_events()
     except Exception as e:
@@ -231,7 +231,7 @@ def run_pre_start_tasks() -> None:
         subscribe_to_events()
         dispatch(
             event=APPLICATION_STARTING,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
     except Exception as e:
         log_error(message=f"Caught an exception while running pre start tasks: {e}")
@@ -255,7 +255,7 @@ def run_pre_stop_tasks() -> None:
     try:
         dispatch(
             event=APPLICATION_STOPPING,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
     except Exception as e:
         log_error(message=f"Caught an exception while running pre stop tasks: {e}")

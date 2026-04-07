@@ -12,13 +12,13 @@ import customtkinter as ctk
 from tkinter.constants import NSEW, W
 from typing import Any, Callable, Final, Literal, Optional, Union
 
-from studyfrog.constants.common import GLOBAL, QUESTION_TYPES
 from studyfrog.constants.events import (
     DESTROY_ANSWER_CREATE_FORM,
     DESTROY_QUESTION_CREATE_FORM,
     GET_CREATE_FORM,
     GET_OBSERVABLE_MODEL,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.gui.forms.answer_create_form import (
     get_answer_choice_create_form,
     get_answer_open_ended_create_form,
@@ -424,7 +424,7 @@ def _on_combobox_select(value: str) -> None:
 
     dispatch(
         event=DESTROY_ANSWER_CREATE_FORM,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
     value_to_answer_type: dict[

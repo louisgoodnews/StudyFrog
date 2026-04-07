@@ -20,6 +20,7 @@ from studyfrog.constants.events import (
     GET_OBSERVABLE_MODEL,
 )
 from studyfrog.constants.gui import READONLY
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.models.observables import FlashcardObservableModel, ObservableModel
 from studyfrog.utils.common import exists
 from studyfrog.utils.dispatcher import dispatch, subscribe, unsubscribe
@@ -547,28 +548,28 @@ def _subscribe_to_events() -> None:
     subscriptions: list[dict[str, Any]] = [
         {
             "event": CLEAR_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL_NAMESPACE,
             "function": _on_clear_create_form,
             "persistent": True,
             "priority": 1,
         },
         {
             "event": DESTROY_FLASHCARD_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL_NAMESPACE,
             "function": _on_destroy,
             "persistent": True,
             "priority": 1,
         },
         {
             "event": GET_CREATE_FORM,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL_NAMESPACE,
             "function": _on_get_create_form,
             "persistent": True,
             "priority": 1,
         },
         {
             "event": GET_OBSERVABLE_MODEL,
-            "namespace": "GLOBAL",
+            "namespace": GLOBAL_NAMESPACE,
             "function": _on_get_observable_model,
             "persistent": True,
             "priority": 1,

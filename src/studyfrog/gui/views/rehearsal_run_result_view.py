@@ -10,8 +10,8 @@ import customtkinter as ctk
 
 from typing import Any, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import DESTROY_REHEARSAL_RUN_RESULT_VIEW
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.gui.gui import get_bottom_frame, get_center_frame, get_top_frame
 from studyfrog.models.models import Model
 from studyfrog.utils.common import exists
@@ -219,7 +219,7 @@ def _subscribe_to_events() -> None:
         {
             "event": DESTROY_REHEARSAL_RUN_RESULT_VIEW,
             "function": _on_destroy,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         }

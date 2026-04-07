@@ -10,7 +10,6 @@ import customtkinter as ctk
 
 from typing import Final
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     DESTROY_DASHBOARD_VIEW,
     GET_CREATE_VIEW,
@@ -19,6 +18,7 @@ from studyfrog.constants.events import (
     GET_REHEARSAL_RUN_SETUP_VIEW,
     GET_VIEW_VIEW,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.models.models import Model
 from studyfrog.utils.dispatcher import dispatch
 from studyfrog.utils.logging import log_error, log_info
@@ -53,7 +53,7 @@ def on_create_button_click() -> None:
 
         dispatch(
             event=GET_CREATE_VIEW,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             toplevel=ctk.CTkToplevel(),
         )
     except Exception as e:
@@ -78,7 +78,7 @@ def on_delete_button_click(stack: Model) -> None:
         dispatch(
             event=GET_DELETE_CONFIRMATION_VIEW,
             model=stack,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             toplevel=ctk.CTkToplevel(),
         )
     except Exception as e:
@@ -103,7 +103,7 @@ def on_edit_button_click(stack: Model) -> None:
         dispatch(
             event=GET_EDIT_VIEW,
             model=stack,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             toplevel=ctk.CTkToplevel(),
         )
     except Exception as e:
@@ -127,12 +127,12 @@ def on_rehearse_button_click(stack: Model) -> None:
 
         dispatch(
             event=DESTROY_DASHBOARD_VIEW,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
         dispatch(
             event=GET_REHEARSAL_RUN_SETUP_VIEW,
             model=stack,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
     except Exception as e:
         log_error(message=f"Caught an exception while attempting to create a new stack: {e}")
@@ -156,7 +156,7 @@ def on_view_button_click(stack: Model) -> None:
         dispatch(
             event=GET_VIEW_VIEW,
             model=stack,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             toplevel=ctk.CTkToplevel(),
         )
     except Exception as e:

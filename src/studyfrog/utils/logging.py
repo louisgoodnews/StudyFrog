@@ -7,6 +7,7 @@ Description: This module holds the logg functions for the application.
 from __future__ import annotations
 
 import sys
+import traceback
 
 from typing import Any, Final, Literal, Optional, TypeAlias
 
@@ -64,9 +65,11 @@ def log(
     Prints a log message to the console.
 
     Args:
+        *args: Additional positional arguments to include in the log message.
         level (LogLevel, optional): The level of the log. Defaults to "TRACE".
         message (Any): The message to log.
         name (str, optional): The name of the log. Defaults to the application name.
+        **kwargs: Additional keyword arguments to include in the log message.
 
     Returns:
         None
@@ -104,6 +107,8 @@ def log(
 def log_critical(
     message: Any,
     name: Optional[str] = None,
+    *args,
+    **kwargs,
 ) -> None:
     """
     Prints a log message with CRITICAL level.
@@ -111,6 +116,8 @@ def log_critical(
     Args:
         message (Any): The message to log.
         name (str, optional): The name of the log. Defaults to None.
+        *args: Additional positional arguments to include in the log message.
+        **kwargs: Additional keyword arguments to include in the log message.
 
     Returns:
         None
@@ -120,12 +127,16 @@ def log_critical(
         level="CRITICAL",
         message=message,
         name=name,
+        *args,
+        **kwargs,
     )
 
 
 def log_debug(
     message: Any,
     name: Optional[str] = None,
+    *args,
+    **kwargs,
 ) -> None:
     """
     Prints a log message with DEBUG level.
@@ -133,6 +144,8 @@ def log_debug(
     Args:
         message (Any): The message to log.
         name (str, optional): The name of the log. Defaults to None.
+        *args: Additional positional arguments to include in the log message.
+        **kwargs: Additional keyword arguments to include in the log message.
 
     Returns:
         None
@@ -142,12 +155,16 @@ def log_debug(
         level="DEBUG",
         message=message,
         name=name,
+        *args,
+        **kwargs,
     )
 
 
 def log_error(
     message: Any,
     name: Optional[str] = None,
+    *args,
+    **kwargs,
 ) -> None:
     """
     Prints a log message with ERROR level.
@@ -155,6 +172,8 @@ def log_error(
     Args:
         message (Any): The message to log.
         name (str, optional): The name of the log. Defaults to None.
+        *args: Additional positional arguments to include in the log message.
+        **kwargs: Additional keyword arguments to include in the log message.
 
     Returns:
         None
@@ -164,12 +183,43 @@ def log_error(
         level="ERROR",
         message=message,
         name=name,
+        *args,
+        **kwargs,
+    )
+
+
+def log_exception(
+    message: str,
+    name: Optional[str] = None,
+    *args,
+    **kwargs,
+) -> None:
+    """
+    Prints an exception log message with traceback and ERROR level.
+
+    Args:
+        message (Any): The message to log.
+        name (str, optional): The name of the log. Defaults to None.
+        *args: Additional positional arguments to include in the log message.
+        **kwargs: Additional keyword arguments to include in the log message.
+
+    Returns:
+        None
+    """
+
+    log(
+        level="ERROR",
+        message=message,
+        name=name,
+        traceback=traceback.format_exc(),
     )
 
 
 def log_info(
     message: Any,
     name: Optional[str] = None,
+    *args,
+    **kwargs,
 ) -> None:
     """
     Prints a log message with INFO level.
@@ -177,6 +227,8 @@ def log_info(
     Args:
         message (Any): The message to log.
         name (str, optional): The name of the log. Defaults to None.
+        *args: Additional positional arguments to include in the log message.
+        **kwargs: Additional keyword arguments to include in the log message.
 
     Returns:
         None
@@ -186,12 +238,16 @@ def log_info(
         level="INFO",
         message=message,
         name=name,
+        *args,
+        **kwargs,
     )
 
 
 def log_success(
     message: Any,
     name: Optional[str] = None,
+    *args,
+    **kwargs,
 ) -> None:
     """
     Prints a log message with SUCCESS level.
@@ -199,6 +255,8 @@ def log_success(
     Args:
         message (Any): The message to log.
         name (str, optional): The name of the log. Defaults to None.
+        *args: Additional positional arguments to include in the log message.
+        **kwargs: Additional keyword arguments to include in the log message.
 
     Returns:
         None
@@ -208,12 +266,16 @@ def log_success(
         level="SUCCESS",
         message=message,
         name=name,
+        *args,
+        **kwargs,
     )
 
 
 def log_trace(
     message: Any,
     name: Optional[str] = None,
+    *args,
+    **kwargs,
 ) -> None:
     """
     Prints a log message with TRACE level.
@@ -221,6 +283,8 @@ def log_trace(
     Args:
         message (Any): The message to log.
         name (str, optional): The name of the log. Defaults to None.
+        *args: Additional positional arguments to include in the log message.
+        **kwargs: Additional keyword arguments to include in the log message.
 
     Returns:
         None
@@ -230,12 +294,16 @@ def log_trace(
         level="TRACE",
         message=message,
         name=name,
+        *args,
+        **kwargs,
     )
 
 
 def log_warning(
     message: Any,
     name: Optional[str] = None,
+    *args,
+    **kwargs,
 ) -> None:
     """
     Prints a log message with WARNING level.
@@ -243,6 +311,8 @@ def log_warning(
     Args:
         message (Any): The message to log.
         name (str, optional): The name of the log. Defaults to None.
+        *args: Additional positional arguments to include in the log message.
+        **kwargs: Additional keyword arguments to include in the log message.
 
     Returns:
         None
@@ -252,4 +322,6 @@ def log_warning(
         level="WARNING",
         message=message,
         name=name,
+        *args,
+        **kwargs,
     )

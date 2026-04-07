@@ -11,7 +11,6 @@ import customtkinter as ctk
 from tkinter.constants import DISABLED, NORMAL, NSEW, W
 from typing import Any, Callable, Final, Literal, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     DESTROY_REHEARSAL_RUN_VIEW,
     LOAD_REHEARSAL_VIEW_FORM,
@@ -20,12 +19,14 @@ from studyfrog.constants.events import (
     REHEARSAL_RUN_INDEX_MAX_REACHED,
     REHEARSAL_RUN_INDEX_MIN_REACHED,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.gui.gui import get_bottom_frame, get_center_frame, get_top_frame
 from studyfrog.gui.logic.rehearsal_run_view_logic import (
     end_rehearsal_run,
     on_cancel_button_click,
     on_easy_button_click,
     on_edit_button_click,
+    on_end_button_click,
     on_hard_button_click,
     on_medium_button_click,
     on_next_button_click,
@@ -55,7 +56,6 @@ _HARD_BUTTON: Optional[ctk.CTkButton] = None
 _MEDIUM_BUTTON: Optional[ctk.CTkButton] = None
 _NEXT_BUTTON: Optional[ctk.CTkButton] = None
 _PREVIOUS_BUTTON: Optional[ctk.CTkButton] = None
-_REHEARSAL_RUN: Optional[Model] = None
 _SUBSCRIPTION_IDS: Final[list[str]] = []
 
 
@@ -145,23 +145,6 @@ def _get_previous_button() -> Optional[ctk.CTkButton]:
         raise ValueError("Previous button not found. Call 'set_previous_button' first.")
 
     return _PREVIOUS_BUTTON
-
-
-def _get_rehearsal_run() -> Model:
-    """
-    Returns the rehearsal run.
-
-    Args:
-        None
-
-    Returns:
-        Model: The rehearsal run.
-    """
-
-    if not exists(value=_REHEARSAL_RUN):
-        raise ValueError("Rehearsal run not found. Call 'set_rehearsal_run' first.")
-
-    return _REHEARSAL_RUN
 
 
 def _set_easy_button(button: ctk.CTkButton) -> None:
@@ -257,22 +240,6 @@ def _set_previous_button(button: ctk.CTkButton) -> None:
         return
 
     _PREVIOUS_BUTTON = button
-
-
-def _set_rehearsal_run(model: Model) -> None:
-    """
-    Sets the rehearsal run.
-
-    Args:
-        model (Model): The model to set.
-
-    Returns:
-        None
-    """
-
-    global _REHEARSAL_RUN
-
-    _REHEARSAL_RUN = model
 
 
 # ---------- Private Functions ---------- #
@@ -391,6 +358,10 @@ def _configure_top_frame_grid() -> None:
     )
     get_top_frame().grid_columnconfigure(
         index=3,
+        weight=0,
+    )
+    get_top_frame().grid_columnconfigure(
+        index=4,
         weight=0,
     )
     get_top_frame().grid_rowconfigure(
@@ -554,7 +525,7 @@ def _create_top_frame_widgets() -> None:
     ctk.CTkButton(
         command=on_cancel_button_click,
         master=get_top_frame(),
-        text="Cancel",
+        text="Cancel Run",
     ).grid(
         column=2,
         padx=5,
@@ -568,6 +539,17 @@ def _create_top_frame_widgets() -> None:
         text="Edit",
     ).grid(
         column=3,
+        padx=5,
+        pady=5,
+        row=0,
+    )
+
+    ctk.CTkButton(
+        command=on_end_button_click,
+        master=get_top_frame(),
+        text="End Run",
+    ).grid(
+        column=4,
         padx=5,
         pady=5,
         row=0,
@@ -770,7 +752,7 @@ def _on_rehearsal_run_max_index_reached() -> None:
 
     _get_next_button().configure(state=DISABLED)
 
-    end_rehearsal_run(rehearsal_run=_get_rehearsal_run())
+    end_rehearsal_run()
 
 
 def _on_rehearsal_run_min_index_reached() -> None:
@@ -823,42 +805,42 @@ def _subscribe_to_events() -> None:
         {
             "event": DESTROY_REHEARSAL_RUN_VIEW,
             "function": _on_destroy,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": LOAD_REHEARSAL_VIEW_FORM,
             "function": _on_load_rehearsal_view_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": REHEARSAL_RUN_INDEX_DECREMENTED,
             "function": _on_rehearsal_run_index_decremented,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": REHEARSAL_RUN_INDEX_INCREMENTED,
             "function": _on_rehearsal_run_index_incremented,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": REHEARSAL_RUN_INDEX_MAX_REACHED,
             "function": _on_rehearsal_run_max_index_reached,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": REHEARSAL_RUN_INDEX_MIN_REACHED,
             "function": _on_rehearsal_run_min_index_reached,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
@@ -910,8 +892,6 @@ def get_rehearsal_run_view(model: Model) -> None:
     """
 
     try:
-        _set_rehearsal_run(model=model)
-
         _clear_widgets()
         _configure_grid()
         _create_widgets()

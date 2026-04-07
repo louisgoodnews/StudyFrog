@@ -10,8 +10,8 @@ import customtkinter as ctk
 
 from typing import Any, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import DESTROY_FLASHCARD_EDIT_FORM
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.utils.common import exists
 from studyfrog.utils.dispatcher import subscribe, unsubscribe
 from studyfrog.utils.logging import log_error
@@ -40,10 +40,10 @@ _SuBSCRIPTION_IDS: Final[list[str]] = []
 def _append_subscription_id(uuid_: str) -> None:
     """
     Appends a subscription ID to the list of subscription IDs.
-    
+
     Args:
         uuid_ (str): The subscription ID to append.
-        
+
     Returns:
         None
     """
@@ -57,7 +57,7 @@ def _clear_subscription_ids() -> None:
 
     Args:
         None
-    
+
     Returns:
         None
     """
@@ -81,7 +81,9 @@ def _get_customfields_frame() -> ctk.CTkFrame:
     """
 
     if not exists(value=_CUSTOMFIELDS_FRAME):
-        raise ValueError("'customfields_frame' widget has not been initialized yet. Call the '_set_customfields_frame' function first.")
+        raise ValueError(
+            "'customfields_frame' widget has not been initialized yet. Call the '_set_customfields_frame' function first."
+        )
 
     return _CUSTOMFIELDS_FRAME
 
@@ -102,7 +104,9 @@ def _get_form_frame() -> ctk.CTkFrame:
     """
 
     if not exists(value=_FORM_FRAME):
-        raise ValueError("'form_frame' widget has not been initialized yet. Call the '_set_form_frame' function first.")
+        raise ValueError(
+            "'form_frame' widget has not been initialized yet. Call the '_set_form_frame' function first."
+        )
 
     return _FORM_FRAME
 
@@ -123,7 +127,9 @@ def _get_master() -> ctk.CTkTabview:
     """
 
     if not exists(value=_MASTER):
-        raise ValueError("'master' widget has not been initialized yet. Call the '_set_master' function first.")
+        raise ValueError(
+            "'master' widget has not been initialized yet. Call the '_set_master' function first."
+        )
 
     return _MASTER
 
@@ -131,7 +137,7 @@ def _get_master() -> ctk.CTkTabview:
 def _get_subscription_ids() -> list[str]:
     """
     Retrieves the list of subscription IDs.
-    
+
     Returns:
         list[str]: The list of subscription IDs.
     """
@@ -253,17 +259,17 @@ def _subscribe_to_events() -> None:
         None
     """
 
-    subscrptions: list[dict[str, Any]] = [
+    subscriptions: list[dict[str, Any]] = [
         {
             "event": DESTROY_FLASHCARD_EDIT_FORM,
             "function": _on_destroy,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         }
     ]
 
-    for subscription in subscrptions:
+    for subscription in subscriptions:
         _append_subscription_id(
             uuid=subscribe(
                 event=subscription["event"],
@@ -316,6 +322,8 @@ def get_flashcard_edit_form(tabview: ctk.CTkTabview) -> ctk.CTkToplevel:
         _set_master(tabview=tabview)
         _create_widgets()
     except Exception as e:
-        log_error(message=f"Caught an exception while attemping to run 'get_flashcard_edit_form': {e}")
+        log_error(
+            message=f"Caught an exception while attemping to run 'get_flashcard_edit_form': {e}"
+        )
 
         raise e

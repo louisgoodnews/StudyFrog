@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Final
 
 from studyfrog.core.application import start_application, stop_application
-from studyfrog.utils.logging import log_error
+from studyfrog.utils.logging import log_error, log_exception
 
 
 __NAME__: Final[str] = "src.main.main"
@@ -42,8 +42,9 @@ def main() -> int:
     except Exception as e:
         log_error(
             message=f"Caught an exception while running the application: {e}",
-            name=__NAME__,
+            name=f"{__NAME__}.main",
         )
+        log_exception(message="", name=f"{__NAME__}.main")
         return 1
 
 

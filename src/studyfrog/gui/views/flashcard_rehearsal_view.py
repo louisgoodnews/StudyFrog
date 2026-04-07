@@ -11,8 +11,8 @@ import customtkinter as ctk
 from tkinter.constants import NSEW
 from typing import Any, Final, Literal, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import FLASHCARD_FLIPPED
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.gui.gui import get_center_frame
 from studyfrog.models.models import Model
 from studyfrog.utils.common import exists
@@ -242,7 +242,7 @@ def _create_center_frame_widgets(master: ctk.CTkFrame) -> None:
 
         dispatch(
             event=FLASHCARD_FLIPPED,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
 
     label: ctk.CTkLabel = ctk.CTkLabel(

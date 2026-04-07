@@ -11,8 +11,8 @@ import customtkinter as ctk
 from tkinter.constants import BOTTOM, CENTER, FALSE, NONE, NSEW, TOP, W, X, YES
 from typing import Any, Final, Optional, Union
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import DESTROY_ANSWER_CREATE_FORM, GET_CREATE_FORM
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.utils.dispatcher import subscribe, unsubscribe
 from studyfrog.utils.gui import destroy_widget_children, reset_widget_grid
 from studyfrog.utils.logging import log_error, log_info
@@ -695,14 +695,14 @@ def _subscribe_to_events() -> None:
         {
             "event": DESTROY_ANSWER_CREATE_FORM,
             "function": _on_destroy,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_CREATE_FORM,
             "function": _on_get_create_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },

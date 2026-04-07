@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from typing import Any, Callable, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.utils.common import get_now, generate_uuid4_str
-from studyfrog.utils.logging import log_error, log_info, log_warning
+from studyfrog.utils.logging import log_error, log_exception, log_info, log_warning
 
 
 # ---------- Exports ---------- #
@@ -25,6 +25,8 @@ __all__: Final[list[str]] = [
 
 
 # ---------- Constants ---------- #
+
+__NAME__: Final[str] = "utils.dispatcher"
 
 SUBSCRIBERS: Final[dict[str, dict[str, dict[str, Any]]]] = {}
 
@@ -150,17 +152,17 @@ def bulk_unsubscribe(uuids: list[str]) -> bool:
 def dispatch(
     *args: tuple[Any],
     event: str,
-    namespace: str = GLOBAL,
+    namespace: str = GLOBAL_NAMESPACE,
     **kwargs: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Dispatches an event in the given namespace. (Defaults to 'GLOBAL')
+    Dispatches an event in the given namespace. (Defaults to 'namespace:GLOBAL')
 
     Additional parameters such as args and kwargs are optional.
 
     Args:
         event (str): The event to dispatch.
-        namespace (str): The namespace in which to dispatch the event.
+        namespace (str): The namespace in which to dispatch the event. Defaults to GLOBAL_NAMESPACE.
         *args: tuple[Any]: Additional positional arguments to pass along with the event.
         **kwargs: dict[str, Any]: Additional keyword arguments to pass along with the event.
 
@@ -186,7 +188,7 @@ def dispatch(
 
         log_warning(
             message=report,
-            name="utils.dispatcher.dispatch",
+            name=f"{__NAME__}.dispatch",
         )
 
         return report
@@ -199,7 +201,7 @@ def dispatch(
 
         log_warning(
             message=report,
-            name="utils.dispatcher.dispatch",
+            name=f"{__NAME__}.dispatch",
         )
 
         return report
@@ -243,7 +245,12 @@ def dispatch(
 
             log_error(
                 message=report,
-                name="utils.dispatcher.dispatch",
+                name=f"{__NAME__}.dispatch",
+            )
+
+            log_exception(
+                message="",
+                name=f"{__NAME__}.dispatch",
             )
 
         if not subscription["persistent"]:
@@ -263,19 +270,19 @@ def dispatch(
 def subscribe(
     event: str,
     function: Callable[[..., Any], Any],
-    namespace: str = GLOBAL,
+    namespace: str = GLOBAL_NAMESPACE,
     persistent: bool = False,
     priority: int = 0,
 ) -> str:
     """
-    Subscribes a function to an event based on a namespace. (Defaults to the 'GLOBAL' namespace)
+    Subscribes a function to an event based on a namespace. (Defaults to the 'namespace:GLOBAL' namespace)
 
     Additional parameters such as persistent and priority are optional.
 
     Args:
         event (str): The event to subscribe to.
         function (Callable[[..., Any], Any]): The function to subscribe.
-        namespace (str, optional): The namespace to subscribe to. Defaults to GLOBAL.
+        namespace (str, optional): The namespace to subscribe to. Defaults to GLOBAL_NAMESPACE.
         persistent (bool, optional): Whether the subscription should persist. Defaults to False.
         priority (int, optional): The priority of the subscription. Defaults to 0.
 
@@ -313,7 +320,7 @@ def subscribe(
 
     log_info(
         message=f"Subscribed to event '{event}' in namespace '{namespace}' with UUID '{subscription['uuid']}'.",
-        name="utils.dispatcher.subscribe",
+        name=f"{__NAME__}.subscribe",
     )
 
     return subscription["uuid"]
@@ -333,7 +340,7 @@ def unsubscribe(uuid: str) -> bool:
     if uuid not in UUIDS:
         log_warning(
             message=f"UUID '{uuid}' not found. Aborting...",
-            name="utils.dispatcher.unsubscribe",
+            name=f"{__NAME__}.unsubscribe",
         )
         return False
 
@@ -352,7 +359,7 @@ def unsubscribe(uuid: str) -> bool:
 
     log_info(
         message=f"Unsubscribed from event '{event}' in namespace '{namespace}' with UUID '{uuid}'.",
-        name="utils.dispatcher.unsubscribe",
+        name=f"{__NAME__}.unsubscribe",
     )
 
     return True

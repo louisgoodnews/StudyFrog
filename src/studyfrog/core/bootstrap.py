@@ -8,7 +8,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Callable, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.defaults import (
     DEFAULT_EASY_DIFFICULTY,
     DEFAULT_HARD_DIFFICULTY,
@@ -52,6 +51,7 @@ from studyfrog.constants.files import (
     TEACHERS_DB_JSON,
     USERS_DB_JSON,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.gui.forms.answer_create_form import (
     get_answer_choice_create_form,
     get_answer_open_ended_create_form,
@@ -72,7 +72,12 @@ from studyfrog.gui.views.question_rehearsal_view import get_question_rehearsal_v
 from studyfrog.gui.views.rehearsal_run_view import get_rehearsal_run_view
 from studyfrog.gui.views.rehearsal_run_result_view import get_rehearsal_run_result_view
 from studyfrog.gui.views.rehearsal_run_setup_view import get_rehearsal_run_setup_view
-from studyfrog.gui.widgets import get_error_toast, get_info_toast, get_success_toast, get_warning_toast
+from studyfrog.gui.widgets import (
+    get_error_toast,
+    get_info_toast,
+    get_success_toast,
+    get_warning_toast,
+)
 from studyfrog.models.factory import (
     get_answer_model,
     get_flashcard_model,
@@ -206,49 +211,49 @@ def _get_get_create_form_subscriptions() -> list[dict[str, Any]]:
         {
             "event": GET_ANSWER_CHOICE_CREATE_FORM,
             "function": get_answer_choice_create_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_ANSWER_OPEN_ENDED_CREATE_FORM,
             "function": get_answer_open_ended_create_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_ANSWER_TRUE_FALSE_CREATE_FORM,
             "function": get_answer_true_false_create_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_FLASHCARD_CREATE_FORM,
             "function": get_flashcard_create_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_NOTE_CREATE_FORM,
             "function": get_note_create_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_QUESTION_CREATE_FORM,
             "function": get_question_create_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_STACK_CREATE_FORM,
             "function": get_stack_create_form,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
@@ -279,70 +284,70 @@ def _get_get_view_form_subscriptions() -> list[dict[str, Any]]:
             {
                 "event": GET_CREATE_VIEW,
                 "function": get_create_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_DASHBOARD_VIEW,
                 "function": get_dashboard_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_EDIT_VIEW,
                 "function": get_edit_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_DELETE_CONFIRMATION_VIEW,
                 "function": get_delete_confirmation_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_FLASHCARD_REHEARSAL_VIEW,
                 "function": get_flashcard_rehearsal_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_NOTE_REHEARSAL_VIEW,
                 "function": get_note_rehearsal_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_QUESTION_REHEARSAL_VIEW,
                 "function": get_question_rehearsal_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_REHEARSAL_RUN_VIEW,
                 "function": get_rehearsal_run_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_REHEARSAL_RUN_RESULT_VIEW,
                 "function": get_rehearsal_run_result_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
             {
                 "event": GET_REHEARSAL_RUN_SETUP_VIEW,
                 "function": get_rehearsal_run_setup_view,
-                "namespace": GLOBAL,
+                "namespace": GLOBAL_NAMESPACE,
                 "persistent": True,
                 "priority": 100,
             },
@@ -368,49 +373,49 @@ def _get_model_event_subscriptions() -> list[dict[str, Any]]:
         {
             "event": GET_ANSWER_MODEL,
             "function": get_answer_model,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_FLASHCARD_MODEL,
             "function": get_flashcard_model,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_NOTE_MODEL,
             "function": get_note_model,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_QUESTION_MODEL,
             "function": get_question_model,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_REHEARSAL_RUN_MODEL,
             "function": get_rehearsal_run_model,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_REHEARSAL_RUN_ITEM_MODEL,
             "function": get_rehearsal_run_item_model,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_STACK_MODEL,
             "function": get_stack_model,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
@@ -510,7 +515,7 @@ def _get_storage_event_subscriptions() -> list[dict[str, Any]]:
                 {
                     "event": event,
                     "function": function,
-                    "namespace": GLOBAL,
+                    "namespace": GLOBAL_NAMESPACE,
                     "persistent": True,
                     "priority": 100,
                 }
@@ -534,28 +539,28 @@ def _get_toast_event_subscriptions() -> list[dict[str, Any]]:
         {
             "event": GET_ERROR_TOAST,
             "function": get_error_toast,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_INFO_TOAST,
             "function": get_info_toast,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_SUCCESS_TOAST,
             "function": get_success_toast,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },
         {
             "event": GET_WARNING_TOAST,
             "function": get_warning_toast,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         },

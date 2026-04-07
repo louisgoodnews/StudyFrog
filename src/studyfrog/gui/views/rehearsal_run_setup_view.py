@@ -11,7 +11,6 @@ import customtkinter as ctk
 from tkinter.constants import NSEW, TOP, VERTICAL, W, X, YES
 from typing import Any, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     CLEAR_REHEARSAL_RUN_SETUP_FORM,
     DESTROY_REHEARSAL_RUN_SETUP_VIEW,
@@ -20,8 +19,12 @@ from studyfrog.constants.events import (
     GET_ALL_STACKS_FROM_DB,
     GET_REHEARSAL_RUN_SETUP_FORM,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.gui.gui import get_bottom_frame, get_center_frame, get_top_frame
-from studyfrog.gui.logic.rehearsal_run_setup_view_logic import on_cancel_button_click, on_start_button_click
+from studyfrog.gui.logic.rehearsal_run_setup_view_logic import (
+    on_cancel_button_click,
+    on_start_button_click,
+)
 from studyfrog.models.models import Model
 from studyfrog.utils.common import exists
 from studyfrog.utils.dispatcher import dispatch, subscribe, unsubscribe
@@ -321,7 +324,7 @@ def _create_difficulty_form_widgets(master: ctk.CTkScrollableFrame) -> None:
         for difficulty in (
             dispatch(
                 event=GET_ALL_DIFFICULTIES_FROM_DB,
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 table_name="difficulties",
             )
             .get(
@@ -419,7 +422,7 @@ def _create_priority_form_widgets(master: ctk.CTkScrollableFrame) -> None:
         for priority in (
             dispatch(
                 event=GET_ALL_PRIORITIES_FROM_DB,
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 table_name="priorities",
             )
             .get(
@@ -541,7 +544,7 @@ def _create_stack_selection_form_widgets(master: ctk.CTkScrollableFrame) -> None
         for stack in (
             dispatch(
                 event=GET_ALL_STACKS_FROM_DB,
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 table_name="stacks",
             )
             .get(

@@ -10,8 +10,8 @@ import customtkinter as ctk
 
 from typing import Any, Final
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import DESTROY_EDIT_VIEW, GET_DELETE_CONFIRMATION_VIEW
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.utils.dispatcher import dispatch
 
 # ---------- Exports ---------- #
@@ -45,7 +45,7 @@ def on_cancel_button_click() -> None:
 
     dispatch(
         event=DESTROY_EDIT_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
 
@@ -62,7 +62,7 @@ def on_delete_button_click(obj: dict[str, Any]) -> None:
 
     dispatch(
         event=GET_DELETE_CONFIRMATION_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
         obj=obj,
         toplevel=ctk.CTkToplevel(),
     )
@@ -73,7 +73,7 @@ def on_delete_button_click(obj: dict[str, Any]) -> None:
 
     dispatch(
         event=DESTROY_EDIT_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
 
@@ -90,5 +90,5 @@ def on_save_button_click() -> None:
 
     dispatch(
         event=DESTROY_EDIT_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )

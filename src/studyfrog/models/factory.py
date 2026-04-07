@@ -855,7 +855,7 @@ def get_rehearsal_run_model(
     id_: Optional[Union[int, str]] = None,
     is_finished: bool = False,
     item_order_randomization_enabled: bool = False,
-    items: Optional[dict[str, str]] = None,
+    items: Optional[dict[str, Any]] = None,
     key: Optional[str] = None,
     scheduled_at: Optional[Union[datetime, str]] = None,
     scheduled_on: Optional[Union[date, str]] = None,
@@ -890,7 +890,7 @@ def get_rehearsal_run_model(
         id_ (Optional[Union[int, str]]): Internal database identifier.
         is_finished (bool): Flag indicating if the rehearsal session has ended.
         item_order_randomization_enabled (bool): Whether item order randomization is enabled.
-        items (Optional[dict[str, str]]): Mapping of RehearsalRunItem keys within this run.
+        items (Optional[dict[str, Any]]): Mapping of RehearsalRunItem keys within this run.
         key (Optional[str]): Unique model key identifier.
         scheduled_at (Optional[str]): ISO-formatted timestamp for the scheduled start.
         scheduled_on (Optional[str]): ISO-formatted date for the scheduled start.

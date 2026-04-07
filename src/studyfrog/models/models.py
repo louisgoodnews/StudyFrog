@@ -3514,7 +3514,10 @@ class RehearsalRunItemModel(BaseModel):
             str,
         ],
     ) -> None:
-        if isinstance(value, list):
+        if isinstance(
+            value,
+            list,
+        ):
             self._actions.extend(value)
 
             return
@@ -3718,6 +3721,15 @@ class RehearsalRunModel(BaseModel):
 
         super().__init__()
 
+        if not isinstance(
+            items,
+            dict,
+        ):
+            items = {
+                "items": items if exists(value=items) else [],
+                "total": len(items) if exists(value=items) else 0,
+            }
+
         self._completed_at: Optional[datetime] = completed_at
         self._completed_on: Optional[datetime] = completed_on
         self._configuration: Final[dict[str, Any]] = configuration
@@ -3731,7 +3743,10 @@ class RehearsalRunModel(BaseModel):
             uuid_=uuid_,
         )
         self._is_finished: bool = is_finished
-        self._items: list[dict[str, str]] = items or {}
+        self._items: dict[str, Any] = {
+            "items": items.get("items", []) if exists(value=items) else [],
+            "total": len(items.get("items", [])) if exists(value=items) else 0,
+        }
         self._metadata: Final[ModelMetadata] = ModelMetadata(
             author=author,
             created_at=created_at,
@@ -3887,29 +3902,30 @@ class RehearsalRunModel(BaseModel):
         self._is_finished = value
 
     @property
-    def items(self) -> dict[str, str]:
+    def items(self) -> dict[str, Any]:
         """
         Returns the mapping of item keys (e.g., flashcards, questions) corresponding to their order number in this run.
 
         Returns:
-            dict[str, str]: A mapping of item keys (e.g., flashcards, questions) corresponding to their order number in this run.
+            dict[str, Any]: A mapping of item keys (e.g., flashcards, questions) corresponding to their order number in this run.
         """
         return self._items
 
     @items.setter
     def items(
         self,
-        value: Union[list[dict[str, str]], dict[str, str]],
+        value: Union[list[str], str],
     ) -> None:
         if isinstance(
             value,
             list,
         ):
-            self._items.extend(value)
-
+            self._items.get("items", []).extend(value)
+            self._items["total"] = len(self._items.get("items", []))
             return
 
-        self._items.append(value)
+        self._items.get("items", []).append(value)
+        self._items["total"] = len(self._items.get("items", []))
 
     @property
     def key(self) -> Optional[str]:
@@ -4121,8 +4137,8 @@ class StackModel(BaseModel):
             uuid_=uuid_,
         )
         self._items: dict[str, Any] = {
-            "items": items["items"] if exists(value=items) else [],
-            "total": len(items["items"]) if exists(value=items) else 0,
+            "items": items.get("items", []) if exists(value=items) else [],
+            "total": len(items.get("items", [])) if exists(value=items) else 0,
         }
         self._metadata: Final[ModelMetadata] = ModelMetadata(
             author=author,
@@ -4289,13 +4305,16 @@ class StackModel(BaseModel):
         self,
         value: Union[list[str], str],
     ) -> None:
-        if isinstance(value, list):
-            self._items["items"].extend(value)
-            self._items["total"] = len(self._items["items"])
+        if isinstance(
+            value,
+            list,
+        ):
+            self._items.get("items", []).extend(value)
+            self._items["total"] = len(self._items.get("items", []))
             return
 
-        self._items["items"].append(value)
-        self._items["total"] = len(self._items["items"])
+        self._items.get("items", []).append(value)
+        self._items["total"] = len(self._items.get("items", []))
 
     @property
     def key(self) -> Optional[str]:

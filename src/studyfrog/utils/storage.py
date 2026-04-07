@@ -5,19 +5,16 @@ Date: 2025-12-10
 
 from __future__ import annotations
 
-import uuid
-
 from pathlib import Path
 from typing import Any, Final, Optional, Union
 
 from studyfrog.constants.common import PATTERNS
 from studyfrog.constants.directories import DATA_DIR
 from studyfrog.constants.events import *
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.models.factory import get_model
 from studyfrog.models.models import Model
 from studyfrog.utils.common import (
-    date_from_string,
-    datetime_from_string,
     exists,
     flatten_dictionary,
     generate_model_key,
@@ -34,7 +31,7 @@ from studyfrog.utils.files import (
     read_file_json,
     write_file_json,
 )
-from studyfrog.utils.logging import log_debug, log_error, log_info, log_warning
+from studyfrog.utils.logging import log_error, log_info
 
 
 # ---------- Exports ---------- #
@@ -883,6 +880,7 @@ def add_entry(
                     **model_data,
                 ),
             },
+            namespace=GLOBAL_NAMESPACE,
         )
 
         return model_data["identifiable"]["id"]
@@ -1017,6 +1015,7 @@ def add_entries(
                         for model_data in model_datas
                     ],
                 },
+                namespace=GLOBAL_NAMESPACE,
             )
 
         return added_ids
@@ -1197,7 +1196,8 @@ def delete_all_entries(table_name: str) -> bool:
         if exists(value=model_type):
             dispatch(
                 event=_get_delete_all_event(model_type=model_type),
-                kwargs={},
+                namespace=GLOBAL_NAMESPACE,
+                **{},
             )
 
         return True
@@ -1299,6 +1299,7 @@ def delete_entries(
         if exists(value=model_type):
             dispatch(
                 event=_get_bulk_delete_event(model_type=model_type),
+                namespace=GLOBAL_NAMESPACE,
                 **{
                     pluralize_word(word=model_type).lower(): deleted_entries,
                 },
@@ -1381,6 +1382,7 @@ def delete_entry(
 
         dispatch(
             event=_get_delete_event(model_type=model_type),
+            namespace=GLOBAL_NAMESPACE,
             **{
                 model_type.lower(): deleted_entry,
             },
@@ -1485,6 +1487,7 @@ def filter_entries(
         if count == 1:
             dispatch(
                 event=_get_get_event(model_type=model_type),
+                namespace=GLOBAL_NAMESPACE,
                 **{
                     pluralize_word(word=model_type).lower(): filtered_entries[0],
                 },
@@ -1492,6 +1495,7 @@ def filter_entries(
         elif count > 1:
             dispatch(
                 event=_get_bulk_get_event(model_type=model_type),
+                namespace=GLOBAL_NAMESPACE,
                 **{
                     pluralize_word(word=model_type).lower(): filtered_entries,
                 },
@@ -1557,6 +1561,7 @@ def get_all_entries(table_name: str) -> Optional[list[Model]]:
 
         dispatch(
             event=_get_get_all_event(model_type=model_type),
+            namespace=GLOBAL_NAMESPACE,
             **{f"all_{pluralize_word(word=model_type).lower()}": models},
         )
 
@@ -1651,6 +1656,7 @@ def get_entries(
         if exists(value=model_type):
             dispatch(
                 event=_get_bulk_get_event(model_type=model_type),
+                namespace=GLOBAL_NAMESPACE,
                 **{pluralize_word(word=model_type).lower(): models},
             )
 
@@ -1755,6 +1761,7 @@ def get_entry(
 
         dispatch(
             event=_get_get_event(model_type=model_type),
+            namespace=GLOBAL_NAMESPACE,
             **{model_type.lower(): model},
         )
 
@@ -1829,12 +1836,12 @@ def update_entry(
     """
 
     try:
-        if not exists(value=model.id_):
+        if not exists(value=model.id):
             raise ValueError("The provided model must contain an 'id' key for update operations.")
 
         _ensure_table_json(table_name=table_name)
 
-        entry_id_str: str = str(model.id_)
+        entry_id_str: str = str(model.id)
 
         file: Path = DATA_DIR / (
             f"{table_name}.json" if not table_name.endswith(".json") else table_name
@@ -1863,6 +1870,7 @@ def update_entry(
 
         dispatch(
             event=_get_update_event(model_type=model_type),
+            namespace=GLOBAL_NAMESPACE,
             **{
                 model_type.lower(): get_model(
                     type_=model_type,
@@ -1877,7 +1885,7 @@ def update_entry(
         )
     except Exception as e:
         log_error(
-            message=f"Caught an exception while attempting to update entry '{model.id_}' in '{table_name}' table: {e}"
+            message=f"Caught an exception while attempting to update entry '{model.id}' in '{table_name}' table: {e}"
         )
         raise e
 
@@ -1928,10 +1936,10 @@ def update_entries(
         model_type: str = ""
 
         for model in models:
-            if not exists(value=model.id_):
+            if not exists(value=model.id):
                 raise ValueError("A model in the batch update list must contain an 'id' key.")
 
-            model_id_str: str = str(model.id_)
+            model_id_str: str = str(model.id)
 
             if model_id_str not in all_entries:
                 log_info(
@@ -1965,6 +1973,7 @@ def update_entries(
         if exists(value=model_type):
             dispatch(
                 event=_get_bulk_update_event(model_type=model_type),
+                namespace=GLOBAL_NAMESPACE,
                 **{
                     pluralize_word(word=model_type).lower(): [
                         get_model(

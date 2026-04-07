@@ -10,7 +10,6 @@ import customtkinter as ctk
 
 from typing import Any, Callable, Final, Literal, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     ADD_ANSWER_TO_DB,
     ADD_FLASHCARD_TO_DB,
@@ -57,6 +56,7 @@ from studyfrog.constants.events import (
     UPDATE_QUESTION_IN_DB,
     UPDATE_STACK_IN_DB,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.constants.storage import (
     ANSWERS,
     DIFFICULTIES,
@@ -145,7 +145,7 @@ def _add_to_database(model: Model) -> Optional[int]:
             dispatch(
                 model=model,
                 event=_get_add_event(type_=type_),
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 table_name=_get_table_name(type_=type_),
             )
             .get(
@@ -187,7 +187,7 @@ def _filter_difficulty(**kwargs) -> Model:
     difficulties: Optional[list[Model]] = (
         dispatch(
             event=FILTER_DIFFICULTIES_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name=DIFFICULTIES,
             **kwargs,
         )
@@ -221,7 +221,7 @@ def _filter_priority(**kwargs) -> Model:
     priorities: Optional[list[Model]] = (
         dispatch(
             event=FILTER_PRIORITIES_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name=PRIORITIES,
             **kwargs,
         )
@@ -255,7 +255,7 @@ def _filter_stack(**kwargs) -> Model:
     stacks: Optional[list[Model]] = (
         dispatch(
             event=FILTER_STACKS_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name=STACKS,
             **kwargs,
         )
@@ -289,7 +289,7 @@ def _filter_subject(**kwargs) -> Model:
     subjects: Optional[list[Model]] = (
         dispatch(
             event=FILTER_SUBJECTS_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name=SUBJECTS,
             **kwargs,
         )
@@ -323,7 +323,7 @@ def _filter_teacher(**kwargs) -> Model:
     teachers: Optional[list[Model]] = (
         dispatch(
             event=FILTER_TEACHERS_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name=TEACHERS,
             **kwargs,
         )
@@ -394,7 +394,7 @@ def _get_from_database(key: str) -> Optional[Model]:
         return (
             dispatch(
                 event=_get_get_from_db_event(type_=type_),
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 id_=id_,
                 table_name=_get_table_name(type_=type_),
             )
@@ -497,7 +497,7 @@ def _get_model(
         response: Optional[Model] = (
             dispatch(
                 event=_get_get_model_event(type_=type_),
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 **data,
             )
             .get(
@@ -742,7 +742,7 @@ def _update_in_database(model: Model) -> Optional[int]:
             dispatch(
                 model=model,
                 event=_get_update_in_db_event(type_=type_),
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 table_name=_get_table_name(type_=type_),
             )
             .get(
@@ -866,7 +866,7 @@ def _validate_form(form: dict[str, Any]) -> dict[str, Any]:
             dispatch(
                 event=GET_ERROR_TOAST,
                 message="Please fill in all required fields.",
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 title="Note creation failed",
             )
 
@@ -1157,7 +1157,7 @@ def on_cancel_button_click() -> None:
 
     dispatch(
         event=DESTROY_CREATE_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
 
@@ -1174,7 +1174,7 @@ def on_create_button_click() -> None:
 
     reponses: Optional[list[Model]] = dispatch(
         event=GET_CREATE_FORM,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     ).get(
         "_on_get_create_form",
         [{}],
@@ -1253,14 +1253,14 @@ def on_create_button_click() -> None:
     if not create_another:
         dispatch(
             event=DESTROY_CREATE_VIEW,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
 
         return
 
     dispatch(
         event=CLEAR_CREATE_FORM,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
 
@@ -1280,7 +1280,7 @@ def on_stack_combobox_select(value: str) -> None:
 
         dispatch(
             event=RESET_CREATE_FORM,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
 
         return
@@ -1292,14 +1292,14 @@ def on_stack_combobox_select(value: str) -> None:
 
         dispatch(
             event=RESET_CREATE_FORM,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
 
         return
 
     dispatch(
         event=SET_CREATE_FORM,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
         **stack.to_json_dict(),
     )
 
@@ -1334,7 +1334,7 @@ def on_type_combobox_select(
 
     bulk_dispatch(
         events=events,
-        namespaces=[GLOBAL for _ in events],
+        namespaces=[GLOBAL_NAMESPACE for _ in events],
     )
 
     dispatch(
@@ -1344,6 +1344,6 @@ def on_type_combobox_select(
             "question": GET_QUESTION_CREATE_FORM,
             "stack": GET_STACK_CREATE_FORM,
         }[value.lower()],
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
         scrollable_frame=scrollable_frame,
     )

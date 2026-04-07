@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Final
 
+from studyfrog.constants.common import GLOBAL
+
 
 # ---------- Exports ---------- #
 
@@ -16,7 +18,7 @@ __all__: Final[list[str]] = ["GLOBAL_NAMESPACE"]
 
 # ---------- Constants ---------- #
 
-GLOBAL_NAMESPACE: Final[str] = "namespace:global"
+GLOBAL_NAMESPACE: Final[str] = f"namespace:{GLOBAL}"
 
 
 # ---------- Helper Functions ---------- #

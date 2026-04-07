@@ -10,13 +10,13 @@ import customtkinter as ctk
 
 from typing import Any, Final, Literal
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     DELETE_FLASHCARD_FROM_DB,
     DELETE_STACK_FROM_DB,
     DESTROY_DELETE_CONFIRMATION_VIEW,
     GET_INFO_TOAST,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.models.models import Model
 from studyfrog.utils.common import exists, pluralize_word, string_to_snake_case
 from studyfrog.utils.dispatcher import dispatch
@@ -72,7 +72,7 @@ def on_cancel_button_click() -> None:
 
     dispatch(
         event=DESTROY_DELETE_CONFIRMATION_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
 
@@ -104,18 +104,18 @@ def on_okay_button_click(model: Model) -> None:
         dispatch(
             event=type_to_delete_event[string_to_snake_case(string=model.type_)],
             id_=model.id,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name=pluralize_word(word=string_to_snake_case(string=model.type_)),
         )
 
     dispatch(
         event=DESTROY_DELETE_CONFIRMATION_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
     dispatch(
         event=GET_INFO_TOAST,
         message=f"{model.key} deleted successfully",
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
         title=f"{model.type_.title()} Deleted",
     )

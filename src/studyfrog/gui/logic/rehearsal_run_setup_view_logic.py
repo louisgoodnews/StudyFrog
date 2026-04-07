@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     ADD_REHEARSAL_RUN_TO_DB,
     DESTROY_REHEARSAL_RUN_SETUP_VIEW,
@@ -21,6 +20,7 @@ from studyfrog.constants.events import (
     GET_REHEARSAL_RUN_SETUP_FORM,
     GET_REHEARSAL_RUN_VIEW,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.models.models import Model
 from studyfrog.utils.common import exists
 from studyfrog.utils.dispatcher import dispatch
@@ -55,7 +55,7 @@ def _filter_difficulty(**kwargs) -> Model:
     difficulties: Optional[list[Model]] = (
         dispatch(
             event=FILTER_DIFFICULTIES_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name="difficulties",
             **kwargs,
         )
@@ -89,7 +89,7 @@ def _filter_priority(**kwargs) -> Model:
     priorities: Optional[list[Model]] = (
         dispatch(
             event=FILTER_PRIORITIES_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name="priorities",
             **kwargs,
         )
@@ -123,7 +123,7 @@ def _filter_stack(**kwargs) -> Model:
     stacks: Optional[list[Model]] = (
         dispatch(
             event=FILTER_STACKS_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name="stacks",
             **kwargs,
         )
@@ -279,7 +279,7 @@ def on_cancel_button_click() -> None:
 
     dispatch(
         event=GET_DASHBOARD_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
 
@@ -297,7 +297,7 @@ def on_start_button_click() -> None:
     response: Optional[dict[str, Any]] = (
         dispatch(
             event=GET_REHEARSAL_RUN_SETUP_FORM,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
         )
         .get(
             "_on_get_rehearsal_run_setup_form",
@@ -329,7 +329,7 @@ def on_start_button_click() -> None:
             item_order_randomization_enabled=bool(
                 response["item_order_randomization_enabled"]["value"]
             ),
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             stacks=response["stacks"]["value"],
         )
         .get(
@@ -347,7 +347,7 @@ def on_start_button_click() -> None:
             model=rehearsal_run_model,
             event=ADD_REHEARSAL_RUN_TO_DB,
             force=True,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name="rehearsal_runs",
         )
         .get(
@@ -366,7 +366,7 @@ def on_start_button_click() -> None:
 
     dispatch(
         event=DESTROY_REHEARSAL_RUN_SETUP_VIEW,
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )
 
     dispatch(
@@ -374,7 +374,7 @@ def on_start_button_click() -> None:
         model=dispatch(
             event=GET_REHEARSAL_RUN_FROM_DB,
             id_=id,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name="rehearsal_runs",
         )
         .get(
@@ -385,5 +385,5 @@ def on_start_button_click() -> None:
             "result",
             {},
         ),
-        namespace=GLOBAL,
+        namespace=GLOBAL_NAMESPACE,
     )

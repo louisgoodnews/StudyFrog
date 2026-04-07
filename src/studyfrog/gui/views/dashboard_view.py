@@ -11,7 +11,6 @@ import customtkinter as ctk
 from tkinter.constants import NSEW, TOP, VERTICAL, W, X, YES
 from typing import Any, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     DESTROY_DASHBOARD_VIEW,
     GET_ALL_STACKS_FROM_DB,
@@ -19,6 +18,7 @@ from studyfrog.constants.events import (
     STACK_DELETED,
     STACKS_ADDED,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.gui.gui import (
     get_bottom_frame,
     get_center_frame,
@@ -432,7 +432,7 @@ def _load_stacks() -> None:
     stacks: Optional[list[Model]] = (
         dispatch(
             event=GET_ALL_STACKS_FROM_DB,
-            namespace=GLOBAL,
+            namespace=GLOBAL_NAMESPACE,
             table_name="stacks",
         )
         .get(

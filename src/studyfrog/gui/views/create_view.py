@@ -11,7 +11,6 @@ import customtkinter as ctk
 from tkinter.constants import NSEW, W
 from typing import Any, Final, Optional, Union
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import (
     CLEAR_CREATE_FORM,
     DESTROY_CREATE_VIEW,
@@ -25,6 +24,7 @@ from studyfrog.constants.events import (
     STACK_ADDED,
     STACKS_ADDED,
 )
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.constants.gui import READONLY, TOPLEVEL_GEOMETRY, WINDOW_TITLE
 from studyfrog.gui.logic.create_view_logic import (
     on_create_button_click,
@@ -617,7 +617,7 @@ def _create_top_frame_widgets() -> None:
             for stack in (
                 dispatch(
                     event=GET_ALL_STACKS_FROM_DB,
-                    namespace=GLOBAL,
+                    namespace=GLOBAL_NAMESPACE,
                     table_name="stacks",
                 )
                 .get(
@@ -737,7 +737,7 @@ def _create_top_frame_widgets() -> None:
         for difficulty in (
             dispatch(
                 event=GET_ALL_DIFFICULTIES_FROM_DB,
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 table_name="difficulties",
             )
             .get(
@@ -796,7 +796,7 @@ def _create_top_frame_widgets() -> None:
         for priority in (
             dispatch(
                 event=GET_ALL_PRIORITIES_FROM_DB,
-                namespace=GLOBAL,
+                namespace=GLOBAL_NAMESPACE,
                 table_name="priorities",
             )
             .get(

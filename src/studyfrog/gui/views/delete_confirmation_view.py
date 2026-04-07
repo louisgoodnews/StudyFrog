@@ -11,10 +11,13 @@ import customtkinter as ctk
 from tkinter.constants import CENTER, NSEW, W
 from typing import Any, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import DESTROY_DELETE_CONFIRMATION_VIEW
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.constants.gui import TOPLEVEL_GEOMETRY, WINDOW_TITLE
-from studyfrog.gui.logic.delete_confirmation_view_logic import on_cancel_button_click, on_okay_button_click
+from studyfrog.gui.logic.delete_confirmation_view_logic import (
+    on_cancel_button_click,
+    on_okay_button_click,
+)
 from studyfrog.models.models import Model
 from studyfrog.utils.common import exists
 from studyfrog.utils.dispatcher import subscribe, unsubscribe
@@ -547,7 +550,7 @@ def _subscribe_to_events() -> None:
         {
             "event": DESTROY_DELETE_CONFIRMATION_VIEW,
             "function": _on_destroy,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         }

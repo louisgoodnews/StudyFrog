@@ -11,8 +11,8 @@ import customtkinter as ctk
 from tkinter.constants import NSEW, W
 from typing import Any, Final, Optional
 
-from studyfrog.constants.common import GLOBAL
 from studyfrog.constants.events import DESTROY_EDIT_VIEW
+from studyfrog.constants.namespaces import GLOBAL_NAMESPACE
 from studyfrog.constants.gui import WINDOW_GEOMETRY, WINDOW_TITLE
 from studyfrog.gui.logic.edit_view_logic import (
     on_cancel_button_click,
@@ -648,7 +648,7 @@ def _subscribe_to_events() -> None:
         {
             "event": DESTROY_EDIT_VIEW,
             "function": _on_destroy,
-            "namespace": GLOBAL,
+            "namespace": GLOBAL_NAMESPACE,
             "persistent": True,
             "priority": 100,
         }
